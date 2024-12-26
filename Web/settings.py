@@ -38,7 +38,7 @@ CSRF_TRUSTED_ORIGINS = [
     'http://www.as-avto.com',
 
 ]
-#gdgsgschvvscv
+
 
 # Application definition
 

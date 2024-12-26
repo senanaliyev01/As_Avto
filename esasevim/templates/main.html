@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avto Ehtiyat Hissələri</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="{% static 'img/favicon.png' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+
+</head>
+<body>
+   <div class="container">
+        <div id="welcomeCard" class="welcome-card">
+            Xoş gəlmisiniz!
+        </div>
+    </div>
+    <!-- Header Bölməsi -->
+    <header>
+        <div class="top-header">
+            <div class="logo">
+              <img src="{% static '/img/Header_Logo.png' %}" alt="Logo">
+                <span>As Avto</span>
+            </div>
+            <div class="header-right">
+                <a href="#"><i class="fas fa-user"></i> {{ user.username }}</a>
+
+
+            </div>
+            <div class="user">
+                <h3>Salam {{ user.username }}</h3>
+            </div>
+        </div>
+        <div class="working-hours">
+            <p>İş vaxtımız: 09:00 - 18:00</p>
+            <p class="current-time">Hazırki Saat: <span id="current-time"></span></p>
+        </div>
+    </header>
+
+    <!-- Naviqasiya Bölməsi -->
+    <div class="nav-bar">
+        <a href="{%url 'main' %}"><i class="fa-solid fa-house"></i> Əsas Səhifə</a>
+    <a href="{% url 'sifaris_izle' %}"><i class="fa-solid fa-truck-fast"></i> Sifarişlərim</a>
+     <a href="{% url 'products_list' %}"><i class="fas fa-cogs"></i> Məhsullar</a>
+    <a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> Məlumat</a>
+    </div>
+
+ <div class="slider-section">
+    <h2>Kateqoriyalar</h2>
+    <div class="slider" id="category-slider">
+        <div class="slide"><img src="{% static 'img/muherrik_yagi.webp' %}"><span>Mühərrik Yağı</span></div>
+        <div class="slide"><img src="{% static 'img/antifiriz.webp' %}"><span>Antifiriz</span></div>
+        <div class="slide"> <img src="{% static 'img/filterler_sekil.webp' %}"><span>Filter</span></div>
+         <div class="slide">  <img src="{% static 'img/potrubka.webp' %}"><span>Potrupka</span></div>
+         <div class="slide">  <img src="{% static 'img/remen_sekil.webp' %}"><span>Remen İç Və Çöl</span></div>
+         <div class="slide">  <img src="{% static 'img/alt_sekil.webp' %}"><span>Alt Hissə</span></div>
+    </div>
+</div>
+
+<div class="slider-section">
+    <h2>Marka</h2>
+    <div class="slider" id="brand-slider">
+        <div class="slide"><img src="{% static 'img/mercedes_logo.jpg' %}" alt="Marka 1"><span>Mercedes</span></div>
+        <div class="slide"><img src="{% static 'img/bmw_logo.jpg' %}" alt="Marka 2"><span>BMW</span></div>
+        <div class="slide"><img src="{% static 'img/opel_logo.jpg' %}" alt="Marka 3"><span>Opel</span></div>
+        <div class="slide"><img src="{% static 'img/chevrolet_logo.jpg' %}" alt="Marka 3"><span>Chevrolet</span></div>
+        <div class="slide"><img src="{% static 'img/hyundai_logo.jfif' %}" alt="Marka 3"><span>Hyundai</span></div>
+        <div class="slide"><img src="{% static 'img/kia_logo.webp' %}" alt="Marka 3"><span>Kia</span></div>
+        <div class="slide"><img src="{% static 'img/toyota_logo.jpg' %}" alt="Marka 3"><span>Toyota</span></div>
+        <div class="slide"><img src="{% static 'img/ford_logo.webp' %}" alt="Marka 3"><span>Ford</span></div>
+        <div class="slide"><img src="{% static 'img/nissan_logo.jpg' %}" alt="Marka 3"><span>Nissan</span></div>
+    </div>
+</div>
+
+  <div class="section partners-section">
+            <h2>Tərəfdaşlarımız</h2>
+            <div class="partner-slider">
+                <div class="partner-slider-items">
+                    <img src="{% static 'img/partner2.png' %}" alt="">
+                    <img src="{% static 'img/partner5.png' %}" alt="">
+                    <img src="{% static 'img/partner6.webp' %}" alt="">
+                    <img src="{% static 'img/partner7.svg' %}" alt="">
+                    <img src="{% static 'img/partner9.png' %}" alt="">
+                    <img src="{% static 'img/partner10.png' %}" alt="">
+                    <img src="{% static 'img/partner11.svg' %}" alt="">
+                    <img src="{% static 'img/blue-print-partner.png' %}" alt="">
+                    <img src="{% static 'img/febi-partner.png' %}" alt="">
+                    <img src="{% static 'img/BGA-Partner.png' %}" alt="">
+                    <img src="{% static 'img/ELRING-PARTNER.png' %}" alt="">
+                </div>
+            </div>
+        </div>
+<!--
+<div class="slider-section">
+    <h2>Yeni Gələn Məhsullar</h2>
+    <div class="product-section">
+        <div class="product"><img src="{% static 'img/product1.jpg' %}" alt="Məhsul 1"><span>Məhsul 1</span></div>
+        <div class="product"><img src="{% static 'img/product2.jpg' %}" alt="Məhsul 2"><span>Məhsul 2</span></div>
+        <div class="product"><img src="{% static 'img/product3.jpg' %}" alt="Məhsul 3"><span>Məhsul 3</span></div>
+    </div>
+</div>
+-->
+
+    <!-- Footer Bölməsi -->
+    <footer>
+        <div class="footer-left">
+           <img src="{% static '/img/Header_Logo.png' %}" alt="Logo">
+            <a href="{%url 'main' %}">As Avto</a>
+        </div>
+        <div class="footer-center">
+            <a href="tel:+994501234567"><i class="fa-solid fa-tty"></i>+994 12 123 45 67</a>
+            <a href="tel:+994501234567"><i class="fas fa-phone-alt"></i>+994 50 123 45 67</a>
+            <a href="mailto:email@example.com"><i class="fas fa-envelope"></i>email@example.com</a>
+            <a href="https://maps.app.goo.gl/fU5jUAg8veccL3Zq9"><i class="fa-solid fa-location-dot"></i>Binəqədi R. M.Rəsulzadə qəs. As-Avto</a>
+        </div>
+
+        <div class="footer-right">
+            <a href="https://wa.me/994501234567" target="_blank"><i class="fab fa-whatsapp"></i></a>
+            <a href="https://www.tiktok.com/@a_avto_service" target="_blank"><i class="fab fa-tiktok"></i></a>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

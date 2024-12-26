@@ -1,0 +1,325 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background: linear-gradient(to right, #e6f7ff, #cceeff);
+    color: #e0f7fa;
+    overflow-x: hidden;
+}
+
+/* Header */
+header {
+    background: linear-gradient(135deg, #00838f, #006064); /* Tünd aqua tonları */
+    color: white;
+    padding: 20px 20px 10px;
+    text-align: center;
+    position: relative;
+    z-index: 100;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.logo {
+    display: flex; /* Yan-yana düzülmə */
+    align-items: center; /* Şaquli mərkəzləşdirmə */
+}
+
+.logo img {
+    width: 100px;
+    margin-right: 10px; /* Loqo ilə yazı arasında boşluq */
+}
+
+.logo span {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+
+.header-right a {
+    color: #e0f7fa;
+    text-decoration: none;
+    margin-left: 20px;
+    font-size: 1.2rem;
+}
+
+.header-right a:hover {
+    color: #80cbc4;
+}
+
+.working-hours p {
+    margin: 5px 0;
+}
+
+.current-time {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+/* Səbət linki */
+.cart-link {
+    position: relative; /* Relativ mövqe təyin edilir */
+    text-decoration: none; /* Alt xətləri sil */
+    color: #333; /* Mətn rəngi */
+    font-size: 20px; /* Nişan ölçüsü */
+}
+
+/* Səbət miqdar göstəricisi */
+.cart-badge {
+    position: absolute; /* Səbət nişanının üstünə yerləşdirilir */
+    top: -10px; /* Yuxarıya məsafə */
+    right: -10px; /* Sağa məsafə */
+    background-color: red; /* Qırmızı fon */
+    color: white; /* Ağ mətn */
+    font-size: 12px; /* Şrift ölçüsü */
+    padding: 2px 6px; /* Boşluq */
+    border-radius: 50%; /* Tam dairə */
+    border: 2px solid white; /* Ağ kənar xətt */
+    font-weight: bold; /* Qalın mətn */
+    display: inline-block; /* Sıra içi blok */
+    min-width: 10px; /* Minimum eni */
+    text-align: center; /* Mətn ortalanır */
+}
+
+
+/* Position the user section in the bottom left corner */
+.user {
+    position: absolute;
+    bottom: 10px; /* Move user section near the bottom */
+    right: 10px;   /* Align user section to the left */
+    text-align: center;
+    z-index: 101; /* Ensure it appears above the background */
+}
+
+/* Additional styling for user section */
+.user h3 {
+    font-size: 1.2rem;
+    color: #e0f7fa;
+}
+
+/* Navigation Bar */
+.nav-bar {
+    display: flex;
+    justify-content: center;
+    background: linear-gradient(135deg, #00838f, #006064); /* Tünd aqua tonları */
+    padding: 15px 0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.nav-bar a {
+    color: white;
+    text-decoration: none;
+    margin: 0 20px;
+    font-size: 1.2rem;
+    position: relative;
+}
+
+.nav-bar a:hover {
+    color: #80cbc4;
+}
+
+.nav-bar a::after {
+    content: '';
+    display: block;
+    height: 2px;
+    background: #80cbc4;
+    width: 0;
+    transition: width 0.3s;
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+}
+
+.nav-bar a:hover::after {
+    width: 100%;
+}
+
+/* Search Bar */
+.search-bar {
+    text-align: center;
+    margin: 30px 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #00838f, #006064); /* Tünd aqua tonları */
+    border-radius: 15px;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.search-bar input, .search-bar select, .search-bar button {
+    padding: 15px;
+    margin: 10px;
+    border: none;
+    border-radius: 8px;
+    outline: none;
+    font-size: 1rem;
+}
+
+.search-bar input {
+    width: 300px;
+}
+
+.search-bar button {
+    background-color: #004d40;
+    color: white;
+    cursor: pointer;
+}
+
+.search-bar button:hover {
+    background-color: #00363a;
+}
+
+/* Footer */
+footer {
+    background: linear-gradient(135deg, #00838f, #006064); /* Tünd aqua tonları */
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.footer-left, .footer-center, .footer-right {
+    flex: 1;
+    text-align: center;
+    margin: 10px 0;
+}
+
+.footer-left img {
+    width: 100px;
+    margin-bottom: 10px;
+}
+
+.footer-left a {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #e0f7fa;
+    text-decoration: none;
+}
+
+.footer-left a:hover {
+    color: #80cbc4;
+}
+
+.footer-center a {
+    color: #e0f7fa;
+    text-decoration: none;
+    font-size: 1rem;
+    margin: 5px 0;
+    display: block;
+}
+
+.footer-center a:hover {
+    color: #80cbc4;
+}
+
+.footer-right a {
+    color: #e0f7fa;
+    margin: 0 10px;
+    font-size: 1.5rem;
+}
+
+.footer-right a:hover {
+    color: #80cbc4;
+}
+
+/* İkonlar */
+.footer-center a i {
+    margin-right: 8px;
+}
+
+.footer-right a i {
+    font-size: 1.8rem;
+}
+
+/* Məhsul Cədvəli */
+.products-table {
+    margin: 30px auto;
+    width: 80%;
+    background-color: #ffffff; /* Ağ fon */
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.products-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.products-table thead {
+    background: linear-gradient(135deg, #00838f, #006064); /* Tünd aqua tonları */
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.products-table th, .products-table td {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.products-table tr:last-child td {
+    border-bottom: none; /* Sonuncu sətirdə sərhəd xətti olmaması üçün */
+}
+
+.products-table td {
+    color: #333333;
+    font-size: 1.1rem;
+}
+
+/* Sebet ikonu */
+.products-table td .cart-icon {
+    display: inline-block;
+    background-color: #4caf50; /* Yaşıl rəng */
+    color: #ffffff;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    text-decoration: none;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Sebet ikonunun hover effekti */
+.products-table td .cart-icon:hover {
+    background-color: #388e3c; /* Tünd yaşıl hover */
+    transform: scale(1.1);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* Sebet ikonunun arxa fonunun dəyişməsi */
+.products-table td .cart-icon:before {
+    content: ''; /* Boş məzmun */
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    z-index: -1; /* Arxada qalacaq */
+    border-radius: 25px;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover vəziyyətində əlavə təsir */
+.products-table td .cart-icon:hover:before {
+    background-color: #2c6c32; /* Daha tünd yaşıl rəng */
+}
+
+
+
+
+
+
+
+

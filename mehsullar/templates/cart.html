@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Səbət</title>
+    <link rel="icon" href="{% static 'img/favicon.png' %}">
+    <link rel="stylesheet" href="{% static 'css/cart.css' %}">
+
+</head>
+<body>
+    <h1>Səbətiniz</h1>
+    <h1> <a href="{% url 'main'  %}">Əsas Səhifə</a></h1>
+    {% if sebet %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Məhsul Adı</th>
+                    <th>Kateqoriya</th>
+                    <th>Brend</th>
+                    <th>Marka</th>
+                    <th>Brend_Kod</th>
+                    <th>Oem_Kod</th>
+                    <th>Miqdar</th>
+                    <th>Qiymət</th>
+                    <th>Sil</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in sebet %}
+                   <tr>
+    <td>{{ item.mehsul.adi }}</td>
+    <td>{{ item.mehsul.kateqoriya.adi }}</td>
+    <td>{{ item.mehsul.brend.adi }}</td>
+    <td>{{ item.mehsul.marka.adi }}</td>
+    <td>{{ item.mehsul.brend_kod }}</td>
+    <td>{{ item.mehsul.oem_kod }}</td>
+  <td>
+    <div class="quantity-container">
+        <button class="decrease" data-id="{{ item.id }}">-</button>
+        <span class="quantity">{{ item.miqdar }}</span>
+        <button class="increase" data-id="{{ item.id }}">+</button>
+    </div>
+</td>
+    <td>{{ item.mehsul.qiymet }}</td>
+    <td>
+        <a href="{% url 'sebetden_sil' item.id %}">Sil</a>
+    </td>
+</tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div>
+            <h2>Cəmi Məbləğ: {{ cemi_mebleg|floatformat:2 }} AZN</h2>
+        </div>
+        <form action="{% url 'sifarisi_gonder' %}" method="post" onsubmit="confirmOrder(event)">
+            {% csrf_token %}
+            <button type="submit">Sifarişi Göndər</button>
+        </form>
+    {% else %}
+        <p>Səbətiniz boşdur.</p>
+    {% endif %}
+<script src="{% static 'js/cart.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+/* Ümumi stil */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7fc; /* Daha açıq və təravətli fon */
+    color: #333;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 40px;
+    color: #007bff; /* Başlıqda mavi rəng */
+}
+
+h3 {
+    text-align: right;
+    margin-right: 20px;
+    font-size: 18px;
+    color: #6c757d; /* Gözəl açıq boz rəng */
+}
+
+/* Statistika bölməsi */
+div.statistic {
+    background-color: #fff;
+    padding: 25px;
+    margin: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Daha incə və yumşaq kölgə */
+}
+
+.statistic h3 {
+    color: #007bff;
+    font-size: 22px;
+    margin-bottom: 15px;
+}
+
+p {
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+strong {
+    font-weight: bold;
+}
+
+/* Cədvəl stili */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    border-radius: 8px; /* Yuvarlaq künclər */
+    overflow: hidden;
+}
+
+table th,
+table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd; /* Cədvəl xəttini zəif göstərmək */
+    font-size: 16px;
+}
+
+table th {
+    background-color: #f8f9fa; /* Yüngül boz fon */
+    color: #007bff; /* Başlıqlara mavi rəng */
+}
+
+/* Statuslara uyğun rənglər */
+.status-gozleyir {
+    background-color: #f0f0f0; /* Açıq boz */
+    color: #333;
+}
+
+.status-hazirlanir {
+    background-color: #007bff; /* Mavi */
+    color: #fff;
+}
+
+.status-yoldadir {
+    background-color: #ffc107; /* Sarı */
+    color: #333;
+}
+
+.status-catdirildi {
+    background-color: #28a745; /* Yaşıl */
+    color: #fff;
+}
+
+/* Statistika rəngləri */
+.statistic .cem-mebleg {
+    color: #6c757d;
+}
+
+.statistic .odenilen-mebleg {
+    color: #007bff;
+}
+
+.statistic .qaliq-borc {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Rənglərə uyğun siniflər */
+.qaliq-borc-negativ {
+    color: #dc3545; /* Qırmızı */
+}
+
+.qaliq-borc-pozitiv {
+    color: #28a745; /* Yaşıl */
+}
+
+/* Şişmə effekti */
+table th:hover,
+table td:hover {
+    transform: scale(1.05); /* Şişmə effekti */
+
+    cursor: pointer;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+/* İkonlar əlavə edək */
+.status-gozleyir::before {
+    content: "\1F6AB"; /* Qadağan işarəsi */
+    font-size: 24px;
+    margin-right: 10px;
+}
+
+.status-hazirlanir::before {
+    content: "\1F6A8"; /* Əlavə işarəsi */
+    font-size: 24px;
+    margin-right: 10px;
+}
+
+.status-yoldadir::before {
+    content: "\1F4E6"; /* Göndərmə işarəsi */
+    font-size: 24px;
+    margin-right: 10px;
+}
+
+.status-catdirildi::before {
+    content: "\2714"; /* Yoxlanmış işarəsi */
+    font-size: 24px;
+    margin-right: 10px;
+}
+
+/* Statistika bölməsinə ikona əlavə edək */
+.statistic p::before {
+    content: "\1F4C8"; /* Qrafik işarəsi */
+    font-size: 20px;
+    margin-right: 8px;
+}
+
+.statistic .cem-mebleg::before {
+    content: "\1F4B0"; /* Pul işarəsi */
+    font-size: 20px;
+}
+
+.statistic .odenilen-mebleg::before {
+    content: "\1F4B8"; /* Pul kisəsi */
+    font-size: 20px;
+}
+
+.statistic .qaliq-borc::before {
+    content: "\1F4B5"; /* Borc işarəsi */
+    font-size: 20px;
+}
+
+/* Link hover effekti */
+a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}

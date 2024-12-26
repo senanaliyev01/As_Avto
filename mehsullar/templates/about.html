@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Əlaqə-Məlumat</title>
+    <link rel="icon" href="{% static 'img/favicon.png' %}">
+    <link rel="stylesheet" href="{% static 'css/about.css' %}">
+</head>
+<body>
+    <a href="{% url 'main' %}">Əsas Səhifə</a>
+    <div class="container">
+        <div class="header">
+            <h1>Satış Müdürü</h1>
+        </div>
+        <div class="main-card">
+             <img src="{% static '/img/senan_satis_muduru.jpg' %}" alt="Satış Müdürü">
+            <h2>Sənan Əliyev</h2>
+            <p>Peşə: Satış Müdürü </p>
+            <p>Telefon: <a href="tel:+994773059585">+994 77 305 95 85</a></p>
+        </div>
+
+        <div class="header">
+            <h1>İşçilər</h1>
+        </div>
+        <div class="card-grid">
+            <div class="card">
+                <img src="{% static '/img/aydin_profil.enc' %}" alt="Usta şəkli">
+                <div class="card-content">
+                    <h3>Aydın Əliyev</h3>
+                    <p>Peşə: Sürücü</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <img src="{% static '/img/Header_Logo.png' %}" alt="Logo">
+            <p>Email: <a href="mailto:info@as-avto.com">info@as-avto.com</a></p>
+            <p>Əlaqə Nömrəsi: <a href="tel:+994773059585">+994773059585</a></p>
+            <p>Ünvan: <a href="https://maps.app.goo.gl/fU5jUAg8veccL3Zq9">Binəqədi Rayonu Məmmədəmin Rəsulzadə Qəsəbəsi-A Avto</a></p>
+        </div>
+    </div>
+</body>
+</html>

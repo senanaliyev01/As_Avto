@@ -1,0 +1,328 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background: linear-gradient(to right, #4f95b3, #b0e3fd);
+    color: #e0f7fa;
+    overflow-x: hidden;
+}
+
+/* Header */
+header {
+    background: linear-gradient(135deg, #00838f, #006064); /* Tünd aqua tonları */
+    color: white;
+    padding: 20px 20px 10px;
+    text-align: center;
+    position: relative;
+    z-index: 100;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.logo {
+    display: flex; /* Yan-yana düzülmə */
+    align-items: center; /* Şaquli mərkəzləşdirmə */
+}
+
+.logo img {
+    width: 100px;
+    margin-right: 10px; /* Loqo ilə yazı arasında boşluq */
+}
+
+.logo span {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+
+.header-right a {
+    color: #e0f7fa;
+    text-decoration: none;
+    margin-left: 20px;
+    font-size: 1.2rem;
+}
+
+.header-right a:hover {
+    color: #80cbc4;
+}
+
+.working-hours p {
+    margin: 5px 0;
+}
+
+.current-time {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+/* Position the user section in the bottom left corner */
+.user {
+    position: absolute;
+    bottom: 10px; /* Move user section near the bottom */
+    right: 10px;   /* Align user section to the left */
+    text-align: center;
+    z-index: 101; /* Ensure it appears above the background */
+}
+
+/* Additional styling for user section */
+.user h3 {
+    font-size: 1.2rem;
+    color: #e0f7fa;
+}
+
+/* Navigation Bar */
+.nav-bar {
+    display: flex;
+    justify-content: center;
+    background: linear-gradient(135deg, #00838f, #006064); /* Tünd aqua tonları */
+    padding: 15px 0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.nav-bar a {
+    color: white;
+    text-decoration: none;
+    margin: 0 20px;
+    font-size: 1.2rem;
+    position: relative;
+}
+
+.nav-bar a:hover {
+    color: #80cbc4;
+}
+
+.nav-bar a::after {
+    content: '';
+    display: block;
+    height: 2px;
+    background: #80cbc4;
+    width: 0;
+    transition: width 0.3s;
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+}
+
+.nav-bar a:hover::after {
+    width: 100%;
+}
+
+.slider-section {
+    margin: 30px 0;
+    text-align: center;
+}
+
+.slider {
+    display: flex;
+    overflow-x: hidden;
+     scroll-behavior: smooth;
+    gap: 15px;
+    padding: 20px;
+}
+
+.slider .slide {
+    position: relative;
+    min-width: 200px;
+    height: 150px;
+}
+
+.slider .slide img {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.slider .slide span {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.product-section {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.product {
+    position: relative;
+    width: 200px;
+    height: 200px;
+}
+
+.product img {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.product span {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+
+/* Footer */
+footer {
+    background: linear-gradient(135deg, #00838f, #006064); /* Tünd aqua tonları */
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.footer-left, .footer-center, .footer-right {
+    flex: 1;
+    text-align: center;
+    margin: 10px 0;
+}
+
+.footer-left img {
+    width: 100px;
+    margin-bottom: 10px;
+}
+
+.footer-left a {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #e0f7fa;
+    text-decoration: none;
+}
+
+.footer-left a:hover {
+    color: #80cbc4;
+}
+
+.footer-center a {
+    color: #e0f7fa;
+    text-decoration: none;
+    font-size: 1rem;
+    margin: 5px 0;
+    display: block;
+}
+
+.footer-center a:hover {
+    color: #80cbc4;
+}
+
+.footer-right a {
+    color: #e0f7fa;
+    margin: 0 10px;
+    font-size: 1.5rem;
+}
+
+.footer-right a:hover {
+    color: #80cbc4;
+}
+
+/* İkonlar */
+.footer-center a i {
+    margin-right: 8px;
+}
+
+.footer-right a i {
+    font-size: 1.8rem;
+}
+
+
+.partner-slider {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    max-width: 100%;
+    overflow: hidden;
+
+    border-radius: 16px;
+    backdrop-filter: blur(7.4px);
+    -webkit-backdrop-filter: blur(7.4px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.partner-slider-items {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.partner-slider-items img {
+    width: 150px; /* Slider ilə uyumlu ölçü */
+    height: auto; /* Şəkillərin orijinal nisbətini qoruyacaq */
+}
+
+.partners-section {
+    display: grid;
+    place-items: center;
+    width: 100%; /* Ekran ölçüsünə uyğunlaşdırmaq üçün */
+}
+
+#welcomeCard {
+    display: none;
+    background-color: green;
+    color: white;
+    padding: 40px;
+    border-radius: 10px;
+    position: fixed;
+    top: 20%;
+    right: -100%; /* Başlangıçda sağdan gizli */
+    z-index: 1000;
+    transform: translateY(-50%);
+    font-size: 24px;
+    animation: slideIn 10s ease-in-out forwards, waveEffect 2s infinite;
+}
+
+/* Sağdan sola doğru hərəkət animasiyası */
+@keyframes slideIn {
+    0% {
+        right: -100%;
+    }
+    50% {
+        right: 10%;
+    }
+    100% {
+        right: -100%;
+    }
+}
+
+/* Dalgalanma effektini əlavə edirik */
+@keyframes waveEffect {
+    0%, 100% {
+        transform: translateY(-50%) rotate(0deg);
+    }
+    25% {
+        transform: translateY(-60%) rotate(-3deg);
+    }
+    50% {
+        transform: translateY(-50%) rotate(3deg);
+    }
+    75% {
+        transform: translateY(-40%) rotate(-3deg);
+    }
+}

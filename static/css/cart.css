@@ -1,0 +1,147 @@
+/* Bütün səhifə üçün ümumi stillər */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2 {
+    text-align: center;
+    color: #333;
+}
+
+a {
+    color: #007BFF;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+#main-page-link {
+    font-size: 18px;
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    text-align: center;
+    width: 200px;
+    margin-top: 20px;
+}
+
+#main-page-link:hover {
+    background-color: #007BFF;
+    color: #fff;
+}
+
+/* Cədvəl stili */
+table {
+    width: 80%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+    padding: 12px 20px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #007BFF;
+    color: #fff;
+}
+
+td {
+    background-color: #f9f9f9;
+}
+
+tr:hover td {
+    background-color: #f1f1f1;
+}
+
+/* Sil düyməsi üçün xüsusi stil */
+td a {
+    display: inline-block;
+    background-color: #dc3545;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    text-align: center;
+}
+
+td a:hover {
+    background-color: #c82333;
+}
+
+/* Səbət boş olduqda mesaj üçün */
+p {
+    text-align: center;
+    font-size: 18px;
+    color: #999;
+}
+
+div {
+    text-align: center;
+    margin-top: 20px;
+}
+
+h2 {
+    color: #333;
+    font-size: 20px;
+}
+
+button {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    display: block;
+    margin: 20px auto;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+/* Düymələrin ümumi üslubu */
+button.increase, button.decrease {
+    padding: 2px 6px; /* Kiçik ölçülü düymələr */
+    margin: 0 2px; /* Az məsafə */
+    background-color: #007bff; /* Mavi fon */
+    color: white; /* Ağ mətn */
+    border: none; /* Kənar xətt yoxdur */
+    border-radius: 3px; /* Yuvarlaq künclər */
+    cursor: pointer; /* İşarə dəyişimi */
+    font-size: 12px; /* Kiçik şrift */
+}
+
+/* Hover vəziyyəti */
+button.increase:hover, button.decrease:hover {
+    background-color: #0056b3; /* Daha tünd mavi */
+}
+
+/* Miqdar bölməsi */
+td .quantity-container {
+    display: flex; /* Sıra içi üslub */
+    align-items: center; /* Ortalanma */
+    justify-content: center; /* Ortalanma */
+}
+
+/* Miqdar sayı */
+td .quantity {
+    padding: 0 10px; /* Mətn üçün boşluq */
+    font-size: 14px; /* Şrift ölçüsü */
+}

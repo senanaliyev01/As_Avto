@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <title>Sifariş İzlə</title>
+    <link rel="icon" href="{% static 'img/favicon.png' %}">
+    <link rel="stylesheet" href="{% static 'css/sifaris_izleme.css' %}">
+</head>
+<body>
+    <h3><a href="{% url 'main' %}">Əsas Səhifə</a></h3>
+    <h1>Sifarişlərim</h1>
+
+    <div class="statistic">
+        <h3>Ümumi Statistika</h3>
+        <p class="cem-mebleg"><strong>Cəmi Məbləğ:</strong> {{ toplam_mebleg }} AZN</p>
+        <p class="odenilen-mebleg"><strong>Ödənilən Məbləğ:</strong> {{ odenilen_mebleg }} AZN</p>
+
+        <!-- Qalıq Borc Bölməsi -->
+        <p class="qaliq-borc {% if qaliq_borc < 0 %}qaliq-borc-pozitiv{% else %}qaliq-borc-negativ{% endif %}">
+            <strong>Qalıq Borc:</strong> {{ qaliq_borc }} AZN
+        </p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Təsvir</th>
+                <th>ID</th>
+                <th>Tarix</th>
+                <th>Cəmi Məbləğ</th>
+                <th>Ödənilən Məbləğ</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sifaris in sifarisler %}
+            <tr class="status-{{ sifaris.status }}">
+                <td>{{ sifaris.id }}</td>
+                <td>{{ sifaris.tarix }}</td>
+                <td>{{ sifaris.cemi_mebleg }} AZN</td>
+                <td>{{ sifaris.odenilen_mebleg }} AZN</td>
+                <td>{{ sifaris.display_status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>

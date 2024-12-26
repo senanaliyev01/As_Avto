@@ -1,0 +1,200 @@
+
+
+<!DOCTYPE html>
+{% load static %}
+<html lang="az">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AS AVTO</title>
+    <link rel="stylesheet" href="{% static 'css/anaevim.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css"
+        integrity="sha512-5Hs3dF2AEPkpNAR7UiOHba+lRSJNeM2ECkwxUIxC1Q/FLycGTbNapWXB4tP889k5T5Ju8fs4b1P5z/iB4nMfSQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="icon" href="{% static 'img/favicon.png' %}">
+</head>
+
+<body>
+    <header>
+        <a class="logo" href="{% url 'anaevim' %}">
+            <img src="{% static '/img/Header_Logo.png' %}" alt="Logo">
+            <h1>As Avto</h1>
+        </a>
+
+        <nav class="navbar">
+            <ul class="navbar_link">
+                <li class="navbar_links"><a href="{% url 'login' %}">B4B Giriş</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="container">
+        <div class="slider-container">
+            <div class="slider">
+                <div class="slide">
+                    <img src="{% static 'img/muherrik_yagi.webp' %}">
+                </div>
+                <div class="slide">
+                    <img src="{% static 'img/antifiriz.webp' %}">
+                </div>
+                <div class="slide">
+                    <img src="{% static 'img/filterler_sekil.webp' %}">
+                </div>
+                <div class="slide">
+                    <img src="{% static 'img/potrubka.webp' %}">
+                </div>
+                <div class="slide">
+                    <img src="{% static 'img/remen_sekil.webp' %}">
+                </div>
+                <div class="slide">
+                    <img src="{% static 'img/alt_sekil.webp' %}">
+                </div>
+            </div>
+            <button class="prev">&#10094;</button>
+            <button class="next">&#10095;</button>
+        </div>
+
+        <div class="section">
+            <h2>Haqqımızda</h2>
+            <div class="cards">
+                <div class="card info-card">
+                    <div class="card-body">
+                        <div class="card-title" style="border: none !important">Biz Kimik?</div>
+                        <div class="card-description" style="line-height: 2;">
+                            <p>Biz avtomobil sahəsində etibarlı tərəfdaşınız olaraq müştərilərimizə ən yaxşı xidmətləri
+                                təqdim etməyə sadiqik. Məqsədimiz:</p>
+                            <ul>
+                                <li>Ən yüksək keyfiyyətli avtomobil ehtiyat hissələrini təqdim etmək,</li>
+                                <li>Peşəkar avtomobil təmiri və texniki xidmət göstərmək,</li>
+                                <li>Avtomobil baxımı və ehtiyat hissələri ilə bağlı etibarlı məsləhətlər vermək,</li>
+                                <li>Müştəri məmnuniyyətini hər zaman ön planda tutmaq.</li>
+                            </ul>
+                            <p>Keyfiyyət, etibarlılıq və sürət bizim əsas dəyərlərimizdir. Sizin avtomobiliniz bizim
+                                üçün əhəmiyyətlidir!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section partners-section">
+            <h2>Tərəfdaşlarımız</h2>
+            <div class="partner-slider">
+                <div class="partner-slider-items">
+                    <img src="{% static 'img/partner1.jpg' %}" alt="">
+                    <img src="{% static 'img/partner2.png' %}" alt="">
+                    <img src="{% static 'img/partner3.jpeg' %}" alt="">
+                    <img src="{% static 'img/partner4.png' %}" alt="">
+                    <img src="{% static 'img/partner5.png' %}" alt="">
+                    <img src="{% static 'img/partner6.webp' %}" alt="">
+                    <img src="{% static 'img/partner7.svg' %}" alt="">
+                    <img src="{% static 'img/partner8.png' %}" alt="">
+                    <img src="{% static 'img/partner9.png' %}" alt="">
+                    <img src="{% static 'img/partner10.png' %}" alt="">
+                    <img src="{% static 'img/partner11.svg' %}" alt="">
+                    <img src="{% static 'img/blue-print-partner.png' %}" alt="">
+                    <img src="{% static 'img/febi-partner.png' %}" alt="">
+                    <img src="{% static 'img/BGA-Partner.png' %}" alt="">
+                    <img src="{% static 'img/ELRING-PARTNER.png' %}" alt="">
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Xİdmətlər</h2>
+            <div class="cards">
+                <div class="card">
+                    <img src="{% static 'img/avtoservice.jpg' %}" alt="Xidmət 1">
+                    <div class="card-body">
+                        <div class="card-title">Avto Service Xidməti </div>
+                        <div class="card-description">Avtomobil ehtiyat hissələrinin satışı və təmiri üzrə peşəkar
+                            xidmətlər təqdim edirik. Yüksək keyfiyyətli ehtiyat hissələri və təcrübəli ustalarımızla
+                            avtomobilinizin ehtiyaclarını qarşılayırıq. Müasir avadanlıqlarla həyata keçirilən
+                            xidmətlərimizə mühərrik, transmissiya, süspansiyon və əyləc sistemləri üzrə təmir
+                            daxildir.
+                            Məqsədimiz müştərilərimizin məmnuniyyətini təmin etməkdir. Bizimlə əlaqə saxlayın və
+                            avtomobiliniz üçün ən yaxşı xidməti əldə edin.</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="{% static 'img/operator.webp' %}" alt="Xidmət 2">
+                    <div class="card-body">
+                        <div class="card-title">Operator Xidməti</div>
+                        <div class="card-description">Müştərilərimizin hər zaman yanında olmaq üçün peşəkar operator
+                            xidmətimiz fəaliyyət göstərir. Operatorlarımız, məhsullarımızla bağlı hər cür
+                            suallarınıza
+                            cavab verməyə, ehtiyac duyduğunuz texniki dəstəyi göstərməyə hazırdır. Əlavə olaraq,
+                            məhsullar haqqında ətraflı məlumat, istifadə təlimatları və alış prosesi ilə bağlı
+                            suallarınızı da operativ şəkildə cavablandırırıq. Məqsədimiz, hər bir müştərimizə fərdi
+                            yanaşma ilə yüksək keyfiyyətli xidmət təklif etməkdir.</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="{% static 'img/catdirilma.jpg' %}" alt="Xidmət 3">
+                    <div class="card-body">
+                        <div class="card-title">Çatdırılma Xidməti</div>
+                        <div class="card-description">Biz müştərilərimizin rahatlığını nəzərə alaraq iki növ
+                            çatdırılma
+                            xidməti təklif edirik. Filialdan götürmə: Müştərilər sifarişlərini filialımızdan özləri
+                            götürə bilərlər. Pulsuz çatdırılma: 30 manatdan yuxarı sifarişlər üçün çatdırılma bir iş
+                            günü ərzində həyata keçirilir. 30 manatdan aşağı sifarişlər isə 3 iş günü ərzində
+                            müştərinin
+                            ünvanına çatdırılır. Çatdırılma xidməti sürətli və etibarlıdır, müştərilərimizə rahatlıq
+                            və
+                            dəstək təmin edir. Bizim məqsədimiz müştərilərimizin sifarişlərini zamanında və
+                            təhlükəsiz
+                            bir şəkildə çatdırmaqdır.
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Necə Bİzİm Müştərİmİz Ola Bİlərsİnİz?</h2>
+            <div class="cards">
+                <div class="card t-card" >
+                    <img src="{% static 'img/musteri.jpg' %}" alt="Müştəri">
+                    <div class="card-body">
+                        <div class="card-title" style="border: none !important">Müştəri Olun</div>
+                        <div class="card-description">Bizimlə əməkdaşlıq etmək çox asandır! Əlaqə saxlayın və
+                            peşəkar xidmətlərimizdən dərhal faydalanmağa başlayın.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <footer>
+        <div class="footer-container">
+            <a class="footer-logo">
+                <img src="{% static 'img/Header_Logo.png' %}" alt="Şirkət Loqosu" />
+                <h1>As Avto </h1>
+            </a>
+            <div class="footer-info">
+                <h3>BİZİMLƏ ƏLAQƏ</h3>
+                <p><i class="fas fa-envelope"></i> Email: <a href="mailto:info@as-avto.com"
+                        class="contact-item">info@as-avto.com</a></p>
+                <p><i class="fas fa-phone-alt"></i> Əlaqə Nömrəsi: <a href="tel:+994773059585"
+                        class="contact-item">+994773059585</a></p>
+
+                <p><i class="fas fa-home"></i> Ünvan: <a href="https://maps.app.goo.gl/fU5jUAg8veccL3Zq9">Binəqədi Rayonu Məmmədəmin Rəsulzadə Qəsəbəsi-A Avto</a></p>
+            </div>
+            <div class="footer-social">
+                <h3>Sosial Media</h3>
+                <a href="https://www.tiktok.com/@a_avto_service" target="_blank"><i class="fab fa-tiktok"></i>
+                    TikTok</a>
+                <a href="" target="_blank"><i class="fab fa-whatsapp"></i>
+                    WhatsApp</a>
+            </div>
+        </div>
+        <div class="footer-copy">
+            <p>&copy; 2024 As Avto. Bütün hüquqlar qorunur.</p>
+        </div>
+    </footer>
+    <script src="{% static 'js/anaevim.js' %}"></script>
+
+</body>
+
+</html>

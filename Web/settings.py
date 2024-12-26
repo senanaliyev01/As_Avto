@@ -31,6 +31,13 @@ DEBUG = os.environ.get('DEBUG')
 
 ALLOWED_HOSTS = ['188.245.112.154','localost','127.0.0.1','0.0.0.0', 'as-avto.com', 'www.as-avto.com']
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://as-avto.com',
+    'https://www.as-avto.com',
+    'http://as-avto.com',
+    'http://www.as-avto.com'
+]
+
 
 # Application definition
 

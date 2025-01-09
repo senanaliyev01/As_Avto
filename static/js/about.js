@@ -1,139 +1,95 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Enhanced Scroll Animations
+// Səhifə yüklənəndə animasiyaları başlat
+document.addEventListener('DOMContentLoaded', () => {
+    // Scroll animasiyaları
     const animateOnScroll = () => {
-        const elements = document.querySelectorAll('.animate-on-scroll');
+        const elements = document.querySelectorAll('.manager-card, .delivery-card, .location-container');
         
         elements.forEach(element => {
-            const elementPosition = element.getBoundingClientRect().top;
-            const screenPosition = window.innerHeight;
+            const elementTop = element.getBoundingClientRect().top;
+            const elementBottom = element.getBoundingClientRect().bottom;
             
-            if(elementPosition < screenPosition) {
-                element.classList.add('animate');
+            if (elementTop < window.innerHeight && elementBottom > 0) {
+                element.style.opacity = '1';
+                element.style.transform = 'translateY(0)';
             }
         });
     };
 
-    // Enhanced Navbar Interaction
+    // Elementlərə başlanğıc stilləri əlavə et
+    const elements = document.querySelectorAll('.manager-card, .delivery-card, .location-container');
+    elements.forEach(element => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(50px)';
+        element.style.transition = 'all 0.6s ease-out';
+    });
+
+    // Scroll hadisəsini izlə
+    window.addEventListener('scroll', animateOnScroll);
+    animateOnScroll(); // İlk yükləmədə də yoxla
+
+    // Navbar scroll effekti
+    let prevScrollPos = window.pageYOffset;
     const navbar = document.querySelector('.navbar');
-    let lastScroll = 0;
-    let isNavbarVisible = true;
 
-    const handleNavbarVisibility = () => {
-        const currentScroll = window.pageYOffset;
-        
-        if (currentScroll <= 0) {
-            navbar.style.transform = 'translateY(0)';
-            navbar.style.backgroundColor = 'rgba(10, 25, 47, 0.95)';
-            return;
-        }
-        
-        if (currentScroll > lastScroll && isNavbarVisible) {
-            navbar.style.transform = 'translateY(-100%)';
-            isNavbarVisible = false;
-        } else if (currentScroll < lastScroll && !isNavbarVisible) {
-            navbar.style.transform = 'translateY(0)';
-            navbar.style.backgroundColor = 'rgba(10, 25, 47, 0.98)';
-            isNavbarVisible = true;
-        }
-        
-        lastScroll = currentScroll;
-    };
-
-    // Parallax Effect for Hero Section
-    const heroSection = document.querySelector('.hero-section');
-    const parallaxEffect = () => {
-        const scroll = window.pageYOffset;
-        heroSection.style.backgroundPositionY = `${scroll * 0.5}px`;
-    };
-
-    // Enhanced Card Animations
-    const cards = document.querySelectorAll('.delivery-card');
-    cards.forEach((card, index) => {
-        card.style.animationDelay = `${index * 0.2}s`;
-        
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            
-            const rotateX = (y - centerY) / 20;
-            const rotateY = (centerX - x) / 20;
-            
-            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-        });
-        
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
-        });
-    });
-
-    // Enhanced Contact Information Interaction
-    const contactElements = document.querySelectorAll('.manager-info a, .footer-contact a');
-    contactElements.forEach(element => {
-        element.addEventListener('click', function(e) {
-            if (this.href.startsWith('tel:') || this.href.startsWith('mailto:')) {
-                e.preventDefault();
-                const text = this.href.includes('tel:') ? 
-                    this.href.replace('tel:', '') : 
-                    this.href.replace('mailto:', '');
-                
-                navigator.clipboard.writeText(text)
-                    .then(() => showNotification('Məlumat kopyalandı!', 'success'))
-                    .catch(() => showNotification('Kopyalama xətası!', 'error'));
-            }
-        });
-    });
-
-    // Enhanced Notification System
-    const showNotification = (message, type = 'success') => {
-        const notification = document.getElementById('notification');
-        notification.textContent = message;
-        notification.className = `notification ${type} show`;
-        
-        // Add animation
-        notification.style.animation = 'slideIn 0.5s ease-out forwards';
-        
-        setTimeout(() => {
-            notification.style.animation = 'slideOut 0.5s ease-in forwards';
-            setTimeout(() => {
-                notification.className = 'notification';
-            }, 500);
-        }, 3000);
-    };
-
-    // Lazy Loading for Map
-    const mapContainer = document.querySelector('.map-container');
-    const lazyLoadMap = (entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const iframe = entry.target.querySelector('iframe');
-                if (iframe && !iframe.src) {
-                    iframe.src = iframe.dataset.src;
-                    observer.unobserve(entry.target);
-                }
-            }
-        });
-    };
-
-    const mapObserver = new IntersectionObserver(lazyLoadMap, {
-        threshold: 0.1,
-        rootMargin: '50px'
-    });
-
-    if (mapContainer) {
-        mapObserver.observe(mapContainer);
-    }
-
-    // Event Listeners
     window.addEventListener('scroll', () => {
-        handleNavbarVisibility();
-        animateOnScroll();
-        parallaxEffect();
+        const currentScrollPos = window.pageYOffset;
+        
+        if (prevScrollPos > currentScrollPos) {
+            navbar.style.top = '0';
+        } else {
+            navbar.style.top = '-100px';
+        }
+        
+        if (currentScrollPos > 100) {
+            navbar.style.backgroundColor = 'rgba(23, 42, 69, 0.95)';
+            navbar.style.backdropFilter = 'blur(8px)';
+        } else {
+            navbar.style.backgroundColor = 'var(--secondary-color)';
+            navbar.style.backdropFilter = 'none';
+        }
+        
+        prevScrollPos = currentScrollPos;
     });
 
-    // Initial calls
-    animateOnScroll();
+    // Telefon nömrəsini kopyalama funksiyası
+    const phoneNumber = document.querySelector('a[href^="tel:"]');
+    phoneNumber.addEventListener('click', (e) => {
+        e.preventDefault();
+        const number = phoneNumber.href.replace('tel:', '');
+        navigator.clipboard.writeText(number).then(() => {
+            showNotification('Telefon nömrəsi kopyalandı!');
+        });
+    });
+
+    // Email ünvanını kopyalama funksiyası
+    const email = document.querySelector('a[href^="mailto:"]');
+    email.addEventListener('click', (e) => {
+        e.preventDefault();
+        const emailAddress = email.href.replace('mailto:', '');
+        navigator.clipboard.writeText(emailAddress).then(() => {
+            showNotification('Email ünvanı kopyalandı!');
+        });
+    });
+});
+
+// Bildiriş göstərmə funksiyası
+function showNotification(message) {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.style.display = 'block';
+    
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 3000);
+}
+
+// Xəritə yükləmə optimizasiyası
+const mapIframe = document.querySelector('.map-container iframe');
+if (mapIframe) {
+    mapIframe.setAttribute('loading', 'lazy');
+}
+
+// Şəkillərin lazy loading
+document.querySelectorAll('img').forEach(img => {
+    img.setAttribute('loading', 'lazy');
 });

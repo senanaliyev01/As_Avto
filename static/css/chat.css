@@ -1,0 +1,465 @@
+/* Chat Container */
+.chat-container {
+    display: flex;
+    height: 100vh;
+    background: #f0f2f5;
+}
+
+/* Sol Panel - İstifadəçilər */
+.users-panel {
+    width: 300px;
+    background: white;
+    border-right: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-header {
+    padding: 20px;
+    background: linear-gradient(135deg, #1e3a8a, #1e40af);
+    color: white;
+}
+
+.panel-header h2 {
+    margin: 0 0 15px 0;
+    font-size: 1.2rem;
+}
+
+.user-stats {
+    display: flex;
+    gap: 15px;
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+    background: rgba(255,255,255,0.1);
+    padding: 5px 10px;
+    border-radius: 20px;
+}
+
+.user-group {
+    padding: 20px;
+}
+
+.user-group h3 {
+    margin: 0 0 15px 0;
+    color: #666;
+    font-size: 1rem;
+}
+
+.user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.user-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    transition: all 0.3s;
+}
+
+.user-item:hover {
+    background: #f8f9fa;
+}
+
+.user-item img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.username {
+    font-weight: 500;
+    color: #333;
+}
+
+.status {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.user-item.online .status {
+    color: #10B981;
+}
+
+.back-button {
+    margin-top: auto;
+    padding: 15px 20px;
+    background: #f8f9fa;
+    color: #666;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s;
+}
+
+.back-button:hover {
+    background: #e9ecef;
+    color: #333;
+}
+
+/* Sağ Panel - Mesajlaşma */
+.chat-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-header {
+    padding: 20px;
+    background: white;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+.chat-info {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.message {
+    max-width: 70%;
+    margin: 8px;
+    clear: both;
+}
+
+.message.sent {
+    float: right;
+}
+
+.message.received {
+    float: left;
+}
+
+.message-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.message-info img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.sender-name {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.admin-badge {
+    background: #ef4444;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+}
+
+.message-content {
+    padding: 12px;
+    border-radius: 15px;
+    background: white;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.message.sent .message-content {
+    background: #1e3a8a;
+    color: white;
+}
+
+.time {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 4px;
+    display: block;
+}
+
+.message.sent .time {
+    color: rgba(255,255,255,0.8);
+}
+
+.message-image {
+    max-width: 300px;
+    border-radius: 10px;
+    margin-top: 5px;
+}
+
+.message-video {
+    max-width: 300px;
+    border-radius: 10px;
+    margin-top: 5px;
+}
+
+.message-audio {
+    width: 250px;
+    margin-top: 5px;
+}
+
+.chat-input {
+    padding: 15px;
+    background: white;
+    border-top: 1px solid #e0e0e0;
+}
+
+.input-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.message-input-container {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: #f0f2f5;
+    border-radius: 24px;
+    padding: 8px 16px;
+}
+
+#messageInput {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 1rem;
+    padding: 8px 0;
+    min-height: 24px;
+    max-height: 100px;
+    resize: none;
+    outline: none;
+}
+
+.input-icons {
+    display: flex;
+    gap: 8px;
+}
+
+.emoji-btn {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    transition: all 0.3s;
+}
+
+.emoji-btn:hover {
+    background: rgba(0,0,0,0.1);
+    color: #333;
+}
+
+.audio-btn, .send-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.audio-btn {
+    background: #f0f2f5;
+    color: #1e3a8a;
+}
+
+.audio-btn:hover {
+    background: #e4e6eb;
+}
+
+.send-btn {
+    background: #1e3a8a;
+    color: white;
+}
+
+.send-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Səs yazma animasiyası */
+.recording-indicator {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .chat-container {
+        flex-direction: column;
+    }
+    
+    .users-panel {
+        width: 100%;
+        height: 300px;
+    }
+    
+    .chat-panel {
+        height: calc(100vh - 300px);
+    }
+} 
+
+/* Video önizləmə */
+.video-preview-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.9);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.video-preview-container video {
+    max-width: 90%;
+    max-height: 80vh;
+    border-radius: 10px;
+}
+
+.video-controls {
+    position: absolute;
+    bottom: 40px;
+    display: flex;
+    gap: 20px;
+}
+
+.video-controls button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.video-controls button:hover {
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.1);
+}
+
+.stop-video {
+    background: #ef4444 !important;
+}
+
+.cancel-video {
+    background: #666 !important;
+}
+
+/* Bildiriş */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 10px;
+    color: white;
+    z-index: 1001;
+    animation: slideIn 0.3s ease-out;
+}
+
+.notification.error {
+    background: #ef4444;
+}
+
+.notification.info {
+    background: #3b82f6;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+} 
+
+/* Audio player */
+audio {
+    max-width: 250px;
+    margin-top: 4px;
+}
+
+/* Input hissəsi */
+.input-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 12px;
+    background: white;
+    border-top: 1px solid #eee;
+}
+
+#messageInput {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #eee;
+    border-radius: 20px;
+    outline: none;
+}
+
+.send-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: #1e3a8a;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.send-btn:hover {
+    transform: scale(1.1);
+} 

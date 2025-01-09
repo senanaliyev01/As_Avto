@@ -1,0 +1,108 @@
+.snowflake {
+    position: fixed;
+    top: -10px;
+    z-index: 9999;
+    user-select: none;
+    pointer-events: none;
+    cursor: default;
+    animation-name: snowflakes-fall, snowflakes-shake;
+    animation-duration: 10s, 3s;
+    animation-timing-function: linear, ease-in-out;
+    animation-iteration-count: infinite, infinite;
+    animation-play-state: running, running;
+    will-change: transform;
+    color: #fff;
+    text-shadow: 0 0 2px rgba(0,0,0,0.1);
+}
+
+@keyframes snowflakes-fall {
+    0% {
+        top: -10%
+    }
+    100% {
+        top: 100%
+    }
+}
+
+@keyframes snowflakes-shake {
+    0%, 100% {
+        transform: translateX(0)
+    }
+    50% {
+        transform: translateX(80px)
+    }
+}
+
+@media (max-width: 768px) {
+    .snowflake {
+        animation-duration: 8s, 2s;
+    }
+    
+    @keyframes snowflakes-shake {
+        0%, 100% {
+            transform: translateX(0)
+        }
+        50% {
+            transform: translateX(40px)
+        }
+    }
+}
+
+.snowflake:hover {
+    opacity: 0.8;
+    transform: scale(1.2);
+    transition: all 0.3s ease;
+}
+
+@keyframes snowflake-glow {
+    0%, 100% {
+        filter: blur(0.2px) brightness(1);
+        transform: scale(1);
+    }
+    50% {
+        filter: blur(0px) brightness(1.2);
+        transform: scale(1.1);
+    }
+}
+
+@keyframes snowflake-rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.snowflake.size-1 { font-size: 0.8em; }
+.snowflake.size-2 { font-size: 1.0em; }
+.snowflake.size-3 { font-size: 1.2em; }
+
+@media (prefers-reduced-motion: reduce) {
+    .snowflake {
+        animation-duration: 20s, 6s;
+    }
+}
+
+/* Yeni qar dənəcikləri üçün stillər */
+.snowflake.type-1 { content: '❄'; }
+.snowflake.type-2 { content: '❅'; }
+.snowflake.type-3 { content: '❆'; }
+.snowflake.type-4 { content: '✻'; }
+.snowflake.type-5 { content: '✺'; }
+.snowflake.type-6 { content: '❉'; }
+
+/* Fərqli rənglər əlavə edirik */
+.snowflake.color-1 { color: #ffffff; }
+.snowflake.color-2 { color: #f0f0f0; }
+.snowflake.color-3 { color: #e8e8e8; }
+.snowflake.color-4 { color: #f8f8f8; }
+
+/* Fərqli fırlanma animasiyaları */
+.snowflake.rotate {
+    animation: snowflake-rotate 4s linear infinite;
+}
+
+.snowflake.rotate-reverse {
+    animation: snowflake-rotate 4s linear infinite reverse;
+}

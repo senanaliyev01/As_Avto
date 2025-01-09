@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B4B Giriş | AS AVTO</title>
+    <link rel="icon" href="{% static 'img/favicon.png' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <!-- <link rel="stylesheet" href="{% static 'css/snow.css' %}"> -->
+</head>
+<body>
+    <!-- Animasyonlu Arka Plan -->
+    <div class="area">
+        <ul class="circles">
+            <li></li><li></li><li></li><li></li><li></li>
+            <li></li><li></li><li></li><li></li><li></li>
+        </ul>
+    </div>
+
+    <!-- Login Container -->
+    <div class="login-container">
+        <!-- Alert Mesajları -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert {{ message.tags }}">
+                <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %}"></i>
+                <span>{{ message }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Login Formu -->
+        <div class="login-box">
+            <!-- Logo 1q-->
+            <div class="logo-wrap">
+                <!-- <img src="{% static '/img/Logo_Winter.png' %}" alt="Logo"> -->
+                <img src="{% static 'img/Header_Logo.png' %}" alt="AS AVTO Logo">
+            </div>
+
+            <!-- Başlık -->
+            <div class="title-wrap">
+                <h1>B4B Giriş</h1>
+                <p>Xoş gəlmisiniz! Zəhmət olmasa məlumatlarınızı daxil edin.</p>
+            </div>
+
+            <!-- Form -->
+            <form method="post" action="{% url 'login' %}" class="login-form">
+                {% csrf_token %}
+                
+                <!-- İstifadəçi Adı -->
+                <div class="form-group">
+                    <div class="input-wrap">
+                        <i class="fas fa-user icon"></i>
+                        <input type="text" name="username" required>
+                        <label>İstifadəçi Adı</label>
+                    </div>
+                </div>
+
+                <!-- Şifrə -->
+                <div class="form-group">
+                    <div class="input-wrap password-wrap">
+                        <i class="fas fa-lock icon"></i>
+                        <input type="password" name="password" id="passwordInput" required>
+                        <label>Şifrə</label>
+                        <button type="button" class="toggle-password" aria-label="Şifrəni göstər/gizlə">
+                            <i class="fas fa-eye-slash"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Giriş Düyməsi -->
+                <button type="submit" class="login-btn">
+                    <span class="btn-text">Daxil Ol</span>
+                    <div class="btn-loader"></div>
+                </button>
+
+                <!-- Ana Səhifə Linki -->
+                <div class="home-link">
+                    <a href="{% url 'anaevim' %}">
+                        <i class="fas fa-home"></i>
+                        <span>Ana Səhifəyə Qayıt</span>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{% static 'js/login.js' %}"></script>
+    <!-- <script src="{% static 'js/snow.js' %}"></script> -->
+    
+</body>
+</html>

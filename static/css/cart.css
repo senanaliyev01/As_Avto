@@ -1,0 +1,818 @@
+:root {
+    --primary-color: #2563eb;
+    --danger-color: #dc2626;
+    --success-color: #16a34a;
+    --warning-color: #d97706;
+    --text-color: #1f2937;
+    --bg-color: #f3f4f6;
+    --card-bg: #ffffff;
+    --border-color: #e5e7eb;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 100%;
+    margin: 0;
+    padding: 1rem;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 0.5rem;
+    transition: var(--transition);
+}
+
+.back-btn:hover {
+    transform: translateX(-5px);
+    background-color: #1d4ed8;
+}
+
+/* Cart Container */
+.cart-container {
+    background-color: var(--card-bg);
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+    width: 100%;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+/* Table Styles */
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 0;
+}
+
+/* Header Styles */
+thead th {
+    position: sticky;
+    top: 0;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: white;
+    z-index: 20;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.8rem;
+    text-align: center;
+    white-space: nowrap;
+    overflow: visible;
+}
+
+thead th:first-child {
+    border-top-left-radius: 8px;
+}
+
+thead th:last-child {
+    border-top-right-radius: 8px;
+}
+
+/* Sütun genişlikləri - yenilənmiş */
+th, td {
+    padding: 0.6rem 0.4rem;
+    font-size: 0.9rem;
+}
+
+/* Məhsul adı sütunu */
+th:nth-child(1), td:nth-child(1) { width: 13%; }  /* Məhsul */
+th:nth-child(2), td:nth-child(2) { width: 9%; }   /* Kateqoriya */
+th:nth-child(3), td:nth-child(3) { width: 8%; }   /* Brend */
+th:nth-child(4), td:nth-child(4) { width: 8%; }   /* Model */
+th:nth-child(5), td:nth-child(5) { width: 9%; }   /* Brend Kod */
+th:nth-child(6), td:nth-child(6) { width: 9%; }   /* OEM */
+th:nth-child(7), td:nth-child(7) { width: 8%; }   /* Stok */
+th:nth-child(8), td:nth-child(8) { width: 8%; }   /* Qiymət */
+th:nth-child(9), td:nth-child(9) { width: 8%; }   /* Miqdar */
+th:nth-child(10), td:nth-child(10) { width: 8%; } /* Cəmi */
+th:nth-child(11), td:nth-child(11) { width: 12%; text-align: center; } /* Sil */
+
+/* Row Styles */
+tbody tr {
+    transition: all 0.2s ease;
+    border-bottom: 1px solid var(--border-color);
+}
+
+tbody tr:hover {
+    background-color: rgba(37, 99, 235, 0.03);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+}
+
+/* Cell Styles */
+td {
+    font-size: 0.95rem;
+    color: var(--text-color);
+    background: white;
+}
+
+/* Footer Styles */
+tfoot tr td {
+    padding: 1rem;
+    background: linear-gradient(to bottom, #f8fafc, #f1f5f9);
+    font-weight: 600;
+    color: var(--primary-color);
+    border-top: 2px solid var(--border-color);
+    text-align: right;
+}
+
+tfoot td[colspan="8"] {
+    text-align: right;
+}
+
+tfoot td:last-child {
+    text-align: center;
+    padding: 0.8rem 1rem;
+}
+
+/* Delete Button Column */
+.delete-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 6px;
+    background: rgba(220, 38, 38, 0.1);
+    color: var(--danger-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 0 auto;
+}
+
+.delete-btn:hover {
+    background: rgba(220, 38, 38, 0.2);
+    transform: scale(1.05);
+}
+
+.delete-btn i {
+    font-size: 0.9rem;
+}
+
+/* Price and Total Columns */
+td.price, td.item-total {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+}
+
+/* Stock Status in Table */
+.stock-status {
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+/* Quantity Controls in Table */
+.quantity-controls {
+    display: inline-flex;
+    align-items: center;
+    background: #f8fafc;
+    padding: 0.25rem;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    gap: 2px;
+    width: fit-content;
+}
+
+.quantity-btn {
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 4px;
+    background: var(--primary-color);
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+}
+
+.quantity-input {
+    width: 40px;
+    text-align: center;
+    padding: 2px 4px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+/* Total Amount Highlight */
+#total-amount {
+    display: inline-block;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    background: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+    min-width: 100px;
+    text-align: center;
+}
+
+/* Stock Status Styles */
+.stock-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.stock-status i {
+    font-size: 1rem;
+}
+
+.in-stock {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #059669;
+}
+
+.low-stock {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+}
+
+.out-of-stock {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+/* Delete Button */
+.delete-btn {
+    position: relative;
+    right: 0;
+    background: none;
+    border: none;
+    color: var(--danger-color);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: var(--transition);
+    width: 40px;
+    height: 40px;
+}
+
+.delete-btn:hover {
+    background-color: rgba(220, 38, 38, 0.1);
+    transform: scale(1.1);
+}
+
+/* Cart Actions */
+.cart-actions {
+    padding: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    border-top: 1px solid var(--border-color);
+}
+
+.order-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--success-color);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.order-btn:hover {
+    background-color: #15803d;
+    transform: translateY(-2px);
+}
+
+/* Empty Cart */
+.empty-cart {
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: var(--card-bg);
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+}
+
+.empty-cart i {
+    font-size: 4rem;
+    color: #94a3b8;
+    margin-bottom: 1rem;
+}
+
+.continue-shopping {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+    transition: var(--transition);
+}
+
+.continue-shopping:hover {
+    background-color: #1d4ed8;
+    transform: translateY(-2px);
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 15px;
+    text-align: center;
+    animation: modalOpen 0.3s ease-out;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    max-width: 450px;
+    width: 90%;
+}
+
+@keyframes modalOpen {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: #f0fdf4;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-icon {
+    font-size: 40px;
+    color: #10b981;
+}
+
+.modal-icon-wrapper.success {
+    background: #f0fdf4;
+}
+
+.modal-icon-wrapper.success .modal-icon {
+    color: #10b981;
+}
+
+.modal-content h2 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.modal-content p {
+    color: #64748b;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.confirm-btn, .cancel-btn {
+    padding: 0.8rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.confirm-btn {
+    background: #10b981;
+    color: white;
+}
+
+.confirm-btn:hover {
+    background: #059669;
+    transform: translateY(-2px);
+}
+
+.cancel-btn {
+    background: #ef4444;
+    color: white;
+}
+
+.cancel-btn:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+}
+
+/* Success Modal */
+.success-details {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.success-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.2rem;
+    background: #f8fafc;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.success-item:hover {
+    background: #f1f5f9;
+    transform: translateX(5px);
+}
+
+.success-item i {
+    color: #10b981;
+    font-size: 1.4rem;
+}
+
+.success-item span {
+    color: #334155;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+/* Notification */
+.notification {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    padding: 1rem 2rem;
+    border-radius: 0.5rem;
+    color: white;
+    transform: translateX(150%);
+    transition: var(--transition);
+    z-index: 1000;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification.success {
+    background-color: var(--success-color);
+}
+
+.notification.error {
+    background-color: var(--danger-color);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideOut {
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .container {
+        padding: 1rem;
+    }
+    
+    .cart-container {
+        overflow-x: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .quantity-controls {
+        flex-direction: column;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 1.5rem;
+    }
+}
+
+/* Modal Styles */
+.modal-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e1f4ff 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: iconPulse 2s infinite;
+}
+
+.modal-icon-wrapper.success {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+}
+
+.modal-icon {
+    font-size: 40px;
+    color: var(--primary-color);
+    animation: iconRotate 2s infinite;
+}
+
+.modal-icon-wrapper.success .modal-icon {
+    color: var(--success-color);
+    animation: iconSuccess 0.5s ease-out;
+}
+
+.success-details {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.success-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background-color: #f8fafc;
+    border-radius: 8px;
+}
+
+.success-item i {
+    color: var(--success-color);
+}
+
+/* Animations */
+@keyframes iconPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@keyframes iconRotate {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(10deg); }
+    75% { transform: rotate(-10deg); }
+    100% { transform: rotate(0deg); }
+}
+
+@keyframes iconSuccess {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Modal Animations */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes iconBounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-20px);
+    }
+    60% {
+        transform: translateY(-10px);
+    }
+}
+
+.modal.show .modal-content {
+    animation: modalFadeIn 0.5s ease forwards;
+}
+
+.modal-icon {
+    animation: iconBounce 2s ease infinite;
+}
+
+/* Success Modal Specific Styles */
+.modal-content.success {
+    background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+}
+
+.success-details {
+    margin-top: 20px;
+}
+
+.success-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+.success-item:hover {
+    transform: translateX(5px);
+    background: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.success-item i {
+    font-size: 20px;
+    color: var(--success-color);
+}
+
+/* Highlight animation for row updates */
+@keyframes highlight {
+    0% { background-color: transparent; }
+    50% { background-color: rgba(59, 130, 246, 0.1); }
+    100% { background-color: transparent; }
+}
+
+tr.highlight {
+    animation: highlight 0.3s ease;
+}
+
+/* Sütun genişlikləri - faizlə */
+th, td {
+    padding: 0.75rem;
+    white-space: normal; /* Mətn avtomatik sətir dəyişimi */
+}
+
+/* Məhsul adı sütunu */
+th:nth-child(1), td:nth-child(1) { width: 15%; }  /* Məhsul */
+th:nth-child(2), td:nth-child(2) { width: 10%; }  /* Kateqoriya */
+th:nth-child(3), td:nth-child(3) { width: 10%; }  /* Brend */
+th:nth-child(4), td:nth-child(4) { width: 10%; }  /* Model */
+th:nth-child(5), td:nth-child(5) { width: 10%; }  /* Brend Kod */
+th:nth-child(6), td:nth-child(6) { width: 10%; }  /* OEM */
+th:nth-child(7), td:nth-child(7) { width: 10%; }  /* Stok */
+th:nth-child(8), td:nth-child(8) { width: 8%; }   /* Qiymət */
+th:nth-child(9), td:nth-child(9) { width: 8%; }   /* Miqdar */
+th:nth-child(10), td:nth-child(10) { width: 7%; } /* Cəmi */
+th:nth-child(11), td:nth-child(11) { width: 2%; } /* Silmə düyməsi */
+
+/* Mətn sığışdırma */
+td {
+    font-size: 0.9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Silmə düyməsi sütunu */
+th:last-child, td:last-child {
+    position: sticky;
+    right: 0;
+    background: var(--card-bg);
+    z-index: 10;
+    text-align: center;
+    box-shadow: -4px 0 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Footer (Ümumi cəm) */
+tfoot tr td {
+    position: sticky;
+    bottom: 0;
+    background: var(--card-bg);
+    z-index: 10;
+    box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+    font-weight: bold;
+}
+
+/* Cədvəl başlığı */
+thead th {
+    position: sticky;
+    top: 0;
+    background: var(--primary-color);
+    color: white;
+    z-index: 20;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Responsive dizayn */
+@media (max-width: 1400px) {
+    td, th {
+        padding: 0.5rem;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 1200px) {
+    .quantity-controls {
+        flex-direction: row;
+        gap: 4px;
+    }
+    
+    .quantity-btn {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .quantity-input {
+        width: 40px;
+        padding: 4px;
+    }
+}
+
+/* Table Cell Alignment */
+td, th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Last column (Sil) specific style */
+th:last-child {
+    min-width: 60px;  /* Minimum genişlik təyin edildi */
+    padding: 0.8rem 1rem; /* Padding artırıldı */
+    text-align: center;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+td:last-child {
+    text-align: center;
+    padding: 0.8rem 1rem;
+}

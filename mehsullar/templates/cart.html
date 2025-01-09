@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Səbət</title>
+    <link rel="icon" href="{% static 'img/favicon.png' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/cart.css' %}">
+    <!-- <link rel="stylesheet" href="{% static 'css/snow.css' %}"> -->
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="{% url 'main' %}" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Əsas Səhifə
+            </a>
+            <h1>Səbətim</h1>
+        </div>
+
+        {% if sebet %}
+        <div class="cart-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Məhsul</th>
+                        <th>Kateqoriya</th>
+                        <th>Brend</th>
+                        <th>Model</th>
+                        <th>Brend Kod</th>
+                        <th>OEM</th>
+                        <th>Stok</th>
+                        <th>Qiymət</th>
+                        <th>Miqdar</th>
+                        <th>Cəmi</th>
+                        <th>Sil</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in sebet %}
+                    <tr data-item-id="{{ item.id }}" data-price="{{ item.mehsul.qiymet }}">
+                        <td>{{ item.mehsul.adi }}</td>
+                        <td>{{ item.mehsul.kateqoriya.adi }}</td>
+                        <td>{{ item.mehsul.brend.adi }}</td>
+                        <td>{{ item.mehsul.marka.adi }}</td>
+                        <td>{{ item.mehsul.brend_kod }}</td>
+                        <td>{{ item.mehsul.oem }}</td>
+                        <td>
+                            {% if item.mehsul.stok == 0 %}
+                                <span class="stock-status out-of-stock">
+                                    <i class="fas fa-times-circle"></i> Yoxdur
+                                </span>
+                            {% elif item.mehsul.stok <= 20 %}
+                                <span class="stock-status low-stock">
+                                    <i class="fas fa-exclamation-circle"></i> Az var
+                                </span>
+                            {% else %}
+                                <span class="stock-status in-stock">
+                                    <i class="fas fa-check-circle"></i> Var
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="price">{{ item.mehsul.qiymet }} AZN</td>
+                        <td>
+                            <div class="quantity-controls">
+                                <button type="button" class="quantity-btn minus" onclick="updateQuantity({{ item.id }}, -1)">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="number" 
+                                       class="quantity-input" 
+                                       value="{{ item.miqdar }}"
+                                       min="1"
+                                       onchange="updateQuantity({{ item.id }}, this.value)"
+                                       onkeypress="return (event.charCode >= 48 && event.charCode <= 57)">
+                                <button type="button" class="quantity-btn plus" onclick="updateQuantity({{ item.id }}, 1)">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </td>
+                        <td class="item-total">{{ item.cemi }} AZN</td>
+                        <td>
+                            <button class="delete-btn" onclick="removeItem({{ item.id }})" title="Sil">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="9"></td>
+                        <td style="text-align: right; white-space: nowrap;">
+                            <strong>Ümumi Cəmi:</strong>
+                        </td>
+                        <td colspan="2" style="text-align: center;">
+                            <span id="total-amount">{{ cemi_mebleg }} AZN</span>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="cart-actions">
+                <button class="order-btn" onclick="confirmOrder()">
+                    <i class="fas fa-shopping-cart"></i>
+                    Sifarişi Təsdiqlə
+                </button>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-cart">
+            <i class="fas fa-shopping-cart"></i>
+            <p>Səbətiniz boşdur</p>
+            <a href="{% url 'products_list' %}" class="continue-shopping">
+                Alış-verişə davam et
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Təsdiqləmə Modalı -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-icon-wrapper">
+                <i class="fas fa-question-circle modal-icon"></i>
+            </div>
+            <h2>Sifarişi Təsdiqləyin</h2>
+            <p>Sifarişinizi təsdiqləmək istədiyinizə əminsiniz?</p>
+            <div class="modal-actions">
+                <button onclick="submitOrder()" class="confirm-btn">
+                    <i class="fas fa-check"></i> Bəli
+                </button>
+                <button onclick="closeModal()" class="cancel-btn">
+                    <i class="fas fa-times"></i> Xeyr
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Uğurlu Sifariş Modalı -->
+    <div id="successModal" class="modal">
+        <div class="modal-content success">
+            <div class="modal-icon-wrapper success">
+                <i class="fas fa-check-circle modal-icon"></i>
+            </div>
+            <h2>Təbriklər!</h2>
+            <p>Sifarişiniz uğurla tamamlandı</p>
+            <div class="success-details">
+                <div class="success-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Sifariş qeydə alındı</span>
+                </div>
+                <div class="success-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Status: Gözləmədə</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script src="{% static 'js/cart.js' %}"></script>
+  
+    <!-- <script src="{% static 'js/snow.js' %}"></script> -->
+</body>
+</html>

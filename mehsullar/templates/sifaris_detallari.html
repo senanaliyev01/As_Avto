@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <title>Sifariş #{{ sifaris.id }} - Detallar</title>
+    <link rel="icon" href="{% static 'img/favicon.png' %}">
+    <link rel="stylesheet" href="{% static 'css/sifaris_izleme.css' %}">
+    <!-- <link rel="stylesheet" href="{% static 'css/snow.css' %}"> -->
+</head>
+<body>
+    <nav class="header-nav">
+        <a href="{% url 'main' %}">Əsas Səhifə</a>
+        <a href="{% url 'sifaris_izle' %}">Sifarişlərim</a>
+        <h2>Sifariş #{{ sifaris.id }}</h2>
+    </nav>
+
+    <div class="sifaris-info">
+        <div class="info-row">
+            <h3>Sifariş Məlumatları</h3>
+            <p><strong>Tarix:</strong> {{ sifaris.tarix }}</p>
+            <p><strong>Status:</strong> <span class="status-badge status-{{ sifaris.status }}">{{ sifaris.display_status }}</span></p>
+        </div>
+        <div class="info-row">
+            <h3>Ödəniş Məlumatları</h3>
+            <p><strong>Ümumi Məbləğ:</strong> {{ sifaris.cemi_mebleg }} AZN</p>
+            <p><strong>Ödənilən Məbləğ:</strong> {{ sifaris.odenilen_mebleg }} AZN</p>
+            <p class="qaliq-borc {% if sifaris.qaliq_borc < 0 %}qaliq-borc-pozitiv{% else %}qaliq-borc-negativ{% endif %}">
+                <strong>Qalıq Borc:</strong> {{ sifaris.qaliq_borc }} AZN
+            </p>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Məhsul Adı</th>
+                    <th>Kateqoriya</th>
+                    <th>Brend</th>
+                    <th>Model</th>
+                    <th>Brend Kod</th>
+                    <th>OEM Kod</th>
+                    <th>Miqdar</th>
+                    <th>Qiymət</th>
+                    <th>Cəmi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mehsul in sifaris_mehsullari %}
+                <tr>
+                    <td>{{ mehsul.mehsul.adi }}</td>
+                    <td>{{ mehsul.mehsul.kateqoriya.adi }}</td>
+                    <td>{{ mehsul.mehsul.brend.adi }}</td>
+                    <td>{{ mehsul.mehsul.marka.adi }}</td>
+                    <td>{{ mehsul.mehsul.brend_kod }}</td>
+                    <td>{{ mehsul.mehsul.oem }}</td>
+                    <td class="text-center">{{ mehsul.miqdar }}</td>
+                    <td class="text-right">{{ mehsul.qiymet }} AZN</td>
+                    <td class="text-right">{{ mehsul.cemi }} AZN</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="6"></td>
+                    <td colspan="2"><strong>Ümumi Cəmi:</strong></td>
+                    <td class="text-right"><strong>{{ sifaris.cemi_mebleg }} AZN</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <script src="{% static 'js/sifaris.js' %}"></script>
+    <!-- <script src="{% static 'js/snow.js' %}"></script> -->
+</body>
+</html> 

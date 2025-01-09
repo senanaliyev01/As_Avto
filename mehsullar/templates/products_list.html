@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avto Ehtiyat Hissələri</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="{% static 'img/favicon.png' %}">
+    <link rel="stylesheet" href="{% static 'css/products_list.css' %}">
+    <!-- <link rel="stylesheet" href="{% static 'css/snow.css' %}"> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <!-- Header Bölməsi -->
+    <header>
+        <div class="top-header">
+            <div class="logo">
+                <!-- <img src="{% static '/img/Logo_Winter.png' %}" alt="Logo"> -->
+              <img src="{% static '/img/Header_Logo.png' %}" alt="Logo">
+                
+            </div>
+            <div class="header-right">
+                <a href="{% url 'profile' %}"><i class="fas fa-user"></i> {{ user.username }}</a>
+               <a href="{% url 'view_cart' %}" class="cart-link">
+    <i class="fas fa-shopping-cart"></i>
+    <span id="cart-count" class="cart-badge">0</span>
+</a>
+
+
+            </div>
+           
+        </div>
+        <div class="working-hours">
+            <p>İş vaxtımız: 09:00 - 18:00</p>
+            <p class="current-time">Hazırki Saat: <span id="current-time"></span></p>
+        </div>
+    </header>
+    </header>
+
+    <!-- Naviqasiya Bölməsi1 -->
+    <div class="nav-bar">
+        <a href="{%url 'main' %}"><i class="fa-solid fa-house"></i> Əsas Səhifə</a>
+        <a href="{% url 'sifaris_izle' %}"><i class="fa-solid fa-truck-fast"></i> Sifarişlərim</a>
+        <a href="{% url 'products_list' %}"><i class="fas fa-cogs"></i> Məhsullar</a>
+        <a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> Məlumat</a>
+       
+    </div>
+
+<!-- Axtarış Bölməsi -->
+<div class="search-bar">
+    <form method="GET" action="">
+        <select name="category" id="category">
+            <option value="">Kateqoriya</option>
+            {% for category in kateqoriyalar %}
+                <option value="{{ category.adi }}" {% if request.GET.category == category.adi %}selected{% endif %}>
+                    {{ category.adi }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <select name="brand" id="brand">
+            <option value="">Brend</option>
+            {% for brand in brendlər %}
+                <option value="{{ brand.adi }}" {% if request.GET.brand == brand.adi %}selected{% endif %}>
+                    {{ brand.adi }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <select name="model" id="model">
+            <option value="">Marka</option>
+            {% for marka in markalar %}
+                <option value="{{ marka.adi }}" {% if request.GET.model == marka.adi %}selected{% endif %}>
+                    {{ marka.adi }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <input type="text" name="search_text" placeholder="Brend kodu və ya OEM kodu daxil edin" value="{{ request.GET.search_text }}">
+
+        <button type="submit" id="search-button">
+            <span class="button-text">Axtar</span>
+            <span class="spinner" style="display: none;"></span>
+        </button>
+
+
+    </form>
+</div>
+
+
+
+<!-- Axtarış Nəticələri2 -->
+<div class="search-results">
+    {% if mehsullar %}
+        <h2 class="search-result-title" style="color: green">{{ mehsullar.count }} Nəticə tapıldı:</h2>
+        <div class="products-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Məhsul Adı</th>
+                        <th>Kateqoriya</th>
+                        <th>Brend</th>
+                        <th>Marka</th>
+                        <th>Brend Kod</th>
+                        <th>OEM Kod</th>
+                        <th>Stok</th>
+                        <th>Qiymət</th>
+                        <th>Səbət</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mehsul in mehsullar %}
+                    <tr>
+                        <td>{{ mehsul.adi }}</td>
+                        <td>{{ mehsul.kateqoriya }}</td>
+                        <td>{{ mehsul.brend }}</td>
+                        <td>{{ mehsul.marka }}</td>
+                        <td>{{ mehsul.brend_kod }}</td>
+                        <td>{{ mehsul.oem }}</td>
+                        <td>
+                            {% if mehsul.stok == 0 %}
+                                <span class="stock-status out-of-stock">Yoxdur</span>
+                            {% elif mehsul.stok <= 20 %}
+                                <span class="stock-status low-stock">Az var</span>
+                            {% else %}
+                                <span class="stock-status in-stock">Var</span>
+                            {% endif %}
+                        </td>
+                        <td class="price-column">
+                            {{ mehsul.qiymet }}
+                            <i class="fa-solid fa-manat-sign" style="font-size: 0.9em; margin-left: 2px;"></i>
+                        </td>
+                        <td><a href="{% url 'sebet_ekle' mehsul.id %}" class="cart-icon"><i class="fas fa-shopping-cart"></i></a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+
+        </div>
+    {% else %}
+        <h2 class="no-results" style="color: red">Heç bir nəticə tapılmadı. Zəhmət olmasa axtarış parametrlərini yoxlayın.</h2>
+    {% endif %}
+</div>
+
+
+
+
+     <!-- Footer Bölməsi -->
+     <footer>
+        <div class="footer-left">
+            <!-- <img src="{% static '/img/Logo_Winter.png' %}" alt="Logo"> -->
+           <img src="{% static '/img/Header_Logo.png' %}" alt="Logo">
+            <a href="{%url 'main' %}"></a>
+        </div>
+        <div class="footer-center">
+            <a href="tel:+994501234567"><i class="fa-solid fa-tty"></i>+994 70 275 44 99</a>
+            <a href="tel:+994501234567"><i class="fas fa-phone-alt"></i>+994 77 305 95 85</a>
+            <a href="mailto:senan.eliyev.9997@gmail.com"><i class="fas fa-envelope"></i>senan.eliyev.9997@gmail.com</a>
+            <a href="https://maps.app.goo.gl/fU5jUAg8veccL3Zq9"><i class="fa-solid fa-location-dot"></i>Binəqədi R. M.Rəsulzadə qəs. As-Avto</a>
+        </div>
+
+        <div class="footer-right">
+            <a href="https://wa.me/994773059585" target="_blank"><i class="fab fa-whatsapp"></i></a>
+            <a href="https://www.tiktok.com/@a_avto_service" target="_blank"><i class="fab fa-tiktok"></i></a>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/products_list.js' %}"></script>
+    
+</body>
+</html>

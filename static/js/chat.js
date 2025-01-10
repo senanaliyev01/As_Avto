@@ -37,10 +37,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     });
             }
-        }, 1000);
+        }, 2000);
 
         // İstifadəçiləri hər 5 saniyədə bir yenilə
-        userUpdateInterval = setInterval(loadChatUsers, 1000);
+        userUpdateInterval = setInterval(loadChatUsers, 5000);
     }
 
     function stopRealtimeUpdates() {

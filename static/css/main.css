@@ -1590,7 +1590,7 @@ footer::before {
 .close-button {
     background: none;
     border: none;
-    color: #666;
+    color: #e3f2fd;
     cursor: pointer;
     padding: 8px;
     border-radius: 50%;
@@ -1598,12 +1598,38 @@ footer::before {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 32px;
+    height: 32px;
 }
 
 .fullscreen-btn:hover,
 .close-button:hover {
-    background: rgba(0, 0, 0, 0.1);
-    color: #333;
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+}
+
+.audio-btn {
+    background: none;
+    border: none;
+    color: #e3f2fd;
+    font-size: 20px;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.audio-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.audio-btn:active {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ff4444;
 }
 
 .recording-indicator {

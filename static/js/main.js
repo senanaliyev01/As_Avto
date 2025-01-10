@@ -230,8 +230,39 @@ function initChat() {
     let isRecording = false;
     let recordingTimeout;
 
-    // Səs yazma funksiyaları
+    // Səs yazma - mobil üçün
+    audioButton.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        startRecording();
+    });
+
+    audioButton.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        stopRecording();
+    });
+
+    // Səs yazma - PC üçün
+    audioButton.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        startRecording();
+    });
+
+    audioButton.addEventListener('mouseup', (e) => {
+        e.preventDefault();
+        stopRecording();
+    });
+
+    audioButton.addEventListener('mouseleave', (e) => {
+        e.preventDefault();
+        if (isRecording) {
+            stopRecording();
+        }
+    });
+
+    // Səs yazmağı başlat
     async function startRecording() {
+        if (isRecording) return;
+
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             mediaRecorder = new MediaRecorder(stream);
@@ -250,45 +281,29 @@ function initChat() {
 
             mediaRecorder.start();
             showRecordingIndicator();
+            audioButton.classList.add('recording');
         } catch (err) {
             console.error('Səs yazma xətası:', err);
             showNotification('error', 'Səs yazmaq üçün icazə lazımdır');
         }
     }
 
+    // Səs yazmağı bitir və göndər
     function stopRecording() {
-        if (isRecording && mediaRecorder) {
-            mediaRecorder.stop();
-            isRecording = false;
-            hideRecordingIndicator();
-        }
+        if (!isRecording) return;
+
+        mediaRecorder.stop();
+        isRecording = false;
+        hideRecordingIndicator();
+        audioButton.classList.remove('recording');
     }
 
-    // Səs yazma indikatorunu göstər
-    function showRecordingIndicator() {
-        const indicator = document.createElement('div');
-        indicator.className = 'recording-indicator';
-        indicator.innerHTML = `
-            <i class="fas fa-microphone recording-icon"></i>
-            <span>Səs yazılır...</span>
-        `;
-        document.body.appendChild(indicator);
-    }
-
-    // Səs yazma indikatorunu gizlət
-    function hideRecordingIndicator() {
-        const indicator = document.querySelector('.recording-indicator');
-        if (indicator) {
-            indicator.remove();
-        }
-    }
-
-    // Səs göndərmə funksiyası
+    // Səs mesajını göndər
     function sendAudioMessage(blob) {
         const formData = new FormData();
         formData.append('audio', blob, 'voice.webm');
         formData.append('receiver_id', currentReceiverId);
-
+        
         fetch('/chat/send-audio/', {
             method: 'POST',
             body: formData,
@@ -310,39 +325,24 @@ function initChat() {
         });
     }
 
-    // Səs yazma düyməsi
-    const audioButton = document.createElement('button');
-    audioButton.className = 'audio-btn';
-    audioButton.innerHTML = '<i class="fas fa-microphone"></i>';
-    
-    // Mobil cihazlar üçün
-    audioButton.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        startRecording();
-    });
+    // Səs yazma indikatorunu göstər
+    function showRecordingIndicator() {
+        const indicator = document.createElement('div');
+        indicator.className = 'recording-indicator';
+        indicator.innerHTML = `
+            <i class="fas fa-microphone recording-icon"></i>
+            <span>Səs yazılır...</span>
+        `;
+        document.body.appendChild(indicator);
+    }
 
-    audioButton.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        stopRecording();
-    });
-
-    // Desktop üçün
-    audioButton.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        startRecording();
-    });
-
-    audioButton.addEventListener('mouseup', (e) => {
-        e.preventDefault();
-        stopRecording();
-    });
-
-    audioButton.addEventListener('mouseleave', (e) => {
-        e.preventDefault();
-        if (isRecording) {
-            stopRecording();
+    // Səs yazma indikatorunu gizlət
+    function hideRecordingIndicator() {
+        const indicator = document.querySelector('.recording-indicator');
+        if (indicator) {
+            indicator.remove();
         }
-    });
+    }
 
     // Səs düyməsini chat input-a əlavə et
     const chatInput = document.querySelector('.chat-input');

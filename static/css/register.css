@@ -1,15 +1,17 @@
-/* Əsas Dəyişənlər */
+/* Main Variables */
 :root {
-    --primary-dark: #0a192f;
-    --primary-light: #172a45;
-    --accent-blue: #64ffda;
-    --text-primary: #ccd6f6;
-    --text-secondary: #8892b0;
-    --error-color: #ff6b6b;
-    --success-color: #4caf50;
+    --primary-dark: #0A2647;
+    --primary: #144272;
+    --primary-light: #205295;
+    --accent: #2C74B3;
+    --text-light: #ffffff;
+    --text-dark: #0A2647;
+    --error: #ff4444;
+    --success: #00C851;
+    --transition: all 0.3s ease;
 }
 
-/* Əsas Stillər */
+/* Reset and Base Styles */
 * {
     margin: 0;
     padding: 0;
@@ -19,15 +21,15 @@
 
 body {
     min-height: 100vh;
-    background: var(--primary-dark);
     display: flex;
     justify-content: center;
     align-items: center;
+    background: var(--primary-dark);
     position: relative;
     overflow-x: hidden;
 }
 
-/* Animasiyalı Arxa Plan */
+/* Animated Background */
 .area {
     position: fixed;
     top: 0;
@@ -35,6 +37,7 @@ body {
     width: 100%;
     height: 100%;
     z-index: 1;
+    overflow: hidden;
 }
 
 .circles {
@@ -54,7 +57,7 @@ body {
     list-style: none;
     width: 20px;
     height: 20px;
-    background: rgba(100, 255, 218, 0.1);
+    background: rgba(255, 255, 255, 0.1);
     animation: animate 25s linear infinite;
     bottom: -150px;
     border-radius: 50%;
@@ -84,7 +87,7 @@ body {
     }
 }
 
-/* Qeydiyyat Konteyner */
+/* Register Container */
 .register-container {
     width: 100%;
     max-width: 1000px;
@@ -94,14 +97,15 @@ body {
 }
 
 .register-box {
-    background: var(--primary-light);
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
     padding: 2.5rem;
-    border-radius: 15px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
-/* Logo */
+/* Logo Styles */
 .logo-wrap {
     text-align: center;
     margin-bottom: 2rem;
@@ -112,36 +116,33 @@ body {
     height: auto;
 }
 
-/* Başlıq */
+/* Title Styles */
 .title-wrap {
     text-align: center;
     margin-bottom: 2.5rem;
-    color: var(--text-primary);
 }
 
 .title-wrap h1 {
-    font-size: 2.5rem;
+    color: var(--primary-dark);
+    font-size: 2.2rem;
     margin-bottom: 0.5rem;
-    background: linear-gradient(45deg, var(--accent-blue), #4a90e2);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
 }
 
 .title-wrap p {
-    color: var(--text-secondary);
+    color: var(--primary);
+    font-size: 1rem;
 }
 
-/* Form Bölmələri */
+/* Form Sections */
 .form-section {
     margin-bottom: 2rem;
     padding: 1.5rem;
-    background: rgba(23, 42, 69, 0.5);
-    border-radius: 10px;
-    border: 1px solid rgba(100, 255, 218, 0.1);
+    background: rgba(20, 66, 114, 0.03);
+    border-radius: 15px;
 }
 
 .form-section h3 {
-    color: var(--accent-blue);
+    color: var(--primary);
     margin-bottom: 1.5rem;
     font-size: 1.2rem;
     display: flex;
@@ -149,19 +150,17 @@ body {
     gap: 0.5rem;
 }
 
-/* Form Sətirləri */
 .form-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    display: flex;
     gap: 1.5rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 
-/* Input Qrupu */
 .form-group {
-    position: relative;
+    flex: 1;
 }
 
+/* Input Styles */
 .input-wrap {
     position: relative;
     margin-bottom: 1rem;
@@ -169,77 +168,76 @@ body {
 
 .input-wrap input {
     width: 100%;
-    padding: 0.8rem 2.5rem 0.8rem 2.8rem;
-    border: 2px solid rgba(100, 255, 218, 0.1);
+    padding: 0.8rem 2.5rem;
+    border: 2px solid #e0e0e0;
     border-radius: 8px;
-    background: rgba(10, 25, 47, 0.7);
-    color: var(--text-primary);
     font-size: 1rem;
-    transition: all 0.3s ease;
+    transition: var(--transition);
 }
 
 .input-wrap input:focus {
-    border-color: var(--accent-blue);
+    border-color: var(--accent);
     outline: none;
-    box-shadow: 0 0 0 3px rgba(100, 255, 218, 0.1);
 }
 
 .input-wrap label {
     position: absolute;
-    left: 2.8rem;
+    left: 2.5rem;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--text-secondary);
+    color: #666;
+    transition: var(--transition);
     pointer-events: none;
-    transition: all 0.3s ease;
+    font-size: 0.9rem;
 }
 
 .input-wrap input:focus ~ label,
-.input-wrap input:not(:placeholder-shown) ~ label {
+.input-wrap input:valid ~ label {
     top: -0.5rem;
     left: 1rem;
-    font-size: 0.8rem;
+    background: white;
     padding: 0 0.5rem;
-    background: var(--primary-light);
-    color: var(--accent-blue);
+    font-size: 0.8rem;
+    color: var(--accent);
 }
 
 .input-wrap .icon {
     position: absolute;
-    left: 1rem;
+    left: 0.8rem;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--text-secondary);
+    color: var(--primary);
 }
 
-/* Şifrə Göstər/Gizlət */
-.password-wrap .toggle-password {
+/* Password Toggle */
+.password-wrap {
+    position: relative;
+}
+
+.toggle-password {
     position: absolute;
     right: 1rem;
     top: 50%;
     transform: translateY(-50%);
     background: none;
     border: none;
-    color: var(--text-secondary);
+    color: var(--primary);
     cursor: pointer;
     padding: 0.2rem;
 }
 
-.toggle-password:hover {
-    color: var(--accent-blue);
-}
-
-/* Şifrə Tələbləri */
+/* Password Requirements */
 .password-requirements {
     margin: 1.5rem 0;
     padding: 1rem;
-    background: rgba(10, 25, 47, 0.5);
+    background: rgba(20, 66, 114, 0.05);
     border-radius: 8px;
 }
 
 .password-requirements h4 {
-    color: var(--text-primary);
+    color: var(--primary);
     margin-bottom: 0.8rem;
+    font-size: 1rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -253,7 +251,7 @@ body {
 }
 
 .password-requirements li {
-    color: var(--text-secondary);
+    color: #666;
     font-size: 0.9rem;
     display: flex;
     align-items: center;
@@ -261,33 +259,27 @@ body {
 }
 
 .password-requirements li.valid {
-    color: var(--accent-blue);
+    color: var(--success);
 }
 
-.password-requirements li i {
-    font-size: 0.7rem;
-}
-
-/* Qeydiyyat Düyməsi */
+/* Button Styles */
 .register-btn {
     width: 100%;
     padding: 1rem;
-    margin: 1.5rem 0;
-    background: linear-gradient(45deg, var(--accent-blue), #4a90e2);
+    background: var(--primary);
+    color: white;
     border: none;
     border-radius: 8px;
-    color: var(--primary-dark);
-    font-weight: 600;
     font-size: 1.1rem;
     cursor: pointer;
+    transition: var(--transition);
     position: relative;
     overflow: hidden;
-    transition: all 0.3s ease;
 }
 
 .register-btn:hover {
+    background: var(--primary-dark);
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(100, 255, 218, 0.2);
 }
 
 .register-btn:active {
@@ -302,33 +294,30 @@ body {
     transform: translate(-50%, -50%);
     width: 20px;
     height: 20px;
-    border: 3px solid var(--primary-dark);
-    border-top: 3px solid transparent;
+    border: 3px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
+    border-top-color: white;
     animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-    0% { transform: translate(-50%, -50%) rotate(0deg); }
-    100% { transform: translate(-50%, -50%) rotate(360deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-/* Link Stillər */
+/* Links */
 .login-link, .home-link {
     text-align: center;
-    margin-top: 1rem;
-    color: var(--text-secondary);
+    margin-top: 1.5rem;
 }
 
 .login-link a, .home-link a {
-    color: var(--accent-blue);
+    color: var(--accent);
     text-decoration: none;
-    font-weight: 500;
-    transition: all 0.3s ease;
+    transition: var(--transition);
 }
 
 .login-link a:hover, .home-link a:hover {
-    text-decoration: underline;
+    color: var(--primary-dark);
 }
 
 .home-link a {
@@ -337,7 +326,7 @@ body {
     gap: 0.5rem;
 }
 
-/* Modal */
+/* Modal Styles */
 .modal {
     display: none;
     position: fixed;
@@ -345,7 +334,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(10, 25, 47, 0.9);
+    background: rgba(0, 0, 0, 0.5);
     z-index: 1000;
 }
 
@@ -354,12 +343,11 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: var(--primary-light);
+    background: white;
     padding: 2rem;
-    border-radius: 10px;
-    max-width: 500px;
+    border-radius: 15px;
     width: 90%;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
 }
 
 .modal-header {
@@ -370,22 +358,16 @@ body {
 }
 
 .close {
-    color: var(--text-secondary);
     font-size: 1.5rem;
     cursor: pointer;
-    transition: color 0.3s ease;
-}
-
-.close:hover {
-    color: var(--accent-blue);
+    color: var(--primary);
 }
 
 .modal-body {
-    color: var(--text-primary);
     text-align: center;
 }
 
-/* Responsiv Dizayn */
+/* Responsive Design */
 @media (max-width: 768px) {
     .register-container {
         margin: 1rem;
@@ -395,21 +377,22 @@ body {
         padding: 1.5rem;
     }
 
-    .title-wrap h1 {
-        font-size: 2rem;
+    .form-row {
+        flex-direction: column;
+        gap: 0;
     }
 
-    .form-row {
+    .password-requirements ul {
         grid-template-columns: 1fr;
     }
 }
 
-/* Animasiyalar */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+@media (max-width: 480px) {
+    .title-wrap h1 {
+        font-size: 1.8rem;
+    }
 
-.register-box {
-    animation: fadeIn 0.5s ease-out;
+    .form-section {
+        padding: 1rem;
+    }
 } 

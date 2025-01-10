@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCurrentTime();
         setInterval(updateCurrentTime, 1000);
 
-        // İş saatlarını yoxlaa
+        // İş saatlarını yoxla
         checkWorkingHours();
         setInterval(checkWorkingHours, 60000); // Hər dəqiqə yoxla
 
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Sadələşdirilmiş Swiperrr konfiqurasiyası
+// Swiper konfiqurasiyası
 const swiperConfig = {
     slidesPerView: 'auto',
     spaceBetween: 30,
@@ -157,288 +157,12 @@ function updateStatistics() {
     })
     .catch(error => {
         console.error('Statistika yeniləmə xətası:', error);
-        // Xəta halında yenidən cəhd et
         setTimeout(updateStatistics, 1000);
     });
 }
 
-// Chat funksionallığı
-let currentReceiverId = null;
-let currentReceiverName = null;
-let lastMessageCount = 0;
-let lastMessageId = 0;
-
-// Yeni mesaj bildirişi səsi
-function playNewMessageSound() {
-    const audio = document.getElementById('new-message-sound');
-    if (audio) {
-        audio.currentTime = 0;
-        audio.play().catch(error => {
-            console.log('Səs oxutma xətası:', error);
-        });
-    }
-}
-
-// Chat mesajı bildirişi səsi
-function playChatMessageSound() {
-    const audio = document.getElementById('chat-message-sound');
-    if (audio) {
-        audio.currentTime = 0;
-        audio.play().catch(error => {
-            console.log('Səs oxutma xətası:', error);
-        });
-    }
-}
-
-function initChat() {
-    const chatIcon = document.getElementById('chat-icon');
-    const chatWindow = document.getElementById('chat-window');
-    const closeChat = document.getElementById('close-chat');
-    const backButton = document.getElementById('back-to-users');
-    const messageInput = document.getElementById('message-input');
-    const sendButton = document.getElementById('send-message');
-    const chatMain = document.querySelector('.chat-main');
-    const chatSidebar = document.querySelector('.chat-sidebar');
-
-    if (!chatIcon || !chatWindow) return;
-
-    // Chat ikonuna klik
-    chatIcon.addEventListener('click', () => {
-        chatWindow.style.display = chatWindow.style.display === 'none' ? 'flex' : 'none';
-        if (chatWindow.style.display === 'flex') {
-            loadChatUsers();
-            chatMain.style.display = 'none';
-            chatSidebar.style.display = 'block';
-        }
-    });
-
-    // Chat pəncərəsini bağla
-    closeChat.addEventListener('click', () => {
-        chatWindow.style.display = 'none';
-    });
-
-    // İstifadəçilər siyahısına qayıt
-    backButton.addEventListener('click', () => {
-        chatMain.style.display = 'none';
-        chatSidebar.style.display = 'block';
-        currentReceiverId = null;
-        currentReceiverName = null;
-    });
-
-    // Mesaj göndər
-    sendButton.addEventListener('click', sendMessage);
-    messageInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
-    });
-
-    // İstifadəçiləri və mesajları yenilə
-    setInterval(loadChatUsers, 3000);
-    setInterval(() => {
-        if (currentReceiverId) {
-            loadMessages(currentReceiverId);
-        }
-    }, 1000);
-
-    // Axtarış funksiyasını əlavə et
-    const searchInput = document.getElementById('user-search');
-    if (searchInput) {
-        searchInput.addEventListener('input', filterUsers);
-    }
-}
-
-// Chat istifadəçilərini yükləmə funksiyası
-function loadChatUsers() {
-    fetch('/istifadeciler/api/chat/users/')
-        .then(response => response.json())
-        .then(data => {
-            const usersList = document.getElementById('users-list');
-            let totalUnread = 0;
-            
-            usersList.innerHTML = '';
-            
-            // Adminləri və istifadəçiləri əlavə et
-            if (data.admins && data.admins.length > 0) {
-                usersList.innerHTML += '<div class="user-group-title">Adminlər</div>';
-                data.admins.forEach(user => {
-                    totalUnread += user.unread_count;
-                    usersList.innerHTML += createUserItem(user);
-                });
-            }
-            
-            if (data.users && data.users.length > 0) {
-                usersList.innerHTML += '<div class="user-group-title">İstifadəçilər</div>';
-                data.users.forEach(user => {
-                    totalUnread += user.unread_count;
-                    usersList.innerHTML += createUserItem(user);
-                });
-            }
-
-            // Yeni mesaj varsa bildiriş səsini çal
-            if (totalUnread > lastMessageCount) {
-                playNewMessageSound();
-            }
-
-            lastMessageCount = totalUnread;
-            updateUnreadCount(totalUnread);
-        });
-}
-
-function createUserItem(user) {
-    return `
-        <div class="user-item ${user.unread_count > 0 ? 'has-unread' : ''}" 
-             onclick="selectUser(${user.id}, '${user.username}')">
-            <div class="user-info">
-                <i class="fas ${user.is_admin ? 'fa-user-shield admin-icon' : 'fa-user'}"></i>
-                <span>${user.username}</span>
-            </div>
-            ${user.unread_count > 0 ? 
-                `<span class="unread-count">${user.unread_count}</span>` : 
-                ''}
-        </div>
-    `;
-}
-
-function updateUnreadCount(totalUnread) {
-    const totalUnreadElement = document.getElementById('total-unread');
-    const chatIcon = document.getElementById('chat-icon');
-    
-    if (totalUnread > 0) {
-        totalUnreadElement.textContent = totalUnread;
-        totalUnreadElement.style.display = 'block';
-        chatIcon.classList.add('has-notification');
-    } else {
-        totalUnreadElement.style.display = 'none';
-        chatIcon.classList.remove('has-notification');
-    }
-}
-
-function selectUser(userId, username) {
-    currentReceiverId = userId;
-    currentReceiverName = username;
-    
-    const chatMain = document.querySelector('.chat-main');
-    const chatSidebar = document.querySelector('.chat-sidebar');
-    const selectedUsername = document.getElementById('selected-username');
-    
-    chatSidebar.style.display = 'none';
-    chatMain.style.display = 'flex';
-    selectedUsername.textContent = username;
-    
-    loadMessages(userId);
-}
-
-// Mesaj yükləmə funksiyası
-function loadMessages(receiverId) {
-    fetch(`/istifadeciler/api/chat/messages/${receiverId}/`)
-        .then(response => response.json())
-        .then(messages => {
-            const chatMessages = document.getElementById('chat-messages');
-            
-            // Son mesajın ID-sini al
-            const lastMessage = messages[messages.length - 1];
-            
-            // HTML-i yenilə
-            chatMessages.innerHTML = messages.map(msg => `
-                <div class="message ${msg.is_mine ? 'mine' : 'theirs'}">
-                    ${!msg.is_mine ? `<div class="message-sender">${msg.sender}</div>` : ''}
-                    <div class="message-content">${msg.content}</div>
-                    ${msg.is_mine ? `
-                        <div class="message-status ${getMessageStatus(msg)}">
-                            ${getStatusIcons(msg)}
-                        </div>
-                    ` : ''}
-                </div>
-            `).join('');
-
-            // Yeni mesaj gəlibsə və bu mesaj bizim deyilsə səs çal
-            if (lastMessage && lastMessage.id > lastMessageId && !lastMessage.is_mine) {
-                playChatMessageSound();
-            }
-
-            // Son mesaj ID-sini yadda saxla
-            if (lastMessage) {
-                lastMessageId = lastMessage.id;
-            }
-        });
-}
-
-// Mesaj statusunu müəyyən et
-function getMessageStatus(msg) {
-    if (msg.is_read) return 'read';
-    if (msg.is_delivered) return 'delivered';
-    return 'sent';
-}
-
-// Status ikonlarını qaytarır
-function getStatusIcons(msg) {
-    if (msg.is_read) {
-        return '<i class="fas fa-check"></i><i class="fas fa-check"></i>';
-    } else if (msg.is_delivered) {
-        return '<i class="fas fa-check"></i><i class="fas fa-check"></i>';
-    } else {
-        return '<i class="fas fa-check"></i>';
-    }
-}
-
-function sendMessage() {
-    const input = document.getElementById('message-input');
-    const content = input.value.trim();
-    
-    if (!content || !currentReceiverId) return;
-
-    const formData = new FormData();
-    formData.append('receiver_id', currentReceiverId);
-    formData.append('content', content);
-
-    fetch('/istifadeciler/api/chat/send/', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRFToken': getCookie('csrftoken')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            input.value = '';
-            loadMessages(currentReceiverId);
-        }
-    })
-    .catch(error => console.error('Error sending message:', error));
-}
-
-// CSRF token funksiyası
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
-// Chat-i inizializasiya et
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded, initializing chat...'); // Debug üçün
-    initChat();
-});
-
 // DOM yükləndikdə
 document.addEventListener('DOMContentLoaded', function() {
-    // Saat funksiyalarını ləğv edirik
-    // updateCurrentTime();
-    // setInterval(updateCurrentTime, 1000);
-    // checkWorkingHours();
-    // setInterval(checkWorkingHours, 60000);
-
     // Swiper-ləri inicializasiya et
     new Swiper('.brandsSwiper', swiperConfig);
     new Swiper('.carBrandsSwiper', {
@@ -451,34 +175,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // İlkin statistikaları yüklə
     updateStatistics();
-
-    // Hər 1 saniyədə bir yenilə
     setInterval(updateStatistics, 1000);
 
     // Səbət sayını yenilə
     updateCartCount();
 
-    // Rəy formu üçün
+    // Rəy formu
     const reviewForm = document.querySelector('.review-form form');
     if (reviewForm) {
         reviewForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Ulduz seçilməyibsə xəbərdarlıq et
             const rating = reviewForm.querySelector('input[name="qiymetlendirme"]:checked');
             if (!rating) {
                 showReviewNotification('error', 'Zəhmət olmasa, qiymətləndirmə üçün ulduz seçin');
                 return;
             }
 
-            // Rəy yazılmayıbsa xəbərdarlıq et
             const review = reviewForm.querySelector('textarea[name="rey"]').value.trim();
             if (!review) {
                 showReviewNotification('error', 'Zəhmət olmasa, rəyinizi yazın');
                 return;
             }
 
-            // Formu göndər
             fetch(reviewForm.action, {
                 method: 'POST',
                 body: new FormData(reviewForm),
@@ -502,33 +221,28 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// CSS-də əlavə et
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.2); }
-        100% { transform: scale(1); }
+// CSRF token funksiyası
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
     }
-    
-    .message-count.pulse {
-        animation: pulse 0.5s ease-in-out;
-    }
-    
-    .has-new-message {
-        background-color: rgba(59, 130, 246, 0.1);
-    }
-`;
-document.head.appendChild(style);
+    return cookieValue;
+}
 
 function showReviewNotification(type, message) {
-    // Əvvəlki bildirişi sil
     const existingNotification = document.querySelector('.review-notification');
     if (existingNotification) {
         existingNotification.remove();
     }
 
-    // Yeni bildiriş yarat
     const notification = document.createElement('div');
     notification.className = `review-notification ${type}`;
     notification.innerHTML = `
@@ -546,12 +260,10 @@ function showReviewNotification(type, message) {
 
     document.body.appendChild(notification);
 
-    // Animasiyanı başlat
     setTimeout(() => {
         notification.classList.add('show');
     }, 100);
 
-    // Bildirişi gizlət
     setTimeout(() => {
         notification.classList.remove('show');
         setTimeout(() => {
@@ -559,56 +271,5 @@ function showReviewNotification(type, message) {
         }, 500);
     }, 3000);
 }
-
-function filterUsers() {
-    const searchTerm = document.getElementById('user-search').value.toLowerCase();
-    const userItems = document.querySelectorAll('.user-item');
-    const userGroupTitles = document.querySelectorAll('.user-group-title');
-    
-    // Əgər axtarış boşdursa hər şeyi göstər
-    if (!searchTerm) {
-        userGroupTitles.forEach(title => {
-            title.style.display = 'block';
-        });
-        userItems.forEach(item => {
-            item.style.display = 'flex';
-        });
-        return;
-    }
-
-    // Əvvəlcə bütün başlıqları və istifadəçiləri gizlət
-    userGroupTitles.forEach(title => {
-        title.style.display = 'none';
-    });
-    userItems.forEach(item => {
-        item.style.display = 'none';
-    });
-
-    // Axtarış sözünə uyğun istifadəçiləri göstər
-    let adminFound = false;
-    let userFound = false;
-
-    userItems.forEach(item => {
-        const username = item.querySelector('.user-info span').textContent.toLowerCase();
-        if (username.includes(searchTerm)) {
-            item.style.display = 'flex';
-            // İstifadəçinin admin olub-olmadığını yoxla
-            const isAdmin = item.querySelector('.admin-icon') !== null;
-            if (isAdmin) {
-                adminFound = true;
-                document.querySelector('.user-group-title:first-of-type').style.display = 'block';
-            } else {
-                userFound = true;
-                document.querySelector('.user-group-title:last-of-type').style.display = 'block';
-            }
-        }
-    });
-}
-
-// Səhifə yükləndikdə istifadəçi qarşılıqlı əlaqəsini gözlə
-document.addEventListener('click', function initAudioOnUserInteraction() {
-    initAudio();
-    document.removeEventListener('click', initAudioOnUserInteraction);
-}, { once: true });
 
 

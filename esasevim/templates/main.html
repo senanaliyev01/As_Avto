@@ -9,14 +9,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="icon" href="{% static 'img/favicon.png' %}">
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
-    <!-- 11232132332<link rel="stylesheet" href="{% static 'css/snow.css' %}"> -->
+    <link rel="stylesheet" href="{% static 'css/chat.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     {% csrf_token %}
 </head>
 <body>
     {% if user.is_authenticated %}
     <script>
-        const currentUserId = {{ user.id }};
+        const currentUserId = "{{ user.id }}";
         const isAdmin = {% if user.is_staff %}true{% else %}false{% endif %};
     </script>
     {% endif %}
@@ -230,12 +230,8 @@
         <div id="chat-window" class="chat-window" style="display: none;">
             <div class="chat-header">
                 <div class="chat-title">Mesajlar</div>
-                <div class="chat-controls">
-                    <button id="fullscreen-chat" class="control-button">
-                        <i class="fas fa-expand"></i>
-                    </button>
-                    <button id="close-chat" class="close-button">&times;</button>
-                </div>
+                <button id="close-chat" class="close-button">&times;</button>
+                <button id="fullscreen-chat" class="fullscreen-button"><i class="fas fa-expand"></i></button>
             </div>
             
             <div class="chat-container">
@@ -258,6 +254,9 @@
                     <div class="chat-input">
                         <button class="audio-btn" type="button">
                             <i class="fas fa-microphone"></i>
+                            <div class="recording-wave" style="display: none;">
+                                <span></span><span></span><span></span><span></span><span></span>
+                            </div>
                         </button>
                         <input type="text" id="message-input" placeholder="Mesajınızı yazın...">
                         <button id="send-message" type="button">
@@ -271,6 +270,6 @@
     {% endif %}
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="{% static 'js/main.js' %}"></script>
-    <!-- <script src="{% static 'js/snow.js' %}"></script> -->
+    <script src="{% static 'js/chat.js' %}"></script>
 </body>
 </html>

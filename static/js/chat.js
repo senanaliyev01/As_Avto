@@ -1,106 +1,57 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const chatMessages = document.getElementById('chatMessages');
-    const messageForm = document.getElementById('messageForm');
-    const messageInput = document.getElementById('messageInput');
-    const audioButton = document.querySelector('.audio-btn');
-    const fullscreenButton = document.getElementById('fullscreen-chat');
+    const chatWidget = document.getElementById('chat-widget');
     const chatWindow = document.getElementById('chat-window');
+    const chatMessages = document.getElementById('chat-messages');
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-message');
+    const closeButton = document.getElementById('close-chat');
+    const fullscreenButton = document.getElementById('fullscreen-chat');
+    const audioButton = document.querySelector('.audio-btn');
+    const backButton = document.getElementById('back-to-users');
+    const chatMain = document.querySelector('.chat-main');
+    const chatSidebar = document.querySelector('.chat-sidebar');
+    
     let mediaRecorder;
     let audioChunks = [];
     let isRecording = false;
+    let currentReceiverId = null;
 
-    // WebSocket bağlantısı
-    const chatSocket = new WebSocket(
-        'ws://' + window.location.host + '/ws/chat/'
-    );
-
-    chatSocket.onmessage = function(e) {
-        const data = JSON.parse(e.data);
-        if (data.message) {
-            appendMessage(data.message);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+    // Chat ikonuna klik
+    document.getElementById('chat-icon').addEventListener('click', () => {
+        chatWindow.style.display = chatWindow.style.display === 'none' ? 'flex' : 'none';
+        if (chatWindow.style.display === 'flex') {
+            loadChatUsers();
+            chatMain.style.display = 'none';
+            chatSidebar.style.display = 'block';
         }
-    };
+    });
 
-    // Mesaj göndərmə
-    messageForm.onsubmit = function(e) {
-        e.preventDefault();
-        const message = messageInput.value.trim();
-        if (message) {
-            fetch('/chat/send-message/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify({
-                    message: message
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    messageInput.value = '';
-                    appendMessage(data.message);
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                }
-            });
-        }
-    };
-
-    // Link tanıma funksiyası
-    function detectLinks(text) {
-        const urlRegex = /(https?:\/\/[^\s]+)/g;
-        return text.replace(urlRegex, function(url) {
-            return `<a href="${url}" target="_blank">${url}</a>`;
-        });
-    }
-
-    // Mesajı əlavə et
-    function appendMessage(message) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${message.sender === currentUserId ? 'sent' : 'received'}`;
-
-        if (message.type === 'audio') {
-            messageDiv.innerHTML = `
-                <div class="message-content">
-                    <audio controls>
-                        <source src="${message.content}" type="audio/webm">
-                    </audio>
-                    <span class="time">${new Date().toLocaleTimeString()}</span>
-                </div>
-            `;
-        } else {
-            const messageContent = detectLinks(message.content);
-            messageDiv.innerHTML = `
-                <div class="message-content">
-                    <p>${messageContent}</p>
-                    <span class="time">${new Date().toLocaleTimeString()}</span>
-                </div>
-            `;
-        }
-
-        chatMessages.appendChild(messageDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-
-        // Link kliklərini dinlə
-        const links = messageDiv.querySelectorAll('a');
-        links.forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                window.open(this.href, '_blank');
-            });
-        });
-    }
-
-    // Tam ekran funksiyası
+    // Tam ekran düyməsi
     fullscreenButton.addEventListener('click', () => {
         chatWindow.classList.toggle('fullscreen');
-        const icon = fullscreenButton.querySelector('i');
-        if (chatWindow.classList.contains('fullscreen')) {
-            icon.classList.replace('fa-expand', 'fa-compress');
-        } else {
-            icon.classList.replace('fa-compress', 'fa-expand');
+        fullscreenButton.innerHTML = chatWindow.classList.contains('fullscreen') ? 
+            '<i class="fas fa-compress"></i>' : '<i class="fas fa-expand"></i>';
+    });
+
+    // Chat pəncərəsini bağla
+    closeButton.addEventListener('click', () => {
+        chatWindow.style.display = 'none';
+        chatWindow.classList.remove('fullscreen');
+    });
+
+    // İstifadəçilər siyahısına qayıt
+    backButton.addEventListener('click', () => {
+        chatMain.style.display = 'none';
+        chatSidebar.style.display = 'block';
+        currentReceiverId = null;
+    });
+
+    // Mesaj göndər
+    sendButton.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
         }
     });
 
@@ -126,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Vizual feedback
             audioButton.classList.add('recording');
-            showRecordingIndicator();
+            audioButton.querySelector('.recording-wave').style.display = 'flex';
 
             mediaRecorder.ondataavailable = (e) => {
                 audioChunks.push(e.data);
@@ -147,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
         mediaRecorder.stop();
         isRecording = false;
         audioButton.classList.remove('recording');
-        hideRecordingIndicator();
+        audioButton.querySelector('.recording-wave').style.display = 'none';
 
         mediaRecorder.onstop = () => {
             const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
@@ -156,39 +107,31 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
-    // Səs yazma indikatorunu göstər
-    function showRecordingIndicator() {
-        const indicator = document.createElement('div');
-        indicator.className = 'recording-indicator';
-        indicator.innerHTML = `
-            <div class="recording-wave">
-                <span></span><span></span><span></span><span></span><span></span>
-            </div>
-            <span>Səs yazılır...</span>
-        `;
-        document.querySelector('.chat-input').appendChild(indicator);
-    }
+    // Mesaj göndərmə funksiyası
+    function sendMessage() {
+        const content = messageInput.value.trim();
+        if (!content || !currentReceiverId) return;
 
-    // Səs yazma indikatorunu gizlət
-    function hideRecordingIndicator() {
-        const indicator = document.querySelector('.recording-indicator');
-        if (indicator) indicator.remove();
-    }
+        const formData = new FormData();
+        formData.append('receiver_id', currentReceiverId);
+        formData.append('content', content);
 
-    // CSRF token al
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
+        fetch('/istifadeciler/api/chat/send/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
             }
-        }
-        return cookieValue;
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                messageInput.value = '';
+                appendMessage(data.message);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        })
+        .catch(error => console.error('Error:', error));
     }
 
     // Səs mesajını göndər
@@ -219,6 +162,77 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // İstifadəçi seçimi
+    window.selectUser = function(userId, username) {
+        currentReceiverId = userId;
+        document.getElementById('selected-username').textContent = username;
+        chatSidebar.style.display = 'none';
+        chatMain.style.display = 'flex';
+        loadMessages(userId);
+    };
+
+    // Mesajları yüklə
+    function loadMessages(userId) {
+        fetch(`/istifadeciler/api/chat/messages/${userId}/`)
+            .then(response => response.json())
+            .then(messages => {
+                chatMessages.innerHTML = '';
+                messages.forEach(appendMessage);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            });
+    }
+
+    // Link tanıma funksiyası
+    function detectLinks(text) {
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+        return text.replace(urlRegex, function(url) {
+            return `<a href="${url}" target="_blank">${url}</a>`;
+        });
+    }
+
+    // Mesaj əlavə et
+    function appendMessage(message) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${message.is_mine ? 'mine' : 'theirs'}`;
+
+        if (message.type === 'audio') {
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <audio controls>
+                        <source src="${message.content}" type="audio/webm">
+                    </audio>
+                    <span class="time">${new Date(message.created_at).toLocaleTimeString()}</span>
+                </div>
+            `;
+        } else {
+            const messageContent = detectLinks(message.content);
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    ${messageContent}
+                    <span class="time">${new Date(message.created_at).toLocaleTimeString()}</span>
+                </div>
+            `;
+        }
+
+        chatMessages.appendChild(messageDiv);
+    }
+
+    // CSRF token funksiyası
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
     // Bildiriş göstər
     function showNotification(type, message) {
         const notification = document.createElement('div');
@@ -229,5 +243,71 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             notification.remove();
         }, 3000);
+    }
+
+    // İstifadəçiləri yüklə
+    function loadChatUsers() {
+        fetch('/istifadeciler/api/chat/users/')
+            .then(response => response.json())
+            .then(data => {
+                const usersList = document.getElementById('users-list');
+                usersList.innerHTML = '';
+                
+                if (data.admins && data.admins.length > 0) {
+                    usersList.innerHTML += '<div class="user-group-title">Adminlər</div>';
+                    data.admins.forEach(user => {
+                        usersList.innerHTML += createUserItem(user);
+                    });
+                }
+                
+                if (data.users && data.users.length > 0) {
+                    usersList.innerHTML += '<div class="user-group-title">İstifadəçilər</div>';
+                    data.users.forEach(user => {
+                        usersList.innerHTML += createUserItem(user);
+                    });
+                }
+            });
+    }
+
+    // İstifadəçi elementi yarat
+    function createUserItem(user) {
+        return `
+            <div class="user-item ${user.unread_count > 0 ? 'has-unread' : ''}" 
+                 onclick="selectUser(${user.id}, '${user.username}')">
+                <div class="user-info">
+                    <i class="fas ${user.is_admin ? 'fa-user-shield admin-icon' : 'fa-user'}"></i>
+                    <span>${user.username}</span>
+                </div>
+                ${user.unread_count > 0 ? 
+                    `<span class="unread-count">${user.unread_count}</span>` : 
+                    ''}
+            </div>
+        `;
+    }
+
+    // İstifadəçi axtarışı
+    const searchInput = document.getElementById('user-search');
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            const searchTerm = searchInput.value.toLowerCase();
+            const userItems = document.querySelectorAll('.user-item');
+            
+            userItems.forEach(item => {
+                const username = item.querySelector('.user-info span').textContent.toLowerCase();
+                item.style.display = username.includes(searchTerm) ? 'flex' : 'none';
+            });
+        });
+    }
+
+    // Avtomatik yeniləmə
+    setInterval(() => {
+        if (currentReceiverId) {
+            loadMessages(currentReceiverId);
+        }
+    }, 3000);
+
+    // İlkin yükləmə
+    if (chatWindow.style.display === 'flex') {
+        loadChatUsers();
     }
 }); 

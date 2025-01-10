@@ -97,24 +97,96 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Mesajları yenilə
     function updateMessages(messages) {
-        const scrolledToBottom = chatMessages.scrollHeight - chatMessages.scrollTop === chatMessages.clientHeight;
+        if (messages.length === 0) return;
         
-        chatMessages.innerHTML = '';
-        messages.forEach(appendMessage);
+        const lastMsg = messages[messages.length - 1];
         
+        // Əgər yeni mesaj yoxdursa, heç nə etmirik
+        if (lastMsg.id <= lastMessageId) return;
+        
+        // Scroll pozisiyasını yoxlayırıq
+        const scrolledToBottom = Math.abs(
+            chatMessages.scrollHeight - chatMessages.scrollTop - chatMessages.clientHeight
+        ) < 10;
+        
+        // Mövcud mesajları saxlayırıq
+        const existingMessages = {};
+        chatMessages.querySelectorAll('.message').forEach(el => {
+            const msgId = el.getAttribute('data-message-id');
+            if (msgId) existingMessages[msgId] = el;
+        });
+        
+        // Yeni mesajları əlavə edirik
+        messages.forEach(message => {
+            if (!existingMessages[message.id]) {
+                const messageDiv = createMessageElement(message);
+                chatMessages.appendChild(messageDiv);
+                delete existingMessages[message.id];
+            }
+        });
+        
+        // Scroll pozisiyasını qoruyuruq
         if (scrolledToBottom) {
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
         
-        if (messages.length > 0) {
-            lastMessageId = messages[messages.length - 1].id;
-            
-            // Oxunmamış mesajları oxundu olaraq işarələ
-            const unreadMessages = messages.filter(m => !m.is_mine && !m.is_read);
-            if (unreadMessages.length > 0) {
-                markMessagesAsRead(unreadMessages.map(m => m.id));
+        lastMessageId = lastMsg.id;
+        
+        // Oxunmamış mesajları işarələyirik
+        const unreadMessages = messages.filter(m => !m.is_mine && !m.is_read);
+        if (unreadMessages.length > 0) {
+            markMessagesAsRead(unreadMessages.map(m => m.id));
+        }
+    }
+
+    // Yeni funksiya: Mesaj elementi yaratmaq üçün
+    function createMessageElement(message) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${message.is_mine ? 'mine' : 'theirs'}`;
+        messageDiv.setAttribute('data-message-id', message.id);
+        
+        let statusIcon = '';
+        if (message.is_mine) {
+            if (message.is_read) {
+                statusIcon = '<span class="message-status read"><i class="fas fa-check-double"></i></span>';
+            } else if (message.is_delivered) {
+                statusIcon = '<span class="message-status delivered"><i class="fas fa-check"></i></span>';
+            } else {
+                statusIcon = '<span class="message-status sent"><i class="fas fa-clock"></i></span>';
             }
         }
+
+        const messageTime = new Date(message.created_at || new Date()).toLocaleTimeString('az-AZ', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        if (message.type === 'audio') {
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <audio controls>
+                        <source src="${message.content}" type="audio/webm">
+                    </audio>
+                    <div class="message-meta">
+                        <span class="time">${messageTime}</span>
+                        ${statusIcon}
+                    </div>
+                </div>
+            `;
+        } else {
+            const messageContent = detectLinks(message.content);
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    ${messageContent}
+                    <div class="message-meta">
+                        <span class="time">${messageTime}</span>
+                        ${statusIcon}
+                    </div>
+                </div>
+            `;
+        }
+
+        return messageDiv;
     }
 
     // Mesajları oxundu olaraq işarələ
@@ -355,29 +427,69 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 const usersList = document.getElementById('users-list');
-                usersList.innerHTML = '';
+                const currentUsers = new Set();
                 
+                // Mövcud istifadəçiləri saxlayırıq
+                const existingUsers = {};
+                usersList.querySelectorAll('.user-item').forEach(el => {
+                    const userId = el.getAttribute('data-user-id');
+                    if (userId) existingUsers[userId] = el;
+                });
+                
+                // Adminləri əlavə edirik
                 if (data.admins && data.admins.length > 0) {
-                    usersList.innerHTML += '<div class="user-group-title">Adminlər</div>';
+                    if (!usersList.querySelector('.admin-group')) {
+                        usersList.insertAdjacentHTML('beforeend', '<div class="user-group-title admin-group">Adminlər</div>');
+                    }
                     data.admins.forEach(user => {
-                        usersList.innerHTML += createUserItem(user);
+                        updateOrCreateUserElement(user, existingUsers, usersList);
+                        currentUsers.add(user.id.toString());
                     });
                 }
                 
+                // İstifadəçiləri əlavə edirik
                 if (data.users && data.users.length > 0) {
-                    usersList.innerHTML += '<div class="user-group-title">İstifadəçilər</div>';
+                    if (!usersList.querySelector('.users-group')) {
+                        usersList.insertAdjacentHTML('beforeend', '<div class="user-group-title users-group">İstifadəçilər</div>');
+                    }
                     data.users.forEach(user => {
-                        usersList.innerHTML += createUserItem(user);
+                        updateOrCreateUserElement(user, existingUsers, usersList);
+                        currentUsers.add(user.id.toString());
                     });
                 }
+                
+                // Artıq mövcud olmayan istifadəçiləri silirik
+                Object.keys(existingUsers).forEach(userId => {
+                    if (!currentUsers.has(userId)) {
+                        existingUsers[userId].remove();
+                    }
+                });
             });
     }
 
-    // İstifadəçi elementi yarat
+    // Yeni funksiya: İstifadəçi elementini yeniləmək və ya yaratmaq üçün
+    function updateOrCreateUserElement(user, existingUsers, usersList) {
+        const userElement = existingUsers[user.id];
+        const newUserHtml = createUserItem(user);
+        
+        if (userElement) {
+            // Əgər məzmun dəyişibsə, yeniləyirik
+            if (userElement.outerHTML !== newUserHtml) {
+                userElement.outerHTML = newUserHtml;
+            }
+            delete existingUsers[user.id];
+        } else {
+            // Yeni element əlavə edirik
+            usersList.insertAdjacentHTML('beforeend', newUserHtml);
+        }
+    }
+
+    // createUserItem funksiyasını yeniləyirik
     function createUserItem(user) {
         return `
             <div class="user-item ${user.unread_count > 0 ? 'has-unread' : ''}" 
-                 onclick="selectUser(${user.id}, '${user.username}')">
+                 onclick="selectUser(${user.id}, '${user.username}')"
+                 data-user-id="${user.id}">
                 <div class="user-info">
                     <i class="fas ${user.is_admin ? 'fa-user-shield admin-icon' : 'fa-user'}"></i>
                     <span>${user.username}</span>

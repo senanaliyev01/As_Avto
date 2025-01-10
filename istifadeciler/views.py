@@ -120,7 +120,8 @@ def get_messages(request, receiver_id):
         
         return JsonResponse([{
             'id': msg.id,
-            'content': msg.content,
+            'content': msg.audio_file.url if msg.message_type == 'audio' else msg.content,
+            'type': msg.message_type,
             'sender': msg.sender.username,
             'is_mine': msg.sender == request.user,
             'is_read': msg.is_read,
@@ -316,3 +317,58 @@ def register(request):
             })
 
     return render(request, 'register.html')
+
+@login_required
+@csrf_exempt
+def send_audio_message(request):
+    if request.method == 'POST':
+        try:
+            receiver_id = request.POST.get('receiver_id')
+            audio_file = request.FILES.get('audio')
+            
+            if not audio_file:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Səs faylı tapılmadı'
+                })
+                
+            try:
+                receiver = User.objects.get(id=receiver_id)
+            except User.DoesNotExist:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'İstifadəçi tapılmadı'
+                })
+            
+            # Səs mesajını yarat
+            message = Message.objects.create(
+                sender=request.user,
+                receiver=receiver,
+                audio_file=audio_file,
+                message_type='audio',
+                is_delivered=True
+            )
+            
+            return JsonResponse({
+                'status': 'success',
+                'message': {
+                    'id': message.id,
+                    'content': message.audio_file.url,
+                    'type': 'audio',
+                    'sender': message.sender.username,
+                    'is_mine': True,
+                    'is_delivered': True,
+                    'is_read': False
+                }
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': f'Xəta baş verdi: {str(e)}'
+            })
+            
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Yanlış sorğu metodu'
+    })

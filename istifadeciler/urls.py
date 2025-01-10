@@ -10,4 +10,5 @@ urlpatterns = [
     path('api/chat/users/', views.get_chat_users, name='get_chat_users'),
     path('api/chat/messages/<int:receiver_id>/', views.get_messages, name='get_messages'),
     path('api/chat/send/', views.send_message, name='send_message'),
+    path('api/chat/send-audio/', views.send_audio_message, name='send_audio_message'),
 ]

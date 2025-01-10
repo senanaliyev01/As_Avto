@@ -46,11 +46,50 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // Auto-resize input
-    messageInput.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = (this.scrollHeight) + 'px';
-    });
+    // Link tanıma funksiyası
+    function detectLinks(text) {
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+        return text.replace(urlRegex, function(url) {
+            return `<a href="${url}" target="_blank">${url}</a>`;
+        });
+    }
+
+    // Mesajı əlavə et
+    function appendMessage(message) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${message.sender === currentUserId ? 'sent' : 'received'}`;
+
+        if (message.type === 'audio') {
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <audio controls>
+                        <source src="${message.content}" type="audio/webm">
+                    </audio>
+                    <span class="time">${new Date().toLocaleTimeString()}</span>
+                </div>
+            `;
+        } else {
+            const messageContent = detectLinks(message.content);
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <p>${messageContent}</p>
+                    <span class="time">${new Date().toLocaleTimeString()}</span>
+                </div>
+            `;
+        }
+
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Link kliklərini dinlə
+        const links = messageDiv.querySelectorAll('a');
+        links.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.open(this.href, '_blank');
+            });
+        });
+    }
 
     // Səs yazma - mobil üçün
     audioButton.addEventListener('touchstart', startRecording);
@@ -104,72 +143,21 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
-    // Səs mesajını göndər
-    function sendAudioMessage(blob) {
-        const formData = new FormData();
-        formData.append('audio', blob, 'voice.webm');
-        
-        fetch('/chat/send-audio/', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                appendMessage({
-                    type: 'audio',
-                    content: data.url,
-                    sender: currentUserId
-                });
-            }
-        });
-    }
-
-    // Mesaj göndər
-    function sendMessage(content) {
-        chatSocket.send(JSON.stringify({
-            'message': content,
-            'sender': currentUserId
-        }));
-    }
-
-    // Mesajı əlavə et
-    function appendMessage(message) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${message.sender === currentUserId ? 'sent' : 'received'}`;
-
-        if (message.type === 'audio') {
-            messageDiv.innerHTML = `
-                <audio controls>
-                    <source src="${message.content}" type="audio/webm">
-                </audio>
-                <span class="time">${new Date().toLocaleTimeString()}</span>
-            `;
-        } else {
-            messageDiv.innerHTML = `
-                <div class="message-content">
-                    <p>${message.content}</p>
-                    <span class="time">${new Date().toLocaleTimeString()}</span>
-                </div>
-            `;
-        }
-
-        chatMessages.appendChild(messageDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
     // Səs yazma indikatorunu göstər
     function showRecordingIndicator() {
         const indicator = document.createElement('div');
         indicator.className = 'recording-indicator';
         indicator.innerHTML = `
-            <div class="recording-wave"></div>
+            <div class="recording-wave">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
             <span>Səs yazılır...</span>
         `;
-        audioButton.appendChild(indicator);
+        document.querySelector('.chat-input').appendChild(indicator);
     }
 
     // Səs yazma indikatorunu gizlət
@@ -192,5 +180,45 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         return cookieValue;
+    }
+
+    // Səs mesajını göndər
+    function sendAudioMessage(blob) {
+        const formData = new FormData();
+        formData.append('audio', blob, 'voice.webm');
+        formData.append('receiver_id', currentReceiverId);
+        
+        fetch('/istifadeciler/api/chat/send-audio/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                appendMessage(data.message);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            } else {
+                showNotification('error', data.message || 'Səs mesajı göndərilə bilmədi');
+            }
+        })
+        .catch(error => {
+            console.error('Səs mesajı göndərmə xətası:', error);
+            showNotification('error', 'Səs mesajı göndərilə bilmədi');
+        });
+    }
+
+    // Bildiriş göstər
+    function showNotification(type, message) {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
     }
 }); 

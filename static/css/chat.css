@@ -562,3 +562,34 @@ audio {
         right: 20px;
     }
 } 
+
+.chat-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.control-button {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    transition: all 0.3s;
+}
+
+.control-button:hover {
+    background: rgba(0,0,0,0.1);
+    color: #333;
+}
+
+.chat-window.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+} 

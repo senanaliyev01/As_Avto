@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const messageForm = document.getElementById('messageForm');
     const messageInput = document.getElementById('messageInput');
     const audioButton = document.querySelector('.audio-btn');
+    const fullscreenButton = document.getElementById('fullscreen-chat');
+    const chatWindow = document.getElementById('chat-window');
     let mediaRecorder;
     let audioChunks = [];
     let isRecording = false;
@@ -91,6 +93,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Tam ekran funksiyası
+    fullscreenButton.addEventListener('click', () => {
+        chatWindow.classList.toggle('fullscreen');
+        const icon = fullscreenButton.querySelector('i');
+        if (chatWindow.classList.contains('fullscreen')) {
+            icon.classList.replace('fa-expand', 'fa-compress');
+        } else {
+            icon.classList.replace('fa-compress', 'fa-expand');
+        }
+    });
+
     // Səs yazma - mobil üçün
     audioButton.addEventListener('touchstart', startRecording);
     audioButton.addEventListener('touchend', stopRecording);
@@ -122,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
             mediaRecorder.start();
         } catch (err) {
             console.error('Səs yazma xətası:', err);
-            showNotification('Səs yazmaq üçün icazə lazımdır');
+            showNotification('error', 'Səs yazmaq üçün icazə lazımdır');
         }
     }
 
@@ -149,11 +162,7 @@ document.addEventListener('DOMContentLoaded', function() {
         indicator.className = 'recording-indicator';
         indicator.innerHTML = `
             <div class="recording-wave">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
+                <span></span><span></span><span></span><span></span><span></span>
             </div>
             <span>Səs yazılır...</span>
         `;

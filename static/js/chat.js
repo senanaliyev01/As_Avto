@@ -19,41 +19,27 @@ document.addEventListener('DOMContentLoaded', function() {
     let messageUpdateInterval;
     let userUpdateInterval;
 
-    // Real-time mesaj yeniləməsi - optimizasiya edilmiş versiya
+    // Real-time mesaj yeniləməsi
     function startRealtimeUpdates() {
+        // Mesajları hər 2 saniyədə bir yenilə
         messageUpdateInterval = setInterval(() => {
             if (currentReceiverId) {
                 fetch(`/istifadeciler/api/chat/messages/${currentReceiverId}/`)
                     .then(response => response.json())
                     .then(messages => {
-                        if (messages.length === 0) return;
-                        
-                        const newMessages = messages.filter(msg => msg.id > lastMessageId);
-                        if (newMessages.length === 0) return;
-                        
-                        const wasAtBottom = chatMessages.scrollHeight - chatMessages.scrollTop === chatMessages.clientHeight;
-                        
-                        newMessages.forEach(message => {
-                            appendMessage(message);
-                            if (!message.is_mine) {
+                        const lastMessage = messages[messages.length - 1];
+                        if (lastMessage && lastMessage.id > lastMessageId) {
+                            // Yeni mesajlar var
+                            updateMessages(messages);
+                            if (!lastMessage.is_mine) {
                                 playMessageSound();
                             }
-                        });
-                        
-                        lastMessageId = messages[messages.length - 1].id;
-                        
-                        if (wasAtBottom) {
-                            chatMessages.scrollTop = chatMessages.scrollHeight;
-                        }
-                        
-                        const unreadMessages = newMessages.filter(m => !m.is_mine && !m.is_read);
-                        if (unreadMessages.length > 0) {
-                            markMessagesAsRead(unreadMessages.map(m => m.id));
                         }
                     });
             }
         }, 1000);
 
+        // İstifadəçiləri hər 5 saniyədə bir yenilə
         userUpdateInterval = setInterval(loadChatUsers, 1000);
     }
 
@@ -62,6 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
         clearInterval(userUpdateInterval);
     }
 
+    // Mesaj səsini oxut
     function playMessageSound() {
         const audio = document.getElementById('chat-message-sound');
         if (audio) {
@@ -70,6 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Chat ikonuna klik
     document.getElementById('chat-icon').addEventListener('click', () => {
         const isVisible = chatWindow.style.display === 'flex';
         chatWindow.style.display = isVisible ? 'none' : 'flex';
@@ -84,18 +72,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Tam ekran düyməsi
     fullscreenButton.addEventListener('click', () => {
         chatWindow.classList.toggle('fullscreen');
         fullscreenButton.innerHTML = chatWindow.classList.contains('fullscreen') ? 
             '<i class="fas fa-compress"></i>' : '<i class="fas fa-expand"></i>';
     });
 
+    // Chat pəncərəsini bağla
     closeButton.addEventListener('click', () => {
         chatWindow.style.display = 'none';
         chatWindow.classList.remove('fullscreen');
         stopRealtimeUpdates();
     });
 
+    // İstifadəçilər siyahısına qayıt
     backButton.addEventListener('click', () => {
         chatMain.style.display = 'none';
         chatSidebar.style.display = 'block';
@@ -104,6 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
         startRealtimeUpdates();
     });
 
+    // Mesajları yenilə
     function updateMessages(messages) {
         const scrolledToBottom = chatMessages.scrollHeight - chatMessages.scrollTop === chatMessages.clientHeight;
         
@@ -117,6 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (messages.length > 0) {
             lastMessageId = messages[messages.length - 1].id;
             
+            // Oxunmamış mesajları oxundu olaraq işarələ
             const unreadMessages = messages.filter(m => !m.is_mine && !m.is_read);
             if (unreadMessages.length > 0) {
                 markMessagesAsRead(unreadMessages.map(m => m.id));
@@ -124,6 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Mesajları oxundu olaraq işarələ
     function markMessagesAsRead(messageIds) {
         if (!messageIds.length) return;
         
@@ -137,6 +131,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Mesaj göndər
     sendButton.addEventListener('click', sendMessage);
     messageInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -145,12 +140,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Səs yazma - mobil üçün
     audioButton.addEventListener('touchstart', startRecording);
     audioButton.addEventListener('touchend', stopRecording);
+
+    // Səs yazma - PC üçün
     audioButton.addEventListener('mousedown', startRecording);
     audioButton.addEventListener('mouseup', stopRecording);
     audioButton.addEventListener('mouseleave', stopRecording);
 
+    // Səs yazmağı başlat
     async function startRecording(e) {
         e.preventDefault();
         if (isRecording) return;
@@ -175,6 +174,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Səs yazmağı bitir
     function stopRecording(e) {
         e.preventDefault();
         if (!isRecording) return;
@@ -191,6 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
+    // Mesaj göndərmə funksiyası
     function sendMessage() {
         const content = messageInput.value.trim();
         if (!content || !currentReceiverId) return;
@@ -217,6 +218,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => console.error('Error:', error));
     }
 
+    // Səs mesajını göndər
     function sendAudioMessage(blob) {
         const formData = new FormData();
         formData.append('audio', blob, 'voice.webm');
@@ -244,6 +246,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // İstifadəçi seçimi
     window.selectUser = function(userId, username) {
         currentReceiverId = userId;
         document.getElementById('selected-username').textContent = username;
@@ -252,6 +255,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loadMessages(userId);
     };
 
+    // Mesajları yüklə
     function loadMessages(userId) {
         fetch(`/istifadeciler/api/chat/messages/${userId}/`)
             .then(response => response.json())
@@ -260,6 +264,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
+    // Link tanıma funksiyası
     function detectLinks(text) {
         const urlRegex = /(https?:\/\/[^\s]+)/g;
         return text.replace(urlRegex, function(url) {
@@ -267,6 +272,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Mesaj əlavə et
     function appendMessage(message) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${message.is_mine ? 'mine' : 'theirs'}`;
@@ -315,6 +321,7 @@ document.addEventListener('DOMContentLoaded', function() {
         chatMessages.appendChild(messageDiv);
     }
 
+    // CSRF token funksiyası
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -330,6 +337,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return cookieValue;
     }
 
+    // Bildiriş göstər
     function showNotification(type, message) {
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
@@ -341,6 +349,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     }
 
+    // İstifadəçiləri yüklə
     function loadChatUsers() {
         fetch('/istifadeciler/api/chat/users/')
             .then(response => response.json())
@@ -364,6 +373,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
+    // İstifadəçi elementi yarat
     function createUserItem(user) {
         return `
             <div class="user-item ${user.unread_count > 0 ? 'has-unread' : ''}" 
@@ -379,6 +389,7 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
     }
 
+    // İstifadəçi axtarışı
     const searchInput = document.getElementById('user-search');
     if (searchInput) {
         searchInput.addEventListener('input', () => {
@@ -392,8 +403,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // İlkin yükləmə
     if (chatWindow.style.display === 'flex') {
         loadChatUsers();
         startRealtimeUpdates();
     }
-});
+}); 

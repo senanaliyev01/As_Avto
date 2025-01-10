@@ -819,6 +819,41 @@ footer::before {
     flex-direction: column;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+/* Tam ekran üçün yeni class */
+.chat-window.fullscreen {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    border-radius: 0;
+    z-index: 9999;
+}
+
+/* Tam ekran düyməsi */
+.fullscreen-btn {
+    background: none;
+    border: none;
+    color: #e3f2fd;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+}
+
+.fullscreen-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
 }
 
 .chat-header {
@@ -1476,4 +1511,70 @@ footer::before {
     .footer-content {
         grid-template-columns: repeat(2, 1fr);
     }
+}
+
+/* Səs yazma indikatorunun stili */
+.recording-indicator {
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.recording-icon {
+    color: #ff4444;
+    animation: pulse 1s infinite;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translate(-50%, 10px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* Səs düyməsinin stili */
+.audio-btn {
+    background: none;
+    border: none;
+    color: #e3f2fd;
+    font-size: 20px;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    margin-right: 10px;
+}
+
+.audio-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.audio-btn:active {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(0.95);
+}
+
+.audio-btn i {
+    transition: all 0.3s ease;
+}
+
+.audio-btn:active i {
+    color: #ff4444;
 }

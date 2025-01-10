@@ -7,6 +7,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalMessage = document.getElementById('modalMessage');
     const closeModal = document.querySelector('.close');
 
+    // CSRF token əldə et
+    function getCSRFToken() {
+        const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+        return csrfInput ? csrfInput.value : '';
+    }
+
     // Şifrə tələbləri elementləri
     const lengthReq = document.getElementById('length');
     const uppercaseReq = document.getElementById('uppercase');
@@ -15,7 +21,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Şifrə göstər/gizlə
     togglePasswordButtons.forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
             const input = this.parentElement.querySelector('input');
             const icon = this.querySelector('i');
             
@@ -101,11 +108,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 method: 'POST',
                 body: formData,
                 headers: {
-                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                    'X-CSRFToken': getCSRFToken()
                 }
             });
 
             const data = await response.json();
+            console.log('Server cavabı:', data);
 
             if (data.status === 'success') {
                 showModal(data.message, true);
@@ -117,6 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 showModal(data.message, false);
             }
         } catch (error) {
+            console.error('Xəta:', error);
             showModal('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.', false);
         } finally {
             submitBtn.classList.remove('loading');
@@ -138,5 +147,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.parentElement.classList.remove('has-value');
             }
         });
+
+        // Placeholder əlavə et
+        input.setAttribute('placeholder', ' ');
     });
 }); 

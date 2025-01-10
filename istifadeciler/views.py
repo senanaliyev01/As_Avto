@@ -228,6 +228,8 @@ def register(request):
             telefon = request.POST.get('telefon')
             unvan = request.POST.get('unvan')
 
+            print(f"Qəbul edilən məlumatlar: username={username}, email={email}, ad={ad}, soyad={soyad}, telefon={telefon}")
+
             # Boş sahələri yoxla
             if not all([username, email, password, confirm_password, ad, soyad, telefon, unvan]):
                 return JsonResponse({
@@ -288,6 +290,8 @@ def register(request):
                 password=password
             )
 
+            print(f"İstifadəçi yaradıldı: {user.username}")
+
             # Profili yenilə
             profile = user.profile
             profile.ad = ad
@@ -296,15 +300,18 @@ def register(request):
             profile.unvan = unvan
             profile.save()
 
+            print(f"Profil yeniləndi: {profile}")
+
             return JsonResponse({
                 'status': 'success',
                 'message': 'Qeydiyyat uğurla tamamlandı! Zəhmət olmasa admin təsdiqini gözləyin.'
             })
 
         except Exception as e:
+            print(f"Qeydiyyat zamanı xəta: {str(e)}")
             return JsonResponse({
                 'status': 'error',
-                'message': 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.'
+                'message': f'Xəta baş verdi: {str(e)}'
             })
 
     return render(request, 'register.html')

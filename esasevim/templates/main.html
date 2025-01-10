@@ -227,7 +227,7 @@
             <span id="total-unread" class="unread-count" style="display: none;">0</span>
         </div>
         
-        <div id="chat-window" class="chat-window" style="display: none;">
+        <div id="chat-window" class="chat-window">
             <div class="chat-header">
                 <div class="chat-title">Mesajlar</div>
                 <div class="chat-controls">
@@ -251,12 +251,12 @@
                 </div>
                 
                 <!-- Mesajlaşma bölməsi -->
-                <div class="chat-main" style="display: none;">
+                <div class="chat-main">
                     <div class="selected-user">
                         <i class="fas fa-arrow-left" id="back-to-users"></i>
                         <span id="selected-username"></span>
                     </div>
-                    <div class="chat-messages" id="chat-messages"></div>
+                    <div id="chat-messages" class="chat-messages"></div>
                     <div class="chat-input">
                         <input type="text" id="message-input" placeholder="Mesajınızı yazın...">
                         <button class="audio-btn">

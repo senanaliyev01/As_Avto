@@ -168,29 +168,9 @@ let currentReceiverName = null;
 let lastMessageCount = 0;
 let lastMessageId = 0;
 
-// Yeni mesaj bildirişi səsi
-function playNewMessageSound() {
-    const audio = document.getElementById('new-message-sound');
-    if (audio) {
-        audio.currentTime = 0;
-        audio.play().catch(error => {
-            console.log('Səs oxutma xətası:', error);
-        });
-    }
-}
-
-// Chat mesajı bildirişi səsi
-function playChatMessageSound() {
-    const audio = document.getElementById('chat-message-sound');
-    if (audio) {
-        audio.currentTime = 0;
-        audio.play().catch(error => {
-            console.log('Səs oxutma xətası:', error);
-        });
-    }
-}
-
 function initChat() {
+    console.log('initChat started'); // Debug
+    
     const chatIcon = document.getElementById('chat-icon');
     const chatWindow = document.getElementById('chat-window');
     const closeChat = document.getElementById('close-chat');
@@ -200,19 +180,86 @@ function initChat() {
     const chatMain = document.querySelector('.chat-main');
     const chatSidebar = document.querySelector('.chat-sidebar');
     const fullscreenBtn = document.getElementById('fullscreen-chat');
+    const audioButton = document.querySelector('.audio-btn');
 
-    // Tam ekran funksionallığı
-    fullscreenBtn.addEventListener('click', () => {
-        chatWindow.classList.toggle('fullscreen');
-        const icon = fullscreenBtn.querySelector('i');
-        if (chatWindow.classList.contains('fullscreen')) {
-            icon.classList.remove('fa-expand');
-            icon.classList.add('fa-compress');
+    console.log('Elements:', { // Debug
+        chatIcon,
+        chatWindow,
+        closeChat,
+        backButton,
+        messageInput,
+        sendButton,
+        chatMain,
+        chatSidebar,
+        fullscreenBtn,
+        audioButton
+    });
+
+    if (!chatIcon || !chatWindow) {
+        console.error('Chat elements not found!'); // Debug
+        return;
+    }
+
+    // Chat ikonuna klik
+    chatIcon.addEventListener('click', () => {
+        console.log('Chat icon clicked'); // Debug
+        if (chatWindow.style.display === 'none' || !chatWindow.style.display) {
+            chatWindow.style.display = 'flex';
+            loadChatUsers();
+            if (chatMain && chatSidebar) {
+                chatMain.style.display = 'none';
+                chatSidebar.style.display = 'block';
+            }
         } else {
-            icon.classList.remove('fa-compress');
-            icon.classList.add('fa-expand');
+            chatWindow.style.display = 'none';
         }
     });
+
+    // Chat pəncərəsini bağla
+    if (closeChat) {
+        closeChat.addEventListener('click', () => {
+            console.log('Close button clicked'); // Debug
+            chatWindow.style.display = 'none';
+        });
+    }
+
+    // İstifadəçilər siyahısına qayıt
+    if (backButton) {
+        backButton.addEventListener('click', () => {
+            console.log('Back button clicked'); // Debug
+            if (chatMain && chatSidebar) {
+                chatMain.style.display = 'none';
+                chatSidebar.style.display = 'block';
+                currentReceiverId = null;
+                currentReceiverName = null;
+            }
+        });
+    }
+
+    // Mesaj göndər
+    if (sendButton && messageInput) {
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    }
+
+    // Tam ekran funksionallığı
+    if (fullscreenBtn) {
+        fullscreenBtn.addEventListener('click', () => {
+            chatWindow.classList.toggle('fullscreen');
+            const icon = fullscreenBtn.querySelector('i');
+            if (chatWindow.classList.contains('fullscreen')) {
+                icon.classList.remove('fa-expand');
+                icon.classList.add('fa-compress');
+            } else {
+                icon.classList.remove('fa-compress');
+                icon.classList.add('fa-expand');
+            }
+        });
+    }
 
     // ESC düyməsi ilə tam ekrandan çıxış
     document.addEventListener('keydown', (e) => {
@@ -221,163 +268,6 @@ function initChat() {
             const icon = fullscreenBtn.querySelector('i');
             icon.classList.remove('fa-compress');
             icon.classList.add('fa-expand');
-        }
-    });
-
-    // Səs yazma dəyişənləri
-    let mediaRecorder;
-    let audioChunks = [];
-    let isRecording = false;
-    let recordingTimeout;
-
-    // Səs yazma - mobil üçün
-    audioButton.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        startRecording();
-    });
-
-    audioButton.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        stopRecording();
-    });
-
-    // Səs yazma - PC üçün
-    audioButton.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        startRecording();
-    });
-
-    audioButton.addEventListener('mouseup', (e) => {
-        e.preventDefault();
-        stopRecording();
-    });
-
-    audioButton.addEventListener('mouseleave', (e) => {
-        e.preventDefault();
-        if (isRecording) {
-            stopRecording();
-        }
-    });
-
-    // Səs yazmağı başlat
-    async function startRecording() {
-        if (isRecording) return;
-
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder = new MediaRecorder(stream);
-            audioChunks = [];
-            isRecording = true;
-
-            mediaRecorder.ondataavailable = (e) => {
-                audioChunks.push(e.data);
-            };
-
-            mediaRecorder.onstop = () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                sendAudioMessage(audioBlob);
-                stream.getTracks().forEach(track => track.stop());
-            };
-
-            mediaRecorder.start();
-            showRecordingIndicator();
-            audioButton.classList.add('recording');
-        } catch (err) {
-            console.error('Səs yazma xətası:', err);
-            showNotification('error', 'Səs yazmaq üçün icazə lazımdır');
-        }
-    }
-
-    // Səs yazmağı bitir və göndər
-    function stopRecording() {
-        if (!isRecording) return;
-
-        mediaRecorder.stop();
-        isRecording = false;
-        hideRecordingIndicator();
-        audioButton.classList.remove('recording');
-    }
-
-    // Səs mesajını göndər
-    function sendAudioMessage(blob) {
-        const formData = new FormData();
-        formData.append('audio', blob, 'voice.webm');
-        formData.append('receiver_id', currentReceiverId);
-        
-        fetch('/chat/send-audio/', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                loadMessages(currentReceiverId);
-            } else {
-                showNotification('error', 'Səs göndərilmədi');
-            }
-        })
-        .catch(error => {
-            console.error('Səs göndərmə xətası:', error);
-            showNotification('error', 'Səs göndərilmədi');
-        });
-    }
-
-    // Səs yazma indikatorunu göstər
-    function showRecordingIndicator() {
-        const indicator = document.createElement('div');
-        indicator.className = 'recording-indicator';
-        indicator.innerHTML = `
-            <i class="fas fa-microphone recording-icon"></i>
-            <span>Səs yazılır...</span>
-        `;
-        document.body.appendChild(indicator);
-    }
-
-    // Səs yazma indikatorunu gizlət
-    function hideRecordingIndicator() {
-        const indicator = document.querySelector('.recording-indicator');
-        if (indicator) {
-            indicator.remove();
-        }
-    }
-
-    // Səs düyməsini chat input-a əlavə et
-    const chatInput = document.querySelector('.chat-input');
-    chatInput.insertBefore(audioButton, sendButton);
-
-    if (!chatIcon || !chatWindow) return;
-
-    // Chat ikonuna klik
-    chatIcon.addEventListener('click', () => {
-        chatWindow.style.display = chatWindow.style.display === 'none' ? 'flex' : 'none';
-        if (chatWindow.style.display === 'flex') {
-            loadChatUsers();
-            chatMain.style.display = 'none';
-            chatSidebar.style.display = 'block';
-        }
-    });
-
-    // Chat pəncərəsini bağla
-    closeChat.addEventListener('click', () => {
-        chatWindow.style.display = 'none';
-    });
-
-    // İstifadəçilər siyahısına qayıt
-    backButton.addEventListener('click', () => {
-        chatMain.style.display = 'none';
-        chatSidebar.style.display = 'block';
-        currentReceiverId = null;
-        currentReceiverName = null;
-    });
-
-    // Mesaj göndər
-    sendButton.addEventListener('click', sendMessage);
-    messageInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            sendMessage();
         }
     });
 
@@ -395,6 +285,12 @@ function initChat() {
         searchInput.addEventListener('input', filterUsers);
     }
 }
+
+// Chat-i inizializasiya et
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing chat...'); // Debug
+    setTimeout(initChat, 1000); // Give some time for all elements to load
+});
 
 // Chat istifadəçilərini yükləmə funksiyası
 function loadChatUsers() {
@@ -579,8 +475,8 @@ function getCookie(name) {
 
 // Chat-i inizializasiya et
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded, initializing chat...'); // Debug üçün
-    initChat();
+    console.log('DOM loaded, initializing chat...'); // Debug
+    setTimeout(initChat, 1000); // Give some time for all elements to load
 });
 
 // DOM yükləndikdə

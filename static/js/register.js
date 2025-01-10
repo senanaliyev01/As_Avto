@@ -104,11 +104,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         try {
             const formData = new FormData(form);
-            const response = await fetch('/register/', {
+            const response = await fetch('/istifadeciler/register/', {
                 method: 'POST',
                 body: formData,
+                credentials: 'same-origin',
                 headers: {
-                    'X-CSRFToken': getCSRFToken()
+                    'X-CSRFToken': getCSRFToken(),
                 }
             });
 
@@ -119,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 showModal(data.message, true);
                 form.reset();
                 setTimeout(() => {
-                    window.location.href = '/login/';
+                    window.location.href = '/istifadeciler/login/';
                 }, 3000);
             } else {
                 showModal(data.message, false);

@@ -215,6 +215,7 @@ def get_chat_users(request):
     print("Sending response:", response_data) # Debug üçün
     return JsonResponse(response_data)
 
+@csrf_exempt
 def register(request):
     if request.method == 'POST':
         try:

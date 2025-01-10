@@ -288,6 +288,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
+        const messageTime = new Date(message.created_at || new Date()).toLocaleTimeString('az-AZ', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
         if (message.type === 'audio') {
             messageDiv.innerHTML = `
                 <div class="message-content">
@@ -295,7 +300,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <source src="${message.content}" type="audio/webm">
                     </audio>
                     <div class="message-meta">
-                        <span class="time">${new Date(message.created_at).toLocaleTimeString()}</span>
+                        <span class="time">${messageTime}</span>
                         ${statusIcon}
                     </div>
                 </div>
@@ -306,7 +311,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="message-content">
                     ${messageContent}
                     <div class="message-meta">
-                        <span class="time">${new Date(message.created_at).toLocaleTimeString()}</span>
+                        <span class="time">${messageTime}</span>
                         ${statusIcon}
                     </div>
                 </div>

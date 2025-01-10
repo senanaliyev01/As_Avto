@@ -10,6 +10,9 @@ from django.views.decorators.http import require_POST
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+import re
 
 def login_view(request):
     if request.method == 'POST':
@@ -18,6 +21,13 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         
         if user is not None:
+            # İstifadəçinin təsdiq statusunu yoxla
+            if not user.profile.is_approved:
+                messages.error(request, 
+                    'Hesabınız hələ admin tərəfindən təsdiqlənməyib.',
+                    extra_tags='auth-error')
+                return render(request, 'login.html')
+                
             login(request, user)
             return redirect('main')
         else:
@@ -204,3 +214,97 @@ def get_chat_users(request):
     }
     print("Sending response:", response_data) # Debug üçün
     return JsonResponse(response_data)
+
+def register(request):
+    if request.method == 'POST':
+        try:
+            # Məlumatları əldə et
+            username = request.POST.get('username')
+            email = request.POST.get('email')
+            password = request.POST.get('password')
+            confirm_password = request.POST.get('confirm_password')
+            ad = request.POST.get('ad')
+            soyad = request.POST.get('soyad')
+            telefon = request.POST.get('telefon')
+            unvan = request.POST.get('unvan')
+
+            # Boş sahələri yoxla
+            if not all([username, email, password, confirm_password, ad, soyad, telefon, unvan]):
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Bütün sahələr doldurulmalıdır!'
+                })
+
+            # İstifadəçi adının mövcudluğunu yoxla
+            if User.objects.filter(username=username).exists():
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Bu istifadəçi adı artıq mövcuddur!'
+                })
+
+            # Email-in mövcudluğunu yoxla
+            if User.objects.filter(email=email).exists():
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Bu email artıq istifadə olunub!'
+                })
+
+            # Şifrələrin uyğunluğunu yoxla
+            if password != confirm_password:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Şifrələr uyğun gəlmir!'
+                })
+
+            # Şifrə tələblərini yoxla
+            if len(password) < 8:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Şifrə ən azı 8 simvol olmalıdır!'
+                })
+
+            if not re.search(r'[A-Z]', password):
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Şifrədə ən azı 1 böyük hərf olmalıdır!'
+                })
+
+            if not re.search(r'[0-9]', password):
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Şifrədə ən azı 1 rəqəm olmalıdır!'
+                })
+
+            if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Şifrədə ən azı 1 xüsusi simvol olmalıdır!'
+                })
+
+            # İstifadəçini yarat
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password
+            )
+
+            # Profili yenilə
+            profile = user.profile
+            profile.ad = ad
+            profile.soyad = soyad
+            profile.telefon = telefon
+            profile.unvan = unvan
+            profile.save()
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Qeydiyyat uğurla tamamlandı! Zəhmət olmasa admin təsdiqini gözləyin.'
+            })
+
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.'
+            })
+
+    return render(request, 'register.html')

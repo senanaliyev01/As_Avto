@@ -39,6 +39,32 @@ class MessageAdmin(admin.ModelAdmin):
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'ad', 'soyad', 'telefon')
-    search_fields = ('user__username', 'ad', 'soyad', 'telefon')
-    list_filter = ('user__is_active',)
+    list_display = ('user', 'ad', 'soyad', 'telefon', 'is_approved', 'approve_button')
+    list_filter = ('is_approved', 'user__is_active')
+    search_fields = ('user__username', 'ad', 'soyad', 'telefon', 'unvan')
+    readonly_fields = ('user',)
+    list_per_page = 20
+    
+    def approve_button(self, obj):
+        if not obj.is_approved:
+            return format_html(
+                '<a class="button" href="{}?approve=true" style="background-color: #4CAF50; color: white; '
+                'padding: 5px 10px; border-radius: 5px; text-decoration: none;">'
+                '<i class="fas fa-check"></i> Təsdiqlə</a>',
+                reverse('admin:istifadeciler_profile_change', args=[obj.id])
+            )
+        return format_html(
+            '<span style="color: #4CAF50;"><i class="fas fa-check-circle"></i> Təsdiqlənib</span>'
+        )
+    approve_button.short_description = 'Təsdiq'
+    approve_button.allow_tags = True
+
+    def save_model(self, request, obj, form, change):
+        if 'approve' in request.GET and request.GET['approve'] == 'true':
+            obj.is_approved = True
+        super().save_model(request, obj, form, change)
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # Mövcud obyekt
+            return self.readonly_fields
+        return ()

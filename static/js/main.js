@@ -272,7 +272,7 @@ function initChat() {
             <i class="fas fa-microphone recording-icon"></i>
             <span>Səs yazılır...</span>
         `;
-        document.querySelector('.chat-input').appendChild(indicator);
+        document.body.appendChild(indicator);
     }
 
     // Səs yazma indikatorunu gizlət
@@ -484,14 +484,16 @@ function loadMessages(receiverId) {
         .then(messages => {
             const chatMessages = document.getElementById('chat-messages');
             
-            // Son mesajın ID-sini al
             const lastMessage = messages[messages.length - 1];
             
-            // HTML-i yenilə
             chatMessages.innerHTML = messages.map(msg => `
                 <div class="message ${msg.is_mine ? 'mine' : 'theirs'}">
                     ${!msg.is_mine ? `<div class="message-sender">${msg.sender}</div>` : ''}
-                    <div class="message-content">${msg.content}</div>
+                    <div class="message-content">
+                        ${msg.type === 'audio' ? 
+                            `<audio controls src="${msg.content}"></audio>` : 
+                            formatMessageContent(msg.content)}
+                    </div>
                     ${msg.is_mine ? `
                         <div class="message-status ${getMessageStatus(msg)}">
                             ${getStatusIcons(msg)}
@@ -505,10 +507,12 @@ function loadMessages(receiverId) {
                 playChatMessageSound();
             }
 
-            // Son mesaj ID-sini yadda saxla
             if (lastMessage) {
                 lastMessageId = lastMessage.id;
             }
+
+            // Avtomatik aşağı sürüşdür
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         });
 }
 
@@ -758,5 +762,11 @@ document.addEventListener('click', function initAudioOnUserInteraction() {
     initAudio();
     document.removeEventListener('click', initAudioOnUserInteraction);
 }, { once: true });
+
+// Link tanıma funksiyası
+function formatMessageContent(content) {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return content.replace(urlRegex, url => `<a href="${url}" class="message-link" target="_blank">${url}</a>`);
+}
 
 

@@ -824,6 +824,17 @@ button {
         gap: var(--spacing-md);
         text-align: center;
     }
+
+    .header__nav--active .header__actions {
+        flex-direction: column;
+        width: 100%;
+        max-width: 250px;
+    }
+
+    .header__actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 @media (max-width: 480px) {
@@ -839,4 +850,42 @@ button {
     .about__features {
         grid-template-columns: 1fr;
     }
+}
+
+/* B4B Buttons */
+.header__actions {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.header__actions .btn {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border: 2px solid transparent;
+    border-radius: var(--border-radius-md);
+    transition: all var(--transition-fast);
+}
+
+.header__actions .btn i {
+    font-size: var(--font-size-base);
+}
+
+.header__actions .btn--primary {
+    background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark));
+    color: var(--color-white);
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+}
+
+.header__actions .btn--primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+    background: linear-gradient(135deg, var(--color-accent-dark), var(--color-accent));
+}
+
+.header__actions .btn--primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(59, 130, 246, 0.2);
 }

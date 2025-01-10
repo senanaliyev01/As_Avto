@@ -1594,18 +1594,17 @@ footer::before {
 }
 
 .recording-indicator {
-    position: fixed;
-    bottom: 80px;
+    position: absolute;
+    top: -40px;
     left: 50%;
     transform: translateX(-50%);
     background: rgba(0, 0, 0, 0.8);
     color: white;
-    padding: 10px 20px;
+    padding: 8px 16px;
     border-radius: 20px;
     display: flex;
     align-items: center;
     gap: 10px;
-    z-index: 1000;
     animation: fadeIn 0.3s ease-out;
 }
 
@@ -1614,13 +1613,47 @@ footer::before {
     animation: pulse 1s infinite;
 }
 
-.message-link {
-    color: #1e88e5;
-    text-decoration: underline;
-    word-break: break-all;
+@keyframes fadeIn {
+    from { opacity: 0; transform: translate(-50%, 10px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
 }
 
-.message-link:hover {
-    text-decoration: none;
-    opacity: 0.8;
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* Səs düyməsinin stili */
+.audio-btn {
+    background: none;
+    border: none;
+    color: #e3f2fd;
+    font-size: 20px;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    margin-right: 10px;
+}
+
+.audio-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.audio-btn:active {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(0.95);
+}
+
+.audio-btn i {
+    transition: all 0.3s ease;
+}
+
+.audio-btn:active i {
+    color: #ff4444;
 }

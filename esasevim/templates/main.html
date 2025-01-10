@@ -230,15 +230,20 @@
         <div id="chat-window" class="chat-window" style="display: none;">
             <div class="chat-header">
                 <div class="chat-title">Mesajlar</div>
-                <button id="close-chat" class="close-button">&times;</button>
-                <button id="fullscreen-chat" class="fullscreen-button"><i class="fas fa-expand"></i></button>
+                <div class="header-actions">
+                    <button id="fullscreen-chat" class="header-button">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                    <button id="close-chat" class="header-button">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
             </div>
             
             <div class="chat-container">
                 <!-- İstifadəçilər siyahısı -->
                 <div class="chat-sidebar">
                     <div class="search-box">
-                        <i class="fas fa-search"></i>
                         <input type="text" id="user-search" placeholder="İstifadəçi axtar...">
                     </div>
                     <div id="users-list" class="users-list"></div>
@@ -258,7 +263,9 @@
                                 <span></span><span></span><span></span><span></span><span></span>
                             </div>
                         </button>
-                        <input type="text" id="message-input" placeholder="Mesajınızı yazın...">
+                        <div class="message-input-container">
+                            <input type="text" id="message-input" placeholder="Mesajınızı yazın...">
+                        </div>
                         <button id="send-message" type="button">
                             <i class="fas fa-paper-plane"></i>
                         </button>

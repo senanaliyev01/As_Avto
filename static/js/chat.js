@@ -15,12 +15,58 @@ document.addEventListener('DOMContentLoaded', function() {
     let audioChunks = [];
     let isRecording = false;
     let currentReceiverId = null;
+    let lastMessageId = 0;
+    let messageUpdateInterval;
+    let userUpdateInterval;
+
+    // Real-time mesaj yeniləməsi
+    function startRealtimeUpdates() {
+        // Mesajları hər 2 saniyədə bir yenilə
+        messageUpdateInterval = setInterval(() => {
+            if (currentReceiverId) {
+                fetch(`/istifadeciler/api/chat/messages/${currentReceiverId}/`)
+                    .then(response => response.json())
+                    .then(messages => {
+                        const lastMessage = messages[messages.length - 1];
+                        if (lastMessage && lastMessage.id > lastMessageId) {
+                            // Yeni mesajlar var
+                            updateMessages(messages);
+                            if (!lastMessage.is_mine) {
+                                playMessageSound();
+                            }
+                        }
+                    });
+            }
+        }, 2000);
+
+        // İstifadəçiləri hər 5 saniyədə bir yenilə
+        userUpdateInterval = setInterval(loadChatUsers, 5000);
+    }
+
+    function stopRealtimeUpdates() {
+        clearInterval(messageUpdateInterval);
+        clearInterval(userUpdateInterval);
+    }
+
+    // Mesaj səsini oxut
+    function playMessageSound() {
+        const audio = document.getElementById('chat-message-sound');
+        if (audio) {
+            audio.currentTime = 0;
+            audio.play().catch(err => console.log('Səs oxutma xətası:', err));
+        }
+    }
 
     // Chat ikonuna klik
     document.getElementById('chat-icon').addEventListener('click', () => {
-        chatWindow.style.display = chatWindow.style.display === 'none' ? 'flex' : 'none';
-        if (chatWindow.style.display === 'flex') {
+        const isVisible = chatWindow.style.display === 'flex';
+        chatWindow.style.display = isVisible ? 'none' : 'flex';
+        
+        if (isVisible) {
+            stopRealtimeUpdates();
+        } else {
             loadChatUsers();
+            startRealtimeUpdates();
             chatMain.style.display = 'none';
             chatSidebar.style.display = 'block';
         }
@@ -37,6 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
     closeButton.addEventListener('click', () => {
         chatWindow.style.display = 'none';
         chatWindow.classList.remove('fullscreen');
+        stopRealtimeUpdates();
     });
 
     // İstifadəçilər siyahısına qayıt
@@ -44,7 +91,45 @@ document.addEventListener('DOMContentLoaded', function() {
         chatMain.style.display = 'none';
         chatSidebar.style.display = 'block';
         currentReceiverId = null;
+        stopRealtimeUpdates();
+        startRealtimeUpdates();
     });
+
+    // Mesajları yenilə
+    function updateMessages(messages) {
+        const scrolledToBottom = chatMessages.scrollHeight - chatMessages.scrollTop === chatMessages.clientHeight;
+        
+        chatMessages.innerHTML = '';
+        messages.forEach(appendMessage);
+        
+        if (scrolledToBottom) {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        if (messages.length > 0) {
+            lastMessageId = messages[messages.length - 1].id;
+            
+            // Oxunmamış mesajları oxundu olaraq işarələ
+            const unreadMessages = messages.filter(m => !m.is_mine && !m.is_read);
+            if (unreadMessages.length > 0) {
+                markMessagesAsRead(unreadMessages.map(m => m.id));
+            }
+        }
+    }
+
+    // Mesajları oxundu olaraq işarələ
+    function markMessagesAsRead(messageIds) {
+        if (!messageIds.length) return;
+        
+        fetch('/istifadeciler/api/chat/mark-read/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ message_ids: messageIds })
+        });
+    }
 
     // Mesaj göndər
     sendButton.addEventListener('click', sendMessage);
@@ -75,7 +160,6 @@ document.addEventListener('DOMContentLoaded', function() {
             audioChunks = [];
             isRecording = true;
 
-            // Vizual feedback
             audioButton.classList.add('recording');
             audioButton.querySelector('.recording-wave').style.display = 'flex';
 
@@ -176,9 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch(`/istifadeciler/api/chat/messages/${userId}/`)
             .then(response => response.json())
             .then(messages => {
-                chatMessages.innerHTML = '';
-                messages.forEach(appendMessage);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+                updateMessages(messages);
             });
     }
 
@@ -186,7 +268,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function detectLinks(text) {
         const urlRegex = /(https?:\/\/[^\s]+)/g;
         return text.replace(urlRegex, function(url) {
-            return `<a href="${url}" target="_blank">${url}</a>`;
+            return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
         });
     }
 
@@ -194,6 +276,17 @@ document.addEventListener('DOMContentLoaded', function() {
     function appendMessage(message) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${message.is_mine ? 'mine' : 'theirs'}`;
+        
+        let statusIcon = '';
+        if (message.is_mine) {
+            if (message.is_read) {
+                statusIcon = '<span class="message-status read"><i class="fas fa-check-double"></i></span>';
+            } else if (message.is_delivered) {
+                statusIcon = '<span class="message-status delivered"><i class="fas fa-check"></i></span>';
+            } else {
+                statusIcon = '<span class="message-status sent"><i class="fas fa-clock"></i></span>';
+            }
+        }
 
         if (message.type === 'audio') {
             messageDiv.innerHTML = `
@@ -201,7 +294,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <audio controls>
                         <source src="${message.content}" type="audio/webm">
                     </audio>
-                    <span class="time">${new Date(message.created_at).toLocaleTimeString()}</span>
+                    <div class="message-meta">
+                        <span class="time">${new Date(message.created_at).toLocaleTimeString()}</span>
+                        ${statusIcon}
+                    </div>
                 </div>
             `;
         } else {
@@ -209,7 +305,10 @@ document.addEventListener('DOMContentLoaded', function() {
             messageDiv.innerHTML = `
                 <div class="message-content">
                     ${messageContent}
-                    <span class="time">${new Date(message.created_at).toLocaleTimeString()}</span>
+                    <div class="message-meta">
+                        <span class="time">${new Date(message.created_at).toLocaleTimeString()}</span>
+                        ${statusIcon}
+                    </div>
                 </div>
             `;
         }
@@ -299,15 +398,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Avtomatik yeniləmə
-    setInterval(() => {
-        if (currentReceiverId) {
-            loadMessages(currentReceiverId);
-        }
-    }, 3000);
-
     // İlkin yükləmə
     if (chatWindow.style.display === 'flex') {
         loadChatUsers();
+        startRealtimeUpdates();
     }
 }); 

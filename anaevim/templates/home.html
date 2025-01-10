@@ -40,17 +40,17 @@
                     <li><a href="#about" class="header__link">Haqqımızda</a></li>
                     <li><a href="#contact" class="header__link">Əlaqə</a></li>
                 </ul>
-                
                 <div class="header__actions">
-                    <a href="{% url 'login' %}" class="btn btn--primary">
-                        <i class="fas fa-sign-in-alt"></i>
-                        <span>B4B Giriş</span>
-                    </a>
-                </div>
-                <div class="header__actions"></div>
-                    <a href="{% url 'register' %}" class="btn btn--primary">
+                    <a href="{% url 'register' %}" class="btn btn--primary btn--register">
                         <i class="fas fa-sign-in-alt"></i>
                         <span>B4B Qeydiyyat</span>
+                    </a>
+                </div>
+
+                <div class="header__actions">
+                    <a href="{% url 'login' %}" class="btn btn--primary btn--login">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>B4B Giriş</span>
                     </a>
                 </div>
             </nav>

@@ -371,9 +371,17 @@ def send_audio_message(request):
 
 @login_required
 def delete_message(request, message_id):
-    try:
-        message = Message.objects.get(id=message_id, sender=request.user)
-        message.delete()
-        return JsonResponse({'status': 'success'})
-    except Message.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': 'Mesaj tapılmadı'}, status=404)
+    if request.method == 'DELETE':
+        try:
+            message = Message.objects.get(id=message_id, sender=request.user)
+            message.delete()
+            return JsonResponse({'status': 'success'})
+        except Message.DoesNotExist:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Mesaj tapılmadı'
+            }, status=404)
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Yanlış sorğu metodu'
+    }, status=405)

@@ -97,9 +97,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     .then(response => response.json())
                     .then(data => {
                         if (data.messages) {
-                            // Yeni mesajları əlavə et
                             data.messages.forEach(message => {
-                                if (!document.querySelector(`[data-message-id="${message.id}"]`)) {
+                                const existingMessage = document.querySelector(`[data-message-id="${message.id}"]`);
+                                if (!existingMessage) {
                                     appendMessage(message);
                                     if (!message.is_mine) {
                                         playChatMessageSound();
@@ -112,7 +112,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 2000);
 
         // İstifadəçiləri yeniləmə - hər 5 saniyədə
-        userUpdateInterval = setInterval(checkOnlineUsers, 5000);
+        userUpdateInterval = setInterval(() => {
+            fetch('/istifadeciler/api/chat/users/')
+                .then(response => response.json())
+                .then(data => {
+                    updateUsersList(data);
+                    updateTotalUnreadCount(data);
+                });
+        }, 5000);
     }
 
     function stopRealtimeUpdates() {
@@ -204,11 +211,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Mesaj göndər
-    sendButton.addEventListener('click', sendMessage);
+    sendButton.addEventListener('click', () => {
+        const content = messageInput.value.trim();
+        if (content) {
+            sendMessage(content);
+        }
+    });
+
     messageInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            sendMessage();
+            const content = messageInput.value.trim();
+            if (content) {
+                sendMessage(content);
+            }
         }
     });
 
@@ -264,36 +280,35 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Mesaj göndərmə funksiyası
-    function sendMessage() {
-        const content = messageInput.value.trim();
-        if (!content || !currentReceiverId) return;
+    function sendMessage(content, type = 'text') {
+        if (!currentReceiverId) return;
 
-        const tempId = Date.now();
-        const tempMessage = {
-            id: tempId,
-            content: content,
-            is_mine: true,
-            is_delivered: false,
-            is_read: false,
-            created_at: new Date()
-        };
-
-        // Mesajı əlavə et
-        appendMessage(tempMessage);
-        messageInput.value = '';
-
-        if (isScrolledToBottom()) {
-            smoothScrollToBottom();
-        }
-
-        // Mesajı göndər
         const formData = new FormData();
         formData.append('receiver_id', currentReceiverId);
         formData.append('content', content);
+        formData.append('type', type);
 
         fetch('/istifadeciler/api/chat/send/', {
             method: 'POST',
-            body: formData,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                appendMessage(data.message);
+                messageInput.value = '';
+            }
+        })
+        .catch(error => console.error('Mesaj göndərmə xətası:', error));
+    }
+
+    // Mesaj silmə funksiyası
+    function deleteMessage(messageId) {
+        fetch(`/istifadeciler/api/chat/delete-message/${messageId}/`, {
+            method: 'DELETE',
             headers: {
                 'X-CSRFToken': getCookie('csrftoken')
             }
@@ -301,13 +316,13 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                updateTempMessage(tempId, data.message);
+                const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+                if (messageElement) {
+                    messageElement.remove();
+                }
             }
         })
-        .catch(error => {
-            console.error('Error:', error);
-            markMessageError(tempId);
-        });
+        .catch(error => console.error('Mesaj silmə xətası:', error));
     }
 
     // Müvəqqəti mesajı yenilə
@@ -755,21 +770,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Mesaj silmə funksiyası
-    window.deleteMessage = function(messageId) {
-        fetch(`/istifadeciler/api/chat/delete-message/${messageId}/`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken')
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
-                if (messageElement) {
-                    messageElement.remove();
-                }
-            }
-        })
-        .catch(error => console.error('Mesaj silmə xətası:', error));
-    };
+    window.deleteMessage = deleteMessage;
 }); 

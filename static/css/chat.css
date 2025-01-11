@@ -478,3 +478,42 @@ audio::-webkit-media-controls-time-remaining-display {
         width: 150px;
     }
 } 
+
+/* Mesaj silmə düyməsi */
+.delete-message {
+    background: none;
+    border: none;
+    color: var(--text-dark);
+    font-size: 12px;
+    cursor: pointer;
+    padding: 2px 5px;
+    border-radius: 3px;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.message:hover .delete-message {
+    opacity: 1;
+}
+
+.delete-message:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+/* Oxunmamış mesaj indikatoru */
+.chat-icon.has-unread {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(100, 255, 218, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(100, 255, 218, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(100, 255, 218, 0);
+    }
+} 

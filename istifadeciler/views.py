@@ -368,3 +368,12 @@ def send_audio_message(request):
         'status': 'error',
         'message': 'Yanlış sorğu metodu'
     })
+
+@login_required
+def delete_message(request, message_id):
+    try:
+        message = Message.objects.get(id=message_id, sender=request.user)
+        message.delete()
+        return JsonResponse({'status': 'success'})
+    except Message.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Mesaj tapılmadı'}, status=404)

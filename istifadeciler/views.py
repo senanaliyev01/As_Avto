@@ -131,6 +131,14 @@ def register(request):
                     'status': 'error',
                     'message': 'Bütün sahələr doldurulmalıdır!'
                 })
+                     
+                 
+            if not re.match(r'^[a-zA-Z0-9_]+$', username):
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'İstifadəçi adı yalnız hərf, rəqəm və alt xətt (_) simvolundan ibarət ola bilər!'
+                })
+
 
             # İstifadəçi adının mövcudluğunu yoxla
             if User.objects.filter(username=username).exists():

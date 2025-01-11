@@ -27,7 +27,7 @@
         <div class="messages">
             {% for message in messages %}
             <div class="alert {{ message.tags }}">
-                <i class="fas {% if message.tags == 'error' %}fa-times-circle{% else %}fa-check-circle{% endif %}"></i>
+                <i class="fas {% if message.tags == 'error' %}fa-times-circle{% else %}fa-times-circle{% endif %}"></i>
                 <span>{{ message }}</span>
             </div>
             {% endfor %}

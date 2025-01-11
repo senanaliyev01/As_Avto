@@ -93,32 +93,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Mesajları yoxlama - hər 2 saniyədə
         messageUpdateInterval = setInterval(() => {
             if (currentReceiverId) {
-                fetch(`/istifadeciler/api/chat/messages/${currentReceiverId}/`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.messages) {
-                            data.messages.forEach(message => {
-                                const existingMessage = document.querySelector(`[data-message-id="${message.id}"]`);
-                                if (!existingMessage) {
-                                    appendMessage(message);
-                                    if (!message.is_mine) {
-                                        playChatMessageSound();
-                                    }
-                                }
-                            });
-                        }
-                    });
+                checkNewMessages();
             }
         }, 2000);
 
         // İstifadəçiləri yeniləmə - hər 5 saniyədə
         userUpdateInterval = setInterval(() => {
-            fetch('/istifadeciler/api/chat/users/')
-                .then(response => response.json())
-                .then(data => {
-                    updateUsersList(data);
-                    updateTotalUnreadCount(data);
-                });
+            checkOnlineUsers();
         }, 5000);
     }
 
@@ -211,20 +192,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Mesaj göndər
-    sendButton.addEventListener('click', () => {
-        const content = messageInput.value.trim();
-        if (content) {
-            sendMessage(content);
-        }
-    });
-
+    sendButton.addEventListener('click', sendMessage);
     messageInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            const content = messageInput.value.trim();
-            if (content) {
-                sendMessage(content);
-            }
+            sendMessage();
         }
     });
 
@@ -280,35 +252,36 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Mesaj göndərmə funksiyası
-    function sendMessage(content, type = 'text') {
-        if (!currentReceiverId) return;
+    function sendMessage() {
+        const content = messageInput.value.trim();
+        if (!content || !currentReceiverId) return;
 
+        const tempId = Date.now();
+        const tempMessage = {
+            id: tempId,
+            content: content,
+            is_mine: true,
+            is_delivered: false,
+            is_read: false,
+            created_at: new Date()
+        };
+
+        // Mesajı əlavə et
+        appendMessage(tempMessage);
+        messageInput.value = '';
+
+        if (isScrolledToBottom()) {
+            smoothScrollToBottom();
+        }
+
+        // Mesajı göndər
         const formData = new FormData();
         formData.append('receiver_id', currentReceiverId);
         formData.append('content', content);
-        formData.append('type', type);
 
         fetch('/istifadeciler/api/chat/send/', {
             method: 'POST',
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                appendMessage(data.message);
-                messageInput.value = '';
-            }
-        })
-        .catch(error => console.error('Mesaj göndərmə xətası:', error));
-    }
-
-    // Mesaj silmə funksiyası
-    function deleteMessage(messageId) {
-        fetch(`/istifadeciler/api/chat/delete-message/${messageId}/`, {
-            method: 'DELETE',
+            body: formData,
             headers: {
                 'X-CSRFToken': getCookie('csrftoken')
             }
@@ -316,13 +289,13 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
-                if (messageElement) {
-                    messageElement.remove();
-                }
+                updateTempMessage(tempId, data.message);
             }
         })
-        .catch(error => console.error('Mesaj silmə xətası:', error));
+        .catch(error => {
+            console.error('Error:', error);
+            markMessageError(tempId);
+        });
     }
 
     // Müvəqqəti mesajı yenilə
@@ -406,21 +379,68 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Mesaj əlavə et
     function appendMessage(message) {
-        const messageElement = createMessageElement(message);
-        chatMessages.appendChild(messageElement);
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${message.is_mine ? 'mine' : 'theirs'}`;
+        messageDiv.dataset.messageId = message.id;
+        
+        // Titrəmə effektini aradan qaldırırıq
+        messageDiv.style.opacity = '1';
+        
+        let statusIcon = '';
+        if (message.is_mine) {
+            if (message.is_read) {
+                statusIcon = '<span class="message-status read"><i class="fas fa-check-double"></i></span>';
+            } else if (message.is_delivered) {
+                statusIcon = '<span class="message-status delivered"><i class="fas fa-check"></i></span>';
+            } else {
+                statusIcon = '<span class="message-status sent"><i class="fas fa-clock"></i></span>';
+            }
+        }
+
+        const messageTime = new Date(message.created_at || new Date()).toLocaleTimeString('az-AZ', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        if (message.type === 'audio') {
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <audio controls>
+                        <source src="${message.content}" type="audio/webm">
+                    </audio>
+                    <div class="message-meta">
+                        <span class="time">${messageTime}</span>
+                        ${statusIcon}
+                    </div>
+                </div>
+            `;
+        } else {
+            const messageContent = detectLinks(message.content);
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    ${messageContent}
+                    <div class="message-meta">
+                        <span class="time">${messageTime}</span>
+                        ${statusIcon}
+                    </div>
+                </div>
+            `;
+        }
+
+        chatMessages.appendChild(messageDiv);
+
+        // Səs effektlərini əlavə edirik
+        if (!message.is_mine) {
+            if (message.type === 'audio') {
+                playChatMessageSound();
+            } else {
+                playNewMessageSound();
+            }
+        }
 
         // Avtomatik scroll
         if (isScrolledToBottom()) {
             smoothScrollToBottom();
-        }
-
-        // Səs effektləri
-        if (!message.is_mine) {
-            if (!isWindowFocused || chatWindow.style.display !== 'flex') {
-                playNewMessageSound();
-            } else {
-                playChatMessageSound();
-            }
         }
     }
 
@@ -581,15 +601,36 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Yumşaq scroll funksiyası
     function smoothScrollToBottom() {
-        chatMessages.scrollTo({
-            top: chatMessages.scrollHeight,
-            behavior: 'smooth'
-        });
+        const target = chatMessages.scrollHeight;
+        const duration = 300;
+        const start = chatMessages.scrollTop;
+        const distance = target - start;
+        let startTime = null;
+
+        function animation(currentTime) {
+            if (startTime === null) startTime = currentTime;
+            const timeElapsed = currentTime - startTime;
+            const progress = Math.min(timeElapsed / duration, 1);
+            
+            chatMessages.scrollTop = start + distance * easeInOutQuad(progress);
+            
+            if (progress < 1) {
+                requestAnimationFrame(animation);
+            }
+        }
+        
+        requestAnimationFrame(animation);
     }
 
     // Scroll pozisiyasını yoxla
     function isScrolledToBottom() {
-        return chatMessages.scrollHeight - chatMessages.clientHeight <= chatMessages.scrollTop + 100;
+        const tolerance = 50; // 50px tolerans
+        return chatMessages.scrollHeight - chatMessages.scrollTop - chatMessages.clientHeight < tolerance;
+    }
+
+    // Easing funksiyası
+    function easeInOutQuad(t) {
+        return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
     }
 
     // Yeni mesaj səsi
@@ -621,7 +662,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${message.is_mine ? 'mine' : 'theirs'}`;
         messageDiv.dataset.messageId = message.id;
-
+        
         let deleteButton = '';
         if (message.is_mine) {
             deleteButton = `
@@ -631,19 +672,21 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         }
 
+        let statusIcon = '';
+        if (message.is_mine) {
+            if (message.is_read) {
+                statusIcon = '<span class="message-status read"><i class="fas fa-check-double"></i></span>';
+            } else if (message.is_delivered) {
+                statusIcon = '<span class="message-status delivered"><i class="fas fa-check"></i></span>';
+            } else {
+                statusIcon = '<span class="message-status sent"><i class="fas fa-clock"></i></span>';
+            }
+        }
+
         const messageTime = new Date(message.created_at).toLocaleTimeString('az-AZ', {
             hour: '2-digit',
             minute: '2-digit'
         });
-
-        let statusIcon = '';
-        if (message.is_mine) {
-            if (message.is_read) {
-                statusIcon = '<i class="fas fa-check-double"></i>';
-            } else if (message.is_delivered) {
-                statusIcon = '<i class="fas fa-check"></i>';
-            }
-        }
 
         messageDiv.innerHTML = `
             <div class="message-content">
@@ -770,5 +813,94 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Mesaj silmə funksiyası
-    window.deleteMessage = deleteMessage;
+    function deleteMessage(messageId) {
+        fetch(`/istifadeciler/api/chat/delete-message/${messageId}/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+                if (messageElement) {
+                    messageElement.remove();
+                }
+            }
+        })
+        .catch(error => console.error('Mesaj silmə xətası:', error));
+    }
+
+    // Mesaj elementini yaratma funksiyasını yenilə
+    function createMessageElement(message) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${message.is_mine ? 'mine' : 'theirs'}`;
+        messageDiv.dataset.messageId = message.id;
+
+        let deleteButton = '';
+        if (message.is_mine) {
+            deleteButton = `
+                <button class="delete-message" onclick="deleteMessage(${message.id})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+        }
+
+        // Digər mesaj məzmunu...
+        messageDiv.innerHTML = `
+            <div class="message-content">
+                ${message.type === 'audio' ? 
+                    `<audio controls><source src="${message.content}" type="audio/webm"></audio>` :
+                    detectLinks(message.content)
+                }
+                <div class="message-meta">
+                    <span class="time">${messageTime}</span>
+                    ${statusIcon}
+                    ${deleteButton}
+                </div>
+            </div>
+        `;
+
+        return messageDiv;
+    }
+
+    // Səs effektlərini yenilə
+    function playNewMessageSound() {
+        const audio = document.getElementById('new-message-sound');
+        if (audio && (!isWindowFocused || !chatWindow.style.display === 'flex')) {
+            audio.currentTime = 0;
+            audio.play().catch(err => console.log('Səs oxutma xətası:', err));
+        }
+    }
+
+    function playChatMessageSound() {
+        const audio = document.getElementById('chat-message-sound');
+        if (audio && isWindowFocused && chatWindow.style.display === 'flex') {
+            audio.currentTime = 0;
+            audio.play().catch(err => console.log('Səs oxutma xətası:', err));
+        }
+    }
+
+    // Oxunmamış mesajları yeniləmə funksiyasını təkmilləşdir
+    function updateTotalUnreadCount(data) {
+        const allUsers = [...(data.admins || []), ...(data.users || [])];
+        const totalUnread = allUsers.reduce((sum, user) => sum + (user.unread_count || 0), 0);
+        
+        const unreadBadge = document.getElementById('total-unread');
+        const chatIcon = document.getElementById('chat-icon');
+        
+        if (unreadBadge) {
+            if (totalUnread > 0) {
+                unreadBadge.textContent = totalUnread;
+                unreadBadge.style.display = 'flex';
+                chatIcon.classList.add('has-unread');
+                if (!isWindowFocused) {
+                    playNewMessageSound();
+                }
+            } else {
+                unreadBadge.style.display = 'none';
+                chatIcon.classList.remove('has-unread');
+            }
+        }
+    }
 }); 

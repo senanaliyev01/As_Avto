@@ -24,7 +24,7 @@ def login_view(request):
             # İstifadəçinin təsdiq statusunu yoxla
             if not user.profile.is_approved:
                 messages.error(request, 
-                    'Hesabınız hələ admin tərəfindən təsdiqlənməyib.',
+                    'Giriş üçün icazəniz yoxdur.',
                     extra_tags='auth-error')
                 return render(request, 'login.html')
                 

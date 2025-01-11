@@ -169,18 +169,17 @@ def send_message(request):
 
 @login_required
 def get_chat_users(request):
-    print("get_chat_users called") # Debug üçün
-    
     # Admin və normal istifadəçiləri əldə et
     admin_users = User.objects.filter(is_staff=True).exclude(id=request.user.id)
     normal_users = User.objects.filter(is_staff=False).exclude(id=request.user.id)
     
-    print(f"Found {admin_users.count()} admins and {normal_users.count()} users") # Debug üçün
+    response_data = {
+        'is_admin': request.user.is_staff,
+        'admins': [],
+        'users': []
+    }
     
-    # Admin və normal istifadəçilər üçün məlumatları hazırla
-    admins = []
-    users = []
-    
+    # Admin siyahısını hazırla
     for user in admin_users:
         unread_count = Message.objects.filter(
             sender=user,
@@ -188,32 +187,29 @@ def get_chat_users(request):
             is_read=False
         ).count()
         
-        admins.append({
+        response_data['admins'].append({
             'id': user.id,
             'username': user.username,
             'unread_count': unread_count,
             'is_admin': True
         })
     
-    for user in normal_users:
-        unread_count = Message.objects.filter(
-            sender=user,
-            receiver=request.user,
-            is_read=False
-        ).count()
-        
-        users.append({
-            'id': user.id,
-            'username': user.username,
-            'unread_count': unread_count,
-            'is_admin': False
-        })
+    # Əgər current user admindisə, normal istifadəçiləri də əlavə et
+    if request.user.is_staff:
+        for user in normal_users:
+            unread_count = Message.objects.filter(
+                sender=user,
+                receiver=request.user,
+                is_read=False
+            ).count()
+            
+            response_data['users'].append({
+                'id': user.id,
+                'username': user.username,
+                'unread_count': unread_count,
+                'is_admin': False
+            })
     
-    response_data = {
-        'admins': admins,
-        'users': users
-    }
-    print("Sending response:", response_data) # Debug üçün
     return JsonResponse(response_data)
 
 @csrf_exempt

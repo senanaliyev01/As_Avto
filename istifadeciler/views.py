@@ -132,40 +132,47 @@ def get_messages(request, receiver_id):
         return JsonResponse({'error': 'İstifadəçi tapılmadı'}, status=404)
 
 @login_required
-@csrf_exempt
+@require_POST
 def send_message(request):
-    if request.method == 'POST':
+    try:
         receiver_id = request.POST.get('receiver_id')
         content = request.POST.get('content')
+        message_type = request.POST.get('message_type', 'text')
         
-        if not content:
-            return JsonResponse({'status': 'error', 'message': 'Mesaj boş ola bilməz'})
-            
-        try:
-            receiver = User.objects.get(id=receiver_id)
-            message = Message.objects.create(
-                sender=request.user,
-                receiver=receiver,
-                content=content,
-                is_delivered=True  # Avtomatik çatdırıldı kimi qeyd et
-            )
-            
+        if not receiver_id or not content:
             return JsonResponse({
-                'status': 'success',
-                'message': {
-                    'id': message.id,
-                    'content': message.content,
-                    'sender': message.sender.username,
-                    'is_mine': True,
-                    'is_delivered': True,
-                    'is_read': False
-                }
+                'status': 'error',
+                'message': 'Məlumatlar tam deyil'
             })
             
-        except User.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'İstifadəçi tapılmadı'})
-            
-    return JsonResponse({'status': 'error', 'message': 'Yanlış sorğu metodu'})
+        receiver = User.objects.get(id=receiver_id)
+        
+        message = Message.objects.create(
+            sender=request.user,
+            receiver=receiver,
+            content=content,
+            message_type=message_type,
+            is_delivered=True
+        )
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': {
+                'id': message.id,
+                'content': message.content,
+                'type': message.message_type,
+                'created_at': message.created_at.isoformat(),
+                'is_mine': True,
+                'is_delivered': True,
+                'is_read': False
+            }
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        })
 
 @login_required
 def get_chat_users(request):
@@ -371,9 +378,17 @@ def send_audio_message(request):
 
 @login_required
 def delete_message(request, message_id):
-    try:
-        message = Message.objects.get(id=message_id, sender=request.user)
-        message.delete()
-        return JsonResponse({'status': 'success'})
-    except Message.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': 'Mesaj tapılmadı'}, status=404)
+    if request.method == 'DELETE':
+        try:
+            message = Message.objects.get(id=message_id, sender=request.user)
+            message.delete()
+            return JsonResponse({'status': 'success'})
+        except Message.DoesNotExist:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Mesaj tapılmadı'
+            }, status=404)
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Yanlış sorğu metodu'
+    })

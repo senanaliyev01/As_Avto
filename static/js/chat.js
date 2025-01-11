@@ -18,10 +18,11 @@ document.addEventListener('DOMContentLoaded', function() {
     let lastMessageId = 0;
     let messageUpdateInterval;
     let userUpdateInterval;
+    let statusUpdateInterval;
 
     // Real-time mesaj yeniləməsi
     function startRealtimeUpdates() {
-        // Mesajları hər 2 saniyədə bir yenilə
+        // Mesajları yoxlama - hər 1 saniyədə
         messageUpdateInterval = setInterval(() => {
             if (currentReceiverId) {
                 fetch(`/istifadeciler/api/chat/messages/${currentReceiverId}/`)
@@ -29,18 +30,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     .then(messages => {
                         const lastMessage = messages[messages.length - 1];
                         if (lastMessage && lastMessage.id > lastMessageId) {
-                            // Yeni mesajlar var
-                            updateMessages(messages);
-                            if (!lastMessage.is_mine) {
-                                playMessageSound();
-                            }
+                            // Səssiz şəkildə yeni mesajları əlavə et
+                            updateMessagesQuietly(messages);
+                        } else {
+                            // Status yeniləmələrini yoxla
+                            updateMessageStatuses(messages);
                         }
                     });
             }
-        }, 2000);
+        }, 1000);
 
-        // İstifadəçiləri hər 5 saniyədə bir yenilə
-        userUpdateInterval = setInterval(loadChatUsers, 5000);
+        // İstifadəçiləri yeniləmə - hər 3 saniyədə
+        userUpdateInterval = setInterval(loadChatUsers, 3000);
     }
 
     function stopRealtimeUpdates() {
@@ -196,6 +197,25 @@ document.addEventListener('DOMContentLoaded', function() {
         const content = messageInput.value.trim();
         if (!content || !currentReceiverId) return;
 
+        const tempId = Date.now();
+        const tempMessage = {
+            id: tempId,
+            content: content,
+            is_mine: true,
+            is_delivered: false,
+            is_read: false,
+            created_at: new Date()
+        };
+
+        // Mesajı əlavə et
+        appendMessage(tempMessage);
+        messageInput.value = '';
+
+        if (isScrolledToBottom()) {
+            smoothScrollToBottom();
+        }
+
+        // Mesajı göndər
         const formData = new FormData();
         formData.append('receiver_id', currentReceiverId);
         formData.append('content', content);
@@ -210,12 +230,38 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                messageInput.value = '';
-                appendMessage(data.message);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+                updateTempMessage(tempId, data.message);
             }
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => {
+            console.error('Error:', error);
+            markMessageError(tempId);
+        });
+    }
+
+    // Müvəqqəti mesajı yenilə
+    function updateTempMessage(tempId, newMessage) {
+        const messageEl = document.querySelector(`[data-message-id="${tempId}"]`);
+        if (messageEl) {
+            messageEl.dataset.messageId = newMessage.id;
+            const statusSpan = messageEl.querySelector('.message-status');
+            if (statusSpan) {
+                statusSpan.innerHTML = '<i class="fas fa-check"></i>';
+                statusSpan.classList.add('delivered');
+            }
+        }
+    }
+
+    // Xəta halında mesajı işarələ
+    function markMessageError(messageId) {
+        const messageEl = document.querySelector(`[data-message-id="${messageId}"]`);
+        if (messageEl) {
+            const statusSpan = messageEl.querySelector('.message-status');
+            if (statusSpan) {
+                statusSpan.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
+                statusSpan.classList.add('error');
+            }
+        }
     }
 
     // Səs mesajını göndər
@@ -276,6 +322,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function appendMessage(message) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${message.is_mine ? 'mine' : 'theirs'}`;
+        messageDiv.dataset.messageId = message.id; // Message ID əlavə edirik
         
         let statusIcon = '';
         if (message.is_mine) {
@@ -318,7 +365,20 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         }
 
+        // Yeni mesajı əlavə edərkən səlis animasiya
+        messageDiv.style.opacity = '0';
         chatMessages.appendChild(messageDiv);
+        
+        // Səlis görünmə effekti
+        requestAnimationFrame(() => {
+            messageDiv.style.transition = 'opacity 0.3s ease';
+            messageDiv.style.opacity = '1';
+        });
+
+        // Avtomatik scroll
+        if (chatMessages.scrollTop + chatMessages.clientHeight >= chatMessages.scrollHeight - 100) {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
     }
 
     // CSRF token funksiyası
@@ -357,18 +417,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 const usersList = document.getElementById('users-list');
                 usersList.innerHTML = '';
                 
-                if (data.admins && data.admins.length > 0) {
-                    usersList.innerHTML += '<div class="user-group-title">Adminlər</div>';
-                    data.admins.forEach(user => {
-                        usersList.innerHTML += createUserItem(user);
-                    });
-                }
-                
-                if (data.users && data.users.length > 0) {
-                    usersList.innerHTML += '<div class="user-group-title">İstifadəçilər</div>';
-                    data.users.forEach(user => {
-                        usersList.innerHTML += createUserItem(user);
-                    });
+                // Əgər current user admin deyilsə, yalnız adminləri göstər
+                if (!data.is_admin) {
+                    if (data.admins && data.admins.length > 0) {
+                        usersList.innerHTML = '<div class="user-group-title">Adminlər</div>';
+                        data.admins.forEach(user => {
+                            usersList.innerHTML += createUserItem(user);
+                        });
+                    }
+                } else {
+                    // Admin üçün bütün istifadəçiləri göstər
+                    if (data.admins && data.admins.length > 0) {
+                        usersList.innerHTML += '<div class="user-group-title">Adminlər</div>';
+                        data.admins.forEach(user => {
+                            usersList.innerHTML += createUserItem(user);
+                        });
+                    }
+                    
+                    if (data.users && data.users.length > 0) {
+                        usersList.innerHTML += '<div class="user-group-title">İstifadəçilər</div>';
+                        data.users.forEach(user => {
+                            usersList.innerHTML += createUserItem(user);
+                        });
+                    }
                 }
             });
     }
@@ -407,5 +478,91 @@ document.addEventListener('DOMContentLoaded', function() {
     if (chatWindow.style.display === 'flex') {
         loadChatUsers();
         startRealtimeUpdates();
+    }
+
+    // Mesaj statuslarını yeniləyən funksiya
+    function updateMessageStatuses(messages) {
+        const messageElements = chatMessages.querySelectorAll('.message');
+        
+        messageElements.forEach(messageEl => {
+            const messageId = messageEl.dataset.messageId;
+            const message = messages.find(m => m.id.toString() === messageId);
+            
+            if (message && messageEl.classList.contains('mine')) {
+                const statusSpan = messageEl.querySelector('.message-status');
+                if (statusSpan) {
+                    if (message.is_read) {
+                        statusSpan.innerHTML = '<i class="fas fa-check-double"></i>';
+                        statusSpan.classList.add('read');
+                    } else if (message.is_delivered) {
+                        statusSpan.innerHTML = '<i class="fas fa-check"></i>';
+                        statusSpan.classList.add('delivered');
+                    }
+                }
+            }
+        });
+    }
+
+    // Səssiz mesaj yeniləməsi
+    function updateMessagesQuietly(messages) {
+        const scrolledToBottom = isScrolledToBottom();
+        const currentMessages = Array.from(chatMessages.children);
+        
+        // Yeni mesajları əlavə et
+        messages.forEach(message => {
+            const existingMessage = currentMessages.find(
+                m => m.dataset.messageId === message.id.toString()
+            );
+            
+            if (!existingMessage) {
+                appendMessage(message);
+                if (!message.is_mine && !message.is_read) {
+                    markMessagesAsRead([message.id]);
+                }
+            }
+        });
+
+        // Əgər əvvəldən aşağıdaydısa, yeni scroll et
+        if (scrolledToBottom) {
+            smoothScrollToBottom();
+        }
+        
+        if (messages.length > 0) {
+            lastMessageId = messages[messages.length - 1].id;
+        }
+    }
+
+    // Yumşaq scroll funksiyası
+    function smoothScrollToBottom() {
+        const target = chatMessages.scrollHeight;
+        const duration = 300;
+        const start = chatMessages.scrollTop;
+        const distance = target - start;
+        let startTime = null;
+
+        function animation(currentTime) {
+            if (startTime === null) startTime = currentTime;
+            const timeElapsed = currentTime - startTime;
+            const progress = Math.min(timeElapsed / duration, 1);
+            
+            chatMessages.scrollTop = start + distance * easeInOutQuad(progress);
+            
+            if (progress < 1) {
+                requestAnimationFrame(animation);
+            }
+        }
+        
+        requestAnimationFrame(animation);
+    }
+
+    // Scroll pozisiyasını yoxla
+    function isScrolledToBottom() {
+        const tolerance = 50; // 50px tolerans
+        return chatMessages.scrollHeight - chatMessages.scrollTop - chatMessages.clientHeight < tolerance;
+    }
+
+    // Easing funksiyası
+    function easeInOutQuad(t) {
+        return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
     }
 }); 

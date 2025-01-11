@@ -19,29 +19,27 @@ document.addEventListener('DOMContentLoaded', function() {
     let messageUpdateInterval;
     let userUpdateInterval;
     let statusUpdateInterval;
+    let totalUnreadMessages = 0;
+    let lastUsersList = [];
+    let isWindowFocused = true;
+
+    // Focus izləmə
+    window.addEventListener('focus', () => isWindowFocused = true);
+    window.addEventListener('blur', () => isWindowFocused = false);
 
     // Real-time mesaj yeniləməsi
     function startRealtimeUpdates() {
         // Mesajları yoxlama - hər 1 saniyədə
         messageUpdateInterval = setInterval(() => {
             if (currentReceiverId) {
-                fetch(`/istifadeciler/api/chat/messages/${currentReceiverId}/`)
-                    .then(response => response.json())
-                    .then(messages => {
-                        const lastMessage = messages[messages.length - 1];
-                        if (lastMessage && lastMessage.id > lastMessageId) {
-                            // Səssiz şəkildə yeni mesajları əlavə et
-                            updateMessagesQuietly(messages);
-                        } else {
-                            // Status yeniləmələrini yoxla
-                            updateMessageStatuses(messages);
-                        }
-                    });
+                checkNewMessages();
             }
         }, 1000);
 
         // İstifadəçiləri yeniləmə - hər 3 saniyədə
-        userUpdateInterval = setInterval(loadChatUsers, 3000);
+        userUpdateInterval = setInterval(() => {
+            checkOnlineUsers();
+        }, 3000);
     }
 
     function stopRealtimeUpdates() {
@@ -506,27 +504,28 @@ document.addEventListener('DOMContentLoaded', function() {
     // Səssiz mesaj yeniləməsi
     function updateMessagesQuietly(messages) {
         const scrolledToBottom = isScrolledToBottom();
-        const currentMessages = Array.from(chatMessages.children);
-        
-        // Yeni mesajları əlavə et
+        const fragment = document.createDocumentFragment();
+        const existingIds = new Set(Array.from(chatMessages.children).map(el => el.dataset.messageId));
+
         messages.forEach(message => {
-            const existingMessage = currentMessages.find(
-                m => m.dataset.messageId === message.id.toString()
-            );
-            
-            if (!existingMessage) {
-                appendMessage(message);
+            if (!existingIds.has(message.id.toString())) {
+                const messageEl = createMessageElement(message);
+                fragment.appendChild(messageEl);
+                
                 if (!message.is_mine && !message.is_read) {
                     markMessagesAsRead([message.id]);
                 }
             }
         });
 
-        // Əgər əvvəldən aşağıdaydısa, yeni scroll et
-        if (scrolledToBottom) {
-            smoothScrollToBottom();
+        if (fragment.children.length > 0) {
+            chatMessages.appendChild(fragment);
+            
+            if (scrolledToBottom) {
+                smoothScrollToBottom();
+            }
         }
-        
+
         if (messages.length > 0) {
             lastMessageId = messages[messages.length - 1].id;
         }
@@ -564,5 +563,167 @@ document.addEventListener('DOMContentLoaded', function() {
     // Easing funksiyası
     function easeInOutQuad(t) {
         return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    }
+
+    // Yeni mesaj səsi
+    function playNewMessageSound() {
+        const audio = document.getElementById('new-message-sound');
+        if (audio) {
+            audio.currentTime = 0;
+            audio.play().catch(err => console.log('Səs oxutma xətası:', err));
+        }
+    }
+
+    // Bildiriş göstər
+    function showNotification(title, message) {
+        if (!("Notification" in window)) return;
+
+        if (Notification.permission === "granted") {
+            new Notification(title, { body: message });
+        } else if (Notification.permission !== "denied") {
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    new Notification(title, { body: message });
+                }
+            });
+        }
+    }
+
+    // Mesaj elementi yaratma
+    function createMessageElement(message) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${message.is_mine ? 'mine' : 'theirs'}`;
+        messageDiv.dataset.messageId = message.id;
+        
+        let statusIcon = '';
+        if (message.is_mine) {
+            if (message.is_read) {
+                statusIcon = '<span class="message-status read"><i class="fas fa-check-double"></i></span>';
+            } else if (message.is_delivered) {
+                statusIcon = '<span class="message-status delivered"><i class="fas fa-check"></i></span>';
+            } else {
+                statusIcon = '<span class="message-status sent"><i class="fas fa-clock"></i></span>';
+            }
+        }
+
+        const messageTime = new Date(message.created_at).toLocaleTimeString('az-AZ', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        messageDiv.innerHTML = `
+            <div class="message-content">
+                ${message.type === 'audio' ? 
+                    `<audio controls><source src="${message.content}" type="audio/webm"></audio>` :
+                    detectLinks(message.content)
+                }
+                <div class="message-meta">
+                    <span class="time">${messageTime}</span>
+                    ${statusIcon}
+                </div>
+            </div>
+        `;
+
+        return messageDiv;
+    }
+
+    // Yeni mesajları yoxla
+    async function checkNewMessages() {
+        try {
+            const response = await fetch(`/istifadeciler/api/chat/messages/${currentReceiverId}/`);
+            const messages = await response.json();
+            const lastMessage = messages[messages.length - 1];
+
+            if (lastMessage && lastMessage.id > lastMessageId) {
+                updateMessagesQuietly(messages);
+                if (!lastMessage.is_mine) {
+                    if (!isWindowFocused) {
+                        playNewMessageSound();
+                        showNotification('Yeni mesaj', `${lastMessage.sender}: ${lastMessage.content}`);
+                    }
+                }
+            } else {
+                updateMessageStatuses(messages);
+            }
+        } catch (error) {
+            console.error('Mesaj yoxlama xətası:', error);
+        }
+    }
+
+    // Online istifadəçiləri yoxla
+    async function checkOnlineUsers() {
+        try {
+            const response = await fetch('/istifadeciler/api/chat/users/');
+            const data = await response.json();
+            
+            // İstifadəçi siyahısını müqayisə et və dəyişiklik varsa yenilə
+            if (hasUserListChanged(data)) {
+                updateUsersList(data);
+                lastUsersList = data;
+            }
+
+            // Oxunmamış mesajları hesabla
+            updateTotalUnreadCount(data);
+        } catch (error) {
+            console.error('İstifadəçi yoxlama xətası:', error);
+        }
+    }
+
+    // İstifadəçi siyahısının dəyişib-dəyişmədiyini yoxla
+    function hasUserListChanged(newData) {
+        if (!lastUsersList.admins || !lastUsersList.users) return true;
+        
+        const oldUsers = [...(lastUsersList.admins || []), ...(lastUsersList.users || [])];
+        const newUsers = [...(newData.admins || []), ...(newData.users || [])];
+        
+        if (oldUsers.length !== newUsers.length) return true;
+        
+        return JSON.stringify(oldUsers) !== JSON.stringify(newUsers);
+    }
+
+    // İstifadəçi siyahısını yenilə
+    function updateUsersList(data) {
+        const usersList = document.getElementById('users-list');
+        const currentContent = usersList.innerHTML;
+        let newContent = '';
+
+        // Admin üçün bütün istifadəçiləri göstər
+        if (data.is_admin) {
+            if (data.users && data.users.length > 0) {
+                newContent += '<div class="user-group-title">İstifadəçilər</div>';
+                data.users.forEach(user => {
+                    newContent += createUserItem(user);
+                });
+            }
+        }
+        
+        // Adminləri göstər
+        if (data.admins && data.admins.length > 0) {
+            newContent += '<div class="user-group-title">Adminlər</div>';
+            data.admins.forEach(user => {
+                newContent += createUserItem(user);
+            });
+        }
+
+        // Əgər məzmun dəyişibsə, yalnız onda DOM-u yenilə
+        if (currentContent !== newContent) {
+            usersList.innerHTML = newContent;
+        }
+    }
+
+    // Ümumi oxunmamış mesaj sayını yenilə
+    function updateTotalUnreadCount(data) {
+        const allUsers = [...(data.admins || []), ...(data.users || [])];
+        const totalUnread = allUsers.reduce((sum, user) => sum + (user.unread_count || 0), 0);
+        
+        const unreadBadge = document.getElementById('total-unread');
+        if (unreadBadge) {
+            if (totalUnread > 0) {
+                unreadBadge.textContent = totalUnread;
+                unreadBadge.style.display = 'flex';
+            } else {
+                unreadBadge.style.display = 'none';
+            }
+        }
     }
 }); 

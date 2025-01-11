@@ -29,17 +29,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Real-time mesaj yeniləməsi
     function startRealtimeUpdates() {
-        // Mesajları yoxlama - hər 2 saniyədə
+        // Mesajları yoxlama - hər 1 saniyədə
         messageUpdateInterval = setInterval(() => {
             if (currentReceiverId) {
                 checkNewMessages();
             }
-        }, 2000);
+        }, 1000);
 
-        // İstifadəçiləri yeniləmə - hər 5 saniyədə
+        // İstifadəçiləri yeniləmə - hər 3 saniyədə
         userUpdateInterval = setInterval(() => {
             checkOnlineUsers();
-        }, 5000);
+        }, 3000);
     }
 
     function stopRealtimeUpdates() {
@@ -320,10 +320,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function appendMessage(message) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${message.is_mine ? 'mine' : 'theirs'}`;
-        messageDiv.dataset.messageId = message.id;
-        
-        // Titrəmə effektini aradan qaldırırıq
-        messageDiv.style.opacity = '1';
+        messageDiv.dataset.messageId = message.id; // Message ID əlavə edirik
         
         let statusIcon = '';
         if (message.is_mine) {
@@ -366,20 +363,19 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         }
 
+        // Yeni mesajı əlavə edərkən səlis animasiya
+        messageDiv.style.opacity = '0';
         chatMessages.appendChild(messageDiv);
-
-        // Səs effektlərini əlavə edirik
-        if (!message.is_mine) {
-            if (message.type === 'audio') {
-                playChatMessageSound();
-            } else {
-                playNewMessageSound();
-            }
-        }
+        
+        // Səlis görünmə effekti
+        requestAnimationFrame(() => {
+            messageDiv.style.transition = 'opacity 0.3s ease';
+            messageDiv.style.opacity = '1';
+        });
 
         // Avtomatik scroll
-        if (isScrolledToBottom()) {
-            smoothScrollToBottom();
+        if (chatMessages.scrollTop + chatMessages.clientHeight >= chatMessages.scrollHeight - 100) {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
     }
 
@@ -419,29 +415,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 const usersList = document.getElementById('users-list');
                 usersList.innerHTML = '';
                 
-                // Admin və istifadəçi görünürlüyü
-                if (data.is_admin) {
-                    // Admin bütün istifadəçiləri görür
+                // Əgər current user admin deyilsə, yalnız adminləri göstər
+                if (!data.is_admin) {
+                    if (data.admins && data.admins.length > 0) {
+                        usersList.innerHTML = '<div class="user-group-title">Adminlər</div>';
+                        data.admins.forEach(user => {
+                            usersList.innerHTML += createUserItem(user);
+                        });
+                    }
+                } else {
+                    // Admin üçün bütün istifadəçiləri göstər
                     if (data.admins && data.admins.length > 0) {
                         usersList.innerHTML += '<div class="user-group-title">Adminlər</div>';
                         data.admins.forEach(user => {
-                            if (user.id !== currentUserId) {
-                                usersList.innerHTML += createUserItem(user);
-                            }
+                            usersList.innerHTML += createUserItem(user);
                         });
                     }
                     
                     if (data.users && data.users.length > 0) {
                         usersList.innerHTML += '<div class="user-group-title">İstifadəçilər</div>';
                         data.users.forEach(user => {
-                            usersList.innerHTML += createUserItem(user);
-                        });
-                    }
-                } else {
-                    // Normal istifadəçi yalnız adminləri görür
-                    if (data.admins && data.admins.length > 0) {
-                        usersList.innerHTML = '<div class="user-group-title">Adminlər</div>';
-                        data.admins.forEach(user => {
                             usersList.innerHTML += createUserItem(user);
                         });
                     }
@@ -575,7 +568,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Yeni mesaj səsi
     function playNewMessageSound() {
         const audio = document.getElementById('new-message-sound');
-        if (audio && !isWindowFocused) {
+        if (audio) {
             audio.currentTime = 0;
             audio.play().catch(err => console.log('Səs oxutma xətası:', err));
         }
@@ -731,15 +724,6 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 unreadBadge.style.display = 'none';
             }
-        }
-    }
-
-    // Chat mesaj səsi
-    function playChatMessageSound() {
-        const audio = document.getElementById('chat-message-sound');
-        if (audio && isWindowFocused) {
-            audio.currentTime = 0;
-            audio.play().catch(err => console.log('Səs oxutma xətası:', err));
         }
     }
 }); 

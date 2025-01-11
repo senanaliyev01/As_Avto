@@ -27,22 +27,3 @@ def save_user_profile(sender, instance, **kwargs):
     except Profile.DoesNotExist:
         Profile.objects.create(user=instance)
 
-class Message(models.Model):
-    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
-    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
-    content = models.TextField(blank=True, null=True)
-    audio_file = models.FileField(upload_to='chat_audio/', blank=True, null=True)
-    message_type = models.CharField(max_length=10, default='text', choices=[
-        ('text', 'Text'),
-        ('audio', 'Audio')
-    ])
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_read = models.BooleanField(default=False)
-    is_delivered = models.BooleanField(default=False)
-
-    class Meta:
-        ordering = ['created_at']
-
-    def __str__(self):
-        return f'Message from {self.sender.username} to {self.receiver.username}'
-

@@ -9,17 +9,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="icon" href="{% static 'img/favicon.png' %}">
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
-    <link rel="stylesheet" href="{% static 'css/chat.css' %}">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     {% csrf_token %}
 </head>
 <body>
-    {% if user.is_authenticated %}
-    <script>
-        const currentUserId = "{{ user.id }}";
-        const isAdmin = {% if user.is_staff %}true{% else %}false{% endif %};
-    </script>
-    {% endif %}
+  
  
     <!-- Header Bölməsi -->
     <header>
@@ -213,6 +208,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="{% static 'js/main.js' %}"></script>
-    <script src="{% static 'js/chat.js' %}"></script>
+    
 </body>
 </html>

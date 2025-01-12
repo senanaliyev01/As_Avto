@@ -181,55 +181,53 @@ def sebetden_sil(request, sebet_id):
 
 @login_required
 def sifarisi_gonder(request):
-    if request.method == "POST":
+    if request.method == 'POST':
         try:
-            sebet = Sebet.objects.filter(user=request.user)
-            if not sebet.exists():
-                return JsonResponse({
-                    'success': False,
-                    'message': 'Səbətiniz boşdur'
-                }, status=400)
+            sebet_items = Sebet.objects.filter(user=request.user)
+            if not sebet_items:
+                return JsonResponse({'status': 'error', 'message': 'Səbətiniz boşdur'})
 
-            # Yeni sifarişi yarat
+            # Ümumi məbləği EUR-da hesabla
+            total_eur = sum(item.mehsul.qiymet_eur * item.miqdar for item in sebet_items)
+
+            # Yeni sifarişi yarat (EUR məbləğləri ilə)
             sifaris = Sifaris.objects.create(
                 user=request.user,
-                cemi_mebleg=0
+                cemi_mebleg_eur=total_eur,  # EUR məbləği
+                odenilen_mebleg_eur=0,  # İlkin ödəniş 0
+                status='gozleyir'
             )
 
-            total_amount = 0
-            # Məhsulları sifarişə əlavə et
-            for item in sebet:
-                item_total = item.mehsul.qiymet_eur * item.miqdar
-                total_amount += item_total
-                
+            # Sifariş məhsullarını əlavə et
+            for item in sebet_items:
                 SifarisMehsul.objects.create(
                     sifaris=sifaris,
                     mehsul=item.mehsul,
                     miqdar=item.miqdar,
                     qiymet=item.mehsul.qiymet_eur  # EUR qiyməti
                 )
+                
+                # Stoku yenilə
+                mehsul = item.mehsul
+                mehsul.stok = F('stok') - item.miqdar
+                mehsul.save()
 
-            sifaris.cemi_mebleg = total_amount
-            sifaris.status = 'gozleyir'
-            sifaris.save()
-
-            sebet.delete()
+            # Səbəti təmizlə
+            sebet_items.delete()
 
             return JsonResponse({
-                'success': True,
-                'message': 'Sifarişiniz uğurla qeydə alındı'
+                'status': 'success',
+                'message': 'Sifariş uğurla yaradıldı',
+                'sifaris_id': sifaris.id
             })
 
         except Exception as e:
             return JsonResponse({
-                'success': False,
-                'message': 'Xəta baş verdi: ' + str(e)
-            }, status=500)
+                'status': 'error',
+                'message': f'Xəta baş verdi: {str(e)}'
+            })
 
-    return JsonResponse({
-        'success': False,
-        'message': 'Yanlış sorğu metodu'
-    }, status=400)
+    return JsonResponse({'status': 'error', 'message': 'Yanlış sorğu metodu'})
 
 
 from django.contrib.auth.decorators import login_required

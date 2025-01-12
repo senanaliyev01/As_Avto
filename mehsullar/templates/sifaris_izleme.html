@@ -46,6 +46,7 @@
             <thead>
                 <tr>
                     <th>ID</th>
+                    <th>Sifariş Məzənnəsi</th>
                     <th>Tarix</th>
                     <th>Cəmi Məbləğ (EUR)</th>
                     <th>Cəmi Məbləğ (AZN)</th>
@@ -58,6 +59,7 @@
                 {% for sifaris in sifarisler %}
                 <tr>
                     <td><a href="{% url 'sifaris_detallari' sifaris.id %}" class="sifaris-link">{{ sifaris.id }}</a></td>
+                    <td>1 EUR = {{ sifaris.sifaris_mezennesi }} AZN</td>
                     <td>{{ sifaris.tarix }}</td>
                     <td>{{ sifaris.cemi_mebleg_eur }} EUR</td>
                     <td>{{ sifaris.cemi_mebleg_azn }} AZN</td>

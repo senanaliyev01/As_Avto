@@ -1,5 +1,5 @@
 from pickle import FALSE
-
+from decimal import Decimal
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -75,8 +75,8 @@ class Sifaris(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
-    cemi_mebleg_eur = models.DecimalField(max_digits=10, decimal_places=2)  # EUR məbləği
-    odenilen_mebleg_eur = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # EUR ödəniş
+    cemi_mebleg_eur = models.DecimalField(max_digits=10, decimal_places=2)
+    odenilen_mebleg_eur = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     tarix = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='gozleyir')
     tamamlandi = models.BooleanField(default=False)

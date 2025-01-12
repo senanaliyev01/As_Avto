@@ -244,19 +244,13 @@ def sifaris_izle(request):
     eur_rate = get_eur_rate()
     update_time = cache.get('eur_update_time', 'Məlumat yoxdur')
 
-    toplam_mebleg_eur = Decimal('0')
-    toplam_mebleg_azn = Decimal('0')
-    odenilen_mebleg_eur = Decimal('0')
-    odenilen_mebleg_azn = Decimal('0')
-
-    for sifaris in sifarisler:
-        # EUR məbləğləri
-        toplam_mebleg_eur += sifaris.cemi_mebleg_eur
-        odenilen_mebleg_eur += sifaris.odenilen_mebleg_eur
-        
-        # AZN məbləğləri
-        toplam_mebleg_azn = toplam_mebleg_eur * eur_rate
-        odenilen_mebleg_azn = odenilen_mebleg_eur * eur_rate
+    # Ümumi məbləğləri hesabla
+    toplam_mebleg_eur = sum(sifaris.cemi_mebleg_eur for sifaris in sifarisler)
+    odenilen_mebleg_eur = sum(sifaris.odenilen_mebleg_eur for sifaris in sifarisler)
+    
+    # AZN məbləğləri
+    toplam_mebleg_azn = toplam_mebleg_eur * eur_rate
+    odenilen_mebleg_azn = odenilen_mebleg_eur * eur_rate
 
     # Qalıq borcları hesabla
     qaliq_borc_eur = toplam_mebleg_eur - odenilen_mebleg_eur
@@ -271,10 +265,6 @@ def sifaris_izle(request):
 
     for sifaris in sifarisler:
         sifaris.display_status = status_text.get(sifaris.status, 'Gözləyir')
-        # Hər sifariş üçün EUR və AZN məbləğlərini hesabla
-        sifaris.cemi_mebleg_azn = sifaris.cemi_mebleg_eur * eur_rate
-        sifaris.odenilen_mebleg_azn = sifaris.odenilen_mebleg_eur * eur_rate
-        sifaris.qaliq_borc_azn = sifaris.qaliq_borc_eur * eur_rate
 
     return render(request, 'sifaris_izleme.html', {
         'sifarisler': sifarisler,

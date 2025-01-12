@@ -363,13 +363,8 @@ def sifaris_detallari(request, sifaris_id):
         mehsul.cemi_eur = mehsul.qiymet * mehsul.miqdar
         mehsul.cemi_azn = mehsul.cemi_eur * eur_rate
     
-    # Sifariş məbləğlərini hesabla
-    sifaris.cemi_mebleg_eur = sifaris.cemi_mebleg
-    sifaris.cemi_mebleg_azn = sifaris.cemi_mebleg * eur_rate
-    sifaris.odenilen_mebleg_eur = sifaris.odenilen_mebleg
-    sifaris.odenilen_mebleg_azn = sifaris.odenilen_mebleg * eur_rate
-    sifaris.qaliq_borc_eur = sifaris.cemi_mebleg - sifaris.odenilen_mebleg
-    sifaris.qaliq_borc_azn = sifaris.qaliq_borc_eur * eur_rate
+    # Artıq bu hesablamalara ehtiyac yoxdur, çünki model-də property kimi təyin olunub
+    # sifaris.cemi_mebleg_eur və digər sahələr birbaşa modeldən gəlir
     
     status_text = {
         'gozleyir': 'Gözləyir',

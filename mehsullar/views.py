@@ -9,7 +9,8 @@ import json
 import re
 from django.contrib.auth.models import User
 from django.core.cache import cache
-import requests
+from urllib.request import urlopen
+from urllib.error import URLError
 from decimal import Decimal
 from datetime import datetime
 
@@ -67,25 +68,21 @@ def get_eur_rate():
         cached_rate = cache.get('eur_mezenne')
         if cached_rate:
             return cached_rate
+
+        # Sadə API-dən məzənnəni alırıq
+        url = "https://open.er-api.com/v6/latest/EUR"
+        with urlopen(url) as response:
+            data = json.loads(response.read())
+            rate = Decimal(str(data['rates']['AZN']))
             
-        # Mərkəzi Bankın API-sindən məzənnəni alırıq
-        response = requests.get('https://www.cbar.az/currencies/08.06.2024.json')
-        data = response.json()
-        
-        # EUR məzənnəsini tapırıq
-        for currency in data['ValCurs']['ValType'][1]['Valute']:
-            if currency['@Code'] == 'EUR':
-                rate = Decimal(currency['Value'].replace(',', '.'))
-                # Məzənnəni 1 saat cache-də saxlayırıq
-                cache.set('eur_mezenne', rate, 3600)
-                cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 3600)
-                return rate
-                
-        return Decimal('2.00')  # Default məzənnə
-        
+            # Məzənnəni cache-də saxlayırıq
+            cache.set('eur_mezenne', rate, 3600)  # 1 saat
+            cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 3600)
+            return rate
+
     except Exception as e:
         print(f"Məzənnə yeniləmə xətası: {e}")
-        return Decimal('2.00')  # Xəta halında default məzənnə
+        return Decimal('2.00')  # Default məzənnə
 
 @login_required
 def products_list(request):

@@ -187,14 +187,18 @@ def sifarisi_gonder(request):
             if not sebet_items:
                 return JsonResponse({'status': 'error', 'message': 'Səbətiniz boşdur'})
 
+            # Cari məzənnəni al və saxla
+            current_rate = get_eur_rate()
+
             # Ümumi məbləği EUR-da hesabla
             total_eur = sum(item.mehsul.qiymet_eur * item.miqdar for item in sebet_items)
 
-            # Yeni sifarişi yarat (EUR məbləğləri ilə)
+            # Yeni sifarişi yarat
             sifaris = Sifaris.objects.create(
                 user=request.user,
-                cemi_mebleg_eur=total_eur,  # EUR məbləği
-                odenilen_mebleg_eur=0,  # İlkin ödəniş 0
+                cemi_mebleg_eur=total_eur,
+                odenilen_mebleg_eur=0,
+                sifaris_mezennesi=current_rate,  # Məzənnəni saxla
                 status='gozleyir'
             )
 

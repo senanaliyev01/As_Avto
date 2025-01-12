@@ -239,10 +239,28 @@ from .models import Sifaris
 @login_required
 def sifaris_izle(request):
     sifarisler = Sifaris.objects.filter(user=request.user)
+    
+    # Cari məzənnəni al
+    eur_rate = get_eur_rate()
+    update_time = cache.get('eur_update_time', 'Məlumat yoxdur')
 
-    toplam_mebleg = sum(sifaris.cemi_mebleg for sifaris in sifarisler)
-    odenilen_mebleg = sum(sifaris.odenilen_mebleg for sifaris in sifarisler)
-    qaliq_borc = toplam_mebleg - odenilen_mebleg
+    toplam_mebleg_eur = Decimal('0')
+    toplam_mebleg_azn = Decimal('0')
+    odenilen_mebleg_eur = Decimal('0')
+    odenilen_mebleg_azn = Decimal('0')
+
+    for sifaris in sifarisler:
+        # EUR məbləğləri
+        toplam_mebleg_eur += sifaris.cemi_mebleg_eur
+        odenilen_mebleg_eur += sifaris.odenilen_mebleg_eur
+        
+        # AZN məbləğləri
+        toplam_mebleg_azn = toplam_mebleg_eur * eur_rate
+        odenilen_mebleg_azn = odenilen_mebleg_eur * eur_rate
+
+    # Qalıq borcları hesabla
+    qaliq_borc_eur = toplam_mebleg_eur - odenilen_mebleg_eur
+    qaliq_borc_azn = qaliq_borc_eur * eur_rate
 
     status_text = {
         'gozleyir': 'Gözləyir',
@@ -251,15 +269,23 @@ def sifaris_izle(request):
         'catdirildi': 'Çatdırıldı'
     }
 
-    # Hər sifarişə status əlavə edirik
     for sifaris in sifarisler:
         sifaris.display_status = status_text.get(sifaris.status, 'Gözləyir')
+        # Hər sifariş üçün EUR və AZN məbləğlərini hesabla
+        sifaris.cemi_mebleg_azn = sifaris.cemi_mebleg_eur * eur_rate
+        sifaris.odenilen_mebleg_azn = sifaris.odenilen_mebleg_eur * eur_rate
+        sifaris.qaliq_borc_azn = sifaris.qaliq_borc_eur * eur_rate
 
     return render(request, 'sifaris_izleme.html', {
         'sifarisler': sifarisler,
-        'toplam_mebleg': toplam_mebleg,
-        'odenilen_mebleg': odenilen_mebleg,
-        'qaliq_borc': qaliq_borc,
+        'toplam_mebleg_eur': round(toplam_mebleg_eur, 2),
+        'toplam_mebleg_azn': round(toplam_mebleg_azn, 2),
+        'odenilen_mebleg_eur': round(odenilen_mebleg_eur, 2),
+        'odenilen_mebleg_azn': round(odenilen_mebleg_azn, 2),
+        'qaliq_borc_eur': round(qaliq_borc_eur, 2),
+        'qaliq_borc_azn': round(qaliq_borc_azn, 2),
+        'eur_rate': eur_rate,
+        'update_time': update_time
     })
 
 
@@ -338,14 +364,25 @@ def sifaris_detallari(request, sifaris_id):
     sifaris = get_object_or_404(Sifaris, id=sifaris_id, user=request.user)
     sifaris_mehsullari = SifarisMehsul.objects.filter(sifaris=sifaris)
     
-    # Hər məhsul üçün cəmi məbləği hesablayaq
+    # Cari məzənnəni al
+    eur_rate = get_eur_rate()
+    update_time = cache.get('eur_update_time', 'Məlumat yoxdur')
+    
+    # Hər məhsul üçün EUR və AZN qiymətlərini hesabla
     for mehsul in sifaris_mehsullari:
-        mehsul.cemi = mehsul.qiymet * mehsul.miqdar
+        mehsul.qiymet_eur = mehsul.qiymet
+        mehsul.qiymet_azn = mehsul.qiymet * eur_rate
+        mehsul.cemi_eur = mehsul.qiymet * mehsul.miqdar
+        mehsul.cemi_azn = mehsul.cemi_eur * eur_rate
     
-    # Qalıq borcu hesablayaq
-    sifaris.qaliq_borc = sifaris.cemi_mebleg - sifaris.odenilen_mebleg
+    # Sifariş məbləğlərini hesabla
+    sifaris.cemi_mebleg_eur = sifaris.cemi_mebleg
+    sifaris.cemi_mebleg_azn = sifaris.cemi_mebleg * eur_rate
+    sifaris.odenilen_mebleg_eur = sifaris.odenilen_mebleg
+    sifaris.odenilen_mebleg_azn = sifaris.odenilen_mebleg * eur_rate
+    sifaris.qaliq_borc_eur = sifaris.cemi_mebleg - sifaris.odenilen_mebleg
+    sifaris.qaliq_borc_azn = sifaris.qaliq_borc_eur * eur_rate
     
-    # Status mətnini əlavə edək
     status_text = {
         'gozleyir': 'Gözləyir',
         'hazirlanir': 'Hazırlanır',
@@ -357,5 +394,7 @@ def sifaris_detallari(request, sifaris_id):
     context = {
         'sifaris': sifaris,
         'sifaris_mehsullari': sifaris_mehsullari,
+        'eur_rate': eur_rate,
+        'update_time': update_time
     }
     return render(request, 'sifaris_detallari.html', context)

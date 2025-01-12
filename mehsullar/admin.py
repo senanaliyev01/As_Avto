@@ -23,20 +23,54 @@ class SifarisAdmin(admin.ModelAdmin):
 
 # Sifariş məhsulları admin paneli
 class SifarisMehsulAdmin(admin.ModelAdmin):
-    list_display = ('sifaris', 'mehsul', 'miqdar', 'qiymet_eur')
+    list_display = ('sifaris', 'mehsul', 'miqdar', 'qiymet')
+    
+    def qiymet(self, obj):
+        return f"{obj.qiymet} EUR"
+    qiymet.short_description = 'Qiymət (EUR)'
 
 # Məhsul admin paneli
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet_eur', 'brend_kod', 'oem', 'stok')
+    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet_eur_display', 'qiymet_azn_display', 'brend_kod', 'oem', 'stok')
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem')
+    list_filter = ('kateqoriya', 'brend', 'marka')
     inlines = [OEMKodInline]
 
-# Qeydiyyatları düzəltdik
+    def qiymet_eur_display(self, obj):
+        return f"{obj.qiymet_eur} EUR"
+    qiymet_eur_display.short_description = 'Qiymət (EUR)'
+
+    def qiymet_azn_display(self, obj):
+        return f"{obj.qiymet_azn} AZN"
+    qiymet_azn_display.short_description = 'Qiymət (AZN)'
+
+# Kateqoriya admin paneli
+class KateqoriyaAdmin(admin.ModelAdmin):
+    list_display = ('adi',)
+    search_fields = ('adi',)
+
+# Brend admin paneli
+class BrendAdmin(admin.ModelAdmin):
+    list_display = ('adi',)
+    search_fields = ('adi',)
+
+# Marka admin paneli
+class MarkaAdmin(admin.ModelAdmin):
+    list_display = ('adi',)
+    search_fields = ('adi',)
+
+# Səbət admin paneli
+class SebetAdmin(admin.ModelAdmin):
+    list_display = ('user', 'mehsul', 'miqdar')
+    list_filter = ('user',)
+    search_fields = ('user__username', 'mehsul__adi')
+
+# Qeydiyyatları yeniləyirik
 admin.site.register(SifarisMehsul, SifarisMehsulAdmin)
-admin.site.register(Kateqoriya)
-admin.site.register(Brend)
-admin.site.register(Marka)
-admin.site.register(Sebet)
+admin.site.register(Kateqoriya, KateqoriyaAdmin)
+admin.site.register(Brend, BrendAdmin)
+admin.site.register(Marka, MarkaAdmin)
+admin.site.register(Sebet, SebetAdmin)
 admin.site.register(Mehsul, MehsulAdmin)
 
 @admin.register(MusteriReyi)

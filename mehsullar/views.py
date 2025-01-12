@@ -89,8 +89,8 @@ def get_eur_rate():
             rate = Decimal(str(data['rates']['AZN']))
             
             # Məzənnəni cache-də saxlayırıq
-            cache.set('eur_mezenne', rate, 3600)  # 1 saat
-            cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 3600)
+            cache.set('eur_mezenne', rate, 600)  
+            cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 600)
             return rate
 
     except Exception as e:

@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
+            if (data.status === 'success') {
                 // Təsdiq modalını bağla
                 closeModal('confirmModal');
                 
@@ -229,16 +229,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const successModal = document.getElementById('successModal');
                 successModal.classList.add('show');
                 
-                // 3 saniyə sonra yönləndir və browser tarixçəsini təmizlə
+                // 3 saniyə sonra yönləndir
                 setTimeout(() => {
-                    // Yeni URL-ə yönləndir və browser tarixçəsini əvəz et
-                    window.location.replace('/orders/');
-                    
-                    // Əlavə təhlükəsizlik üçün history-ni təmizlə
-                    window.history.pushState(null, '', '/orders/');
-                    window.onpopstate = function(event) {
-                        window.history.pushState(null, '', '/orders/');
-                    };
+                    window.location.href = '/orders/';
                 }, 3000);
             } else {
                 throw new Error(data.message || 'Sifariş göndərilmədi');

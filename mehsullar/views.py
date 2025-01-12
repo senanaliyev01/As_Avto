@@ -33,19 +33,30 @@ def sebet_ekle(request, mehsul_id):
 @login_required
 def view_cart(request):
     sebet = Sebet.objects.filter(user=request.user)
-    cemi_mebleg = sebet.aggregate(total=Sum(F('miqdar') * F('mehsul__qiymet_eur')))['total'] or 0
-
+    
+    # Cari məzənnəni al
+    eur_rate = get_eur_rate()
+    update_time = cache.get('eur_update_time', 'Məlumat yoxdur')
+    
     # Hər məhsul üçün stok məlumatını və cəmi məbləği əlavə et
+    total_eur = 0
+    total_azn = 0
+    
     for item in sebet:
         item.stok_status = get_stock_status(item.mehsul.stok)
         item.stok_class = get_stock_class(item.mehsul.stok)
-        item.cemi = item.mehsul.qiymet_eur * item.miqdar  # EUR qiyməti
-        item.cemi_azn = item.mehsul.qiymet_azn * item.miqdar  # AZN qiyməti
+        item.cemi_eur = item.mehsul.qiymet_eur * item.miqdar  # EUR cəmi
+        item.cemi_azn = item.mehsul.qiymet_azn * item.miqdar  # AZN cəmi
+        
+        total_eur += item.cemi_eur
+        total_azn += item.cemi_azn
 
     return render(request, 'cart.html', {
         'sebet': sebet,
-        'cemi_mebleg': cemi_mebleg,
-        'cemi_mebleg_azn': sum(item.cemi_azn for item in sebet)
+        'cemi_mebleg_eur': total_eur,
+        'cemi_mebleg_azn': total_azn,
+        'eur_rate': eur_rate,
+        'update_time': update_time
     })
 
 def get_stock_status(stok):

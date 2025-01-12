@@ -148,28 +148,37 @@ def products_list(request):
 
 @login_required
 def sebetden_sil(request, sebet_id):
-    try:
-        sebet_item = Sebet.objects.get(id=sebet_id, user=request.user)
-        sebet_item.delete()
-        
-        # Yeni cəmi məbləği hesabla
-        sebet = Sebet.objects.filter(user=request.user)
-        cemi_mebleg = sebet.aggregate(
-            total=Sum(F('miqdar') * F('mehsul__qiymet_eur'))
-        )['total'] or 0
-        
-        # Float-a çevir və yuvarlaqlaşdır
-        cemi_mebleg = round(float(cemi_mebleg), 2)
-        
-        return JsonResponse({
-            'success': True,
-            'cemi_mebleg': cemi_mebleg
-        })
-    except Sebet.DoesNotExist:
-        return JsonResponse({
-            'success': False,
-            'message': 'Məhsul tapılmadı'
-        }, status=404)
+    if request.method == 'POST':
+        try:
+            sebet_item = get_object_or_404(Sebet, id=sebet_id, user=request.user)
+            sebet_item.delete()
+
+            # Cari məzənnəni al
+            eur_rate = get_eur_rate()
+            
+            # Yeni ümumi məbləği hesabla
+            cart_total_eur = Sebet.objects.filter(user=request.user).aggregate(
+                total_eur=Sum(F('miqdar') * F('mehsul__qiymet_eur'))
+            )['total_eur'] or 0
+            
+            cart_total_eur = round(float(cart_total_eur), 2)
+            cart_total_azn = round(float(cart_total_eur * eur_rate), 2)
+
+            return JsonResponse({
+                'success': True,
+                'total_amount_eur': cart_total_eur,
+                'total_amount_azn': cart_total_azn
+            })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': str(e)
+            }, status=500)
+    
+    return JsonResponse({
+        'success': False,
+        'message': 'Yanlış sorğu metodu'
+    }, status=400)
 
 @login_required
 def sifarisi_gonder(request):
@@ -285,23 +294,28 @@ def update_quantity(request, item_id, new_quantity):
         cart_item.miqdar = new_quantity
         cart_item.save()
 
+        # Cari məzənnəni al
+        eur_rate = get_eur_rate()
+
         # Yeni məbləğləri hesabla
         item_total_eur = round(float(cart_item.mehsul.qiymet_eur * new_quantity), 2)
-        item_total_azn = round(float(cart_item.mehsul.qiymet_azn * new_quantity), 2)
+        item_total_azn = round(float(item_total_eur * eur_rate), 2)
         
         # Ümumi səbət məbləğini hesabla
-        cart_totals = Sebet.objects.filter(user=request.user).aggregate(
-            total_eur=Sum(F('miqdar') * F('mehsul__qiymet_eur')),
-            total_azn=Sum(F('miqdar') * F('mehsul__qiymet_azn'))
-        )
+        cart_total_eur = Sebet.objects.filter(user=request.user).aggregate(
+            total_eur=Sum(F('miqdar') * F('mehsul__qiymet_eur'))
+        )['total_eur'] or 0
+        
+        cart_total_eur = round(float(cart_total_eur), 2)
+        cart_total_azn = round(float(cart_total_eur * eur_rate), 2)
 
         return JsonResponse({
             'success': True,
             'new_quantity': new_quantity,
             'item_total_eur': item_total_eur,
             'item_total_azn': item_total_azn,
-            'total_amount_eur': round(float(cart_totals['total_eur'] or 0), 2),
-            'total_amount_azn': round(float(cart_totals['total_azn'] or 0), 2)
+            'total_amount_eur': cart_total_eur,
+            'total_amount_azn': cart_total_azn
         })
             
     except Exception as e:

@@ -9,6 +9,7 @@
     <link rel="icon" href="{% static 'img/favicon.png' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/cart.css' %}">
+    <!-- q<link rel="stylesheet" href="{% static 'css/snow.css' %}"> -->
 </head>
 <body>
     <div class="container">
@@ -19,6 +20,8 @@
             <h1>Səbətim</h1>
         </div>
             
+      
+             
         {% if sebet %}
         <div class="cart-container">
             <table>
@@ -40,7 +43,7 @@
                 </thead>
                 <tbody>
                     {% for item in sebet %}
-                    <tr data-item-id="{{ item.id }}">
+                    <tr data-item-id="{{ item.id }}" data-price="{{ item.mehsul.qiymet_eur }}">
                         <td>{{ item.mehsul.adi }}</td>
                         <td>{{ item.mehsul.kateqoriya.adi }}</td>
                         <td>{{ item.mehsul.brend.adi }}</td>
@@ -79,15 +82,17 @@
                                        class="quantity-input" 
                                        value="{{ item.miqdar }}"
                                        min="1"
-                                       data-item-id="{{ item.id }}"
-                                       onchange="handleQuantityInput(this)"
+                                       onchange="updateQuantity({{ item.id }}, this.value)"
                                        onkeypress="return (event.charCode >= 48 && event.charCode <= 57)">
                                 <button type="button" class="quantity-btn plus" onclick="updateQuantity({{ item.id }}, 1)">
                                     <i class="fas fa-plus"></i>
                                 </button>
                             </div>
                         </td>
-                        <td class="item-total">{{ item.cemi_azn }} AZN</td>
+                        <td class="item-total">
+                            <div>{{ item.cemi_eur }} EUR</div>
+                            <div>{{ item.cemi_azn }} AZN</div>
+                        </td>
                         <td>
                             <button class="delete-btn" onclick="removeItem({{ item.id }})" title="Sil">
                                 <i class="fas fa-trash-alt"></i>
@@ -98,11 +103,13 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="10" style="text-align: right;">
+                        <td colspan="9"></td>
+                        <td style="text-align: right; white-space: nowrap;">
                             <strong>Ümumi Cəmi:</strong>
                         </td>
                         <td colspan="2" style="text-align: center;">
-                            <span id="total-amount">{{ cemi_mebleg_azn }} AZN</span>
+                            <div id="total-amount-eur">{{ cemi_mebleg_eur }} EUR</div>
+                            <div id="total-amount-azn">{{ cemi_mebleg_azn }} AZN</div>
                         </td>
                     </tr>
                 </tfoot>
@@ -166,9 +173,17 @@
         </div>
     </div>
 
-    <!-- Bildiriş -->
+    <!-- Notification -->
     <div id="notification" class="notification"></div>
 
     <script src="{% static 'js/cart.js' %}"></script>
+  
+    <!-- <script src="{% static 'js/snow.js' %}"></script> -->
+
+    <!-- Məzənnə məlumatını əlavə et -->
+    <div class="exchange-rate-info">
+        <span>1 EUR = {{ eur_rate }} AZN</span>
+        <small>(Son yeniləmə: {{ update_time }})</small>
+    </div>
 </body>
 </html>

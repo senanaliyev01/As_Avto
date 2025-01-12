@@ -154,20 +154,19 @@ def sebetden_sil(request, sebet_id):
             sebet_item.delete()
 
             # Cari məzənnəni al
-            eur_rate = get_eur_rate()
+            eur_rate = get_eur_rate()  # Bu Decimal qaytarır
             
             # Yeni ümumi məbləği hesabla
             cart_total_eur = Sebet.objects.filter(user=request.user).aggregate(
                 total_eur=Sum(F('miqdar') * F('mehsul__qiymet_eur'))
-            )['total_eur'] or 0
+            )['total_eur'] or Decimal('0')
             
-            cart_total_eur = round(float(cart_total_eur), 2)
-            cart_total_azn = round(float(cart_total_eur * eur_rate), 2)
+            cart_total_azn = cart_total_eur * eur_rate
 
             return JsonResponse({
                 'success': True,
-                'total_amount_eur': cart_total_eur,
-                'total_amount_azn': cart_total_azn
+                'total_amount_eur': str(round(cart_total_eur, 2)),
+                'total_amount_azn': str(round(cart_total_azn, 2))
             })
         except Exception as e:
             return JsonResponse({
@@ -295,27 +294,26 @@ def update_quantity(request, item_id, new_quantity):
         cart_item.save()
 
         # Cari məzənnəni al
-        eur_rate = get_eur_rate()
+        eur_rate = get_eur_rate()  # Bu Decimal qaytarır
 
-        # Yeni məbləğləri hesabla
-        item_total_eur = round(float(cart_item.mehsul.qiymet_eur * new_quantity), 2)
-        item_total_azn = round(float(item_total_eur * eur_rate), 2)
+        # Yeni məbləğləri hesabla - hər şeyi Decimal-a çeviririk
+        item_total_eur = Decimal(str(cart_item.mehsul.qiymet_eur)) * Decimal(str(new_quantity))
+        item_total_azn = item_total_eur * eur_rate
         
         # Ümumi səbət məbləğini hesabla
         cart_total_eur = Sebet.objects.filter(user=request.user).aggregate(
             total_eur=Sum(F('miqdar') * F('mehsul__qiymet_eur'))
-        )['total_eur'] or 0
+        )['total_eur'] or Decimal('0')
         
-        cart_total_eur = round(float(cart_total_eur), 2)
-        cart_total_azn = round(float(cart_total_eur * eur_rate), 2)
+        cart_total_azn = cart_total_eur * eur_rate
 
         return JsonResponse({
             'success': True,
             'new_quantity': new_quantity,
-            'item_total_eur': item_total_eur,
-            'item_total_azn': item_total_azn,
-            'total_amount_eur': cart_total_eur,
-            'total_amount_azn': cart_total_azn
+            'item_total_eur': str(round(item_total_eur, 2)),
+            'item_total_azn': str(round(item_total_azn, 2)),
+            'total_amount_eur': str(round(cart_total_eur, 2)),
+            'total_amount_azn': str(round(cart_total_azn, 2))
         })
             
     except Exception as e:

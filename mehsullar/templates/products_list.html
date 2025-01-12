@@ -96,7 +96,6 @@
 
 <!-- Məhsullar cədvəlində qiymət sütununu yeniləyirik -->
 <div class="products-table">
-    {% if mehsullar %}
     <table>
         <thead>
             <tr>
@@ -107,8 +106,8 @@
                 <th>Brend Kod</th>
                 <th>OEM Kod</th>
                 <th>Stok</th>
-                <th>Qiymət (EUR)</th>
                 <th>Qiymət (AZN)</th>
+                <th>Qiymət (EUR)</th>
                 <th>Səbət</th>
             </tr>
         </thead>
@@ -131,23 +130,18 @@
                     {% endif %}
                 </td>
                 <td class="price-column">
-                    {{ mehsul.qiymet_eur }}
-                    <i class="fa-solid fa-euro-sign"></i>
+                    {{ mehsul.qiymet_azn }}
+                    <i class="fa-solid fa-manat-sign"></i>
                 </td>
                 <td class="price-column">
-                    {{ mehsul.qiymet }}
-                    <i class="fa-solid fa-manat-sign"></i>
+                    {{ mehsul.qiymet_eur }}
+                    <i class="fa-solid fa-euro-sign"></i>
                 </td>
                 <td><a href="{% url 'sebet_ekle' mehsul.id %}" class="cart-icon"><i class="fas fa-shopping-cart"></i></a></td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-</div>
-{% else %}
-    <h2 class="no-results" style="color: red">Heç bir nəticə tapılmadı. Zəhmət olmasa axtarış parametrlərini yoxlayın.</h2>
-{% endif %}
-</div>
 </div>
 
 

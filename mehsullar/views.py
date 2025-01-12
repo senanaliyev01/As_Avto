@@ -34,6 +34,7 @@ def sebet_ekle(request, mehsul_id):
 def view_cart(request):
     sebet = Sebet.objects.filter(user=request.user)
     cemi_mebleg = sebet.aggregate(total=Sum(F('miqdar') * F('mehsul__qiymet')))['total'] or 0
+    cemi_mebleg = sebet.aggregate(total=Sum(F('miqdar') * F('qiymet__eur')))['total'] or 0
 
     # Hər məhsul üçün stok məlumatını və cəmi məbləği əlavə et
     for item in sebet:

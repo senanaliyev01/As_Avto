@@ -468,19 +468,19 @@ header {
 }
 
 .out-of-stock {
-    background: linear-gradient(135deg, #ff7675, #d63031);
+    background: red;
     color: white;
     border: none;
 }
 
 .low-stock {
-    background: linear-gradient(135deg, #ffd32a, #fdcb6e);
-    color: #805317;
+    background: rgb(199, 199, 3);
+    color: white;
     border: none;
 }
 
 .in-stock {
-    background: linear-gradient(135deg, #26de81, #20bf6b);
+    background: green;
     color: white;
     border: none;
 }

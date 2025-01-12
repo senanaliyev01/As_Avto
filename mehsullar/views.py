@@ -33,17 +33,19 @@ def sebet_ekle(request, mehsul_id):
 @login_required
 def view_cart(request):
     sebet = Sebet.objects.filter(user=request.user)
-    cemi_mebleg = sebet.aggregate(total=Sum(F('miqdar') * F('mehsul__qiymet')))['total'] or 0
+    cemi_mebleg = sebet.aggregate(total=Sum(F('miqdar') * F('mehsul__qiymet_eur')))['total'] or 0
 
     # Hər məhsul üçün stok məlumatını və cəmi məbləği əlavə et
     for item in sebet:
         item.stok_status = get_stock_status(item.mehsul.stok)
         item.stok_class = get_stock_class(item.mehsul.stok)
-        item.cemi = item.mehsul.qiymet * item.miqdar  # Hər məhsul üçün cəmi məbləğ
+        item.cemi = item.mehsul.qiymet_eur * item.miqdar  # EUR qiyməti
+        item.cemi_azn = item.mehsul.qiymet_azn * item.miqdar  # AZN qiyməti
 
     return render(request, 'cart.html', {
         'sebet': sebet,
-        'cemi_mebleg': cemi_mebleg
+        'cemi_mebleg': cemi_mebleg,
+        'cemi_mebleg_azn': sum(item.cemi_azn for item in sebet)
     })
 
 def get_stock_status(stok):
@@ -142,7 +144,7 @@ def sebetden_sil(request, sebet_id):
         # Yeni cəmi məbləği hesabla
         sebet = Sebet.objects.filter(user=request.user)
         cemi_mebleg = sebet.aggregate(
-            total=Sum(F('miqdar') * F('mehsul__qiymet'))
+            total=Sum(F('miqdar') * F('mehsul__qiymet_eur'))
         )['total'] or 0
         
         # Float-a çevir və yuvarlaqlaşdır
@@ -162,7 +164,6 @@ def sebetden_sil(request, sebet_id):
 def sifarisi_gonder(request):
     if request.method == "POST":
         try:
-            # Səbətdəki məhsulları yoxla
             sebet = Sebet.objects.filter(user=request.user)
             if not sebet.exists():
                 return JsonResponse({
@@ -179,22 +180,20 @@ def sifarisi_gonder(request):
             total_amount = 0
             # Məhsulları sifarişə əlavə et
             for item in sebet:
-                item_total = item.mehsul.qiymet * item.miqdar
+                item_total = item.mehsul.qiymet_eur * item.miqdar
                 total_amount += item_total
                 
                 SifarisMehsul.objects.create(
                     sifaris=sifaris,
                     mehsul=item.mehsul,
                     miqdar=item.miqdar,
-                    qiymet=item.mehsul.qiymet
+                    qiymet=item.mehsul.qiymet_eur  # EUR qiyməti
                 )
 
-            # Ümumi məbləği yenilə və sifarişi tamamla
             sifaris.cemi_mebleg = total_amount
             sifaris.status = 'gozleyir'
             sifaris.save()
 
-            # Səbəti təmizlə
             sebet.delete()
 
             return JsonResponse({
@@ -276,11 +275,11 @@ def update_quantity(request, item_id, new_quantity):
         cart_item.save()
 
         # Yeni məbləğləri hesabla
-        item_total = round(float(cart_item.mehsul.qiymet * new_quantity), 2)
+        item_total = round(float(cart_item.mehsul.qiymet_eur * new_quantity), 2)
         
         # Ümumi səbət məbləğini hesabla
         cart_total = round(float(Sebet.objects.filter(user=request.user).aggregate(
-            total=Sum(F('miqdar') * F('mehsul__qiymet'))
+            total=Sum(F('miqdar') * F('mehsul__qiymet_eur'))
         )['total'] or 0), 2)
 
         return JsonResponse({

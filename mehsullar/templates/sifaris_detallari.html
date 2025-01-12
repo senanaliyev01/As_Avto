@@ -12,12 +12,15 @@
     <nav class="header-nav">
         <a href="{% url 'main' %}">Əsas Səhifə</a>
         <a href="{% url 'sifaris_izle' %}">Sifarişlərim</a>
-        <h2>Sifariş #{{ sifaris.id }}</h2>
+        <h2>Sifariş #{{ sifaris.id }} (1 EUR = {{ sifaris.sifaris_mezennesi }} AZN)</h2>
     </nav>
 
     <div class="exchange-rate-info">
-        <span>1 EUR = {{ eur_rate }} AZN</span>
-        <small>(Son yeniləmə: {{ update_time }})</small>
+        <div class="rate-info">
+            <div class="historical-rate">Sifariş məzənnəsi: 1 EUR = {{ sifaris.sifaris_mezennesi }} AZN</div>
+            <div class="current-rate">Cari məzənnə: 1 EUR = {{ eur_rate }} AZN</div>
+            <small>(Son yeniləmə: {{ update_time }})</small>
+        </div>
     </div>
 
     <div class="sifaris-info">

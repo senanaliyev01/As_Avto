@@ -136,7 +136,7 @@ def register(request):
             if not re.match(r'^[a-zA-Z0-9_]+$', username):
                 return JsonResponse({
                     'status': 'error',
-                    'message': 'İstifadəçi adı yalnız hərf, rəqəm və alt xətt (_) simvolundan ibarət ola bilər!'
+                    'message': 'İstifadəçi adı yalnız İngilis hərfləri, rəqəm və alt xətt (_) simvolundan ibarət ola bilər!'
                 })
 
 

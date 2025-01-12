@@ -20,7 +20,11 @@
             <h1>Səbətim</h1>
         </div>
             
-      
+       <!-- Məzənnə məlumatını əlavə et -->
+    <div class="exchange-rate-info">
+        <span>1 EUR = {{ eur_rate }} AZN</span>
+        <small>(Son yeniləmə: {{ update_time }})</small>
+    </div>
              
         {% if sebet %}
         <div class="cart-container">
@@ -180,10 +184,6 @@
   
     <!-- <script src="{% static 'js/snow.js' %}"></script> -->
 
-    <!-- Məzənnə məlumatını əlavə et -->
-    <div class="exchange-rate-info">
-        <span>1 EUR = {{ eur_rate }} AZN</span>
-        <small>(Son yeniləmə: {{ update_time }})</small>
-    </div>
+   
 </body>
 </html>

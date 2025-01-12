@@ -18,19 +18,26 @@ document.addEventListener('DOMContentLoaded', function() {
     // Ümumi məbləği yeniləmə funksiyası
     function updateTotalAmount() {
         const rows = document.querySelectorAll('tbody tr');
-        let total = 0;
+        let totalEur = 0;
+        let totalAzn = 0;
 
         rows.forEach(row => {
-            const itemTotal = parseFloat(row.querySelector('.item-total').textContent);
-            total += itemTotal;
+            const itemTotalEur = parseFloat(row.querySelector('.item-total div:first-child').textContent);
+            const itemTotalAzn = parseFloat(row.querySelector('.item-total div:last-child').textContent);
+            totalEur += itemTotalEur;
+            totalAzn += itemTotalAzn;
         });
 
-        const totalElement = document.getElementById('total-amount');
-        if (totalElement) {
-            totalElement.textContent = total.toFixed(2) + ' AZN';
+        const totalEurElement = document.getElementById('total-amount-eur');
+        const totalAznElement = document.getElementById('total-amount-azn');
+        
+        if (totalEurElement && totalAznElement) {
+            totalEurElement.textContent = totalEur.toFixed(2) + ' EUR';
+            totalAznElement.textContent = totalAzn.toFixed(2) + ' AZN';
             
             // Animasiya
-            totalElement.style.animation = 'fadeIn 0.3s ease';
+            totalEurElement.style.animation = 'fadeIn 0.3s ease';
+            totalAznElement.style.animation = 'fadeIn 0.3s ease';
         }
     }
 

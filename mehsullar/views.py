@@ -286,18 +286,22 @@ def update_quantity(request, item_id, new_quantity):
         cart_item.save()
 
         # Yeni məbləğləri hesabla
-        item_total = round(float(cart_item.mehsul.qiymet_eur * new_quantity), 2)
+        item_total_eur = round(float(cart_item.mehsul.qiymet_eur * new_quantity), 2)
+        item_total_azn = round(float(cart_item.mehsul.qiymet_azn * new_quantity), 2)
         
         # Ümumi səbət məbləğini hesabla
-        cart_total = round(float(Sebet.objects.filter(user=request.user).aggregate(
-            total=Sum(F('miqdar') * F('mehsul__qiymet_eur'))
-        )['total'] or 0), 2)
+        cart_totals = Sebet.objects.filter(user=request.user).aggregate(
+            total_eur=Sum(F('miqdar') * F('mehsul__qiymet_eur')),
+            total_azn=Sum(F('miqdar') * F('mehsul__qiymet_azn'))
+        )
 
         return JsonResponse({
             'success': True,
             'new_quantity': new_quantity,
-            'item_total': item_total,
-            'total_amount': cart_total
+            'item_total_eur': item_total_eur,
+            'item_total_azn': item_total_azn,
+            'total_amount_eur': round(float(cart_totals['total_eur'] or 0), 2),
+            'total_amount_azn': round(float(cart_totals['total_azn'] or 0), 2)
         })
             
     except Exception as e:

@@ -77,21 +77,18 @@ class Sifaris(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     cemi_mebleg_eur = models.DecimalField(max_digits=10, decimal_places=2)
     odenilen_mebleg_eur = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    sifaris_mezennesi = models.DecimalField(max_digits=10, decimal_places=2)
     tarix = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='gozleyir')
     tamamlandi = models.BooleanField(default=False)
 
     @property
     def cemi_mebleg_azn(self):
-        from django.core.cache import cache
-        eur_rate = cache.get('eur_mezenne', Decimal('2.00'))
-        return round(self.cemi_mebleg_eur * eur_rate, 2)
+        return round(self.cemi_mebleg_eur * self.sifaris_mezennesi, 2)
 
     @property
     def odenilen_mebleg_azn(self):
-        from django.core.cache import cache
-        eur_rate = cache.get('eur_mezenne', Decimal('2.00'))
-        return round(self.odenilen_mebleg_eur * eur_rate, 2)
+        return round(self.odenilen_mebleg_eur * self.sifaris_mezennesi, 2)
 
     @property
     def qaliq_borc_eur(self):
@@ -99,9 +96,7 @@ class Sifaris(models.Model):
 
     @property
     def qaliq_borc_azn(self):
-        from django.core.cache import cache
-        eur_rate = cache.get('eur_mezenne', Decimal('2.00'))
-        return round(self.qaliq_borc_eur * eur_rate, 2)
+        return round(self.qaliq_borc_eur * self.sifaris_mezennesi, 2)
 
     def __str__(self):
         return f"Sifariş {self.id} - {self.tarix}"

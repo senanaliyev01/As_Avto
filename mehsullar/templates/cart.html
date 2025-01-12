@@ -19,9 +19,7 @@
             </a>
             <h1>Səbətim</h1>
         </div>
-            
-      
-             
+
         {% if sebet %}
         <div class="cart-container">
             <table>
@@ -34,8 +32,7 @@
                         <th>Brend Kod</th>
                         <th>OEM</th>
                         <th>Stok</th>
-                        <th>Qiymət EUR</th>
-                        <th>Qiymət AZN</th>
+                        <th>Qiymət</th>
                         <th>Miqdar</th>
                         <th>Cəmi</th>
                         <th>Sil</th>
@@ -43,7 +40,7 @@
                 </thead>
                 <tbody>
                     {% for item in sebet %}
-                    <tr data-item-id="{{ item.id }}" data-price="{{ item.mehsul.qiymet }}">
+                    <tr data-item-id="{{ item.id }}" data-price="{{ item.mehsul.qiymet_eur }}">
                         <td>{{ item.mehsul.adi }}</td>
                         <td>{{ item.mehsul.kateqoriya.adi }}</td>
                         <td>{{ item.mehsul.brend.adi }}</td>
@@ -65,14 +62,8 @@
                                 </span>
                             {% endif %}
                         </td>
-                        <td class="price-column">
-                            {{ item.mehsul.qiymet_eur }}
-                            <i class="fa-solid fa-euro-sign"></i>
-                        </td>
-                        <td class="price-column">
-                            {{ item.mehsul.qiymet_azn }}
-                            <i class="fa-solid fa-manat-sign"></i>
-                        </td>
+                        <td>{{ item.mehsul.qiymet_eur }} EUR</td>
+                        <td>{{ item.mehsul.qiymet_azn }} AZN</td>
                         <td>
                             <div class="quantity-controls">
                                 <button type="button" class="quantity-btn minus" onclick="updateQuantity({{ item.id }}, -1)">
@@ -89,7 +80,8 @@
                                 </button>
                             </div>
                         </td>
-                        <td class="item-total">{{ item.cemi }} AZN</td>
+                        <td>{{ item.cemi }} EUR</td>
+                        <td>{{ item.cemi_azn }} AZN</td>
                         <td>
                             <button class="delete-btn" onclick="removeItem({{ item.id }})" title="Sil">
                                 <i class="fas fa-trash-alt"></i>
@@ -105,8 +97,10 @@
                             <strong>Ümumi Cəmi:</strong>
                         </td>
                         <td colspan="2" style="text-align: center;">
-                            
-                            <span id="total-amount">{{ cemi_mebleg }} AZN</span>
+                            <div class="total">
+                                <p>Ümumi məbləğ: {{ cemi_mebleg }} EUR</p>
+                                <p>Ümumi məbləğ: {{ cemi_mebleg_azn }} AZN</p>
+                            </div>
                         </td>
                     </tr>
                 </tfoot>

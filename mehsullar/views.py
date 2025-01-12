@@ -8,6 +8,10 @@ from django.views.decorators.http import require_POST
 import json
 import re
 from django.contrib.auth.models import User
+from django.core.cache import cache
+import requests
+from decimal import Decimal
+from datetime import datetime
 
 @login_required
 def about(request):
@@ -57,14 +61,44 @@ def get_stock_class(stok):
     else:
         return "in-stock"
 
+def get_eur_rate():
+    try:
+        # Cache-də məzənnə varsa onu qaytarırıq
+        cached_rate = cache.get('eur_mezenne')
+        if cached_rate:
+            return cached_rate
+            
+        # Mərkəzi Bankın API-sindən məzənnəni alırıq
+        response = requests.get('https://www.cbar.az/currencies/08.06.2024.json')
+        data = response.json()
+        
+        # EUR məzənnəsini tapırıq
+        for currency in data['ValCurs']['ValType'][1]['Valute']:
+            if currency['@Code'] == 'EUR':
+                rate = Decimal(currency['Value'].replace(',', '.'))
+                # Məzənnəni 1 saat cache-də saxlayırıq
+                cache.set('eur_mezenne', rate, 3600)
+                cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 3600)
+                return rate
+                
+        return Decimal('2.00')  # Default məzənnə
+        
+    except Exception as e:
+        print(f"Məzənnə yeniləmə xətası: {e}")
+        return Decimal('2.00')  # Xəta halında default məzənnə
+
 @login_required
 def products_list(request):
-    # Başlanğıc olaraq bütün məhsulları götürürük
+    # Mövcud kodu saxlayırıq
     mehsullar = Mehsul.objects.all()
     kateqoriyalar = Kateqoriya.objects.all()
     brendlər = Brend.objects.all()
     markalar = Marka.objects.all()
-
+    
+    # Məzənnəni yeniləyirik
+    eur_rate = get_eur_rate()
+    update_time = cache.get('eur_update_time', 'Məlumat yoxdur')
+    
     # Axtarış parametrlərini alırıq
     category = request.GET.get('category')
     brand = request.GET.get('brand')
@@ -96,7 +130,9 @@ def products_list(request):
         'mehsullar': mehsullar,
         'kateqoriyalar': kateqoriyalar,
         'brendlər': brendlər,
-        'markalar': markalar
+        'markalar': markalar,
+        'eur_rate': eur_rate,
+        'update_time': update_time
     })
 
 
@@ -300,4 +336,3 @@ def sifaris_detallari(request, sifaris_id):
         'sifaris_mehsullari': sifaris_mehsullari,
     }
     return render(request, 'sifaris_detallari.html', context)
-

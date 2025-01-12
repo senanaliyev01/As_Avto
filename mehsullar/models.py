@@ -30,7 +30,20 @@ class Mehsul(models.Model):
     oem = models.CharField(max_length=100)
     stok = models.IntegerField()
     qiymet = models.DecimalField(max_digits=10, decimal_places=2)
-
+    
+    @property
+    def qiymet_eur(self):
+        from decimal import Decimal
+        from django.core.cache import cache
+        
+        # Cache-dən məzənnəni al
+        mezenne = cache.get('eur_mezenne')
+        if not mezenne:
+            return Decimal('0.00')
+        
+        # AZN qiyməti EUR-a çevir
+        return round(self.qiymet / Decimal(str(mezenne)), 2)
+    
     def __str__(self):
         return self.adi
 
@@ -134,5 +147,3 @@ class MusteriReyi(models.Model):
 
     def __str__(self):
         return f"{self.musteri.get_full_name()} - {self.get_qiymetlendirme_display()}"
-
-

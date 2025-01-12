@@ -23,11 +23,11 @@ class SifarisAdmin(admin.ModelAdmin):
 
 # Sifariş məhsulları admin paneli
 class SifarisMehsulAdmin(admin.ModelAdmin):
-    list_display = ('sifaris', 'mehsul', 'miqdar', 'qiymet')
+    list_display = ('sifaris', 'mehsul', 'miqdar', 'qiymet_eur')
 
 # Məhsul admin paneli
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'oem', 'stok')
+    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet_eur', 'brend_kod', 'oem', 'stok')
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem')
     inlines = [OEMKodInline]
 

@@ -16,18 +16,18 @@
     <div class="statistic">
         <div class="stat-item">
             <h3>Ümumi Məbləğ</h3>
-            <p class="amount-info">{{ toplam_mebleg_eur }} EUR</p>
-            <p class="amount-info">{{ toplam_mebleg_azn }} AZN</p>
+            <p class="amount-info">{{ toplam_mebleg_eur|floatformat:2 }} EUR</p>
+            <p class="amount-info">{{ toplam_mebleg_azn|floatformat:2 }} AZN</p>
         </div>
         <div class="stat-item">
             <h3>Ödənilən Məbləğ</h3>
-            <p class="amount-info">{{ toplam_odenilen_eur }} EUR</p>
-            <p class="amount-info">{{ toplam_odenilen_azn }} AZN</p>
+            <p class="amount-info">{{ toplam_odenilen_eur|floatformat:2 }} EUR</p>
+            <p class="amount-info">{{ toplam_odenilen_azn|floatformat:2 }} AZN</p>
         </div>
         <div class="stat-item">
             <h3>Qalıq Borc</h3>
-            <p class="amount-info">{{ toplam_qaliq_eur }} EUR</p>
-            <p class="amount-info">{{ toplam_qaliq_azn }} AZN</p>
+            <p class="amount-info">{{ toplam_qaliq_eur|floatformat:2 }} EUR</p>
+            <p class="amount-info">{{ toplam_qaliq_azn|floatformat:2 }} AZN</p>
         </div>
     </div>
 

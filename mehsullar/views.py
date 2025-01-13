@@ -218,12 +218,12 @@ def sifaris_izle(request):
     sifarisler = Sifaris.objects.filter(user=request.user).order_by('-tarix')
     
     # Ümumi statistika hesablamaları
-    toplam_mebleg_eur = sum(sifaris.cemi_mebleg_eur for sifaris in sifarisler)
-    toplam_mebleg_azn = sum(sifaris.cemi_mebleg_azn for sifaris in sifarisler)
-    toplam_odenilen_eur = sum(sifaris.odenilen_mebleg_eur for sifaris in sifarisler)
-    toplam_odenilen_azn = sum(sifaris.odenilen_mebleg_azn for sifaris in sifarisler)
-    toplam_qaliq_eur = toplam_mebleg_eur - toplam_odenilen_eur
-    toplam_qaliq_azn = toplam_mebleg_azn - toplam_odenilen_azn
+    toplam_mebleg_eur = round(sum(sifaris.cemi_mebleg_eur for sifaris in sifarisler), 2)
+    toplam_mebleg_azn = round(sum(sifaris.cemi_mebleg_azn for sifaris in sifarisler), 2)
+    toplam_odenilen_eur = round(sum(sifaris.odenilen_mebleg_eur for sifaris in sifarisler), 2)
+    toplam_odenilen_azn = round(sum(sifaris.odenilen_mebleg_azn for sifaris in sifarisler), 2)
+    toplam_qaliq_eur = round(toplam_mebleg_eur - toplam_odenilen_eur, 2)
+    toplam_qaliq_azn = round(toplam_mebleg_azn - toplam_odenilen_azn, 2)
 
     # Status mətnlərini əlavə et
     status_text = {

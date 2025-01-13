@@ -60,8 +60,8 @@ class Mehsul(models.Model):
         if not self.son_mezenne:
             return None
         current_rate = cache.get('eur_mezenne', Decimal('2.00'))
-        return (current_rate > self.son_mezenne, 
-                abs(self.qiymet_azn - (self.qiymet_eur * self.son_mezenne)))
+        old_price = self.qiymet_eur * self.son_mezenne
+        return (current_rate > self.son_mezenne, old_price)
 
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

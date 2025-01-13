@@ -33,31 +33,29 @@ def sebet_ekle(request, mehsul_id):
 @login_required
 def view_cart(request):
     sebet = Sebet.objects.filter(user=request.user)
-    
-    # Cari məzənnəni al
-    eur_rate = get_eur_rate()
-    update_time = cache.get('eur_update_time', 'Məlumat yoxdur')
-
-    # Hər məhsul üçün stok məlumatını və cəmi məbləği əlavə et
-    total_eur = 0
-    total_azn = 0
+    current_rate, previous_rate = get_eur_rate()
+    rate_change = current_rate - previous_rate
     
     for item in sebet:
         item.stok_status = get_stock_status(item.mehsul.stok)
         item.stok_class = get_stock_class(item.mehsul.stok)
-        item.cemi_eur = item.mehsul.qiymet_eur * item.miqdar  # EUR cəmi
-        item.cemi_azn = item.mehsul.qiymet_azn * item.miqdar  # AZN cəmi
-        
-        total_eur += item.cemi_eur
-        total_azn += item.cemi_azn
+        item.cemi_eur = item.mehsul.qiymet_eur * item.miqdar
+        item.cemi_azn = item.mehsul.qiymet_azn * item.miqdar
+        item.previous_price_azn = round(item.mehsul.qiymet_eur * previous_rate, 2)
+        item.price_change = round(item.mehsul.qiymet_azn - item.previous_price_azn, 2)
+        # Mütləq qiyməti burada hesablayırıq
+        item.price_change_percent = abs(round((item.price_change / item.previous_price_azn) * 100, 1))
 
-    return render(request, 'cart.html', {
+    context = {
         'sebet': sebet,
-        'cemi_mebleg_eur': total_eur,
-        'cemi_mebleg_azn': total_azn,
-        'eur_rate': eur_rate,
-        'update_time': update_time
-    })
+        'cemi_mebleg_eur': sum(item.cemi_eur for item in sebet),
+        'cemi_mebleg_azn': sum(item.cemi_azn for item in sebet),
+        'eur_rate': current_rate,
+        'rate_change': rate_change,
+        'rate_change_percent': abs(round((rate_change / previous_rate) * 100, 1)),
+        'update_time': cache.get('eur_update_time', 'Məlumat yoxdur')
+    }
+    return render(request, 'cart.html', context)
 
 def get_stock_status(stok):
     if stok == 0:
@@ -111,7 +109,8 @@ def products_list(request):
     for mehsul in mehsullar:
         mehsul.previous_price_azn = round(mehsul.qiymet_eur * previous_rate, 2)
         mehsul.price_change = round(mehsul.qiymet_azn - mehsul.previous_price_azn, 2)
-        mehsul.price_change_percent = round((mehsul.price_change / mehsul.previous_price_azn) * 100, 1)
+        # Mütləq qiyməti burada hesablayırıq
+        mehsul.price_change_percent = abs(round((mehsul.price_change / mehsul.previous_price_azn) * 100, 1))
 
     context = {
         'mehsullar': mehsullar,

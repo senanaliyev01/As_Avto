@@ -278,8 +278,8 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => console.error('Məzənnə yeniləmə xətası:', error));
     }
 
-    // Hər 30 saniyədə yenilə
-    setInterval(updateExchangeRate, 30000);
+    // Hər 1 saatda bir yenilə (3600000 millisaniyə = 1 saat)
+    setInterval(updateExchangeRate, 3600000);
 
     // Səhifə yükləndikdə yenilə
     document.addEventListener('DOMContentLoaded', updateExchangeRate);

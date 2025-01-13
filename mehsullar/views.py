@@ -35,9 +35,9 @@ def view_cart(request):
     sebet = Sebet.objects.filter(user=request.user)
     
     # Cari məzənnəni al
-    eur_rate = get_eur_rate()
+    current_rate, previous_rate = get_eur_rate()
     update_time = cache.get('eur_update_time', 'Məlumat yoxdur')
-    
+
     # Hər məhsul üçün stok məlumatını və cəmi məbləği əlavə et
     total_eur = 0
     total_azn = 0
@@ -55,7 +55,8 @@ def view_cart(request):
         'sebet': sebet,
         'cemi_mebleg_eur': total_eur,
         'cemi_mebleg_azn': total_azn,
-        'eur_rate': eur_rate,
+        'eur_rate': current_rate,
+        'previous_rate': previous_rate,
         'update_time': update_time
     })
 
@@ -77,25 +78,33 @@ def get_stock_class(stok):
 
 def get_eur_rate():
     try:
-        # Cache-də məzənnə varsa onu qaytarırıq
-        cached_rate = cache.get('eur_mezenne')
-        if cached_rate:
-            return cached_rate
-
-        # Sadə API-dən məzənnəni alırıq
-        url = "https://open.er-api.com/v6/latest/EUR"
-        with urlopen(url) as response:
-            data = json.loads(response.read())
-            rate = Decimal(str(data['rates']['AZN']))
+        previous_rate = cache.get('previous_eur_rate')
+        current_rate = cache.get('eur_mezenne')
+        
+        if current_rate:
+            if not previous_rate:
+                cache.set('previous_eur_rate', current_rate)
+                previous_rate = current_rate
             
-            # Məzənnəni cache-də saxlayırıq
-            cache.set('eur_mezenne', rate, 600)  
-            cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 600)
-            return rate
+            # Yeni məzənnə alınanda köhnəni saxla
+            url = "https://open.er-api.com/v6/latest/EUR"
+            with urlopen(url) as response:
+                data = json.loads(response.read())
+                new_rate = Decimal(str(data['rates']['AZN']))
+                
+                if new_rate != current_rate:
+                    cache.set('previous_eur_rate', current_rate)
+                    cache.set('eur_mezenne', new_rate, 600)
+                    cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 600)
+                    return new_rate, current_rate
+                
+            return current_rate, previous_rate
+            
+        return Decimal('2.00'), Decimal('2.00')
 
     except Exception as e:
         print(f"Məzənnə yeniləmə xətası: {e}")
-        return Decimal('2.00')  # Default məzənnə
+        return Decimal('2.00'), Decimal('2.00')
 
 @login_required
 def products_list(request):
@@ -106,7 +115,7 @@ def products_list(request):
     markalar = Marka.objects.all()
     
     # Məzənnəni yeniləyirik
-    eur_rate = get_eur_rate()
+    current_rate, previous_rate = get_eur_rate()
     update_time = cache.get('eur_update_time', 'Məlumat yoxdur')
     
     # Axtarış parametrlərini alırıq
@@ -136,12 +145,17 @@ def products_list(request):
             Q(oem_kodlar__kod__icontains=search_text)  # Əlavə OEM kodlarında hissəvi uyğunluq
         ).distinct()
 
+    # Hər məhsul üçün əvvəlki AZN qiymətini hesabla
+    for mehsul in mehsullar:
+        mehsul.previous_azn = round(mehsul.qiymet_eur * previous_rate, 2)
+    
     return render(request, 'products_list.html', {
         'mehsullar': mehsullar,
         'kateqoriyalar': kateqoriyalar,
         'brendlər': brendlər,
         'markalar': markalar,
-        'eur_rate': eur_rate,
+        'eur_rate': current_rate,
+        'previous_rate': previous_rate,
         'update_time': update_time
     })
 
@@ -149,10 +163,10 @@ def products_list(request):
 @login_required
 def sebetden_sil(request, sebet_id):
     if request.method == 'POST':
-        try:
+    try:
             sebet_item = get_object_or_404(Sebet, id=sebet_id, user=request.user)
-            sebet_item.delete()
-
+        sebet_item.delete()
+        
             # Cari məzənnəni al
             eur_rate = get_eur_rate()  # Bu Decimal qaytarır
             
@@ -162,15 +176,15 @@ def sebetden_sil(request, sebet_id):
             )['total_eur'] or Decimal('0')
             
             cart_total_azn = cart_total_eur * eur_rate
-
-            return JsonResponse({
-                'success': True,
+        
+        return JsonResponse({
+            'success': True,
                 'total_amount_eur': str(round(cart_total_eur, 2)),
                 'total_amount_azn': str(round(cart_total_azn, 2))
-            })
+        })
         except Exception as e:
-            return JsonResponse({
-                'success': False,
+        return JsonResponse({
+            'success': False,
                 'message': str(e)
             }, status=500)
     
@@ -210,7 +224,7 @@ def sifarisi_gonder(request):
                     miqdar=item.miqdar,
                     qiymet=item.mehsul.qiymet_eur  # EUR qiyməti
                 )
-                
+
                 # Stoku yenilə
                 mehsul = item.mehsul
                 mehsul.stok = F('stok') - item.miqdar
@@ -241,7 +255,7 @@ from .models import Sifaris
 @login_required
 def sifaris_izle(request):
     sifarisler = Sifaris.objects.filter(user=request.user)
-    
+
     # Cari məzənnəni al
     eur_rate = get_eur_rate()
     update_time = cache.get('eur_update_time', 'Məlumat yoxdur')

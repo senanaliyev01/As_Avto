@@ -1,0 +1,73 @@
+/* Qiymət dəyişikliyi stilləri */
+.price-change {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+}
+
+.old-price {
+    text-decoration: line-through;
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.price-increase {
+    color: #22c55e;
+    animation: bounce 0.5s ease infinite;
+}
+
+.price-decrease {
+    color: #ef4444;
+    animation: bounce 0.5s ease infinite;
+}
+
+/* Məzənnə məlumatı */
+.exchange-rate-info {
+    background: linear-gradient(135deg, #1a237e, #0d47a1);
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.rate-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.current-rate {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: white;
+}
+
+.current-rate i {
+    font-size: 1rem;
+}
+
+/* Animasiyalar */
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+/* Qiymət sütunu */
+.price-column {
+    position: relative;
+    padding: 10px 15px;
+    transition: all 0.3s ease;
+}
+
+.price-column:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.price-column .fa-manat-sign {
+    margin-left: 5px;
+    color: #2563eb;
+} 

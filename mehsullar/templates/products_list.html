@@ -88,11 +88,37 @@
     </form>
 </div>
 
-<!-- Cədvəlin üstündə məzənnə məlumatı -->
+<!-- Məzənnə məlumatı -->
 <div class="exchange-rate-info">
-    <span>1 EUR = {{ eur_rate }} AZN</span>
-    <small>(Son yeniləmə: {{ update_time }})</small>
+    <div class="rate-info">
+        <div class="current-rate">
+            <span>1 EUR = {{ eur_rate }} AZN</span>
+            {% if eur_rate > previous_rate %}
+                <i class="fas fa-arrow-up price-increase"></i>
+            {% elif eur_rate < previous_rate %}
+                <i class="fas fa-arrow-down price-decrease"></i>
+            {% endif %}
+        </div>
+        <small>(Son yeniləmə: {{ update_time }})</small>
+    </div>
 </div>
+
+<!-- Məhsullar cədvəlində qiymət sütunu -->
+<td class="price-column">
+    {{ mehsul.qiymet_azn }} 
+    {% if eur_rate > previous_rate %}
+        <div class="price-change">
+            <span class="old-price">{{ mehsul.previous_azn }}</span>
+            <i class="fas fa-arrow-up price-increase"></i>
+        </div>
+    {% elif eur_rate < previous_rate %}
+        <div class="price-change">
+            <span class="old-price">{{ mehsul.previous_azn }}</span>
+            <i class="fas fa-arrow-down price-decrease"></i>
+        </div>
+    {% endif %}
+    <i class="fa-solid fa-manat-sign"></i>
+</td>
 
 <!-- Məhsullar cədvəlində qiymət sütununu yeniləyirik -->
 <div class="products-table">
@@ -135,7 +161,18 @@
                     <i class="fa-solid fa-euro-sign"></i>
                 </td>
                 <td class="price-column">
-                    {{ mehsul.qiymet_azn }}
+                    {{ mehsul.qiymet_azn }} 
+                    {% if eur_rate > previous_rate %}
+                        <div class="price-change">
+                            <span class="old-price">{{ mehsul.previous_azn }}</span>
+                            <i class="fas fa-arrow-up price-increase"></i>
+                        </div>
+                    {% elif eur_rate < previous_rate %}
+                        <div class="price-change">
+                            <span class="old-price">{{ mehsul.previous_azn }}</span>
+                            <i class="fas fa-arrow-down price-decrease"></i>
+                        </div>
+                    {% endif %}
                     <i class="fa-solid fa-manat-sign"></i>
                 </td>
                 <td><a href="{% url 'sebet_ekle' mehsul.id %}" class="cart-icon"><i class="fas fa-shopping-cart"></i></a></td>

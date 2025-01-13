@@ -22,8 +22,17 @@
             
        <!-- Məzənnə məlumatını əlavə et -->
     <div class="exchange-rate-info">
-        <span>1 EUR = {{ eur_rate }} AZN</span>
-        <small>(Son yeniləmə: {{ update_time }})</small>
+        <div class="rate-info">
+            <div class="current-rate">
+                <span>1 EUR = {{ eur_rate }} AZN</span>
+                {% if eur_rate > previous_rate %}
+                    <i class="fas fa-arrow-up price-increase"></i>
+                {% elif eur_rate < previous_rate %}
+                    <i class="fas fa-arrow-down price-decrease"></i>
+                {% endif %}
+            </div>
+            <small>(Son yeniləmə: {{ update_time }})</small>
+        </div>
     </div>
              
         {% if sebet %}
@@ -75,6 +84,17 @@
                         </td>
                         <td class="price-column">
                             {{ item.mehsul.qiymet_azn }}
+                            {% if eur_rate > previous_rate %}
+                                <div class="price-change">
+                                    <span class="old-price">{{ item.mehsul.previous_azn }}</span>
+                                    <i class="fas fa-arrow-up price-increase"></i>
+                                </div>
+                            {% elif eur_rate < previous_rate %}
+                                <div class="price-change">
+                                    <span class="old-price">{{ item.mehsul.previous_azn }}</span>
+                                    <i class="fas fa-arrow-down price-decrease"></i>
+                                </div>
+                            {% endif %}
                             <i class="fa-solid fa-manat-sign"></i>
                         </td>
                         <td>

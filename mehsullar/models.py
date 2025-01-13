@@ -84,22 +84,7 @@ class Sifaris(models.Model):
 
     @property
     def cemi_mebleg_azn(self):
-        # Sifarişin yaradıldığı məzənnə ilə hesablanır
         return round(self.cemi_mebleg_eur * self.sifaris_mezennesi, 2)
-    
-    @property
-    def cari_mebleg_azn(self):
-        # Cari məzənnə ilə hesablanır
-        from django.core.cache import cache
-        cari_mezenne = cache.get('eur_mezenne', Decimal('2.00'))
-        return round(self.cemi_mebleg_eur * cari_mezenne, 2)
-    
-    @property
-    def mezenne_deyisimi(self):
-        # Məzənnə dəyişimini hesablayır
-        from django.core.cache import cache
-        cari_mezenne = cache.get('eur_mezenne', Decimal('2.00'))
-        return cari_mezenne - self.sifaris_mezennesi
 
     @property
     def odenilen_mebleg_azn(self):

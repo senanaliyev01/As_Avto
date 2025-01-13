@@ -164,8 +164,8 @@ def sifarisi_gonder(request):
             if not sebet_items:
                 return JsonResponse({'status': 'error', 'message': 'Səbətiniz boşdur'})
 
-            # Cari məzənnəni al və saxla
-            current_rate = get_eur_rate()
+            # Cari məzənnəni al
+            current_rate, _ = get_eur_rate()  # Yalnız cari məzənnəni istifadə edirik
 
             # Ümumi məbləği EUR-da hesabla
             total_eur = sum(item.mehsul.qiymet_eur * item.miqdar for item in sebet_items)
@@ -175,7 +175,7 @@ def sifarisi_gonder(request):
                 user=request.user,
                 cemi_mebleg_eur=total_eur,
                 odenilen_mebleg_eur=0,
-                sifaris_mezennesi=current_rate,  # Məzənnəni saxla
+                sifaris_mezennesi=current_rate,  # Cari məzənnəni yadda saxlayırıq
                 status='gozleyir'
             )
 
@@ -185,7 +185,7 @@ def sifarisi_gonder(request):
                     sifaris=sifaris,
                     mehsul=item.mehsul,
                     miqdar=item.miqdar,
-                    qiymet=item.mehsul.qiymet_eur  # EUR qiyməti
+                    qiymet=item.mehsul.qiymet_eur  # EUR qiyməti saxlayırıq
                 )
 
                 # Stoku yenilə
@@ -325,19 +325,12 @@ def sifaris_detallari(request, sifaris_id):
     sifaris = get_object_or_404(Sifaris, id=sifaris_id, user=request.user)
     sifaris_mehsullari = SifarisMehsul.objects.filter(sifaris=sifaris)
     
-    # Cari məzənnəni al
-    eur_rate = get_eur_rate()
-    update_time = cache.get('eur_update_time', 'Məlumat yoxdur')
-    
     # Hər məhsul üçün EUR və AZN qiymətlərini hesabla
     for mehsul in sifaris_mehsullari:
-        mehsul.qiymet_eur = mehsul.qiymet
-        mehsul.qiymet_azn = mehsul.qiymet * eur_rate
+        mehsul.qiymet_eur = mehsul.qiymet  # Saxlanmış EUR qiyməti
+        mehsul.qiymet_azn = mehsul.qiymet * sifaris.sifaris_mezennesi  # Sifariş məzənnəsi ilə hesabla
         mehsul.cemi_eur = mehsul.qiymet * mehsul.miqdar
-        mehsul.cemi_azn = mehsul.cemi_eur * eur_rate
-    
-    # Artıq bu hesablamalara ehtiyac yoxdur, çünki model-də property kimi təyin olunub
-    # sifaris.cemi_mebleg_eur və digər sahələr birbaşa modeldən gəlir
+        mehsul.cemi_azn = mehsul.cemi_eur * sifaris.sifaris_mezennesi  # Sifariş məzənnəsi ilə hesabla
     
     status_text = {
         'gozleyir': 'Gözləyir',
@@ -350,7 +343,5 @@ def sifaris_detallari(request, sifaris_id):
     context = {
         'sifaris': sifaris,
         'sifaris_mehsullari': sifaris_mehsullari,
-        'eur_rate': eur_rate,
-        'update_time': update_time
     }
     return render(request, 'sifaris_detallari.html', context)

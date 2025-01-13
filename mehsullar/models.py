@@ -74,7 +74,7 @@ class Sifaris(models.Model):
         ('catdirildi', 'Çatdırıldı'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     cemi_mebleg_eur = models.DecimalField(max_digits=10, decimal_places=2)
     odenilen_mebleg_eur = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     sifaris_mezennesi = models.DecimalField(max_digits=10, decimal_places=2)

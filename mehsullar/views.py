@@ -118,7 +118,7 @@ def products_list(request):
         'eur_rate': current_rate,
         'previous_rate': previous_rate,
         'rate_change': rate_change,
-        'rate_change_percent': round((rate_change / previous_rate) * 100, 1),
+        'rate_change_percent': abs(round((rate_change / previous_rate) * 100, 1)),
         'update_time': cache.get('eur_update_time', 'Məlumat yoxdur')
     }
     return render(request, 'products_list.html', context)

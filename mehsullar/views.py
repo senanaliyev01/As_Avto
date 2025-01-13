@@ -84,7 +84,7 @@ def get_eur_rate():
         
         if current_rate:
             if not previous_rate:
-                cache.set('previous_eur_mezenne', current_rate, 43200)  # 12 saat
+                cache.set('previous_eur_mezenne', current_rate, 1)  # 12 saat
             return current_rate, previous_rate or current_rate
 
         # Google Finance-dən məzənnəni al
@@ -111,11 +111,11 @@ def get_eur_rate():
                         if 1.5 <= float(rate) <= 2.5:
                             # Əvvəlki məzənnəni saxla
                             if current_rate:
-                                cache.set('previous_eur_mezenne', current_rate, 43200)
+                                cache.set('previous_eur_mezenne', current_rate, 1)
                             
                             # Yeni məzənnəni cache-də saxla
-                            cache.set('eur_mezenne', rate, 43200)  # 12 saat
-                            cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 43200)
+                            cache.set('eur_mezenne', rate, 1)  
+                            cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 1)
                             
                             return rate, current_rate or rate
                     except (ValueError, decimal.InvalidOperation):

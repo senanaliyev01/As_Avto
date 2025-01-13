@@ -88,10 +88,19 @@
     </form>
 </div>
 
-<!-- Cədvəlin üstündə məzənnə məlumatı -->
+<!-- Məzənnə məlumatı -->
 <div class="exchange-rate-info">
-    <span>1 EUR = {{ eur_rate }} AZN</span>
-    <small>(Son yeniləmə: {{ update_time }})</small>
+    <div class="rate-info">
+        <div class="current-rate">Cari məzənnə: 1 EUR = {{ eur_rate }} AZN</div>
+        {% if mezenne_deyisimi != 0 %}
+            <div class="rate-change {% if mezenne_artib %}rate-up{% else %}rate-down{% endif %}">
+                <i class="fas fa-{% if mezenne_artib %}arrow-up{% else %}arrow-down{% endif %}"></i>
+                <span class="change-percent">({{ mezenne_deyisimi }}%)</span>
+                <span class="rate-time">Son 24 saat</span>
+            </div>
+        {% endif %}
+        <small>(Son yeniləmə: {{ update_time }})</small>
+    </div>
 </div>
 
 <!-- Məhsullar cədvəlində qiymət sütununu yeniləyirik -->
@@ -131,12 +140,16 @@
                     {% endif %}
                 </td>
                 <td class="price-column">
-                    {{ mehsul.qiymet_eur }}
-                    <i class="fa-solid fa-euro-sign"></i>
-                </td>
-                <td class="price-column">
-                    {{ mehsul.qiymet_azn }}
-                    <i class="fa-solid fa-manat-sign"></i>
+                    <div class="price-eur">{{ mehsul.qiymet_eur }} EUR</div>
+                    {% if mezenne_deyisimi != 0 %}
+                        <div class="price-change {% if mezenne_artib %}price-up{% else %}price-down{% endif %}">
+                            <i class="fas fa-{% if mezenne_artib %}arrow-up{% else %}arrow-down{% endif %}"></i>
+                            <span class="old-price">{{ mehsul.qiymet_azn_old }} AZN</span>
+                            <span class="new-price">{{ mehsul.qiymet_azn }} AZN</span>
+                        </div>
+                    {% else %}
+                        <div class="price-static">{{ mehsul.qiymet_azn }} AZN</div>
+                    {% endif %}
                 </td>
                 <td><a href="{% url 'sebet_ekle' mehsul.id %}" class="cart-icon"><i class="fas fa-shopping-cart"></i></a></td>
             </tr>

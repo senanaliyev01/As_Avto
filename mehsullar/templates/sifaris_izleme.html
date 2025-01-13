@@ -59,7 +59,19 @@
                 {% for sifaris in sifarisler %}
                 <tr>
                     <td><a href="{% url 'sifaris_detallari' sifaris.id %}" class="sifaris-link">{{ sifaris.id }}</a></td>
-                    <td>1 EUR = {{ sifaris.sifaris_mezennesi }} AZN</td>
+                    <td class="mezenne-column">
+                        <div class="mezenne-info">
+                            <span class="current-rate">1 EUR = {{ sifaris.sifaris_mezennesi }} AZN</span>
+                            {% if sifaris.mezenne_deyisimi != 0 %}
+                                <div class="rate-change {% if sifaris.mezenne_artib %}rate-up{% else %}rate-down{% endif %}">
+                                    <i class="fas fa-{% if sifaris.mezenne_artib %}arrow-up{% else %}arrow-down{% endif %}"></i>
+                                    <span class="old-rate">{{ sifaris.sifaris_mezennesi }} AZN</span>
+                                    <span class="new-rate">{{ eur_rate }} AZN</span>
+                                    <span class="change-percent">({{ sifaris.mezenne_deyisimi }}%)</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </td>
                     <td>{{ sifaris.tarix }}</td>
                     <td>{{ sifaris.cemi_mebleg_eur }} EUR</td>
                     <td>{{ sifaris.cemi_mebleg_azn }} AZN</td>

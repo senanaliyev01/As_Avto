@@ -78,6 +78,7 @@ class Sifaris(models.Model):
     cemi_mebleg_eur = models.DecimalField(max_digits=10, decimal_places=2)
     odenilen_mebleg_eur = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     sifaris_mezennesi = models.DecimalField(max_digits=10, decimal_places=2)
+    cari_mezenne = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     tarix = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='gozleyir')
     tamamlandi = models.BooleanField(default=False)
@@ -97,6 +98,21 @@ class Sifaris(models.Model):
     @property
     def qaliq_borc_azn(self):
         return round(self.qaliq_borc_eur * self.sifaris_mezennesi, 2)
+
+    @property
+    def mezenne_deyisimi(self):
+        """Məzənnə dəyişimini hesablayır"""
+        if not self.cari_mezenne:
+            from django.core.cache import cache
+            self.cari_mezenne = cache.get('eur_mezenne', Decimal('2.00'))
+        
+        deyisim = ((self.cari_mezenne - self.sifaris_mezennesi) / self.sifaris_mezennesi) * 100
+        return round(deyisim, 2)
+    
+    @property
+    def mezenne_artib(self):
+        """Məzənnənin artıb-azalmasını yoxlayır"""
+        return self.mezenne_deyisimi > 0
 
     def __str__(self):
         return f"Sifariş {self.id} - {self.tarix}"

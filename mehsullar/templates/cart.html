@@ -22,8 +22,17 @@
             
        <!-- Məzənnə məlumatını əlavə et -->
     <div class="exchange-rate-info">
-        <span>1 EUR = {{ eur_rate }} AZN</span>
-        <small>(Son yeniləmə: {{ update_time }})</small>
+        <div class="rate-info">
+            <div class="current-rate">Cari məzənnə: 1 EUR = {{ eur_rate }} AZN</div>
+            {% if mezenne_deyisimi != 0 %}
+                <div class="rate-change {% if mezenne_artib %}rate-up{% else %}rate-down{% endif %}">
+                    <i class="fas fa-{% if mezenne_artib %}arrow-up{% else %}arrow-down{% endif %}"></i>
+                    <span class="change-percent">({{ mezenne_deyisimi }}%)</span>
+                    <span class="rate-time">Son 24 saat</span>
+                </div>
+            {% endif %}
+            <small>(Son yeniləmə: {{ update_time }})</small>
+        </div>
     </div>
              
         {% if sebet %}
@@ -70,8 +79,16 @@
                             {% endif %}
                         </td>
                         <td class="price-column">
-                            {{ item.mehsul.qiymet_eur }}
-                            <i class="fa-solid fa-euro-sign"></i>
+                            {{ item.mehsul.qiymet_eur }} EUR
+                            {% if mezenne_deyisimi != 0 %}
+                                <div class="price-change {% if mezenne_artib %}price-up{% else %}price-down{% endif %}">
+                                    <i class="fas fa-{% if mezenne_artib %}arrow-up{% else %}arrow-down{% endif %}"></i>
+                                    <span class="old-price">{{ item.mehsul.qiymet_azn_old }} AZN</span>
+                                    <span class="new-price">{{ item.mehsul.qiymet_azn }} AZN</span>
+                                </div>
+                            {% else %}
+                                <div class="price-static">{{ item.mehsul.qiymet_azn }} AZN</div>
+                            {% endif %}
                         </td>
                         <td class="price-column">
                             {{ item.mehsul.qiymet_azn }}

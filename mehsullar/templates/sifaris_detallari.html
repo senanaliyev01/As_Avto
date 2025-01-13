@@ -12,14 +12,14 @@
     <nav class="header-nav">
         <a href="{% url 'main' %}">Əsas Səhifə</a>
         <a href="{% url 'sifaris_izle' %}">Sifarişlərim</a>
-        <h2>Sifariş #{{ sifaris.id }}</h2>
+        <h2>Sifariş #{{ sifaris.id }} (1 EUR = {{ sifaris.sifaris_mezennesi }} AZN)</h2>
     </nav>
 
     <div class="exchange-rate-info">
         <div class="rate-info">
-            <div class="historical-rate">
-                Sifariş məzənnəsi: 1 EUR = {{ sifaris.sifaris_mezennesi|floatformat:6 }} AZN
-            </div>
+            <div class="historical-rate">Sifariş məzənnəsi: 1 EUR = {{ sifaris.sifaris_mezennesi }} AZN</div>
+            <div class="current-rate">Cari məzənnə: 1 EUR = {{ eur_rate }} AZN</div>
+            <small>(Son yeniləmə: {{ update_time }})</small>
         </div>
     </div>
 
@@ -32,17 +32,17 @@
         <div class="info-row">
             <h3>Ödəniş Məlumatları</h3>
             <p><strong>Ümumi Məbləğ:</strong> 
-                <span>{{ sifaris.cemi_mebleg_eur|floatformat:2 }} EUR</span>
-                <span>{{ sifaris.cemi_mebleg_azn|floatformat:2 }} AZN</span>
+                <span>{{ sifaris.cemi_mebleg_eur }} EUR</span>
+                <span>{{ sifaris.cemi_mebleg_azn }} AZN</span>
             </p>
             <p><strong>Ödənilən Məbləğ:</strong>
-                <span>{{ sifaris.odenilen_mebleg_eur|floatformat:2 }} EUR</span>
-                <span>{{ sifaris.odenilen_mebleg_azn|floatformat:2 }} AZN</span>
+                <span>{{ sifaris.odenilen_mebleg_eur }} EUR</span>
+                <span>{{ sifaris.odenilen_mebleg_azn }} AZN</span>
             </p>
             <p class="qaliq-borc {% if sifaris.qaliq_borc_eur < 0 %}qaliq-borc-pozitiv{% else %}qaliq-borc-negativ{% endif %}">
                 <strong>Qalıq Borc:</strong>
-                <span>{{ sifaris.qaliq_borc_eur|floatformat:2 }} EUR</span>
-                <span>{{ sifaris.qaliq_borc_azn|floatformat:2 }} AZN</span>
+                <span>{{ sifaris.qaliq_borc_eur }} EUR</span>
+                <span>{{ sifaris.qaliq_borc_azn }} AZN</span>
             </p>
         </div>
     </div>
@@ -86,8 +86,8 @@
                     <td colspan="8"></td>
                     <td colspan="2"><strong>Ümumi Cəmi:</strong></td>
                     <td class="text-right">
-                        <strong>{{ sifaris.cemi_mebleg_eur|floatformat:2 }} EUR</strong><br>
-                        <strong>{{ sifaris.cemi_mebleg_azn|floatformat:2 }} AZN</strong>
+                        <strong>{{ sifaris.cemi_mebleg_eur }} EUR</strong><br>
+                        <strong>{{ sifaris.cemi_mebleg_azn }} AZN</strong>
                     </td>
                 </tr>
             </tfoot>

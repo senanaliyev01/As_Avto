@@ -22,19 +22,7 @@
             
        <!-- Məzənnə məlumatını əlavə et -->
     <div class="exchange-rate-info">
-        <div class="rate-details">
-            <span class="current-rate">1 EUR = {{ eur_rate|floatformat:6 }} AZN</span>
-            {% if rate_change != 0 %}
-                <span class="rate-change {% if rate_change > 0 %}increase{% else %}decrease{% endif %}">
-                    {% if rate_change > 0 %}
-                        <i class="fas fa-arrow-up"></i>
-                    {% else %}
-                        <i class="fas fa-arrow-down"></i>
-                    {% endif %}
-                    {{ rate_change_percent }}%
-                </span>
-            {% endif %}
-        </div>
+        <span>1 EUR = {{ eur_rate }} AZN</span>
         <small>(Son yeniləmə: {{ update_time }})</small>
     </div>
              
@@ -86,20 +74,8 @@
                             <i class="fa-solid fa-euro-sign"></i>
                         </td>
                         <td class="price-column">
-                            {{ item.mehsul.qiymet_azn }} <i class="fa-solid fa-manat-sign"></i>
-                            {% if item.price_change != 0 %}
-                                <div class="price-change {% if item.price_change > 0 %}increase{% else %}decrease{% endif %}">
-                                    <span class="old-price">{{ item.previous_price_azn }}</span>
-                                    <span class="change-percent">
-                                        {% if item.price_change > 0 %}
-                                            <i class="fas fa-arrow-up"></i>
-                                        {% else %}
-                                            <i class="fas fa-arrow-down"></i>
-                                        {% endif %}
-                                        {{ item.price_change_percent }}%
-                                    </span>
-                                </div>
-                            {% endif %}
+                            {{ item.mehsul.qiymet_azn }}
+                            <i class="fa-solid fa-manat-sign"></i>
                         </td>
                         <td>
                             <div class="quantity-controls">

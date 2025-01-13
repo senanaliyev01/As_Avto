@@ -33,29 +33,31 @@ def sebet_ekle(request, mehsul_id):
 @login_required
 def view_cart(request):
     sebet = Sebet.objects.filter(user=request.user)
-    current_rate, previous_rate = get_eur_rate()
-    rate_change = current_rate - previous_rate
-
+    
+    # Cari məzənnəni al
+    eur_rate = get_eur_rate()
+    update_time = cache.get('eur_update_time', 'Məlumat yoxdur')
+    
+    # Hər məhsul üçün stok məlumatını və cəmi məbləği əlavə et
+    total_eur = 0
+    total_azn = 0
+    
     for item in sebet:
         item.stok_status = get_stock_status(item.mehsul.stok)
         item.stok_class = get_stock_class(item.mehsul.stok)
-        item.cemi_eur = item.mehsul.qiymet_eur * item.miqdar
-        item.cemi_azn = item.mehsul.qiymet_azn * item.miqdar
-        item.previous_price_azn = round(item.mehsul.qiymet_eur * previous_rate, 2)
-        item.price_change = round(item.mehsul.qiymet_azn - item.previous_price_azn, 2)
-        # Mütləq qiyməti burada hesablayırıq
-        item.price_change_percent = abs(round((item.price_change / item.previous_price_azn) * 100, 1))
+        item.cemi_eur = item.mehsul.qiymet_eur * item.miqdar  # EUR cəmi
+        item.cemi_azn = item.mehsul.qiymet_azn * item.miqdar  # AZN cəmi
+        
+        total_eur += item.cemi_eur
+        total_azn += item.cemi_azn
 
-    context = {
+    return render(request, 'cart.html', {
         'sebet': sebet,
-        'cemi_mebleg_eur': sum(item.cemi_eur for item in sebet),
-        'cemi_mebleg_azn': sum(item.cemi_azn for item in sebet),
-        'eur_rate': current_rate,
-        'rate_change': rate_change,
-        'rate_change_percent': abs(round((rate_change / previous_rate) * 100, 1)),
-        'update_time': cache.get('eur_update_time', 'Məlumat yoxdur')
-    }
-    return render(request, 'cart.html', context)
+        'cemi_mebleg_eur': total_eur,
+        'cemi_mebleg_azn': total_azn,
+        'eur_rate': eur_rate,
+        'update_time': update_time
+    })
 
 def get_stock_status(stok):
     if stok == 0:
@@ -75,52 +77,73 @@ def get_stock_class(stok):
 
 def get_eur_rate():
     try:
-        # Əvvəlki məzənnəni saxla
-        previous_rate = cache.get('previous_eur_mezenne')
-        current_rate = cache.get('eur_mezenne')
-        
-        if current_rate:
-            if not previous_rate:
-                cache.set('previous_eur_mezenne', current_rate, 43200)
-            return current_rate, previous_rate or current_rate
+        # Cache-də məzənnə varsa onu qaytarırıq
+        cached_rate = cache.get('eur_mezenne')
+        if cached_rate:
+            return cached_rate
 
+        # Sadə API-dən məzənnəni alırıq
         url = "https://open.er-api.com/v6/latest/EUR"
         with urlopen(url) as response:
             data = json.loads(response.read())
             rate = Decimal(str(data['rates']['AZN']))
             
-            if current_rate:
-                cache.set('previous_eur_mezenne', current_rate,  43200)
-            cache.set('eur_mezenne', rate,  43200)
-            cache.set('eur_update_time', datetime.now().strftime('%H:%M'),  43200)
-            
-            return rate, current_rate or rate
+            # Məzənnəni cache-də saxlayırıq
+            cache.set('eur_mezenne', rate, 600)  
+            cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 600)
+            return rate
 
     except Exception as e:
         print(f"Məzənnə yeniləmə xətası: {e}")
-        return Decimal('1.746752'), Decimal('1.746752')  # Default məzənnəni yenilədik
+        return Decimal('2.00')  # Default məzənnə
 
 @login_required
 def products_list(request):
+    # Mövcud kodu saxlayırıq
     mehsullar = Mehsul.objects.all()
-    current_rate, previous_rate = get_eur_rate()
-    rate_change = current_rate - previous_rate
+    kateqoriyalar = Kateqoriya.objects.all()
+    brendlər = Brend.objects.all()
+    markalar = Marka.objects.all()
     
-    for mehsul in mehsullar:
-        mehsul.previous_price_azn = round(mehsul.qiymet_eur * previous_rate, 2)
-        mehsul.price_change = round(mehsul.qiymet_azn - mehsul.previous_price_azn, 2)
-        # Mütləq qiyməti burada hesablayırıq
-        mehsul.price_change_percent = abs(round((mehsul.price_change / mehsul.previous_price_azn) * 100, 1))
+    # Məzənnəni yeniləyirik
+    eur_rate = get_eur_rate()
+    update_time = cache.get('eur_update_time', 'Məlumat yoxdur')
+    
+    # Axtarış parametrlərini alırıq
+    category = request.GET.get('category')
+    brand = request.GET.get('brand')
+    model = request.GET.get('model')
+    search_text = request.GET.get('search_text')
 
-    context = {
+    # Brend, kateqoriya və marka üçün dəqiq filtrasiya
+    if category:
+        mehsullar = mehsullar.filter(kateqoriya__adi=category)
+    
+    if brand:
+        mehsullar = mehsullar.filter(brend__adi=brand)
+    
+    if model:
+        mehsullar = mehsullar.filter(marka__adi=model)
+
+    # Brend kodu və OEM kodu üçün hissəvi axtarış
+    if search_text:
+        # Xüsusi simvolları təmizləyirik
+        search_text = re.sub(r'[^a-zA-Z0-9]', '', search_text)
+        # Brend kodu və ya OEM koduna görə hissəvi axtarış
+        mehsullar = mehsullar.filter(
+            Q(brend_kod__icontains=search_text) |  # Hissəvi uyğunluq
+            Q(oem__icontains=search_text) |        # Hissəvi uyğunluq
+            Q(oem_kodlar__kod__icontains=search_text)  # Əlavə OEM kodlarında hissəvi uyğunluq
+        ).distinct()
+
+    return render(request, 'products_list.html', {
         'mehsullar': mehsullar,
-        'eur_rate': current_rate,
-        'previous_rate': previous_rate,
-        'rate_change': rate_change,
-        'rate_change_percent': abs(round((rate_change / previous_rate) * 100, 1)),
-        'update_time': cache.get('eur_update_time', 'Məlumat yoxdur')
-    }
-    return render(request, 'products_list.html', context)
+        'kateqoriyalar': kateqoriyalar,
+        'brendlər': brendlər,
+        'markalar': markalar,
+        'eur_rate': eur_rate,
+        'update_time': update_time
+    })
 
 
 @login_required
@@ -129,19 +152,21 @@ def sebetden_sil(request, sebet_id):
         try:
             sebet_item = get_object_or_404(Sebet, id=sebet_id, user=request.user)
             sebet_item.delete()
-            
+
             # Cari məzənnəni al
-            current_rate, _ = get_eur_rate()
+            eur_rate = get_eur_rate()  # Bu Decimal qaytarır
             
             # Yeni ümumi məbləği hesabla
-            sebet_items = Sebet.objects.filter(user=request.user)
-            total_eur = sum(item.mehsul.qiymet_eur * item.miqdar for item in sebet_items)
-            total_azn = total_eur * current_rate
-        
+            cart_total_eur = Sebet.objects.filter(user=request.user).aggregate(
+                total_eur=Sum(F('miqdar') * F('mehsul__qiymet_eur'))
+            )['total_eur'] or Decimal('0')
+            
+            cart_total_azn = cart_total_eur * eur_rate
+
             return JsonResponse({
                 'success': True,
-                'total_amount_eur': str(round(total_eur, 2)),
-                'total_amount_azn': str(round(total_azn, 2))
+                'total_amount_eur': str(round(cart_total_eur, 2)),
+                'total_amount_azn': str(round(cart_total_azn, 2))
             })
         except Exception as e:
             return JsonResponse({
@@ -162,18 +187,18 @@ def sifarisi_gonder(request):
             if not sebet_items:
                 return JsonResponse({'status': 'error', 'message': 'Səbətiniz boşdur'})
 
-            # Cari məzənnəni al
-            current_rate, _ = get_eur_rate()
-            
+            # Cari məzənnəni al və saxla
+            current_rate = get_eur_rate()
+
             # Ümumi məbləği EUR-da hesabla
             total_eur = sum(item.mehsul.qiymet_eur * item.miqdar for item in sebet_items)
 
-            # Yeni sifarişi yarat və cari məzənnəni dəqiq olaraq saxla
+            # Yeni sifarişi yarat
             sifaris = Sifaris.objects.create(
                 user=request.user,
                 cemi_mebleg_eur=total_eur,
                 odenilen_mebleg_eur=0,
-                sifaris_mezennesi=float(current_rate),  # Cari məzənnəni float olaraq saxla
+                sifaris_mezennesi=current_rate,  # Məzənnəni saxla
                 status='gozleyir'
             )
 
@@ -183,9 +208,9 @@ def sifarisi_gonder(request):
                     sifaris=sifaris,
                     mehsul=item.mehsul,
                     miqdar=item.miqdar,
-                    qiymet=float(item.mehsul.qiymet_eur)  # Qiyməti float olaraq saxla
+                    qiymet=item.mehsul.qiymet_eur  # EUR qiyməti
                 )
-
+                
                 # Stoku yenilə
                 mehsul = item.mehsul
                 mehsul.stok = F('stok') - item.miqdar
@@ -215,17 +240,24 @@ from .models import Sifaris
 
 @login_required
 def sifaris_izle(request):
-    sifarisler = Sifaris.objects.filter(user=request.user).order_by('-tarix')
+    sifarisler = Sifaris.objects.filter(user=request.user)
     
-    # Ümumi statistika hesablamaları
-    toplam_mebleg_eur = round(sum(sifaris.cemi_mebleg_eur for sifaris in sifarisler), 2)
-    toplam_mebleg_azn = round(sum(sifaris.cemi_mebleg_azn for sifaris in sifarisler), 2)
-    toplam_odenilen_eur = round(sum(sifaris.odenilen_mebleg_eur for sifaris in sifarisler), 2)
-    toplam_odenilen_azn = round(sum(sifaris.odenilen_mebleg_azn for sifaris in sifarisler), 2)
-    toplam_qaliq_eur = round(toplam_mebleg_eur - toplam_odenilen_eur, 2)
-    toplam_qaliq_azn = round(toplam_mebleg_azn - toplam_odenilen_azn, 2)
+    # Cari məzənnəni al
+    eur_rate = get_eur_rate()
+    update_time = cache.get('eur_update_time', 'Məlumat yoxdur')
 
-    # Status mətnlərini əlavə et
+    # Ümumi məbləğləri hesabla
+    toplam_mebleg_eur = sum(sifaris.cemi_mebleg_eur for sifaris in sifarisler)
+    odenilen_mebleg_eur = sum(sifaris.odenilen_mebleg_eur for sifaris in sifarisler)
+    
+    # AZN məbləğləri
+    toplam_mebleg_azn = toplam_mebleg_eur * eur_rate
+    odenilen_mebleg_azn = odenilen_mebleg_eur * eur_rate
+
+    # Qalıq borcları hesabla
+    qaliq_borc_eur = toplam_mebleg_eur - odenilen_mebleg_eur
+    qaliq_borc_azn = qaliq_borc_eur * eur_rate
+
     status_text = {
         'gozleyir': 'Gözləyir',
         'hazirlanir': 'Hazırlanır',
@@ -236,16 +268,17 @@ def sifaris_izle(request):
     for sifaris in sifarisler:
         sifaris.display_status = status_text.get(sifaris.status, 'Gözləyir')
 
-    context = {
+    return render(request, 'sifaris_izleme.html', {
         'sifarisler': sifarisler,
-        'toplam_mebleg_eur': toplam_mebleg_eur,
-        'toplam_mebleg_azn': toplam_mebleg_azn,
-        'toplam_odenilen_eur': toplam_odenilen_eur,
-        'toplam_odenilen_azn': toplam_odenilen_azn,
-        'toplam_qaliq_eur': toplam_qaliq_eur,
-        'toplam_qaliq_azn': toplam_qaliq_azn,
-    }
-    return render(request, 'sifaris_izleme.html', context)
+        'toplam_mebleg_eur': round(toplam_mebleg_eur, 2),
+        'toplam_mebleg_azn': round(toplam_mebleg_azn, 2),
+        'odenilen_mebleg_eur': round(odenilen_mebleg_eur, 2),
+        'odenilen_mebleg_azn': round(odenilen_mebleg_azn, 2),
+        'qaliq_borc_eur': round(qaliq_borc_eur, 2),
+        'qaliq_borc_azn': round(qaliq_borc_azn, 2),
+        'eur_rate': eur_rate,
+        'update_time': update_time
+    })
 
 
 @login_required
@@ -279,24 +312,26 @@ def update_quantity(request, item_id, new_quantity):
         cart_item.save()
 
         # Cari məzənnəni al
-        current_rate, _ = get_eur_rate()
+        eur_rate = get_eur_rate()  # Bu Decimal qaytarır
 
-        # Yeni məbləğləri hesabla
-        item_total_eur = float(cart_item.mehsul.qiymet_eur) * new_quantity
-        item_total_azn = item_total_eur * float(current_rate)
+        # Yeni məbləğləri hesabla - hər şeyi Decimal-a çeviririk
+        item_total_eur = Decimal(str(cart_item.mehsul.qiymet_eur)) * Decimal(str(new_quantity))
+        item_total_azn = item_total_eur * eur_rate
         
         # Ümumi səbət məbləğini hesabla
-        sebet_items = Sebet.objects.filter(user=request.user)
-        cart_total_eur = sum(float(item.mehsul.qiymet_eur) * item.miqdar for item in sebet_items)
-        cart_total_azn = cart_total_eur * float(current_rate)
+        cart_total_eur = Sebet.objects.filter(user=request.user).aggregate(
+            total_eur=Sum(F('miqdar') * F('mehsul__qiymet_eur'))
+        )['total_eur'] or Decimal('0')
+        
+        cart_total_azn = cart_total_eur * eur_rate
 
         return JsonResponse({
             'success': True,
             'new_quantity': new_quantity,
-            'item_total_eur': f"{item_total_eur:.2f}",
-            'item_total_azn': f"{item_total_azn:.2f}",
-            'total_amount_eur': f"{cart_total_eur:.2f}",
-            'total_amount_azn': f"{cart_total_azn:.2f}"
+            'item_total_eur': str(round(item_total_eur, 2)),
+            'item_total_azn': str(round(item_total_azn, 2)),
+            'total_amount_eur': str(round(cart_total_eur, 2)),
+            'total_amount_azn': str(round(cart_total_azn, 2))
         })
             
     except Exception as e:
@@ -321,12 +356,19 @@ def sifaris_detallari(request, sifaris_id):
     sifaris = get_object_or_404(Sifaris, id=sifaris_id, user=request.user)
     sifaris_mehsullari = SifarisMehsul.objects.filter(sifaris=sifaris)
     
+    # Cari məzənnəni al
+    eur_rate = get_eur_rate()
+    update_time = cache.get('eur_update_time', 'Məlumat yoxdur')
+    
     # Hər məhsul üçün EUR və AZN qiymətlərini hesabla
     for mehsul in sifaris_mehsullari:
-        mehsul.qiymet_eur = mehsul.qiymet  # Saxlanmış EUR qiyməti
-        mehsul.qiymet_azn = mehsul.qiymet * sifaris.sifaris_mezennesi  # Sifariş məzənnəsi ilə hesabla
+        mehsul.qiymet_eur = mehsul.qiymet
+        mehsul.qiymet_azn = mehsul.qiymet * eur_rate
         mehsul.cemi_eur = mehsul.qiymet * mehsul.miqdar
-        mehsul.cemi_azn = mehsul.cemi_eur * sifaris.sifaris_mezennesi  # Sifariş məzənnəsi ilə hesabla
+        mehsul.cemi_azn = mehsul.cemi_eur * eur_rate
+    
+    # Artıq bu hesablamalara ehtiyac yoxdur, çünki model-də property kimi təyin olunub
+    # sifaris.cemi_mebleg_eur və digər sahələr birbaşa modeldən gəlir
     
     status_text = {
         'gozleyir': 'Gözləyir',
@@ -339,5 +381,7 @@ def sifaris_detallari(request, sifaris_id):
     context = {
         'sifaris': sifaris,
         'sifaris_mehsullari': sifaris_mehsullari,
+        'eur_rate': eur_rate,
+        'update_time': update_time
     }
     return render(request, 'sifaris_detallari.html', context)

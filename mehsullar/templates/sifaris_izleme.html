@@ -6,6 +6,7 @@
     <title>Sifariş İzlə</title>
     <link rel="icon" href="{% static 'img/favicon.png' %}">
     <link rel="stylesheet" href="{% static 'css/sifaris_izleme.css' %}">
+    <!-- 1<link rel="stylesheet" href="{% static 'css/snow.css' %}"> -->
 </head>
 <body>
     <nav class="header-nav">
@@ -13,25 +14,34 @@
         <h2>Sifarişlərim</h2>
     </nav>
 
+    <div class="exchange-rate-info">
+        <span>1 EUR = {{ eur_rate }} AZN</span>
+        <small>(Son yeniləmə: {{ update_time }})</small>
+    </div>
+
     <div class="statistic">
         <div class="stat-item">
             <h3>Ümumi Məbləğ</h3>
-            <p class="amount-info">{{ toplam_mebleg_eur|floatformat:2 }} EUR</p>
-            <p class="amount-info">{{ toplam_mebleg_azn|floatformat:2 }} AZN</p>
+            <p class="amount-info">{{ toplam_mebleg_eur }} EUR</p>
+            <p class="amount-info">{{ toplam_mebleg_azn }} AZN</p>
         </div>
         <div class="stat-item">
             <h3>Ödənilən Məbləğ</h3>
-            <p class="amount-info">{{ toplam_odenilen_eur|floatformat:2 }} EUR</p>
-            <p class="amount-info">{{ toplam_odenilen_azn|floatformat:2 }} AZN</p>
+            <p class="amount-info">{{ odenilen_mebleg_eur }} EUR</p>
+            <p class="amount-info">{{ odenilen_mebleg_azn }} AZN</p>
         </div>
         <div class="stat-item">
             <h3>Qalıq Borc</h3>
-            <p class="amount-info">{{ toplam_qaliq_eur|floatformat:2 }} EUR</p>
-            <p class="amount-info">{{ toplam_qaliq_azn|floatformat:2 }} AZN</p>
+            <p class="qaliq-borc {% if qaliq_borc_eur < 0 %}qaliq-borc-pozitiv{% else %}qaliq-borc-negativ{% endif %}">
+                {{ qaliq_borc_eur }} EUR
+            </p>
+            <p class="qaliq-borc {% if qaliq_borc_azn < 0 %}qaliq-borc-pozitiv{% else %}qaliq-borc-negativ{% endif %}">
+                {{ qaliq_borc_azn }} AZN
+            </p>
         </div>
     </div>
 
-    <div class="orders-table">
+    <div class="table-container">
         <table>
             <thead>
                 <tr>
@@ -49,16 +59,12 @@
                 {% for sifaris in sifarisler %}
                 <tr>
                     <td><a href="{% url 'sifaris_detallari' sifaris.id %}" class="sifaris-link">{{ sifaris.id }}</a></td>
-                    <td>
-                        <span class="rate-info">
-                            1 EUR = {{ sifaris.sifaris_mezennesi|floatformat:6 }} AZN
-                        </span>
-                    </td>
+                    <td>1 EUR = {{ sifaris.sifaris_mezennesi }} AZN</td>
                     <td>{{ sifaris.tarix }}</td>
-                    <td>{{ sifaris.cemi_mebleg_eur|floatformat:2 }} EUR</td>
-                    <td>{{ sifaris.cemi_mebleg_azn|floatformat:2 }} AZN</td>
-                    <td>{{ sifaris.odenilen_mebleg_eur|floatformat:2 }} EUR</td>
-                    <td>{{ sifaris.odenilen_mebleg_azn|floatformat:2 }} AZN</td>
+                    <td>{{ sifaris.cemi_mebleg_eur }} EUR</td>
+                    <td>{{ sifaris.cemi_mebleg_azn }} AZN</td>
+                    <td>{{ sifaris.odenilen_mebleg_eur }} EUR</td>
+                    <td>{{ sifaris.odenilen_mebleg_azn }} AZN</td>
                     <td><span class="status-badge status-{{ sifaris.status }}">{{ sifaris.display_status }}</span></td>
                 </tr>
                 {% endfor %}
@@ -67,5 +73,6 @@
     </div>
 
     <script src="{% static 'js/sifaris.js' %}"></script>
+    <!-- <script src="{% static 'js/snow.js' %}"></script> -->
 </body>
 </html>

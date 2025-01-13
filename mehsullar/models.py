@@ -30,32 +30,20 @@ class Mehsul(models.Model):
     oem = models.CharField(max_length=100)
     stok = models.IntegerField()
     qiymet_eur = models.DecimalField(max_digits=10, decimal_places=2)
-    evvelki_qiymet_azn = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    son_yenilenme = models.DateTimeField(auto_now=True)
     
     @property
     def qiymet_azn(self):
         from decimal import Decimal
         from django.core.cache import cache
         
+        # Cache-dən məzənnəni al
         mezenne = cache.get('eur_mezenne')
         if not mezenne:
+            # Default məzənnə
             mezenne = Decimal('2.00')
-        
-        yeni_qiymet = round(self.qiymet_eur * mezenne, 2)
-        
-        # Əvvəlki qiyməti saxla
-        if self.evvelki_qiymet_azn != yeni_qiymet:
-            self.evvelki_qiymet_azn = self.qiymet_azn
-            self.save(update_fields=['evvelki_qiymet_azn', 'son_yenilenme'])
-        
-        return yeni_qiymet
-
-    @property
-    def qiymet_deyisimi(self):
-        if not self.evvelki_qiymet_azn:
-            return 0
-        return ((self.qiymet_azn - self.evvelki_qiymet_azn) / self.evvelki_qiymet_azn) * 100
+            
+        # EUR qiyməti AZN-ə çevir
+        return round(self.qiymet_eur * mezenne, 2)
     
     def __str__(self):
         return self.adi

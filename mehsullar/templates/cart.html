@@ -9,7 +9,6 @@
     <link rel="icon" href="{% static 'img/favicon.png' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/cart.css' %}">
-    <link rel="stylesheet" href="{% static 'css/shared_styles.css' %}">
     <!-- q<link rel="stylesheet" href="{% static 'css/snow.css' %}"> -->
 </head>
 <body>
@@ -75,27 +74,7 @@
                             <i class="fa-solid fa-euro-sign"></i>
                         </td>
                         <td class="price-column">
-                            {% if item.mehsul.evvelki_qiymet_azn %}
-                                {% if item.mehsul.qiymet_azn > item.mehsul.evvelki_qiymet_azn %}
-                                    <div class="price-change increase">
-                                        <span class="old-price">{{ item.mehsul.evvelki_qiymet_azn }}</span>
-                                        <span class="new-price">{{ item.mehsul.qiymet_azn }}</span>
-                                        <i class="fas fa-arrow-up"></i>
-                                        <span class="change-percent">+{{ item.mehsul.qiymet_deyisimi|floatformat:1 }}%</span>
-                                    </div>
-                                {% elif item.mehsul.qiymet_azn < item.mehsul.evvelki_qiymet_azn %}
-                                    <div class="price-change decrease">
-                                        <span class="old-price">{{ item.mehsul.evvelki_qiymet_azn }}</span>
-                                        <span class="new-price">{{ item.mehsul.qiymet_azn }}</span>
-                                        <i class="fas fa-arrow-down"></i>
-                                        <span class="change-percent">{{ item.mehsul.qiymet_deyisimi|floatformat:1 }}%</span>
-                                    </div>
-                                {% else %}
-                                    {{ item.mehsul.qiymet_azn }}
-                                {% endif %}
-                            {% else %}
-                                {{ item.mehsul.qiymet_azn }}
-                            {% endif %}
+                            {{ item.mehsul.qiymet_azn }}
                             <i class="fa-solid fa-manat-sign"></i>
                         </td>
                         <td>

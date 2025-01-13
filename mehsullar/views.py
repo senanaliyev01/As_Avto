@@ -129,7 +129,7 @@ def get_eur_rate():
 
     except Exception as e:
         print(f"Məzənnə yeniləmə xətası: {e}")
-        return Decimal('1.746752'), Decimal('1.746752')
+        return Decimal('1.746752'), Decimal('1.756752')
 
 @login_required
 def products_list(request):

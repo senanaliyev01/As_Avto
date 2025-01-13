@@ -30,21 +30,32 @@ class Mehsul(models.Model):
     oem = models.CharField(max_length=100)
     stok = models.IntegerField()
     qiymet_eur = models.DecimalField(max_digits=10, decimal_places=2)
-    son_mezenne = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    evvelki_qiymet_azn = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    son_yenilenme = models.DateTimeField(auto_now=True)
     
     @property
     def qiymet_azn(self):
         from decimal import Decimal
         from django.core.cache import cache
         
-        # Cache-dən məzənnəni al
         mezenne = cache.get('eur_mezenne')
         if not mezenne:
-            # Default məzənnə
             mezenne = Decimal('2.00')
             
-        # EUR qiyməti AZN-ə çevir
-        return round(self.qiymet_eur * mezenne, 2)
+        yeni_qiymet = round(self.qiymet_eur * mezenne, 2)
+        
+        # Əvvəlki qiyməti saxla
+        if self.evvelki_qiymet_azn != yeni_qiymet:
+            self.evvelki_qiymet_azn = self.qiymet_azn
+            self.save(update_fields=['evvelki_qiymet_azn', 'son_yenilenme'])
+            
+        return yeni_qiymet
+    
+    @property
+    def qiymet_deyisimi(self):
+        if not self.evvelki_qiymet_azn:
+            return 0
+        return round(self.qiymet_azn - self.evvelki_qiymet_azn, 2)
     
     def __str__(self):
         return self.adi
@@ -54,19 +65,6 @@ class Mehsul(models.Model):
         kodlar = [self.oem]
         kodlar.extend([oem.kod for oem in self.oem_kodlar.all()])
         return kodlar
-
-    @property
-    def qiymet_deyisimi(self):
-        if not self.son_mezenne:
-            return 0
-        current_rate = cache.get('eur_mezenne', Decimal('2.00'))
-        return (current_rate - self.son_mezenne) / self.son_mezenne * 100
-
-    @property
-    def kohne_qiymet_azn(self):
-        if not self.son_mezenne:
-            return None
-        return round(self.qiymet_eur * self.son_mezenne, 2)
 
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -176,14 +174,3 @@ class MusteriReyi(models.Model):
 
     def __str__(self):
         return f"{self.musteri.get_full_name()} - {self.get_qiymetlendirme_display()}"
-
-
-class MezenneTarixcesi(models.Model):
-    mezenne = models.DecimalField(max_digits=10, decimal_places=2)
-    tarix = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['-tarix']
-
-    def __str__(self):
-        return f"1 EUR = {self.mezenne} AZN ({self.tarix})"

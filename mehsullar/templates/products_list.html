@@ -136,23 +136,18 @@
                 </td>
                 <td class="price-column">
                     {% if mehsul.qiymet_deyisimi != 0 %}
-                        {% if mehsul.qiymet_deyisimi > 0 %}
-                            <div class="price-increase">
-                                <span class="new-price">{{ mehsul.qiymet_azn }}</span>
+                        <div class="old-price">{{ mehsul.evvelki_qiymet_azn }} AZN</div>
+                        <div class="price-change {% if mehsul.qiymet_deyisimi > 0 %}price-up{% else %}price-down{% endif %}">
+                            {{ mehsul.qiymet_azn }} AZN
+                            {% if mehsul.qiymet_deyisimi > 0 %}
                                 <i class="fas fa-arrow-up"></i>
-                                <span class="old-price">{{ mehsul.kohne_qiymet_azn }}</span>
-                            </div>
-                        {% else %}
-                            <div class="price-decrease">
-                                <span class="new-price">{{ mehsul.qiymet_azn }}</span>
+                            {% else %}
                                 <i class="fas fa-arrow-down"></i>
-                                <span class="old-price">{{ mehsul.kohne_qiymet_azn }}</span>
-                            </div>
-                        {% endif %}
+                            {% endif %}
+                        </div>
                     {% else %}
-                        {{ mehsul.qiymet_azn }}
+                        <div class="current-price">{{ mehsul.qiymet_azn }} AZN</div>
                     {% endif %}
-                    <i class="fa-solid fa-manat-sign"></i>
                 </td>
                 <td><a href="{% url 'sebet_ekle' mehsul.id %}" class="cart-icon"><i class="fas fa-shopping-cart"></i></a></td>
             </tr>

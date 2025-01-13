@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404,HttpResponse
 from django.contrib.auth.decorators import login_required
-from .models import Mehsul, Sebet, Kateqoriya, Brend, Marka, Sifaris, SifarisMehsul, OEMKod, SebetItem, MezenneTarixcesi
+from .models import Mehsul, Sebet, Kateqoriya, Brend, Marka, Sifaris, SifarisMehsul, OEMKod, SebetItem
 from django.db.models import F, Sum, Q
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -86,12 +86,10 @@ def get_eur_rate():
             data = json.loads(response.read())
             rate = Decimal(str(data['rates']['AZN']))
             
-            # Köhnə məzənnəni saxla
-            old_rate = cache.get('eur_mezenne')
-            if old_rate and old_rate != rate:
-                # Məzənnə dəyişibsə, bütün məhsulların son_mezenne sahəsini yenilə
-                Mehsul.objects.all().update(son_mezenne=old_rate)
-                MezenneTarixcesi.objects.create(mezenne=rate)
+            # Əvvəlki məzənnəni saxla
+            old_rate = cache.get('evvelki_mezenne')
+            if old_rate != rate:
+                cache.set('evvelki_mezenne', old_rate)
             
             cache.set('eur_mezenne', rate, 600)
             cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 600)

@@ -17,7 +17,9 @@
 
     <div class="exchange-rate-info">
         <div class="rate-info">
-            <div class="historical-rate">Sifariş məzənnəsi: 1 EUR = {{ sifaris.sifaris_mezennesi }} AZN</div>
+            <div class="historical-rate">
+                Sifariş məzənnəsi: 1 EUR = {{ sifaris.sifaris_mezennesi|floatformat:6 }} AZN
+            </div>
         </div>
     </div>
 

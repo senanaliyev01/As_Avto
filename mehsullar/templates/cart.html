@@ -23,7 +23,7 @@
        <!-- Məzənnə məlumatını əlavə et -->
     <div class="exchange-rate-info">
         <div class="rate-details">
-            <span class="current-rate">1 EUR = {{ eur_rate }} AZN</span>
+            <span class="current-rate">1 EUR = {{ eur_rate|floatformat:6 }} AZN</span>
             {% if rate_change != 0 %}
                 <span class="rate-change {% if rate_change > 0 %}increase{% else %}decrease{% endif %}">
                     {% if rate_change > 0 %}

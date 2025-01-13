@@ -49,7 +49,11 @@
                 {% for sifaris in sifarisler %}
                 <tr>
                     <td><a href="{% url 'sifaris_detallari' sifaris.id %}" class="sifaris-link">{{ sifaris.id }}</a></td>
-                    <td>1 EUR = {{ sifaris.sifaris_mezennesi }} AZN</td>
+                    <td>
+                        <span class="rate-info">
+                            1 EUR = {{ sifaris.sifaris_mezennesi|floatformat:6 }} AZN
+                        </span>
+                    </td>
                     <td>{{ sifaris.tarix }}</td>
                     <td>{{ sifaris.cemi_mebleg_eur }} EUR</td>
                     <td>{{ sifaris.cemi_mebleg_azn }} AZN</td>

@@ -1,63 +1,90 @@
 /* Root Variables */
 :root {
-    --primary-color: #1e3a8a;
-    --secondary-color: #1e40af;
+    --primary-dark: #0a1f44;
+    --primary-main: #1a3a6c;
+    --primary-light: #2c5282;
     --accent-color: #3b82f6;
     --success-color: #059669;
     --warning-color: #d97706;
     --danger-color: #dc2626;
-    --light-bg: #f1f5f9;
+    --text-light: #e3f2fd;
+    --text-white: #ffffff;
     --card-bg: rgba(255, 255, 255, 0.95);
-    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-    --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.15);
+    --shadow-lg: 0 8px 15px rgba(0,0,0,0.2);
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Base Styles */
 body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-main) 100%);
     min-height: 100vh;
     margin: 0;
     padding: 20px;
-    color: #1e293b;
+    color: var(--text-light);
 }
 
-/* Header Styles */
+/* Header Navigation */
 .header-nav {
-    background: var(--card-bg);
-    backdrop-filter: blur(10px);
-    border-radius: 16px;
+    background: linear-gradient(135deg, var(--primary-main), var(--primary-light));
+    border-radius: 12px;
     padding: 1rem 2rem;
     margin-bottom: 2rem;
     display: flex;
     align-items: center;
     gap: 2rem;
     box-shadow: var(--shadow-lg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .header-nav a {
-    color: var(--primary-color);
+    color: var(--text-white);
     text-decoration: none;
     font-weight: 500;
     padding: 0.75rem 1.5rem;
     border-radius: 8px;
     transition: var(--transition);
-    background: transparent;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .header-nav a:hover {
-    background: var(--primary-color);
-    color: white;
+    background: rgba(255, 255, 255, 0.2);
     transform: translateY(-2px);
 }
 
 .header-nav h2 {
     margin: 0;
-    color: var(--primary-color);
+    color: var(--text-white);
     font-weight: 600;
     margin-left: auto;
+}
+
+/* Exchange Rate Info */
+.exchange-rate-info {
+    background: linear-gradient(135deg, var(--primary-main), var(--primary-light));
+    padding: 1.25rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rate-info {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    color: var(--text-white);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.historical-rate {
+    font-weight: 600;
+    color: #ffd700;
 }
 
 /* Statistics Cards */
@@ -69,8 +96,8 @@ body {
 }
 
 .stat-item {
-    background: var(--card-bg);
-    border-radius: 16px;
+    background: linear-gradient(135deg, var(--primary-main), var(--primary-light));
+    border-radius: 12px;
     padding: 1.5rem;
     box-shadow: var(--shadow-lg);
     transition: var(--transition);
@@ -82,7 +109,7 @@ body {
 }
 
 .stat-item h3 {
-    color: var(--primary-color);
+    color: var(--text-light);
     font-size: 1.1rem;
     margin: 0 0 1rem 0;
     font-weight: 600;
@@ -91,35 +118,17 @@ body {
 .amount-info {
     font-size: 1.8rem;
     font-weight: 700;
-    color: var(--secondary-color);
-    margin: 0;
-}
-
-.qaliq-borc {
-    font-size: 1.8rem;
-    font-weight: 700;
-    padding: 0.5rem 1rem;
-    border-radius: 12px;
-    margin: 0;
-}
-
-.qaliq-borc-pozitiv {
-    color: var(--success-color);
-    background: rgba(5, 150, 105, 0.1);
-}
-
-.qaliq-borc-negativ {
-    color: var(--danger-color);
-    background: rgba(220, 38, 38, 0.1);
+    color: var(--text-white);
+    margin: 0.5rem 0;
 }
 
 /* Table Styles */
-.table-container {
+.orders-table, .table-container {
     background: var(--card-bg);
-    border-radius: 16px;
-    box-shadow: var(--shadow-lg);
+    border-radius: 12px;
     overflow: hidden;
-    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-lg);
+    margin-bottom: 2rem;
 }
 
 table {
@@ -129,26 +138,18 @@ table {
 }
 
 thead th {
-    background: var(--primary-color);
-    color: white;
+    background: linear-gradient(135deg, var(--primary-main), var(--primary-light));
+    color: var(--text-white);
     padding: 1.25rem 1rem;
     font-weight: 600;
     text-transform: uppercase;
     font-size: 0.85rem;
     letter-spacing: 0.05em;
-    text-align: left;
-}
-
-thead th:first-child {
-    border-top-left-radius: 16px;
-}
-
-thead th:last-child {
-    border-top-right-radius: 16px;
 }
 
 tbody tr {
     transition: var(--transition);
+    background: white;
 }
 
 tbody tr:hover {
@@ -157,27 +158,11 @@ tbody tr:hover {
 
 td {
     padding: 1.25rem 1rem;
+    color: var(--primary-dark);
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* Sifariş ID Style */
-.sifaris-link {
-    color: var(--accent-color);
-    text-decoration: none;
-    font-weight: 600;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    background: rgba(59, 130, 246, 0.1);
-    transition: var(--transition);
-}
-
-.sifaris-link:hover {
-    background: var(--accent-color);
-    color: white;
-    transform: translateY(-2px);
-}
-
-/* Status Badge Styles */
+/* Status Badge */
 .status-badge {
     padding: 0.5rem 1rem;
     border-radius: 20px;
@@ -186,7 +171,6 @@ td {
     display: inline-block;
     text-align: center;
     min-width: 120px;
-    transition: var(--transition);
 }
 
 .status-gozleyir {
@@ -209,7 +193,7 @@ td {
     color: white;
 }
 
-/* Sifariş Details Styles */
+/* Order Details */
 .sifaris-info {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -218,14 +202,16 @@ td {
 }
 
 .info-row {
-    background: var(--card-bg);
+    background: linear-gradient(135deg, var(--primary-main), var(--primary-light));
     padding: 1.5rem;
-    border-radius: 16px;
+    border-radius: 12px;
     box-shadow: var(--shadow-lg);
+    color: var(--text-white);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .info-row h3 {
-    color: var(--primary-color);
+    color: var(--text-light);
     margin: 0 0 1rem 0;
     font-size: 1.2rem;
     font-weight: 600;
@@ -239,45 +225,14 @@ td {
     align-items: center;
 }
 
-/* Table Footer */
-tfoot {
-    background: rgba(59, 130, 246, 0.05);
-    font-weight: 600;
-}
-
-tfoot td {
-    padding: 1.25rem 1rem;
-    color: var(--primary-color);
-}
-
-.text-right {
-    text-align: right;
-}
-
-.text-center {
-    text-align: center;
-}
-
-/* Animations */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.stat-item, .table-container, .info-row {
-    animation: fadeInUp 0.5s ease-out forwards;
-}
-
 /* Responsive Design */
 @media (max-width: 1024px) {
     .statistic {
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+    
+    .sifaris-info {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -292,87 +247,56 @@ tfoot td {
     }
 
     .header-nav h2 {
-        margin: 0;
+        margin: 1rem 0;
     }
 
-    .table-container {
+    .orders-table, .table-container {
         overflow-x: auto;
     }
 
     table {
         min-width: 800px;
     }
+}
 
-    .stat-item {
-        padding: 1rem;
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
-/* Loading Animation */
-.loading {
-    position: relative;
-    overflow: hidden;
+.stat-item, .orders-table, .info-row {
+    animation: fadeIn 0.5s ease-out forwards;
 }
 
-.loading::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.2),
-        transparent
-    );
-    animation: loading 1.5s infinite;
+/* Text Alignment */
+.text-right {
+    text-align: right;
 }
 
-@keyframes loading {
-    0% {
-        transform: translateX(-100%);
-    }
-    100% {
-        transform: translateX(100%);
-    }
-}
-.exchange-rate-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    margin: 20px 0;
-    background: linear-gradient(135deg, #1a237e, #0d47a1);
-    border-radius: 8px;
-    color: white;
+.text-center {
+    text-align: center;
 }
 
-.rate-info {
-    font-family: monospace;
-    font-size: 1rem;
-    color: #1a237e;
-    background: rgba(26, 35, 126, 0.1);
-    padding: 4px 8px;
-    border-radius: 4px;
-    display: inline-block;
-    white-space: nowrap;
-}
-
-.historical-rate {
+/* Links */
+.sifaris-link {
+    color: var(--accent-color);
+    text-decoration: none;
     font-weight: 600;
-    color: #1a237e;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    background: rgba(59, 130, 246, 0.1);
+    transition: var(--transition);
 }
 
-.current-rate {
-    font-size: 1rem;
-    color: #ffffff;
-}
-
-/* Cədvəldə məzənnə sütunu üçün stil */
-table td:nth-child(2) {  /* Məzənnə sütunu */
-    font-weight: 500;
-    color: #ffd700;  /* Qızılı rəng */
-    background-color: rgba(26, 35, 126, 0.1);  /* Açıq mavi fon */
+.sifaris-link:hover {
+    background: var(--accent-color);
+    color: white;
+    transform: translateY(-2px);
 }

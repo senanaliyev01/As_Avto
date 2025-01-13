@@ -139,16 +139,22 @@
                     {% endif %}
                 </td>
                 <td class="price-column">
-                    <div class="price-eur">{{ mehsul.qiymet_eur }} EUR</div>
-                    {% if mezenne_deyisimi != 0 %}
-                        <div class="price-change {% if mezenne_artib %}price-up{% else %}price-down{% endif %}">
-                            <i class="fas fa-{% if mezenne_artib %}arrow-up{% else %}arrow-down{% endif %}"></i>
-                            <span class="old-price">{{ mehsul.qiymet_azn_old }} AZN</span>
-                            <span class="new-price">{{ mehsul.qiymet_azn }} AZN</span>
+                    <div class="price-info">
+                        <div class="price-eur">{{ mehsul.qiymet_eur }} EUR</div>
+                        <div class="price-azn {% if mezenne_deyisimi > 0 %}price-increased{% endif %}">
+                            {% if mezenne_deyisimi != 0 %}
+                                <div class="price-change">
+                                    {% if mezenne_deyisimi > 0 %}
+                                        <i class="fas fa-arrow-up"></i>
+                                    {% else %}
+                                        <i class="fas fa-arrow-down"></i>
+                                    {% endif %}
+                                    <span class="old-price">{{ mehsul.qiymet_azn_old }} AZN</span>
+                                </div>
+                            {% endif %}
+                            <div class="current-price">{{ mehsul.qiymet_azn }} AZN</div>
                         </div>
-                    {% else %}
-                        <div class="price-static">{{ mehsul.qiymet_azn }} AZN</div>
-                    {% endif %}
+                    </div>
                 </td>
                 <td><a href="{% url 'sebet_ekle' mehsul.id %}" class="cart-icon"><i class="fas fa-shopping-cart"></i></a></td>
             </tr>

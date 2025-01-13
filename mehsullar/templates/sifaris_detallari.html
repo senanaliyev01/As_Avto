@@ -32,17 +32,17 @@
         <div class="info-row">
             <h3>Ödəniş Məlumatları</h3>
             <p><strong>Ümumi Məbləğ:</strong> 
-                <span>{{ sifaris.cemi_mebleg_eur }} EUR</span>
-                <span>{{ sifaris.cemi_mebleg_azn }} AZN</span>
+                <span>{{ sifaris.cemi_mebleg_eur|floatformat:2 }} EUR</span>
+                <span>{{ sifaris.cemi_mebleg_azn|floatformat:2 }} AZN</span>
             </p>
             <p><strong>Ödənilən Məbləğ:</strong>
-                <span>{{ sifaris.odenilen_mebleg_eur }} EUR</span>
-                <span>{{ sifaris.odenilen_mebleg_azn }} AZN</span>
+                <span>{{ sifaris.odenilen_mebleg_eur|floatformat:2 }} EUR</span>
+                <span>{{ sifaris.odenilen_mebleg_azn|floatformat:2 }} AZN</span>
             </p>
             <p class="qaliq-borc {% if sifaris.qaliq_borc_eur < 0 %}qaliq-borc-pozitiv{% else %}qaliq-borc-negativ{% endif %}">
                 <strong>Qalıq Borc:</strong>
-                <span>{{ sifaris.qaliq_borc_eur }} EUR</span>
-                <span>{{ sifaris.qaliq_borc_azn }} AZN</span>
+                <span>{{ sifaris.qaliq_borc_eur|floatformat:2 }} EUR</span>
+                <span>{{ sifaris.qaliq_borc_azn|floatformat:2 }} AZN</span>
             </p>
         </div>
     </div>

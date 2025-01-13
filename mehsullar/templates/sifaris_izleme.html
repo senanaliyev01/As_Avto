@@ -55,10 +55,10 @@
                         </span>
                     </td>
                     <td>{{ sifaris.tarix }}</td>
-                    <td>{{ sifaris.cemi_mebleg_eur }} EUR</td>
-                    <td>{{ sifaris.cemi_mebleg_azn }} AZN</td>
-                    <td>{{ sifaris.odenilen_mebleg_eur }} EUR</td>
-                    <td>{{ sifaris.odenilen_mebleg_azn }} AZN</td>
+                    <td>{{ sifaris.cemi_mebleg_eur|floatformat:2 }} EUR</td>
+                    <td>{{ sifaris.cemi_mebleg_azn|floatformat:2 }} AZN</td>
+                    <td>{{ sifaris.odenilen_mebleg_eur|floatformat:2 }} EUR</td>
+                    <td>{{ sifaris.odenilen_mebleg_azn|floatformat:2 }} AZN</td>
                     <td><span class="status-badge status-{{ sifaris.status }}">{{ sifaris.display_status }}</span></td>
                 </tr>
                 {% endfor %}

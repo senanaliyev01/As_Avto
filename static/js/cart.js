@@ -261,4 +261,36 @@ document.addEventListener('DOMContentLoaded', function() {
             closeModal();
         }
     };
+
+    // Məzənnə yeniləmə funksiyası
+    function updateExchangeRate() {
+        fetch('/get_current_rate/')  // Yeni view yaradacağıq
+            .then(response => response.json())
+            .then(data => {
+                const rateElement = document.querySelector('.current-rate');
+                const timeElement = document.querySelector('.update-time');
+                
+                if (rateElement) {
+                    rateElement.textContent = `1 EUR = ${data.rate} AZN`;
+                }
+                if (timeElement) {
+                    timeElement.textContent = `(Son yeniləmə: ${data.update_time})`;
+                }
+                
+                // Qiymət dəyişikliklərini yenilə
+                if (data.rate_change !== 0) {
+                    const changeElement = document.querySelector('.rate-change');
+                    if (changeElement) {
+                        changeElement.className = `rate-change ${data.rate_change > 0 ? 'increase' : 'decrease'}`;
+                        changeElement.innerHTML = `
+                            <i class="fas fa-arrow-${data.rate_change > 0 ? 'up' : 'down'}"></i>
+                            ${Math.abs(data.rate_change_percent)}%
+                        `;
+                    }
+                }
+            });
+    }
+
+    // Hər 5 saniyədə yenilə
+    setInterval(updateExchangeRate, 5000);
 });

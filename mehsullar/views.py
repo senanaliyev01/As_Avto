@@ -13,6 +13,8 @@ from urllib.request import urlopen
 from urllib.error import URLError
 from decimal import Decimal
 from datetime import datetime
+from bs4 import BeautifulSoup
+import requests
 
 @login_required
 def about(request):
@@ -75,30 +77,44 @@ def get_stock_class(stok):
 
 def get_eur_rate():
     try:
-        # Əvvəlki məzənnəni saxla
+        # Cache-dən yoxla
         previous_rate = cache.get('previous_eur_mezenne')
         current_rate = cache.get('eur_mezenne')
         
         if current_rate:
             if not previous_rate:
-                cache.set('previous_eur_mezenne', current_rate, 43200)
+                cache.set('previous_eur_mezenne', current_rate, 1800)  # 30 dəqiqə
             return current_rate, previous_rate or current_rate
 
+        # Google Finance-dən məzənnəni al
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
         url = "https://www.google.com/finance/quote/EUR-AZN"
-        with urlopen(url) as response:
-            data = json.loads(response.read())
-            rate = Decimal(str(data['rates']['AZN']))
+        response = requests.get(url, headers=headers, timeout=10)
+        
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, 'html.parser')
+            rate_div = soup.find('div', {'class': 'YMlKec fxKbKc'})
             
-            if current_rate:
-                cache.set('previous_eur_mezenne', current_rate, 43200)
-            cache.set('eur_mezenne', rate, 43200)
-            cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 43200)
-            
-            return rate, current_rate or rate
+            if rate_div and rate_div.text:
+                rate = Decimal(rate_div.text)
+                
+                # Əvvəlki məzənnəni saxla
+                if current_rate:
+                    cache.set('previous_eur_mezenne', current_rate, 1800)
+                
+                # Yeni məzənnəni cache-də saxla
+                cache.set('eur_mezenne', rate, 1800)  # 30 dəqiqə
+                cache.set('eur_update_time', datetime.now().strftime('%H:%M:%S'), 1800)
+                
+                return rate, current_rate or rate
+
+        return Decimal('1.746752'), Decimal('1.746752')
 
     except Exception as e:
         print(f"Məzənnə yeniləmə xətası: {e}")
-        return Decimal('1.746752'), Decimal('1.746752')  # Default məzənnəni yenilədik
+        return Decimal('1.746752'), Decimal('1.746752')
 
 @login_required
 def products_list(request):
@@ -341,3 +357,15 @@ def sifaris_detallari(request, sifaris_id):
         'sifaris_mehsullari': sifaris_mehsullari,
     }
     return render(request, 'sifaris_detallari.html', context)
+
+@login_required
+def get_current_rate(request):
+    current_rate, previous_rate = get_eur_rate()
+    rate_change = current_rate - previous_rate
+    
+    return JsonResponse({
+        'rate': f"{current_rate:.6f}",
+        'update_time': cache.get('eur_update_time', 'Məlumat yoxdur'),
+        'rate_change': float(rate_change),
+        'rate_change_percent': abs(round((rate_change / previous_rate) * 100, 1))
+    })

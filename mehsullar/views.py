@@ -167,13 +167,18 @@ def sifarisi_gonder(request):
                     'message': 'Səbətiniz boşdur'
                 })
 
-            current_rate, _ = get_eur_rate()  # Yalnız cari məzənnəni istifadə edirik
+            current_rate, _ = get_eur_rate()
+
+            # Ümumi məbləği hesabla
+            total_eur = sum(item.mehsul.qiymet_eur * item.miqdar for item in sebet_items)
             
             # Yeni sifariş yarat
             sifaris = Sifaris.objects.create(
                 user=request.user,
                 status='gozleyir',
-                sifaris_mezennesi=current_rate  # Cari məzənnəni saxla
+                sifaris_mezennesi=current_rate,
+                cemi_mebleg_eur=total_eur,  # Ümumi məbləği əlavə et
+                odenilen_mebleg_eur=Decimal('0.00')  # Default olaraq 0
             )
             
             # Səbətdəki hər məhsul üçün sifariş elementi yarat
@@ -190,7 +195,8 @@ def sifarisi_gonder(request):
             
             return JsonResponse({
                 'success': True,
-                'message': 'Sifariş uğurla göndərildi'
+                'message': 'Sifariş uğurla göndərildi',
+                'sifaris_id': sifaris.id
             })
             
         except Exception as e:

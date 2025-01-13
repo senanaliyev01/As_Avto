@@ -6,13 +6,20 @@
     <title>Sifariş #{{ sifaris.id }} - Detallar</title>
     <link rel="icon" href="{% static 'img/favicon.png' %}">
     <link rel="stylesheet" href="{% static 'css/sifaris_izleme.css' %}">
+    <!-- <link rel="stylesheet" href="{% static 'css/snow.css' %}"> -->
 </head>
 <body>
     <nav class="header-nav">
         <a href="{% url 'main' %}">Əsas Səhifə</a>
         <a href="{% url 'sifaris_izle' %}">Sifarişlərim</a>
-        <h2>Sifariş #{{ sifaris.id }} (1 EUR = {{ sifaris.sifaris_mezennesi }} AZN)</h2>
+        <h2>Sifariş #{{ sifaris.id }}</h2>
     </nav>
+
+    <div class="exchange-rate-info">
+        <div class="rate-info">
+            <div class="historical-rate">Sifariş məzənnəsi: 1 EUR = {{ sifaris.sifaris_mezennesi }} AZN</div>
+        </div>
+    </div>
 
     <div class="sifaris-info">
         <div class="info-row">
@@ -86,5 +93,6 @@
     </div>
 
     <script src="{% static 'js/sifaris.js' %}"></script>
+    <!-- <script src="{% static 'js/snow.js' %}"></script> -->
 </body>
 </html> 

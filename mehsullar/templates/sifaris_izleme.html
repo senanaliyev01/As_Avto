@@ -21,21 +21,17 @@
         </div>
         <div class="stat-item">
             <h3>Ödənilən Məbləğ</h3>
-            <p class="amount-info">{{ odenilen_mebleg_eur }} EUR</p>
-            <p class="amount-info">{{ odenilen_mebleg_azn }} AZN</p>
+            <p class="amount-info">{{ toplam_odenilen_eur }} EUR</p>
+            <p class="amount-info">{{ toplam_odenilen_azn }} AZN</p>
         </div>
         <div class="stat-item">
             <h3>Qalıq Borc</h3>
-            <p class="qaliq-borc {% if qaliq_borc_eur < 0 %}qaliq-borc-pozitiv{% else %}qaliq-borc-negativ{% endif %}">
-                {{ qaliq_borc_eur }} EUR
-            </p>
-            <p class="qaliq-borc {% if qaliq_borc_azn < 0 %}qaliq-borc-pozitiv{% else %}qaliq-borc-negativ{% endif %}">
-                {{ qaliq_borc_azn }} AZN
-            </p>
+            <p class="amount-info">{{ toplam_qaliq_eur }} EUR</p>
+            <p class="amount-info">{{ toplam_qaliq_azn }} AZN</p>
         </div>
     </div>
 
-    <div class="table-container">
+    <div class="orders-table">
         <table>
             <thead>
                 <tr>

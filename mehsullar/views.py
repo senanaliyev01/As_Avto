@@ -131,14 +131,14 @@ def sebetden_sil(request, sebet_id):
             sebet_item.delete()
             
             # Cari məzənnəni al
-            current_rate, _ = get_eur_rate()  # Yalnız cari məzənnəni istifadə edirik
+            eur_rate = get_eur_rate()  # Bu Decimal qaytarır
             
             # Yeni ümumi məbləği hesabla
             cart_total_eur = Sebet.objects.filter(user=request.user).aggregate(
                 total_eur=Sum(F('miqdar') * F('mehsul__qiymet_eur'))
             )['total_eur'] or Decimal('0')
             
-            cart_total_azn = cart_total_eur * current_rate
+            cart_total_azn = cart_total_eur * eur_rate
         
             return JsonResponse({
                 'success': True,
@@ -161,54 +161,54 @@ def sifarisi_gonder(request):
     if request.method == 'POST':
         try:
             sebet_items = Sebet.objects.filter(user=request.user)
-            if not sebet_items.exists():
-                return JsonResponse({
-                    'success': False,
-                    'message': 'Səbətiniz boşdur'
-                })
+            if not sebet_items:
+                return JsonResponse({'status': 'error', 'message': 'Səbətiniz boşdur'})
 
-            current_rate, _ = get_eur_rate()
+            # Cari məzənnəni al və saxla
+            current_rate = get_eur_rate()
 
-            # Ümumi məbləği hesabla
+            # Ümumi məbləği EUR-da hesabla
             total_eur = sum(item.mehsul.qiymet_eur * item.miqdar for item in sebet_items)
-            
-            # Yeni sifariş yarat
+
+            # Yeni sifarişi yarat
             sifaris = Sifaris.objects.create(
                 user=request.user,
-                status='gozleyir',
-                sifaris_mezennesi=current_rate,
-                cemi_mebleg_eur=total_eur,  # Ümumi məbləği əlavə et
-                odenilen_mebleg_eur=Decimal('0.00')  # Default olaraq 0
+                cemi_mebleg_eur=total_eur,
+                odenilen_mebleg_eur=0,
+                sifaris_mezennesi=current_rate,  # Məzənnəni saxla
+                status='gozleyir'
             )
-            
-            # Səbətdəki hər məhsul üçün sifariş elementi yarat
+
+            # Sifariş məhsullarını əlavə et
             for item in sebet_items:
                 SifarisMehsul.objects.create(
                     sifaris=sifaris,
                     mehsul=item.mehsul,
                     miqdar=item.miqdar,
-                    qiymet=item.mehsul.qiymet_eur
+                    qiymet=item.mehsul.qiymet_eur  # EUR qiyməti
                 )
-            
+
+                # Stoku yenilə
+                mehsul = item.mehsul
+                mehsul.stok = F('stok') - item.miqdar
+                mehsul.save()
+
             # Səbəti təmizlə
             sebet_items.delete()
-            
+
             return JsonResponse({
-                'success': True,
-                'message': 'Sifariş uğurla göndərildi',
+                'status': 'success',
+                'message': 'Sifariş uğurla yaradıldı',
                 'sifaris_id': sifaris.id
             })
-            
+
         except Exception as e:
             return JsonResponse({
-                'success': False,
+                'status': 'error',
                 'message': f'Xəta baş verdi: {str(e)}'
             })
-    
-    return JsonResponse({
-        'success': False,
-        'message': 'Yanlış sorğu metodu'
-    })
+
+    return JsonResponse({'status': 'error', 'message': 'Yanlış sorğu metodu'})
 
 
 from django.contrib.auth.decorators import login_required
@@ -217,38 +217,37 @@ from .models import Sifaris
 
 @login_required
 def sifaris_izle(request):
-    sifarisler = Sifaris.objects.filter(user=request.user)
+    sifarisler = Sifaris.objects.filter(user=request.user).order_by('-tarix')
     
-    # Ümumi məbləğləri hesabla
-    toplam_mebleg_eur = Decimal('0')
-    odenilen_mebleg_eur = Decimal('0')
-    
-    for sifaris in sifarisler:
-        toplam_mebleg_eur += sifaris.cemi_mebleg_eur
-        odenilen_mebleg_eur += sifaris.odenilen_mebleg_eur
-    
-    # Qalıq borcları hesabla
-    qaliq_borc_eur = toplam_mebleg_eur - odenilen_mebleg_eur
+    # Ümumi statistika hesablamaları
+    toplam_mebleg_eur = sum(sifaris.cemi_mebleg_eur for sifaris in sifarisler)
+    toplam_mebleg_azn = sum(sifaris.cemi_mebleg_azn for sifaris in sifarisler)
+    toplam_odenilen_eur = sum(sifaris.odenilen_mebleg_eur for sifaris in sifarisler)
+    toplam_odenilen_azn = sum(sifaris.odenilen_mebleg_azn for sifaris in sifarisler)
+    toplam_qaliq_eur = toplam_mebleg_eur - toplam_odenilen_eur
+    toplam_qaliq_azn = toplam_mebleg_azn - toplam_odenilen_azn
 
+    # Status mətnlərini əlavə et
     status_text = {
         'gozleyir': 'Gözləyir',
         'hazirlanir': 'Hazırlanır',
         'yoldadir': 'Yoldadır',
         'catdirildi': 'Çatdırıldı'
     }
-
+    
     for sifaris in sifarisler:
         sifaris.display_status = status_text.get(sifaris.status, 'Gözləyir')
 
-    return render(request, 'sifaris_izleme.html', {
+    context = {
         'sifarisler': sifarisler,
-        'toplam_mebleg_eur': round(toplam_mebleg_eur, 2),
-        'toplam_mebleg_azn': round(toplam_mebleg_eur * sifaris.sifaris_mezennesi, 2),
-        'odenilen_mebleg_eur': round(odenilen_mebleg_eur, 2),
-        'odenilen_mebleg_azn': round(odenilen_mebleg_eur * sifaris.sifaris_mezennesi, 2),
-        'qaliq_borc_eur': round(qaliq_borc_eur, 2),
-        'qaliq_borc_azn': round(qaliq_borc_eur * sifaris.sifaris_mezennesi, 2)
-    })
+        'toplam_mebleg_eur': toplam_mebleg_eur,
+        'toplam_mebleg_azn': toplam_mebleg_azn,
+        'toplam_odenilen_eur': toplam_odenilen_eur,
+        'toplam_odenilen_azn': toplam_odenilen_azn,
+        'toplam_qaliq_eur': toplam_qaliq_eur,
+        'toplam_qaliq_azn': toplam_qaliq_azn,
+    }
+    return render(request, 'sifaris_izleme.html', context)
 
 
 @login_required

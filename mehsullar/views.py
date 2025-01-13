@@ -87,38 +87,30 @@ def get_eur_rate():
         if current_rate and previous_rate:
             return current_rate, previous_rate
 
-        # Bugünkü tarix
-        today = datetime.now().strftime('%d.%m.%Y')
-        
-        # CBAR API URL
-        url = f"https://www.cbar.az/currencies/{today}.xml"
-        
+        # Exchangerates API
+        url = "https://api.exchangerate-api.com/v4/latest/EUR"
         response = requests.get(url, timeout=5)
         
         if response.status_code == 200:
-            # XML parse et
-            root = ET.fromstring(response.content)
+            data = response.json()
+            new_rate = Decimal(str(data['rates']['AZN']))
             
-            # EUR məzənnəsini tap
-            for valute in root.findall('.//Valute[@Code="EUR"]'):
-                new_rate = Decimal(valute.find('Value').text.replace(',', '.'))
+            # Cache-ə yaz (1 saat)
+            if current_rate:
+                cache.set('previous_eur_mezenne', current_rate, 3600)
+            else:
+                cache.set('previous_eur_mezenne', new_rate, 3600)
                 
-                # Cache-ə yaz (1 saat)
-                if current_rate:
-                    cache.set('previous_eur_mezenne', current_rate, 3600)
-                else:
-                    cache.set('previous_eur_mezenne', new_rate, 3600)
-                    
-                cache.set('eur_mezenne', new_rate, 3600)
-                cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 3600)
-                
-                return new_rate, current_rate or new_rate
+            cache.set('eur_mezenne', new_rate, 3600)
+            cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 3600)
+            
+            return new_rate, current_rate or new_rate
 
-        # Əgər CBAR-dan məlumat alına bilməsə və cache-də varsa
+        # Əgər API-dən məlumat alına bilməsə və cache-də varsa
         if current_rate:
             return current_rate, previous_rate or current_rate
 
-        # Heç bir məlumat yoxdursa, yenidən cəhd et
+        # Yenidən cəhd et
         return get_eur_rate()
 
     except Exception:
@@ -126,7 +118,7 @@ def get_eur_rate():
         if current_rate:
             return current_rate, previous_rate or current_rate
             
-        # Son cəhd - yenidən yoxla
+        # Son cəhd
         return get_eur_rate()
 
 @login_required

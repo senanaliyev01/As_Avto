@@ -98,7 +98,7 @@ def get_eur_rate():
 
     except Exception as e:
         print(f"Məzənnə yeniləmə xətası: {e}")
-        return Decimal('2.00'), Decimal('2.00')
+        return Decimal('1.746752'), Decimal('1.746752')  # Default məzənnəni yenilədik
 
 @login_required
 def products_list(request):
@@ -164,13 +164,16 @@ def sifarisi_gonder(request):
 
             # Cari məzənnəni al
             current_rate, _ = get_eur_rate()
+            
+            # Ümumi məbləği EUR-da hesabla
+            total_eur = sum(item.mehsul.qiymet_eur * item.miqdar for item in sebet_items)
 
-            # Yeni sifarişi yarat
+            # Yeni sifarişi yarat və cari məzənnəni dəqiq olaraq saxla
             sifaris = Sifaris.objects.create(
                 user=request.user,
-                cemi_mebleg_eur=sum(item.mehsul.qiymet_eur * item.miqdar for item in sebet_items),
+                cemi_mebleg_eur=total_eur,
                 odenilen_mebleg_eur=0,
-                sifaris_mezennesi=current_rate,  # Cari məzənnəni yadda saxlayırıq
+                sifaris_mezennesi=float(current_rate),  # Cari məzənnəni float olaraq saxla
                 status='gozleyir'
             )
 
@@ -180,7 +183,7 @@ def sifarisi_gonder(request):
                     sifaris=sifaris,
                     mehsul=item.mehsul,
                     miqdar=item.miqdar,
-                    qiymet=item.mehsul.qiymet_eur
+                    qiymet=float(item.mehsul.qiymet_eur)  # Qiyməti float olaraq saxla
                 )
 
                 # Stoku yenilə

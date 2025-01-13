@@ -357,6 +357,7 @@ tfoot td {
     padding: 4px 8px;
     border-radius: 4px;
     display: inline-block;
+    white-space: nowrap;
 }
 
 .historical-rate {

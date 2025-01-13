@@ -163,15 +163,12 @@ def sifarisi_gonder(request):
                 return JsonResponse({'status': 'error', 'message': 'Səbətiniz boşdur'})
 
             # Cari məzənnəni al
-            current_rate, _ = get_eur_rate()  # Yalnız cari məzənnəni istifadə edirik
-
-            # Ümumi məbləği EUR-da hesabla
-            total_eur = sum(item.mehsul.qiymet_eur * item.miqdar for item in sebet_items)
+            current_rate, _ = get_eur_rate()
 
             # Yeni sifarişi yarat
             sifaris = Sifaris.objects.create(
                 user=request.user,
-                cemi_mebleg_eur=total_eur,
+                cemi_mebleg_eur=sum(item.mehsul.qiymet_eur * item.miqdar for item in sebet_items),
                 odenilen_mebleg_eur=0,
                 sifaris_mezennesi=current_rate,  # Cari məzənnəni yadda saxlayırıq
                 status='gozleyir'
@@ -183,7 +180,7 @@ def sifarisi_gonder(request):
                     sifaris=sifaris,
                     mehsul=item.mehsul,
                     miqdar=item.miqdar,
-                    qiymet=item.mehsul.qiymet_eur  # EUR qiyməti saxlayırıq
+                    qiymet=item.mehsul.qiymet_eur
                 )
 
                 # Stoku yenilə
@@ -282,21 +279,21 @@ def update_quantity(request, item_id, new_quantity):
         current_rate, _ = get_eur_rate()
 
         # Yeni məbləğləri hesabla
-        item_total_eur = cart_item.mehsul.qiymet_eur * Decimal(str(new_quantity))
-        item_total_azn = item_total_eur * current_rate
+        item_total_eur = float(cart_item.mehsul.qiymet_eur) * new_quantity
+        item_total_azn = item_total_eur * float(current_rate)
         
         # Ümumi səbət məbləğini hesabla
         sebet_items = Sebet.objects.filter(user=request.user)
-        cart_total_eur = sum(item.mehsul.qiymet_eur * item.miqdar for item in sebet_items)
-        cart_total_azn = cart_total_eur * current_rate
+        cart_total_eur = sum(float(item.mehsul.qiymet_eur) * item.miqdar for item in sebet_items)
+        cart_total_azn = cart_total_eur * float(current_rate)
 
         return JsonResponse({
             'success': True,
             'new_quantity': new_quantity,
-            'item_total_eur': str(round(item_total_eur, 2)),
-            'item_total_azn': str(round(item_total_azn, 2)),
-            'total_amount_eur': str(round(cart_total_eur, 2)),
-            'total_amount_azn': str(round(cart_total_azn, 2))
+            'item_total_eur': f"{item_total_eur:.2f}",
+            'item_total_azn': f"{item_total_azn:.2f}",
+            'total_amount_eur': f"{cart_total_eur:.2f}",
+            'total_amount_azn': f"{cart_total_azn:.2f}"
         })
             
     except Exception as e:

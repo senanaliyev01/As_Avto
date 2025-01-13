@@ -131,14 +131,14 @@ def sebetden_sil(request, sebet_id):
             sebet_item.delete()
             
             # Cari məzənnəni al
-            eur_rate = get_eur_rate()  # Bu Decimal qaytarır
+            current_rate, _ = get_eur_rate()  # Yalnız cari məzənnəni istifadə edirik
             
             # Yeni ümumi məbləği hesabla
             cart_total_eur = Sebet.objects.filter(user=request.user).aggregate(
                 total_eur=Sum(F('miqdar') * F('mehsul__qiymet_eur'))
             )['total_eur'] or Decimal('0')
             
-            cart_total_azn = cart_total_eur * eur_rate
+            cart_total_azn = cart_total_eur * current_rate
         
             return JsonResponse({
                 'success': True,
@@ -161,54 +161,48 @@ def sifarisi_gonder(request):
     if request.method == 'POST':
         try:
             sebet_items = Sebet.objects.filter(user=request.user)
-            if not sebet_items:
-                return JsonResponse({'status': 'error', 'message': 'Səbətiniz boşdur'})
+            if not sebet_items.exists():
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Səbətiniz boşdur'
+                })
 
-            # Cari məzənnəni al və saxla
-            current_rate = get_eur_rate()
-
-            # Ümumi məbləği EUR-da hesabla
-            total_eur = sum(item.mehsul.qiymet_eur * item.miqdar for item in sebet_items)
-
-            # Yeni sifarişi yarat
+            current_rate, _ = get_eur_rate()  # Yalnız cari məzənnəni istifadə edirik
+            
+            # Yeni sifariş yarat
             sifaris = Sifaris.objects.create(
                 user=request.user,
-                cemi_mebleg_eur=total_eur,
-                odenilen_mebleg_eur=0,
-                sifaris_mezennesi=current_rate,  # Məzənnəni saxla
-                status='gozleyir'
+                status='gozleyir',
+                sifaris_mezennesi=current_rate  # Cari məzənnəni saxla
             )
-
-            # Sifariş məhsullarını əlavə et
+            
+            # Səbətdəki hər məhsul üçün sifariş elementi yarat
             for item in sebet_items:
                 SifarisMehsul.objects.create(
                     sifaris=sifaris,
                     mehsul=item.mehsul,
                     miqdar=item.miqdar,
-                    qiymet=item.mehsul.qiymet_eur  # EUR qiyməti
+                    qiymet=item.mehsul.qiymet_eur
                 )
-
-                # Stoku yenilə
-                mehsul = item.mehsul
-                mehsul.stok = F('stok') - item.miqdar
-                mehsul.save()
-
+            
             # Səbəti təmizlə
             sebet_items.delete()
-
+            
             return JsonResponse({
-                'status': 'success',
-                'message': 'Sifariş uğurla yaradıldı',
-                'sifaris_id': sifaris.id
+                'success': True,
+                'message': 'Sifariş uğurla göndərildi'
             })
-
+            
         except Exception as e:
             return JsonResponse({
-                'status': 'error',
+                'success': False,
                 'message': f'Xəta baş verdi: {str(e)}'
             })
-
-    return JsonResponse({'status': 'error', 'message': 'Yanlış sorğu metodu'})
+    
+    return JsonResponse({
+        'success': False,
+        'message': 'Yanlış sorğu metodu'
+    })
 
 
 from django.contrib.auth.decorators import login_required

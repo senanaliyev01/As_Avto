@@ -13,10 +13,6 @@ from urllib.request import urlopen
 from urllib.error import URLError
 from decimal import Decimal
 from datetime import datetime
-from bs4 import BeautifulSoup
-import requests
-import decimal
-import xml.etree.ElementTree as ET
 
 @login_required
 def about(request):
@@ -39,7 +35,7 @@ def view_cart(request):
     sebet = Sebet.objects.filter(user=request.user)
     current_rate, previous_rate = get_eur_rate()
     rate_change = current_rate - previous_rate
-
+    
     for item in sebet:
         item.stok_status = get_stock_status(item.mehsul.stok)
         item.stok_class = get_stock_class(item.mehsul.stok)
@@ -79,53 +75,30 @@ def get_stock_class(stok):
 
 def get_eur_rate():
     try:
-        # Cache-dən yoxla (1 saat = 3600 saniyə)
-        current_rate = cache.get('eur_mezenne')
+        # Əvvəlki məzənnəni saxla
         previous_rate = cache.get('previous_eur_mezenne')
+        current_rate = cache.get('eur_mezenne')
         
-        # Əgər cache-də məzənnə varsa və vaxtı bitməyibsə
-        if current_rate and previous_rate:
-            return current_rate, previous_rate
-
-        # Frankfurter API
-        url = "https://api.frankfurter.app/latest?from=EUR&to=AZN"
-        
-        try:
-            response = requests.get(url, timeout=3)
-            
-            if response.status_code == 200:
-                data = response.json()
-                new_rate = Decimal(str(data['rates']['AZN']))
-                
-                # Cache-ə yaz (1 saat)
-                if current_rate:
-                    cache.set('previous_eur_mezenne', current_rate, 3600)
-                else:
-                    cache.set('previous_eur_mezenne', new_rate, 3600)
-                    
-                cache.set('eur_mezenne', new_rate, 3600)
-                cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 3600)
-                
-                return new_rate, current_rate or new_rate
-
-        except (requests.RequestException, KeyError, ValueError):
-            pass
-
-        # Cache-də varsa onu istifadə et
         if current_rate:
+            if not previous_rate:
+                cache.set('previous_eur_mezenne', current_rate, 43200)
             return current_rate, previous_rate or current_rate
 
-        # Default dəyərlər
-        default_rate = Decimal('1.87')
-        cache.set('eur_mezenne', default_rate, 3600)
-        cache.set('previous_eur_mezenne', default_rate, 3600)
-        cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 3600)
-        
-        return default_rate, default_rate
+        url = "https://open.er-api.com/v6/latest/EUR"
+        with urlopen(url) as response:
+            data = json.loads(response.read())
+            rate = Decimal(str(data['rates']['AZN']))
+            
+            if current_rate:
+                cache.set('previous_eur_mezenne', current_rate, 43200)
+            cache.set('eur_mezenne', rate, 43200)
+            cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 43200)
+            
+            return rate, current_rate or rate
 
-    except Exception:
-        # Son default dəyərlər
-        return Decimal('1.87'), Decimal('1.87')
+    except Exception as e:
+        print(f"Məzənnə yeniləmə xətası: {e}")
+        return Decimal('1.746752'), Decimal('1.746752')  # Default məzənnəni yenilədik
 
 @login_required
 def products_list(request):
@@ -213,7 +186,10 @@ def sifarisi_gonder(request):
                     qiymet=float(item.mehsul.qiymet_eur)  # Qiyməti float olaraq saxla
                 )
 
-             
+                # Stoku yenilə
+                mehsul = item.mehsul
+                mehsul.stok = F('stok') - item.miqdar
+                mehsul.save()
 
             # Səbəti təmizlə
             sebet_items.delete()
@@ -256,7 +232,7 @@ def sifaris_izle(request):
         'yoldadir': 'Yoldadır',
         'catdirildi': 'Çatdırıldı'
     }
-
+    
     for sifaris in sifarisler:
         sifaris.display_status = status_text.get(sifaris.status, 'Gözləyir')
 
@@ -365,15 +341,3 @@ def sifaris_detallari(request, sifaris_id):
         'sifaris_mehsullari': sifaris_mehsullari,
     }
     return render(request, 'sifaris_detallari.html', context)
-
-@login_required
-def get_current_rate(request):
-    current_rate, previous_rate = get_eur_rate()
-    rate_change = current_rate - previous_rate
-    
-    return JsonResponse({
-        'rate': f"{current_rate:.6f}",
-        'update_time': cache.get('eur_update_time', 'Məlumat yoxdur'),
-        'rate_change': float(rate_change),
-        'rate_change_percent': abs(round((rate_change / previous_rate) * 100, 1))
-    })

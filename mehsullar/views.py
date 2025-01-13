@@ -16,6 +16,7 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 import requests
 import decimal
+import xml.etree.ElementTree as ET
 
 @login_required
 def about(request):
@@ -86,23 +87,21 @@ def get_eur_rate():
         if current_rate and previous_rate:
             return current_rate, previous_rate
 
-        # Google Finance-dən məzənnəni al
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/91.0.4472.124'
-        }
+        # Bugünkü tarix
+        today = datetime.now().strftime('%d.%m.%Y')
         
-        response = requests.get(
-            "https://www.google.com/finance/quote/EUR-AZN",
-            headers=headers,
-            timeout=5
-        )
+        # CBAR API URL
+        url = f"https://www.cbar.az/currencies/{today}.xml"
+        
+        response = requests.get(url, timeout=5)
         
         if response.status_code == 200:
-            soup = BeautifulSoup(response.text, 'html.parser')
-            rate_div = soup.select_one('div[data-last-price]')
+            # XML parse et
+            root = ET.fromstring(response.content)
             
-            if rate_div and rate_div.text:
-                new_rate = Decimal(rate_div.text.strip().replace(',', '.'))
+            # EUR məzənnəsini tap
+            for valute in root.findall('.//Valute[@Code="EUR"]'):
+                new_rate = Decimal(valute.find('Value').text.replace(',', '.'))
                 
                 # Cache-ə yaz (1 saat)
                 if current_rate:
@@ -115,7 +114,7 @@ def get_eur_rate():
                 
                 return new_rate, current_rate or new_rate
 
-        # Əgər Google-dan məlumat alına bilməsə və cache-də varsa
+        # Əgər CBAR-dan məlumat alına bilməsə və cache-də varsa
         if current_rate:
             return current_rate, previous_rate or current_rate
 

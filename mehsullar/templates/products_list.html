@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="icon" href="{% static 'img/favicon.png' %}">
     <link rel="stylesheet" href="{% static 'css/products_list.css' %}">
+    <link rel="stylesheet" href="{% static 'css/shared_styles.css' %}">
     <!-- <link rel="stylesheet" href="{% static 'css/snow.css' %}"> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
@@ -135,19 +136,28 @@
                     <i class="fa-solid fa-euro-sign"></i>
                 </td>
                 <td class="price-column">
-                    {% if mehsul.qiymet_deyisimi != 0 %}
-                        <div class="old-price">{{ mehsul.evvelki_qiymet_azn }} AZN</div>
-                        <div class="price-change {% if mehsul.qiymet_deyisimi > 0 %}price-up{% else %}price-down{% endif %}">
-                            {{ mehsul.qiymet_azn }} AZN
-                            {% if mehsul.qiymet_deyisimi > 0 %}
+                    {% if mehsul.evvelki_qiymet_azn %}
+                        {% if mehsul.qiymet_azn > mehsul.evvelki_qiymet_azn %}
+                            <div class="price-change increase">
+                                <span class="old-price">{{ mehsul.evvelki_qiymet_azn }}</span>
+                                <span class="new-price">{{ mehsul.qiymet_azn }}</span>
                                 <i class="fas fa-arrow-up"></i>
-                            {% else %}
+                                <span class="change-percent">+{{ mehsul.qiymet_deyisimi|floatformat:1 }}%</span>
+                            </div>
+                        {% elif mehsul.qiymet_azn < mehsul.evvelki_qiymet_azn %}
+                            <div class="price-change decrease">
+                                <span class="old-price">{{ mehsul.evvelki_qiymet_azn }}</span>
+                                <span class="new-price">{{ mehsul.qiymet_azn }}</span>
                                 <i class="fas fa-arrow-down"></i>
-                            {% endif %}
-                        </div>
+                                <span class="change-percent">{{ mehsul.qiymet_deyisimi|floatformat:1 }}%</span>
+                            </div>
+                        {% else %}
+                            {{ mehsul.qiymet_azn }}
+                        {% endif %}
                     {% else %}
-                        <div class="current-price">{{ mehsul.qiymet_azn }} AZN</div>
+                        {{ mehsul.qiymet_azn }}
                     {% endif %}
+                    <i class="fa-solid fa-manat-sign"></i>
                 </td>
                 <td><a href="{% url 'sebet_ekle' mehsul.id %}" class="cart-icon"><i class="fas fa-shopping-cart"></i></a></td>
             </tr>

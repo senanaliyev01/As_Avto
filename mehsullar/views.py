@@ -77,27 +77,25 @@ def get_stock_class(stok):
 
 def get_eur_rate():
     try:
+        # Cache-də məzənnə varsa onu qaytarırıq
         cached_rate = cache.get('eur_mezenne')
         if cached_rate:
             return cached_rate
 
+        # Sadə API-dən məzənnəni alırıq
         url = "https://open.er-api.com/v6/latest/EUR"
         with urlopen(url) as response:
             data = json.loads(response.read())
             rate = Decimal(str(data['rates']['AZN']))
             
-            # Əvvəlki məzənnəni saxla
-            old_rate = cache.get('evvelki_mezenne')
-            if old_rate != rate:
-                cache.set('evvelki_mezenne', old_rate)
-            
-            cache.set('eur_mezenne', rate, 600)
+            # Məzənnəni cache-də saxlayırıq
+            cache.set('eur_mezenne', rate, 600)  
             cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 600)
             return rate
 
     except Exception as e:
         print(f"Məzənnə yeniləmə xətası: {e}")
-        return Decimal('2.00')
+        return Decimal('2.00')  # Default məzənnə
 
 @login_required
 def products_list(request):
@@ -151,10 +149,10 @@ def products_list(request):
 @login_required
 def sebetden_sil(request, sebet_id):
     if request.method == 'POST':
-        try:
+    try:
             sebet_item = get_object_or_404(Sebet, id=sebet_id, user=request.user)
-            sebet_item.delete()
-            
+        sebet_item.delete()
+        
             # Cari məzənnəni al
             eur_rate = get_eur_rate()  # Bu Decimal qaytarır
             
@@ -164,15 +162,15 @@ def sebetden_sil(request, sebet_id):
             )['total_eur'] or Decimal('0')
             
             cart_total_azn = cart_total_eur * eur_rate
-            
-            return JsonResponse({
-                'success': True,
+        
+        return JsonResponse({
+            'success': True,
                 'total_amount_eur': str(round(cart_total_eur, 2)),
                 'total_amount_azn': str(round(cart_total_azn, 2))
-            })
+        })
         except Exception as e:
-            return JsonResponse({
-                'success': False,
+        return JsonResponse({
+            'success': False,
                 'message': str(e)
             }, status=500)
     

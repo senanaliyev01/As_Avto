@@ -1,0 +1,47 @@
+.price-change {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.old-price {
+    text-decoration: line-through;
+    color: #666;
+    font-size: 0.85em;
+}
+
+.new-price {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.change-percent {
+    font-size: 0.8em;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.price-change.increase {
+    color: #059669;
+}
+
+.price-change.increase .change-percent {
+    background-color: rgba(5, 150, 105, 0.1);
+}
+
+.price-change.increase i {
+    color: #059669;
+}
+
+.price-change.decrease {
+    color: #dc2626;
+}
+
+.price-change.decrease .change-percent {
+    background-color: rgba(220, 38, 38, 0.1);
+}
+
+.price-change.decrease i {
+    color: #dc2626;
+} 

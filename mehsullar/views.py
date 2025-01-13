@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404,HttpResponse
 from django.contrib.auth.decorators import login_required
-from .models import Mehsul, Sebet, Kateqoriya, Brend, Marka, Sifaris, SifarisMehsul, OEMKod, SebetItem
+from .models import Mehsul, Sebet, Kateqoriya, Brend, Marka, Sifaris, SifarisMehsul, OEMKod, SebetItem, MezenneTarixcesi
 from django.db.models import F, Sum, Q
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -77,25 +77,30 @@ def get_stock_class(stok):
 
 def get_eur_rate():
     try:
-        # Cache-də məzənnə varsa onu qaytarırıq
         cached_rate = cache.get('eur_mezenne')
         if cached_rate:
             return cached_rate
 
-        # Sadə API-dən məzənnəni alırıq
         url = "https://open.er-api.com/v6/latest/EUR"
         with urlopen(url) as response:
             data = json.loads(response.read())
             rate = Decimal(str(data['rates']['AZN']))
             
-            # Məzənnəni cache-də saxlayırıq
-            cache.set('eur_mezenne', rate, 600)  
+            # Köhnə məzənnəni saxla
+            old_rate = cache.get('eur_mezenne')
+            if old_rate:
+                # Bütün məhsulların son məzənnəsini yenilə
+                Mehsul.objects.all().update(son_mezenne=old_rate)
+            
+            # Yeni məzənnəni yadda saxla
+            MezenneTarixcesi.objects.create(mezenne=rate)
+            cache.set('eur_mezenne', rate, 600)
             cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 600)
             return rate
 
     except Exception as e:
         print(f"Məzənnə yeniləmə xətası: {e}")
-        return Decimal('2.00')  # Default məzənnə
+        return Decimal('2.00')
 
 @login_required
 def products_list(request):

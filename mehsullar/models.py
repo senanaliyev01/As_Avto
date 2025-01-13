@@ -30,6 +30,7 @@ class Mehsul(models.Model):
     oem = models.CharField(max_length=100)
     stok = models.IntegerField()
     qiymet_eur = models.DecimalField(max_digits=10, decimal_places=2)
+    son_mezenne = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     
     @property
     def qiymet_azn(self):
@@ -53,6 +54,14 @@ class Mehsul(models.Model):
         kodlar = [self.oem]
         kodlar.extend([oem.kod for oem in self.oem_kodlar.all()])
         return kodlar
+
+    @property
+    def qiymet_deyisimi(self):
+        if not self.son_mezenne:
+            return None
+        current_rate = cache.get('eur_mezenne', Decimal('2.00'))
+        return (current_rate > self.son_mezenne, 
+                abs(self.qiymet_azn - (self.qiymet_eur * self.son_mezenne)))
 
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -162,3 +171,14 @@ class MusteriReyi(models.Model):
 
     def __str__(self):
         return f"{self.musteri.get_full_name()} - {self.get_qiymetlendirme_display()}"
+
+
+class MezenneTarixcesi(models.Model):
+    mezenne = models.DecimalField(max_digits=10, decimal_places=2)
+    tarix = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-tarix']
+
+    def __str__(self):
+        return f"1 EUR = {self.mezenne} AZN ({self.tarix})"

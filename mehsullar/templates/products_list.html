@@ -88,9 +88,21 @@
     </form>
 </div>
 
-<!-- Cədvəlin üstündə məzənnə məlumatı -->
+<!-- Məzənnə məlumatı -->
 <div class="exchange-rate-info">
-    <span>1 EUR = {{ eur_rate }} AZN</span>
+    <div class="rate-details">
+        <span class="current-rate">1 EUR = {{ eur_rate }} AZN</span>
+        {% if rate_change != 0 %}
+            <span class="rate-change {% if rate_change > 0 %}increase{% else %}decrease{% endif %}">
+                {% if rate_change > 0 %}
+                    <i class="fas fa-arrow-up"></i>
+                {% else %}
+                    <i class="fas fa-arrow-down"></i>
+                {% endif %}
+                {{ rate_change_percent|abs }}%
+            </span>
+        {% endif %}
+    </div>
     <small>(Son yeniləmə: {{ update_time }})</small>
 </div>
 
@@ -135,8 +147,20 @@
                     <i class="fa-solid fa-euro-sign"></i>
                 </td>
                 <td class="price-column">
-                    {{ mehsul.qiymet_azn }}
-                    <i class="fa-solid fa-manat-sign"></i>
+                    {{ mehsul.qiymet_azn }} <i class="fa-solid fa-manat-sign"></i>
+                    {% if mehsul.price_change != 0 %}
+                        <div class="price-change {% if mehsul.price_change > 0 %}increase{% else %}decrease{% endif %}">
+                            <span class="old-price">{{ mehsul.previous_price_azn }}</span>
+                            <span class="change-percent">
+                                {% if mehsul.price_change > 0 %}
+                                    <i class="fas fa-arrow-up"></i>
+                                {% else %}
+                                    <i class="fas fa-arrow-down"></i>
+                                {% endif %}
+                                {{ mehsul.price_change_percent|abs }}%
+                            </span>
+                        </div>
+                    {% endif %}
                 </td>
                 <td><a href="{% url 'sebet_ekle' mehsul.id %}" class="cart-icon"><i class="fas fa-shopping-cart"></i></a></td>
             </tr>

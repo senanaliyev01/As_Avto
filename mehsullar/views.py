@@ -77,73 +77,51 @@ def get_stock_class(stok):
 
 def get_eur_rate():
     try:
-        # Cache-də məzənnə varsa onu qaytarırıq
-        cached_rate = cache.get('eur_mezenne')
-        if cached_rate:
-            return cached_rate
+        # Əvvəlki məzənnəni saxla
+        previous_rate = cache.get('previous_eur_mezenne')
+        current_rate = cache.get('eur_mezenne')
+        
+        if current_rate:
+            if not previous_rate:
+                cache.set('previous_eur_mezenne', current_rate, 600)
+            return current_rate, previous_rate or current_rate
 
-        # Sadə API-dən məzənnəni alırıq
         url = "https://open.er-api.com/v6/latest/EUR"
         with urlopen(url) as response:
             data = json.loads(response.read())
             rate = Decimal(str(data['rates']['AZN']))
             
-            # Məzənnəni cache-də saxlayırıq
-            cache.set('eur_mezenne', rate, 600)  
+            if current_rate:
+                cache.set('previous_eur_mezenne', current_rate, 600)
+            cache.set('eur_mezenne', rate, 600)
             cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 600)
-            return rate
+            
+            return rate, current_rate or rate
 
     except Exception as e:
         print(f"Məzənnə yeniləmə xətası: {e}")
-        return Decimal('2.00')  # Default məzənnə
+        return Decimal('2.00'), Decimal('2.00')
 
 @login_required
 def products_list(request):
-    # Mövcud kodu saxlayırıq
     mehsullar = Mehsul.objects.all()
-    kateqoriyalar = Kateqoriya.objects.all()
-    brendlər = Brend.objects.all()
-    markalar = Marka.objects.all()
+    current_rate, previous_rate = get_eur_rate()
+    rate_change = current_rate - previous_rate
     
-    # Məzənnəni yeniləyirik
-    eur_rate = get_eur_rate()
-    update_time = cache.get('eur_update_time', 'Məlumat yoxdur')
-    
-    # Axtarış parametrlərini alırıq
-    category = request.GET.get('category')
-    brand = request.GET.get('brand')
-    model = request.GET.get('model')
-    search_text = request.GET.get('search_text')
+    for mehsul in mehsullar:
+        mehsul.previous_price_azn = round(mehsul.qiymet_eur * previous_rate, 2)
+        mehsul.price_change = round(mehsul.qiymet_azn - mehsul.previous_price_azn, 2)
+        mehsul.price_change_percent = round((mehsul.price_change / mehsul.previous_price_azn) * 100, 1)
 
-    # Brend, kateqoriya və marka üçün dəqiq filtrasiya
-    if category:
-        mehsullar = mehsullar.filter(kateqoriya__adi=category)
-    
-    if brand:
-        mehsullar = mehsullar.filter(brend__adi=brand)
-    
-    if model:
-        mehsullar = mehsullar.filter(marka__adi=model)
-
-    # Brend kodu və OEM kodu üçün hissəvi axtarış
-    if search_text:
-        # Xüsusi simvolları təmizləyirik
-        search_text = re.sub(r'[^a-zA-Z0-9]', '', search_text)
-        # Brend kodu və ya OEM koduna görə hissəvi axtarış
-        mehsullar = mehsullar.filter(
-            Q(brend_kod__icontains=search_text) |  # Hissəvi uyğunluq
-            Q(oem__icontains=search_text) |        # Hissəvi uyğunluq
-            Q(oem_kodlar__kod__icontains=search_text)  # Əlavə OEM kodlarında hissəvi uyğunluq
-        ).distinct()
-
-    return render(request, 'products_list.html', {
+    context = {
         'mehsullar': mehsullar,
-        'kateqoriyalar': kateqoriyalar,
-        'brendlər': brendlər,
-        'markalar': markalar,
-        'eur_rate': eur_rate,
-        'update_time': update_time
-    })
+        'eur_rate': current_rate,
+        'previous_rate': previous_rate,
+        'rate_change': rate_change,
+        'rate_change_percent': round((rate_change / previous_rate) * 100, 1),
+        'update_time': cache.get('eur_update_time', 'Məlumat yoxdur')
+    }
+    return render(request, 'products_list.html', context)
 
 
 @login_required

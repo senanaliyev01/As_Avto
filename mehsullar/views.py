@@ -129,11 +129,11 @@ def get_eur_rate():
         except (requests.RequestException, ConnectionError) as e:
             print(f"Request xətası: {e}")  # Debug üçün
 
-        return Decimal('1.736'), Decimal('1.736')  # Google-dakı cari məzənnə
+        return Decimal('1.736'), Decimal('1.756')  # Google-dakı cari məzənnə
 
     except Exception as e:
         print(f"Ümumi xəta: {e}")  # Debug üçün
-        return Decimal('1.736'), Decimal('1.736')
+        return Decimal('1.736'), Decimal('1.756')
 
 @login_required
 def products_list(request):
@@ -221,10 +221,7 @@ def sifarisi_gonder(request):
                     qiymet=float(item.mehsul.qiymet_eur)  # Qiyməti float olaraq saxla
                 )
 
-                # Stoku yenilə
-                mehsul = item.mehsul
-                mehsul.stok = F('stok') - item.miqdar
-                mehsul.save()
+             
 
             # Səbəti təmizlə
             sebet_items.delete()

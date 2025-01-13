@@ -78,14 +78,10 @@ def get_stock_class(stok):
 
 def get_eur_rate():
     try:
-        # Cache-dən son məzənnəni yoxla (30 saniyə)
-        current_rate = cache.get('eur_mezenne')
+        # Cache-dən yoxla (1 saniyə)
         previous_rate = cache.get('previous_eur_mezenne')
+        current_rate = cache.get('eur_mezenne')
         
-        # Əgər cache-də məzənnə varsa və 30 saniyə keçməyibsə
-        if current_rate and previous_rate:
-            return current_rate, previous_rate
-
         # Google Finance-dən məzənnəni al
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/91.0.4472.124'
@@ -94,23 +90,27 @@ def get_eur_rate():
         response = requests.get(
             "https://www.google.com/finance/quote/EUR-AZN",
             headers=headers,
-            timeout=3
+            timeout=5
         )
         
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, 'html.parser')
             rate_div = soup.select_one('div[data-last-price]')
             
-            if rate_div and rate_div.text:
-                new_rate = Decimal(rate_div.text.strip().replace(',', '.'))
+            if rate_div:
+                rate_text = rate_div.text.strip().replace(',', '.')
+                rate = Decimal(rate_text)
                 
-                # Cache-ə yaz (30 saniyə)
-                cache.set('previous_eur_mezenne', current_rate or new_rate, 30)
-                cache.set('eur_mezenne', new_rate, 30)
-                cache.set('eur_update_time', datetime.now().strftime('%H:%M:%S'), 30)
+                # Əvvəlki məzənnəni saxla
+                if current_rate:
+                    cache.set('previous_eur_mezenne', current_rate, 1)  # 1 saniyə
                 
-                return new_rate, current_rate or new_rate
-
+                # Yeni məzənnəni cache-də saxla
+                cache.set('eur_mezenne', rate, 1)  # 1 saniyə
+                cache.set('eur_update_time', datetime.now().strftime('%H:%M:%S'), 1)
+                
+                return rate, previous_rate or rate
+                
         return current_rate or Decimal('1.736'), previous_rate or Decimal('1.736')
 
     except Exception:

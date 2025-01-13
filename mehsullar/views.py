@@ -81,7 +81,7 @@ def get_eur_rate():
         
         if current_rate:
             if not previous_rate:
-                cache.set('previous_eur_mezenne', current_rate, 600)
+                cache.set('previous_eur_mezenne', current_rate, 60)
             return current_rate, previous_rate or current_rate
 
         url = "https://open.er-api.com/v6/latest/EUR"
@@ -90,9 +90,9 @@ def get_eur_rate():
             rate = Decimal(str(data['rates']['AZN']))
             
             if current_rate:
-                cache.set('previous_eur_mezenne', current_rate, 600)
-            cache.set('eur_mezenne', rate, 600)
-            cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 600)
+                cache.set('previous_eur_mezenne', current_rate, 60)
+            cache.set('eur_mezenne', rate, 60)
+            cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 60)
             
             return rate, current_rate or rate
 

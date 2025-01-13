@@ -84,7 +84,7 @@ def get_eur_rate():
                 cache.set('previous_eur_mezenne', current_rate, 43200)
             return current_rate, previous_rate or current_rate
 
-        url = "https://open.er-api.com/v6/latest/EUR"
+        url = "https://www.google.com/finance/quote/EUR-AZN"
         with urlopen(url) as response:
             data = json.loads(response.read())
             rate = Decimal(str(data['rates']['AZN']))

@@ -261,26 +261,4 @@ document.addEventListener('DOMContentLoaded', function() {
             closeModal();
         }
     };
-
-    // Məzənnə yeniləmə funksiyası
-    function updateExchangeRate() {
-        fetch('/get_current_rate/')
-            .then(response => response.json())
-            .then(data => {
-                document.querySelectorAll('.current-rate').forEach(el => {
-                    el.textContent = `1 EUR = ${data.rate} AZN`;
-                });
-                
-                document.querySelectorAll('.update-time').forEach(el => {
-                    el.textContent = `(Son yeniləmə: ${data.update_time})`;
-                });
-            })
-            .catch(error => console.error('Məzənnə yeniləmə xətası:', error));
-    }
-
-    // Hər 1 saatda bir yenilə (3600000 millisaniyə = 1 saat)
-    setInterval(updateExchangeRate, 3600000);
-
-    // Səhifə yükləndikdə yenilə
-    document.addEventListener('DOMContentLoaded', updateExchangeRate);
 });

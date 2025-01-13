@@ -15,61 +15,23 @@ class OEMKodInline(admin.TabularInline):
 @admin.register(Sifaris)
 class SifarisAdmin(admin.ModelAdmin):
     inlines = [SifarisMehsulInline]
-    list_display = ('id', 'user', 'tarix', 'cemi_mebleg_eur_display', 'cemi_mebleg_azn_display', 
-                   'odenilen_mebleg_eur_display', 'odenilen_mebleg_azn_display', 
-                   'qaliq_borc_eur_display', 'qaliq_borc_azn_display', 'status', 'tamamlandi')
+    list_display = ('id', 'user', 'tarix', 'cemi_mebleg', 'odenilen_mebleg', 'borc', 'status', 'tamamlandi')
     search_fields = ('id', 'user__username', 'status')
     list_filter = ('status', 'tamamlandi')
-    fields = ('user', 'cemi_mebleg_eur', 'odenilen_mebleg_eur', 'status', 'tamamlandi')
-
-    def cemi_mebleg_eur_display(self, obj):
-        return f"{obj.cemi_mebleg_eur} EUR"
-    cemi_mebleg_eur_display.short_description = 'Cəmi Məbləğ (EUR)'
-
-    def cemi_mebleg_azn_display(self, obj):
-        return f"{obj.cemi_mebleg_azn} AZN"
-    cemi_mebleg_azn_display.short_description = 'Cəmi Məbləğ (AZN)'
-
-    def odenilen_mebleg_eur_display(self, obj):
-        return f"{obj.odenilen_mebleg_eur} EUR"
-    odenilen_mebleg_eur_display.short_description = 'Ödənilən Məbləğ (EUR)'
-
-    def odenilen_mebleg_azn_display(self, obj):
-        return f"{obj.odenilen_mebleg_azn} AZN"
-    odenilen_mebleg_azn_display.short_description = 'Ödənilən Məbləğ (AZN)'
-
-    def qaliq_borc_eur_display(self, obj):
-        return f"{obj.qaliq_borc_eur} EUR"
-    qaliq_borc_eur_display.short_description = 'Qalıq Borc (EUR)'
-
-    def qaliq_borc_azn_display(self, obj):
-        return f"{obj.qaliq_borc_azn} AZN"
-    qaliq_borc_azn_display.short_description = 'Qalıq Borc (AZN)'
+    fields = ('user', 'cemi_mebleg', 'odenilen_mebleg', 'status', 'tamamlandi')
+    readonly_fields = ('borc',)
 
 # Sifariş məhsulları admin paneli
 class SifarisMehsulAdmin(admin.ModelAdmin):
-    list_display = ('sifaris', 'mehsul', 'miqdar', 'qiymet_display')
-    
-    def qiymet_display(self, obj):
-        return f"{obj.qiymet} EUR"
-    qiymet_display.short_description = 'Qiymət (EUR)'
+    list_display = ('sifaris', 'mehsul', 'miqdar', 'qiymet')
 
 # Məhsul admin paneli
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet_eur_display', 'qiymet_azn_display', 'brend_kod', 'oem', 'stok')
+    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'oem', 'stok')
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem')
-    list_filter = ('kateqoriya', 'brend', 'marka')
     inlines = [OEMKodInline]
 
-    def qiymet_eur_display(self, obj):
-        return f"{obj.qiymet_eur} EUR"
-    qiymet_eur_display.short_description = 'Qiymət (EUR)'
-
-    def qiymet_azn_display(self, obj):
-        return f"{obj.qiymet_azn} AZN"
-    qiymet_azn_display.short_description = 'Qiymət (AZN)'
-
-# Digər admin qeydiyyatları
+# Qeydiyyatları düzəltdik
 admin.site.register(SifarisMehsul, SifarisMehsulAdmin)
 admin.site.register(Kateqoriya)
 admin.site.register(Brend)

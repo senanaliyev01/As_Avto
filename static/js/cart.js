@@ -18,26 +18,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // Ümumi məbləği yeniləmə funksiyası
     function updateTotalAmount() {
         const rows = document.querySelectorAll('tbody tr');
-        let totalEur = 0;
-        let totalAzn = 0;
+        let total = 0;
 
         rows.forEach(row => {
-            const itemTotalEur = parseFloat(row.querySelector('.item-total div:first-child').textContent);
-            const itemTotalAzn = parseFloat(row.querySelector('.item-total div:last-child').textContent);
-            totalEur += itemTotalEur;
-            totalAzn += itemTotalAzn;
+            const itemTotal = parseFloat(row.querySelector('.item-total').textContent);
+            total += itemTotal;
         });
 
-        const totalEurElement = document.getElementById('total-amount-eur');
-        const totalAznElement = document.getElementById('total-amount-azn');
-        
-        if (totalEurElement && totalAznElement) {
-            totalEurElement.textContent = totalEur.toFixed(2) + ' EUR';
-            totalAznElement.textContent = totalAzn.toFixed(2) + ' AZN';
+        const totalElement = document.getElementById('total-amount');
+        if (totalElement) {
+            totalElement.textContent = total.toFixed(2) + ' AZN';
             
             // Animasiya
-            totalEurElement.style.animation = 'fadeIn 0.3s ease';
-            totalAznElement.style.animation = 'fadeIn 0.3s ease';
+            totalElement.style.animation = 'fadeIn 0.3s ease';
         }
     }
 
@@ -76,16 +69,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     row.remove();
                     
                     // Ümumi cəmi yenilə
-                    const totalEurElement = document.getElementById('total-amount-eur');
-                    const totalAznElement = document.getElementById('total-amount-azn');
-                    
-                    if (totalEurElement && totalAznElement) {
-                        totalEurElement.textContent = `${data.total_amount_eur} EUR`;
-                        totalAznElement.textContent = `${data.total_amount_azn} AZN`;
-                        
-                        // Animasiya
-                        totalEurElement.style.animation = 'fadeIn 0.3s ease';
-                        totalAznElement.style.animation = 'fadeIn 0.3s ease';
+                    const totalElement = document.getElementById('total-amount');
+                    if (totalElement) {
+                        totalElement.textContent = data.cemi_mebleg.toFixed(2) + ' AZN';
+                        totalElement.style.animation = 'fadeIn 0.3s ease';
                     }
                     
                     // Səbət boşdursa səhifəni yenilə
@@ -176,25 +163,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Sətir cəmini yenilə
                     const itemTotalElement = row.querySelector('.item-total');
-                    itemTotalElement.innerHTML = `
-                        <div>${data.item_total_eur} EUR</div>
-                        <div>${data.item_total_azn} AZN</div>
-                    `;
+                    itemTotalElement.textContent = data.item_total.toFixed(2) + ' AZN';
                     
                     // Ümumi cəmi yenilə
-                    const totalEurElement = document.getElementById('total-amount-eur');
-                    const totalAznElement = document.getElementById('total-amount-azn');
-                    
-                    if (totalEurElement && totalAznElement) {
-                        totalEurElement.textContent = `${data.total_amount_eur} EUR`;
-                        totalAznElement.textContent = `${data.total_amount_azn} AZN`;
-                        
-                        // Animasiya
-                        totalEurElement.style.animation = 'fadeIn 0.3s ease';
-                        totalAznElement.style.animation = 'fadeIn 0.3s ease';
+                    const totalElement = document.getElementById('total-amount');
+                    if (totalElement) {
+                        totalElement.textContent = data.total_amount.toFixed(2) + ' AZN';
                     }
 
-                    // Sətir animasiyası
+                    // Animasiya
                     row.classList.add('highlight');
                     setTimeout(() => row.classList.remove('highlight'), 300);
                 } else {
@@ -221,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json())
         .then(data => {
-            if (data.status === 'success') {
+            if (data.success) {
                 // Təsdiq modalını bağla
                 closeModal('confirmModal');
                 
@@ -229,9 +206,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 const successModal = document.getElementById('successModal');
                 successModal.classList.add('show');
                 
-                // 3 saniyə sonra yönləndir
+                // 3 saniyə sonra yönləndir və browser tarixçəsini təmizlə
                 setTimeout(() => {
-                    window.location.href = '/orders/';
+                    // Yeni URL-ə yönləndir və browser tarixçəsini əvəz et
+                    window.location.replace('/orders/');
+                    
+                    // Əlavə təhlükəsizlik üçün history-ni təmizlə
+                    window.history.pushState(null, '', '/orders/');
+                    window.onpopstate = function(event) {
+                        window.history.pushState(null, '', '/orders/');
+                    };
                 }, 3000);
             } else {
                 throw new Error(data.message || 'Sifariş göndərilmədi');

@@ -338,37 +338,3 @@ tfoot td {
         transform: translateX(100%);
     }
 }
-.exchange-rate-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    margin: 20px 0;
-    background: linear-gradient(135deg, #1a237e, #0d47a1);
-    border-radius: 8px;
-    color: white;
-}
-
-.rate-info {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.historical-rate {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #ffd700;  /* Qızılı rəng */
-}
-
-.current-rate {
-    font-size: 1rem;
-    color: #ffffff;
-}
-
-/* Cədvəldə məzənnə sütunu üçün stil */
-table td:nth-child(2) {  /* Məzənnə sütunu */
-    font-weight: 500;
-    color: #ffd700;  /* Qızılı rəng */
-    background-color: rgba(26, 35, 126, 0.1);  /* Açıq mavi fon */
-}

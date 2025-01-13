@@ -1,5 +1,5 @@
 from pickle import FALSE
-from decimal import Decimal
+
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -29,22 +29,8 @@ class Mehsul(models.Model):
     brend_kod = models.CharField(max_length=50, unique=True)
     oem = models.CharField(max_length=100)
     stok = models.IntegerField()
-    qiymet_eur = models.DecimalField(max_digits=10, decimal_places=2)
-    
-    @property
-    def qiymet_azn(self):
-        from decimal import Decimal
-        from django.core.cache import cache
-        
-        # Cache-dən məzənnəni al
-        mezenne = cache.get('eur_mezenne')
-        if not mezenne:
-            # Default məzənnə
-            mezenne = Decimal('2.00')
-            
-        # EUR qiyməti AZN-ə çevir
-        return round(self.qiymet_eur * mezenne, 2)
-    
+    qiymet = models.DecimalField(max_digits=10, decimal_places=2)
+
     def __str__(self):
         return self.adi
 
@@ -75,28 +61,14 @@ class Sifaris(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
-    cemi_mebleg_eur = models.DecimalField(max_digits=10, decimal_places=2)
-    odenilen_mebleg_eur = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    sifaris_mezennesi = models.DecimalField(max_digits=10, decimal_places=2)
+    cemi_mebleg = models.DecimalField(max_digits=10, decimal_places=2)
+    odenilen_mebleg = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     tarix = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='gozleyir')
     tamamlandi = models.BooleanField(default=False)
 
-    @property
-    def cemi_mebleg_azn(self):
-        return round(self.cemi_mebleg_eur * self.sifaris_mezennesi, 2)
-
-    @property
-    def odenilen_mebleg_azn(self):
-        return round(self.odenilen_mebleg_eur * self.sifaris_mezennesi, 2)
-
-    @property
-    def qaliq_borc_eur(self):
-        return self.cemi_mebleg_eur - self.odenilen_mebleg_eur
-
-    @property
-    def qaliq_borc_azn(self):
-        return round(self.qaliq_borc_eur * self.sifaris_mezennesi, 2)
+    def borc(self):
+        return self.cemi_mebleg - self.odenilen_mebleg
 
     def __str__(self):
         return f"Sifariş {self.id} - {self.tarix}"
@@ -162,3 +134,5 @@ class MusteriReyi(models.Model):
 
     def __str__(self):
         return f"{self.musteri.get_full_name()} - {self.get_qiymetlendirme_display()}"
+
+

@@ -12,16 +12,8 @@
     <nav class="header-nav">
         <a href="{% url 'main' %}">Əsas Səhifə</a>
         <a href="{% url 'sifaris_izle' %}">Sifarişlərim</a>
-        <h2>Sifariş #{{ sifaris.id }} (1 EUR = {{ sifaris.sifaris_mezennesi }} AZN)</h2>
+        <h2>Sifariş #{{ sifaris.id }}</h2>
     </nav>
-
-    <div class="exchange-rate-info">
-        <div class="rate-info">
-            <div class="historical-rate">Sifariş məzənnəsi: 1 EUR = {{ sifaris.sifaris_mezennesi }} AZN</div>
-            <div class="current-rate">Cari məzənnə: 1 EUR = {{ eur_rate }} AZN</div>
-            <small>(Son yeniləmə: {{ update_time }})</small>
-        </div>
-    </div>
 
     <div class="sifaris-info">
         <div class="info-row">
@@ -31,18 +23,10 @@
         </div>
         <div class="info-row">
             <h3>Ödəniş Məlumatları</h3>
-            <p><strong>Ümumi Məbləğ:</strong> 
-                <span>{{ sifaris.cemi_mebleg_eur }} EUR</span>
-                <span>{{ sifaris.cemi_mebleg_azn }} AZN</span>
-            </p>
-            <p><strong>Ödənilən Məbləğ:</strong>
-                <span>{{ sifaris.odenilen_mebleg_eur }} EUR</span>
-                <span>{{ sifaris.odenilen_mebleg_azn }} AZN</span>
-            </p>
-            <p class="qaliq-borc {% if sifaris.qaliq_borc_eur < 0 %}qaliq-borc-pozitiv{% else %}qaliq-borc-negativ{% endif %}">
-                <strong>Qalıq Borc:</strong>
-                <span>{{ sifaris.qaliq_borc_eur }} EUR</span>
-                <span>{{ sifaris.qaliq_borc_azn }} AZN</span>
+            <p><strong>Ümumi Məbləğ:</strong> {{ sifaris.cemi_mebleg }} AZN</p>
+            <p><strong>Ödənilən Məbləğ:</strong> {{ sifaris.odenilen_mebleg }} AZN</p>
+            <p class="qaliq-borc {% if sifaris.qaliq_borc < 0 %}qaliq-borc-pozitiv{% else %}qaliq-borc-negativ{% endif %}">
+                <strong>Qalıq Borc:</strong> {{ sifaris.qaliq_borc }} AZN
             </p>
         </div>
     </div>
@@ -58,10 +42,8 @@
                     <th>Brend Kod</th>
                     <th>OEM Kod</th>
                     <th>Miqdar</th>
-                    <th>Qiymət (EUR)</th>
-                    <th>Qiymət (AZN)</th>
-                    <th>Cəmi (EUR)</th>
-                    <th>Cəmi (AZN)</th>
+                    <th>Qiymət</th>
+                    <th>Cəmi</th>
                 </tr>
             </thead>
             <tbody>
@@ -74,21 +56,16 @@
                     <td>{{ mehsul.mehsul.brend_kod }}</td>
                     <td>{{ mehsul.mehsul.oem }}</td>
                     <td class="text-center">{{ mehsul.miqdar }}</td>
-                    <td class="text-right">{{ mehsul.qiymet_eur }} EUR</td>
-                    <td class="text-right">{{ mehsul.qiymet_azn }} AZN</td>
-                    <td class="text-right">{{ mehsul.cemi_eur }} EUR</td>
-                    <td class="text-right">{{ mehsul.cemi_azn }} AZN</td>
+                    <td class="text-right">{{ mehsul.qiymet }} AZN</td>
+                    <td class="text-right">{{ mehsul.cemi }} AZN</td>
                 </tr>
                 {% endfor %}
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="8"></td>
+                    <td colspan="6"></td>
                     <td colspan="2"><strong>Ümumi Cəmi:</strong></td>
-                    <td class="text-right">
-                        <strong>{{ sifaris.cemi_mebleg_eur }} EUR</strong><br>
-                        <strong>{{ sifaris.cemi_mebleg_azn }} AZN</strong>
-                    </td>
+                    <td class="text-right"><strong>{{ sifaris.cemi_mebleg }} AZN</strong></td>
                 </tr>
             </tfoot>
         </table>

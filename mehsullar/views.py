@@ -87,39 +87,45 @@ def get_eur_rate():
         if current_rate and previous_rate:
             return current_rate, previous_rate
 
-        # Exchangerates API
-        url = "https://api.exchangerate-api.com/v4/latest/EUR"
-        response = requests.get(url, timeout=5)
+        # Frankfurter API
+        url = "https://api.frankfurter.app/latest?from=EUR&to=AZN"
         
-        if response.status_code == 200:
-            data = response.json()
-            new_rate = Decimal(str(data['rates']['AZN']))
+        try:
+            response = requests.get(url, timeout=3)
             
-            # Cache-ə yaz (1 saat)
-            if current_rate:
-                cache.set('previous_eur_mezenne', current_rate, 3600)
-            else:
-                cache.set('previous_eur_mezenne', new_rate, 3600)
+            if response.status_code == 200:
+                data = response.json()
+                new_rate = Decimal(str(data['rates']['AZN']))
                 
-            cache.set('eur_mezenne', new_rate, 3600)
-            cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 3600)
-            
-            return new_rate, current_rate or new_rate
+                # Cache-ə yaz (1 saat)
+                if current_rate:
+                    cache.set('previous_eur_mezenne', current_rate, 3600)
+                else:
+                    cache.set('previous_eur_mezenne', new_rate, 3600)
+                    
+                cache.set('eur_mezenne', new_rate, 3600)
+                cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 3600)
+                
+                return new_rate, current_rate or new_rate
 
-        # Əgər API-dən məlumat alına bilməsə və cache-də varsa
+        except (requests.RequestException, KeyError, ValueError):
+            pass
+
+        # Cache-də varsa onu istifadə et
         if current_rate:
             return current_rate, previous_rate or current_rate
 
-        # Yenidən cəhd et
-        return get_eur_rate()
+        # Default dəyərlər
+        default_rate = Decimal('1.87')
+        cache.set('eur_mezenne', default_rate, 3600)
+        cache.set('previous_eur_mezenne', default_rate, 3600)
+        cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 3600)
+        
+        return default_rate, default_rate
 
     except Exception:
-        # Xəta baş versə və cache-də varsa
-        if current_rate:
-            return current_rate, previous_rate or current_rate
-            
-        # Son cəhd
-        return get_eur_rate()
+        # Son default dəyərlər
+        return Decimal('1.87'), Decimal('1.87')
 
 @login_required
 def products_list(request):

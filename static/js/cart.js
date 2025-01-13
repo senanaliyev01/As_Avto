@@ -267,28 +267,20 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch('/get_current_rate/')
             .then(response => response.json())
             .then(data => {
-                // Məzənnəni yenilə
                 document.querySelectorAll('.current-rate').forEach(el => {
                     el.textContent = `1 EUR = ${data.rate} AZN`;
                 });
                 
-                // Yeniləmə vaxtını yenilə
                 document.querySelectorAll('.update-time').forEach(el => {
                     el.textContent = `(Son yeniləmə: ${data.update_time})`;
                 });
-                
-                // Bütün qiymətləri yenilə
-                document.querySelectorAll('[data-eur-price]').forEach(el => {
-                    const eurPrice = parseFloat(el.dataset.eurPrice);
-                    const aznPrice = (eurPrice * parseFloat(data.rate)).toFixed(2);
-                    el.textContent = `${aznPrice} AZN`;
-                });
-            });
+            })
+            .catch(error => console.error('Məzənnə yeniləmə xətası:', error));
     }
 
-    // Hər saniyə yenilə
-    setInterval(updateExchangeRate, 1000);
+    // Hər 30 saniyədə yenilə
+    setInterval(updateExchangeRate, 30000);
 
-    // Səhifə yükləndikdə də yenilə
+    // Səhifə yükləndikdə yenilə
     document.addEventListener('DOMContentLoaded', updateExchangeRate);
 });

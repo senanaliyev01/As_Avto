@@ -127,10 +127,10 @@ def products_list(request):
 @login_required
 def sebetden_sil(request, sebet_id):
     if request.method == 'POST':
-    try:
+        try:
             sebet_item = get_object_or_404(Sebet, id=sebet_id, user=request.user)
-        sebet_item.delete()
-        
+            sebet_item.delete()
+            
             # Cari məzənnəni al
             eur_rate = get_eur_rate()  # Bu Decimal qaytarır
             
@@ -141,14 +141,14 @@ def sebetden_sil(request, sebet_id):
             
             cart_total_azn = cart_total_eur * eur_rate
         
-        return JsonResponse({
-            'success': True,
+            return JsonResponse({
+                'success': True,
                 'total_amount_eur': str(round(cart_total_eur, 2)),
                 'total_amount_azn': str(round(cart_total_azn, 2))
-        })
+            })
         except Exception as e:
-        return JsonResponse({
-            'success': False,
+            return JsonResponse({
+                'success': False,
                 'message': str(e)
             }, status=500)
     

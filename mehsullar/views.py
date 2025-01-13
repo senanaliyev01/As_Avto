@@ -84,7 +84,7 @@ def get_eur_rate():
         
         if current_rate:
             if not previous_rate:
-                cache.set('previous_eur_mezenne', current_rate, 1)  # 12 saat
+                cache.set('previous_eur_mezenne', current_rate, 20000)
             return current_rate, previous_rate or current_rate
 
         # Google Finance-dən məzənnəni al
@@ -101,35 +101,39 @@ def get_eur_rate():
             
             if response.status_code == 200:
                 soup = BeautifulSoup(response.text, 'html.parser')
-                rate_div = soup.find('div', {'class': 'YMlKec fxKbKc'})
+                # Dəyişdirilmiş selector - daha spesifik
+                rate_div = soup.select_one('div[data-last-price]')
                 
-                if rate_div and rate_div.text:
+                if rate_div:
                     try:
-                        rate = Decimal(rate_div.text.replace(',', '.'))
+                        # Vergülü nöqtə ilə əvəz et
+                        rate_text = rate_div.text.strip().replace(',', '.')
+                        rate = Decimal(rate_text)
                         
                         # Məntiqli aralıq yoxlaması
                         if 1.5 <= float(rate) <= 2.5:
                             # Əvvəlki məzənnəni saxla
                             if current_rate:
-                                cache.set('previous_eur_mezenne', current_rate, 1)
+                                cache.set('previous_eur_mezenne', current_rate, 20000)
                             
                             # Yeni məzənnəni cache-də saxla
-                            cache.set('eur_mezenne', rate, 1)  
-                            cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 1)
+                            cache.set('eur_mezenne', rate, 20000)
+                            cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 20000)
                             
+                            print(f"Yeni məzənnə alındı: {rate}")  # Debug üçün
                             return rate, current_rate or rate
-                    except (ValueError, decimal.InvalidOperation):
-                        pass
+                            
+                    except (ValueError, decimal.InvalidOperation) as e:
+                        print(f"Məzənnə parse xətası: {e}")  # Debug üçün
                         
-        except (requests.RequestException, ConnectionError):
-            pass
+        except (requests.RequestException, ConnectionError) as e:
+            print(f"Request xətası: {e}")  # Debug üçün
 
-        # Xəta halında və ya məzənnə tapılmadıqda default qiymət
-        return Decimal('1.746752'), Decimal('1.746752')
+        return Decimal('1.736'), Decimal('1.736')  # Google-dakı cari məzənnə
 
     except Exception as e:
-        print(f"Məzənnə yeniləmə xətası: {e}")
-        return Decimal('1.746752'), Decimal('1.756752')
+        print(f"Ümumi xəta: {e}")  # Debug üçün
+        return Decimal('1.736'), Decimal('1.736')
 
 @login_required
 def products_list(request):

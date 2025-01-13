@@ -98,27 +98,3 @@ document.addEventListener('DOMContentLoaded', function() {
         window.history.pushState(null, '', window.location.href);
     };
 });
-
-function updateRates() {
-    const rateElements = document.querySelectorAll('.mezenne-info');
-    
-    rateElements.forEach(element => {
-        const oldRate = parseFloat(element.dataset.oldRate);
-        const newRate = parseFloat(element.dataset.newRate);
-        const change = ((newRate - oldRate) / oldRate) * 100;
-        
-        const changeElement = element.querySelector('.change-percent');
-        if (changeElement) {
-            changeElement.textContent = `${change.toFixed(2)}%`;
-            changeElement.classList.add(change > 0 ? 'rate-up' : 'rate-down');
-        }
-    });
-}
-
-// Səhifə yükləndikdə
-document.addEventListener('DOMContentLoaded', () => {
-    updateRates();
-    
-    // Hər 5 dəqiqədən bir yenilə
-    setInterval(updateRates, 300000);
-});

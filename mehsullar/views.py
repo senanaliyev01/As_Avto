@@ -241,17 +241,44 @@ from .models import Sifaris
 @login_required
 def sifaris_izle(request):
     sifarisler = Sifaris.objects.filter(user=request.user)
-    current_rate = get_eur_rate()
     
-    for sifaris in sifarisler:
-        sifaris.cari_mezenne = current_rate
+    # Cari məzənnəni al
+    eur_rate = get_eur_rate()
+    update_time = cache.get('eur_update_time', 'Məlumat yoxdur')
+
+    # Ümumi məbləğləri hesabla
+    toplam_mebleg_eur = sum(sifaris.cemi_mebleg_eur for sifaris in sifarisler)
+    odenilen_mebleg_eur = sum(sifaris.odenilen_mebleg_eur for sifaris in sifarisler)
     
-    context = {
-        'sifarisler': sifarisler,
-        'eur_rate': current_rate,
-        # ... digər context məlumatları
+    # AZN məbləğləri
+    toplam_mebleg_azn = toplam_mebleg_eur * eur_rate
+    odenilen_mebleg_azn = odenilen_mebleg_eur * eur_rate
+
+    # Qalıq borcları hesabla
+    qaliq_borc_eur = toplam_mebleg_eur - odenilen_mebleg_eur
+    qaliq_borc_azn = qaliq_borc_eur * eur_rate
+
+    status_text = {
+        'gozleyir': 'Gözləyir',
+        'hazirlanir': 'Hazırlanır',
+        'yoldadir': 'Yoldadır',
+        'catdirildi': 'Çatdırıldı'
     }
-    return render(request, 'sifaris_izleme.html', context)
+
+    for sifaris in sifarisler:
+        sifaris.display_status = status_text.get(sifaris.status, 'Gözləyir')
+
+    return render(request, 'sifaris_izleme.html', {
+        'sifarisler': sifarisler,
+        'toplam_mebleg_eur': round(toplam_mebleg_eur, 2),
+        'toplam_mebleg_azn': round(toplam_mebleg_azn, 2),
+        'odenilen_mebleg_eur': round(odenilen_mebleg_eur, 2),
+        'odenilen_mebleg_azn': round(odenilen_mebleg_azn, 2),
+        'qaliq_borc_eur': round(qaliq_borc_eur, 2),
+        'qaliq_borc_azn': round(qaliq_borc_azn, 2),
+        'eur_rate': eur_rate,
+        'update_time': update_time
+    })
 
 
 @login_required

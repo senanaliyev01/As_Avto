@@ -78,10 +78,6 @@ def get_stock_class(stok):
 
 def get_eur_rate():
     try:
-        # Cache-dən yoxla (1 saniyə)
-        previous_rate = cache.get('previous_eur_mezenne')
-        current_rate = cache.get('eur_mezenne')
-        
         # Google Finance-dən məzənnəni al
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/91.0.4472.124'
@@ -98,23 +94,25 @@ def get_eur_rate():
             rate_div = soup.select_one('div[data-last-price]')
             
             if rate_div:
-                rate_text = rate_div.text.strip().replace(',', '.')
-                rate = Decimal(rate_text)
+                rate = Decimal(rate_div.text.strip().replace(',', '.'))
+                previous_rate = cache.get('previous_eur_mezenne', rate)
                 
                 # Əvvəlki məzənnəni saxla
-                if current_rate:
-                    cache.set('previous_eur_mezenne', current_rate, 1)  # 1 saniyə
-                
-                # Yeni məzənnəni cache-də saxla
-                cache.set('eur_mezenne', rate, 1)  # 1 saniyə
+                cache.set('previous_eur_mezenne', rate, 1)
                 cache.set('eur_update_time', datetime.now().strftime('%H:%M:%S'), 1)
                 
-                return rate, previous_rate or rate
-                
-        return current_rate or Decimal('1.736'), previous_rate or Decimal('1.736')
+                return rate, previous_rate
 
     except Exception:
-        return current_rate or Decimal('1.736'), previous_rate or Decimal('1.736')
+        pass
+        
+    # Əgər məzənnə alına bilməsə, son uğurlu məzənnəni qaytarır
+    last_rate = cache.get('previous_eur_mezenne')
+    if last_rate:
+        return last_rate, last_rate
+        
+    # Heç bir məzənnə yoxdursa, yenidən cəhd et
+    return get_eur_rate()
 
 @login_required
 def products_list(request):

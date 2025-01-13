@@ -267,43 +267,26 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch('/get_current_rate/')
             .then(response => response.json())
             .then(data => {
-                const rateElement = document.querySelector('.current-rate');
-                const timeElement = document.querySelector('.update-time');
+                // Məzənnəni yenilə
+                document.querySelectorAll('.current-rate').forEach(el => {
+                    el.textContent = `1 EUR = ${data.rate} AZN`;
+                });
                 
-                if (rateElement) {
-                    rateElement.textContent = `1 EUR = ${data.rate} AZN`;
-                }
-                if (timeElement) {
-                    timeElement.textContent = `(Son yeniləmə: ${data.update_time})`;
-                }
+                // Yeniləmə vaxtını yenilə
+                document.querySelectorAll('.update-time').forEach(el => {
+                    el.textContent = `(Son yeniləmə: ${data.update_time})`;
+                });
                 
-                // Qiymət dəyişikliklərini yenilə
-                if (data.rate_change !== 0) {
-                    const changeElement = document.querySelector('.rate-change');
-                    if (changeElement) {
-                        changeElement.className = `rate-change ${data.rate_change > 0 ? 'increase' : 'decrease'}`;
-                        changeElement.innerHTML = `
-                            <i class="fas fa-arrow-${data.rate_change > 0 ? 'up' : 'down'}"></i>
-                            ${Math.abs(data.rate_change_percent)}%
-                        `;
-                    }
-                }
-                
-                // Səhifədəki bütün qiymətləri yenilə
-                updateAllPrices(data.rate);
+                // Bütün qiymətləri yenilə
+                document.querySelectorAll('[data-eur-price]').forEach(el => {
+                    const eurPrice = parseFloat(el.dataset.eurPrice);
+                    const aznPrice = (eurPrice * parseFloat(data.rate)).toFixed(2);
+                    el.textContent = `${aznPrice} AZN`;
+                });
             });
     }
 
-    // Səhifədəki bütün qiymətləri yeniləyən funksiya
-    function updateAllPrices(newRate) {
-        document.querySelectorAll('[data-eur-price]').forEach(element => {
-            const eurPrice = parseFloat(element.dataset.eurPrice);
-            const aznPrice = (eurPrice * newRate).toFixed(2);
-            element.textContent = `${aznPrice} AZN`;
-        });
-    }
-
-    // Hər 1 saniyədə yenilə
+    // Hər saniyə yenilə
     setInterval(updateExchangeRate, 1000);
 
     // Səhifə yükləndikdə də yenilə

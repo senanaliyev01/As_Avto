@@ -74,24 +74,24 @@
                             <i class="fa-solid fa-euro-sign"></i>
                         </td>
                         <td class="price-column">
-                            {% if item.mehsul.qiymet_deyisimi %}
-                                {% if item.mehsul.qiymet_deyisimi.0 %}
+                            {% if item.mehsul.qiymet_deyisimi != 0 %}
+                                {% if item.mehsul.qiymet_deyisimi > 0 %}
                                     <div class="price-increase">
-                                        <span class="old-price">{{ item.mehsul.qiymet_deyisimi.1 }} AZN</span>
-                                        <span class="new-price">{{ item.mehsul.qiymet_azn }} AZN</span>
+                                        <span class="new-price">{{ item.mehsul.qiymet_azn }}</span>
                                         <i class="fas fa-arrow-up"></i>
+                                        <span class="old-price">{{ item.mehsul.kohne_qiymet_azn }}</span>
                                     </div>
                                 {% else %}
                                     <div class="price-decrease">
-                                        <span class="old-price">{{ item.mehsul.qiymet_deyisimi.1 }} AZN</span>
-                                        <span class="new-price">{{ item.mehsul.qiymet_azn }} AZN</span>
+                                        <span class="new-price">{{ item.mehsul.qiymet_azn }}</span>
                                         <i class="fas fa-arrow-down"></i>
+                                        <span class="old-price">{{ item.mehsul.kohne_qiymet_azn }}</span>
                                     </div>
                                 {% endif %}
                             {% else %}
                                 {{ item.mehsul.qiymet_azn }}
-                                <i class="fa-solid fa-manat-sign"></i>
                             {% endif %}
+                            <i class="fa-solid fa-manat-sign"></i>
                         </td>
                         <td>
                             <div class="quantity-controls">

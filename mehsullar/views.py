@@ -88,12 +88,11 @@ def get_eur_rate():
             
             # Köhnə məzənnəni saxla
             old_rate = cache.get('eur_mezenne')
-            if old_rate:
-                # Bütün məhsulların son məzənnəsini yenilə
+            if old_rate and old_rate != rate:
+                # Məzənnə dəyişibsə, bütün məhsulların son_mezenne sahəsini yenilə
                 Mehsul.objects.all().update(son_mezenne=old_rate)
+                MezenneTarixcesi.objects.create(mezenne=rate)
             
-            # Yeni məzənnəni yadda saxla
-            MezenneTarixcesi.objects.create(mezenne=rate)
             cache.set('eur_mezenne', rate, 600)
             cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 600)
             return rate
@@ -154,10 +153,10 @@ def products_list(request):
 @login_required
 def sebetden_sil(request, sebet_id):
     if request.method == 'POST':
-        try:
+    try:
             sebet_item = get_object_or_404(Sebet, id=sebet_id, user=request.user)
-            sebet_item.delete()
-            
+        sebet_item.delete()
+        
             # Cari məzənnəni al
             eur_rate = get_eur_rate()  # Bu Decimal qaytarır
             
@@ -167,15 +166,15 @@ def sebetden_sil(request, sebet_id):
             )['total_eur'] or Decimal('0')
             
             cart_total_azn = cart_total_eur * eur_rate
-            
-            return JsonResponse({
-                'success': True,
+        
+        return JsonResponse({
+            'success': True,
                 'total_amount_eur': str(round(cart_total_eur, 2)),
                 'total_amount_azn': str(round(cart_total_azn, 2))
-            })
+        })
         except Exception as e:
-            return JsonResponse({
-                'success': False,
+        return JsonResponse({
+            'success': False,
                 'message': str(e)
             }, status=500)
     

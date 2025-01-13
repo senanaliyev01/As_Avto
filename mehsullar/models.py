@@ -58,10 +58,15 @@ class Mehsul(models.Model):
     @property
     def qiymet_deyisimi(self):
         if not self.son_mezenne:
-            return None
+            return 0
         current_rate = cache.get('eur_mezenne', Decimal('2.00'))
-        old_price = self.qiymet_eur * self.son_mezenne
-        return (current_rate > self.son_mezenne, old_price)
+        return (current_rate - self.son_mezenne) / self.son_mezenne * 100
+
+    @property
+    def kohne_qiymet_azn(self):
+        if not self.son_mezenne:
+            return None
+        return round(self.qiymet_eur * self.son_mezenne, 2)
 
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

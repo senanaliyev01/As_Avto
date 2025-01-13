@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Məzənnə yeniləmə funksiyası
     function updateExchangeRate() {
-        fetch('/get_current_rate/')  // Yeni view yaradacağıq
+        fetch('/get_current_rate/')
             .then(response => response.json())
             .then(data => {
                 const rateElement = document.querySelector('.current-rate');
@@ -288,9 +288,24 @@ document.addEventListener('DOMContentLoaded', function() {
                         `;
                     }
                 }
+                
+                // Səhifədəki bütün qiymətləri yenilə
+                updateAllPrices(data.rate);
             });
     }
 
-    // Hər 5 saniyədə yenilə
-    setInterval(updateExchangeRate, 5000);
+    // Səhifədəki bütün qiymətləri yeniləyən funksiya
+    function updateAllPrices(newRate) {
+        document.querySelectorAll('[data-eur-price]').forEach(element => {
+            const eurPrice = parseFloat(element.dataset.eurPrice);
+            const aznPrice = (eurPrice * newRate).toFixed(2);
+            element.textContent = `${aznPrice} AZN`;
+        });
+    }
+
+    // Hər 1 saniyədə yenilə
+    setInterval(updateExchangeRate, 1000);
+
+    // Səhifə yükləndikdə də yenilə
+    document.addEventListener('DOMContentLoaded', updateExchangeRate);
 });

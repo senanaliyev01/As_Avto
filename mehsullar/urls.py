@@ -10,7 +10,7 @@ urlpatterns = [
     path('orders/', views.sifaris_izle, name='sifaris_izle'),
     path('get_cart_count/', views.get_cart_count, name='get_cart_count'),
     path('orders_detail/<int:sifaris_id>/', views.sifaris_detallari, name='sifaris_detallari'),
-   path('get_current_rate/', views.get_current_rate, name='get_current_rate'),
+  
     path('about/', views.about, name='about'),
     path('update_quantity/<int:item_id>/<int:new_quantity>/', views.update_quantity, name='update_quantity'),
     

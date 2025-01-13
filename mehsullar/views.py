@@ -15,6 +15,7 @@ from decimal import Decimal
 from datetime import datetime
 from bs4 import BeautifulSoup
 import requests
+import decimal
 
 @login_required
 def about(request):
@@ -37,7 +38,7 @@ def view_cart(request):
     sebet = Sebet.objects.filter(user=request.user)
     current_rate, previous_rate = get_eur_rate()
     rate_change = current_rate - previous_rate
-    
+
     for item in sebet:
         item.stok_status = get_stock_status(item.mehsul.stok)
         item.stok_class = get_stock_class(item.mehsul.stok)
@@ -83,33 +84,47 @@ def get_eur_rate():
         
         if current_rate:
             if not previous_rate:
-                cache.set('previous_eur_mezenne', current_rate, 1800)  # 30 dəqiqə
+                cache.set('previous_eur_mezenne', current_rate, 43200)  # 12 saat
             return current_rate, previous_rate or current_rate
 
         # Google Finance-dən məzənnəni al
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/91.0.4472.124'
         }
-        url = "https://www.google.com/finance/quote/EUR-AZN"
-        response = requests.get(url, headers=headers, timeout=10)
         
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.text, 'html.parser')
-            rate_div = soup.find('div', {'class': 'YMlKec fxKbKc'})
+        try:
+            response = requests.get(
+                "https://www.google.com/finance/quote/EUR-AZN",
+                headers=headers,
+                timeout=5
+            )
             
-            if rate_div and rate_div.text:
-                rate = Decimal(rate_div.text)
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.text, 'html.parser')
+                rate_div = soup.find('div', {'class': 'YMlKec fxKbKc'})
                 
-                # Əvvəlki məzənnəni saxla
-                if current_rate:
-                    cache.set('previous_eur_mezenne', current_rate, 1800)
-                
-                # Yeni məzənnəni cache-də saxla
-                cache.set('eur_mezenne', rate, 1800)  # 30 dəqiqə
-                cache.set('eur_update_time', datetime.now().strftime('%H:%M:%S'), 1800)
-                
-                return rate, current_rate or rate
+                if rate_div and rate_div.text:
+                    try:
+                        rate = Decimal(rate_div.text.replace(',', '.'))
+                        
+                        # Məntiqli aralıq yoxlaması
+                        if 1.5 <= float(rate) <= 2.5:
+                            # Əvvəlki məzənnəni saxla
+                            if current_rate:
+                                cache.set('previous_eur_mezenne', current_rate, 43200)
+                            
+                            # Yeni məzənnəni cache-də saxla
+                            cache.set('eur_mezenne', rate, 43200)  # 12 saat
+                            cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 43200)
+                            
+                            return rate, current_rate or rate
+                    except (ValueError, decimal.InvalidOperation):
+                        pass
+                        
+        except (requests.RequestException, ConnectionError):
+            pass
 
+        # Xəta halında və ya məzənnə tapılmadıqda default qiymət
         return Decimal('1.746752'), Decimal('1.746752')
 
     except Exception as e:
@@ -142,10 +157,10 @@ def products_list(request):
 @login_required
 def sebetden_sil(request, sebet_id):
     if request.method == 'POST':
-        try:
+    try:
             sebet_item = get_object_or_404(Sebet, id=sebet_id, user=request.user)
-            sebet_item.delete()
-            
+        sebet_item.delete()
+        
             # Cari məzənnəni al
             current_rate, _ = get_eur_rate()
             
@@ -153,15 +168,15 @@ def sebetden_sil(request, sebet_id):
             sebet_items = Sebet.objects.filter(user=request.user)
             total_eur = sum(item.mehsul.qiymet_eur * item.miqdar for item in sebet_items)
             total_azn = total_eur * current_rate
-            
-            return JsonResponse({
-                'success': True,
+        
+        return JsonResponse({
+            'success': True,
                 'total_amount_eur': str(round(total_eur, 2)),
                 'total_amount_azn': str(round(total_azn, 2))
-            })
+        })
         except Exception as e:
-            return JsonResponse({
-                'success': False,
+        return JsonResponse({
+            'success': False,
                 'message': str(e)
             }, status=500)
     
@@ -248,7 +263,7 @@ def sifaris_izle(request):
         'yoldadir': 'Yoldadır',
         'catdirildi': 'Çatdırıldı'
     }
-    
+
     for sifaris in sifarisler:
         sifaris.display_status = status_text.get(sifaris.status, 'Gözləyir')
 

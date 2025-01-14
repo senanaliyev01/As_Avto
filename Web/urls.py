@@ -30,4 +30,4 @@ urlpatterns = [
 
 admin.site.site_title = 'Admin Paneli'
 admin.site.site_header = 'As-Avto'
-admin.site.index_titlev = 'Sayt İdarəsi'
+admin.site.index_title = 'Sayt İdarəsi'

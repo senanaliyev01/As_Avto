@@ -27,3 +27,7 @@ urlpatterns = [
     path('', include('esasevim.urls')),
     path('', include('mehsullar.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+admin.site.site_title = 'Admin Paneli'
+admin.site.site_header = 'As-Avto'
+admin.site.index_title = 'Sayt İdarəsi'

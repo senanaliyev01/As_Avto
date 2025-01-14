@@ -9,6 +9,7 @@
     <link rel="icon" href="{% static 'img/favicon.png' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/cart.css' %}">
+    <!-- q<link rel="stylesheet" href="{% static 'css/snow.css' %}"> -->
 </head>
 <body>
     <div class="container">
@@ -18,7 +19,7 @@
             </a>
             <h1>Səbətim</h1>
         </div>
-            
+
         {% if sebet %}
         <div class="cart-container">
             <table>
@@ -31,8 +32,7 @@
                         <th>Brend Kod</th>
                         <th>OEM</th>
                         <th>Stok</th>
-                        <th>Qiymət EUR</th>
-                        <th>Qiymət AZN</th>
+                        <th>Qiymət</th>
                         <th>Miqdar</th>
                         <th>Cəmi</th>
                         <th>Sil</th>
@@ -40,7 +40,7 @@
                 </thead>
                 <tbody>
                     {% for item in sebet %}
-                    <tr data-item-id="{{ item.id }}">
+                    <tr data-item-id="{{ item.id }}" data-price="{{ item.mehsul.qiymet }}">
                         <td>{{ item.mehsul.adi }}</td>
                         <td>{{ item.mehsul.kateqoriya.adi }}</td>
                         <td>{{ item.mehsul.brend.adi }}</td>
@@ -62,14 +62,7 @@
                                 </span>
                             {% endif %}
                         </td>
-                        <td class="price-column">
-                            {{ item.mehsul.qiymet_eur }}
-                            <i class="fa-solid fa-euro-sign"></i>
-                        </td>
-                        <td class="price-column">
-                            {{ item.mehsul.qiymet_azn }}
-                            <i class="fa-solid fa-manat-sign"></i>
-                        </td>
+                        <td class="price">{{ item.mehsul.qiymet }} AZN</td>
                         <td>
                             <div class="quantity-controls">
                                 <button type="button" class="quantity-btn minus" onclick="updateQuantity({{ item.id }}, -1)">
@@ -79,15 +72,14 @@
                                        class="quantity-input" 
                                        value="{{ item.miqdar }}"
                                        min="1"
-                                       data-item-id="{{ item.id }}"
-                                       onchange="handleQuantityInput(this)"
+                                       onchange="updateQuantity({{ item.id }}, this.value)"
                                        onkeypress="return (event.charCode >= 48 && event.charCode <= 57)">
                                 <button type="button" class="quantity-btn plus" onclick="updateQuantity({{ item.id }}, 1)">
                                     <i class="fas fa-plus"></i>
                                 </button>
                             </div>
                         </td>
-                        <td class="item-total">{{ item.cemi_azn }} AZN</td>
+                        <td class="item-total">{{ item.cemi }} AZN</td>
                         <td>
                             <button class="delete-btn" onclick="removeItem({{ item.id }})" title="Sil">
                                 <i class="fas fa-trash-alt"></i>
@@ -98,11 +90,12 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="10" style="text-align: right;">
+                        <td colspan="9"></td>
+                        <td style="text-align: right; white-space: nowrap;">
                             <strong>Ümumi Cəmi:</strong>
                         </td>
                         <td colspan="2" style="text-align: center;">
-                            <span id="total-amount">{{ cemi_mebleg_azn }} AZN</span>
+                            <span id="total-amount">{{ cemi_mebleg }} AZN</span>
                         </td>
                     </tr>
                 </tfoot>
@@ -166,9 +159,11 @@
         </div>
     </div>
 
-    <!-- Bildiriş -->
+    <!-- Notification -->
     <div id="notification" class="notification"></div>
 
     <script src="{% static 'js/cart.js' %}"></script>
+  
+    <!-- <script src="{% static 'js/snow.js' %}"></script> -->
 </body>
 </html>

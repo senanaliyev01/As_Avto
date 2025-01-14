@@ -8,11 +8,6 @@ from django.views.decorators.http import require_POST
 import json
 import re
 from django.contrib.auth.models import User
-from django.core.cache import cache
-from urllib.request import urlopen
-from urllib.error import URLError
-from decimal import Decimal
-from datetime import datetime
 
 @login_required
 def about(request):
@@ -33,19 +28,17 @@ def sebet_ekle(request, mehsul_id):
 @login_required
 def view_cart(request):
     sebet = Sebet.objects.filter(user=request.user)
-    cemi_mebleg = sebet.aggregate(total=Sum(F('miqdar') * F('mehsul__qiymet_eur')))['total'] or 0
+    cemi_mebleg = sebet.aggregate(total=Sum(F('miqdar') * F('mehsul__qiymet')))['total'] or 0
 
     # Hər məhsul üçün stok məlumatını və cəmi məbləği əlavə et
     for item in sebet:
         item.stok_status = get_stock_status(item.mehsul.stok)
         item.stok_class = get_stock_class(item.mehsul.stok)
-        item.cemi = item.mehsul.qiymet_eur * item.miqdar  # EUR qiyməti
-        item.cemi_azn = item.mehsul.qiymet_azn * item.miqdar  # AZN qiyməti
+        item.cemi = item.mehsul.qiymet * item.miqdar  # Hər məhsul üçün cəmi məbləğ
 
     return render(request, 'cart.html', {
         'sebet': sebet,
-        'cemi_mebleg': cemi_mebleg,
-        'cemi_mebleg_azn': sum(item.cemi_azn for item in sebet)
+        'cemi_mebleg': cemi_mebleg
     })
 
 def get_stock_status(stok):
@@ -64,40 +57,14 @@ def get_stock_class(stok):
     else:
         return "in-stock"
 
-def get_eur_rate():
-    try:
-        # Cache-də məzənnə varsa onu qaytarırıq
-        cached_rate = cache.get('eur_mezenne')
-        if cached_rate:
-            return cached_rate
-
-        # Sadə API-dən məzənnəni alırıq
-        url = "https://open.er-api.com/v6/latest/EUR"
-        with urlopen(url) as response:
-            data = json.loads(response.read())
-            rate = Decimal(str(data['rates']['AZN']))
-            
-            # Məzənnəni cache-də saxlayırıq
-            cache.set('eur_mezenne', rate, 3600)  # 1 saat
-            cache.set('eur_update_time', datetime.now().strftime('%H:%M'), 3600)
-            return rate
-
-    except Exception as e:
-        print(f"Məzənnə yeniləmə xətası: {e}")
-        return Decimal('2.00')  # Default məzənnə
-
 @login_required
 def products_list(request):
-    # Mövcud kodu saxlayırıq
+    # Başlanğıc olaraq bütün məhsulları götürürük
     mehsullar = Mehsul.objects.all()
     kateqoriyalar = Kateqoriya.objects.all()
     brendlər = Brend.objects.all()
     markalar = Marka.objects.all()
-    
-    # Məzənnəni yeniləyirik
-    eur_rate = get_eur_rate()
-    update_time = cache.get('eur_update_time', 'Məlumat yoxdur')
-    
+
     # Axtarış parametrlərini alırıq
     category = request.GET.get('category')
     brand = request.GET.get('brand')
@@ -129,9 +96,7 @@ def products_list(request):
         'mehsullar': mehsullar,
         'kateqoriyalar': kateqoriyalar,
         'brendlər': brendlər,
-        'markalar': markalar,
-        'eur_rate': eur_rate,
-        'update_time': update_time
+        'markalar': markalar
     })
 
 
@@ -144,7 +109,7 @@ def sebetden_sil(request, sebet_id):
         # Yeni cəmi məbləği hesabla
         sebet = Sebet.objects.filter(user=request.user)
         cemi_mebleg = sebet.aggregate(
-            total=Sum(F('miqdar') * F('mehsul__qiymet_eur'))
+            total=Sum(F('miqdar') * F('mehsul__qiymet'))
         )['total'] or 0
         
         # Float-a çevir və yuvarlaqlaşdır
@@ -164,6 +129,7 @@ def sebetden_sil(request, sebet_id):
 def sifarisi_gonder(request):
     if request.method == "POST":
         try:
+            # Səbətdəki məhsulları yoxla
             sebet = Sebet.objects.filter(user=request.user)
             if not sebet.exists():
                 return JsonResponse({
@@ -180,20 +146,22 @@ def sifarisi_gonder(request):
             total_amount = 0
             # Məhsulları sifarişə əlavə et
             for item in sebet:
-                item_total = item.mehsul.qiymet_eur * item.miqdar
+                item_total = item.mehsul.qiymet * item.miqdar
                 total_amount += item_total
                 
                 SifarisMehsul.objects.create(
                     sifaris=sifaris,
                     mehsul=item.mehsul,
                     miqdar=item.miqdar,
-                    qiymet=item.mehsul.qiymet_eur  # EUR qiyməti
+                    qiymet=item.mehsul.qiymet
                 )
 
+            # Ümumi məbləği yenilə və sifarişi tamamla
             sifaris.cemi_mebleg = total_amount
             sifaris.status = 'gozleyir'
             sifaris.save()
 
+            # Səbəti təmizlə
             sebet.delete()
 
             return JsonResponse({
@@ -275,11 +243,11 @@ def update_quantity(request, item_id, new_quantity):
         cart_item.save()
 
         # Yeni məbləğləri hesabla
-        item_total = round(float(cart_item.mehsul.qiymet_eur * new_quantity), 2)
+        item_total = round(float(cart_item.mehsul.qiymet * new_quantity), 2)
         
         # Ümumi səbət məbləğini hesabla
         cart_total = round(float(Sebet.objects.filter(user=request.user).aggregate(
-            total=Sum(F('miqdar') * F('mehsul__qiymet_eur'))
+            total=Sum(F('miqdar') * F('mehsul__qiymet'))
         )['total'] or 0), 2)
 
         return JsonResponse({
@@ -332,3 +300,4 @@ def sifaris_detallari(request, sifaris_id):
         'sifaris_mehsullari': sifaris_mehsullari,
     }
     return render(request, 'sifaris_detallari.html', context)
+

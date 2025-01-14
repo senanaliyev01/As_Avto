@@ -29,5 +29,5 @@ urlpatterns = [
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 admin.site.site_title = 'Admin Paneli'
-admin.site.site_header = 'As-Avto Admin'
+admin.site.site_header = 'As-Avto Admin Paneli'
 admin.site.index_title = 'Sayt İdarəsi'

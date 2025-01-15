@@ -1,4 +1,4 @@
-/* Root Variables */
+* Root Variables */
 :root {
     --primary-color: #1e3a8a;
     --secondary-color: #1e40af;
@@ -386,42 +386,62 @@ tfoot td {
 .truck-container {
     position: relative;
     display: inline-block;
+    padding: 0 20px;
 }
 
 .truck-icon {
-    animation: drive 0.5s infinite;
+    animation: drive 1s infinite;
+    font-size: 1.5em;
+    color: #475569;
 }
 
 @keyframes drive {
     0% {
-        transform: translateX(-2px);
+        transform: translateX(-2px) rotateY(0);
     }
     50% {
-        transform: translateX(2px);
+        transform: translateX(2px) rotateY(0);
     }
     100% {
-        transform: translateX(-2px);
+        transform: translateX(-2px) rotateY(0);
     }
 }
 
 .smoke {
     position: absolute;
-    left: -15px;
+    left: 0;
     top: 50%;
-    width: 10px;
-    height: 10px;
-    background: rgba(200, 200, 200, 0.5);
-    border-radius: 50%;
-    animation: smoke 2s infinite;
+    transform: translateY(-50%);
 }
 
-@keyframes smoke {
+.smoke-particle {
+    position: absolute;
+    background: linear-gradient(45deg, #94a3b8 10%, #cbd5e1 90%);
+    border-radius: 50%;
+    opacity: 0;
+    animation: smokeLeft 3s ease-out infinite;
+}
+
+.smoke-particle:nth-child(1) { width: 8px; height: 8px; animation-delay: 0.1s; }
+.smoke-particle:nth-child(2) { width: 6px; height: 6px; animation-delay: 0.3s; }
+.smoke-particle:nth-child(3) { width: 4px; height: 4px; animation-delay: 0.5s; }
+.smoke-particle:nth-child(4) { width: 10px; height: 10px; animation-delay: 0.7s; }
+.smoke-particle:nth-child(5) { width: 7px; height: 7px; animation-delay: 0.9s; }
+
+@keyframes smokeLeft {
     0% {
-        transform: scale(1) translateY(0);
-        opacity: 0.8;
+        transform: translate(0, 0) scale(1);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.5;
+    }
+    50% {
+        transform: translate(-20px, -10px) scale(2);
+        opacity: 0.2;
     }
     100% {
-        transform: scale(2) translateY(-10px);
+        transform: translate(-40px, -20px) scale(3);
         opacity: 0;
     }
 }
@@ -451,62 +471,56 @@ tfoot td {
 
 /* Sifariş Progress */
 .order-progress {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 2rem;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.8));
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 2.5rem;
     margin: 2rem 0;
-    background: var(--card-bg);
-    border-radius: 16px;
-    box-shadow: var(--shadow-lg);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 .progress-step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    color: #94a3b8;
-    transition: var(--transition);
-}
-
-.progress-step.active {
-    color: var(--primary-color);
+    position: relative;
+    z-index: 1;
 }
 
 .progress-step i {
-    font-size: 2rem;
-    padding: 1rem;
+    font-size: 2.5rem;
+    padding: 1.2rem;
     border-radius: 50%;
-    background: rgba(203, 213, 225, 0.2);
-    transition: var(--transition);
+    background: rgba(203, 213, 225, 0.3);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
 }
 
 .progress-step.active i {
     background: var(--primary-color);
     color: white;
+    box-shadow: 0 5px 20px rgba(30, 58, 138, 0.3);
+    transform: translateY(-5px);
+}
+
+.progress-step span {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #64748b;
+    margin-top: 0.5rem;
+}
+
+.progress-step.active span {
+    color: var(--primary-color);
 }
 
 .progress-line {
-    flex: 1;
-    height: 3px;
+    height: 4px;
     background: #e2e8f0;
-    margin: 0 1rem;
-    position: relative;
-    overflow: hidden;
+    border-radius: 4px;
 }
 
 .progress-line::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
     height: 100%;
-    width: 0;
-    background: var(--primary-color);
-    transition: width 0.5s ease;
-}
-
-.progress-step.active + .progress-line::after {
-    width: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
 }

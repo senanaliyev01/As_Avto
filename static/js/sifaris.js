@@ -100,30 +100,52 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function createSmoke(truckContainer) {
-    const smoke = document.createElement('div');
+    const smoke = truckContainer.querySelector('.smoke') || document.createElement('div');
     smoke.className = 'smoke';
-    truckContainer.appendChild(smoke);
     
-    setTimeout(() => {
-        smoke.remove();
-    }, 2000);
+    // Əvvəlki tüstü hissəciklərini təmizlə
+    smoke.innerHTML = '';
+    
+    // 5 ədəd tüstü hissəciyi yarat
+    for(let i = 0; i < 5; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'smoke-particle';
+        smoke.appendChild(particle);
+    }
+    
+    if(!truckContainer.querySelector('.smoke')) {
+        truckContainer.appendChild(smoke);
+    }
 }
 
 // Tüstü effektini başlat
 document.querySelectorAll('.truck-container').forEach(container => {
+    createSmoke(container);
     setInterval(() => {
         createSmoke(container);
-    }, 300);
+    }, 3000);
 });
 
 // Progress addımlarını animasiya et
 document.querySelectorAll('.progress-step').forEach((step, index) => {
     if (step.classList.contains('active')) {
         setTimeout(() => {
-            step.style.transform = 'scale(1.1)';
+            step.style.transform = 'scale(1.05) translateY(-5px)';
+            step.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
             setTimeout(() => {
-                step.style.transform = 'scale(1)';
-            }, 200);
-        }, index * 300);
+                step.style.transform = 'scale(1) translateY(0)';
+                step.style.boxShadow = 'none';
+            }, 300);
+        }, index * 400);
     }
+});
+
+// Kamaz ikonuna hover effekti
+document.querySelectorAll('.truck-icon').forEach(truck => {
+    truck.addEventListener('mouseenter', () => {
+        truck.style.transform = 'scale(1.2) translateX(5px)';
+    });
+    truck.addEventListener('mouseleave', () => {
+        truck.style.transform = 'scale(1) translateX(0)';
+    });
 });

@@ -101,7 +101,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Kamaz üçün tüstü effekti
     const truckBody = document.querySelector('.truck-body');
     if (truckBody) {
-        setInterval(() => createSmoke(truckBody), 300);
+        setInterval(() => {
+            if (Math.random() > 0.3) { // 70% ehtimalla tüstü yaradır
+                createSmoke(truckBody);
+            }
+        }, 200);
     }
 
     // Browser-in geri düyməsini deaktiv et
@@ -124,13 +128,18 @@ function createTrees() {
 }
 
 // Tüstü effekti
-function createSmoke(truckIcon) {
+function createSmoke(truckBody) {
     const smoke = document.createElement('div');
     smoke.className = 'smoke';
-    smoke.style.animationDelay = `${Math.random() * 0.5}s`;
-    truckIcon.appendChild(smoke);
     
-    setTimeout(() => smoke.remove(), 1000);
+    // Random delay və opacity
+    const delay = Math.random() * 0.5;
+    smoke.style.animationDelay = `${delay}s`;
+    smoke.style.opacity = Math.random() * 0.5 + 0.3;
+    
+    truckBody.appendChild(smoke);
+    
+    setTimeout(() => smoke.remove(), 1500);
 }
 
 // Progress addımlarını animasiya et

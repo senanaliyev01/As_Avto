@@ -382,63 +382,125 @@ tfoot td {
     }
 }
 
-/* Kamaz və Tüstü Animasiyası */
-.truck-wrapper {
-    position: relative;
-    perspective: 1000px;
-}
-
+/* Kamaz və Tüstü Animasiyaları */
 .truck-container {
     position: relative;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
 }
 
-.truck-container i {
-    font-size: 1.5em;
-    animation: drive 0.5s infinite;
-    position: relative;
-    z-index: 2;
-}
-
-.smoke-container {
-    position: absolute;
-    left: -20px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 1;
-}
-
-.smoke {
+/* Təkər animasiyası */
+.wheel {
     position: absolute;
     width: 8px;
     height: 8px;
-    background: rgba(200, 200, 200, 0.8);
+    background: #333;
     border-radius: 50%;
-    animation: smokeLeft 2s infinite;
+    border: 2px solid #666;
+    animation: wheelRotate 0.5s linear infinite;
 }
 
-.smoke1 { animation-delay: 0s; }
-.smoke2 { animation-delay: 0.4s; }
-.smoke3 { animation-delay: 0.8s; }
+.wheel-front {
+    bottom: -2px;
+    right: 5px;
+}
 
-@keyframes smokeLeft {
+.wheel-back {
+    bottom: -2px;
+    right: 20px;
+}
+
+@keyframes wheelRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Təkmilləşdirilmiş tüstü effekti */
+.smoke {
+    position: absolute;
+    background: rgba(200, 200, 200, 0.8);
+    border-radius: 50%;
+}
+
+.exhaust-smoke {
+    right: 5px;
+    bottom: 0;
+}
+
+.wheel-smoke {
+    bottom: -5px;
+}
+
+/* Müxtəlif tüstü növləri */
+.smoke-particle {
+    position: absolute;
+    background: linear-gradient(45deg, rgba(200,200,200,0.8), rgba(150,150,150,0.3));
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+@keyframes exhaustSmoke {
     0% {
-        transform: scale(1) translate(0, 0);
+        transform: translate(0, 0) scale(1);
         opacity: 0.8;
     }
     100% {
-        transform: scale(3) translate(-20px, -10px);
+        transform: translate(-30px, -20px) scale(3);
         opacity: 0;
     }
 }
 
-@keyframes drive {
-    0%, 100% {
-        transform: translateX(-1px) rotateY(0deg);
+@keyframes wheelSmoke {
+    0% {
+        transform: translate(0, 0) scale(0.5);
+        opacity: 0.6;
     }
-    50% {
-        transform: translateX(1px) rotateY(2deg);
+    100% {
+        transform: translate(-10px, -5px) scale(2);
+        opacity: 0;
     }
+}
+
+/* Status ikonları üçün yeni animasiyalar */
+.status-icon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Gözləyir statusu üçün saat animasiyası */
+.clock-animation {
+    animation: clockTick 1s linear infinite;
+}
+
+@keyframes clockTick {
+    0% { transform: rotate(0deg); }
+    8% { transform: rotate(15deg); }
+    16% { transform: rotate(0deg); }
+    100% { transform: rotate(0deg); }
+}
+
+/* Hazırlanır statusu üçün qutu animasiyası */
+.box-animation {
+    animation: boxPack 2s ease infinite;
+}
+
+@keyframes boxPack {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-5px) scale(1.1); }
+    100% { transform: translateY(0); }
+}
+
+/* Çatdırıldı statusu üçün check animasiyası */
+.check-animation {
+    animation: checkmark 1.5s ease infinite;
+}
+
+@keyframes checkmark {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); filter: brightness(1.2); }
+    100% { transform: scale(1); }
 }
 
 /* İkon Container */

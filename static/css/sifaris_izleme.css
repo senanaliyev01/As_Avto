@@ -890,7 +890,7 @@ tfoot td {
 @keyframes smokeRise {
     0% {
         transform: translate(0, 0) scale(1);
-        opacity: 0;
+        opacity: 0.8;
     }
     20% {
         opacity: 0.5;
@@ -912,4 +912,117 @@ tfoot td {
 
 .truck-body {
     animation: truckBounce 1s ease-in-out infinite;
+}
+
+/* Truck Animation Container for Status */
+.status-badge .truck-animation-container,
+.progress-step .truck-animation-container {
+    width: 50px;
+    height: 40px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Progress Step Truck Animation Container */
+.progress-step .truck-animation-container {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+}
+
+/* Truck Bumper */
+.truck-bumper {
+    position: absolute;
+    bottom: 8px;
+    left: 2px;
+    width: 3px;
+    height: 4px;
+    background: #4A5568;
+}
+
+/* Truck Grill */
+.truck-grill {
+    position: absolute;
+    bottom: 2px;
+    left: 5px;
+    width: 2px;
+    height: 6px;
+    background: #4A5568;
+}
+
+/* Wheel */
+.wheel {
+    position: absolute;
+    bottom: 0;
+    width: 6px;
+    height: 6px;
+    background: #2D3748;
+    border-radius: 50%;
+    animation: wheelRotate 1s linear infinite;
+}
+
+/* Front Wheel */
+.front-wheel {
+    left: 15px;
+}
+
+/* Back Wheel */
+.back-wheel {
+    left: 3px;
+}
+
+/* Wheel Rotation Animation */
+@keyframes wheelRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Truck Window */
+.truck-window {
+    position: absolute;
+    top: 2px;
+    left: 8px;
+    width: 6px;
+    height: 4px;
+    background: #A0AEC0;
+    border-radius: 1px;
+}
+
+/* Progress Step Truck Body */
+.progress-step .truck-body {
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 25px;
+    height: 15px;
+    background: #2D3748;
+    border-radius: 2px;
+    animation: truckBounce 1s ease-in-out infinite;
+}
+
+/* Progress Step Smoke */
+.progress-step .smoke {
+    position: absolute;
+    left: 0;
+    bottom: 10px;
+    width: 4px;
+    height: 4px;
+    background: rgba(160, 174, 192, 0.8);
+    border-radius: 50%;
+    animation: smokeRise 1.5s infinite;
+}
+
+/* Smoke Rise Animation */
+@keyframes smokeRise {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translate(-20px, -20px) scale(2);
+        opacity: 0;
+    }
 }

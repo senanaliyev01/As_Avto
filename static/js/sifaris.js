@@ -88,26 +88,10 @@ document.addEventListener('DOMContentLoaded', function() {
             .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
             .forEach(tr => tbody.appendChild(tr));
     })));
+}); 
 
-    // Ağacların yaradılması
-    createTrees();
-    
-    // Aktiv statusun vurğulanması
-    const currentStatus = document.querySelector('.progress-step[data-status="' + sifarisStatus + '"]');
-    if (currentStatus) {
-        currentStatus.classList.add('active');
-    }
-    
-    // Kamaz üçün tüstü effekti
-    const truckBody = document.querySelector('.truck-body');
-    if (truckBody) {
-        setInterval(() => {
-            if (Math.random() > 0.3) { // 70% ehtimalla tüstü yaradır
-                createSmoke(truckBody);
-            }
-        }, 200);
-    }
-
+   // Səhifə yükləndikdə
+   document.addEventListener('DOMContentLoaded', function() {
     // Browser-in geri düyməsini deaktiv et
     window.history.pushState(null, '', window.location.href);
     window.onpopstate = function() {
@@ -115,32 +99,22 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 });
 
-// Ağacların yaradılması
-function createTrees() {
-    const treesContainer = document.querySelector('.trees');
-    for (let i = 0; i < 6; i++) {
-        const tree = document.createElement('div');
-        tree.className = 'tree';
-        tree.style.left = `${i * 20}%`;
-        tree.style.animationDelay = `${i * 0.5}s`;
-        treesContainer.appendChild(tree);
-    }
-}
-
-// Tüstü effekti
-function createSmoke(truckBody) {
+function createSmoke(truckContainer) {
     const smoke = document.createElement('div');
     smoke.className = 'smoke';
+    truckContainer.appendChild(smoke);
     
-    // Random delay və opacity
-    const delay = Math.random() * 0.5;
-    smoke.style.animationDelay = `${delay}s`;
-    smoke.style.opacity = Math.random() * 0.5 + 0.3;
-    
-    truckBody.appendChild(smoke);
-    
-    setTimeout(() => smoke.remove(), 1500);
+    setTimeout(() => {
+        smoke.remove();
+    }, 2000);
 }
+
+// Tüstü effektini başlat
+document.querySelectorAll('.truck-container').forEach(container => {
+    setInterval(() => {
+        createSmoke(container);
+    }, 300);
+});
 
 // Progress addımlarını animasiya et
 document.querySelectorAll('.progress-step').forEach((step, index) => {

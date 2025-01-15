@@ -7,6 +7,7 @@
     <link rel="icon" href="{% static 'img/favicon.png' %}">
     <link rel="stylesheet" href="{% static 'css/sifaris_izleme.css' %}">
     <!-- <link rel="stylesheet" href="{% static 'css/snow.css' %}"> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
     <nav class="header-nav">
@@ -50,7 +51,25 @@
                     <td>{{ sifaris.tarix }}</td>
                     <td>{{ sifaris.cemi_mebleg }} AZN</td>
                     <td>{{ sifaris.odenilen_mebleg }} AZN</td>
-                    <td><span class="status-badge status-{{ sifaris.status }}">{{ sifaris.display_status }}</span></td>
+                    <td>
+                        <div class="status-container">
+                            <span class="status-badge status-{{ sifaris.status }}">
+                                {% if sifaris.status == 'gozleyir' %}
+                                    <i class="fas fa-clock pulse"></i>
+                                {% elif sifaris.status == 'hazirlanir' %}
+                                    <i class="fas fa-box-open bounce"></i>
+                                {% elif sifaris.status == 'yoldadir' %}
+                                    <div class="truck-container">
+                                        <i class="fas fa-truck truck-icon"></i>
+                                        <div class="smoke"></div>
+                                    </div>
+                                {% elif sifaris.status == 'catdirildi' %}
+                                    <i class="fas fa-check-circle tada"></i>
+                                {% endif %}
+                                {{ sifaris.display_status }}
+                            </span>
+                        </div>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

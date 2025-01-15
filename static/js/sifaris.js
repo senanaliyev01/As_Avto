@@ -98,3 +98,32 @@ document.addEventListener('DOMContentLoaded', function() {
         window.history.pushState(null, '', window.location.href);
     };
 });
+
+function createSmoke(truckContainer) {
+    const smoke = document.createElement('div');
+    smoke.className = 'smoke';
+    truckContainer.appendChild(smoke);
+    
+    setTimeout(() => {
+        smoke.remove();
+    }, 2000);
+}
+
+// Tüstü effektini başlat
+document.querySelectorAll('.truck-container').forEach(container => {
+    setInterval(() => {
+        createSmoke(container);
+    }, 300);
+});
+
+// Progress addımlarını animasiya et
+document.querySelectorAll('.progress-step').forEach((step, index) => {
+    if (step.classList.contains('active')) {
+        setTimeout(() => {
+            step.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                step.style.transform = 'scale(1)';
+            }, 200);
+        }, index * 300);
+    }
+});

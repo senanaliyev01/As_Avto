@@ -19,7 +19,30 @@
         <div class="info-row">
             <h3>Sifariş Məlumatları</h3>
             <p><strong>Tarix:</strong> {{ sifaris.tarix }}</p>
-            <p><strong>Status:</strong> <span class="status-badge status-{{ sifaris.status }}">{{ sifaris.display_status }}</span></p>
+            <div class="order-progress">
+                <div class="progress-step {% if sifaris.status == 'gozleyir' or sifaris.status == 'hazirlanir' or sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}active{% endif %}">
+                    <i class="fas fa-clock"></i>
+                    <span>Gözləyir</span>
+                </div>
+                <div class="progress-line"></div>
+                <div class="progress-step {% if sifaris.status == 'hazirlanir' or sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}active{% endif %}">
+                    <i class="fas fa-box-open"></i>
+                    <span>Hazırlanır</span>
+                </div>
+                <div class="progress-line"></div>
+                <div class="progress-step {% if sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}active{% endif %}">
+                    <div class="truck-container">
+                        <i class="fas fa-truck"></i>
+                        <div class="smoke"></div>
+                    </div>
+                    <span>Yoldadır</span>
+                </div>
+                <div class="progress-line"></div>
+                <div class="progress-step {% if sifaris.status == 'catdirildi' %}active{% endif %}">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Çatdırıldı</span>
+                </div>
+            </div>
         </div>
         <div class="info-row">
             <h3>Ödəniş Məlumatları</h3>

@@ -338,3 +338,175 @@ tfoot td {
         transform: translateX(100%);
     }
 }
+
+/* Status İkonları və Animasiyalar */
+.status-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.status-badge i {
+    margin-right: 8px;
+    font-size: 1.2em;
+}
+
+/* Pulse Animasiyası */
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Bounce Animasiyası */
+.bounce {
+    animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Kamaz və Tüstü Animasiyası */
+.truck-container {
+    position: relative;
+    display: inline-block;
+}
+
+.truck-icon {
+    animation: drive 0.5s infinite;
+}
+
+@keyframes drive {
+    0% {
+        transform: translateX(-2px);
+    }
+    50% {
+        transform: translateX(2px);
+    }
+    100% {
+        transform: translateX(-2px);
+    }
+}
+
+.smoke {
+    position: absolute;
+    left: -15px;
+    top: 50%;
+    width: 10px;
+    height: 10px;
+    background: rgba(200, 200, 200, 0.5);
+    border-radius: 50%;
+    animation: smoke 2s infinite;
+}
+
+@keyframes smoke {
+    0% {
+        transform: scale(1) translateY(0);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(2) translateY(-10px);
+        opacity: 0;
+    }
+}
+
+/* Tada Animasiyası */
+.tada {
+    animation: tada 1s infinite;
+}
+
+@keyframes tada {
+    0% {
+        transform: scale(1);
+    }
+    10%, 20% {
+        transform: scale(0.9) rotate(-3deg);
+    }
+    30%, 50%, 70%, 90% {
+        transform: scale(1.1) rotate(3deg);
+    }
+    40%, 60%, 80% {
+        transform: scale(1.1) rotate(-3deg);
+    }
+    100% {
+        transform: scale(1) rotate(0);
+    }
+}
+
+/* Sifariş Progress */
+.order-progress {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem;
+    margin: 2rem 0;
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: #94a3b8;
+    transition: var(--transition);
+}
+
+.progress-step.active {
+    color: var(--primary-color);
+}
+
+.progress-step i {
+    font-size: 2rem;
+    padding: 1rem;
+    border-radius: 50%;
+    background: rgba(203, 213, 225, 0.2);
+    transition: var(--transition);
+}
+
+.progress-step.active i {
+    background: var(--primary-color);
+    color: white;
+}
+
+.progress-line {
+    flex: 1;
+    height: 3px;
+    background: #e2e8f0;
+    margin: 0 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-line::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 0;
+    background: var(--primary-color);
+    transition: width 0.5s ease;
+}
+
+.progress-step.active + .progress-line::after {
+    width: 100%;
+}

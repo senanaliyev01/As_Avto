@@ -99,88 +99,21 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 });
 
-function createSmokeParticle(container, type) {
+function createSmoke(truckContainer) {
     const smoke = document.createElement('div');
-    smoke.className = 'smoke-particle';
+    smoke.className = 'smoke';
+    truckContainer.appendChild(smoke);
    
-    // Təsadüfi ölçü
-    const size = Math.random() * 6 + 4;
-    smoke.style.width = size + 'px';
-    smoke.style.height = size + 'px';
-   
-    if (type === 'exhaust') {
-        smoke.style.animation = 'exhaustSmoke 2s forwards';
-        container.appendChild(smoke);
-        smoke.style.right = '-5px';
-        smoke.style.bottom = '5px';
-    } else if (type === 'wheel') {
-        smoke.style.animation = 'wheelSmoke 1s forwards';
-        container.appendChild(smoke);
-        smoke.style.bottom = '-2px';
-        smoke.style.right = Math.random() * 20 + 5 + 'px';
-    }
-   
-    setTimeout(() => smoke.remove(), 2000);
+    setTimeout(() => {
+        smoke.remove();
+    }, 2000);
 }
 
-function addWheels(truckContainer) {
-    const wheelFront = document.createElement('div');
-    wheelFront.className = 'wheel wheel-front';
-   
-    const wheelBack = document.createElement('div');
-    wheelBack.className = 'wheel wheel-back';
-   
-    truckContainer.appendChild(wheelFront);
-    truckContainer.appendChild(wheelBack);
-}
-
-function initTruckAnimations() {
-    document.querySelectorAll('.truck-container').forEach(container => {
-        addWheels(container);
-       
-        // Mühərrik tüstüsü
-        setInterval(() => {
-            createSmokeParticle(container, 'exhaust');
-        }, 200);
-       
-        // Təkər tüstüsü
-        setInterval(() => {
-            createSmokeParticle(container, 'wheel');
-        }, 300);
-    });
-}
-
-function initStatusAnimations() {
-    // Status ikonları üçün animasiyalar
-    document.querySelectorAll('.status-badge').forEach(badge => {
-        const status = badge.classList.toString().match(/status-(\w+)/)[1];
-        const icon = badge.querySelector('i');
-       
-        if (icon) {
-            switch(status) {
-                case 'gozleyir':
-                    icon.classList.add('clock-animation');
-                    break;
-                case 'hazirlanir':
-                    icon.classList.add('box-animation');
-                    break;
-                case 'yoldadir':
-                    // Kamaz animasiyaları avtomatik işləyir
-                    break;
-                case 'catdirildi':
-                    icon.classList.add('check-animation');
-                    break;
-            }
-        }
-    });
-}
-
-// DOM yükləndikdə
-document.addEventListener('DOMContentLoaded', function() {
-    initTruckAnimations();
-    initStatusAnimations();
-   
-    // Digər mövcud kodlar...
+// Tüstü effektini başlat
+document.querySelectorAll('.truck-container').forEach(container => {
+    setInterval(() => {
+        createSmoke(container);
+    }, 300);
 });
 
 // Progress addımlarını animasiya et
@@ -193,4 +126,72 @@ document.querySelectorAll('.progress-step').forEach((step, index) => {
             }, 200);
         }, index * 300);
     }
+});
+
+function createTruckElement() {
+    const truckContainer = document.createElement('div');
+    truckContainer.className = 'truck-container';
+
+    // Kamaz ikonu
+    const truckIcon = document.createElement('i');
+    truckIcon.className = 'fas fa-truck truck-icon';
+    truckContainer.appendChild(truckIcon);
+
+    // Təkərlər
+    const wheelFront = document.createElement('div');
+    wheelFront.className = 'wheel wheel-front';
+    const wheelBack = document.createElement('div');
+    wheelBack.className = 'wheel wheel-back';
+    truckContainer.appendChild(wheelFront);
+    truckContainer.appendChild(wheelBack);
+
+    // Təkər tüstüsü
+    const wheelSmoke = document.createElement('div');
+    wheelSmoke.className = 'wheel-smoke';
+    for (let i = 0; i < 3; i++) {
+        const smokeParticle = document.createElement('div');
+        smokeParticle.className = 'wheel-smoke-particle';
+        smokeParticle.style.animationDelay = `${i * 0.3}s`;
+        wheelSmoke.appendChild(smokeParticle);
+    }
+    truckContainer.appendChild(wheelSmoke);
+
+    // Əsas tüstü
+    const exhaustSmoke = document.createElement('div');
+    exhaustSmoke.className = 'exhaust-smoke';
+    for (let i = 0; i < 5; i++) {
+        const smokeParticle = document.createElement('div');
+        smokeParticle.className = 'smoke-particle';
+        smokeParticle.style.width = `${4 + i * 2}px`;
+        smokeParticle.style.height = `${4 + i * 2}px`;
+        smokeParticle.style.animationDelay = `${i * 0.2}s`;
+        exhaustSmoke.appendChild(smokeParticle);
+    }
+    truckContainer.appendChild(exhaustSmoke);
+
+    return truckContainer;
+}
+
+// DOM yükləndikdə
+document.addEventListener('DOMContentLoaded', function() {
+    // Mövcud truck containerləri yeniləri ilə əvəz et
+    document.querySelectorAll('.status-yoldadir .icon-container').forEach(container => {
+        const oldTruck = container.querySelector('.truck-container');
+        if (oldTruck) {
+            const newTruck = createTruckElement();
+            container.replaceChild(newTruck, oldTruck);
+        }
+    });
+
+    // Status animasiyalarını aktivləşdir
+    const statusBadges = document.querySelectorAll('.status-badge');
+    statusBadges.forEach(badge => {
+        if (badge.classList.contains('status-gozleyir')) {
+            badge.querySelector('i').classList.add('pulse');
+        } else if (badge.classList.contains('status-hazirlanir')) {
+            badge.querySelector('i').classList.add('bounce');
+        } else if (badge.classList.contains('status-catdirildi')) {
+            badge.querySelector('i').classList.add('tada');
+        }
+    });
 });

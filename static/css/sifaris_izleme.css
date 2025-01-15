@@ -383,46 +383,114 @@ tfoot td {
 }
 
 /* Kamaz və Tüstü Animasiyası */
+.truck-wrapper {
+    position: relative;
+    perspective: 1000px;
+}
+
 .truck-container {
     position: relative;
     display: inline-block;
 }
 
-.truck-icon {
+.truck-container i {
+    font-size: 1.5em;
     animation: drive 0.5s infinite;
+    position: relative;
+    z-index: 2;
 }
 
-@keyframes drive {
-    0% {
-        transform: translateX(-2px);
-    }
-    50% {
-        transform: translateX(2px);
-    }
-    100% {
-        transform: translateX(-2px);
-    }
+.smoke-container {
+    position: absolute;
+    left: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
 }
 
 .smoke {
     position: absolute;
-    left: -15px;
-    top: 50%;
-    width: 10px;
-    height: 10px;
-    background: rgba(200, 200, 200, 0.5);
+    width: 8px;
+    height: 8px;
+    background: rgba(200, 200, 200, 0.8);
     border-radius: 50%;
-    animation: smoke 2s infinite;
+    animation: smokeLeft 2s infinite;
 }
 
-@keyframes smoke {
+.smoke1 { animation-delay: 0s; }
+.smoke2 { animation-delay: 0.4s; }
+.smoke3 { animation-delay: 0.8s; }
+
+@keyframes smokeLeft {
     0% {
-        transform: scale(1) translateY(0);
+        transform: scale(1) translate(0, 0);
         opacity: 0.8;
     }
     100% {
-        transform: scale(2) translateY(-10px);
+        transform: scale(3) translate(-20px, -10px);
         opacity: 0;
+    }
+}
+
+@keyframes drive {
+    0%, 100% {
+        transform: translateX(-1px) rotateY(0deg);
+    }
+    50% {
+        transform: translateX(1px) rotateY(2deg);
+    }
+}
+
+/* İkon Container */
+.icon-container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    margin-right: 8px;
+}
+
+/* Progress Step İkonları */
+.progress-step .icon-container {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.progress-step.active .icon-container {
+    background: var(--primary-color);
+    color: white;
+    transform: scale(1.1);
+}
+
+/* Animasiya Effektləri */
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+.bounce {
+    animation: bounce 1s infinite;
+}
+
+.tada {
+    animation: tada 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    }
+    100% {
+        transform: scale(1);
     }
 }
 

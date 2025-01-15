@@ -55,16 +55,28 @@
                         <div class="status-container">
                             <span class="status-badge status-{{ sifaris.status }}">
                                 {% if sifaris.status == 'gozleyir' %}
-                                    <i class="fas fa-clock pulse"></i>
+                                    <div class="icon-container">
+                                        <i class="fas fa-clock pulse"></i>
+                                    </div>
                                 {% elif sifaris.status == 'hazirlanir' %}
-                                    <i class="fas fa-box-open bounce"></i>
+                                    <div class="icon-container">
+                                        <i class="fas fa-box-open bounce"></i>
+                                    </div>
                                 {% elif sifaris.status == 'yoldadir' %}
-                                    <div class="truck-container">
-                                        <i class="fas fa-truck truck-icon"></i>
-                                        <div class="smoke"></div>
+                                    <div class="icon-container truck-wrapper">
+                                        <div class="truck-container">
+                                            <i class="fas fa-truck"></i>
+                                            <div class="smoke-container">
+                                                <div class="smoke smoke1"></div>
+                                                <div class="smoke smoke2"></div>
+                                                <div class="smoke smoke3"></div>
+                                            </div>
+                                        </div>
                                     </div>
                                 {% elif sifaris.status == 'catdirildi' %}
-                                    <i class="fas fa-check-circle tada"></i>
+                                    <div class="icon-container">
+                                        <i class="fas fa-check-circle tada"></i>
+                                    </div>
                                 {% endif %}
                                 {{ sifaris.display_status }}
                             </span>

@@ -521,64 +521,154 @@ tfoot td {
 
 /* Sifariş Progress */
 .order-progress {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 2rem;
+    position: relative;
+    padding: 2.5rem 1rem;
     margin: 2rem 0;
     background: var(--card-bg);
-    border-radius: 16px;
+    border-radius: 20px;
     box-shadow: var(--shadow-lg);
 }
 
 .progress-step {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
-    color: #94a3b8;
-    transition: var(--transition);
+    gap: 0.75rem;
+    z-index: 1;
 }
 
-.progress-step.active {
-    color: var(--primary-color);
+.step-icon {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.progress-step i {
-    font-size: 2rem;
-    padding: 1rem;
-    border-radius: 50%;
-    background: rgba(203, 213, 225, 0.2);
-    transition: var(--transition);
-}
-
-.progress-step.active i {
+.step-number {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 25px;
+    height: 25px;
     background: var(--primary-color);
     color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.step-label {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 1rem;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+.progress-step.active .step-label {
+    opacity: 1;
+    transform: translateY(-2px);
+}
+
+.step-check {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 25px;
+    height: 25px;
+    background: var(--success-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.3s ease;
+}
+
+.progress-step.active .step-check {
+    opacity: 1;
+    transform: scale(1);
 }
 
 .progress-line {
-    flex: 1;
-    height: 3px;
-    background: #e2e8f0;
-    margin: 0 1rem;
     position: relative;
-    overflow: hidden;
+    flex: 1;
+    height: 4px;
+    background: #e2e8f0;
+    margin: 2.5rem 0;
 }
 
-.progress-line::after {
+.progress-line-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: linear-gradient(90deg, #ffd700, #ffb700);
+    transition: width 0.5s ease;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.progress-line::before {
     content: '';
     position: absolute;
+    top: 50%;
     left: 0;
-    top: 0;
-    height: 100%;
-    width: 0;
-    background: var(--primary-color);
-    transition: width 0.5s ease;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #ffd700, transparent);
+    transform: translateY(-50%);
+    opacity: 0.3;
 }
 
-.progress-step.active + .progress-line::after {
-    width: 100%;
+/* Status Icon Container Animations */
+.status-icon-container {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.progress-step.active .status-icon-container {
+    border-color: #ffd700;
+    transform: scale(1.1);
+    box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .order-progress {
+        flex-direction: column;
+        gap: 2rem;
+        padding: 2rem 1rem;
+    }
+
+    .progress-line {
+        width: 4px;
+        height: 40px;
+        margin: 0;
+    }
+
+    .progress-line-fill {
+        width: 100% !important;
+        height: var(--progress);
+    }
 }
 
 /* Status İkonları üçün yeni stillər */

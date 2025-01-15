@@ -47,9 +47,12 @@
                     <div class="truck-animation-container">
                         <div class="road"></div>
                         <div class="trees">
-                            {% for i in '123456'|make_list %}
-                                <div class="tree" style="animation-delay: {{ forloop.counter|multiply:0.5 }}s"></div>
-                            {% endfor %}
+                            <div class="tree" style="animation-delay: 0.5s"></div>
+                            <div class="tree" style="animation-delay: 1.0s"></div>
+                            <div class="tree" style="animation-delay: 1.5s"></div>
+                            <div class="tree" style="animation-delay: 2.0s"></div>
+                            <div class="tree" style="animation-delay: 2.5s"></div>
+                            <div class="tree" style="animation-delay: 3.0s"></div>
                         </div>
                         <div class="truck-icon">
                             <i class="fas fa-truck"></i>
@@ -128,4 +131,4 @@
     <script src="{% static 'js/sifaris.js' %}"></script>
     <!-- <script src="{% static 'js/snow.js' %}"></script> -->
 </body>
-</html> 
+</html>

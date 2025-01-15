@@ -116,7 +116,7 @@ document.querySelectorAll('.truck-container').forEach(container => {
     }, 300);
 });
 
-// Progress addımlarını animasiya et
+// Progresss addımlarını animasiya et
 document.querySelectorAll('.progress-step').forEach((step, index) => {
     if (step.classList.contains('active')) {
         setTimeout(() => {

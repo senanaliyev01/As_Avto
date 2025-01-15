@@ -33,11 +33,10 @@
                 <div class="progress-line">
                     <div class="progress-line-fill" style="width: {% if sifaris.status != 'gozleyir' %}100%{% else %}0%{% endif %}"></div>
                 </div>
-                <div class="progress-step {% if sifaris.status == 'hazirlanir' or sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}active{% endif %}">
-                    <div class="status-icon-container status-preparing">
-                        <div class="box-animation">
-                            <div class="box-lid"></div>
-                        </div>
+                <div class="progress-step {% if sifaris.status == 'hazirlanir' %}active{% endif %}">
+                    <div class="preparing-box">
+                        <div class="box-lid"></div>
+                        <div class="package"></div>
                     </div>
                     <span>Hazırlanır</span>
                 </div>
@@ -45,15 +44,20 @@
                     <div class="progress-line-fill" style="width: {% if sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}100%{% else %}0%{% endif %}"></div>
                 </div>
                 <div class="progress-step {% if sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}active{% endif %}">
-                    <div class="status-icon-container status-shipping">
+                    <div class="truck-animation-container">
                         <div class="road"></div>
+                        <div class="trees">
+                            {% for i in '123456'|make_list %}
+                                <div class="tree" style="animation-delay: {{ forloop.counter|multiply:0.5 }}s"></div>
+                            {% endfor %}
+                        </div>
                         <div class="truck-icon">
                             <i class="fas fa-truck"></i>
-                            <div class="wheel wheel-front"></div>
-                            <div class="wheel wheel-back"></div>
-                            <div class="smoke-particle" style="animation-delay: 0s"></div>
-                            <div class="smoke-particle" style="animation-delay: 0.3s"></div>
-                            <div class="smoke-particle" style="animation-delay: 0.6s"></div>
+                            <div class="wheel front-wheel"></div>
+                            <div class="wheel back-wheel"></div>
+                            <div class="smoke" style="animation-delay: 0s"></div>
+                            <div class="smoke" style="animation-delay: 0.3s"></div>
+                            <div class="smoke" style="animation-delay: 0.6s"></div>
                         </div>
                     </div>
                     <span>Yoldadır</span>

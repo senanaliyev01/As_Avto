@@ -759,3 +759,176 @@ tfoot td {
     50% { opacity: 0; }
     100% { opacity: 1; transform: rotate(-45deg) scale(1); }
 }
+
+/* Kamaz və yol animasiyaları */
+.truck-animation-container {
+    position: relative;
+    width: 100%;
+    height: 40px;
+    overflow: hidden;
+    background: linear-gradient(0deg, #2c5282 0%, #4299e1 100%);
+}
+
+.road {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 15px;
+    background: #2d3748;
+    background-image: 
+        linear-gradient(90deg, white 2%, transparent 2%),
+        linear-gradient(90deg, white 2%, transparent 2%);
+    background-size: 20px 100%;
+    background-position: 0 center;
+    animation: roadMove 0.5s linear infinite;
+}
+
+.trees {
+    position: absolute;
+    bottom: 15px;
+    width: 100%;
+    height: 25px;
+}
+
+.tree {
+    position: absolute;
+    bottom: 0;
+    width: 20px;
+    height: 25px;
+    background: #276749;
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    animation: treeMove 4s linear infinite;
+}
+
+.truck-icon {
+    position: absolute;
+    left: 50%;
+    bottom: 15px;
+    transform: translateX(-50%);
+    font-size: 24px;
+    color: #2d3748;
+    z-index: 2;
+}
+
+.wheel {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #1a202c;
+    border-radius: 50%;
+    border: 2px solid #4a5568;
+    animation: wheelRotate 0.5s linear infinite;
+}
+
+.front-wheel {
+    bottom: -4px;
+    right: 2px;
+}
+
+.back-wheel {
+    bottom: -4px;
+    left: 2px;
+}
+
+.smoke {
+    position: absolute;
+    left: -15px;
+    bottom: 5px;
+    width: 6px;
+    height: 6px;
+    background: rgba(160, 174, 192, 0.8);
+    border-radius: 50%;
+    animation: smokeRise 1s infinite;
+}
+
+/* Box animation yenilənməsi */
+.preparing-box {
+    position: relative;
+    width: 30px;
+    height: 25px;
+    background: #4a5568;
+    border-radius: 4px;
+}
+
+.box-lid {
+    position: absolute;
+    top: -5px;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: #2d3748;
+    border-radius: 2px;
+    transform-origin: top;
+    animation: openCloseLid 2s infinite;
+}
+
+.package {
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 15px;
+    background: #ed8936;
+    border-radius: 2px;
+    animation: packageJump 2s infinite;
+}
+
+/* Yeni animasiyalar */
+@keyframes roadMove {
+    from { background-position: 20px center; }
+    to { background-position: 0 center; }
+}
+
+@keyframes treeMove {
+    from { transform: translateX(120%); }
+    to { transform: translateX(-20%); }
+}
+
+@keyframes wheelRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes smokeRise {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translate(-20px, -20px) scale(2);
+        opacity: 0;
+    }
+}
+
+@keyframes openCloseLid {
+    0%, 100% { transform: rotateX(0deg); }
+    40%, 60% { transform: rotateX(-60deg); }
+}
+
+@keyframes packageJump {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-5px); }
+}
+
+/* Status ikonları üçün aktiv/qeyri-aktiv vəziyyətlər */
+.progress-step {
+    opacity: 0.5;
+    filter: grayscale(1);
+    transition: all 0.3s ease;
+}
+
+.progress-step.active {
+    opacity: 1;
+    filter: grayscale(0);
+}
+
+.progress-line {
+    background: #e2e8f0;
+}
+
+.progress-line-fill {
+    height: 100%;
+    background: #3182ce;
+    transition: width 0.5s ease;
+}

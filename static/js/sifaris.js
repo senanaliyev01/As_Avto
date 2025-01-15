@@ -99,21 +99,44 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 });
 
-function createSmoke(truckContainer) {
-    const smoke = document.createElement('div');
-    smoke.className = 'smoke';
-    truckContainer.appendChild(smoke);
-    
-    setTimeout(() => {
-        smoke.remove();
-    }, 2000);
+// Ağacların yaradılması
+function createTrees() {
+    const treesContainer = document.querySelector('.trees');
+    for (let i = 0; i < 6; i++) {
+        const tree = document.createElement('div');
+        tree.className = 'tree';
+        tree.style.left = `${i * 20}%`;
+        tree.style.animationDelay = `${i * 0.5}s`;
+        treesContainer.appendChild(tree);
+    }
 }
 
-// Tüstü effektini başlat
-document.querySelectorAll('.truck-container').forEach(container => {
-    setInterval(() => {
-        createSmoke(container);
-    }, 300);
+// Tüstü effekti
+function createSmoke(truckIcon) {
+    const smoke = document.createElement('div');
+    smoke.className = 'smoke';
+    smoke.style.animationDelay = `${Math.random() * 0.5}s`;
+    truckIcon.appendChild(smoke);
+    
+    setTimeout(() => smoke.remove(), 1000);
+}
+
+// Status animasiyalarının idarə edilməsi
+document.addEventListener('DOMContentLoaded', function() {
+    // Ağacların yaradılması
+    createTrees();
+    
+    // Aktiv statusun vurğulanması
+    const currentStatus = document.querySelector('[data-status="' + sifarisStatus + '"]');
+    if (currentStatus) {
+        currentStatus.classList.add('active');
+    }
+    
+    // Kamaz üçün tüstü effekti
+    const truckIcon = document.querySelector('.truck-icon');
+    if (truckIcon) {
+        setInterval(() => createSmoke(truckIcon), 300);
+    }
 });
 
 // Progress addımlarını animasiya et

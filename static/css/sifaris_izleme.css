@@ -405,25 +405,7 @@ tfoot td {
 }
 
 .smoke {
-    position: absolute;
-    left: -15px;
-    top: 50%;
-    width: 10px;
-    height: 10px;
-    background: rgba(200, 200, 200, 0.5);
-    border-radius: 50%;
-    animation: smoke 2s infinite;
-}
-
-@keyframes smoke {
-    0% {
-        transform: scale(1) translateY(0);
-        opacity: 0.8;
-    }
-    100% {
-        transform: scale(2) translateY(-10px);
-        opacity: 0;
-    }
+    display: none;
 }
 
 /* Tada Animasiyası */
@@ -490,23 +472,75 @@ tfoot td {
 .progress-line {
     flex: 1;
     height: 3px;
-    background: #e2e8f0;
-    margin: 0 1rem;
+    background: #e5e7eb;
     position: relative;
-    overflow: hidden;
 }
 
-.progress-line::after {
-    content: '';
+.progress-step.active + .progress-line {
+    background: #22c55e;
+}
+
+/* Status ikonları üçün yeni stillər */
+.icon-wrapper {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    margin-bottom: 8px;
+}
+
+.progress-step.active .icon-wrapper {
+    transform: scale(1.1);
+}
+
+.gozleyir-icon {
+    color: #f59e0b;
+}
+
+.progress-step.active .gozleyir-icon {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.hazirlanir-icon {
+    color: #3b82f6;
+}
+
+.progress-step.active .hazirlanir-icon {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.yoldadir-icon {
+    color: #8b5cf6;
+}
+
+.progress-step.active .yoldadir-icon {
+    background: #ede9fe;
+    color: #7c3aed;
+}
+
+.catdirildi-icon {
+    color: #10b981;
+}
+
+.progress-step.active .catdirildi-icon {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.check-icon {
     position: absolute;
-    left: 0;
-    top: 0;
-    height: 100%;
-    width: 0;
-    background: var(--primary-color);
-    transition: width 0.5s ease;
-}
-
-.progress-step.active + .progress-line::after {
-    width: 100%;
+    bottom: -5px;
+    right: -5px;
+    background: #22c55e;
+    color: white;
+    border-radius: 50%;
+    padding: 4px;
+    font-size: 0.7rem;
+    border: 2px solid white;
 }

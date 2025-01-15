@@ -113,6 +113,40 @@ document.addEventListener('DOMContentLoaded', function() {
     window.onpopstate = function() {
         window.history.pushState(null, '', window.location.href);
     };
+
+    // Progress steps animation
+    const progressSteps = document.querySelectorAll('.progress-step');
+    const progressLines = document.querySelectorAll('.progress-line-fill');
+    
+    function animateProgress() {
+        progressSteps.forEach((step, index) => {
+            if (step.classList.contains('completed') || step.classList.contains('active')) {
+                setTimeout(() => {
+                    step.style.opacity = '1';
+                    if (index < progressLines.length && progressLines[index]) {
+                        progressLines[index].style.width = '100%';
+                    }
+                }, index * 300);
+            }
+        });
+    }
+    
+    // Initial animation
+    animateProgress();
+    
+    // Refresh animation when needed (e.g., after status updates)
+    function refreshProgress() {
+        progressSteps.forEach(step => {
+            step.style.opacity = '0.5';
+        });
+        progressLines.forEach(line => {
+            line.style.width = '0';
+        });
+        setTimeout(animateProgress, 100);
+    }
+    
+    // You can call refreshProgress() when status updates
+    // window.refreshProgress = refreshProgress;
 });
 
 // Ağacların yaradılması

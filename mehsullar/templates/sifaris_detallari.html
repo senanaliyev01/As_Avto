@@ -21,8 +21,8 @@
             <h3>Sifariş Məlumatları</h3>
             <p><strong>Tarix:</strong> {{ sifaris.tarix }}</p>
             <div class="order-progress">
-                <div class="progress-step {% if sifaris.status == 'gozleyir' or sifaris.status == 'hazirlanir' or sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}active{% endif %}">
-                    <div class="status-icon-container status-waiting">
+                <div class="progress-step {% if sifaris.status == 'gozleyir' %}active{% endif %} {% if sifaris.status == 'hazirlanir' or sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}completed{% endif %}">
+                    <div class="status-icon-container">
                         <div class="clock-animation">
                             <div class="clock-hand hour-hand"></div>
                             <div class="clock-hand minute-hand"></div>
@@ -31,38 +31,28 @@
                     <span>Gözləyir</span>
                 </div>
                 <div class="progress-line">
-                    <div class="progress-line-fill" style="width: {% if sifaris.status != 'gozleyir' %}100%{% else %}0%{% endif %}"></div>
+                    <div class="progress-line-fill" style="width: {% if sifaris.status == 'hazirlanir' or sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}100%{% elif sifaris.status == 'gozleyir' %}0%{% endif %}"></div>
                 </div>
-                <div class="progress-step {% if sifaris.status == 'hazirlanir' %}active{% endif %}">
-                    <div class="preparing-box">
-                        <div class="box-lid"></div>
-                        <div class="package"></div>
+                <div class="progress-step {% if sifaris.status == 'hazirlanir' %}active{% endif %} {% if sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}completed{% endif %}">
+                    <div class="status-icon-container">
+                        <div class="preparing-box">
+                            <div class="box-lid"></div>
+                            <div class="package"></div>
+                        </div>
                     </div>
                     <span>Hazırlanır</span>
                 </div>
                 <div class="progress-line">
                     <div class="progress-line-fill" style="width: {% if sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}100%{% else %}0%{% endif %}"></div>
                 </div>
-                <div class="progress-step {% if sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}active{% endif %}">
-                    <div class="truck-animation-container">
-                        <div class="road"></div>
-                        <div class="trees">
-                            <div class="tree" style="animation-delay: 0.5s"></div>
-                            <div class="tree" style="animation-delay: 1.0s"></div>
-                            <div class="tree" style="animation-delay: 1.5s"></div>
-                            <div class="tree" style="animation-delay: 2.0s"></div>
-                            <div class="tree" style="animation-delay: 2.5s"></div>
-                            <div class="tree" style="animation-delay: 3.0s"></div>
-                        </div>
-                        <div class="truck-body">
-                            <div class="truck-cabin">
-                                <div class="truck-window"></div>
+                <div class="progress-step {% if sifaris.status == 'yoldadir' %}active{% endif %} {% if sifaris.status == 'catdirildi' %}completed{% endif %}">
+                    <div class="status-icon-container">
+                        <div class="truck-animation-container">
+                            <div class="truck-body">
+                                <div class="truck-cabin"></div>
+                                <div class="wheel front-wheel"></div>
+                                <div class="wheel back-wheel"></div>
                             </div>
-                            <div class="wheel front-wheel"></div>
-                            <div class="wheel back-wheel"></div>
-                            <div class="smoke" style="animation-delay: 0s"></div>
-                            <div class="smoke" style="animation-delay: 0.3s"></div>
-                            <div class="smoke" style="animation-delay: 0.6s"></div>
                         </div>
                     </div>
                     <span>Yoldadır</span>
@@ -70,8 +60,8 @@
                 <div class="progress-line">
                     <div class="progress-line-fill" style="width: {% if sifaris.status == 'catdirildi' %}100%{% else %}0%{% endif %}"></div>
                 </div>
-                <div class="progress-step {% if sifaris.status == 'catdirildi' %}active{% endif %}">
-                    <div class="status-icon-container status-delivered">
+                <div class="progress-step {% if sifaris.status == 'catdirildi' %}active completed{% endif %}">
+                    <div class="status-icon-container">
                         <div class="check-circle">
                             <div class="check-mark"></div>
                         </div>

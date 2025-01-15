@@ -55,27 +55,35 @@
                         <div class="status-container">
                             <span class="status-badge status-{{ sifaris.status }}">
                                 {% if sifaris.status == 'gozleyir' %}
-                                    <div class="icon-container">
-                                        <i class="fas fa-clock pulse"></i>
+                                    <div class="status-icon-container status-waiting">
+                                        <div class="clock-animation">
+                                            <div class="clock-hand hour-hand"></div>
+                                            <div class="clock-hand minute-hand"></div>
+                                        </div>
                                     </div>
                                 {% elif sifaris.status == 'hazirlanir' %}
-                                    <div class="icon-container">
-                                        <i class="fas fa-box-open bounce"></i>
+                                    <div class="status-icon-container status-preparing">
+                                        <div class="box-animation">
+                                            <div class="box-lid"></div>
+                                        </div>
                                     </div>
                                 {% elif sifaris.status == 'yoldadir' %}
-                                    <div class="icon-container truck-wrapper">
-                                        <div class="truck-container">
+                                    <div class="status-icon-container status-shipping">
+                                        <div class="road"></div>
+                                        <div class="truck-icon">
                                             <i class="fas fa-truck"></i>
-                                            <div class="smoke-container">
-                                                <div class="smoke smoke1"></div>
-                                                <div class="smoke smoke2"></div>
-                                                <div class="smoke smoke3"></div>
-                                            </div>
+                                            <div class="wheel wheel-front"></div>
+                                            <div class="wheel wheel-back"></div>
+                                            <div class="smoke-particle" style="animation-delay: 0s"></div>
+                                            <div class="smoke-particle" style="animation-delay: 0.3s"></div>
+                                            <div class="smoke-particle" style="animation-delay: 0.6s"></div>
                                         </div>
                                     </div>
                                 {% elif sifaris.status == 'catdirildi' %}
-                                    <div class="icon-container">
-                                        <i class="fas fa-check-circle tada"></i>
+                                    <div class="status-icon-container status-delivered">
+                                        <div class="check-circle">
+                                            <div class="check-mark"></div>
+                                        </div>
                                     </div>
                                 {% endif %}
                                 {{ sifaris.display_status }}

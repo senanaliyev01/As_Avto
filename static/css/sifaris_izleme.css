@@ -578,3 +578,184 @@ tfoot td {
 .progress-step.active + .progress-line::after {
     width: 100%;
 }
+
+/* Status İkonları üçün yeni stillər */
+.status-icon-container {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    position: relative;
+}
+
+/* Gözləyir statusu üçün */
+.status-waiting {
+    background: #1e3a8a;
+    position: relative;
+}
+
+.clock-animation {
+    position: relative;
+    width: 20px;
+    height: 20px;
+}
+
+.clock-hand {
+    position: absolute;
+    background: white;
+    transform-origin: 50% 100%;
+    border-radius: 2px;
+}
+
+.hour-hand {
+    width: 2px;
+    height: 8px;
+    left: 49%;
+    top: 25%;
+    animation: rotateHand 6s linear infinite;
+}
+
+.minute-hand {
+    width: 2px;
+    height: 10px;
+    left: 49%;
+    top: 20%;
+    animation: rotateHand 1s linear infinite;
+}
+
+/* Hazırlanır statusu üçün */
+.status-preparing {
+    background: #fbbf24;
+}
+
+.box-animation {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    animation: boxOpen 2s infinite;
+}
+
+.box-lid {
+    position: absolute;
+    width: 100%;
+    height: 30%;
+    background: white;
+    top: 0;
+    transform-origin: top;
+    animation: openLid 2s infinite;
+}
+
+/* Yoldadır statusu üçün */
+.status-shipping {
+    background: #f59e0b;
+    overflow: hidden;
+}
+
+.road {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.truck-icon {
+    position: relative;
+    font-size: 18px;
+    color: white;
+    animation: truckMove 1s infinite;
+}
+
+.wheel {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: white;
+    border-radius: 50%;
+    animation: wheelRotate 1s infinite linear;
+}
+
+.wheel-front { bottom: -2px; right: 2px; }
+.wheel-back { bottom: -2px; left: 2px; }
+
+.smoke-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    animation: smokeRise 1s infinite;
+}
+
+/* Çatdırıldı statusu üçün */
+.status-delivered {
+    background: #059669;
+    position: relative;
+}
+
+.check-circle {
+    width: 20px;
+    height: 20px;
+    border: 2px solid white;
+    border-radius: 50%;
+    position: relative;
+    animation: circleComplete 2s infinite;
+}
+
+.check-mark {
+    position: absolute;
+    width: 8px;
+    height: 4px;
+    border-left: 2px solid white;
+    border-bottom: 2px solid white;
+    transform: rotate(-45deg);
+    left: 5px;
+    top: 6px;
+    animation: checkAppear 2s infinite;
+}
+
+/* Animasiyalar */
+@keyframes rotateHand {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes openLid {
+    0%, 100% { transform: rotateX(0deg); }
+    50% { transform: rotateX(-60deg); }
+}
+
+@keyframes truckMove {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
+}
+
+@keyframes wheelRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes smokeRise {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translate(-10px, -10px) scale(2);
+        opacity: 0;
+    }
+}
+
+@keyframes circleComplete {
+    0% { clip-path: polygon(0 0, 0 0, 0 100%, 0 100%); }
+    100% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+}
+
+@keyframes checkAppear {
+    0% { opacity: 0; transform: rotate(-45deg) scale(0); }
+    50% { opacity: 0; }
+    100% { opacity: 1; transform: rotate(-45deg) scale(1); }
+}

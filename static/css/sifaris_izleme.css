@@ -581,48 +581,54 @@ tfoot td {
 
 /* Status İkonları üçün yeni stillər */
 .status-icon-container {
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 10px;
+    margin-right: 15px;
     position: relative;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
 }
 
 /* Gözləyir statusu üçün */
 .status-waiting {
     background: #1e3a8a;
-    position: relative;
 }
 
 .clock-animation {
+    width: 30px;
+    height: 30px;
+    border: 2px solid white;
+    border-radius: 50%;
     position: relative;
-    width: 20px;
-    height: 20px;
 }
 
 .clock-hand {
     position: absolute;
     background: white;
-    transform-origin: 50% 100%;
+    transform-origin: 50% 50%;
     border-radius: 2px;
+    left: 50%;
 }
 
 .hour-hand {
     width: 2px;
     height: 8px;
-    left: 49%;
-    top: 25%;
+    margin-left: -1px;
+    margin-top: -4px;
+    top: 50%;
     animation: rotateHand 6s linear infinite;
 }
 
 .minute-hand {
     width: 2px;
-    height: 10px;
-    left: 49%;
-    top: 20%;
+    height: 12px;
+    margin-left: -1px;
+    margin-top: -6px;
+    top: 50%;
     animation: rotateHand 1s linear infinite;
 }
 
@@ -632,89 +638,124 @@ tfoot td {
 }
 
 .box-animation {
+    width: 35px;
+    height: 35px;
+    background: white;
     position: relative;
-    width: 20px;
-    height: 20px;
-    animation: boxOpen 2s infinite;
+    border-radius: 4px;
 }
 
 .box-lid {
     position: absolute;
     width: 100%;
-    height: 30%;
-    background: white;
-    top: 0;
-    transform-origin: top;
+    height: 10px;
+    background: #ffffff;
+    top: -10px;
+    left: 0;
+    transform-origin: bottom;
     animation: openLid 2s infinite;
+    border-radius: 4px 4px 0 0;
 }
 
 /* Yoldadır statusu üçün */
 .status-shipping {
     background: #f59e0b;
     overflow: hidden;
+    width: 120px;
+    border-radius: 30px;
+}
+
+.shipping-scene {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
 .road {
     position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 4px;
+    bottom: 10px;
+    width: 200%;
+    height: 6px;
     background: rgba(255, 255, 255, 0.3);
+    animation: moveRoad 2s linear infinite;
+}
+
+.trees {
+    position: absolute;
+    bottom: 16px;
+    width: 200%;
+    height: 20px;
+    animation: moveRoad 2s linear infinite;
+}
+
+.tree {
+    position: absolute;
+    bottom: 0;
+    width: 12px;
+    height: 20px;
+    background: #2f855a;
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
 }
 
 .truck-icon {
-    position: relative;
-    font-size: 18px;
+    position: absolute;
+    bottom: 16px;
+    left: 20px;
+    font-size: 24px;
     color: white;
-    animation: truckMove 1s infinite;
+    transform: scaleX(-1);
+    z-index: 2;
 }
 
 .wheel {
     position: absolute;
-    width: 4px;
-    height: 4px;
+    width: 6px;
+    height: 6px;
     background: white;
     border-radius: 50%;
-    animation: wheelRotate 1s infinite linear;
+    bottom: -3px;
+    animation: wheelRotate 0.5s linear infinite;
 }
 
-.wheel-front { bottom: -2px; right: 2px; }
-.wheel-back { bottom: -2px; left: 2px; }
+.wheel-front { right: 2px; }
+.wheel-back { left: 2px; }
 
 .smoke-particle {
     position: absolute;
-    width: 4px;
-    height: 4px;
+    width: 6px;
+    height: 6px;
     background: rgba(255, 255, 255, 0.6);
     border-radius: 50%;
-    animation: smokeRise 1s infinite;
+    right: -8px;
+    bottom: 8px;
 }
 
 /* Çatdırıldı statusu üçün */
 .status-delivered {
     background: #059669;
-    position: relative;
 }
 
 .check-circle {
-    width: 20px;
-    height: 20px;
-    border: 2px solid white;
+    width: 35px;
+    height: 35px;
+    border: 3px solid white;
     border-radius: 50%;
     position: relative;
-    animation: circleComplete 2s infinite;
+    animation: circleComplete 2s forwards;
 }
 
 .check-mark {
     position: absolute;
-    width: 8px;
-    height: 4px;
-    border-left: 2px solid white;
-    border-bottom: 2px solid white;
+    width: 15px;
+    height: 8px;
+    border-left: 3px solid white;
+    border-bottom: 3px solid white;
     transform: rotate(-45deg);
-    left: 5px;
-    top: 6px;
-    animation: checkAppear 2s infinite;
+    left: 8px;
+    top: 10px;
+    animation: checkAppear 0.5s 1s forwards;
+    opacity: 0;
 }
 
 /* Animasiyalar */
@@ -725,7 +766,7 @@ tfoot td {
 
 @keyframes openLid {
     0%, 100% { transform: rotateX(0deg); }
-    50% { transform: rotateX(-60deg); }
+    50% { transform: rotateX(-80deg); }
 }
 
 @keyframes truckMove {
@@ -744,7 +785,7 @@ tfoot td {
         opacity: 0.8;
     }
     100% {
-        transform: translate(-10px, -10px) scale(2);
+        transform: translate(-20px, -20px) scale(2);
         opacity: 0;
     }
 }
@@ -759,3 +800,33 @@ tfoot td {
     50% { opacity: 0; }
     100% { opacity: 1; transform: rotate(-45deg) scale(1); }
 }
+
+/* Yeni Animasiyalar */
+@keyframes moveRoad {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+/* Progress Line-lar üçün */
+.progress-line {
+    flex: 1;
+    height: 4px;
+    background: #e2e8f0;
+    margin: 0 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-line-fill {
+    position: absolute;
+    height: 100%;
+    width: 0;
+    background: currentColor;
+    transition: width 0.5s ease;
+}
+
+/* Status rəngləri */
+.status-gozleyir .progress-line-fill { background: #1e3a8a; }
+.status-hazirlanir .progress-line-fill { background: #fbbf24; }
+.status-yoldadir .progress-line-fill { background: #f59e0b; }
+.status-catdirildi .progress-line-fill { background: #059669; }

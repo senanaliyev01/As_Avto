@@ -127,3 +127,68 @@ document.querySelectorAll('.progress-step').forEach((step, index) => {
         }, index * 300);
     }
 });
+
+// Yol və ağacları yaratmaq üçün funksiya
+function createShippingScene() {
+    const shippingContainers = document.querySelectorAll('.status-shipping');
+    
+    shippingContainers.forEach(container => {
+        const scene = document.createElement('div');
+        scene.className = 'shipping-scene';
+        
+        // Yol əlavə et
+        const road = document.createElement('div');
+        road.className = 'road';
+        
+        // Ağacları əlavə et
+        const trees = document.createElement('div');
+        trees.className = 'trees';
+        
+        // 5 ağac əlavə et
+        for(let i = 0; i < 5; i++) {
+            const tree = document.createElement('div');
+            tree.className = 'tree';
+            tree.style.left = `${i * 40 + 20}px`;
+            trees.appendChild(tree);
+        }
+        
+        scene.appendChild(road);
+        scene.appendChild(trees);
+        container.appendChild(scene);
+    });
+}
+
+// Status animasiyalarını aktivləşdirmək üçün
+function activateStatusAnimations() {
+    const currentStatus = document.querySelector('.progress-step.active');
+    if (!currentStatus) return;
+    
+    // Bütün animasiyaları dayandır
+    document.querySelectorAll('.status-icon-container').forEach(container => {
+        container.style.opacity = '0.5';
+    });
+    
+    // Aktiv statusun animasiyasını başlat
+    const activeIcon = currentStatus.querySelector('.status-icon-container');
+    if (activeIcon) {
+        activeIcon.style.opacity = '1';
+        activeIcon.style.transform = 'scale(1.1)';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    createShippingScene();
+    activateStatusAnimations();
+    
+    // Hər 3 saniyədən bir tüstü effekti
+    setInterval(() => {
+        const activeTruck = document.querySelector('.progress-step.active .truck-icon');
+        if (activeTruck) {
+            const smoke = document.createElement('div');
+            smoke.className = 'smoke-particle';
+            activeTruck.appendChild(smoke);
+            
+            setTimeout(() => smoke.remove(), 2000);
+        }
+    }, 300);
+});

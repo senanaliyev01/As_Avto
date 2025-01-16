@@ -17,6 +17,10 @@
                 <a href="{% url 'products_list' %}" class="back-button">
                     <i class="fas fa-arrow-left"></i> Məhsullara Qayıt
                 </a>
+                <a href="{% url 'view_cart' %}" class="cart-link">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="cart-count" class="cart-badge">0</span>
+                </a>
             </div>
         </div>
     </header>
@@ -49,7 +53,7 @@
                         <span class="value">{{ mehsul.brend }}</span>
                     </div>
                     <div class="spec-item">
-                        <span class="label">Model:</span>
+                        <span class="label">Marka:</span>
                         <span class="value">{{ mehsul.marka }}</span>
                     </div>
                     <div class="spec-item">
@@ -57,12 +61,12 @@
                         <span class="value">{{ mehsul.brend_kod }}</span>
                     </div>
                     <div class="spec-item">
-                        <span class="label">Əsas OEM:</span>
+                        <span class="label">OEM:</span>
                         <span class="value">{{ mehsul.oem }}</span>
                     </div>
                     {% if mehsul.oem_kodlar.all %}
                     <div class="spec-item oem-list">
-                        <span class="label">Digər OEM:</span>
+                        <span class="label">Dəyişən OEM Kodlar:</span>
                         <div class="value oem-codes">
                             {% for oem in mehsul.oem_kodlar.all %}
                                 <span class="oem-code">{{ oem.kod }}</span>
@@ -88,6 +92,8 @@
                     </div>
                 </div>
 
+                <a href="{% url 'sebet_ekle' mehsul.id %}" class="cart-icon"><i class="fas fa-shopping-cart"></i></a>
+
                
 
                 {% if mehsul.haqqinda %}
@@ -101,7 +107,7 @@
 
         {% if mehsul.brend.haqqinda or mehsul.brend.sekil %}
         <div class="brand-info">
-            <h2>{{ mehsul.brend.adi }} Haqqında</h2>
+            <h2>{{ mehsul.brend.adi }} Şirkəti Haqqında</h2>
             <div class="brand-content">
                 {% if mehsul.brend.sekil %}
                 <div class="brand-image-container">

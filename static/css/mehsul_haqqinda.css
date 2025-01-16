@@ -9,20 +9,30 @@ body {
     line-height: 1.6;
 }
 
-/* Header */
+/* Ümumi Header Tərtibatı */
 header {
-    background: linear-gradient(to right, #0d2b4d, #1a4980);
-    padding: 1rem;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    background-color: #f8f9fa; /* Açıq rəngli fon */
+    padding: 15px 20px; /* Üst və yan boşluqlar */
+    border-bottom: 2px solid #e9ecef; /* Aşağı xətt */
+    display: flex;
+    justify-content: space-between; /* Mətnin sağ və sola yayılması */
+    align-items: center; /* Şaquli mərkəzləşdirmə */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Kölgə */
 }
 
-.nav-buttons {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
+/* Geri Qayıt Düyməsi */
+.back-button {
+    color: #007bff; /* Mavi rəng */
+    text-decoration: none; /* Alt xətti sil */
+    font-size: 16px; /* Mətn ölçüsü */
+    display: flex;
+    align-items: center; /* Şaquli mərkəzləşdirmə */
+    gap: 8px; /* İkon ilə mətn arası boşluq */
+    transition: color 0.3s ease; /* Keçid effekti */
+}
+
+.back-button:hover {
+    color: #0056b3; /* Tünd mavi rəng */
 }
 
 /* Səbət Linki */
@@ -63,26 +73,6 @@ header {
     transform: scale(1.1); /* Badge böyümə effekti */
 }
 
-
-.back-button {
-    background: rgba(255, 255, 255, 0.1);
-    color: #64ffda;
-    padding: 0.8rem 1.5rem;
-    border-radius: 8px;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.8rem;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(100, 255, 218, 0.2);
-}
-
-.back-button:hover {
-    background: rgba(100, 255, 218, 0.1);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(100, 255, 218, 0.2);
-}
 
 /* Main Container */
 .mehsul-container {

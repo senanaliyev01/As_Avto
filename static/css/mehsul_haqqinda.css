@@ -426,11 +426,11 @@ header {
 } 
 
 /* Cart Badge */
-.nav-buttons .cart-link {
+ .cart-link {
     position: relative;
 }
 
- .nav-buttons .cart-badge {
+ .cart-badge {
     position: absolute;
     top: -8px;
     right: -8px;
@@ -453,7 +453,7 @@ header {
     padding: 10px 12px;
     background-color: #28a745; /* Yaşıl rəng */
     color: #fff; /* Ağ ikon rəngi */
-    border-radius: 50%; /* Dairəvi forma */
+    border-radius: 20px; /* Dairəvi forma */
     text-decoration: none; /* Link alt xəttini sil */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Yumşaq kölgə */
     transition: all 0.3s ease; /* Effektli keçid */

@@ -301,7 +301,7 @@ header {
 .description {
     margin: 3rem auto;
     width: 100%;
-    max-width: 800px;
+    max-width: 1000px;
     background: linear-gradient(145deg, #0d2b4d 0%, #1a4980 100%);
     border-radius: 20px;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);

@@ -91,17 +91,15 @@
                     <i class="fas fa-shopping-cart"></i>
                     <span>Səbətə Əlavə Et</span>
                 </a>
-
-               
-
-                {% if mehsul.haqqinda %}
-                <div class="description">
-                    <h2>Məhsul Haqqında</h2>
-                    <p>{{ mehsul.haqqinda }}</p>
-                </div>
-                {% endif %}
             </div>
         </div>
+
+        {% if mehsul.haqqinda %}
+        <div class="description">
+            <h2>Məhsul Haqqında</h2>
+            <p>{{ mehsul.haqqinda }}</p>
+        </div>
+        {% endif %}
 
         {% if mehsul.brend.haqqinda or mehsul.brend.sekil %}
         <div class="brand-info">

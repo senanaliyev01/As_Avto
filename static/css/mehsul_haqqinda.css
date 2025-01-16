@@ -426,16 +426,16 @@ header {
 } 
 
 /* Cart Badge */
-.cart-link {
+.nav-buttons .cart-link {
     position: relative;
 }
 
-.cart-badge {
+ .nav-buttons .cart-badge {
     position: absolute;
     top: -8px;
     right: -8px;
-    background-color: var(--error-color);
-    color: red;
+    background-color: red;
+    color: white;
     font-size: 12px;
     padding: 2px 6px;
     border-radius: 50%;
@@ -446,4 +446,31 @@ header {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.cart-icon {
+    display: inline-block;
+    padding: 10px 12px;
+    background-color: #28a745; /* Yaşıl rəng */
+    color: #fff; /* Ağ ikon rəngi */
+    border-radius: 50%; /* Dairəvi forma */
+    text-decoration: none; /* Link alt xəttini sil */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Yumşaq kölgə */
+    transition: all 0.3s ease; /* Effektli keçid */
+}
+
+.cart-icon i {
+    font-size: 18px; /* İkon ölçüsü */
+}
+
+.cart-icon:hover {
+    background-color: #218838; /* Daha tünd yaşıl rəng */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); /* Daha güclü kölgə */
+    transform: translateY(-3px); /* İkon yuxarı qalxır */
+}
+
+.cart-icon:active {
+    background-color: #1e7e34; /* Ən tünd yaşıl rəng */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Kölgə azaldılır */
+    transform: translateY(0); /* İkon yeri bərpa edilir */
 }

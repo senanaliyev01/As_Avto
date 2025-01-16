@@ -1,47 +1,36 @@
-/* Base Styles */
-:root {
-    --dark-blue-900: #0a192f;
-    --dark-blue-800: #112240;
-    --dark-blue-700: #1b2d45;
-    --dark-blue-600: #233554;
-    --blue-accent: #64ffda;
-    --text-primary: #e6f1ff;
-    --text-secondary: #8892b0;
-  }
-  
-  body {
+* Base Styles */
+body {
     margin: 0;
     padding: 0;
-    background: linear-gradient(135deg, var(--dark-blue-900) 0%, var(--dark-blue-800) 100%);
-    color: var(--text-primary);
+    background: linear-gradient(135deg, #0a1929 0%, #0d2b4d 100%);
+    color: #e6f1ff;
     font-family: 'Segoe UI', Arial, sans-serif;
     min-height: 100vh;
     line-height: 1.6;
-  }
-  
-  /* Header */
-  header {
-    background: linear-gradient(to right, var(--dark-blue-900), var(--dark-blue-800));
-    padding: 1rem;
+}
+
+/* Header */
+header {
+    background: linear-gradient(to right, #0d2b4d, #1a4980);
+    padding: 1.2rem;
     position: sticky;
     top: 0;
     z-index: 100;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  }
-  
-  .nav-buttons {
+}
+
+.nav-buttons {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-  }
-  
-  /* Back Button */
-  .back-button {
-    background: rgba(230, 241, 255, 0.05);
-    color: var(--blue-accent);
+}
+
+.back-button, .cart-link {
+    background: rgba(255, 255, 255, 0.1);
+    color: #64ffda;
     padding: 0.8rem 1.5rem;
     border-radius: 8px;
     text-decoration: none;
@@ -49,239 +38,446 @@
     align-items: center;
     gap: 0.8rem;
     transition: all 0.3s ease;
-    border: 1px solid rgba(100, 255, 218, 0.1);
-  }
-  
-  .back-button:hover {
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(100, 255, 218, 0.2);
+}
+
+.back-button:hover, .cart-link:hover {
     background: rgba(100, 255, 218, 0.1);
     transform: translateY(-2px);
-  }
-  
-  /* Cart Link */
-  .cart-link {
+    box-shadow: 0 4px 15px rgba(100, 255, 218, 0.2);
+}
+
+.cart-link {
     position: relative;
-    background: rgba(100, 255, 218, 0.1);
-    padding: 0.8rem 1.2rem;
-    border-radius: 8px;
-    color: var(--blue-accent);
-    text-decoration: none;
-    transition: all 0.3s ease;
-    border: 1px solid rgba(100, 255, 218, 0.1);
-  }
-  
-  .cart-badge {
+}
+
+.cart-badge {
     position: absolute;
     top: -8px;
     right: -8px;
-    background: #ff4d4d;
+    background: #ff4757;
     color: white;
-    font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
-    min-width: 18px;
-    height: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid var(--dark-blue-900);
-  }
-  
-  /* Main Container */
-  .mehsul-container {
+    font-size: 0.8rem;
+    font-weight: bold;
+    border: 2px solid #1a4980;
+    transition: all 0.3s ease;
+}
+
+/* Add to Cart Button */
+.cart-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    background: linear-gradient(135deg, #00b894, #00cec9);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    margin-top: 2rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 184, 148, 0.3);
+}
+
+.cart-icon i {
+    font-size: 1.2rem;
+}
+
+.cart-icon:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 184, 148, 0.4);
+    background: linear-gradient(135deg, #00cec9, #00b894);
+}
+
+.cart-icon:active {
+    transform: translateY(-1px);
+}
+
+/* Main Container */
+.mehsul-container {
     max-width: 1200px;
     margin: 2rem auto;
     padding: 0 1.5rem;
-  }
-  
-  /* Product Info */
-  .mehsul-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Product Info Section */
+.mehsul-info {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 3rem;
-    background: var(--dark-blue-800);
+    background: linear-gradient(145deg, #0d2b4d 0%, #1a4980 100%);
     padding: 2.5rem;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(100, 255, 218, 0.1);
-  }
-  
-  /* Gallery */
-  .mehsul-gallery {
-    background: var(--dark-blue-700);
+    width: 100%;
+    max-width: 1000px;
+}
+
+/* Product Gallery */
+.mehsul-gallery {
+    position: relative;
+    background: rgba(13, 43, 77, 0.5);
     border-radius: 15px;
-    padding: 2rem;
-    min-height: 400px;
+    padding: 2.5rem;
+    backdrop-filter: blur(10px);
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(100, 255, 218, 0.1);
+    min-height: 450px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgba(100, 255, 218, 0.1);
-  }
-  
-  .product-image {
-    max-width: 100%;
-    height: auto;
+}
+
+.model-viewer-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-image {
+    width: auto;
+    max-width: 90%;
+    max-height: 400px;
     object-fit: contain;
-    border-radius: 10px;
-  }
-  
-  .drag-hint {
+    cursor: grab;
+    transition: transform 0.3s ease;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4));
+    position: relative;
+    z-index: 2;
+}
+
+/* Əlavə effektlər üçün */
+.model-viewer-container::before {
+    content: '';
+    position: absolute;
+    width: 80%;
+    height: 20px;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse at center, rgba(100,255,218,0.15) 0%, rgba(100,255,218,0) 70%);
+    filter: blur(5px);
+    z-index: 1;
+}
+
+.product-image:active {
+    cursor: grabbing;
+}
+
+.drag-hint {
     position: absolute;
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background: var(--dark-blue-800);
-    color: var(--blue-accent);
+    background: rgba(13, 43, 77, 0.9);
+    color: #64ffda;
     padding: 0.8rem 1.5rem;
     border-radius: 25px;
     font-size: 0.9rem;
     display: flex;
     align-items: center;
     gap: 0.8rem;
-  }
-  
-  /* Product Details */
-  .mehsul-details h1 {
-    color: var(--blue-accent);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(100, 255, 218, 0.2);
+}
+
+/* Product Details */
+.mehsul-details {
+    padding: 1rem;
+}
+
+.mehsul-details h1 {
+    color: #64ffda;
     margin: 0 0 2rem 0;
     font-size: 2.2rem;
-    border-bottom: 2px solid rgba(100, 255, 218, 0.1);
+    border-bottom: 2px solid rgba(100, 255, 218, 0.2);
     padding-bottom: 1rem;
-  }
-  
-  /* Specs */
-  .specs {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.specs {
     display: grid;
     gap: 1rem;
-  }
-  
-  .spec-item {
+}
+
+.spec-item {
     display: flex;
     align-items: center;
     padding: 1.2rem;
-    background: var(--dark-blue-700);
+    background: rgba(13, 43, 77, 0.5);
     border-radius: 12px;
     transition: all 0.3s ease;
-  }
-  
-  .label {
-    color: var(--blue-accent);
+    border: 1px solid rgba(100, 255, 218, 0.1);
+    backdrop-filter: blur(5px);
+}
+
+.spec-item:hover {
+    background: rgba(26, 73, 128, 0.5);
+    transform: translateX(5px);
+    border-color: rgba(100, 255, 218, 0.3);
+}
+
+.label {
     font-weight: 600;
-    width: 140px;
-  }
-  
-  .value {
-    color: var(--text-secondary);
-  }
-  
-  /* Stock Status */
-  .stock-status {
+    color: #64ffda;
+    width: 130px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.value {
+    color: #e6f1ff;
+}
+
+.price-item {
+    background: linear-gradient(135deg, #1a4980 0%, #2a5788 100%);
+    border: none;
+}
+
+.price {
+    color: #64ffda;
+    font-size: 1.6rem;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* OEM Codes */
+.oem-list {
+    flex-direction: column;
+    align-items: flex-start !important;
+}
+
+.oem-codes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-top: 0.8rem;
+}
+
+.oem-code {
+    background: rgba(26, 73, 128, 0.5);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: #64ffda;
+    border: 1px solid rgba(100, 255, 218, 0.2);
+    transition: all 0.3s ease;
+}
+
+.oem-code:hover {
+    background: rgba(26, 73, 128, 0.8);
+    transform: translateY(-2px);
+}
+
+/* Description */
+.description {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: rgba(13, 43, 77, 0.5);
+    border-radius: 15px;
+    border-left: 4px solid #64ffda;
+    backdrop-filter: blur(5px);
+}
+
+.description h2 {
+    color: #64ffda;
+    margin: 0 0 1rem 0;
+    font-size: 1.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Brand Info */
+.brand-info {
+    margin-top: 3rem;
+    padding: 2.5rem;
+    background: linear-gradient(145deg, #0d2b4d 0%, #1a4980 100%);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(100, 255, 218, 0.1);
+    width: 100%;
+    max-width: 1000px;
+}
+
+.brand-info h2 {
+    color: #64ffda;
+    margin: 0 0 2rem 0;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid rgba(100, 255, 218, 0.2);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+.brand-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
+
+.brand-image-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.brand-image {
+    width: 300px;
+    background: rgba(13, 43, 77, 0.5);
+    padding: 1rem;
+    border-radius: 15px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(100, 255, 218, 0.1);
+}
+
+.brand-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    cursor: grab;
+    transition: transform 0.3s ease;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4));
+}
+
+.brand-description {
+    width: 100%;
+    background: rgba(13, 43, 77, 0.5);
+    padding: 1.5rem;
+    border-radius: 15px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(100, 255, 218, 0.1);
+    line-height: 1.8;
+    text-align: center;
+}
+
+/* Mövcudluq statusları */
+.stock-item {
+    margin-bottom: 1rem;
+}
+
+.stock-status {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     padding: 0.4rem 1rem;
     border-radius: 6px;
-  }
-  
-  .out-of-stock {
-    background: rgba(220, 38, 38, 0.1);
-    color: #ff4d4d;
-  }
-  
-  .low-stock {
-    background: rgba(245, 158, 11, 0.1);
-    color: #ffd700;
-  }
-  
-  .in-stock {
-    background: rgba(16, 185, 129, 0.1);
-    color: #4ade80;
-  }
-  
-  /* Add to Cart Button */
-  .cart-icon {
-    display: inline-flex;
-    align-items: center;
-    gap: 1rem;
-    margin-top: 2rem;
-    padding: 1rem 2rem;
-    background: linear-gradient(135deg, var(--blue-accent) 0%, #48c9a5 100%);
-    color: var(--dark-blue-900);
-    border-radius: 12px;
-    text-decoration: none;
     font-weight: 600;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(100, 255, 218, 0.2);
-  }
-  
-  .cart-icon:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(100, 255, 218, 0.3);
-  }
-  
-  /* Brand Info */
-  .brand-info {
-    margin-top: 3rem;
-    padding: 2.5rem;
-    background: var(--dark-blue-800);
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(100, 255, 218, 0.1);
-  }
-  
-  .brand-info h2 {
-    color: var(--blue-accent);
-    text-align: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid rgba(100, 255, 218, 0.1);
-  }
-  
-  .brand-content {
-    display: grid;
-    gap: 2rem;
-  }
-  
-  .brand-image {
-    background: var(--dark-blue-700);
-    padding: 1rem;
-    border-radius: 15px;
-  }
-  
-  .brand-image img {
-    width: 250px;
-    height: auto;
-    border-radius: 10px;
-  }
-  
-  .brand-description {
-    color: var(--text-secondary);
-    line-height: 1.8;
-  }
-  
-  /* Responsive Design */
-  @media (max-width: 768px) {
+}
+
+.stock-status i {
+    font-size: 1.1rem;
+}
+
+/* Yoxdur */
+.out-of-stock {
+    background: rgba(220, 38, 38, 0.2);
+    color: #ff4d4d;
+    border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+.out-of-stock i {
+    color: #ff4d4d;
+}
+
+/* Az var */
+.low-stock {
+    background: rgba(245, 158, 11, 0.2);
+    color: #ffd700;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.low-stock i {
+    color: #ffd700;
+}
+
+/* Var */
+.in-stock {
+    background: rgba(16, 185, 129, 0.2);
+    color: #4ade80;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.in-stock i {
+    color: #4ade80;
+}
+
+/* Hover effektləri */
+.stock-status:hover {
+    transform: translateX(5px);
+}
+
+.out-of-stock:hover {
+    background: rgba(220, 38, 38, 0.3);
+}
+
+.low-stock:hover {
+    background: rgba(245, 158, 11, 0.3);
+}
+
+.in-stock:hover {
+    background: rgba(16, 185, 129, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
     .mehsul-info {
-      grid-template-columns: 1fr;
-      gap: 2rem;
-      padding: 1.5rem;
+        grid-template-columns: 1fr;
+        padding: 1.5rem;
+    }
+    
+    .brand-content {
+        grid-template-columns: 1fr;
     }
     
     .mehsul-details h1 {
-      font-size: 1.8rem;
+        font-size: 1.8rem;
     }
     
     .spec-item {
-      flex-direction: column;
-      align-items: flex-start;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
     }
     
     .label {
-      width: 100%;
-      margin-bottom: 0.5rem;
+        width: 100%;
     }
     
-    .cart-icon {
-      width: 100%;
-      justify-content: center;
+    .mehsul-gallery {
+        min-height: 350px;
+        padding: 1.5rem;
     }
-  }
+    
+    .product-image {
+        max-height: 300px;
+    }
+    
+    .stock-status {
+        width: 100%;
+        justify-content: center;
+        margin-top: 0.5rem;
+    }
+    
+    .brand-image {
+        width: 100%;
+        max-width: 250px;
+    }
+    
+    .brand-description {
+        padding: 1rem;
+    }
+} 

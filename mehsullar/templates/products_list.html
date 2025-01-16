@@ -61,7 +61,7 @@
 
         <select name="brand" id="brand">
             <option value="">Brend</option>
-            {% for brand in brendlər %}
+            {% for brand in brendler %}
                 <option value="{{ brand.adi }}" {% if request.GET.brand == brand.adi %}selected{% endif %}>
                     {{ brand.adi }}
                 </option>

@@ -11,6 +11,8 @@ class Kateqoriya(models.Model):
 
 class Brend(models.Model):
     adi = models.CharField(max_length=100, unique=True)
+    sekil = models.ImageField(upload_to='brend_sekilleri/', null=True, blank=True)
+    haqqinda = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.adi
@@ -30,6 +32,8 @@ class Mehsul(models.Model):
     oem = models.CharField(max_length=100)
     stok = models.IntegerField()
     qiymet = models.DecimalField(max_digits=10, decimal_places=2)
+    sekil = models.ImageField(upload_to='mehsul_sekilleri/', null=True, blank=True)
+    haqqinda = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.adi

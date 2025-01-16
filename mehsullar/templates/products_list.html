@@ -107,6 +107,7 @@
                         <th>Stok</th>
                         <th>Qiymət</th>
                         <th>Səbət</th>
+                        <th>Ətraflı</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -132,6 +133,12 @@
                             <i class="fa-solid fa-manat-sign" style="font-size: 0.9em; margin-left: 2px;"></i>
                         </td>
                         <td><a href="{% url 'sebet_ekle' mehsul.id %}" class="cart-icon"><i class="fas fa-shopping-cart"></i></a></td>
+                        <td>
+                            <a href="{% url 'mehsul_haqqinda' mehsul.id %}" class="info-link">
+                                <i class="fas fa-info"></i>
+                                Ətraflı
+                            </a>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>

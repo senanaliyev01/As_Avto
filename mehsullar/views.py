@@ -301,3 +301,9 @@ def sifaris_detallari(request, sifaris_id):
     }
     return render(request, 'sifaris_detallari.html', context)
 
+def mehsul_haqqinda(request, mehsul_id):
+    mehsul = get_object_or_404(Mehsul, id=mehsul_id)
+    return render(request, 'mehsul_haqqinda.html', {
+        'mehsul': mehsul
+    })
+

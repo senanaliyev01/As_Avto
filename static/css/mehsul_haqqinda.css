@@ -25,6 +25,30 @@ header {
     padding: 0 1rem;
 }
 
+/* Cart Badge */
+.cart-link {
+    position: relative;
+}
+
+ .cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: red;
+    color: white;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 50%;
+    border: 2px solid var(--text-white);
+    font-weight: bold;
+    min-width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
 .back-button {
     background: rgba(255, 255, 255, 0.1);
     color: #64ffda;
@@ -425,28 +449,7 @@ header {
     }
 } 
 
-/* Cart Badge */
- .cart-link {
-    position: relative;
-}
 
- .cart-badge {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background-color: red;
-    color: white;
-    font-size: 12px;
-    padding: 2px 6px;
-    border-radius: 50%;
-    border: 2px solid var(--text-white);
-    font-weight: bold;
-    min-width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 
 .cart-icon {
     display: inline-block;

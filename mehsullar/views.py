@@ -62,7 +62,7 @@ def products_list(request):
     # Başlanğıc olaraq bütün məhsulları götürürük
     mehsullar = Mehsul.objects.all()
     kateqoriyalar = Kateqoriya.objects.all()
-    brendlər = Brend.objects.all()
+    brendler = Brend.objects.all()
     markalar = Marka.objects.all()
 
     # Axtarış parametrlərini alırıq
@@ -95,7 +95,7 @@ def products_list(request):
     return render(request, 'products_list.html', {
         'mehsullar': mehsullar,
         'kateqoriyalar': kateqoriyalar,
-        'brendlər': brendlər,
+        'brendler': brendler,
         'markalar': markalar
     })
 

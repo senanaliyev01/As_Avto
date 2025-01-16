@@ -424,3 +424,26 @@ header {
         padding: 1rem;
     }
 } 
+
+/* Cart Badge */
+.cart-link {
+    position: relative;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: var(--error-color);
+    color: red;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 50%;
+    border: 2px solid var(--text-white);
+    font-weight: bold;
+    min-width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

@@ -95,7 +95,7 @@ def products_list(request):
     return render(request, 'products_list.html', {
         'mehsullar': mehsullar,
         'kateqoriyalar': kateqoriyalar,
-        'brendler': brendler,
+        'brendlər': brendlər,
         'markalar': markalar
     })
 

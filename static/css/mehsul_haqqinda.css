@@ -9,70 +9,44 @@ body {
     line-height: 1.6;
 }
 
-/* Ümumi Header Tərtibatı */
+/* Header */
 header {
-    background-color: #f8f9fa; /* Açıq rəngli fon */
-    padding: 15px 20px; /* Üst və yan boşluqlar */
-    border-bottom: 2px solid #e9ecef; /* Aşağı xətt */
-    display: flex;
-    justify-content: space-between; /* Mətnin sağ və sola yayılması */
-    align-items: center; /* Şaquli mərkəzləşdirmə */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Kölgə */
+    background: linear-gradient(to right, #0d2b4d, #1a4980);
+    padding: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-/* Geri Qayıt Düyməsi */
+.nav-buttons {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+
+
+
 .back-button {
-    color: #007bff; /* Mavi rəng */
-    text-decoration: none; /* Alt xətti sil */
-    font-size: 16px; /* Mətn ölçüsü */
-    display: flex;
-    align-items: center; /* Şaquli mərkəzləşdirmə */
-    gap: 8px; /* İkon ilə mətn arası boşluq */
-    transition: color 0.3s ease; /* Keçid effekti */
+    background: rgba(255, 255, 255, 0.1);
+    color: #64ffda;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(100, 255, 218, 0.2);
 }
 
 .back-button:hover {
-    color: #0056b3; /* Tünd mavi rəng */
+    background: rgba(100, 255, 218, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(100, 255, 218, 0.2);
 }
-
-/* Səbət Linki */
-.cart-link {
-    color: #28a745; /* Yaşıl rəng */
-    text-decoration: none; /* Alt xətti sil */
-    font-size: 18px; /* Mətn ölçüsü */
-    font-weight: bold; /* Mətn qalınlığı */
-    display: flex;
-    align-items: center; /* Şaquli mərkəzləşdirmə */
-    gap: 10px; /* İkon və mətn arası boşluq */
-    position: relative; /* Badge üçün */
-    transition: color 0.3s ease, transform 0.3s ease; /* Keçidlər */
-}
-
-.cart-link:hover {
-    color: #218838; /* Daha tünd yaşıl rəng */
-    transform: scale(1.05); /* Yüngül böyümə effekti */
-}
-
-/* Səbət Badge (Say Göstəricisi) */
-.cart-badge {
-    background-color: #dc3545; /* Qırmızı rəng */
-    color: #fff; /* Ağ mətn */
-    font-size: 12px; /* Kiçik ölçü */
-    font-weight: bold; /* Mətn qalınlığı */
-    border-radius: 50%; /* Dairəvi forma */
-    padding: 4px 8px; /* İç boşluqlar */
-    position: absolute;
-    top: -8px; /* Linkin üstündə yerləşir */
-    right: -10px; /* Sağ tərəfdə yerləşir */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Yumşaq kölgə */
-    transition: transform 0.3s ease, background-color 0.3s ease; /* Keçid effekti */
-}
-
-.cart-badge:hover {
-    background-color: #bd2130; /* Daha tünd qırmızı */
-    transform: scale(1.1); /* Badge böyümə effekti */
-}
-
 
 /* Main Container */
 .mehsul-container {
@@ -456,29 +430,115 @@ header {
 
 
 
-.cart-icon {
-    display: inline-block;
-    padding: 10px 12px;
-    background-color: #28a745; /* Yaşıl rəng */
-    color: #fff; /* Ağ ikon rəngi */
-    border-radius: 20px; /* Dairəvi forma */
-    text-decoration: none; /* Link alt xəttini sil */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Yumşaq kölgə */
-    transition: all 0.3s ease; /* Effektli keçid */
+/* Header Cart Link */
+.cart-link {
+    position: relative;
+    background: rgba(255, 255, 255, 0.1);
+    color: #64ffda;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(100, 255, 218, 0.2);
+    margin-left: 1rem;
 }
 
-.cart-icon i {
-    font-size: 18px; /* İkon ölçüsü */
+.cart-link:hover {
+    background: rgba(100, 255, 218, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(100, 255, 218, 0.2);
+}
+
+.cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: linear-gradient(135deg, #ff4d4d 0%, #f03 100%);
+    color: white;
+    font-size: 0.75rem;
+    padding: 0.25rem;
+    border-radius: 50%;
+    border: 2px solid #0a1929;
+    font-weight: bold;
+    min-width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Add to Cart Button */
+.cart-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    padding: 1rem 2rem;
+    margin-top: 1.5rem;
+    background: linear-gradient(135deg, #64ffda 0%, #00b8d4 100%);
+    color: #0a1929;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(100, 255, 218, 0.2);
+    border: none;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+}
+
+.cart-icon:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
+    transform: translateX(-100%);
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .cart-icon:hover {
-    background-color: #218838; /* Daha tünd yaşıl rəng */
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); /* Daha güclü kölgə */
-    transform: translateY(-3px); /* İkon yuxarı qalxır */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(100, 255, 218, 0.3);
+    background: linear-gradient(135deg, #64ffda 20%, #00b8d4 120%);
+}
+
+.cart-icon:hover:before {
+    transform: translateX(100%);
 }
 
 .cart-icon:active {
-    background-color: #1e7e34; /* Ən tünd yaşıl rəng */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Kölgə azaldılır */
-    transform: translateY(0); /* İkon yeri bərpa edilir */
+    transform: translateY(1px);
+    box-shadow: 0 2px 10px rgba(100, 255, 218, 0.2);
+}
+
+.cart-icon i {
+    font-size: 1.1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .nav-buttons {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .cart-link {
+        padding: 0.6rem 1.2rem;
+    }
+    
+    .cart-icon {
+        padding: 0.8rem 1.5rem;
+        font-size: 0.9rem;
+    }
 }

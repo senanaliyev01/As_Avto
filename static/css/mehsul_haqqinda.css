@@ -25,27 +25,42 @@ header {
     padding: 0 1rem;
 }
 
-/* Cart Badge */
+/* Səbət Linki */
 .cart-link {
-    position: relative;
+    color: #28a745; /* Yaşıl rəng */
+    text-decoration: none; /* Alt xətti sil */
+    font-size: 18px; /* Mətn ölçüsü */
+    font-weight: bold; /* Mətn qalınlığı */
+    display: flex;
+    align-items: center; /* Şaquli mərkəzləşdirmə */
+    gap: 10px; /* İkon və mətn arası boşluq */
+    position: relative; /* Badge üçün */
+    transition: color 0.3s ease, transform 0.3s ease; /* Keçidlər */
 }
 
- .cart-badge {
+.cart-link:hover {
+    color: #218838; /* Daha tünd yaşıl rəng */
+    transform: scale(1.05); /* Yüngül böyümə effekti */
+}
+
+/* Səbət Badge (Say Göstəricisi) */
+.cart-badge {
+    background-color: #dc3545; /* Qırmızı rəng */
+    color: #fff; /* Ağ mətn */
+    font-size: 12px; /* Kiçik ölçü */
+    font-weight: bold; /* Mətn qalınlığı */
+    border-radius: 50%; /* Dairəvi forma */
+    padding: 4px 8px; /* İç boşluqlar */
     position: absolute;
-    top: -8px;
-    right: -8px;
-    background-color: red;
-    color: white;
-    font-size: 12px;
-    padding: 2px 6px;
-    border-radius: 50%;
-    border: 2px solid var(--text-white);
-    font-weight: bold;
-    min-width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    top: -8px; /* Linkin üstündə yerləşir */
+    right: -10px; /* Sağ tərəfdə yerləşir */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Yumşaq kölgə */
+    transition: transform 0.3s ease, background-color 0.3s ease; /* Keçid effekti */
+}
+
+.cart-badge:hover {
+    background-color: #bd2130; /* Daha tünd qırmızı */
+    transform: scale(1.1); /* Badge böyümə effekti */
 }
 
 

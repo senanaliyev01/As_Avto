@@ -116,7 +116,13 @@
                         <td>{{ mehsul.adi }}</td>
                         <td>{{ mehsul.kateqoriya }}</td>
                         <td>{{ mehsul.brend }}</td>
-                        <td>{{ mehsul.marka }}</td>
+                        <td>
+                            {% if mehsul.marka.sekil %}
+                                <img src="{{ mehsul.marka.sekil.url }}" alt="{{ mehsul.marka.adi }}" class="marka-image">
+                            {% else %}
+                                <span>{{ mehsul.marka.adi }}</span>
+                            {% endif %}
+                        </td>
                         <td>{{ mehsul.brend_kod }}</td>
                         <td>{{ mehsul.oem }}</td>
                         <td>

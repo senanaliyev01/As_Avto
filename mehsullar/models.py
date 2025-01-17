@@ -19,6 +19,7 @@ class Brend(models.Model):
 
 class Marka(models.Model):
     adi = models.CharField(max_length=100, unique=True)
+    sekil = models.ImageField(upload_to='marka_sekilleri/',null=True , blank=True)
 
     def __str__(self):
         return self.adi

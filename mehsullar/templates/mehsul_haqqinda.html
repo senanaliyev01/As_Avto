@@ -49,9 +49,9 @@
                     </div>
                     <div class="spec-item">
                         <span class="label">Marka:</span>
-                        <span class="value">
+                        <span class="value" style="display: flex; align-items: center;">
                             {% if mehsul.marka.sekil %}
-                                <img src="{{ mehsul.marka.sekil.url }}" alt="{{ mehsul.marka.adi }}" class="marka-image">
+                                <img src="{{ mehsul.marka.sekil.url }}" alt="{{ mehsul.marka.adi }}" class="marka-image" style="margin-right: 8px;">
                             {% else %}
                                 {{ mehsul.marka.adi }}
                             {% endif %}

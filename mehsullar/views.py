@@ -354,7 +354,7 @@ def generate_pdf(sifaris, sifaris_mehsullari):
     elements.append(Paragraph("<br/>", styles['Normal']))  # Boşluq
 
     # Sifariş məhsulları üçün cədvəl
-    data = [['Məhsul Adı', 'Brend Kod' 'Oem Kod' 'Miqdar', 'Qiymət', 'Cəmi']]
+    data = [['Məhsul Adı', 'Brend Kod', 'Oem Kod', 'Miqdar', 'Qiymət', 'Cəmi']]
     for mehsul in sifaris_mehsullari:
         data.append([mehsul.mehsul.adi, mehsul.mehsul.brend_kod, mehsul.mehsul.oem, mehsul.miqdar, f"{mehsul.qiymet} AZN", f"{mehsul.cemi} AZN"])
 
@@ -368,6 +368,9 @@ def generate_pdf(sifaris, sifaris_mehsullari):
         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),  # Başlıq padding
         ('BACKGROUND', (0, 1), (-1, -1), colors.beige),  # Cədvəl arxa planı
         ('GRID', (0, 0), (-1, -1), 1, colors.black),  # Cədvəl xətləri
+        ('FONTSIZE', (0, 0), (-1, -1), 10),  # Font ölçüsünü tənzimləyin
+        ('TOPPADDING', (0, 0), (-1, 0), 10),  # Başlıq üst padding
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 5),  # Cədvəl alt padding
     ]))
 
     elements.append(table)
@@ -378,13 +381,7 @@ def generate_pdf(sifaris, sifaris_mehsullari):
 
     # İmza üçün xətt
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq
-    elements.append(Paragraph("Təhvil Aldı: ____________________", styles['Normal']))
-    
-    elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq
-    elements.append(Paragraph("Təhvil Verdi: ____________________", styles['Normal']))
-    
-    elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq
-    elements.append(Paragraph("Ödənilən Məbləğ: __________________________", styles['Normal']))
+    elements.append(Paragraph("İmza: ____________________", styles['Normal']))
 
     doc.build(elements)
     buffer.seek(0)

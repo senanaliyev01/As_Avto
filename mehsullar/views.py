@@ -341,12 +341,12 @@ def generate_pdf(sifaris, sifaris_mehsullari):
     styles['Normal'].fontName = 'DejaVuSans'
     styles['Title'].fontName = 'DejaVuSans'  # Başlıq üçün fontu dəyişdirin
     
-    # # Şirkət loqosunu əlavə edin
-    # logo_path = 'static/img/Header_Logo.png'  # Loqonun yolu
-    # logo = Image(logo_path, width=150, height=150)  # Loqonun ölçülərini tənzimləyin
-    # logo.hAlign = 'LEFT'
-    # elements.append(logo)
-    # elements.append(Paragraph("<br/>", styles['Normal']))  # Boşluq əlavə et
+    # Şirkət loqosunu əlavə edin
+    logo_path = 'static/img/Header_Logo.png'  # Loqonun yolu
+    logo = Image(logo_path, width=150, height=150)  # Loqonun ölçülərini tənzimləyin
+    logo.hAlign = 'LEFT'
+    elements.append(logo)
+    elements.append(Paragraph("<br/>", styles['Normal']))  # Boşluq əlavə et
 
 
 
@@ -368,7 +368,7 @@ def generate_pdf(sifaris, sifaris_mehsullari):
     for mehsul in sifaris_mehsullari:
         data.append([mehsul.mehsul.adi, mehsul.mehsul.brend_kod, mehsul.mehsul.oem, mehsul.miqdar, f"{mehsul.qiymet} AZN", f"{mehsul.cemi} AZN"])
 
-    # Cədvəl yaradılması
+    # Cədvəl yaradılması1
     table = Table(data)
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # Başlıq arxa planı

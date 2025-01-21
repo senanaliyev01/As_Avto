@@ -335,7 +335,9 @@ def generate_pdf(sifaris, sifaris_mehsullari):
     # Fontu qeyd edirik
     pdfmetrics.registerFont(TTFont('DejaVuSans', 'mehsullar/DejaVuSans.ttf'))  # Düzgün yolu göstərin
     styles = getSampleStyleSheet()
-    styles.add(ParagraphStyle(name='Normal', fontName='DejaVuSans', fontSize=12))  # Normal stilini dəyişdirin
+    
+    # Normal stilini dəyişdirmədən istifadə edirik
+    # styles.add(ParagraphStyle(name='Normal', fontName='DejaVuSans', fontSize=12))  # Bu sətri silin
 
     # Header
     header = Paragraph("Sifariş Detalları", styles['Title'])

@@ -215,7 +215,7 @@ def sifaris_izle(request):
     # Hər sifarişə status əlavə edirik
     for sifaris in sifarisler:
         sifaris.display_status = status_text.get(sifaris.status, 'Gözləyir')
-        # Tarixi Bakı saatına uyğunlaşdırırıq
+        # Tarixi Bakı1 saatına uyğunlaşdırırıq
         sifaris.tarix = sifaris.tarix.astimezone(timezone.get_current_timezone())
         # Tarixi formatlayırıq
         sifaris.formatted_tarix = sifaris.tarix.strftime('%Y-%m-%d %H:%M:%S')

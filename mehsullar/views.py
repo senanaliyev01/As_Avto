@@ -372,13 +372,14 @@ def generate_pdf(sifaris, sifaris_mehsullari):
         ('FONTSIZE', (0, 0), (-1, -1), 10),  # Font ölçüsünü tənzimləyin
         ('TOPPADDING', (0, 0), (-1, 0), 10),  # Başlıq üst padding
         ('BOTTOMPADDING', (0, 1), (-1, -1), 5),  # Cədvəl alt padding
-        ('BOTTOMPADDING', (0, -1), (-1, -1), 20),  # Cədvəlin altında əlavə boşluq
+        
     ]))
 
     elements.append(table)
     
     
     # Ümumi məbləği cədvəlin altında göstər
+    elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq əlavə et
     total_amount = Paragraph(f"<strong>Ümumi Məbləğ: {sifaris.cemi_mebleg} AZN</strong>", styles['Normal'])
     elements.append(total_amount)
 

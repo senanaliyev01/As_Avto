@@ -13,5 +13,5 @@ urlpatterns = [
     path('mehsul/<int:mehsul_id>/', views.mehsul_haqqinda, name='mehsul_haqqinda'),
     path('about/', views.about, name='about'),
     path('update_quantity/<int:item_id>/<int:new_quantity>/', views.update_quantity, name='update_quantity'),
-    
+    path('sifaris/pdf/<int:sifaris_id>/', views.generate_pdf, name='sifaris_pdf'),
 ]

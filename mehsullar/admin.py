@@ -1,5 +1,7 @@
 from django.contrib import admin
 from .models import Kateqoriya, Brend, Marka, Mehsul, Sebet, Sifaris, SifarisMehsul, OEMKod, MusteriReyi
+from django.urls import reverse
+from django.utils.html import format_html
 
 # Sifarişlərdə məhsul detalını əlavə etmək üçün
 class SifarisMehsulInline(admin.TabularInline):
@@ -15,11 +17,15 @@ class OEMKodInline(admin.TabularInline):
 @admin.register(Sifaris)
 class SifarisAdmin(admin.ModelAdmin):
     inlines = [SifarisMehsulInline]
-    list_display = ('id', 'user', 'tarix', 'cemi_mebleg', 'odenilen_mebleg', 'borc', 'status', 'tamamlandi')
+    list_display = ('id', 'user', 'tarix', 'cemi_mebleg', 'odenilen_mebleg', 'borc', 'status', 'tamamlandi', 'pdf_link')
     search_fields = ('id', 'user__username', 'status')
     list_filter = ('status', 'tamamlandi')
     fields = ('user', 'cemi_mebleg', 'odenilen_mebleg', 'status', 'tamamlandi')
     readonly_fields = ('borc',)
+
+    def pdf_link(self, obj):
+        return format_html('<a href="{}" target="_blank">PDF-yə Çevir</a>', reverse('sifaris_detallari', args=[obj.id]) + '?pdf=1')
+    pdf_link.short_description = 'PDF-yə Çevir'
 
 # Sifariş məhsulları admin paneli
 class SifarisMehsulAdmin(admin.ModelAdmin):

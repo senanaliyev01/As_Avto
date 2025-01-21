@@ -349,7 +349,6 @@ def generate_pdf(sifaris, sifaris_mehsullari):
     elements.append(Paragraph(f"İstifadəçi: {sifaris.user.username}", styles['Normal']))
     elements.append(Paragraph(f"Sifariş ID: {sifaris.id}", styles['Normal']))
     elements.append(Paragraph(f"Tarix: {sifaris.tarix.astimezone(timezone.get_current_timezone()).strftime('%Y-%m-%d %H:%M:%S')}", styles['Normal']))
-    elements.append(Paragraph(f"Ümumi Məbləğ: {sifaris.cemi_mebleg} AZN", styles['Normal']))
     elements.append(Paragraph(f"Ödənilən Məbləğ: {sifaris.odenilen_mebleg} AZN", styles['Normal']))
     elements.append(Paragraph(f"Qalıq Borc: {sifaris.qaliq_borc} AZN", styles['Normal']))
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq əlavə et
@@ -385,7 +384,17 @@ def generate_pdf(sifaris, sifaris_mehsullari):
 
     # İmza üçün xətt
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq
-    elements.append(Paragraph("İmza: ____________________", styles['Normal']))
+    elements.append(Paragraph("Təhvil Aldı: ____________________", styles['Normal']))
+    
+    # İmza üçün xətt
+    elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq
+    elements.append(Paragraph("Təhvil Verdi: ____________________", styles['Normal']))
+    
+    # İmza üçün xətt
+    elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq
+    elements.append(Paragraph("Ödənilən Məbləğ: ___________________________", styles['Normal']))
+    
+   
 
     doc.build(elements)
     buffer.seek(0)

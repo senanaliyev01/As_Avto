@@ -335,7 +335,7 @@ def generate_pdf(sifaris, sifaris_mehsullari):
     response['Content-Disposition'] = f'attachment; filename="sifaris_{sifaris.id}.pdf"'
 
     buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=20, leftMargin=20, topMargin=20, bottomMargin=20)  # Marginləri tənzimlədik
+    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=20, leftMargin=20, topMargin=0, bottomMargin=20)  # Top margin sıfırlandı
     elements = []
 
     # Fontu qeyd edirik

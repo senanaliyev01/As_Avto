@@ -337,7 +337,7 @@ def generate_pdf(sifaris, sifaris_mehsullari):
     styles = getSampleStyleSheet()
     
     # Normal stilini dəyişdirmədən istifadə edirik
-    # styles.add(ParagraphStyle(name='Normal', fontName='DejaVuSans', fontSize=12))  # Bu sətri silin
+    styles['Normal'].fontName = 'DejaVuSans'  # Normal stilini DejaVuSans fontu ilə dəyişdirin
 
     # Header
     header = Paragraph("Sifariş Detalları", styles['Title'])

@@ -48,7 +48,7 @@
                 {% for sifaris in sifarisler %}
                 <tr>
                     <td><a href="{% url 'sifaris_detallari' sifaris.id %}" class="sifaris-link">{{ sifaris.id }}</a></td>
-                    <td>{{ sifaris.tarix }}</td>
+                    <td>{{ sifaris.tarix.astimezone(timezone.get_current_timezone).strftime('%Y-%m-%d %H:%M:%S') }}</td>
                     <td>{{ sifaris.cemi_mebleg }} AZN</td>
                     <td>{{ sifaris.odenilen_mebleg }} AZN</td>
                     <td>

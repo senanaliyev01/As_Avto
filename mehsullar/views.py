@@ -8,12 +8,15 @@ from django.views.decorators.http import require_POST
 import json
 import re
 from django.contrib.auth.models import User
+import io
 from django.http import HttpResponse
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
-from django.template.loader import render_to_string
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import SimpleDocTemplate, Paragraph
+from django.utils import timezone
 
-import io
 
 @login_required
 def about(request):
@@ -310,35 +313,38 @@ def sifaris_detallari(request, sifaris_id):
     
     return render(request, 'sifaris_detallari.html', context)
 
+@login_required
 def generate_pdf(sifaris, sifaris_mehsullari):
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="sifaris_{sifaris.id}.pdf"'
 
     buffer = io.BytesIO()
-    p = canvas.Canvas(buffer, pagesize=A4)
-    width, height = A4
+    doc = SimpleDocTemplate(buffer, pagesize=A4)
+    elements = []
 
     # Header
-    p.drawString(100, height - 50, "Sifariş Detalları")
-    p.drawString(100, height - 70, f"Sifariş ID: {sifaris.id}")
-    p.drawString(100, height - 90, f"Tarix: {sifaris.tarix}")
-    p.drawString(100, height - 110, f"Ümumi Məbləğ: {sifaris.cemi_mebleg} AZN")
-    p.drawString(100, height - 130, f"Ödənilən Məbləğ: {sifaris.odenilen_mebleg} AZN")
-    p.drawString(100, height - 150, f"Qalıq Borc: {sifaris.qaliq_borc} AZN")
+    styles = getSampleStyleSheet()
+    header = Paragraph("Sifariş Detalları", styles['Title'])
+    elements.append(header)
+
+    # Sifariş məlumatları
+    elements.append(Paragraph(f"Sifariş ID: {sifaris.id}", styles['Normal']))
+    elements.append(Paragraph(f"Tarix: {sifaris.tarix.astimezone(timezone.get_current_timezone()).strftime('%Y-%m-%d %H:%M:%S')}", styles['Normal']))
+    elements.append(Paragraph(f"Ümumi Məbləğ: {sifaris.cemi_mebleg} AZN", styles['Normal']))
+    elements.append(Paragraph(f"Ödənilən Məbləğ: {sifaris.odenilen_mebleg} AZN", styles['Normal']))
+    elements.append(Paragraph(f"Qalıq Borc: {sifaris.qaliq_borc} AZN", styles['Normal']))
+    elements.append(Paragraph("<br/>", styles['Normal']))  # Boşluq
 
     # Sifariş məhsulları
-    p.drawString(100, height - 180, "Məhsul Adı | Miqdar | Qiymət | Cəmi")
-    y = height - 200
+    elements.append(Paragraph("Məhsul Adı | Miqdar | Qiymət | Cəmi", styles['Normal']))
     for mehsul in sifaris_mehsullari:
-        p.drawString(100, y, f"{mehsul.mehsul.adi} | {mehsul.miqdar} | {mehsul.qiymet} AZN | {mehsul.cemi} AZN")
-        y -= 20
+        elements.append(Paragraph(f"{mehsul.mehsul.adi} | {mehsul.miqdar} | {mehsul.qiymet} AZN | {mehsul.cemi} AZN", styles['Normal']))
 
     # İmza üçün xətt
-    p.line(100, y, 300, y)
-    p.drawString(100, y - 10, "İmza")
+    elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq
+    elements.append(Paragraph("İmza: ____________________", styles['Normal']))
 
-    p.showPage()
-    p.save()
+    doc.build(elements)
     buffer.seek(0)
     response.write(buffer.read())
     return response

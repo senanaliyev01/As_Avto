@@ -8,6 +8,11 @@ from django.views.decorators.http import require_POST
 import json
 import re
 from django.contrib.auth.models import User
+from django.http import HttpResponse
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from django.template.loader import render_to_string
+from django.utils import timezone
 
 @login_required
 def about(request):
@@ -299,7 +304,44 @@ def sifaris_detallari(request, sifaris_id):
         'sifaris': sifaris,
         'sifaris_mehsullari': sifaris_mehsullari,
     }
+    if request.GET.get('pdf'):
+        return generate_pdf(sifaris, sifaris_mehsullari)
+    
     return render(request, 'sifaris_detallari.html', context)
+
+def generate_pdf(sifaris, sifaris_mehsullari):
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="sifaris_{sifaris.id}.pdf"'
+
+    buffer = io.BytesIO()
+    p = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
+
+    # Header
+    p.drawString(100, height - 50, "Sifariş Detalları")
+    p.drawString(100, height - 70, f"Sifariş ID: {sifaris.id}")
+    p.drawString(100, height - 90, f"Tarix: {sifaris.tarix.strftime('%Y-%m-%d %H:%M:%S')}")
+    p.drawString(100, height - 110, f"Ümumi Məbləğ: {sifaris.cemi_mebleg} AZN")
+    p.drawString(100, height - 130, f"Ödənilən Məbləğ: {sifaris.odenilen_mebleg} AZN")
+    p.drawString(100, height - 150, f"Qalıq Borc: {sifaris.qaliq_borc} AZN")
+
+    # Sifariş məhsulları
+    p.drawString(100, height - 180, "Məhsul Adı | Miqdar | Qiymət | Cəmi")
+    y = height - 200
+    for mehsul in sifaris_mehsullari:
+        p.drawString(100, y, f"{mehsul.mehsul.adi} | {mehsul.miqdar} | {mehsul.qiymet} AZN | {mehsul.cemi} AZN")
+        y -= 20
+
+    # İmza üçün xətt
+    p.line(100, y, 300, y)
+    p.drawString(100, y - 10, "İmza")
+
+    p.showPage()
+    p.save()
+    buffer.seek(0)
+    response.write(buffer.read())
+    return response
+
 
 def mehsul_haqqinda(request, mehsul_id):
     mehsul = get_object_or_404(Mehsul, id=mehsul_id)

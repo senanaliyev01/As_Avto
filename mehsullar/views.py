@@ -13,6 +13,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from django.template.loader import render_to_string
 from django.utils import timezone
+import io
 
 @login_required
 def about(request):

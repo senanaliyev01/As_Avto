@@ -41,14 +41,14 @@
                     <th>Cəmi Məbləğ</th>
                     <th>Ödənilən Məbləğ</th>
                     <th>Status</th>
-                   
+                    <th>PDF-ə Çevir</th>
                 </tr>
             </thead>
             <tbody>
                 {% for sifaris in sifarisler %}
                 <tr>
                     <td><a href="{% url 'sifaris_detallari' sifaris.id %}" class="sifaris-link">{{ sifaris.id }}</a></td>
-                    <td>{{ sifaris.tarix.astimezone(timezone.get_current_timezone).strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td>{{ sifaris.tarix.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                     <td>{{ sifaris.cemi_mebleg }} AZN</td>
                     <td>{{ sifaris.odenilen_mebleg }} AZN</td>
                     <td>
@@ -69,6 +69,9 @@
                                 {{ sifaris.display_status }}
                             </span>
                         </div>
+                    </td>
+                    <td>
+                        <a href="{% url 'sifaris_detallari' sifaris.id %}?pdf=true" class="btn btn-primary">PDF-ə Çevir</a>
                     </td>
                 </tr>
                 {% endfor %}

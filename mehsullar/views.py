@@ -212,6 +212,8 @@ def sifaris_izle(request):
     # Hər sifarişə status əlavə edirik
     for sifaris in sifarisler:
         sifaris.display_status = status_text.get(sifaris.status, 'Gözləyir')
+        # Tarixi Bakı saatına uyğunlaşdırırıq
+        sifaris.tarix = sifaris.tarix.astimezone(timezone.get_current_timezone())
 
     return render(request, 'sifaris_izleme.html', {
         'sifarisler': sifarisler,
@@ -308,9 +310,10 @@ def sifaris_detallari(request, sifaris_id):
         'sifaris': sifaris,
         'sifaris_mehsullari': sifaris_mehsullari,
     }
+    
     if request.GET.get('pdf'):
         return generate_pdf(sifaris, sifaris_mehsullari)
-    
+
     return render(request, 'sifaris_detallari.html', context)
 
 @login_required

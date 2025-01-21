@@ -356,7 +356,7 @@ def generate_pdf(sifaris, sifaris_mehsullari):
     # Sifariş məhsulları üçün cədvəl
     data = [['Məhsul Adı', 'Brend Kod' 'Oem Kod' 'Miqdar', 'Qiymət', 'Cəmi']]
     for mehsul in sifaris_mehsullari:
-        data.append([mehsul.mehsul.adi, mehsul.brend_kod, mehsul.oem, mehsul.miqdar, f"{mehsul.qiymet} AZN", f"{mehsul.cemi} AZN"])
+        data.append([mehsul.mehsul.adi, mehsul.mehsul.brend_kod, mehsul.mehsul.oem, mehsul.miqdar, f"{mehsul.qiymet} AZN", f"{mehsul.cemi} AZN"])
 
     # Cədvəl yaradılması
     table = Table(data)

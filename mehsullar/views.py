@@ -335,7 +335,7 @@ def generate_pdf(sifaris, sifaris_mehsullari):
     response['Content-Disposition'] = f'attachment; filename="sifaris_{sifaris.id}.pdf"'
 
     buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4)
+    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=20, leftMargin=20, topMargin=20, bottomMargin=20)  # Marginləri tənzimlədik
     elements = []
 
     # Fontu qeyd edirik
@@ -353,14 +353,6 @@ def generate_pdf(sifaris, sifaris_mehsullari):
     elements.append(logo)
     elements.append(Paragraph("<br/>", styles['Normal']))  # Boşluq əlavə et
 
-
-
-
-    # # Header
-    # header = Paragraph("AS-AVTO", styles['Title'])
-    # elements.append(header)
-    # elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq əlavə et
-
     # Sifariş məlumatları
     elements.append(Paragraph(f"Müştəri: {sifaris.user.username}", styles['Normal']))
     elements.append(Paragraph(f"Sifariş ID: {sifaris.id}", styles['Normal']))
@@ -373,8 +365,8 @@ def generate_pdf(sifaris, sifaris_mehsullari):
     for mehsul in sifaris_mehsullari:
         data.append([mehsul.mehsul.adi, mehsul.mehsul.brend_kod, mehsul.mehsul.oem, mehsul.miqdar, f"{mehsul.qiymet} AZN", f"{mehsul.cemi} AZN"])
 
-    # Cədvəl yaradılması1
-    table = Table(data)
+    # Cədvəl yaradılması
+    table = Table(data, colWidths=[100, 100, 100, 50, 70, 70])  # Cədvəl sütun genişliklərini tənzimlədik
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # Başlıq arxa planı
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),  # Başlıq mətni
@@ -390,7 +382,6 @@ def generate_pdf(sifaris, sifaris_mehsullari):
     ]))
 
     elements.append(table)
-    
     
     # Ümumi məbləği cədvəlin altında göstər
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq əlavə et

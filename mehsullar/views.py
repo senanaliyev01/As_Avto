@@ -399,7 +399,6 @@ def generate_pdf(sifaris, sifaris_mehsullari):
     imza_data = [
         [Paragraph("Təhvil Aldı: ____________________", styles['Normal']), 
          Paragraph("Təhvil Verdi: ____________________", styles['Normal'])],
-        [Paragraph("Ödənilən Məbləğ: ___________________________", styles['Normal'],)]
     ]
     
     imza_table = Table(imza_data, colWidths=[200, 200])  # İmzaların genişliyini tənzimləyin
@@ -410,6 +409,10 @@ def generate_pdf(sifaris, sifaris_mehsullari):
     ]))
 
     elements.append(imza_table)
+
+    # Ödənilən məbləği ortada yerləşdirin
+    elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq
+    elements.append(Paragraph("Ödənilən Məbləğ: ___________________________", styles['Normal']))
 
     doc.build(elements)
     buffer.seek(0)

@@ -321,7 +321,7 @@ def generate_pdf(sifaris, sifaris_mehsullari):
     # Header
     p.drawString(100, height - 50, "Sifariş Detalları")
     p.drawString(100, height - 70, f"Sifariş ID: {sifaris.id}")
-    p.drawString(100, height - 90, f"Tarix: {sifaris.tarix.strftime('%Y-%m-%d %H:%M:%S')}")
+    p.drawString(100, height - 90, f"Tarix: {sifaris.tarix}")
     p.drawString(100, height - 110, f"Ümumi Məbləğ: {sifaris.cemi_mebleg} AZN")
     p.drawString(100, height - 130, f"Ödənilən Məbləğ: {sifaris.odenilen_mebleg} AZN")
     p.drawString(100, height - 150, f"Qalıq Borc: {sifaris.qaliq_borc} AZN")

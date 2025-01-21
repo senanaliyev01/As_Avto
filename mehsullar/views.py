@@ -293,9 +293,11 @@ def mehsul_axtaris(request):
 @login_required
 def sifaris_detallari(request, sifaris_id):
     # Sifarişin yalnız cari istifadəçiyə aid olub olmadığını yoxlayır
-    sifaris = get_object_or_404(Sifaris, id=sifaris_id, user=request.user)
+    try:
+        sifaris = Sifaris.objects.get(id=sifaris_id, user=request.user)
+    except Sifaris.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Sifariş tapılmadı'}, status=404)
 
-    # Sifariş məhsullarını alırıq
     sifaris_mehsullari = SifarisMehsul.objects.filter(sifaris=sifaris)
     
     # Hər məhsul üçün cəmi məbləği hesablayaq

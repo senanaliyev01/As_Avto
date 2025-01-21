@@ -308,6 +308,9 @@ def sifaris_detallari(request, sifaris_id):
     }
     sifaris.display_status = status_text.get(sifaris.status, 'Gözləyir')
     
+    # Tarixi formatlayırıq
+    sifaris.formatted_tarix = sifaris.tarix.astimezone(timezone.get_current_timezone()).strftime('%Y-%m-%d %H:%M:%S')
+    
     context = {
         'sifaris': sifaris,
         'sifaris_mehsullari': sifaris_mehsullari,

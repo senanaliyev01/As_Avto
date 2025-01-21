@@ -375,6 +375,7 @@ def generate_pdf(sifaris, sifaris_mehsullari):
     ]))
 
     elements.append(table)
+    elements.append(Table("<br/><br/>", styles['Normal']))
     
     # Ümumi məbləği cədvəlin altında göstər
     total_amount = Paragraph(f"<strong>Ümumi Məbləğ: {sifaris.cemi_mebleg} AZN</strong>", styles['Normal'])

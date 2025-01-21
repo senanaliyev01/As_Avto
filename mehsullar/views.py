@@ -18,6 +18,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle
 from django.utils import timezone
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.platypus import Image
 
 
 @login_required
@@ -339,6 +340,15 @@ def generate_pdf(sifaris, sifaris_mehsullari):
     # Normal stilini DejaVuSans fontu ilə dəyişdirin
     styles['Normal'].fontName = 'DejaVuSans'
     styles['Title'].fontName = 'DejaVuSans'  # Başlıq üçün fontu dəyişdirin
+    
+    # Şirkət loqosunu əlavə edin
+    logo_path = 'static/img/Header_Logo.png'  # Loqonun yolu
+    logo = Image(logo_path, width=200, height=100)  # Loqonun ölçülərini tənzimləyin
+    elements.append(logo)
+    elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq əlavə et
+
+
+
 
     # Header
     header = Paragraph("Sifariş Detalları", styles['Title'])
@@ -349,7 +359,6 @@ def generate_pdf(sifaris, sifaris_mehsullari):
     elements.append(Paragraph(f"İstifadəçi: {sifaris.user.username}", styles['Normal']))
     elements.append(Paragraph(f"Sifariş ID: {sifaris.id}", styles['Normal']))
     elements.append(Paragraph(f"Tarix: {sifaris.tarix.astimezone(timezone.get_current_timezone()).strftime('%Y-%m-%d %H:%M:%S')}", styles['Normal']))
-    elements.append(Paragraph(f"Ödənilən Məbləğ: {sifaris.odenilen_mebleg} AZN", styles['Normal']))
     elements.append(Paragraph(f"Qalıq Borc: {sifaris.qaliq_borc} AZN", styles['Normal']))
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq əlavə et
 

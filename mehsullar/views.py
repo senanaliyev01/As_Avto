@@ -14,7 +14,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import SimpleDocTemplate, Paragraph
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle
 from django.utils import timezone
 
 
@@ -343,10 +343,24 @@ def generate_pdf(sifaris, sifaris_mehsullari):
     elements.append(Paragraph(f"Qalıq Borc: {sifaris.qaliq_borc} AZN", styles['Normal']))
     elements.append(Paragraph("<br/>", styles['Normal']))  # Boşluq
 
-    # Sifariş məhsulları
-    elements.append(Paragraph("Məhsul Adı | Miqdar | Qiymət | Cəmi", styles['Normal']))
+    # Sifariş məhsulları üçün cədvəl
+    data = [['Məhsul Adı', 'Miqdar', 'Qiymət', 'Cəmi']]
     for mehsul in sifaris_mehsullari:
-        elements.append(Paragraph(f"{mehsul.mehsul.adi} | {mehsul.miqdar} | {mehsul.qiymet} AZN | {mehsul.cemi} AZN", styles['Normal']))
+        data.append([mehsul.mehsul.adi, mehsul.miqdar, f"{mehsul.qiymet} AZN", f"{mehsul.cemi} AZN"])
+
+    # Cədvəl yaradılması
+    table = Table(data)
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # Başlıq arxa planı
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),  # Başlıq mətni
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),  # Mərkəzləşdirmək
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),  # Başlıq fontu
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),  # Başlıq padding
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),  # Cədvəl arxa planı
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),  # Cədvəl xətləri
+    ]))
+
+    elements.append(table)
 
     # İmza üçün xətt
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq

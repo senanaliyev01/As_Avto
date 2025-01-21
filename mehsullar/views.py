@@ -343,7 +343,7 @@ def generate_pdf(sifaris, sifaris_mehsullari):
     
     # Şirkət loqosunu əlavə edin
     logo_path = 'static/img/Header_Logo.png'  # Loqonun yolu
-    logo = Image(logo_path, width=250, height=250)  # Loqonun ölçülərini tənzimləyin
+    logo = Image(logo_path, width=150, height=150)  # Loqonun ölçülərini tənzimləyin
     elements.append(logo)
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq əlavə et
 

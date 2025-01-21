@@ -357,7 +357,7 @@ def generate_pdf(sifaris, sifaris_mehsullari):
 
 
     # Header
-    header = Paragraph("Sifariş Detalları", styles['Title'])
+    header = Paragraph("AS-AVTO", styles['Title'])
     elements.append(header)
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq əlavə et
 

@@ -294,7 +294,7 @@ def mehsul_axtaris(request):
 def sifaris_detallari(request, sifaris_id):
     # Sifarişin yalnız cari istifadəçiyə aid olub olmadığını yoxlayır
     try:
-        sifaris = Sifaris.objects.get(id=sifaris_id, user=request.user)
+        sifaris = Sifaris.objects.get(id=sifaris_id)
     except Sifaris.DoesNotExist:
         return JsonResponse({'success': False, 'message': 'Sifariş tapılmadı'}, status=404)
 

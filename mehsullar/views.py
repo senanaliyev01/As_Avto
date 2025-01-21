@@ -13,9 +13,11 @@ from django.http import HttpResponse
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle
 from django.utils import timezone
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 
 
 @login_required
@@ -330,8 +332,12 @@ def generate_pdf(sifaris, sifaris_mehsullari):
     doc = SimpleDocTemplate(buffer, pagesize=A4)
     elements = []
 
-    # Header
+    # Fontu qeyd edirik
+    pdfmetrics.registerFont(TTFont('DejaVuSans', 'mehsullar/DejaVuSans.ttf'))  # Düzgün yolu göstərin
     styles = getSampleStyleSheet()
+    styles.add(ParagraphStyle(name='Normal', fontName='DejaVuSans', fontSize=12))  # Normal stilini dəyişdirin
+
+    # Header
     header = Paragraph("Sifariş Detalları", styles['Title'])
     elements.append(header)
 
@@ -354,7 +360,7 @@ def generate_pdf(sifaris, sifaris_mehsullari):
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # Başlıq arxa planı
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),  # Başlıq mətni
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),  # Mərkəzləşdirmək
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),  # Başlıq fontu
+        ('FONTNAME', (0, 0), (-1, 0), 'DejaVuSans'),  # Başlıq fontu
         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),  # Başlıq padding
         ('BACKGROUND', (0, 1), (-1, -1), colors.beige),  # Cədvəl arxa planı
         ('GRID', (0, 0), (-1, -1), 1, colors.black),  # Cədvəl xətləri

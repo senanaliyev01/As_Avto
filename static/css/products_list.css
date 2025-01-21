@@ -50,8 +50,8 @@ header {
 }
 
 .logo img {
-    width: 200px;
-    height: 200px;
+    width: 250px;
+    height: 250px;
     object-fit: contain;
 }
 
@@ -656,8 +656,8 @@ footer::before {
 }
 
 .footer-left img {
-    width: 200px;
-    height: 200px;
+    width: 250px;
+    height: 250px;
     filter: brightness(1.2);
 }
 

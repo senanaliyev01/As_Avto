@@ -394,17 +394,22 @@ def generate_pdf(sifaris, sifaris_mehsullari):
 
     # İmza üçün xətt
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq
-    elements.append(Paragraph("Təhvil Aldı: ____________________", styles['Normal']))
+
+    # İmzaları yan-yana yerləşdirmək üçün cədvəl yaradın
+    imza_data = [
+        [Paragraph("Təhvil Aldı: ____________________", styles['Normal']), 
+         Paragraph("Təhvil Verdi: ____________________", styles['Normal'])],
+        [Paragraph("Ödənilən Məbləğ: ___________________________", styles['Normal'],)]
+    ]
     
-    # İmza üçün xətt
-    elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq
-    elements.append(Paragraph("Təhvil Verdi: ____________________", styles['Normal']))
-    
-    # İmza üçün xətt
-    elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq
-    elements.append(Paragraph("Ödənilən Məbləğ: ___________________________", styles['Normal']))
-    
-   
+    imza_table = Table(imza_data, colWidths=[200, 200])  # İmzaların genişliyini tənzimləyin
+    imza_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),  # Sol hizalama
+        ('TOPPADDING', (0, 0), (-1, -1), 10),  # Üst padding
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 10),  # Alt padding
+    ]))
+
+    elements.append(imza_table)
 
     doc.build(elements)
     buffer.seek(0)

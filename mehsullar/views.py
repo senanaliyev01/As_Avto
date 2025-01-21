@@ -346,7 +346,7 @@ def generate_pdf(sifaris, sifaris_mehsullari):
     logo = Image(logo_path, width=150, height=150)  # Loqonun ölçülərini tənzimləyin
     logo.hAlign = 'LEFT'
     elements.append(logo)
-    elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq əlavə et
+    elements.append(Paragraph("<br/>", styles['Normal']))  # Boşluq əlavə et
 
 
 

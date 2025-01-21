@@ -351,12 +351,12 @@ def generate_pdf(sifaris, sifaris_mehsullari):
     elements.append(Paragraph(f"Ümumi Məbləğ: {sifaris.cemi_mebleg} AZN", styles['Normal']))
     elements.append(Paragraph(f"Ödənilən Məbləğ: {sifaris.odenilen_mebleg} AZN", styles['Normal']))
     elements.append(Paragraph(f"Qalıq Borc: {sifaris.qaliq_borc} AZN", styles['Normal']))
-    elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq
+    elements.append(Paragraph("<br/>", styles['Normal']))  # Boşluq
 
     # Sifariş məhsulları üçün cədvəl
-    data = [['Məhsul Adı', 'Miqdar', 'Qiymət', 'Cəmi']]
+    data = [['Məhsul Adı', 'Brend Kod' 'Oem Kod' 'Miqdar', 'Qiymət', 'Cəmi']]
     for mehsul in sifaris_mehsullari:
-        data.append([mehsul.mehsul.adi, mehsul.miqdar, f"{mehsul.qiymet} AZN", f"{mehsul.cemi} AZN"])
+        data.append([mehsul.mehsul.adi, mehsul.brend_kod, mehsul.oem, mehsul.miqdar, f"{mehsul.qiymet} AZN", f"{mehsul.cemi} AZN"])
 
     # Cədvəl yaradılması
     table = Table(data)

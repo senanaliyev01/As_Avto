@@ -88,8 +88,9 @@ body {
 }
 
 .logo-wrap img {
-    max-width: 200px;
-    height: auto;
+    max-width: 250px;
+    height: 250px;
+    object-fit: contain;
 }
 
 /* Başlıq */

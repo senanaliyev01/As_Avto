@@ -176,8 +176,9 @@ button {
 }
 
 .header__logo img {
-    width: 500px;
-    height: 228px;
+    width: 250px;
+    height: 250px;
+    object-fit: contain;
     transition: transform var(--transition-normal);
 }
 
@@ -571,8 +572,9 @@ button {
 }
 
 .footer__brand img {
-    width: 500px;
-    height: 228px;
+    width: 250px;
+    height: 250px;
+    object-fit: contain;
     margin-bottom: var(--spacing-lg);
 }
 

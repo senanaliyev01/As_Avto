@@ -326,7 +326,8 @@ def sifaris_detallari(request, sifaris_id):
     context = {
         'sifaris': sifaris,
         'sifaris_mehsullari': sifaris_mehsullari,
-        'musteri_novresi': profile.telefon  
+        'musteri_novresi': profile.telefon,
+        'musteri_unvani': profile.unvan  
     }
     
     if request.GET.get('pdf'):
@@ -361,6 +362,7 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     # Sifariş məlumatları
     elements.append(Paragraph(f"Müştəri: {sifaris.user.username}", styles['Normal']))
     elements.append(Paragraph(f"Müştəri Nömrəsi: {profile.telefon}", styles['Normal']))
+    elements.append(Paragraph(f"Müştəri Ünvanı: {profile.unvan}", styles['Normal']))
     elements.append(Paragraph(f"Sifariş ID: {sifaris.id}", styles['Normal']))
     elements.append(Paragraph(f"Tarix: {sifaris.tarix.astimezone(timezone.get_current_timezone()).strftime('%Y-%m-%d %H:%M:%S')}", styles['Normal']))
     elements.append(Paragraph(f"Qalıq Borc: {sifaris.qaliq_borc} AZN", styles['Normal']))

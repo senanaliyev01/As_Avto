@@ -19,6 +19,7 @@ from django.utils import timezone
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import Image
+from istifadeciler.models import Profile
 
 
 @login_required
@@ -300,6 +301,9 @@ def sifaris_detallari(request, sifaris_id):
 
     sifaris_mehsullari = SifarisMehsul.objects.filter(sifaris=sifaris)
     
+    # Müştəri nömrəsini profile modelindən al
+    profile = get_object_or_404(Profile, user=sifaris.user)  # Müştərinin profilini əldə et
+
     # Hər məhsul üçün cəmi məbləği hesablayaq
     for mehsul in sifaris_mehsullari:
         mehsul.cemi = mehsul.qiymet * mehsul.miqdar
@@ -322,6 +326,7 @@ def sifaris_detallari(request, sifaris_id):
     context = {
         'sifaris': sifaris,
         'sifaris_mehsullari': sifaris_mehsullari,
+        'musteri_novresi': profile.telefon  
     }
     
     if request.GET.get('pdf'):
@@ -351,10 +356,11 @@ def generate_pdf(sifaris, sifaris_mehsullari):
     logo = Image(logo_path, width=260, height=150)  # Loqonun ölçülərini tənzimləyin
     logo.hAlign = 'CENTER'
     elements.append(logo)
-    elements.append(Paragraph("<br/>", styles['Normal']))  # Boşluq əlavə et
+    elements.append(Paragraph("", styles['Normal']))  # Boşluq əlavə et
 
     # Sifariş məlumatları
     elements.append(Paragraph(f"Müştəri: {sifaris.user.username}", styles['Normal']))
+    elements.append(Paragraph(f"Müştəri Nömrəsi: {profile.telefon}", styles['Normal']))
     elements.append(Paragraph(f"Sifariş ID: {sifaris.id}", styles['Normal']))
     elements.append(Paragraph(f"Tarix: {sifaris.tarix.astimezone(timezone.get_current_timezone()).strftime('%Y-%m-%d %H:%M:%S')}", styles['Normal']))
     elements.append(Paragraph(f"Qalıq Borc: {sifaris.qaliq_borc} AZN", styles['Normal']))

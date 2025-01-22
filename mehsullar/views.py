@@ -330,17 +330,17 @@ def sifaris_detallari(request, sifaris_id):
     }
     
     if request.GET.get('pdf'):
-        return generate_pdf(sifaris, sifaris_mehsullari)
+        return generate_pdf(sifaris, sifaris_mehsullari, profile)
 
     return render(request, 'sifaris_detallari.html', context)
 
 @login_required
-def generate_pdf(sifaris, sifaris_mehsullari):
+def generate_pdf(sifaris, sifaris_mehsullari, profile):
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="sifaris_{sifaris.id}.pdf"'
 
     buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=20, leftMargin=20, topMargin=0, bottomMargin=20)  # Top margin sıfırlandı
+    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=20, leftMargin=20, topMargin=0, bottomMargin=20)
     elements = []
 
     # Fontu qeyd edirik
@@ -360,7 +360,7 @@ def generate_pdf(sifaris, sifaris_mehsullari):
 
     # Sifariş məlumatları
     elements.append(Paragraph(f"Müştəri: {sifaris.user.username}", styles['Normal']))
-    elements.append(Paragraph(f"Müştəri Nömrəsi: {Profile.telefon}", styles['Normal']))
+    elements.append(Paragraph(f"Müştəri Nömrəsi: {profile.telefon}", styles['Normal']))
     elements.append(Paragraph(f"Sifariş ID: {sifaris.id}", styles['Normal']))
     elements.append(Paragraph(f"Tarix: {sifaris.tarix.astimezone(timezone.get_current_timezone()).strftime('%Y-%m-%d %H:%M:%S')}", styles['Normal']))
     elements.append(Paragraph(f"Qalıq Borc: {sifaris.qaliq_borc} AZN", styles['Normal']))

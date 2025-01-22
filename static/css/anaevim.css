@@ -172,7 +172,8 @@ button {
 }
 
 .header__logo {
-    display: block;
+    display: flex;
+    align-items: center;
 }
 
 .header__logo img {

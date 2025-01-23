@@ -311,7 +311,7 @@ def sifaris_detallari(request, sifaris_id):
     # Qalıq borcu hesablayaq
     sifaris.qaliq_borc = sifaris.cemi_mebleg - sifaris.odenilen_mebleg
     
-    sifarisler = Sifaris.objects.filter(user=request.user)
+    sifarisler = Sifaris.objects.filter(user=sifaris.user)
     toplam_mebleg = sum(sifaris.cemi_mebleg for sifaris in sifarisler)
     odenilen_mebleg = sum(sifaris.odenilen_mebleg for sifaris in sifarisler)
     sifaris.qaliq_borc = toplam_mebleg - odenilen_mebleg  # Burada qalıq borcu hesablayırıq

@@ -43,7 +43,6 @@ CSRF_TRUSTED_ORIGINS = [
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -54,6 +53,10 @@ INSTALLED_APPS = [
     'istifadeciler',
     'mehsullar',
     'esasevim',
+    "admin_interface",
+    'django.contrib.admin',
+    "colorfield",
+
 ]
 
 MIDDLEWARE = [

@@ -374,12 +374,12 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq əlavə et
 
     # Sifariş məhsulları üçün cədvəl
-    data = [['Məhsul Adı', 'Brend Kod', 'Oem Kod', 'Miqdar', 'Qiymət', 'Cəmi']]
-    for mehsul in sifaris_mehsullari:
-        data.append([mehsul.mehsul.adi, mehsul.mehsul.brend_kod, mehsul.mehsul.oem, mehsul.miqdar, f"{mehsul.qiymet} AZN", f"{mehsul.cemi} AZN"])
+    data = [['№', 'Məhsul Adı', 'Brend Kod', 'Oem Kod', 'Miqdar', 'Qiymət', 'Cəmi']]
+    for index, mehsul in enumerate(sifaris_mehsullari, start=1):
+        data.append([index, mehsul.mehsul.adi, mehsul.mehsul.brend_kod, mehsul.mehsul.oem, mehsul.miqdar, f"{mehsul.qiymet} AZN", f"{mehsul.cemi} AZN"])
 
     # Cədvəl yaradılması
-    table = Table(data, colWidths=[100, 100, 100, 50, 70, 70])  # Cədvəl sütun genişliklərini tənzimlədik
+    table = Table(data, colWidths=[30, 100, 100, 100, 50, 70, 70])  # Cədvəl sütun genişliklərini tənzimlədik
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # Başlıq arxa planı
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),  # Başlıq mətni

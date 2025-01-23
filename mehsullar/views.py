@@ -311,6 +311,8 @@ def sifaris_detallari(request, sifaris_id):
     # Qalıq borcu hesablayaq
     sifaris.qaliq_borc = sifaris.cemi_mebleg - sifaris.odenilen_mebleg
     
+    sifaris.qaliq_borc = sifaris.borc()
+    
     # Status mətnini əlavə edək
     status_text = {
         'gozleyir': 'Gözləyir',

@@ -311,7 +311,10 @@ def sifaris_detallari(request, sifaris_id):
     # Qalıq borcu hesablayaq
     sifaris.qaliq_borc = sifaris.cemi_mebleg - sifaris.odenilen_mebleg
     
-    sifaris.qaliq_borc = sifaris.borc()
+    sifarisler = Sifaris.objects.filter(user=request.user)
+    toplam_mebleg = sum(sifaris.cemi_mebleg for sifaris in sifarisler)
+    odenilen_mebleg = sum(sifaris.odenilen_mebleg for sifaris in sifarisler)
+    sifaris.qaliq_borc = toplam_mebleg - odenilen_mebleg  # Burada qalıq borcu hesablayırıq
     
     # Status mətnini əlavə edək
     status_text = {
@@ -367,7 +370,7 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     elements.append(Paragraph(f"Müştəri Ünvanı: {profile.unvan}", styles['Normal']))
     elements.append(Paragraph(f"Sifariş Nömrəsi: №{sifaris.id}", styles['Normal']))
     elements.append(Paragraph(f"Tarix: {sifaris.tarix.astimezone(timezone.get_current_timezone()).strftime('%Y-%m-%d %H:%M:%S')}", styles['Normal']))
-    elements.append(Paragraph(f"Qalıq Borc: {sifaris.borc()} AZN", styles['Normal']))
+    elements.append(Paragraph(f"Qalıq Borc: {sifaris.qaliq_borc} AZN", styles['Normal']))
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq əlavə et
 
     # Sifariş məhsulları üçün cədvəl

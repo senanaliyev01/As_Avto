@@ -926,67 +926,9 @@ footer::before {
     animation: spin 0.8s linear infinite;
 }
 
-.stock-status {
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-weight: 500;
-    font-size: 0.9em;
-    display: inline-block;
-    text-align: center;
-    min-width: 80px;
-}
 
-.out-of-stock {
-    background-color: #ffe5e5;
-    color: #d63031;
-    border: 1px solid #ff7675;
-}
 
-.low-stock {
-    background-color: #ffeaa7;
-    color: #b7791f;
-    border: 1px solid #fdcb6e;
-}
 
-.in-stock {
-    background-color: #e5f9e0;
-    color: #27ae60;
-    border: 1px solid #55efc4;
-}
-
-.products-table table {
-    border-collapse: separate;
-    border-spacing: 0;
-    width: 100%;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.products-table th {
-    background-color: #2c3e50;
-    color: white;
-    padding: 12px;
-    font-weight: 500;
-}
-
-.products-table td {
-    padding: 12px;
-    border-bottom: 1px solid #dfe6e9;
-}
-
-.products-table tr:hover {
-    background-color: #f5f6fa;
-}
-
-.cart-icon {
-    color: #2c3e50;
-    transition: color 0.3s ease;
-}
-
-.cart-icon:hover {
-    color: #3498db;
-}
 
 .marka-image {
     display: block;

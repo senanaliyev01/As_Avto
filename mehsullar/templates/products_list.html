@@ -98,6 +98,7 @@
             <table>
                 <thead>
                     <tr>
+                        <th>Təsvir</th>
                         <th>Məhsul Adı</th>
                         <th>Kateqoriya</th>
                         <th>Brend</th>
@@ -113,13 +114,16 @@
                 <tbody>
                     {% for mehsul in mehsullar %}
                     <tr>
+                        <td>
+                            {% if mehsul.sekil %}
+                                    <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="marka-image">
+                            {% endif %}
+                        </td>
                         <td>{{ mehsul.adi }}</td>
                         <td>{{ mehsul.kateqoriya }}</td>
                         <td>
                             {% if mehsul.brend.sekilyazi %}
-                                {% for sekil in mehsul.marka.sekiller.all %}
                                     <img src="{{ mehsul.brend.sekilyazi.url }}" alt="{{ mehsul.brend.adi }}" class="marka-image">
-                                {% endfor %}
                             {% else %}
                                 <span>{{ mehsul.brend.adi }}</span>
                             {% endif %}

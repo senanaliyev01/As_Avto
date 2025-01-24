@@ -1010,8 +1010,7 @@ footer::before {
     height: auto;
     object-fit: contain;
     margin: 5px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: transparent;
     transition: transform 0.2s ease;
 }
 

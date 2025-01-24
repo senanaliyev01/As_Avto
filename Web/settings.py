@@ -89,7 +89,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'Web.wsgi.application'
 
 
-# Database
+#1 Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 # DATABASES = {

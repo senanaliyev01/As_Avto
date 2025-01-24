@@ -378,27 +378,27 @@ header {
     }
 }
 
-/* Enhanced Professional Products Table - Dark Blue Theme */
+/* Enhanced Professional Products Table */
 .products-table {
     margin: 30px auto;
     width: 95%;
     max-width: 1200px;
-    background: #192a56; /* Dark Blue Background */
+    background: #f4f6f9;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .products-table table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    background: #273c75; /* Slightly Lighter Dark Blue */
+    background: #ffffff;
 }
 
 .products-table thead {
-    background: linear-gradient(120deg, #40739e, #273c75); /* Darker Gradient */
+    background: linear-gradient(120deg, #34495e, #2c3e50);
     position: relative;
 }
 
@@ -415,14 +415,14 @@ header {
 }
 
 .products-table th:hover {
-    background: rgba(255, 255, 255, 0.1); /* Subtle White Hover */
+    background: rgba(255,255,255,0.1);
 }
 
 .products-table td {
     padding: 16px 15px;
-    color: #dcdde1; /* Light Text for Contrast */
+    color: #2d3436;
     font-size: 0.9rem;
-    border-bottom: 1px solid #353b48; /* Darker Separator */
+    border-bottom: 1px solid #e9ecef;
     transition: all 0.3s ease;
     text-align: center;
     vertical-align: middle;
@@ -434,12 +434,11 @@ header {
 }
 
 .products-table tbody tr:hover {
-    background: #718093; /* Hover Light Blue */
+    background: #f8f9fa;
     transform: translateX(5px);
-    border-left: 3px solid #40739e; /* Accent Border on Hover */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-left: 3px solid #34495e;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
 }
-
 
 /* Stock Status Badges */
 .stock-status {

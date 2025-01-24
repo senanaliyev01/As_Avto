@@ -430,16 +430,18 @@ header {
 }
 
 .products-table tbody tr {
+    background: #1a2639; /* Tünd göy rəng */
     transition: all 0.3s ease;
     border-left: 3px solid transparent;
 }
 
 .products-table tbody tr:hover {
-    background: #5079a8; /* Daha tünd göy rəng */
+    background: #092f5a; /* Daha tünd göy rəng */
     transform: translateX(5px);
     border-left: 3px solid #1e2f45; /* Tünd göy rəng */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
+
 
 
 

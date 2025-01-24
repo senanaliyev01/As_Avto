@@ -1002,11 +1002,19 @@ footer::before {
     color: #3498db;
 }
 
-/* Marka şəkli üçün stil */
 .marka-image {
-    width: 60px; /* Şəkilin genişliyi */
-    height: auto; /* Hündürlük avtomatik */
-    
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Kölgə effekti */
-    object-fit: cover; /* Şəkilin ölçüsünü qorumaq üçün */
+    display: block;
+    max-width: 100px;
+    max-height: 100px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    margin: 5px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.marka-image:hover {
+    transform: scale(1.05);
 }

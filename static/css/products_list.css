@@ -383,49 +383,50 @@ header {
     margin: 30px auto;
     width: 100%;
     max-width: 1200px;
-    background: #1c2833; /* Tünd göy rəng */
+    background: #1a2639; /* Daha tünd göy rəng */
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    border: 1px solid #2a3b4f; /* Tünd göy çərçivə */
 }
 
 .products-table table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    background: #1c2833; /* Tünd göy rəng */
+    background: #1a2639; /* Tünd göy rəng */
 }
 
 .products-table thead {
-    background: linear-gradient(120deg, #283747, #212f3d); /* Tünd göy rəng tonları */
+    background: linear-gradient(120deg, #2c3e57, #1e2f45); /* Tünd göy tonları */
     position: relative;
 }
 
 .products-table th {
-    padding: 18px 15px;
+    padding: 20px 15px;
     font-weight: 700;
-    color: #d6dbdf; /* Açıq boz rəng */
+    color: #e0e6ed; /* Açıq boz rəng */
     text-transform: uppercase;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     letter-spacing: 1.2px;
     text-align: center;
     vertical-align: middle;
-    transition: background 0.3s ease;
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
 .products-table th:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: #34495e; /* Tünd göy tonları */
+    color: #ffffff; /* Ağ rəng */
 }
 
 .products-table td {
-    padding: 16px 15px;
-    color: #d5d8dc; /* Açıq boz rəng */
+    padding: 18px 15px;
+    color: #d1d8e0; /* Açıq boz rəng */
     font-size: 0.9rem;
-    border-bottom: 1px solid #34495e; /* Tünd göy rəng */
-    transition: all 0.3s ease;
+    border-bottom: 1px solid #3b4c66; /* Daha açıq tünd göy xətt */
     text-align: center;
     vertical-align: middle;
+    transition: all 0.3s ease;
 }
 
 .products-table tbody tr {
@@ -434,11 +435,12 @@ header {
 }
 
 .products-table tbody tr:hover {
-    background: #2c3e50; /* Daha tünd göy rəng */
+    background: #27394d; /* Daha tünd göy rəng */
     transform: translateX(5px);
-    border-left: 3px solid #1c2833; /* Tünd göy rəng */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-left: 3px solid #1e2f45; /* Tünd göy rəng */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
+
 
 
 /* Stock Status Badges */

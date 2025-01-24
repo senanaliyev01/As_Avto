@@ -381,8 +381,8 @@ header {
 /* Enhanced Professional Products Table */
 .products-table {
     margin: 30px auto;
-    width: 100%;
-    max-width: 1200px;
+    width: 110%;
+    max-width: 1300px;
     background: #ffffff;
     border-radius: 12px;
     overflow: hidden;
@@ -391,7 +391,7 @@ header {
 }
 
 .products-table table {
-    width: 100%;
+    width: 105%;
     border-collapse: separate;
     border-spacing: 0;
     background: #ffffff;

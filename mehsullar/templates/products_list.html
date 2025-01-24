@@ -118,7 +118,9 @@
                         <td>{{ mehsul.brend }}</td>
                         <td>
                             {% if mehsul.marka.sekiller.all %}
-                                <img src="{{ MarkaSekil.sekil.url }}" alt="{{ mehsul.marka.adi }}" class="marka-image">
+                                {% for sekil in mehsul.marka.sekiller.all %}
+                                    <img src="{{ sekil.sekil.url }}" alt="{{ mehsul.marka.adi }}" class="marka-image">
+                                {% endfor %}
                             {% else %}
                                 <span>{{ mehsul.marka.adi }}</span>
                             {% endif %}

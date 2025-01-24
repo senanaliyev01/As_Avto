@@ -51,12 +51,14 @@
                         <span class="label">Marka:</span>
                         <span class="value" style="display: flex; align-items: center;">
                             {% if mehsul.marka.sekiller.all %}
-                                <img src="{{ MarkaSekil.sekil.url }}" alt="{{ mehsul.marka.adi }}" class="marka-image" style="margin-right: 8px;">
+                                {% for sekil in mehsul.marka.sekiller.all %}
+                                    <img src="{{ sekil.sekil.url }}" alt="{{ mehsul.marka.adi }}" class="marka-image" style="margin-right: 8px;">
+                                {% endfor %}
                             {% else %}
                                 {{ mehsul.marka.adi }}
                             {% endif %}
                         </span>
-                    </div>
+                     </div>
                     <div class="spec-item">
                         <span class="label">Brend Kodu:</span>
                         <span class="value">{{ mehsul.brend_kod }}</span>

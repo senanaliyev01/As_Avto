@@ -19,10 +19,16 @@ class Brend(models.Model):
 
 class Marka(models.Model):
     adi = models.CharField(max_length=100, unique=True)
-    sekil = models.ImageField(upload_to='marka_sekilleri/',null=True , blank=True)
 
     def __str__(self):
         return self.adi
+
+class MarkaSekil(models.Model):
+    marka = models.ForeignKey(Marka, related_name='sekiller', on_delete=models.CASCADE)
+    sekil = models.ImageField(upload_to='marka_sekilleri/', null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.marka.adi} - Şəkil"
 
 class Mehsul(models.Model):
     adi = models.CharField(max_length=255)

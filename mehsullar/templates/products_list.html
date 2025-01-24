@@ -117,8 +117,8 @@
                         <td>{{ mehsul.kateqoriya }}</td>
                         <td>{{ mehsul.brend }}</td>
                         <td>
-                            {% if mehsul.marka.sekil %}
-                                <img src="{{ mehsul.marka.sekil.url }}" alt="{{ mehsul.marka.adi }}" class="marka-image">
+                            {% if mehsul.marka.sekiller.all %}
+                                <img src="{{ sekil.sekil.url }}" alt="{{ mehsul.marka.adi }}" class="marka-image">
                             {% else %}
                                 <span>{{ mehsul.marka.adi }}</span>
                             {% endif %}

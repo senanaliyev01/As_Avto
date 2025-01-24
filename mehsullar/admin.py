@@ -1,7 +1,16 @@
 from django.contrib import admin
-from .models import Kateqoriya, Brend, Marka, Mehsul, Sebet, Sifaris, SifarisMehsul, OEMKod, MusteriReyi
+from .models import Kateqoriya, Brend, Marka, Mehsul, Sebet, Sifaris, SifarisMehsul, OEMKod, MusteriReyi,MarkaSekil
 from django.urls import reverse
 from django.utils.html import format_html
+
+class MarkaSekilInline(admin.TabularInline):
+    model = MarkaSekil
+    extra = 1  # Yeni şəkil əlavə etmək üçün bir boş forma
+
+@admin.register(Marka)
+class MarkaAdmin(admin.ModelAdmin):
+    inlines = [MarkaSekilInline]
+    list_display = ('adi',)
 
 # Sifarişlərdə məhsul detalını əlavə etmək üçün
 class SifarisMehsulInline(admin.TabularInline):

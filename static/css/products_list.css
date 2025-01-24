@@ -378,50 +378,66 @@ header {
     }
 }
 
+/* Enhanced Professional Products Table */
 .products-table {
     margin: 30px auto;
     width: 95%;
     max-width: 1200px;
-    background: #121621;
+    background: #f4f6f9;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
-    border: 1px solid #1f2937;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .products-table table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    background: #1e293b;
+    background: #ffffff;
 }
 
 .products-table thead {
-    background: linear-gradient(120deg, #0f172a, #1e293b);
+    background: linear-gradient(120deg, #34495e, #2c3e50);
+    position: relative;
 }
 
 .products-table th {
     padding: 18px 15px;
     font-weight: 700;
-    color: #e2e8f0;
+    color: #ffffff;
     text-transform: uppercase;
     font-size: 0.85rem;
     letter-spacing: 1.2px;
-    background: rgba(15, 23, 42, 0.5);
+    text-align: center;
+    vertical-align: middle;
+    transition: background 0.3s ease;
+}
+
+.products-table th:hover {
+    background: rgba(255,255,255,0.1);
 }
 
 .products-table td {
     padding: 16px 15px;
-    color: #cbd5e1;
+    color: #2d3436;
     font-size: 0.9rem;
-    border-bottom: 1px solid #334155;
-    background: #1e293b;
+    border-bottom: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.products-table tbody tr {
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
 }
 
 .products-table tbody tr:hover {
-    background: #334155;
+    background: #f8f9fa;
     transform: translateX(5px);
-    border-left: 3px solid #6366f1;
+    border-left: 3px solid #34495e;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
 }
 
 /* Stock Status Badges */

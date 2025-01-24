@@ -435,7 +435,7 @@ header {
 }
 
 .products-table tbody tr:hover {
-    background: #27394d; /* Daha tünd göy rəng */
+    background: #5079a8; /* Daha tünd göy rəng */
     transform: translateX(5px);
     border-left: 3px solid #1e2f45; /* Tünd göy rəng */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);

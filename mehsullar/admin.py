@@ -50,7 +50,6 @@ class MehsulAdmin(admin.ModelAdmin):
 admin.site.register(SifarisMehsul, SifarisMehsulAdmin)
 admin.site.register(Kateqoriya)
 admin.site.register(Brend)
-admin.site.register(Marka)
 admin.site.register(Sebet)
 admin.site.register(Mehsul, MehsulAdmin)
 

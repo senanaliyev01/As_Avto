@@ -383,29 +383,29 @@ header {
     margin: 30px auto;
     width: 100%;
     max-width: 1200px;
-    background: #1c2833; /* Tünd göy rəng */
+    background: #ffffff;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .products-table table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    background: #1c2833; /* Tünd göy rəng */
+    background: #ffffff;
 }
 
 .products-table thead {
-    background: linear-gradient(120deg, #283747, #212f3d); /* Tünd göy rəng tonları */
+    background: linear-gradient(120deg, #34495e, #2c3e50);
     position: relative;
 }
 
 .products-table th {
     padding: 18px 15px;
     font-weight: 700;
-    color: #d6dbdf; /* Açıq boz rəng */
+    color: #ffffff;
     text-transform: uppercase;
     font-size: 0.85rem;
     letter-spacing: 1.2px;
@@ -415,14 +415,14 @@ header {
 }
 
 .products-table th:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255,255,255,0.1);
 }
 
 .products-table td {
     padding: 16px 15px;
-    color: #d5d8dc; /* Açıq boz rəng */
+    color: #2d3436;
     font-size: 0.9rem;
-    border-bottom: 1px solid #34495e; /* Tünd göy rəng */
+    border-bottom: 1px solid #e9ecef;
     transition: all 0.3s ease;
     text-align: center;
     vertical-align: middle;
@@ -434,12 +434,11 @@ header {
 }
 
 .products-table tbody tr:hover {
-    background: #2c3e50; /* Daha tünd göy rəng */
+    background: #f8f9fa;
     transform: translateX(5px);
-    border-left: 3px solid #1c2833; /* Tünd göy rəng */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-left: 3px solid #34495e;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
 }
-
 
 /* Stock Status Badges */
 .stock-status {

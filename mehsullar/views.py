@@ -385,6 +385,7 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),  # Başlıq mətni
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),  # Mərkəzləşdirmək
         ('FONTNAME', (0, 0), (-1, 0), 'NotoSans'),  # Başlıq fontu
+        ('FONTNAME', (0, 1), (-1, -1), 'NotoSans'),  # Cədvəl mətni üçün fontu NotoSans ilə dəyişdirin
         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),  # Başlıq padding
         ('BACKGROUND', (0, 1), (-1, -1), colors.beige),  # Cədvəl arxa planı
         ('GRID', (0, 0), (-1, -1), 1, colors.black),  # Cədvəl xətləri

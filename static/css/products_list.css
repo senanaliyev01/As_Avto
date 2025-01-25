@@ -515,21 +515,28 @@ header {
 
 
 
+/* Responsive Products Table Styles */
 .products-table {
     width: 100%;
     background-color: #0f2942;
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    overflow: hidden;
+    overflow: auto; /* Allow horizontal scrolling if needed */
+    max-width: 100%;
 }
 
 .products-table table {
     width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: auto; /* Adjust column widths dynamically */
+    min-width: 1000px; /* Ensure minimum width for readability */
 }
 
 .products-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
     background: linear-gradient(135deg, #1a4980, #0d2b4d);
     color: #64ffda;
 }
@@ -542,6 +549,7 @@ header {
     text-transform: uppercase;
     letter-spacing: 1px;
     border-bottom: 2px solid rgba(100, 255, 218, 0.2);
+    white-space: nowrap;
 }
 
 .products-table tbody tr {
@@ -564,8 +572,28 @@ header {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     vertical-align: middle;
     transition: color 0.3s ease;
+    word-break: break-word; /* Ensure long words break */
+    max-width: 200px; /* Limit column width */
 }
 
+/* Image cell specific styling */
+.products-table td:first-child,
+.products-table td:nth-child(4),
+.products-table td:nth-child(5) {
+    width: 120px;
+    max-width: 120px;
+}
+
+.marka-image,
+.marka-image-pr-list {
+    max-width: 100px;
+    max-height: 100px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    margin: 0 auto;
+    display: block;
+}
 
 
 
@@ -923,35 +951,3 @@ footer::before {
 
 
 
-.marka-image {
-    display: block;
-    max-width: 100px;
-    max-height: 100px;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    margin: 5px;
-    background: transparent;
-    transition: transform 0.2s ease;
-}
-
-.marka-image:hover {
-    transform: scale(1.05);
-}
-
-
-.marka-image-pr-list {
-    display: block;
-    max-width: 70px;
-    max-height: 70px;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    margin: 5px;
-    background: transparent;
-    transition: transform 0.2s ease;
-}
-
-.marka-image-pr-list:hover {
-    transform: scale(1.05);
-}

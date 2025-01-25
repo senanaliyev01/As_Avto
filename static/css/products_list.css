@@ -475,7 +475,7 @@ header {
 
 /* Enhanced Professional Table Styles */
 .products-table {
-    width: 100%;
+    width: 150%;
     max-width: 1400px;
     background: linear-gradient(145deg, #0a1930, #0f2645);
     border-radius: 15px;
@@ -536,8 +536,8 @@ header {
 /* Image Styles - Unified */
 .marka-image,
 .marka-image-pr-list {
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
     object-fit: contain;
     padding: 4px;
     background: rgba(255, 255, 255, 0.03);

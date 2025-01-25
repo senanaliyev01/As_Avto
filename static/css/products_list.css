@@ -515,28 +515,29 @@ header {
 
 .products-table {
     width: 100%;
-    overflow-x: auto;
-    background-color: #0a1f44;
+    background-color: #0f2942;
     border-radius: 12px;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
 }
 
 .products-table table {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
+    border-collapse: collapse;
+    table-layout: fixed;
 }
 
 .products-table thead {
     background: linear-gradient(135deg, #1a4980, #0d2b4d);
+    color: #64ffda;
 }
 
 .products-table th {
-    padding: 15px;
+    padding: 15px 10px;
     text-align: center;
-    color: #64ffda;
+    font-weight: 600;
+    font-size: 0.9rem;
     text-transform: uppercase;
-    font-weight: 700;
     letter-spacing: 1px;
     border-bottom: 2px solid rgba(100, 255, 218, 0.2);
 }
@@ -552,14 +553,15 @@ header {
 
 .products-table tbody tr:hover {
     background-color: #1a3a5e;
-    transform: scale(1.02);
 }
 
 .products-table td {
-    padding: 12px 15px;
+    padding: 12px 10px;
     text-align: center;
     color: #a0b7cf;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    vertical-align: middle;
+    transition: color 0.3s ease;
 }
 
 

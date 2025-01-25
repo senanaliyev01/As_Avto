@@ -564,11 +564,7 @@ header {
     transition: color 0.3s ease;
 }
 
-.products-table td img {
-    max-height: 50px;
-    max-width: 80px;
-    object-fit: contain;
-}
+
 
 
 
@@ -925,8 +921,35 @@ footer::before {
 
 
 
-.marka-image, .marka-image-pr-list {
-    max-height: 40px;
-    max-width: 60px;
-    margin: 0 auto;
+.marka-image {
+    display: block;
+    max-width: 100px;
+    max-height: 100px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    margin: 5px;
+    background: transparent;
+    transition: transform 0.2s ease;
+}
+
+.marka-image:hover {
+    transform: scale(1.05);
+}
+
+
+.marka-image-pr-list {
+    display: block;
+    max-width: 70px;
+    max-height: 70px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    margin: 5px;
+    background: transparent;
+    transition: transform 0.2s ease;
+}
+
+.marka-image-pr-list:hover {
+    transform: scale(1.05);
 }

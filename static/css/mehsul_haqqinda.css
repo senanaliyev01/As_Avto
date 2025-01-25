@@ -566,11 +566,18 @@ header {
     }
 } 
 
-/* Marka şəkli üçün stil */
 .marka-image {
-    width: 50px; /* Şəkilin genişliyi */
-    height: auto; /* Hündürlük avtomatik */
-    border-radius: 5px; /* Küncləri yuvarlaqlaşdırmaq üçün */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Kölgə effekti */
-    object-fit: cover; /* Şəkilin ölçüsünü qorumaq üçün */
+    display: block;
+    max-width: 100px;
+    max-height: 100px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    margin: 5px;
+    background: transparent;
+    transition: transform 0.2s ease;
+}
+
+.marka-image:hover {
+    transform: scale(1.05);
 }

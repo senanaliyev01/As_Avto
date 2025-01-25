@@ -522,7 +522,6 @@ header {
     border-spacing: 0;
     background-color: #0a1f44;
     border-radius: 12px;
-    overflow: auto; /* Cədvəl artıq olduğunda təkcə cədvəl hissəsi sürüşdürülə bilər */
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     table-layout: auto; /* Məzmunu nəzərə alaraq sütun ölçüləri avtomatik tənzimlənir */
     display: block; /* Dinamik göstərmə üçün */

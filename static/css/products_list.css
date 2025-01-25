@@ -503,7 +503,7 @@ header {
     margin-left: -50vw;
     margin-right: -50vw;
     background: rgba(16, 33, 62, 0.3);
-    overflow-x: auto; /* Add this to ensure horizontal scrolling */
+    
 }
 
 .products-table table {
@@ -544,7 +544,7 @@ header {
     width: auto;
     height: auto;
     object-fit: contain;
-    display: inline-block;
+    display: flex;
     vertical-align: middle;
 }
 

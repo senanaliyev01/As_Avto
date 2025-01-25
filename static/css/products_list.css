@@ -515,16 +515,21 @@ header {
 
 /* Enhanced Products Table Styles */
 .products-table {
-    width: 115%; /* Cədvəl tam ekran genişliyinə uyğun olacaq */
-    height: auto; /* Boyutları avtomatik uyğunlaşdırır */
-    margin: 50px auto; /* Ortada yerləşdirir */
+    width: 90%; /* Cədvəl genişliyi ekranın 90%-i qədər olacaq */
+    max-width: 1200px; /* Maksimum genişlik 1200px */
+    margin: 50px auto; /* Üfüqi və şaquli mərkəzləşdirilmə */
     border-collapse: separate;
     border-spacing: 0;
     background-color: #0a1f44;
     border-radius: 12px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    table-layout: auto; /* Məzmunu nəzərə alaraq sütun ölçüləri avtomatik tənzimlənir */
-    display: block; /* Dinamik göstərmə üçün */
+    overflow: hidden; /* Çərçivəni idarə etmək üçün */
+    table-layout: fixed; /* Sütunların eyni ölçüdə olması üçün */
+}
+
+.products-table table {
+    width: 100%; /* Cədvəl genişliyi tam uyğun olacaq */
+    border-collapse: collapse;
 }
 
 .products-table thead {
@@ -535,11 +540,12 @@ header {
 }
 
 .products-table th {
-    padding: 20px 15px;
+    padding: 15px;
     text-align: center;
     font-weight: 600;
     font-size: 0.9rem;
     border-bottom: 2px solid rgba(100, 255, 218, 0.2);
+    word-wrap: break-word; /* Uzun başlıqları idarə etmək üçün */
     transition: background-color 0.3s ease;
 }
 
@@ -564,19 +570,27 @@ header {
 }
 
 .products-table td {
-    padding: 18px 15px;
+    padding: 15px;
     text-align: center;
     color: #a0b7cf;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     font-size: 0.95rem;
     vertical-align: middle;
-    transition: all 0.3s ease;
-    word-wrap: break-word; /* Uzun mətnlərin kəsilmədən sətir dəyişməsini təmin edir */
+    word-wrap: break-word; /* Uzun mətnlərin uyğunlaşdırılması */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Uzun mətnlər üçün üç nöqtə əlavə edir */
+}
+
+.products-table img {
+    max-width: 50px; /* Şəkillərin maksimum ölçüsü */
+    height: auto;
+    border-radius: 5px;
 }
 
 .products-table tbody tr:hover td {
     color: #64ffda;
 }
+
 
 
 

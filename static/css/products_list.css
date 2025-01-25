@@ -515,9 +515,10 @@ header {
 
 /* Enhanced Products Table Styles */
 .products-table {
-    width: 100%; /* Cədvəl tam ekran genişliyinə uyğun olacaq */
+    width: 80%; /* Cədvəl genişliyini təyin edir */
+    max-width: 1200px; /* Maksimum genişlik əlavə edilir ki, cədvəl çox böyük olmasın */
     height: auto; /* Boyutları avtomatik uyğunlaşdırır */
-    margin: 50px auto; /* Ortada yerləşdirir */
+    margin: 50px auto; /* Ortada yerləşdirir və üstdə müəyyən boşluq əlavə edir */
     border-collapse: separate;
     border-spacing: 0;
     background-color: #0a1f44;
@@ -525,6 +526,7 @@ header {
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     table-layout: auto; /* Məzmunu nəzərə alaraq sütun ölçüləri avtomatik tənzimlənir */
     display: block; /* Dinamik göstərmə üçün */
+    overflow-x: auto; /* Üfüqi hərəkət etmək üçün */
 }
 
 .products-table thead {
@@ -577,6 +579,7 @@ header {
 .products-table tbody tr:hover td {
     color: #64ffda;
 }
+
 
 
 

@@ -515,7 +515,7 @@ header {
 
 /* Enhanced Products Table Styles */
 .products-table {
-    width: 114%;
+    width: auto;
    
     height: auto;
     margin-left: -7.5%;

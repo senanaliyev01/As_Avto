@@ -515,7 +515,7 @@ header {
 
 /* Enhanced Products Table Styles */
 .products-table {
-    width: 113%; 
+   max-width: 1200px;
     height: auto;
     margin-left: -7.5%;
     border-collapse: separate;
@@ -949,8 +949,8 @@ footer::before {
 
 .marka-image-pr-list {
     display: block;
-    max-width: 70px;
-    max-height: 70px;
+    max-width: 60px;
+    max-height: 60px;
     width: auto;
     height: auto;
     object-fit: contain;

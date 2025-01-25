@@ -515,7 +515,8 @@ header {
 
 /* Enhanced Products Table Styles */
 .products-table {
-    width: 115%;
+    width: 100%; 
+    max-width: 115%; 
     height: auto;
     margin: 0 auto;
     border-collapse: separate;
@@ -576,12 +577,7 @@ header {
     color: #64ffda;
 }
 
-.table-container {
-    display: flex;
-    justify-content: center;
-    overflow-x: auto; /* Allows horizontal scrolling if needed */
-    width: 100%;
-}
+
 
 
 /* Responsive adjustments */

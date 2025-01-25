@@ -378,30 +378,107 @@ header {
     }
 }
 
-.products-table tbody tr {
-    background-color: var(--transparent-white-hover); /* Default rəng */
+/* Enhanced Professional Products Table Styling */
+.products-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: linear-gradient(to bottom, #0a2239, #13375b);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.products-table thead {
+    background: linear-gradient(135deg, #002b63, #035a8d);
+    color: #ffffff;
+}
+
+.products-table th {
+    padding: 20px 15px;
+    text-align: center;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
     transition: all 0.3s ease;
 }
 
+.products-table tbody tr {
+    transition: all 0.3s ease;
+    background-color: rgba(10, 34, 57, 0.8); /* Deep blue base */
+}
+
 .products-table tbody tr:nth-child(even) {
-    background-color: #1a2639; /* Daha tünd rəng */
+    background-color: rgba(19, 55, 91, 0.6); /* Slightly lighter shade for alternating rows */
 }
 
 .products-table tbody tr:hover {
-    background-color: #092f5a; /* Hover zamanı rəng */
-}
-
-.products-table tbody tr:hover td {
-    color: var(--text-light); /* Yazı rəngi hover zamanı */
+    background-color: rgba(5, 63, 124, 0.8); /* Highlighted hover state */
+    transform: scale(1.01);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .products-table td {
-    background-color: #1a2639; /* Default arxa plan */
-    color: var(--text-light); /* Açıq yazı rəngi */
-    border-bottom: 1px solid var(--transparent-white); /* Separator */
     padding: 18px 15px;
     text-align: center;
-    vertical-align: middle;
+    color: #e3f2fd; /* Light blue text */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.products-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .products-table {
+        border-radius: 10px;
+    }
+    
+    .products-table th,
+    .products-table td {
+        padding: 15px 10px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Column-specific Styling */
+.products-table .stock-column {
+    width: 150px;
+}
+
+.products-table .price-column {
+    font-weight: 700;
+    color: #64ffda; /* Vibrant accent color */
+    font-size: 1.1rem;
+}
+
+/* Scroll bar for overflow */
+.products-table-container {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+/* Custom Scrollbar */
+.products-table-container::-webkit-scrollbar {
+    width: 10px;
+}
+
+.products-table-container::-webkit-scrollbar-track {
+    background: rgba(10, 34, 57, 0.9);
+    border-radius: 10px;
+}
+
+.products-table-container::-webkit-scrollbar-thumb {
+    background: rgba(3, 90, 141, 0.8);
+    border-radius: 10px;
+}
+
+.products-table-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(5, 63, 124, 1);
 }
 
 

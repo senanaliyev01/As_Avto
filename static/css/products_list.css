@@ -1,4 +1,4 @@
-/* Root Variables */
+* Root Variables */
 :root {
     --primary-gradient: linear-gradient(135deg, #1a237e, #0d47a1);
     --secondary-gradient: linear-gradient(135deg, #00838f, #006064);
@@ -492,20 +492,17 @@ header {
 
 /* Enhanced Professional Table Styles */
 .products-table {
-    width: 100%;
+    width: 95%;
     max-width: 1400px;
-    background: linear-gradient(145deg, #0a1930, #0f2645);
-    border-radius: 15px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    background: transparent;
     margin: 2rem auto;
-    border: 1px solid rgba(100, 255, 218, 0.1);
     padding: 1rem;
 }
 
 .products-table table {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0;
+    border-spacing: 0 8px;
 }
 
 .products-table thead {
@@ -523,8 +520,8 @@ header {
     letter-spacing: 1px;
     font-size: 0.9rem;
     text-align: center;
-    border-bottom: 2px solid rgba(100, 255, 218, 0.15);
-    white-space: nowrap;
+    border: none;
+    background: rgba(20, 45, 76, 0.5);
 }
 
 .products-table tbody tr {
@@ -546,8 +543,9 @@ header {
     padding: 0.8rem;
     color: #b8c9e6;
     text-align: center;
-    border-bottom: 1px solid rgba(100, 255, 218, 0.05);
     vertical-align: middle;
+    border: none;
+    background: rgba(16, 33, 62, 0.3);
 }
 
 /* Image Styles - Unified */
@@ -556,17 +554,15 @@ header {
     width: 70px;
     height: 70px;
     object-fit: contain;
-    padding: 4px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 8px;
+    padding: 0;
+    background: transparent;
+    margin: 0;
     transition: transform 0.3s ease;
-    margin: 2px;
 }
 
 .marka-image:hover,
 .marka-image-pr-list:hover {
-    transform: scale(1.15);
-    box-shadow: 0 4px 15px rgba(100, 255, 218, 0.15);
+    transform: scale(1.1);
 }
 
 /* Multiple images container */
@@ -575,8 +571,9 @@ td[style*="display: flex"] {
     flex-wrap: nowrap !important;
     justify-content: center;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
     padding: 0.5rem;
+    background: transparent !important;
 }
 
 /* Table column widths */
@@ -633,14 +630,17 @@ td[style*="display: flex"] {
 }
 
 /* Responsive adjustments */
-@media (max-width: 1400px) {
+@media (max-width: 1200px) {
     .products-table {
-        margin: 1rem;
-        overflow-x: auto;
+        width: 98%;
+        margin: 1rem auto;
     }
-    
-    .products-table table {
-        min-width: 1200px;
+}
+
+@media (max-width: 768px) {
+    .products-table {
+        width: 100%;
+        overflow-x: auto;
     }
 }
 
@@ -964,4 +964,3 @@ footer::before {
 #search-button.loading .spinner {
     animation: spin 0.8s linear infinite;
 }
-

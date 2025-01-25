@@ -44,9 +44,16 @@
                         <span class="value">{{ mehsul.kateqoriya }}</span>
                     </div>
                     <div class="spec-item">
-                        <span class="label">Brend:</span>
-                        <span class="value">{{ mehsul.brend }}</span>
-                    </div>
+                        <span class="label">Firma:</span>
+                        <span class="value" style="display: flex; align-items: center;">
+                            {% if mehsul.brend.sekilyazi %}
+                            <img src="{{ mehsul.brend.sekilyazi.url }}" alt="{{ mehsul.brend.adi }}" class="marka-image">
+                           
+                            {% else %}
+                                {{ mehsul.brend.adi }}
+                            {% endif %}
+                        </span>
+                     </div>
                     <div class="spec-item">
                         <span class="label">Marka:</span>
                         <span class="value" style="display: flex; align-items: center;">

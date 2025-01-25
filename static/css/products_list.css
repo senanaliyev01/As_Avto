@@ -515,9 +515,9 @@ header {
 
 /* Enhanced Products Table Styles */
 .products-table {
-    width: 110%; 
+    width: 115%; 
     height: auto;
-    margin-left: -7.5%;
+    margin-left: -5.5%;
     border-collapse: separate;
     border-spacing: 0;
     background-color: #0a1f44;

@@ -581,11 +581,7 @@ header {
     text-overflow: ellipsis; /* Uzun mətnlər üçün üç nöqtə əlavə edir */
 }
 
-.products-table img {
-    max-width: 50px; /* Şəkillərin maksimum ölçüsü */
-    height: auto;
-    border-radius: 5px;
-}
+
 
 .products-table tbody tr:hover td {
     color: #64ffda;

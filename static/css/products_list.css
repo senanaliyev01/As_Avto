@@ -385,15 +385,17 @@ header {
 
 /* Stock Status Badges */
 .stock-status {
-    padding: 8px 16px;
-    border-radius: 30px;
+    padding: 4px 8px;
+    border-radius: 20px;
     font-weight: 600;
-    font-size: 0.85em;
-    letter-spacing: 0.8px;
+    font-size: 0.75em;
+    letter-spacing: 0.6px;
     text-transform: uppercase;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    min-width: 100px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
     display: inline-block;
+    max-width: 100%;
+    text-align: center;
+    line-height: 1.4;
 }
 
 .out-of-stock {

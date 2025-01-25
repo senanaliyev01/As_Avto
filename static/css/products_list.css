@@ -544,17 +544,17 @@ header {
     width: auto;
     height: auto;
     object-fit: contain;
-    display: flex;
-    vertical-align: middle;
+    display: inline-block;
+    margin: 0 auto; /* Ortada yerləşdirir */
 }
 
 td[style*="display: flex"] {
     display: flex !important;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
+    justify-content: center; /* Şəkilləri üfiqi olaraq ortalayır */
+    align-items: center;    /* Şəkilləri şaquli olaraq ortalayır */
+    gap: 5px;               /* Şəkillər arası məsafəni təyin edir */
     padding: 0.5rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;      /* Yan-yana düzülməsi üçün sıralama */
     max-width: 100%;
     overflow: auto;
 }
@@ -562,8 +562,6 @@ td[style*="display: flex"] {
 td[style*="display: flex"] img {
     max-width: 70px;
     max-height: 70px;
-    width: auto;
-    height: auto;
     object-fit: contain;
 }
 

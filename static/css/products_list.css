@@ -515,20 +515,19 @@ header {
 
 /* Enhanced Products Table Styles */
 .products-table {
-    width: 100%; /* Cədvəl genişliyi ekranın 90%-i qədər olacaq */
-    max-width: 1200px; /* Maksimum genişlik 1200px */
-    margin: 0 auto; /* Üfüqi və şaquli mərkəzləşdirilmə */
-    border-collapse: separate;
+    max-width: 100%; /* Cədvəl tam ekran genişliyinə uyğun olacaq */
+    margin: 20px auto; /* Üfüqi və şaquli mərkəzləşdirilmə */
+    border-collapse: collapse;
     border-spacing: 0;
     background-color: #0a1f44;
     border-radius: 12px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    overflow: hidden; /* Çərçivəni idarə etmək üçün */
-    table-layout: fixed; /* Sütunların eyni ölçüdə olması üçün */
+    overflow: hidden; /* İç məzmunun çıxmasının qarşısını alır */
 }
 
 .products-table table {
     width: 100%; /* Cədvəl genişliyi tam uyğun olacaq */
+    table-layout: auto; /* Sütun ölçüləri məzmun əsasında tənzimlənir */
     border-collapse: collapse;
 }
 
@@ -556,7 +555,6 @@ header {
 .products-table tbody tr {
     background-color: #122235;
     transition: all 0.3s ease;
-    text-align: center;
 }
 
 .products-table tbody tr:nth-child(even) {
@@ -571,20 +569,22 @@ header {
 
 .products-table td {
     padding: 15px;
-    text-align: center;
     color: #a0b7cf;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     font-size: 0.95rem;
-    vertical-align: middle;
-    word-wrap: break-word; /* Uzun mətnlərin uyğunlaşdırılması */
+    word-wrap: break-word;
     overflow: hidden;
-    text-overflow: ellipsis; /* Uzun mətnlər üçün üç nöqtə əlavə edir */
+    text-overflow: ellipsis;
 }
-
-
 
 .products-table tbody tr:hover td {
     color: #64ffda;
+}
+
+.products-table img {
+    max-width: 100%;
+    height: auto; /* Şəkillər avtomatik uyğunlaşacaq */
+    border-radius: 5px;
 }
 
 

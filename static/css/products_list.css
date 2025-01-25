@@ -948,34 +948,3 @@ footer::before {
     animation: spin 0.8s linear infinite;
 }
 
-.marka-image {
-    display: block;
-    max-width: 100px;
-    max-height: 100px;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    margin: 5px;
-    background: transparent;
-    transition: transform 0.2s ease;
-}
-
-.marka-image:hover {
-    transform: scale(1.05);
-}
-
-.marka-image-pr-list {
-    display: block;
-    max-width: 70px;
-    max-height: 70px;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    margin: 5px;
-    background: transparent;
-    transition: transform 0.2s ease;
-}
-
-.marka-image-pr-list:hover {
-    transform: scale(1.05);
-}

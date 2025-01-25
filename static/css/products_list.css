@@ -515,7 +515,7 @@ header {
 
 /* Enhanced Products Table Styles */
 .products-table {
-    width: 90%; /* Cədvəl genişliyi ekranın 90%-i qədər olacaq */
+    width: 100%; /* Cədvəl genişliyi ekranın 90%-i qədər olacaq */
     max-width: 1200px; /* Maksimum genişlik 1200px */
     margin: 50px auto; /* Üfüqi və şaquli mərkəzləşdirilmə */
     border-collapse: separate;

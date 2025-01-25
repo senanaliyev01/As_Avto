@@ -1,4 +1,4 @@
-/* Root Variables */
+* Root Variables */
 :root {
     --primary-gradient: linear-gradient(135deg, #1a237e, #0d47a1);
     --secondary-gradient: linear-gradient(135deg, #00838f, #006064);
@@ -385,33 +385,41 @@ header {
 
 /* Stock Status Badges */
 .stock-status {
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 0.75rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.8rem;
     display: inline-block;
     text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .in-stock {
-    background: linear-gradient(135deg, #00897b, #00695c);
+    background: linear-gradient(135deg, #059669, #047857);
     color: white;
 }
 
 .low-stock {
-    background: linear-gradient(135deg, #ffd54f, #ffb300);
-    color: #333;
+    background: linear-gradient(135deg, #d97706, #b45309);
+    color: white;
 }
 
 .out-of-stock {
-    background: linear-gradient(135deg, #e53935, #c62828);
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
     color: white;
 }
 
 /* Price Column */
 .price-column {
     font-weight: 600;
-    color: #4caf50;
+    color: #10b981;
+    font-size: 1rem;
+}
+
+.fa-manat-sign {
+    color: #10b981;
+    margin-left: 2px;
+    font-size: 0.9em !important;
 }
 
 /* Cart Icon */
@@ -419,137 +427,104 @@ header {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 6px;
+    width: 35px;
+    height: 35px;
+    background: linear-gradient(135deg, #2c5282, #1a365d);
     border-radius: 8px;
-    color: #fff;
+    color: #fff !important;
     text-decoration: none;
-    transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .cart-icon:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: linear-gradient(135deg, #2d5689, #1e3d66);
     transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
-.info-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    background: linear-gradient(135deg, #1a4980, #0d2b4d);
-    border-radius: 8px;
-    color: #64ffda !important;
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-    border: 1px solid rgba(100, 255, 218, 0.2);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.info-link i {
+.cart-icon i {
     font-size: 1rem;
-    transition: transform 0.3s ease;
 }
-
-.info-link:hover {
-    background: linear-gradient(135deg, #0d2b4d, #1a4980);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(100, 255, 218, 0.15);
-    border-color: rgba(100, 255, 218, 0.4);
-}
-
-.info-link:hover i {
-    transform: rotate(15deg);
-}
-
-.info-link:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-}
-
-
-
-
-
 
 /* Enhanced Professional Table Styles */
 .products-table {
     width: 100%;
     max-width: 1400px;
-    background: linear-gradient(145deg, #0a1930, #0f2645);
-    border-radius: 15px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(145deg, #0d1b30, #162942);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     margin: 2rem auto;
-    border: 1px solid rgba(100, 255, 218, 0.1);
-    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
 }
 
 .products-table table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
+    background: transparent;
 }
 
 .products-table thead {
-    background: linear-gradient(135deg, #142d4c, #1a3a6c);
+    background: linear-gradient(135deg, #1a2942, #233656);
     position: sticky;
     top: 0;
     z-index: 10;
 }
 
 .products-table th {
-    padding: 1.2rem 0.8rem;
+    padding: 1rem;
     color: #64ffda;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     font-size: 0.9rem;
     text-align: center;
     border-bottom: 2px solid rgba(100, 255, 218, 0.15);
-    white-space: nowrap;
 }
 
 .products-table tbody tr {
-    background: rgba(16, 33, 62, 0.4);
-    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.03);
+    transition: all 0.2s ease;
 }
 
 .products-table tbody tr:nth-child(even) {
-    background: rgba(13, 28, 53, 0.6);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .products-table tbody tr:hover {
-    background: rgba(28, 57, 107, 0.8);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-1px);
 }
 
 .products-table td {
     padding: 0.8rem;
-    color: #b8c9e6;
+    color: #e1e8f5;
     text-align: center;
-    border-bottom: 1px solid rgba(100, 255, 218, 0.05);
     vertical-align: middle;
+    border: none;
 }
 
-/* Image Styles - Unified */
+/* Image Styles */
 .marka-image,
 .marka-image-pr-list {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     object-fit: contain;
     padding: 4px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 8px;
-    transition: transform 0.3s ease;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    transition: transform 0.2s ease;
     margin: 2px;
+    display: inline-block;
+    vertical-align: middle;
 }
 
 .marka-image:hover,
 .marka-image-pr-list:hover {
-    transform: scale(1.15);
-    box-shadow: 0 4px 15px rgba(100, 255, 218, 0.15);
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.08);
 }
 
 /* Multiple images container */
@@ -560,14 +535,16 @@ td[style*="display: flex"] {
     align-items: center;
     gap: 4px;
     padding: 0.5rem;
+    border: none !important;
+    background: transparent !important;
 }
 
 /* Table column widths */
 .products-table th:nth-child(1),
-.products-table td:nth-child(1) { width: 80px; }
+.products-table td:nth-child(1) { width: 70px; }
 
 .products-table th:nth-child(2),
-.products-table td:nth-child(2) { width: 140px; }
+.products-table td:nth-child(2) { width: 130px; }
 
 .products-table th:nth-child(3),
 .products-table td:nth-child(3) { width: 100px; }
@@ -576,7 +553,7 @@ td[style*="display: flex"] {
 .products-table td:nth-child(4) { width: 100px; }
 
 .products-table th:nth-child(5),
-.products-table td:nth-child(5) { width: 160px; }
+.products-table td:nth-child(5) { width: 150px; }
 
 .products-table th:nth-child(6),
 .products-table td:nth-child(6) { width: 90px; }

@@ -494,18 +494,22 @@ header {
 
 /* Professional Table Styles */
 .products-table {
-    width: 100%;
-    margin: 2rem auto;
+    width: 100vw;
+    margin: 2rem 0;
     padding: 0;
-    overflow-x: auto;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
 }
 
 .products-table table {
     width: 100%;
-    min-width: 1200px;
     border-collapse: separate;
     border-spacing: 0 8px;
     margin: 0;
+    padding: 0 2rem;
 }
 
 /* Table Headers */
@@ -558,37 +562,37 @@ td[style*="display: flex"] img {
 
 /* Column Widths - Auto-adjusting */
 .products-table th:nth-child(1),
-.products-table td:nth-child(1) { min-width: 90px; } /* Təsvir */
+.products-table td:nth-child(1) { width: 5%; } /* Təsvir */
 
 .products-table th:nth-child(2),
-.products-table td:nth-child(2) { min-width: 150px; } /* Məhsul */
+.products-table td:nth-child(2) { width: 15%; } /* Məhsul */
 
 .products-table th:nth-child(3),
-.products-table td:nth-child(3) { min-width: 120px; } /* Kateqoriya */
+.products-table td:nth-child(3) { width: 10%; } /* Kateqoriya */
 
 .products-table th:nth-child(4),
-.products-table td:nth-child(4) { min-width: 100px; } /* Firma */
+.products-table td:nth-child(4) { width: 10%; } /* Firma */
 
 .products-table th:nth-child(5),
-.products-table td:nth-child(5) { min-width: 180px; } /* Avtomobil */
+.products-table td:nth-child(5) { width: 15%; } /* Avtomobil */
 
 .products-table th:nth-child(6),
-.products-table td:nth-child(6) { min-width: 100px; } /* Brend */
+.products-table td:nth-child(6) { width: 10%; } /* Brend */
 
 .products-table th:nth-child(7),
-.products-table td:nth-child(7) { min-width: 100px; } /* OEM */
+.products-table td:nth-child(7) { width: 10%; } /* OEM */
 
 .products-table th:nth-child(8),
-.products-table td:nth-child(8) { min-width: 90px; } /* Mövcudluq */
+.products-table td:nth-child(8) { width: 8%; } /* Mövcudluq */
 
 .products-table th:nth-child(9),
-.products-table td:nth-child(9) { min-width: 90px; } /* Qiymət */
+.products-table td:nth-child(9) { width: 7%; } /* Qiymət */
 
 .products-table th:nth-child(10),
-.products-table td:nth-child(10) { min-width: 70px; } /* Səbət */
+.products-table td:nth-child(10) { width: 5%; } /* Səbət */
 
 .products-table th:nth-child(11),
-.products-table td:nth-child(11) { min-width: 90px; } /* Ətraflı */
+.products-table td:nth-child(11) { width: 5%; } /* Ətraflı */
 
 /* Row Styles */
 .products-table tbody tr {
@@ -608,16 +612,20 @@ td[style*="display: flex"] img {
 
 /* Responsive Design */
 @media (max-width: 1600px) {
-    .products-table {
-        margin: 2rem auto;
-    }
-    
-    .search-bar form {
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    .products-table table {
+        padding: 0 1rem;
     }
 }
 
 @media (max-width: 768px) {
+    .products-table {
+        overflow-x: auto; /* Kiçik ekranlarda scroll */
+    }
+    
+    .products-table table {
+        min-width: 1200px; /* Kiçik ekranlarda minimum genişlik */
+    }
+    
     .top-header {
         padding: 1rem 2rem;
     }

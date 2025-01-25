@@ -493,7 +493,6 @@ header {
 
 
 
-/* Professional Table Styles */
 .products-table {
     width: 100vw;
     margin: 2rem 0;
@@ -504,6 +503,7 @@ header {
     margin-left: -50vw;
     margin-right: -50vw;
     background: rgba(16, 33, 62, 0.3);
+    overflow-x: auto; /* Add this to ensure horizontal scrolling */
 }
 
 .products-table table {
@@ -537,17 +537,17 @@ header {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Image Styles */
 .marka-image,
 .marka-image-pr-list {
-    width: 70px;
-    height: 70px;
+    max-width: 70px;
+    max-height: 70px;
+    width: auto;
+    height: auto;
     object-fit: contain;
     display: inline-block;
     vertical-align: middle;
 }
 
-/* Multiple Images Container */
 td[style*="display: flex"] {
     display: flex !important;
     justify-content: center;
@@ -555,11 +555,15 @@ td[style*="display: flex"] {
     gap: 8px;
     padding: 0.5rem;
     flex-wrap: wrap;
+    max-width: 100%;
+    overflow: auto;
 }
 
 td[style*="display: flex"] img {
-    flex: 0 0 70px;
-    height: 70px;
+    max-width: 70px;
+    max-height: 70px;
+    width: auto;
+    height: auto;
     object-fit: contain;
 }
 
@@ -614,25 +618,21 @@ td[style*="display: flex"] img {
     vertical-align: middle;
 }
 
-/* Responsive Design */
-@media (max-width: 1600px) {
-    .products-table {
-        width: 100vw;
-        margin-left: -50vw;
-        margin-right: -50vw;
-    }
-}
+
 
 @media (max-width: 768px) {
-    .products-table {
-        overflow-x: auto;
-        margin-left: -50vw;
-        margin-right: -50vw;
-        padding: 0;
-    }
-    
-    .products-table table {
-        min-width: 1200px;
+  
+        .products-table {
+            width: 100%;
+            margin-left: 0;
+            margin-right: 0;
+            overflow-x: auto;
+        }
+        
+        .products-table table {
+            min-width: 1200px; /* Ensure table doesn't shrink below readability */
+            width: max-content; /* Allow table to expand based on content */
+        }
     }
     
     .top-header {

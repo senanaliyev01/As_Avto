@@ -542,7 +542,7 @@ header {
 .marka-image-pr-list {
     width: 100px !important;
     height: 100px !important;
-    object-fit: contain;
+    
     display: block;
     margin: 0 auto;
 }
@@ -551,16 +551,13 @@ header {
 td[style*="display: flex"] img {
     width: 100px !important;
     height: 100px !important;
-    object-fit: contain;
+   
 }
 
 /* Additional rule to ensure consistent sizing in all table image scenarios */
 .products-table td img {
     width: 100px !important;
     height: 100px !important;
-    object-fit: contain;
-    max-width: 70px;
-    max-height: 70px;
 }
 
 

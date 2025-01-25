@@ -530,7 +530,6 @@ header {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    min-width: 1000px;
 }
 
 .products-table thead {
@@ -549,17 +548,7 @@ header {
     font-size: 0.9rem;
     text-align: center;
     border-bottom: 2px solid rgba(100, 255, 218, 0.15);
-    position: relative;
-}
-
-.products-table th::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.2), transparent);
+    white-space: nowrap;
 }
 
 .products-table tbody tr {
@@ -592,10 +581,23 @@ header {
     padding: 0.5rem;
 }
 
+/* Multiple images container */
+td[style*="display: flex"] {
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    min-height: 80px;
+    max-width: 300px;
+}
+
+/* Image styles */
 .marka-image,
 .marka-image-pr-list {
-    max-width: 100px;
-    max-height: 100px;
+    max-width: 70px;
+    max-height: 70px;
     width: auto;
     height: auto;
     object-fit: contain;
@@ -603,6 +605,7 @@ header {
     padding: 5px;
     background: rgba(255, 255, 255, 0.03);
     border-radius: 8px;
+    margin: 2px;
 }
 
 .marka-image:hover,
@@ -611,39 +614,63 @@ header {
     box-shadow: 0 4px 15px rgba(100, 255, 218, 0.15);
 }
 
-/* Multiple images container */
-td[style*="display: flex"] {
-    display: flex !important;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.5rem;
-    min-height: 80px;
-}
+/* Table cell width control */
+.products-table th:nth-child(1),
+.products-table td:nth-child(1) { width: 100px; }
+
+.products-table th:nth-child(2),
+.products-table td:nth-child(2) { width: 150px; }
+
+.products-table th:nth-child(3),
+.products-table td:nth-child(3) { width: 120px; }
+
+.products-table th:nth-child(4),
+.products-table td:nth-child(4) { width: 120px; }
+
+.products-table th:nth-child(5),
+.products-table td:nth-child(5) { width: 200px; }
+
+.products-table th:nth-child(6),
+.products-table td:nth-child(6) { width: 100px; }
+
+.products-table th:nth-child(7),
+.products-table td:nth-child(7) { width: 100px; }
+
+.products-table th:nth-child(8),
+.products-table td:nth-child(8) { width: 100px; }
+
+.products-table th:nth-child(9),
+.products-table td:nth-child(9) { width: 100px; }
+
+.products-table th:nth-child(10),
+.products-table td:nth-child(10) { width: 80px; }
+
+.products-table th:nth-child(11),
+.products-table td:nth-child(11) { width: 100px; }
 
 /* Responsive adjustments */
-@media (max-width: 1200px) {
+@media (max-width: 1400px) {
     .products-table {
-        margin: 1rem;
-        width: calc(100% - 2rem);
+        overflow-x: auto;
+        padding-bottom: 1rem;
     }
     
-    .products-table td {
-        padding: 0.8rem;
-        font-size: 0.9rem;
+    .products-table::-webkit-scrollbar {
+        height: 8px;
     }
-}
-
-@media (max-width: 768px) {
-    .products-table {
-        border-radius: 10px;
-        margin: 0.5rem;
+    
+    .products-table::-webkit-scrollbar-track {
+        background: rgba(100, 255, 218, 0.1);
+        border-radius: 4px;
     }
-
-    .marka-image,
-    .marka-image-pr-list {
-        max-width: 80px;
-        max-height: 80px;
+    
+    .products-table::-webkit-scrollbar-thumb {
+        background: rgba(100, 255, 218, 0.3);
+        border-radius: 4px;
+    }
+    
+    .products-table::-webkit-scrollbar-thumb:hover {
+        background: rgba(100, 255, 218, 0.5);
     }
 }
 

@@ -576,6 +576,12 @@ header {
     color: #64ffda;
 }
 
+.table-container {
+    display: flex;
+    justify-content: center;
+    overflow-x: auto; /* Allows horizontal scrolling if needed */
+    width: 100%;
+}
 
 
 /* Responsive adjustments */

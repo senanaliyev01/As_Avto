@@ -1,4 +1,4 @@
-/* Root Variables */
+* Root Variables */
 :root {
     --primary-gradient: linear-gradient(135deg, #1a237e, #0d47a1);
     --secondary-gradient: linear-gradient(135deg, #00838f, #006064);
@@ -268,8 +268,9 @@ header {
 
 /* Search Results Section */
 .search-results {
-    max-width: 1200px;
-    margin: 2rem auto;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
     padding: 0 1rem;
 }
 
@@ -494,11 +495,13 @@ header {
 .products-table {
     width: 100%;
     margin: 2rem auto;
-    padding: 0 2rem;
+    padding: 0;
+    overflow-x: auto;
 }
 
 .products-table table {
     width: 100%;
+    min-width: max-content;
     border-collapse: separate;
     border-spacing: 0 8px;
 }
@@ -553,37 +556,37 @@ td[style*="display: flex"] img {
 
 /* Column Widths - Auto-adjusting */
 .products-table th:nth-child(1),
-.products-table td:nth-child(1) { min-width: 90px; } /* Təsvir */
+.products-table td:nth-child(1) { width: 90px; } /* Təsvir */
 
 .products-table th:nth-child(2),
-.products-table td:nth-child(2) { min-width: 150px; } /* Məhsul */
+.products-table td:nth-child(2) { width: 150px; } /* Məhsul */
 
 .products-table th:nth-child(3),
-.products-table td:nth-child(3) { min-width: 120px; } /* Kateqoriya */
+.products-table td:nth-child(3) { width: 120px; } /* Kateqoriya */
 
 .products-table th:nth-child(4),
-.products-table td:nth-child(4) { min-width: 100px; } /* Firma */
+.products-table td:nth-child(4) { width: 100px; } /* Firma */
 
 .products-table th:nth-child(5),
-.products-table td:nth-child(5) { min-width: 180px; } /* Avtomobil */
+.products-table td:nth-child(5) { width: 180px; } /* Avtomobil */
 
 .products-table th:nth-child(6),
-.products-table td:nth-child(6) { min-width: 100px; } /* Brend */
+.products-table td:nth-child(6) { width: 100px; } /* Brend */
 
 .products-table th:nth-child(7),
-.products-table td:nth-child(7) { min-width: 100px; } /* OEM */
+.products-table td:nth-child(7) { width: 100px; } /* OEM */
 
 .products-table th:nth-child(8),
-.products-table td:nth-child(8) { min-width: 90px; } /* Mövcudluq */
+.products-table td:nth-child(8) { width: 90px; } /* Mövcudluq */
 
 .products-table th:nth-child(9),
-.products-table td:nth-child(9) { min-width: 90px; } /* Qiymət */
+.products-table td:nth-child(9) { width: 90px; } /* Qiymət */
 
 .products-table th:nth-child(10),
-.products-table td:nth-child(10) { min-width: 70px; } /* Səbət */
+.products-table td:nth-child(10) { width: 70px; } /* Səbət */
 
 .products-table th:nth-child(11),
-.products-table td:nth-child(11) { min-width: 90px; } /* Ətraflı */
+.products-table td:nth-child(11) { width: 90px; } /* Ətraflı */
 
 /* Row Styles */
 .products-table tbody tr {
@@ -603,13 +606,7 @@ td[style*="display: flex"] img {
 
 /* Responsive Design */
 @media (max-width: 1600px) {
-    .products-table {
-        padding: 0 1rem;
-    }
-}
-
-@media (max-width: 1200px) {
-    .products-table {
+    .search-results {
         padding: 0 0.5rem;
     }
 }
@@ -788,4 +785,3 @@ footer::before {
 #search-button.loading .spinner {
     animation: spin 0.8s linear infinite;
 }
-

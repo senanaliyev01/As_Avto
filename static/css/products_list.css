@@ -539,10 +539,8 @@ header {
 
 .marka-image,
 .marka-image-pr-list {
-    max-width: 70px;
-    max-height: 70px;
-    width: auto;
-    height: auto;
+    width: 70px;
+    height: 70px;
     object-fit: contain;
     display: inline-block;
     margin: 0 auto; /* Ortada yerləşdirir */
@@ -559,11 +557,7 @@ td[style*="display: flex"] {
     overflow: auto;
 }
 
-td[style*="display: flex"] img {
-    max-width: 70px;
-    max-height: 70px;
-    object-fit: contain;
-}
+
 
 /* Column Widths - Auto-adjusting */
 .products-table th:nth-child(1),

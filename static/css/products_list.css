@@ -1,4 +1,4 @@
-* Root Variables */
+/* Root Variables */
 :root {
     --primary-gradient: linear-gradient(135deg, #1a237e, #0d47a1);
     --secondary-gradient: linear-gradient(135deg, #00838f, #006064);
@@ -530,6 +530,7 @@ header {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
+    table-layout: fixed;
 }
 
 .products-table thead {
@@ -549,6 +550,8 @@ header {
     text-align: center;
     border-bottom: 2px solid rgba(100, 255, 218, 0.15);
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .products-table tbody tr {
@@ -573,12 +576,30 @@ header {
     border-bottom: 1px solid rgba(100, 255, 218, 0.05);
     transition: all 0.3s ease;
     vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* Image cell styles */
-.products-table td:first-child {
-    width: 120px;
-    padding: 0.5rem;
+/* Image Styles - Unified */
+.marka-image,
+.marka-image-pr-list {
+    max-width: 70px;
+    max-height: 70px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    margin: 5px;
+    background: transparent;
+    transition: transform 0.3s ease;
+    padding: 5px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+}
+
+.marka-image:hover,
+.marka-image-pr-list:hover {
+    transform: scale(1.15);
+    box-shadow: 0 4px 15px rgba(100, 255, 218, 0.15);
 }
 
 /* Multiple images container */
@@ -591,27 +612,6 @@ td[style*="display: flex"] {
     padding: 0.5rem;
     min-height: 80px;
     max-width: 300px;
-}
-
-/* Image styles */
-.marka-image,
-.marka-image-pr-list {
-    max-width: 70px;
-    max-height: 70px;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    transition: transform 0.3s ease;
-    padding: 5px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 8px;
-    margin: 2px;
-}
-
-.marka-image:hover,
-.marka-image-pr-list:hover {
-    transform: scale(1.15);
-    box-shadow: 0 4px 15px rgba(100, 255, 218, 0.15);
 }
 
 /* Table cell width control */
@@ -648,11 +648,16 @@ td[style*="display: flex"] {
 .products-table th:nth-child(11),
 .products-table td:nth-child(11) { width: 100px; }
 
-/* Responsive adjustments */
+/* Responsive Table */
 @media (max-width: 1400px) {
     .products-table {
         overflow-x: auto;
         padding-bottom: 1rem;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .products-table table {
+        min-width: 1200px;
     }
     
     .products-table::-webkit-scrollbar {
@@ -995,10 +1000,6 @@ footer::before {
     animation: spin 0.8s linear infinite;
 }
 
-
-
-
-
 .marka-image {
     display: block;
     max-width: 100px;
@@ -1014,7 +1015,6 @@ footer::before {
 .marka-image:hover {
     transform: scale(1.05);
 }
-
 
 .marka-image-pr-list {
     display: block;

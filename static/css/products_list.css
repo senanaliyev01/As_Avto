@@ -492,7 +492,7 @@ header {
 
 /* Enhanced Professional Table Styles */
 .products-table {
-    width: 95%;
+    width: 100%;
     max-width: 1400px;
     background: transparent;
     margin: 2rem auto;

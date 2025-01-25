@@ -268,9 +268,10 @@ header {
 
 /* Search Results Section */
 .search-results {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 1rem;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
 }
 
 .search-result-title {
@@ -502,14 +503,15 @@ header {
     right: 50%;
     margin-left: -50vw;
     margin-right: -50vw;
+    background: rgba(16, 33, 62, 0.3);
 }
 
 .products-table table {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0 8px;
+    border-collapse: collapse;
     margin: 0;
-    padding: 0 2rem;
+    padding: 0;
+    background: transparent;
 }
 
 /* Table Headers */
@@ -521,8 +523,9 @@ header {
     letter-spacing: 1px;
     font-size: 0.95rem;
     text-align: center;
-    background: rgba(20, 45, 76, 0.5);
+    background: rgba(20, 45, 76, 0.8);
     border: none;
+    white-space: nowrap;
 }
 
 /* Table Cells */
@@ -530,8 +533,8 @@ header {
     padding: 1rem;
     text-align: center;
     vertical-align: middle;
-    background: rgba(16, 33, 62, 0.3);
     border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Image Styles */
@@ -597,10 +600,11 @@ td[style*="display: flex"] img {
 /* Row Styles */
 .products-table tbody tr {
     transition: all 0.3s ease;
+    background: rgba(16, 33, 62, 0.3);
 }
 
 .products-table tbody tr:hover {
-    background: rgba(28, 57, 107, 0.5);
+    background: rgba(28, 57, 107, 0.7);
     transform: translateY(-2px);
 }
 
@@ -612,18 +616,23 @@ td[style*="display: flex"] img {
 
 /* Responsive Design */
 @media (max-width: 1600px) {
-    .products-table table {
-        padding: 0 1rem;
+    .products-table {
+        width: 100vw;
+        margin-left: -50vw;
+        margin-right: -50vw;
     }
 }
 
 @media (max-width: 768px) {
     .products-table {
-        overflow-x: auto; /* Kiçik ekranlarda scroll */
+        overflow-x: auto;
+        margin-left: -50vw;
+        margin-right: -50vw;
+        padding: 0;
     }
     
     .products-table table {
-        min-width: 1200px; /* Kiçik ekranlarda minimum genişlik */
+        min-width: 1200px;
     }
     
     .top-header {

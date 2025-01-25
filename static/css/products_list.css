@@ -515,19 +515,18 @@ header {
 
 /* Enhanced Products Table Styles */
 .products-table {
-    width: 90%; /* Cədvəlin eni ekranın 90%-ni əhatə edir */
-    max-width: 1200px; /* Maksimum genişlik */
-    margin: 0 auto; /* Ortaya yerləşdirir */
-    border-collapse: collapse; /* Sərhəd boşluğunu aradan qaldırır */
+    width: 80%; /* Cədvəl genişliyini təyin edir */
+    max-width: 1200px; /* Maksimum genişlik əlavə edilir ki, cədvəl çox böyük olmasın */
+    height: auto; /* Boyutları avtomatik uyğunlaşdırır */
+    margin: 50px auto; /* Ortada yerləşdirir və üstdə müəyyən boşluq əlavə edir */
+    border-collapse: separate;
+    border-spacing: 0;
     background-color: #0a1f44;
     border-radius: 12px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    overflow: hidden; /* İçindəki hər şeyi saxlayır */
-}
-
-.products-table table {
-    width: 100%; /* Cədvəlin içindəki tablonun eni tam olacaq */
-    table-layout: fixed; /* Sütunların eni sabitlənir */
+    table-layout: auto; /* Məzmunu nəzərə alaraq sütun ölçüləri avtomatik tənzimlənir */
+    display: block; /* Dinamik göstərmə üçün */
+    overflow-x: auto; /* Üfüqi hərəkət etmək üçün */
 }
 
 .products-table thead {
@@ -537,25 +536,23 @@ header {
     letter-spacing: 1px;
 }
 
-.products-table th, .products-table td {
-    padding: 15px; /* Yaxşı görsənməsi üçün padding */
+.products-table th {
+    padding: 20px 15px;
     text-align: center;
+    font-weight: 600;
     font-size: 0.9rem;
-    color: #a0b7cf;
-    word-wrap: break-word; /* Uzun mətnləri sətirə bölür */
-    overflow: hidden; /* Mətnin daşmasını aradan qaldırır */
+    border-bottom: 2px solid rgba(100, 255, 218, 0.2);
+    transition: background-color 0.3s ease;
 }
 
-.products-table td img {
-    max-width: 100px; /* Şəkil üçün maksimum eni */
-    max-height: 100px; /* Şəkil üçün maksimum hündürlük */
-    object-fit: cover; /* Şəkli uyğunlaşdırır */
-    border-radius: 6px; /* Şəkilə kənar radius verir */
+.products-table th:hover {
+    background-color: rgba(100, 255, 218, 0.1);
 }
 
 .products-table tbody tr {
     background-color: #122235;
     transition: all 0.3s ease;
+    text-align: center;
 }
 
 .products-table tbody tr:nth-child(even) {
@@ -567,6 +564,22 @@ header {
     transform: scale(1.01);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
+
+.products-table td {
+    padding: 18px 15px;
+    text-align: center;
+    color: #a0b7cf;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.95rem;
+    vertical-align: middle;
+    transition: all 0.3s ease;
+    word-wrap: break-word; /* Uzun mətnlərin kəsilmədən sətir dəyişməsini təmin edir */
+}
+
+.products-table tbody tr:hover td {
+    color: #64ffda;
+}
+
 
 
 

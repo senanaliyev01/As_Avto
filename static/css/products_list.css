@@ -517,6 +517,7 @@ header {
 .products-table {
     width: 115%;
     height: auto;
+    margin: 0 auto;
     border-collapse: separate;
     border-spacing: 0;
     background-color: #0a1f44;
@@ -548,6 +549,7 @@ header {
 .products-table tbody tr {
     background-color: #122235;
     transition: all 0.3s ease;
+    text-align: center;
 }
 
 .products-table tbody tr:nth-child(even) {

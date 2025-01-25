@@ -948,9 +948,9 @@ footer::before {
 
 
 .marka-image-pr-list {
-    display: block;
-    max-width: 60px;
-    max-height: 60px;
+    display: flex;
+    max-width: 70px;
+    max-height: 70px;
     width: auto;
     height: auto;
     object-fit: contain;

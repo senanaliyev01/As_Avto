@@ -60,7 +60,7 @@
         </select>
 
         <select name="brand" id="brand">
-            <option value="">Brend</option>
+            <option value="">Firma</option>
             {% for brand in brendler %}
                 <option value="{{ brand.adi }}" {% if request.GET.brand == brand.adi %}selected{% endif %}>
                     {{ brand.adi }}
@@ -69,7 +69,7 @@
         </select>
 
         <select name="model" id="model">
-            <option value="">Marka</option>
+            <option value="">Avtomobil</option>
             {% for marka in markalar %}
                 <option value="{{ marka.adi }}" {% if request.GET.model == marka.adi %}selected{% endif %}>
                     {{ marka.adi }}

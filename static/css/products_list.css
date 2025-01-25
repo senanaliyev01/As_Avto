@@ -369,6 +369,9 @@ header {
     border: 3px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
     border-top-color: white;
+    display: inline-block;
+    margin-left: 8px;
+    vertical-align: middle;
     animation: spin 1s linear infinite;
 }
 
@@ -391,11 +394,11 @@ header {
     font-size: 0.75rem;
     display: inline-block;
     text-transform: uppercase;
+    color: white;
 }
 
 .in-stock {
     background: linear-gradient(135deg, #00897b, #00695c);
-    color: white;
 }
 
 .low-stock {
@@ -405,7 +408,6 @@ header {
 
 .out-of-stock {
     background: linear-gradient(135deg, #e53935, #c62828);
-    color: white;
 }
 
 /* Price Column */
@@ -494,13 +496,16 @@ header {
 .products-table {
     width: 100%;
     margin: 2rem auto;
-    padding: 0 2rem;
+    padding: 0;
+    overflow-x: auto;
 }
 
 .products-table table {
     width: 100%;
+    min-width: 1200px;
     border-collapse: separate;
     border-spacing: 0 8px;
+    margin: 0;
 }
 
 /* Table Headers */
@@ -604,13 +609,59 @@ td[style*="display: flex"] img {
 /* Responsive Design */
 @media (max-width: 1600px) {
     .products-table {
-        padding: 0 1rem;
+        margin: 2rem auto;
+    }
+    
+    .search-bar form {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     }
 }
 
-@media (max-width: 1200px) {
-    .products-table {
-        padding: 0 0.5rem;
+@media (max-width: 768px) {
+    .top-header {
+        padding: 1rem 2rem;
+    }
+    
+    .working-hours {
+        padding: 1rem 2rem;
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .logo img {
+        width: 180px;
+        height: 180px;
+    }
+    
+    .header-right {
+        gap: 0.5rem;
+    }
+    
+    .header-right a {
+        padding: 0.4rem 0.8rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .top-header {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .logo img {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .search-bar {
+        padding: 1rem;
+    }
+    
+    .search-bar form {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -761,24 +812,6 @@ footer::before {
     }
 }
 
-/* Spinner stilii */
-.spinner {
-    width: 20px;
-    height: 20px;
-    border: 3px solid #ffffff;
-    border-top: 3px solid transparent;
-    border-radius: 50%;
-    display: inline-block;
-    margin-left: 8px;
-    vertical-align: middle;
-}
-
-/* Spinner animasiyası */
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
 /* Loading vəziyyətində button stili */
 #search-button.loading {
     pointer-events: none;
@@ -788,4 +821,3 @@ footer::before {
 #search-button.loading .spinner {
     animation: spin 0.8s linear infinite;
 }
-

@@ -492,7 +492,7 @@ header {
 
 /* Enhanced Professional Table Styles */
 .products-table {
-    width: 150%;
+    width: 100%;
     max-width: 1400px;
     background: linear-gradient(145deg, #0a1930, #0f2645);
     border-radius: 15px;

@@ -515,15 +515,17 @@ header {
 
 /* Enhanced Products Table Styles */
 .products-table {
-    width: 115%;
+    width: 80%; /* Ən geniş 100%-ə qədər uzanacaq, ancaq daha kiçik ölçülər üçün uyumlu */
+    max-width: 100%; /* Ən çox ekranın genişliyini keçməməsi üçün */
     height: auto;
-    margin-left: -7.5%;
+    margin: 0 auto; /* Ortaya hizalama */
     border-collapse: separate;
     border-spacing: 0;
     background-color: #0a1f44;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    table-layout: auto; /* Məzmunun həcminə görə sütun genişliklərini uyğunlaşdırır */
 }
 
 .products-table thead {
@@ -570,6 +572,7 @@ header {
     font-size: 0.95rem;
     vertical-align: middle;
     transition: all 0.3s ease;
+    word-wrap: break-word; /* Uzun mətnlərin kəsilmədən sətir dəyişməsini təmin edir */
 }
 
 .products-table tbody tr:hover td {
@@ -948,7 +951,7 @@ footer::before {
 
 
 .marka-image-pr-list {
-    display: flex;
+    display: block;
     max-width: 70px;
     max-height: 70px;
     width: auto;

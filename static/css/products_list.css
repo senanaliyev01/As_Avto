@@ -1,4 +1,4 @@
-/* Root Variables */
+* Root Variables */
 :root {
     --primary-gradient: linear-gradient(135deg, #1a237e, #0d47a1);
     --secondary-gradient: linear-gradient(135deg, #00838f, #006064);
@@ -494,16 +494,16 @@ header {
 .products-table {
     width: 100%;
     max-width: 1400px;
-    background: transparent;
     margin: 2rem auto;
     padding: 1rem;
+    overflow-x: auto;
 }
 
 .products-table table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0 8px;
-    table-layout: fixed;
+    table-layout: auto;
 }
 
 .products-table thead {
@@ -514,15 +514,16 @@ header {
 }
 
 .products-table th {
-    padding: 1.2rem 0.8rem;
+    padding: 1rem;
     color: #64ffda;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
     font-size: 0.9rem;
     text-align: center;
-    border: none;
     background: rgba(20, 45, 76, 0.5);
+    white-space: nowrap;
+    vertical-align: middle;
 }
 
 .products-table tbody tr {
@@ -545,8 +546,9 @@ header {
     color: #b8c9e6;
     text-align: center;
     vertical-align: middle;
-    border: none;
     background: rgba(16, 33, 62, 0.3);
+    white-space: normal;
+    word-wrap: break-word;
 }
 
 /* Image Styles - Unified */
@@ -555,10 +557,10 @@ header {
     width: 70px;
     height: 70px;
     object-fit: contain;
-    padding: 0;
-    background: transparent;
-    margin: 0;
+    padding: 4px;
     transition: transform 0.3s ease;
+    display: inline-block;
+    vertical-align: middle;
 }
 
 .marka-image:hover,
@@ -569,29 +571,44 @@ header {
 /* Multiple images container */
 td[style*="display: flex"] {
     display: flex !important;
-    flex-wrap: nowrap !important;
+    flex-wrap: wrap !important;
     justify-content: center;
     align-items: center;
-    gap: 8px;
-    padding: 0.5rem;
-    background: transparent !important;
+    gap: 4px;
+    padding: 8px;
+    min-height: 86px;
 }
 
 /* Table column widths */
 .products-table th:nth-child(1),
-.products-table td:nth-child(1) { width: 80px; }
+.products-table td:nth-child(1) { 
+    width: 100px;
+    min-width: 100px;
+}
 
 .products-table th:nth-child(2),
-.products-table td:nth-child(2) { width: 140px; }
+.products-table td:nth-child(2) { 
+    width: 150px;
+    min-width: 150px;
+}
 
 .products-table th:nth-child(3),
-.products-table td:nth-child(3) { width: 100px; }
+.products-table td:nth-child(3) { 
+    width: 120px;
+    min-width: 120px;
+}
 
 .products-table th:nth-child(4),
-.products-table td:nth-child(4) { width: 100px; }
+.products-table td:nth-child(4) { 
+    width: 120px;
+    min-width: 120px;
+}
 
 .products-table th:nth-child(5),
-.products-table td:nth-child(5) { width: 160px; }
+.products-table td:nth-child(5) { 
+    width: 180px;
+    min-width: 180px;
+}
 
 .products-table th:nth-child(6),
 .products-table td:nth-child(6) { width: 90px; }
@@ -633,19 +650,17 @@ td[style*="display: flex"] {
 /* Responsive adjustments */
 @media (max-width: 1200px) {
     .products-table {
-        width: 98%;
-        margin: 1rem auto;
+        margin: 1rem;
     }
 }
 
 @media (max-width: 768px) {
     .products-table {
-        width: 100%;
-        overflow-x: auto;
+        font-size: 0.9rem;
     }
     
     .products-table table {
-        min-width: 800px;
+        min-width: 1000px;
     }
 
     /* Footer adjustments */
@@ -848,3 +863,9 @@ footer::before {
     animation: spin 0.8s linear infinite;
 }
 
+/* Şəkil olan hücrələr */
+.products-table td:has(img) {
+    padding: 8px;
+    min-height: 86px;
+    vertical-align: middle;
+}

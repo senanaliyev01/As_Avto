@@ -581,11 +581,7 @@ header {
     color: #64ffda;
 }
 
-.products-table img {
-    max-width: 100%;
-    height: auto; /* Şəkillər avtomatik uyğunlaşacaq */
-    border-radius: 5px;
-}
+
 
 
 

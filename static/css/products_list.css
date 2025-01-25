@@ -517,7 +517,7 @@ header {
 .products-table {
     width: 100%; /* Cədvəl genişliyi ekranın 90%-i qədər olacaq */
     max-width: 1200px; /* Maksimum genişlik 1200px */
-    margin: 50px auto; /* Üfüqi və şaquli mərkəzləşdirilmə */
+    margin: 0 auto; /* Üfüqi və şaquli mərkəzləşdirilmə */
     border-collapse: separate;
     border-spacing: 0;
     background-color: #0a1f44;

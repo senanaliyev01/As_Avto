@@ -527,6 +527,12 @@ header {
     display: block; /* Dinamik göstərmə üçün */
 }
 
+.products-table table {
+    width: 100%; /* Cədvəl genişliyi tam uyğun olacaq */
+    table-layout: auto; /* Sütun ölçüləri məzmun əsasında tənzimlənir */
+    border-collapse: collapse;
+}
+
 .products-table thead {
     background: linear-gradient(135deg, #1a4980, #0d2b4d);
     color: #64ffda;

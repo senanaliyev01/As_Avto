@@ -34,7 +34,7 @@ function showLoadingAnimation() {
     loadingContainer.style.left = "0";
     loadingContainer.style.width = "100vw";
     loadingContainer.style.height = "100vh";
-    loadingContainer.style.backgroundColor = "rgba(10, 20, 50, 0.9)"; // Tünd göy rəng
+    loadingContainer.style.background = "linear-gradient(135deg, #0f172a, #1e293b)"; // Tünd rəng keçidləri
     loadingContainer.style.display = "flex";
     loadingContainer.style.flexDirection = "column";
     loadingContainer.style.justifyContent = "center";
@@ -42,23 +42,33 @@ function showLoadingAnimation() {
     loadingContainer.style.zIndex = "9999";
 
     const loadingText = document.createElement("div");
-    loadingText.style.fontSize = "26px";
+    loadingText.style.fontSize = "28px";
     loadingText.style.fontWeight = "bold";
     loadingText.style.color = "#ffffff";
     loadingText.style.marginBottom = "20px";
-    loadingText.innerHTML = `Yüklənir<span id="dots">...</span>`;
+    loadingText.style.letterSpacing = "1px";
+    loadingText.innerHTML = `<span id="loading-title">Yüklənir</span><span id="dots">...</span>`;
 
-    const spinner = document.createElement("div");
-    spinner.className = "spinner";
-    spinner.style.width = "60px";
-    spinner.style.height = "60px";
-    spinner.style.border = "6px solid rgba(255, 255, 255, 0.2)";
-    spinner.style.borderTop = "6px solid #ffffff";
-    spinner.style.borderRadius = "50%";
-    spinner.style.animation = "spin 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite";
+    const spinnerContainer = document.createElement("div");
+    spinnerContainer.style.display = "flex";
+    spinnerContainer.style.justifyContent = "center";
+    spinnerContainer.style.alignItems = "center";
+    spinnerContainer.style.gap = "15px";
+
+    for (let i = 0; i < 3; i++) {
+        const dot = document.createElement("div");
+        dot.className = "spinner-dot";
+        dot.style.width = "15px";
+        dot.style.height = "15px";
+        dot.style.backgroundColor = "#ffffff";
+        dot.style.borderRadius = "50%";
+        dot.style.animation = `dotBounce 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite`;
+        dot.style.animationDelay = `${i * 0.2}s`;
+        spinnerContainer.appendChild(dot);
+    }
 
     loadingContainer.appendChild(loadingText);
-    loadingContainer.appendChild(spinner);
+    loadingContainer.appendChild(spinnerContainer);
     document.body.appendChild(loadingContainer);
 
     animateDots();
@@ -70,23 +80,36 @@ function animateDots() {
     setInterval(() => {
         dots.textContent = ".".repeat(count);
         count = count < 3 ? count + 1 : 1;
-    }, 400); // Daha sürətli nöqtə animasiyası
+    }, 400);
 }
 
 const style = document.createElement("style");
 style.innerHTML = `
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes dotBounce {
+        0%, 80%, 100% {
+            transform: scale(0);
+        }
+        40% {
+            transform: scale(1);
+        }
     }
 
     #loading-container {
         animation: fadeIn 0.5s ease-in-out;
     }
 
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
+    #loading-title {
+        font-family: 'Roboto', sans-serif;
+        text-transform: uppercase;
+    }
+
+    .spinner-dot {
+        animation-timing-function: cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Daha səliqəli animasiya */
     }
 `;
 document.head.appendChild(style);

@@ -36,19 +36,29 @@ function showLoadingAnimation() {
     loadingContainer.style.height = "100vh";
     loadingContainer.style.backgroundColor = "rgba(10, 20, 50, 0.9)"; // Tünd göy rəng
     loadingContainer.style.display = "flex";
+    loadingContainer.style.flexDirection = "column";
     loadingContainer.style.justifyContent = "center";
     loadingContainer.style.alignItems = "center";
     loadingContainer.style.zIndex = "9999";
 
-    const loadingContent = document.createElement("div");
-    loadingContent.style.textAlign = "center";
-    loadingContent.style.color = "#ffffff";
-    loadingContent.innerHTML = `
-        <div style="font-size: 26px; font-weight: bold; margin-bottom: 20px;">Yüklənir<span id="dots">...</span></div>
-        <div class="spinner" style="width: 60px; height: 60px; border: 6px solid rgba(255, 255, 255, 0.2); border-top: 6px solid #ffffff; border-radius: 50%; animation: spin 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;"></div>
-    `;
+    const loadingText = document.createElement("div");
+    loadingText.style.fontSize = "26px";
+    loadingText.style.fontWeight = "bold";
+    loadingText.style.color = "#ffffff";
+    loadingText.style.marginBottom = "20px";
+    loadingText.innerHTML = `Yüklənir<span id="dots">...</span>`;
 
-    loadingContainer.appendChild(loadingContent);
+    const spinner = document.createElement("div");
+    spinner.className = "spinner";
+    spinner.style.width = "60px";
+    spinner.style.height = "60px";
+    spinner.style.border = "6px solid rgba(255, 255, 255, 0.2)";
+    spinner.style.borderTop = "6px solid #ffffff";
+    spinner.style.borderRadius = "50%";
+    spinner.style.animation = "spin 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite";
+
+    loadingContainer.appendChild(loadingText);
+    loadingContainer.appendChild(spinner);
     document.body.appendChild(loadingContainer);
 
     animateDots();

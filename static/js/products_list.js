@@ -123,6 +123,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                     : ''
                                 }
                                 <span class="product-name">${mehsulData.adi}</span>
+                                <span class="product-name">${mehsulData.oem}</span>
                             </div>
                         ` : ''}
                     </div>

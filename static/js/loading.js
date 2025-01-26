@@ -42,7 +42,7 @@ function showLoadingAnimation() {
     loadingContainer.style.zIndex = "9999";
 
     const logo = document.createElement("img");
-    logo.src = "static/img/favicon.png"; // Burada logonuzun yolunu əlavə edin
+    logo.src = "/static/img/favicon.png"; // Burada logonuzun yolunu əlavə edin
     logo.alt = "Logo";
     logo.style.width = "100px";
     logo.style.height = "100px";

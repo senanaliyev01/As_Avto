@@ -56,53 +56,185 @@ document.addEventListener('DOMContentLoaded', function () {
 
     cartLinks.forEach(link => {
         link.addEventListener('click', function (event) {
-            event.preventDefault(); // Default yönləndirməni bloklayır
+            event.preventDefault();
 
-            const url = this.getAttribute('href'); // URL alır
-            fetch(url) // Ajax vasitəsilə serverə sorğu göndərir
-                .then(response => {
-                    if (response.ok) {
-                        showAnimatedMessage("Məhsul səbətə əlavə olundu!");
-                        updateCartCount(); // Səbət sayını yeniləyir
-                    } else {
-                        showAnimatedMessage("Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.", true);
-                    }
-                })
-                .catch(error => {
-                    console.error("Xəta:", error);
-                    showAnimatedMessage("Serverdə xəta baş verdi.", true);
-                });
+            const originalContent = this.innerHTML;
+            const url = this.getAttribute('href');
+
+            // Loading effektini göstər
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            this.style.pointerEvents = 'none';
+            this.style.opacity = '0.7';
+
+            // 2 saniyə gözlə
+            setTimeout(() => {
+                fetch(url)
+                    .then(response => {
+                        if (response.ok) {
+                            // Original ikonu bərpa et
+                            this.innerHTML = originalContent;
+                            this.style.pointerEvents = 'auto';
+                            this.style.opacity = '1';
+
+                            showAnimatedMessage("Məhsul səbətə əlavə olundu!");
+                            updateCartCount();
+                        } else {
+                            this.innerHTML = originalContent;
+                            this.style.pointerEvents = 'auto';
+                            this.style.opacity = '1';
+                            showAnimatedMessage("Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.", true);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Xəta:", error);
+                        this.innerHTML = originalContent;
+                        this.style.pointerEvents = 'auto';
+                        this.style.opacity = '1';
+                        showAnimatedMessage("Serverdə xəta baş verdi.", true);
+                    });
+            }, 2000); // 2 saniyə gözlə
         });
     });
 
     // Mesaj animasiyası
     function showAnimatedMessage(message, isError = false) {
         const messageDiv = document.createElement('div');
-        messageDiv.innerText = message;
-        messageDiv.style.position = 'fixed';
-        messageDiv.style.top = '20px';
-        messageDiv.style.right = '-300px'; // Sağdan başlayır
-        messageDiv.style.backgroundColor = isError ? '#dc3545' : '#28a745'; // Xətalar üçün qırmızı, uğur üçün yaşıl
-        messageDiv.style.color = 'white';
-        messageDiv.style.padding = '10px 20px';
-        messageDiv.style.borderRadius = '5px';
-        messageDiv.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
-        messageDiv.style.zIndex = '1000';
-        messageDiv.style.transition = 'right 0.5s ease'; // Animasiya
+        messageDiv.className = 'animated-message';
+        
+        // Professional görünüş üçün HTML strukturu
+        messageDiv.innerHTML = `
+            <div class="message-content">
+                ${!isError ? `
+                    <div class="success-checkmark">
+                        <div class="check-icon">
+                            <span class="icon-line line-tip"></span>
+                            <span class="icon-line line-long"></span>
+                            <div class="icon-circle"></div>
+                            <div class="icon-fix"></div>
+                        </div>
+                    </div>
+                ` : `
+                    <div class="error-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                `}
+                <div class="message-text">${message}</div>
+            </div>
+        `;
 
+        // Stil əlavə et
+        Object.assign(messageDiv.style, {
+            position: 'fixed',
+            top: '20px',
+            right: '-400px',
+            backgroundColor: isError ? '#dc3545' : '#ffffff',
+            color: isError ? '#ffffff' : '#333333',
+            padding: '15px 25px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.15)',
+            zIndex: '1000',
+            transition: 'all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+            minWidth: '300px',
+            border: isError ? 'none' : '1px solid #eee'
+        });
+
+        // CSS stilləri əlavə et
+        const style = document.createElement('style');
+        style.textContent = `
+            .animated-message {
+                display: flex;
+                align-items: center;
+            }
+            .message-content {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                width: 100%;
+            }
+            .message-text {
+                font-size: 1rem;
+                font-weight: 500;
+            }
+            .success-checkmark {
+                width: 30px;
+                height: 30px;
+                position: relative;
+            }
+            .check-icon {
+                width: 30px;
+                height: 30px;
+                position: relative;
+                border-radius: 50%;
+                background-color: #4CAF50;
+                transform: scale(0);
+                animation: pop 0.5s forwards 0.5s;
+            }
+            .icon-line {
+                position: absolute;
+                background-color: #fff;
+                border-radius: 2px;
+            }
+            .line-tip {
+                top: 46%;
+                left: 14%;
+                width: 12px;
+                transform: rotate(45deg);
+                animation: icon-line-tip 0.75s forwards 0.5s;
+            }
+            .line-long {
+                top: 38%;
+                right: 8px;
+                width: 16px;
+                transform: rotate(-45deg);
+                animation: icon-line-long 0.75s forwards 0.5s;
+            }
+            .error-icon {
+                color: #ffffff;
+                font-size: 24px;
+                animation: shake 0.5s forwards;
+            }
+            @keyframes pop {
+                0% { transform: scale(0) }
+                50% { transform: scale(1.2) }
+                100% { transform: scale(1) }
+            }
+            @keyframes icon-line-tip {
+                0% { width: 0; left: 1px; top: 19px; }
+                54% { width: 0; left: 1px; top: 19px; }
+                70% { width: 12px; left: -2px; top: 37px; }
+                84% { width: 8px; left: 4px; top: 48px; }
+                100% { width: 12px; left: 2px; top: 45%; }
+            }
+            @keyframes icon-line-long {
+                0% { width: 0; right: 46px; top: 54px; }
+                65% { width: 0; right: 46px; top: 54px; }
+                84% { width: 16px; right: 0px; top: 35px; }
+                100% { width: 16px; right: 8px; top: 38%; }
+            }
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                20%, 60% { transform: translateX(-5px); }
+                40%, 80% { transform: translateX(5px); }
+            }
+        `;
+
+        document.head.appendChild(style);
         document.body.appendChild(messageDiv);
 
         // Mesajın görünməsi
-        setTimeout(() => {
-            messageDiv.style.right = '20px'; // Sağdan sola hərəkət
-        }, 10);
+        requestAnimationFrame(() => {
+            messageDiv.style.right = '20px';
+            messageDiv.style.transform = 'translateY(0)';
+        });
 
         // 3 saniyədən sonra mesajın yox olması
         setTimeout(() => {
-            messageDiv.style.right = '-300px'; // Geri çəkilir
+            messageDiv.style.right = '-400px';
+            messageDiv.style.transform = 'translateY(10px)';
+            
             setTimeout(() => {
                 document.body.removeChild(messageDiv);
-            }, 500); // Transition vaxtından sonra silinir
+            }, 500);
         }, 3000);
     }
 
@@ -154,5 +286,4 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 2000);
     });
 });
-
 

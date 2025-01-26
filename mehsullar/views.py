@@ -374,7 +374,7 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq əlavə et
 
     # Sifariş məhsulları üçün cədvəl
-    data = [['№', 'Məhsul Adı', 'Brend Kod', 'Oem Kod', 'Miqdar', 'Qiymət', 'Cəmi']]
+    data = [['№', 'Məhsul Adı', 'Brend', 'Oem', 'Miqdar', 'Qiymət', 'Cəmi']]
     for index, mehsul in enumerate(sifaris_mehsullari, start=1):
         data.append([index, mehsul.mehsul.adi, mehsul.mehsul.brend_kod, mehsul.mehsul.oem, mehsul.miqdar, f"{mehsul.qiymet} AZN", f"{mehsul.cemi} AZN"])
 

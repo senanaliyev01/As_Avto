@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "https://as-avto.com/about/",
         "https://as-avto.com/cart/",
         "https://as-avto.com/istifadeciler/profile/",
+        "https://as-avto.com/orders_detail/",
     ];
 
     const allLinks = document.querySelectorAll("a");

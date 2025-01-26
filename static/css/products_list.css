@@ -538,8 +538,24 @@ header {
 }
 
 /* Update these existing styles in your CSS */
-.marka-image,
-.marka-image-pr-list {
+.marka-pr-image{
+    width: 120px !important;
+    height: 90px !important;
+    
+    display: block;
+    margin: 0 auto;  
+}
+
+.marka-image-pr-list{
+    width: 70px !important;
+    height: 70px !important;
+    
+    display: block;
+    margin: 0 auto; 
+}
+
+.marka-image
+ {
     width: 100px !important;
     height: 100px !important;
     
@@ -555,10 +571,6 @@ td[style*="display: flex"] img {
 }
 
 /* Additional rule to ensure consistent sizing in all table image scenarios */
-.products-table td img {
-    width: 100px !important;
-    height: 100px !important;
-}
 
 
 td[style*="display: flex"] {

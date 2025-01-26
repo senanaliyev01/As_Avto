@@ -6,7 +6,6 @@ document.addEventListener("DOMContentLoaded", function () {
         "https://as-avto.com/about/",
         "https://as-avto.com/cart/",
         "https://as-avto.com/istifadeciler/profile/",
-        "https://as-avto.com/orders_detail/",
     ];
 
     const allLinks = document.querySelectorAll("a");
@@ -36,6 +35,7 @@ function showLoadingAnimation() {
     loadingContainer.style.height = "100vh";
     loadingContainer.style.backgroundColor = "rgba(10, 20, 50, 0.9)"; // Tünd göy rəng
     loadingContainer.style.display = "flex";
+    loadingContainer.style.flexDirection = "column";
     loadingContainer.style.justifyContent = "center";
     loadingContainer.style.alignItems = "center";
     loadingContainer.style.zIndex = "9999";
@@ -45,7 +45,10 @@ function showLoadingAnimation() {
     loadingContent.style.color = "#ffffff";
     loadingContent.innerHTML = `
         <div style="font-size: 26px; font-weight: bold; margin-bottom: 20px;">Yüklənir<span id="dots">...</span></div>
-        <div class="spinner" style="width: 60px; height: 60px; border: 6px solid rgba(255, 255, 255, 0.2); border-top: 6px solid #ffffff; border-radius: 50%; animation: spin 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;"></div>
+        <div class="spinner" style="position: relative; width: 60px; height: 60px;">
+            <div style="width: 60px; height: 60px; border: 6px solid rgba(255, 255, 255, 0.2); border-top: 6px solid #ffffff; border-radius: 50%; animation: spin 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;"></div>
+            <div id="spinner-dots" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18px;">...</div>
+        </div>
     `;
 
     loadingContainer.appendChild(loadingContent);
@@ -56,9 +59,11 @@ function showLoadingAnimation() {
 
 function animateDots() {
     const dots = document.getElementById("dots");
+    const spinnerDots = document.getElementById("spinner-dots");
     let count = 1;
     setInterval(() => {
         dots.textContent = ".".repeat(count);
+        spinnerDots.textContent = ".".repeat(count);
         count = count < 3 ? count + 1 : 1;
     }, 400); // Daha sürətli nöqtə animasiyası
 }

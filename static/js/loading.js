@@ -1,9 +1,4 @@
-// HTML dosyasına uygun bir ID ilə bağlanılabilir. JS yalnız loading efektini düzenler.
-
-// Sayfa yüklendiğinde dinamik bir "loading" animasyonu göstermek üçün JS kodları.
-
 document.addEventListener("DOMContentLoaded", function () {
-    // Loading animasiyasını yalnız təyin edilmiş linklər üçün tətbiq etmək
     const linksWithLoading = [
         "https://as-avto.com/main/",
         "https://as-avto.com/orders/",
@@ -21,18 +16,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 showLoadingAnimation();
                 setTimeout(() => {
                     window.location.href = link.href;
-                }, 1000); // 2 saniyə sonra linkə yönləndirir
+                }, 1000); // 1 saniyə sonra yönləndirir
             });
         }
     });
 });
 
 function showLoadingAnimation() {
-    // Var olan loading ekranını silmək (əgər mövcuddursa)
     const existingLoader = document.getElementById("loading-container");
     if (existingLoader) existingLoader.remove();
 
-    // Yeni loading animasiyası yaratmaq
     const loadingContainer = document.createElement("div");
     loadingContainer.id = "loading-container";
     loadingContainer.style.position = "fixed";
@@ -40,7 +33,7 @@ function showLoadingAnimation() {
     loadingContainer.style.left = "0";
     loadingContainer.style.width = "100vw";
     loadingContainer.style.height = "100vh";
-    loadingContainer.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+    loadingContainer.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
     loadingContainer.style.display = "flex";
     loadingContainer.style.justifyContent = "center";
     loadingContainer.style.alignItems = "center";
@@ -50,8 +43,11 @@ function showLoadingAnimation() {
     loadingContent.style.textAlign = "center";
     loadingContent.style.color = "white";
     loadingContent.innerHTML = `
-        <div style="font-size: 24px; margin-bottom: 20px;">Yüklənir<span id="dots">.</span></div>
-        <div class="spinner" style="width: 50px; height: 50px; border: 5px solid rgba(255, 255, 255, 0.3); border-top: 5px solid white; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        <div style="font-size: 28px; font-weight: bold; margin-bottom: 20px;">
+            <span id="loading-text">Yüklənir</span>
+            <span id="dots">...</span>
+        </div>
+        <div class="spinner"></div>
     `;
 
     loadingContainer.appendChild(loadingContent);
@@ -60,21 +56,38 @@ function showLoadingAnimation() {
     animateDots();
 }
 
+// Nöqtələri animasiya etmək
 function animateDots() {
     const dots = document.getElementById("dots");
     let count = 1;
     setInterval(() => {
         dots.textContent = ".".repeat(count);
         count = count < 3 ? count + 1 : 1;
-    }, 500); // Hər yarım saniyədə nöqtələri dəyişir
+    }, 500); // Hər 500 ms-də nöqtələri dəyişir
 }
 
-// CSS üçün dinamik spinner animasiyası əlavə edirik
+// CSS üçün professional spinner və animasiya
 const style = document.createElement("style");
 style.innerHTML = `
     @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
+    }
+    .spinner {
+        width: 60px;
+        height: 60px;
+        border: 6px solid rgba(255, 255, 255, 0.3);
+        border-top: 6px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+    }
+    #loading-container div {
+        animation: fadeIn 1s ease-in-out;
+    }
+    @keyframes fadeIn {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
     }
 `;
 document.head.appendChild(style);

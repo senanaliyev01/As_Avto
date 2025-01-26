@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function () {
             position: 'fixed',
             top: '20px',
             right: '-400px',
-            backgroundColor: isError ? '#dc3545' : '#d4edda',
+            backgroundColor: isError ? '#dc3545' : '#ffffff',
             color: isError ? '#ffffff' : '#333333',
             padding: '15px 25px',
             borderRadius: '8px',

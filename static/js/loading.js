@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 showLoadingAnimation();
                 setTimeout(() => {
                     window.location.href = link.href;
-                }, 1500); // Daha uzun yükləmə animasiyası üçün vaxt artırıldı
+                }, 1200);
             });
         }
     });
@@ -34,7 +34,7 @@ function showLoadingAnimation() {
     loadingContainer.style.left = "0";
     loadingContainer.style.width = "100vw";
     loadingContainer.style.height = "100vh";
-    loadingContainer.style.background = "linear-gradient(135deg, #1d3557, #457b9d)"; // Gradient rəng
+    loadingContainer.style.backgroundColor = "rgba(10, 20, 50, 0.9)"; // Tünd göy rəng
     loadingContainer.style.display = "flex";
     loadingContainer.style.justifyContent = "center";
     loadingContainer.style.alignItems = "center";
@@ -44,13 +44,8 @@ function showLoadingAnimation() {
     loadingContent.style.textAlign = "center";
     loadingContent.style.color = "#ffffff";
     loadingContent.innerHTML = `
-        <div style="font-size: 26px; font-weight: bold; margin-bottom: 20px; animation: fadeInText 1s infinite;">
-            Yüklənir<span id="dots">...</span>
-        </div>
-        <div class="spinner" style="width: 60px; height: 60px; border: 6px solid rgba(255, 255, 255, 0.2); border-top: 6px solid #ffffff; border-radius: 50%; animation: spin 1.2s ease-in-out infinite;"></div>
-        <div style="margin-top: 20px; font-size: 14px; animation: pulseText 1.5s infinite;">
-            Zəhmət olmasa gözləyin
-        </div>
+        <div style="font-size: 26px; font-weight: bold; margin-bottom: 20px;">Yüklənir<span id="dots">...</span></div>
+        <div class="spinner" style="width: 60px; height: 60px; border: 6px solid rgba(255, 255, 255, 0.2); border-top: 6px solid #ffffff; border-radius: 50%; animation: spin 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;"></div>
     `;
 
     loadingContainer.appendChild(loadingContent);
@@ -65,7 +60,7 @@ function animateDots() {
     setInterval(() => {
         dots.textContent = ".".repeat(count);
         count = count < 3 ? count + 1 : 1;
-    }, 300); // Daha yüngül və axıcı nöqtə animasiyası
+    }, 400); // Daha sürətli nöqtə animasiyası
 }
 
 const style = document.createElement("style");
@@ -75,18 +70,8 @@ style.innerHTML = `
         100% { transform: rotate(360deg); }
     }
 
-    @keyframes fadeInText {
-        0%, 100% { opacity: 0.5; }
-        50% { opacity: 1; }
-    }
-
-    @keyframes pulseText {
-        0%, 100% { color: #ffffff; }
-        50% { color: #a8dadc; }
-    }
-
     #loading-container {
-        animation: fadeIn 0.6s ease-in-out;
+        animation: fadeIn 0.5s ease-in-out;
     }
 
     @keyframes fadeIn {

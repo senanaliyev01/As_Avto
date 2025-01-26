@@ -66,38 +66,35 @@ document.addEventListener('DOMContentLoaded', function () {
             this.style.pointerEvents = 'none';
             this.style.opacity = '0.7';
 
-            // 2 saniyə gözlə
-            setTimeout(() => {
-                fetch(url)
-                    .then(response => response.json())
-                    .then(data => {
-                        // Original ikonu bərpa et
-                        this.innerHTML = originalContent;
-                        this.style.pointerEvents = 'auto';
-                        this.style.opacity = '1';
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    // Original ikonu bərpa et
+                    this.innerHTML = originalContent;
+                    this.style.pointerEvents = 'auto';
+                    this.style.opacity = '1';
 
-                        if (data.success) {
-                            showAnimatedMessage(
-                                "Məhsul səbətə əlavə olundu!", 
-                                false, 
-                                data.mehsul
-                            );
-                            updateCartCount();
-                        } else {
-                            showAnimatedMessage(
-                                "Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.", 
-                                true
-                            );
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Xəta:", error);
-                        this.innerHTML = originalContent;
-                        this.style.pointerEvents = 'auto';
-                        this.style.opacity = '1';
-                        showAnimatedMessage("Serverdə xəta baş verdi.", true);
-                    });
-            }, 2000);
+                    if (data.success) {
+                        showAnimatedMessage(
+                            "Məhsul səbətə əlavə olundu!", 
+                            false, 
+                            data.mehsul
+                        );
+                        updateCartCount();
+                    } else {
+                        showAnimatedMessage(
+                            data.error || "Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.", 
+                            true
+                        );
+                    }
+                })
+                .catch(error => {
+                    console.error("Xəta:", error);
+                    this.innerHTML = originalContent;
+                    this.style.pointerEvents = 'auto';
+                    this.style.opacity = '1';
+                    showAnimatedMessage("Serverdə xəta baş verdi.", true);
+                });
         });
     });
 
@@ -118,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                     <div class="message-text">
                         ${message}
-                        ${mehsulData ? `
+                        ${mehsulData && mehsulData.adi ? `
                             <div class="product-info">
                                 ${mehsulData.sekil ? 
                                     `<img src="${mehsulData.sekil}" alt="${mehsulData.adi}" class="product-image">` 

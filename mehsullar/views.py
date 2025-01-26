@@ -30,19 +30,27 @@ def about(request):
 
 @login_required
 def sebet_ekle(request, mehsul_id):
-    mehsul = get_object_or_404(Mehsul, id=mehsul_id)
-    sebet, created = Sebet.objects.get_or_create(user=request.user, mehsul=mehsul)
-    if not created:
-        sebet.miqdar += 1
-        sebet.save()
+    try:
+        mehsul = get_object_or_404(Mehsul, id=mehsul_id)
+        sebet, created = Sebet.objects.get_or_create(user=request.user, mehsul=mehsul)
+        if not created:
+            sebet.miqdar += 1
+            sebet.save()
 
-    return JsonResponse({
-        'succes': True,
-        'mehsul': {
-            'adi': mehsul.adi,
-            'sekil': mehsul.sekil.url if mehsul.sekil else None,
-        }
-    })
+        # Məhsul məlumatlarını JSON formatında qaytarırıq
+        return JsonResponse({
+            'success': True,
+            'mehsul': {
+                'adi': mehsul.adi,
+                'sekil': mehsul.sekil.url if mehsul.sekil else None,
+            }
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=400)
+
 @login_required
 def view_cart(request):
     sebet = Sebet.objects.filter(user=request.user)
@@ -440,4 +448,3 @@ def mehsul_haqqinda(request, mehsul_id):
     return render(request, 'mehsul_haqqinda.html', {
         'mehsul': mehsul
     })
-

@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 showLoadingAnimation();
                 setTimeout(() => {
                     window.location.href = link.href;
-                }, 2000); // 2 saniyə sonra linkə yönləndirir
+                }, 1500); // 2 saniyə sonra linkə yönləndirir
             });
         }
     });

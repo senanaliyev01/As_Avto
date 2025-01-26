@@ -816,3 +816,11 @@ td:last-child {
     text-align: center;
     padding: 0.8rem 1rem;
 }
+
+.marka-pr-image{
+    width: 120px ;
+    height: 90px ;
+    
+    display: block;
+    margin: 0 auto;  
+}

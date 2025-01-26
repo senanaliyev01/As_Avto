@@ -548,11 +548,19 @@ header {
 }
 
 .marka-image-pr-list{
-    width: 70px ;
-    height: 70px ;
-    
     display: block;
-    margin: 0 auto; 
+    max-width: 60px;
+    max-height: 60px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    margin: 5px;
+    background: transparent;
+    transition: transform 0.2s ease;
+}
+
+.marka-image-pr-list:hover {
+    transform: scale(1.05);
 }
 
 .marka-image

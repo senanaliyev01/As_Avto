@@ -42,11 +42,7 @@
                 <tbody>
                     {% for item in sebet %}
                     <tr data-item-id="{{ item.id }}" data-price="{{ item.mehsul.qiymet }}">
-                        <td>
-                            {% if item.mehsul.sekil %}
-                                    <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="marka-pr-image">
-                            {% endif %}
-                        </td>
+                      
                         <td>{{ item.mehsul.adi }}</td>
                         <td>{{ item.mehsul.kateqoriya.adi }}</td>
                         <td>{{ item.mehsul.brend.adi }}</td>

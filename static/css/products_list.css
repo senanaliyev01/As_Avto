@@ -155,6 +155,7 @@ header {
     transform: scale(1.1);
 }
 
+
 .status-badge {
     background: var(--transparent-white);
     padding: 4px 8px;
@@ -678,7 +679,7 @@ td[style*="display: flex"] {
         padding: 0.4rem 0.8rem;
         font-size: 1rem;
     }
-}
+
 
 @media (max-width: 480px) {
     .top-header {

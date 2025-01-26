@@ -9,6 +9,8 @@ document.addEventListener("DOMContentLoaded", function () {
         "https://as-avto.com/orders/",
         "https://as-avto.com/products/",
         "https://as-avto.com/about/",
+        "https://as-avto.com/cart/",
+        "https://as-avto.com/istifadeciler/profile/",
     ]; // Yalnız bu linklərdə animasiya göstəriləcək
 
     const allLinks = document.querySelectorAll("a");

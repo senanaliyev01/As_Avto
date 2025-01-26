@@ -1,4 +1,4 @@
-/ Saat elementlərini əldə et
+// Saat elementlərini əldə et
 const currentTimeElement = document.getElementById('current-time');
 
 // Təkmilləşdirilmiş saat funksiyası
@@ -69,15 +69,14 @@ document.addEventListener('DOMContentLoaded', function () {
             // 2 saniyə gözlə
             setTimeout(() => {
                 fetch(url)
-                    .then(response => response.json())  // JSON cavabını gözləyirik
-                    .then(data => {
-                        if (data.success) {
+                    .then(response => {
+                        if (response.ok) {
                             // Original ikonu bərpa et
                             this.innerHTML = originalContent;
                             this.style.pointerEvents = 'auto';
                             this.style.opacity = '1';
 
-                            showAnimatedMessage("Məhsul səbətə əlavə olundu!", false, data.mehsul);
+                            showAnimatedMessage("Məhsul səbətə əlavə olundu!");
                             updateCartCount();
                         } else {
                             this.innerHTML = originalContent;
@@ -93,12 +92,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         this.style.opacity = '1';
                         showAnimatedMessage("Serverdə xəta baş verdi.", true);
                     });
-            }, 2000);
+            }, 2000); // 2 saniyə gözlə
         });
     });
 
     // Mesaj animasiyası
-    function showAnimatedMessage(message, isError = false, mehsul = null) {
+    function showAnimatedMessage(message, isError = false) {
         const messageDiv = document.createElement('div');
         messageDiv.className = 'animated-message';
         
@@ -114,14 +113,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                     <div class="message-text">
                         ${message}
-                        ${mehsul ? `
-                            <div class="product-info">
-                                ${mehsul.sekil ? `
-                                    <img src="${mehsul.sekil}" alt="${mehsul.adi}" class="product-image">
-                                ` : ''}
-                                <span class="product-name">${mehsul.adi}</span>
-                            </div>
-                        ` : ''}
                         <div class="checkout-icon">
                             <i class="fas fa-shopping-cart"></i>
                             <span class="checkout-plus">+</span>
@@ -287,26 +278,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 20%, 60% { transform: translateX(-5px); }
                 40%, 80% { transform: translateX(5px); }
             }
-            .product-info {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                margin: 10px 0;
-                padding: 5px;
-                background: #f8f9fa;
-                border-radius: 4px;
-            }
-            .product-image {
-                width: 50px;
-                height: 50px;
-                object-fit: cover;
-                border-radius: 4px;
-            }
-            .product-name {
-                font-size: 0.9em;
-                color: #333;
-                font-weight: 500;
-            }
         `;
 
         document.head.appendChild(style);
@@ -377,6 +348,4 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 2000);
     });
 });
-
-
 

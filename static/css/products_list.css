@@ -634,15 +634,11 @@ header {
     
     .working-hours {
         padding: 1rem 2rem;
-        flex-direction: column;
         gap: 1rem;
         text-align: center;
     }
     
-    .logo img {
-        width: 180px;
-        height: 180px;
-    }
+   
     
     .header-right {
         gap: 0.5rem;

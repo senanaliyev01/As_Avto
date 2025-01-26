@@ -69,20 +69,25 @@ document.addEventListener('DOMContentLoaded', function () {
             // 2 saniyə gözlə
             setTimeout(() => {
                 fetch(url)
-                    .then(response => {
-                        if (response.ok) {
-                            // Original ikonu bərpa et
-                            this.innerHTML = originalContent;
-                            this.style.pointerEvents = 'auto';
-                            this.style.opacity = '1';
+                    .then(response => response.json())
+                    .then(data => {
+                        // Original ikonu bərpa et
+                        this.innerHTML = originalContent;
+                        this.style.pointerEvents = 'auto';
+                        this.style.opacity = '1';
 
-                            showAnimatedMessage("Məhsul səbətə əlavə olundu!");
+                        if (data.success) {
+                            showAnimatedMessage(
+                                "Məhsul səbətə əlavə olundu!", 
+                                false, 
+                                data.mehsul
+                            );
                             updateCartCount();
                         } else {
-                            this.innerHTML = originalContent;
-                            this.style.pointerEvents = 'auto';
-                            this.style.opacity = '1';
-                            showAnimatedMessage("Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.", true);
+                            showAnimatedMessage(
+                                "Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.", 
+                                true
+                            );
                         }
                     })
                     .catch(error => {
@@ -92,12 +97,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         this.style.opacity = '1';
                         showAnimatedMessage("Serverdə xəta baş verdi.", true);
                     });
-            }, 2000); // 2 saniyə gözlə
+            }, 2000);
         });
     });
 
     // Mesaj animasiyası
-    function showAnimatedMessage(message, isError = false) {
+    function showAnimatedMessage(message, isError = false, mehsulData = null) {
         const messageDiv = document.createElement('div');
         messageDiv.className = 'animated-message';
         
@@ -113,6 +118,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                     <div class="message-text">
                         ${message}
+                        ${mehsulData ? `
+                            <div class="product-info">
+                                ${mehsulData.sekil ? 
+                                    `<img src="${mehsulData.sekil}" alt="${mehsulData.adi}" class="product-image">` 
+                                    : ''
+                                }
+                                <span class="product-name">${mehsulData.adi}</span>
+                            </div>
+                        ` : ''}
                         <div class="checkout-icon">
                             <i class="fas fa-shopping-cart"></i>
                             <span class="checkout-plus">+</span>
@@ -278,6 +292,29 @@ document.addEventListener('DOMContentLoaded', function () {
                 20%, 60% { transform: translateX(-5px); }
                 40%, 80% { transform: translateX(5px); }
             }
+            .product-info {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin: 10px 0;
+                padding: 8px;
+                background: #f8f9fa;
+                border-radius: 6px;
+            }
+            
+            .product-image {
+                width: 50px;
+                height: 50px;
+                object-fit: cover;
+                border-radius: 4px;
+                border: 1px solid #dee2e6;
+            }
+            
+            .product-name {
+                font-size: 0.9em;
+                font-weight: 500;
+                color: #495057;
+            }
         `;
 
         document.head.appendChild(style);
@@ -348,4 +385,3 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 2000);
     });
 });
-

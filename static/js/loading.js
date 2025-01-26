@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 
                 setTimeout(() => {
                     isTransitioning = false;
-                }, 2000);
+                }, 3000);
             });
         }
     });
@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", function () {
         progressBar.style.position = "absolute";
         progressBar.style.top = "0";
         progressBar.style.left = "0";
-        progressBar.style.transition = "width 1.2s ease-in-out";
+        progressBar.style.transition = "width 3s linear";
 
         const spinner = document.createElement("div");
         spinner.className = "spinner";
@@ -119,7 +119,7 @@ document.addEventListener("DOMContentLoaded", function () {
         spinner.style.border = "6px solid rgba(255, 255, 255, 0.2)";
         spinner.style.borderTop = "6px solid #ffffff";
         spinner.style.borderRadius = "50%";
-        spinner.style.animation = "spin 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite";
+        spinner.style.animation = "spin 3s linear infinite";
 
         loadingContainer.appendChild(progressBar);
         loadingContainer.appendChild(loadingText);
@@ -137,10 +137,15 @@ document.addEventListener("DOMContentLoaded", function () {
     function animateDots() {
         const dots = document.getElementById("dots");
         let count = 1;
-        setInterval(() => {
+        const interval = setInterval(() => {
             dots.textContent = ".".repeat(count);
             count = count < 3 ? count + 1 : 1;
         }, 400);
+
+        // Stop interval after 3 seconds
+        setTimeout(() => {
+            clearInterval(interval);
+        }, 3000);
     }
 
     const style = document.createElement("style");
@@ -162,7 +167,7 @@ document.addEventListener("DOMContentLoaded", function () {
             animation: fadeIn 0.5s ease-in-out;
         }
         body.transition-out {
-            animation: pageTransition 0.5s forwards;
+            animation: pageTransition 3s forwards;
         }
     `;
     document.head.appendChild(style);

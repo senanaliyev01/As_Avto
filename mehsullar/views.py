@@ -36,8 +36,14 @@ def sebet_ekle(request, mehsul_id):
         sebet.miqdar += 1
         sebet.save()
 
-    # Yalnız uğurlu əlavə üçün cavab
-    return HttpResponse(status=204)
+    # Məhsul məlumatlarını JSON formatında qaytarırıq
+    return JsonResponse({
+        'success': True,
+        'mehsul': {
+            'adi': mehsul.adi,
+            'sekil': mehsul.sekil.url if mehsul.sekil else None,
+        }
+    })
 @login_required
 def view_cart(request):
     sebet = Sebet.objects.filter(user=request.user)
@@ -435,4 +441,3 @@ def mehsul_haqqinda(request, mehsul_id):
     return render(request, 'mehsul_haqqinda.html', {
         'mehsul': mehsul
     })
-

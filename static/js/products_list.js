@@ -1,4 +1,4 @@
-/ Saat elementlərini əldə et
+// Saat elementlərini əldə et
 const currentTimeElement = document.getElementById('current-time');
 
 // Təkmilləşdirilmiş saat funksiyası
@@ -60,11 +60,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const originalContent = this.innerHTML;
             const url = this.getAttribute('href');
-            
-            // Məhsul məlumatlarını əldə et
-            const productRow = this.closest('tr');
-            const productImage = productRow.querySelector('td:first-child img').src;
-            const productName = productRow.querySelector('td:nth-child(2)').textContent;
 
             // Loading effektini göstər
             this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
@@ -76,11 +71,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 fetch(url)
                     .then(response => {
                         if (response.ok) {
+                            // Original ikonu bərpa et
                             this.innerHTML = originalContent;
                             this.style.pointerEvents = 'auto';
                             this.style.opacity = '1';
 
-                            showAnimatedMessage("Məhsul səbətə əlavə olundu!", false, productImage, productName);
+                            showAnimatedMessage("Məhsul səbətə əlavə olundu!");
                             updateCartCount();
                         } else {
                             this.innerHTML = originalContent;
@@ -96,15 +92,16 @@ document.addEventListener('DOMContentLoaded', function () {
                         this.style.opacity = '1';
                         showAnimatedMessage("Serverdə xəta baş verdi.", true);
                     });
-            }, 2000);
+            }, 2000); // 2 saniyə gözlə
         });
     });
 
     // Mesaj animasiyası
-    function showAnimatedMessage(message, isError = false, productImage = null, productName = null) {
+    function showAnimatedMessage(message, isError = false) {
         const messageDiv = document.createElement('div');
         messageDiv.className = 'animated-message';
         
+        // Professional görünüş üçün HTML strukturu
         messageDiv.innerHTML = `
             <div class="message-content">
                 ${!isError ? `
@@ -116,12 +113,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                     <div class="message-text">
                         ${message}
-                        ${productImage && productName ? `
-                            <div class="product-info">
-                                <img src="${productImage}" alt="${productName}" class="product-thumbnail">
-                                <span class="product-name">${productName}</span>
-                            </div>
-                        ` : ''}
                         <div class="checkout-icon">
                             <i class="fas fa-shopping-cart"></i>
                             <span class="checkout-plus">+</span>
@@ -287,26 +278,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 20%, 60% { transform: translateX(-5px); }
                 40%, 80% { transform: translateX(5px); }
             }
-            .product-info {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                margin: 10px 0;
-                padding: 5px;
-                background: rgba(76, 175, 80, 0.1);
-                border-radius: 4px;
-            }
-            .product-thumbnail {
-                width: 40px;
-                height: 40px;
-                object-fit: contain;
-                border-radius: 4px;
-            }
-            .product-name {
-                font-size: 0.9em;
-                color: #333;
-                font-weight: 500;
-            }
         `;
 
         document.head.appendChild(style);
@@ -377,3 +348,4 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 2000);
     });
 });
+

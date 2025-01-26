@@ -41,12 +41,13 @@ function showLoadingAnimation() {
     loadingContainer.style.alignItems = "center";
     loadingContainer.style.zIndex = "9999";
 
-    const loadingText = document.createElement("div");
-    loadingText.style.fontSize = "26px";
-    loadingText.style.fontWeight = "bold";
-    loadingText.style.color = "#ffffff";
-    loadingText.style.marginBottom = "20px";
-    loadingText.innerHTML = `Yüklənir<span id="dots">...</span>`;
+    const logo = document.createElement("img");
+    logo.src = "static/img/favicon.png"; // Burada logonuzun yolunu əlavə edin
+    logo.alt = "Logo";
+    logo.style.width = "100px";
+    logo.style.height = "100px";
+    logo.style.marginBottom = "20px";
+    logo.style.animation = "fadeInLogo 1s ease-in-out";
 
     const spinner = document.createElement("div");
     spinner.className = "spinner";
@@ -57,20 +58,9 @@ function showLoadingAnimation() {
     spinner.style.borderRadius = "50%";
     spinner.style.animation = "spin 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite";
 
-    loadingContainer.appendChild(loadingText);
+    loadingContainer.appendChild(logo);
     loadingContainer.appendChild(spinner);
     document.body.appendChild(loadingContainer);
-
-    animateDots();
-}
-
-function animateDots() {
-    const dots = document.getElementById("dots");
-    let count = 1;
-    setInterval(() => {
-        dots.textContent = ".".repeat(count);
-        count = count < 3 ? count + 1 : 1;
-    }, 400); // Daha sürətli nöqtə animasiyası
 }
 
 const style = document.createElement("style");
@@ -78,6 +68,11 @@ style.innerHTML = `
     @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeInLogo {
+        from { opacity: 0; transform: scale(0.8); }
+        to { opacity: 1; transform: scale(1); }
     }
 
     #loading-container {

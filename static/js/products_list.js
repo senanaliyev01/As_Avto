@@ -66,35 +66,38 @@ document.addEventListener('DOMContentLoaded', function () {
             this.style.pointerEvents = 'none';
             this.style.opacity = '0.7';
 
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    // Original ikonu bərpa et
-                    this.innerHTML = originalContent;
-                    this.style.pointerEvents = 'auto';
-                    this.style.opacity = '1';
+            // 2 saniyə loading göstər
+            setTimeout(() => {
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Original ikonu bərpa et
+                        this.innerHTML = originalContent;
+                        this.style.pointerEvents = 'auto';
+                        this.style.opacity = '1';
 
-                    if (data.success) {
-                        showAnimatedMessage(
-                            "Məhsul səbətə əlavə olundu!", 
-                            false, 
-                            data.mehsul
-                        );
-                        updateCartCount();
-                    } else {
-                        showAnimatedMessage(
-                            data.error || "Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.", 
-                            true
-                        );
-                    }
-                })
-                .catch(error => {
-                    console.error("Xəta:", error);
-                    this.innerHTML = originalContent;
-                    this.style.pointerEvents = 'auto';
-                    this.style.opacity = '1';
-                    showAnimatedMessage("Serverdə xəta baş verdi.", true);
-                });
+                        if (data.success) {
+                            showAnimatedMessage(
+                                "Məhsul səbətə əlavə olundu!", 
+                                false, 
+                                data.mehsul
+                            );
+                            updateCartCount();
+                        } else {
+                            showAnimatedMessage(
+                                data.error || "Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.", 
+                                true
+                            );
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Xəta:", error);
+                        this.innerHTML = originalContent;
+                        this.style.pointerEvents = 'auto';
+                        this.style.opacity = '1';
+                        showAnimatedMessage("Serverdə xəta baş verdi.", true);
+                    });
+            }, 2000); // 2 saniyə gözlə
         });
     });
 
@@ -103,14 +106,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const messageDiv = document.createElement('div');
         messageDiv.className = 'animated-message';
         
-        // Professional görünüş üçün HTML strukturu
         messageDiv.innerHTML = `
             <div class="message-content">
                 ${!isError ? `
                     <div class="success-checkmark">
                         <div class="check-icon">
-                            <span class="icon-line line-tip"></span>
-                            <span class="icon-line line-long"></span>
+                            <i class="fas fa-check"></i>
                         </div>
                     </div>
                     <div class="message-text">
@@ -122,14 +123,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                     : ''
                                 }
                                 <span class="product-name">${mehsulData.adi}</span>
-                                 <span class="product-name">${mehsulData.oem}</span>
                             </div>
                         ` : ''}
-                        <div class="checkout-icon">
-                            <i class="fas fa-shopping-cart"></i>
-                            <span class="checkout-plus">+</span>
-                            <span class="checkout-item"></span>
-                        </div>
                     </div>
                 ` : `
                     <div class="error-icon">
@@ -187,28 +182,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 position: relative;
                 border-radius: 50%;
                 background-color: #4CAF50;
-                transform: scale(0);
-                animation: pop 0.5s forwards 0.5s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                animation: pop 0.5s forwards;
             }
-            .icon-line {
-                height: 2px;
-                position: absolute;
-                background-color: #fff;
-                border-radius: 2px;
-            }
-            .line-tip {
-                top: 46%;
-                left: 14%;
-                width: 12px;
-                transform: rotate(45deg);
-                animation: icon-line-tip 0.75s forwards 0.5s;
-            }
-            .line-long {
-                top: 38%;
-                right: 8px;
-                width: 16px;
-                transform: rotate(-45deg);
-                animation: icon-line-long 0.75s forwards 0.5s;
+            .check-icon i {
+                color: white;
+                font-size: 16px;
             }
             .checkout-icon {
                 display: flex;
@@ -271,24 +252,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 0% { transform: scale(0) }
                 50% { transform: scale(1.2) }
                 100% { transform: scale(1) }
-            }
-            @keyframes icon-line-tip {
-                0% { width: 0; left: 1px; top: 19px; }
-                54% { width: 0; left: 1px; top: 19px; }
-                70% { width: 12px; left: -2px; top: 37px; }
-                84% { width: 8px; left: 4px; top: 48px; }
-                100% { width: 12px; left: 2px; top: 45%; }
-            }
-            @keyframes icon-line-long {
-                0% { width: 0; right: 46px; top: 54px; }
-                65% { width: 0; right: 46px; top: 54px; }
-                84% { width: 16px; right: 0px; top: 35px; }
-                100% { width: 16px; right: 8px; top: 38%; }
-            }
-            @keyframes shake {
-                0%, 100% { transform: translateX(0); }
-                20%, 60% { transform: translateX(-5px); }
-                40%, 80% { transform: translateX(5px); }
             }
             .product-info {
                 display: flex;

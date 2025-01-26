@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         this.style.opacity = '1';
                         showAnimatedMessage("Serverdə xəta baş verdi.", true);
                     });
-            }, 2000); // 2 saniyə gözlə
+            }, 2000); // 2 saniyə gözlə1
         });
     });
 

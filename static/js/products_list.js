@@ -1,4 +1,4 @@
-// Saat elementlərini əldə et
+/ Saat elementlərini əldə et
 const currentTimeElement = document.getElementById('current-time');
 
 // Təkmilləşdirilmiş saat funksiyası

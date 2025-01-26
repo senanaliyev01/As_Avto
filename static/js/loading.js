@@ -8,18 +8,22 @@ document.addEventListener("DOMContentLoaded", function () {
         "https://as-avto.com/istifadeciler/profile/",
         "https://as-avto.com/istifadeciler/password_change/",
     ];
+
     const allLinks = document.querySelectorAll("a");
     allLinks.forEach(link => {
         if (linksWithLoading.includes(link.href)) {
             link.addEventListener("click", function (e) {
                 e.preventDefault();
-                showLoadingAnimation(link.href);
+                showLoadingAnimation();
+                setTimeout(() => {
+                    window.location.href = link.href;
+                }, 1200);
             });
         }
     });
 });
 
-function showLoadingAnimation(targetUrl) {
+function showLoadingAnimation() {
     const existingLoader = document.getElementById("loading-container");
     if (existingLoader) existingLoader.remove();
 
@@ -30,72 +34,59 @@ function showLoadingAnimation(targetUrl) {
     loadingContainer.style.left = "0";
     loadingContainer.style.width = "100vw";
     loadingContainer.style.height = "100vh";
-    loadingContainer.style.backgroundColor = "rgba(255,255,255,1)";
+    loadingContainer.style.backgroundColor = "rgba(10, 20, 50, 0.9)"; // Tünd göy rəng
     loadingContainer.style.display = "flex";
     loadingContainer.style.flexDirection = "column";
     loadingContainer.style.justifyContent = "center";
     loadingContainer.style.alignItems = "center";
     loadingContainer.style.zIndex = "9999";
 
-    // Your logo image
-    const brandLogo = document.createElement("img");
-    brandLogo.src = "/path/to/your/logo.png"; // Replace with actual logo path
-    brandLogo.style.maxWidth = "200px";
-    brandLogo.style.marginBottom = "30px";
-
-    // Loading text
     const loadingText = document.createElement("div");
-    loadingText.style.fontSize = "22px";
+    loadingText.style.fontSize = "26px";
     loadingText.style.fontWeight = "bold";
-    loadingText.style.color = "#333";
+    loadingText.style.color = "#ffffff";
     loadingText.style.marginBottom = "20px";
-    loadingText.textContent = "Yüklənir...";
+    loadingText.innerHTML = `Yüklənir<span id="dots">...</span>`;
 
-    // Progress bar
-    const progressBar = document.createElement("div");
-    progressBar.style.width = "300px";
-    progressBar.style.height = "6px";
-    progressBar.style.backgroundColor = "rgba(0,0,0,0.1)";
-    progressBar.style.borderRadius = "3px";
-    progressBar.style.overflow = "hidden";
+    const spinner = document.createElement("div");
+    spinner.className = "spinner";
+    spinner.style.width = "60px";
+    spinner.style.height = "60px";
+    spinner.style.border = "6px solid rgba(255, 255, 255, 0.2)";
+    spinner.style.borderTop = "6px solid #ffffff";
+    spinner.style.borderRadius = "50%";
+    spinner.style.animation = "spin 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite";
 
-    const progressIndicator = document.createElement("div");
-    progressIndicator.style.width = "0%";
-    progressIndicator.style.height = "100%";
-    progressIndicator.style.backgroundColor = "#007bff";
-    progressIndicator.style.transition = "width 3s linear";
-    progressBar.appendChild(progressIndicator);
-
-    loadingContainer.appendChild(brandLogo);
     loadingContainer.appendChild(loadingText);
-    loadingContainer.appendChild(progressBar);
+    loadingContainer.appendChild(spinner);
     document.body.appendChild(loadingContainer);
 
-    // Animate progress bar
-    progressIndicator.style.width = "100%";
+    animateDots();
+}
 
-    // Navigate after progress completes
-    setTimeout(() => {
-        const exitAnimation = document.createElement("style");
-        exitAnimation.innerHTML = `
-            @keyframes fadeOut {
-                from { opacity: 1; transform: scale(1); }
-                to { opacity: 0; transform: scale(1.1); }
-            }
-            #loading-container {
-                animation: fadeOut 0.5s forwards;
-            }
-        `;
-        document.head.appendChild(exitAnimation);
-
-        setTimeout(() => {
-            window.location.href = targetUrl;
-        }, 500);
-    }, 3000);
+function animateDots() {
+    const dots = document.getElementById("dots");
+    let count = 1;
+    setInterval(() => {
+        dots.textContent = ".".repeat(count);
+        count = count < 3 ? count + 1 : 1;
+    }, 400); // Daha sürətli nöqtə animasiyası
 }
 
 const style = document.createElement("style");
 style.innerHTML = `
-    body { margin: 0; overflow-x: hidden; }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    #loading-container {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
 `;
 document.head.appendChild(style);

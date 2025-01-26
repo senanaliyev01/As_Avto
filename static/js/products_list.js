@@ -8,7 +8,7 @@ function updateCurrentTime() {
         const hours = now.getHours().toString().padStart(2, '0');
         const minutes = now.getMinutes().toString().padStart(2, '0');
         const seconds = now.getSeconds().toString().padStart(2, '0');
-
+        
         // Animasiyalı rəqəm dəyişməsi
         currentTimeElement.innerHTML = `
             <span class="time-unit">${hours}</span>:
@@ -23,7 +23,7 @@ function checkWorkingHours() {
     const now = new Date();
     const currentHour = now.getHours();
     const isWorkingHours = currentHour >= 9 && currentHour < 18;
-
+    
     const workingHoursElement = document.querySelector('.working-hours p:first-child');
     if (workingHoursElement) {
         workingHoursElement.style.color = isWorkingHours ? '#4caf50' : '#ff5252';
@@ -58,22 +58,20 @@ document.addEventListener('DOMContentLoaded', function () {
         link.addEventListener('click', function (event) {
             event.preventDefault(); // Default yönləndirməni bloklayır
 
-            // İkona loading effekti əlavə edir
-            const icon = this.querySelector('i');
-            icon.classList.add('fa-spinner', 'fa-spin');
-            icon.classList.remove('fa-shopping-cart');
-
-            setTimeout(() => {
-                // 2 saniyə sonra loading tamamlanır
-                icon.classList.remove('fa-spinner', 'fa-spin');
-                icon.classList.add('fa-shopping-cart');
-
-                // Mesaj göstərilir
-                showAnimatedMessage("Məhsul səbətə əlavə olundu!");
-
-                // Səbət sayını yeniləyir
-                updateCartCount();
-            }, 2000);
+            const url = this.getAttribute('href'); // URL alır
+            fetch(url) // Ajax vasitəsilə serverə sorğu göndərir
+                .then(response => {
+                    if (response.ok) {
+                        showAnimatedMessage("Məhsul səbətə əlavə olundu!");
+                        updateCartCount(); // Səbət sayını yeniləyir
+                    } else {
+                        showAnimatedMessage("Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.", true);
+                    }
+                })
+                .catch(error => {
+                    console.error("Xəta:", error);
+                    showAnimatedMessage("Serverdə xəta baş verdi.", true);
+                });
         });
     });
 
@@ -108,23 +106,53 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 3000);
     }
 
-    // Səbətə əlavə olunan məhsul sayını yeniləyir
-    function updateCartCount() {
-        fetch('/get_cart_count/')  // Backend-dən səbət sayını alır
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('cart-count').textContent = data.count;
-            });
-    }
-
-    // Hər dəfə səhifə yükləndikdə səbət sayını yenilə
-    updateCartCount();
-
-    // Yalnızca AJAX ilə səbətə məhsul əlavə edildikdən sonra səbət sayını yeniləyəcək
-    const addToCartButtons = document.querySelectorAll('.cart-icon');
-    addToCartButtons.forEach(button => {
-        button.addEventListener('click', function () {
-            updateCartCount();
+  // Səbətə əlavə olunan məhsul sayını yeniləyir
+  function updateCartCount() {
+    fetch('/get_cart_count/')  // Backend-dən səbət sayını alır
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('cart-count').textContent = data.count;
         });
+}
+
+// Hər dəfə səhifə yükləndikdə səbət sayını yenilə
+updateCartCount();
+
+// Yalnızca AJAX ilə səbətə məhsul əlavə edildikdən sonra səbət sayını yeniləyəcək
+const addToCartButtons = document.querySelectorAll('.cart-icon');
+addToCartButtons.forEach(button => {
+    button.addEventListener('click', function () {
+        updateCartCount();
     });
 });
+});
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const searchForm = document.querySelector('form');
+    const searchButton = document.getElementById('search-button');
+    const buttonText = searchButton.querySelector('.button-text');
+    const spinner = searchButton.querySelector('.spinner');
+
+    searchForm.addEventListener('submit', function(e) {
+        e.preventDefault(); // Formanın default davranışını dayandırırıq
+
+        // Buttonu loading vəziyyətinə keçiririk
+        searchButton.classList.add('loading');
+        buttonText.style.opacity = '0.5';
+        spinner.style.display = 'inline-block';
+
+        // 2 saniyə gözləyirik
+        setTimeout(() => {
+            // 2 saniyədən sonra formanı göndəririk
+            searchButton.classList.remove('loading');
+            buttonText.style.opacity = '1';
+            spinner.style.display = 'none';
+            
+            // Formanı göndəririk
+            this.submit();
+        }, 2000);
+    });
+});
+
+

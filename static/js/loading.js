@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
             baseUrl: "https://as-avto.com"
         },
         loading: {
-            duration: 1500,
+            duration: 3000, // 3 saniyəlik animasiya
             containerStyle: {
                 background: "rgba(10, 20, 50, 0.95)",
                 zIndex: 9999
@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 border: 7px solid rgba(255, 255, 255, 0.2);
                 border-top: 7px solid #ffffff;
                 border-radius: 50%;
-                animation: spin 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+                animation: spin 3s cubic-bezier(0.4, 0, 0.2, 1) infinite, circleTransform 3s linear infinite;
             `;
             return spinner;
         }
@@ -130,6 +130,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 @keyframes spin {
                     0% { transform: rotate(0deg); }
                     100% { transform: rotate(360deg); }
+                }
+
+                @keyframes circleTransform {
+                    0% { transform: scale(1); }
+                    50% { transform: scale(1.2); }
+                    100% { transform: scale(1); }
                 }
 
                 @keyframes fadeInLogo {

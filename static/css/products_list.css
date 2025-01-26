@@ -1,21 +1,10 @@
-* Root Variables - Yeni rəng sxemi */
+/* Root Variables */
 :root {
-    --primary-dark: #0a1929;
-    --primary-main: #0d47a1;
-    --primary-light: #1976d2;
-    --secondary-dark: #002233;
-    --secondary-main: #003366;
-    --accent-color: #64ffda;
-    --text-light: #e3f2fd;
-    --text-white: #ffffff;
-    --gradient-dark: linear-gradient(135deg, #0a1929, #0d47a1);
-    --gradient-light: linear-gradient(135deg, #1976d2, #2196f3);
-    --nav-gradient: linear-gradient(135deg, #001a33, #003366);
-    --header-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    --glass-effect: rgba(255, 255, 255, 0.1);
     --primary-gradient: linear-gradient(135deg, #1a237e, #0d47a1);
     --secondary-gradient: linear-gradient(135deg, #00838f, #006064);
     --button-gradient: linear-gradient(135deg, #004d40, #00695c);
+    --text-light: #e3f2fd;
+    --text-white: #ffffff;
     --text-dark: #333333;
     --transparent-white: rgba(255, 255, 255, 0.1);
     --transparent-white-hover: rgba(255, 255, 255, 0.2);
@@ -40,22 +29,19 @@ body {
 
 /* Header Styles */
 header {
-    background: var(--gradient-dark);
+    background: var(--primary-gradient);
     padding: 0;
-    box-shadow: var(--header-shadow);
+    box-shadow: var(--shadow-md);
     position: relative;
     z-index: 100;
-    border-bottom: 1px solid var(--glass-effect);
 }
 
 .top-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 4rem;
+    padding: 1.2rem 4rem;
     position: relative;
-    background: rgba(10, 25, 41, 0.8);
-    backdrop-filter: blur(10px);
 }
 
 .logo {
@@ -138,10 +124,8 @@ header {
     display: flex;
     justify-content: space-between;
     padding: 1rem 4rem;
-    background: var(--secondary-dark);
+    background: rgba(255, 255, 255, 0.1);
     color: #ffffff;
-    border-top: 1px solid var(--glass-effect);
-    border-bottom: 1px solid var(--glass-effect);
 }
 
 .working-hours p {
@@ -160,32 +144,35 @@ header {
     display: inline-block;
     min-width: 25px;
     text-align: center;
-    background: var(--primary-dark);
-    padding: 4px 8px;
-    border-radius: 6px;
-    border: 1px solid rgba(100, 255, 218, 0.2);
-    font-weight: 600;
-    letter-spacing: 1px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    color: var(--accent-color);
+    background: var(--transparent-white);
+    padding: 2px 5px;
+    border-radius: 4px;
     transition: all 0.3s ease;
 }
 
 .time-unit:hover {
-    border-color: var(--accent-color);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(100, 255, 218, 0.2);
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
 }
 
 .status-badge {
-    background: var(--primary-dark);
-    border: 1px solid var(--accent-color);
-    color: var(--accent-color);
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    background: var(--transparent-white);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+@-webkit-keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
 }
 
 /* Navbar */
@@ -195,26 +182,25 @@ header {
     align-items: center;
     gap: 2rem;
     padding: 1.2rem;
-    background: var(--nav-gradient);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, #002b63, #035a8d);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     position: sticky;
     top: 0;
     z-index: 99;
-    border-bottom: 1px solid var(--glass-effect);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .nav-bar a {
     color: #ffffff;
     text-decoration: none;
     font-size: 1.1rem;
-    padding: 1rem 2rem;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 1rem 1.8rem;
+    border-radius: 10px;
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
     gap: 0.8rem;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.08);
     position: relative;
     overflow: hidden;
 }
@@ -222,7 +208,6 @@ header {
 .nav-bar a i {
     font-size: 1.3rem;
     transition: transform 0.3s ease;
-    color: var(--accent-color);
 }
 
 .nav-bar a::before {
@@ -242,10 +227,9 @@ header {
 }
 
 .nav-bar a:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: var(--accent-color);
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .nav-bar a:hover i {
@@ -315,14 +299,12 @@ header {
 
 /* Search Bar - Professional Style */
 .search-bar {
-    background: var(--gradient-dark);
+    background: linear-gradient(135deg, #1a237e, #0d47a1);
     padding: 2rem;
     border-radius: 15px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     margin: 2rem auto;
     max-width: 1200px;
-    border: 1px solid var(--glass-effect);
 }
 
 .search-bar form {
@@ -338,21 +320,18 @@ header {
     padding: 0.8rem 1rem;
     border: none;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--text-white);
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
     font-size: 1rem;
     transition: all 0.3s ease;
     backdrop-filter: blur(5px);
-    font-weight: 500;
 }
 
 .search-bar select:focus, 
 .search-bar input:focus {
     outline: none;
-    border-color: var(--accent-color);
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 0 2px rgba(100, 255, 218, 0.2);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
 }
 
 .search-bar select option {
@@ -365,11 +344,11 @@ header {
 }
 
 #search-button {
-    padding: 1rem 2rem;
+    padding: 0.8rem 2rem;
     border: none;
     border-radius: 8px;
-    background: linear-gradient(135deg, #006064, #00838f);
-    color: var(--text-white);
+    background: linear-gradient(135deg, #00c853, #64dd17);
+    color: white;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
@@ -378,14 +357,12 @@ header {
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    letter-spacing: 0.5px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 #search-button:hover {
-    background: linear-gradient(135deg, #00838f, #0097a7);
+    background: linear-gradient(135deg, #00e676, #76ff03);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 #search-button:active {
@@ -730,13 +707,12 @@ header {
 
 /* Footer */
 footer {
-    background: var(--gradient-dark);
+    background: var(--primary-gradient);
     color: var(--text-white);
-    padding: 4rem;
+    padding: 3rem 4rem;
     position: relative;
     box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.2);
     margin-top: 3rem;
-    border-top: 1px solid var(--glass-effect);
 }
 
 footer::before {
@@ -792,11 +768,9 @@ footer::before {
     display: flex;
     align-items: center;
     gap: 1rem;
-    transition: all 0.3s ease;
-    padding: 1rem;
+    transition: var(--transition);
+    padding: 0.5rem;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .footer-center a i {
@@ -805,21 +779,18 @@ footer::before {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--primary-dark);
+    background: var(--transparent-white);
     border-radius: 50%;
-    transition: all 0.3s ease;
-    color: var(--accent-color);
+    transition: var(--transition);
 }
 
 .footer-center a:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: var(--accent-color);
+    background: var(--transparent-white);
     transform: translateX(10px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .footer-center a:hover i {
-    background: var(--secondary-main);
+    background: var(--transparent-white-hover);
     transform: rotate(360deg);
 }
 
@@ -839,18 +810,15 @@ footer::before {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--primary-dark);
+    background: var(--transparent-white);
     border-radius: 50%;
-    transition: all 0.3s ease;
+    transition: var(--transition);
     text-decoration: none;
-    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .footer-right a:hover {
-    background: var(--secondary-main);
-    border-color: var(--accent-color);
+    background: var(--transparent-white-hover);
     transform: translateY(-5px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 .footer-right a i {

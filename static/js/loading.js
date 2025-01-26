@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "https://as-avto.com/about/",
         "https://as-avto.com/cart/",
         "https://as-avto.com/istifadeciler/profile/",
-    ]; // Yalnız bu linklərdə animasiya göstəriləcək
+    ];
 
     const allLinks = document.querySelectorAll("a");
     allLinks.forEach(link => {
@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 showLoadingAnimation();
                 setTimeout(() => {
                     window.location.href = link.href;
-                }, 1000); // 1 saniyə sonra yönləndirir
+                }, 1200);
             });
         }
     });
@@ -33,7 +33,7 @@ function showLoadingAnimation() {
     loadingContainer.style.left = "0";
     loadingContainer.style.width = "100vw";
     loadingContainer.style.height = "100vh";
-    loadingContainer.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+    loadingContainer.style.backgroundColor = "rgba(10, 20, 50, 0.9)"; // Tünd göy rəng
     loadingContainer.style.display = "flex";
     loadingContainer.style.justifyContent = "center";
     loadingContainer.style.alignItems = "center";
@@ -41,13 +41,10 @@ function showLoadingAnimation() {
 
     const loadingContent = document.createElement("div");
     loadingContent.style.textAlign = "center";
-    loadingContent.style.color = "white";
+    loadingContent.style.color = "#ffffff";
     loadingContent.innerHTML = `
-        <div style="font-size: 28px; font-weight: bold; margin-bottom: 20px;">
-            <span id="loading-text">Yüklənir</span>
-            <span id="dots">...</span>
-        </div>
-        <div class="spinner"></div>
+        <div style="font-size: 26px; font-weight: bold; margin-bottom: 20px;">Yüklənir<span id="dots">...</span></div>
+        <div class="spinner" style="width: 60px; height: 60px; border: 6px solid rgba(255, 255, 255, 0.2); border-top: 6px solid #ffffff; border-radius: 50%; animation: spin 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;"></div>
     `;
 
     loadingContainer.appendChild(loadingContent);
@@ -56,38 +53,29 @@ function showLoadingAnimation() {
     animateDots();
 }
 
-// Nöqtələri animasiya etmək
 function animateDots() {
     const dots = document.getElementById("dots");
     let count = 1;
     setInterval(() => {
         dots.textContent = ".".repeat(count);
         count = count < 3 ? count + 1 : 1;
-    }, 500); // Hər 500 ms-də nöqtələri dəyişir
+    }, 400); // Daha sürətli nöqtə animasiyası
 }
 
-// CSS üçün professional spinner və animasiya
 const style = document.createElement("style");
 style.innerHTML = `
     @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
     }
-    .spinner {
-        width: 60px;
-        height: 60px;
-        border: 6px solid rgba(255, 255, 255, 0.3);
-        border-top: 6px solid white;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+
+    #loading-container {
+        animation: fadeIn 0.5s ease-in-out;
     }
-    #loading-container div {
-        animation: fadeIn 1s ease-in-out;
-    }
+
     @keyframes fadeIn {
-        0% { opacity: 0; }
-        100% { opacity: 1; }
+        from { opacity: 0; }
+        to { opacity: 1; }
     }
 `;
 document.head.appendChild(style);

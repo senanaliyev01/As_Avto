@@ -109,16 +109,22 @@ document.addEventListener('DOMContentLoaded', function () {
                         <div class="check-icon">
                             <span class="icon-line line-tip"></span>
                             <span class="icon-line line-long"></span>
-                            <div class="icon-circle"></div>
-                            <div class="icon-fix"></div>
+                        </div>
+                    </div>
+                    <div class="message-text">
+                        ${message}
+                        <div class="checkout-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="checkout-plus">+</span>
+                            <span class="checkout-item"></span>
                         </div>
                     </div>
                 ` : `
                     <div class="error-icon">
                         <i class="fas fa-exclamation-circle"></i>
                     </div>
+                    <div class="message-text">${message}</div>
                 `}
-                <div class="message-text">${message}</div>
             </div>
         `;
 
@@ -154,6 +160,9 @@ document.addEventListener('DOMContentLoaded', function () {
             .message-text {
                 font-size: 1rem;
                 font-weight: 500;
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
             }
             .success-checkmark {
                 width: 30px;
@@ -170,6 +179,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 animation: pop 0.5s forwards 0.5s;
             }
             .icon-line {
+                height: 2px;
                 position: absolute;
                 background-color: #fff;
                 border-radius: 2px;
@@ -188,10 +198,62 @@ document.addEventListener('DOMContentLoaded', function () {
                 transform: rotate(-45deg);
                 animation: icon-line-long 0.75s forwards 0.5s;
             }
-            .error-icon {
-                color: #ffffff;
-                font-size: 24px;
-                animation: shake 0.5s forwards;
+            .checkout-icon {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                margin-top: 5px;
+                color: #4CAF50;
+                font-size: 0.9em;
+            }
+            .checkout-icon i {
+                animation: cartBounce 1s ease-in-out;
+            }
+            .checkout-plus {
+                color: #4CAF50;
+                font-weight: bold;
+                animation: plusPulse 1s ease-in-out;
+            }
+            .checkout-item {
+                width: 8px;
+                height: 8px;
+                background-color: #4CAF50;
+                border-radius: 50%;
+                animation: itemSlide 1s ease-in-out;
+            }
+            @keyframes cartBounce {
+                0%, 20%, 50%, 80%, 100% {
+                    transform: translateY(0);
+                }
+                40% {
+                    transform: translateY(-5px);
+                }
+                60% {
+                    transform: translateY(-3px);
+                }
+            }
+            @keyframes plusPulse {
+                0%, 100% {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+                50% {
+                    transform: scale(1.5);
+                    opacity: 0.7;
+                }
+            }
+            @keyframes itemSlide {
+                0% {
+                    transform: translateX(-20px);
+                    opacity: 0;
+                }
+                50% {
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
             }
             @keyframes pop {
                 0% { transform: scale(0) }
@@ -267,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const spinner = searchButton.querySelector('.spinner');
 
     searchForm.addEventListener('submit', function(e) {
-        e.preventDefault(); // Formanın default davranışını dayandırırıq
+        e.preventDefault(); // Formanın default davranışını dayandırıq
 
         // Buttonu loading vəziyyətinə keçiririk
         searchButton.classList.add('loading');

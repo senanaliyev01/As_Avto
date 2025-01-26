@@ -545,13 +545,14 @@ header {
     margin: 0 auto;  
 }
 
-.marka-image-pr-list{
-    width: 70px ;
-    height: 70px ;
-    
-    display: block;
-    margin: 0 auto; 
+.marka-image-pr-list {
+    width: 70px;
+    height: 70px;
+    display: inline-block;  /* Yan-yana düzülmə üçün inline-block */
+    margin: 0 10px;  /* Şəkillər arasına boşluq əlavə edirik */
+    vertical-align: middle;  /* Şəkillərin eyni xəttdə düzülməsi üçün */
 }
+
 
 .marka-image
  {

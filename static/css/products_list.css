@@ -549,7 +549,7 @@ header {
     width: 70px;
     height: 70px;
     display: inline-block;  /* Yan-yana düzülmə üçün inline-block */
-    margin: 0 10px;  /* Şəkillər arasına boşluq əlavə edirik */
+    margin: 0 5px;  /* Şəkillər arasına boşluq əlavə edirik */
     vertical-align: middle;  /* Şəkillərin eyni xəttdə düzülməsi üçün */
 }
 

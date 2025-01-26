@@ -43,6 +43,7 @@ def sebet_ekle(request, mehsul_id):
             'mehsul': {
                 'adi': mehsul.adi,
                 'sekil': mehsul.sekil.url if mehsul.sekil else None,
+                'oem': mehsul.oem,
             }
         })
     except Exception as e:

@@ -404,15 +404,55 @@ header {
 
 .in-stock {
     background: linear-gradient(135deg, #00897b, #00695c);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.in-stock::before {
+    content: "\f00c";  /* Font Awesome check icon */
+    font-family: "Font Awesome 5 Free";  /* Font Awesome */
+    font-weight: 900;
+    margin-right: 5px;  /* İkon ilə mətn arasına boşluq */
 }
 
 .low-stock {
     background: linear-gradient(135deg, #ffd54f, #ffb300);
+    color: black;
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.low-stock::before {
+    content: "\f0eb";  /* Font Awesome exclamation icon */
+    font-family: "Font Awesome 5 Free";  /* Font Awesome */
+    font-weight: 900;
+    margin-right: 5px;  /* İkon ilə mətn arasına boşluq */
 }
 
 .out-of-stock {
     background: linear-gradient(135deg, #e53935, #c62828);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
+
+.out-of-stock::before {
+    content: "\f00d";  /* Font Awesome cross icon */
+    font-family: "Font Awesome 5 Free";  /* Font Awesome */
+    font-weight: 900;
+    margin-right: 5px;  /* İkon ilə mətn arasına boşluq */
+}
+
 
 /* Price Column */
 .price-column {

@@ -20,8 +20,8 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = os.environ.get('DEBUG')
 # DEBUG = False
 
-# ALLOWED_HOSTS = ['188.245.112.154','localost','127.0.0.1','0.0.0.0', 'as-avto.com', 'www.as-avto.com']
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['188.245.112.154','localost','127.0.0.1','0.0.0.0', 'as-avto.com', 'www.as-avto.com']
+# ALLOWED_HOSTS = ['*']
 
 CSRF_TRUSTED_ORIGINS = [
     'https://as-avto.com',

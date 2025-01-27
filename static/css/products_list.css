@@ -271,30 +271,68 @@ header {
     }
 }
 
-/* Search Results Section */
+/* Search Results Container */
 .search-results {
-    max-width: 100%;
-    margin: 0;
-    padding: 0;
+    max-width: 1200px; /* Məhdud container eni */
+    margin: 0 auto; /* Mərkəzləşdirmə */
+    padding: 2rem;
     overflow: hidden;
+    animation: fadeIn 0.3s ease-in-out; /* Yüklənmə animasiyası */
 }
 
+/* Search Results Title */
 .search-result-title {
     text-align: center;
-    margin-bottom: 1.5rem;
-    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    font-weight: 600;
     color: var(--success-color) !important;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    padding-bottom: 1rem;
 }
 
+/* Title alt xətti */
+.search-result-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 3px;
+    background: var(--success-color);
+    border-radius: 2px;
+}
+
+/* No Results Message */
 .no-results {
     text-align: center;
     color: var(--error-color) !important;
-    font-size: 1.5rem;
-    padding: 2rem;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-sm);
+    font-size: 1.6rem;
+    padding: 3rem 2rem;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.no-results:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
+}
+
+/* Animasiyalar */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Search Bar - Professional Style */

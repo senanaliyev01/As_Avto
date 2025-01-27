@@ -8,7 +8,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 "/about/",
                 "/cart/",
                 "/istifadeciler/profile/",
-                "/istifadeciler/password_change/"
+                "/istifadeciler/password_change/",
+                "/istifadeciler/register/",
+                "/istifadeciler/login/",
             ],
             baseUrl: "https://as-avto.com"
         },

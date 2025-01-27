@@ -277,6 +277,7 @@ header {
     margin: 0;
     padding: 0;
     overflow: hidden;
+    border-radius: 10px; /* Yumru künclər üçün əlavə edin */
 }
 
 .search-result-title {
@@ -285,6 +286,7 @@ header {
     font-size: 1.8rem;
     color: var(--success-color) !important;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    border-radius: 10px; /* Yumru künclər üçün əlavə edin */
 }
 
 .no-results {
@@ -293,7 +295,7 @@ header {
     font-size: 1.5rem;
     padding: 2rem;
     background: rgba(255, 255, 255, 0.9);
-    border-radius: var(--border-radius);
+    border-radius: 10px; /* Yumru künclər üçün əlavə edin */
     box-shadow: var(--shadow-sm);
 }
 

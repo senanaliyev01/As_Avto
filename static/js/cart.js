@@ -119,28 +119,51 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
 
         // Modal stilləri
-        Object.assign(modal.style, {
-            position: 'fixed',
-            top: '0',
-            left: '0',
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: '1000',
-            opacity: '0',
-            transition: 'opacity 0.3s ease'
-        });
-
-        document.body.appendChild(modal);
-        requestAnimationFrame(() => modal.style.opacity = '1');
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        `;
 
         const modalContent = modal.querySelector('.modal-content');
-        modalContent.style.transform = 'scale(0.7)';
-        modalContent.style.transition = 'transform 0.3s ease';
-        requestAnimationFrame(() => modalContent.style.transform = 'scale(1)');
+        modalContent.style.cssText = `
+            background: linear-gradient(145deg, #0a1929, #1a2942);
+            padding: 2.5rem;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            color: #fff;
+            position: relative;
+            transform: scale(0.7);
+            transition: transform 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        `;
+
+        document.body.appendChild(modal);
+        requestAnimationFrame(() => {
+            modal.style.opacity = '1';
+            modalContent.style.transform = 'scale(1)';
+        });
+
+        // Modalın xaricində klikləmə
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modalContent.style.transform = 'scale(0.7)';
+                modal.style.opacity = '0';
+                setTimeout(() => modal.remove(), 300);
+            }
+        });
 
         // Təsdiq və ləğv düymələri
         modal.querySelector('.cancel-btn').onclick = () => {
@@ -186,6 +209,73 @@ document.addEventListener('DOMContentLoaded', function() {
 
             setTimeout(() => modal.remove(), 300);
         };
+
+        // Modal düymələrinin stilləri
+        const buttons = modal.querySelectorAll('button');
+        buttons.forEach(button => {
+            button.style.cssText = `
+                padding: 12px 25px;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                transition: transform 0.2s ease;
+            `;
+        });
+
+        const confirmBtn = modal.querySelector('.confirm-btn');
+        confirmBtn.style.cssText += `
+            background: #ff5252;
+            color: #fff;
+        `;
+
+        const cancelBtn = modal.querySelector('.cancel-btn');
+        cancelBtn.style.cssText += `
+            background: #e0e0e0;
+            color: #333;
+        `;
+
+        // Modal ikonunun stili
+        const modalIcon = modal.querySelector('.modal-icon');
+        modalIcon.style.cssText = `
+            width: 70px;
+            height: 70px;
+            background: #ff5252;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        `;
+
+        modalIcon.querySelector('i').style.cssText = `
+            font-size: 30px;
+            color: #fff;
+        `;
+
+        // Modal mətnlərinin stilləri
+        const modalTitle = modal.querySelector('h3');
+        modalTitle.style.cssText = `
+            color: #fff;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        `;
+
+        const modalText = modal.querySelector('p');
+        modalText.style.cssText = `
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 25px;
+        `;
+
+        const modalButtons = modal.querySelector('.modal-buttons');
+        modalButtons.style.cssText = `
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        `;
     };
 
     // Səbət sayını yeniləmə funksiyası

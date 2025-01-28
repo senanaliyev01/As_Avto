@@ -36,7 +36,7 @@ class SifarisAdmin(admin.ModelAdmin):
         return format_html('<a href="{}" target="_blank">PDF-yə Çevir</a>', reverse('sifaris_detallari', args=[obj.id]) + '?pdf=1')
     pdf_link.short_description = 'PDF-yə Çevir'
 
-# Sifariş məhsulları admin paneli
+# 1Sifariş məhsulları admin paneli
 class SifarisMehsulAdmin(admin.ModelAdmin):
     list_display = ('sifaris', 'mehsul', 'miqdar', 'qiymet')
 

@@ -485,19 +485,21 @@
                     
                     const rating = reviewForm.querySelector('input[name="qiymetlendirme"]:checked');
                     if (!rating) {
-                        showReviewNotification('error', 'Zəhmət olmasa, qiymətləndirmə üçün ulduz seçin');
+                        showAnimatedMessage('Zəhmət olmasa, qiymətləndirmə üçün ulduz seçin', true);
                         return;
                     }
 
                     const review = reviewForm.querySelector('textarea[name="rey"]').value.trim();
                     if (!review) {
-                        showReviewNotification('error', 'Zəhmət olmasa, rəyinizi yazın');
+                        showAnimatedMessage('Zəhmət olmasa, rəyinizi yazın', true);
                         return;
                     }
 
+                    const formData = new FormData(reviewForm);
+                    
                     fetch(reviewForm.action, {
                         method: 'POST',
-                        body: new FormData(reviewForm),
+                        body: formData,
                         headers: {
                             'X-CSRFToken': getCookie('csrftoken')
                         }
@@ -505,14 +507,18 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            showReviewNotification('success', 'Rəyiniz uğurla göndərildi. Təsdiqlənməsi gözlənilir');
+                            showAnimatedMessage('Rəyiniz uğurla göndərildi. Təsdiqlənməsi gözlənilir', false);
                             reviewForm.reset();
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 3000);
                         } else {
-                            showReviewNotification('error', data.message || 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin');
+                            showAnimatedMessage(data.message || 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin', true);
                         }
                     })
                     .catch(error => {
-                        showReviewNotification('error', 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin');
+                        console.error('Xəta:', error);
+                        showAnimatedMessage('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin', true);
                     });
                 });
             }

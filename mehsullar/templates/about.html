@@ -1,91 +1,81 @@
-<!DOCTYPE html>
+{% extends 'base.html' %}
 {% load static %}
-<html lang="az">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Haqqımızda - A-Avto Ehtiyat Hissələri</title>
-    <link rel="icon" type="image/png" sizes="128x128" href="{% static 'img/favicon.png' %}">
-    <link rel="stylesheet" href="{% static 'css/about.css' %}">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body>
-    <nav class="navbar">
-      
-        <a href="{% url 'main' %}" class="nav-link">Əsas Səhifə</a>
-    </nav>
 
-    <div class="hero-section">
-        <h1>AS-Avto Ehtiyat Hissələri</h1>
-        <p>Avtomobil ehtiyat hissələri və təmiri üzrə peşəkar xidmət</p>
-    </div>
+{% block title %}Haqqımızda - A-Avto Ehtiyat Hissələri{% endblock %}
 
-    <div class="container">
-        <!-- Satış Müdürü Bölməsi -->
-        <section class="contact-section" id="sales-manager">
-            <h2>Satış Müdürümüz</h2>
-            <div class="manager-card">
-                <div class="manager-image">
-                    <img src="{% static '/img/senansatis.jpg' %}" alt="Satış Müdürü">
-                </div>
-                <div class="manager-info">
-                    <h3>Sənan Əliyev</h3>
-                    <p><i class="fas fa-briefcase"></i> Satış Müdürü</p>
-                    <p><i class="fas fa-phone"></i> <a href="tel:+994773059585">+994 77 305 95 85</a></p>
-                    <p><i class="fas fa-envelope"></i> <a href="mailto:senan.eliyev.9997@gmail.com">senan.eliyev.9997@gmail.com</a></p>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/about.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <h1>AS-Avto Ehtiyat Hissələri</h1>
+    <p>Avtomobil ehtiyat hissələri və təmiri üzrə peşəkar xidmət</p>
+</div>
+
+<div class="container">
+    <!-- Satış Müdürü Bölməsi -->
+    <section class="contact-section" id="sales-manager">
+        <h2>Satış Müdürümüz</h2>
+        <div class="manager-card">
+            <div class="manager-image">
+                <img src="{% static '/img/senansatis.jpg' %}" alt="Satış Müdürü">
+            </div>
+            <div class="manager-info">
+                <h3>Sənan Əliyev</h3>
+                <p><i class="fas fa-briefcase"></i> Satış Müdürü</p>
+                <p><i class="fas fa-phone"></i> <a href="tel:+994773059585">+994 77 305 95 85</a></p>
+                <p><i class="fas fa-envelope"></i> <a href="mailto:senan.eliyev.9997@gmail.com">senan.eliyev.9997@gmail.com</a></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Çatdırılma Məlumatları -->
+    <section class="delivery-section">
+        <h2>Çatdırılma Şərtləri</h2>
+        <div class="delivery-cards">
+            <div class="delivery-card">
+                <i class="fas fa-truck-fast"></i>
+                <h3>Sürətli Çatdırılma</h3>
+                <ul>
+                    <li>30 ₼-dan yuxarı sifarişlər 1 iş günü ərzində çatdırılır</li>
+                    <li>30 ₼-dan aşağı sifarişlər 3 iş günü ərzində çatdırılır</li>
+                </ul>
+            </div>
+            <div class="delivery-card">
+                <i class="fas fa-clock"></i>
+                <h3>Sifariş Vaxtları</h3>
+                <ul>
+                    <li>Sifarişlər bir gün öncədən qəbul edilir</li>
+                    <li>Səhər saat 10:00-a qədər verilən sifarişlər həmin gün çatdırılır</li>
+                    <li>Təcili sifarişlər üçün əlavə ödənişli taksi xidməti mövcuddur</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Xəritə və Ünvan -->
+    <section class="location-section">
+        <h2>Bizim Ünvan</h2>
+        <div class="location-container">
+            <div class="map-container">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3036.661218173641!2d49.844750000000005!3d40.4385!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zNDDCsDI2JzE4LjYiTiA0OcKwNTAnNDEuMSJF!5e0!3m2!1str!2saz!4v1735895097575!5m2!1str!2saz" width="800" height="600" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+            <div class="address-info">
+                <h3><i class="fas fa-location-dot"></i> Fiziki Ünvan</h3>
+                <p>Binəqədi Rayonu, Məmmədəmin Rəsulzadə Qəsəbəsi, A-Avto</p>
+                <div class="working-hours">
+                    <h3><i class="fas fa-clock"></i> İş Saatları</h3>
+                    <p>Bazar ertəsi - Bazar: 09:00 - 18:00</p>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
+</div>
 
-        <!-- Çatdırılma Məlumatları -->
-        <section class="delivery-section">
-            <h2>Çatdırılma Şərtləri</h2>
-            <div class="delivery-cards">
-                <div class="delivery-card">
-                    <i class="fas fa-truck-fast"></i>
-                    <h3>Sürətli Çatdırılma</h3>
-                    <ul>
-                        <li>30 ₼-dan yuxarı sifarişlər 1 iş günü ərzində çatdırılır</li>
-                        <li>30 ₼-dan aşağı sifarişlər 3 iş günü ərzində çatdırılır</li>
-                    </ul>
-                </div>
-                <div class="delivery-card">
-                    <i class="fas fa-clock"></i>
-                    <h3>Sifariş Vaxtları</h3>
-                    <ul>
-                        <li>Sifarişlər bir gün öncədən qəbul edilir</li>
-                        <li>Səhər saat 10:00-a qədər verilən sifarişlər həmin gün çatdırılır</li>
-                        <li>Təcili sifarişlər üçün əlavə ödənişli taksi xidməti mövcuddur</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
+<div id="notification" class="notification"></div>
+{% endblock %}
 
-        <!-- Xəritə və Ünvan -->
-        <section class="location-section">
-            <h2>Bizim Ünvan</h2>
-            <div class="location-container">
-                <div class="map-container">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3036.661218173641!2d49.844750000000005!3d40.4385!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zNDDCsDI2JzE4LjYiTiA0OcKwNTAnNDEuMSJF!5e0!3m2!1str!2saz!4v1735895097575!5m2!1str!2saz" width="800" height="600" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                </div>
-                <div class="address-info">
-                    <h3><i class="fas fa-location-dot"></i> Fiziki Ünvan</h3>
-                    <p>Binəqədi Rayonu, Məmmədəmin Rəsulzadə Qəsəbəsi, A-Avto</p>
-                    <div class="working-hours">
-                        <h3><i class="fas fa-clock"></i> İş Saatları</h3>
-                        <p>Bazar ertəsi - Bazar: 09:00 - 18:00</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </div>
-
- 
-
-    <div id="notification" class="notification"></div>
-    <script src="{% static 'js/about.js' %}"></script>
-    <script src="{% static 'js/loading.js' %}"></script>
-  
-</body>
-</html>
+{% block extra_js %}
+<script src="{% static 'js/about.js' %}"></script>
+{% endblock %}

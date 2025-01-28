@@ -1,89 +1,94 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="az">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profil | {{ user.username }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
-  
-    <link rel="icon" type="image/png" sizes="128x128" href="{% static 'img/favicon.png' %}">
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light">
-        <div class="container">
-            <a href="{% url 'main' %}" class="navbar-brand d-flex align-items-center">
-                <i class="fas fa-home me-2"></i>
-                <span class="brand-text">Əsas Səhifə</span>
-            </a>
-            <div class="ms-auto d-flex align-items-center">
-                <div class="user-welcome me-3">
-                    Xoş gəldiniz, {{ user.username }}!
+
+{% block title %}Profil | {{ user.username }}{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Alert Messages -->
+    <div class="messages-container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show custom-alert" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-                <button onclick="logout()" class="btn btn-outline-danger">
-                    <i class="fas fa-sign-out-alt me-2"></i>
-                    Çıxış
-                </button>
-            </div>
-        </div>
-    </nav>
+            {% endfor %}
+        {% endif %}
+    </div>
 
-    <div class="container py-5">
-        <!-- Alert Messages -->
-        <div class="messages-container">
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show custom-alert" role="alert">
-                        <i class="fas fa-info-circle me-2"></i>
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <!-- Main Profile Card -->
+    <div class="profile-card">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <form method="POST" enctype="multipart/form-data" id="profileImageForm">
+                {% csrf_token %}
+                <div class="profile-image-container">
+                    <img src="{{ user.profile.sekil.url }}" alt="Profile" id="profileImage" 
+                         onerror="this.src='{% static 'img/default.png' %}'">
+                    <div class="image-overlay">
+                        <i class="fas fa-camera"></i>
+                        <span>Şəkli Dəyiş</span>
                     </div>
-                {% endfor %}
-            {% endif %}
+                    <input type="file" id="imageInput" name="sekil" accept="image/*" style="display: none;">
+                </div>
+            </form>
+            <h3 class="profile-name">{{ user.username }}</h3>
+            <p class="profile-email">
+                <i class="fas fa-envelope"></i>
+                {{ user.email }}
+            </p>
+            <a href="{% url 'password_change' %}" class="btn btn-outline-light">
+                <i class="fas fa-key me-2"></i>
+                Şifrəni Dəyiş
+            </a>
         </div>
 
-        <!-- Main Profile Card -->
-        <div class="profile-card">
-            <!-- Profile Header -->
-            <div class="profile-header">
-                <form method="POST" enctype="multipart/form-data" id="profileImageForm">
-                    {% csrf_token %}
-                    <div class="profile-image-container">
-                        <img src="{{ user.profile.sekil.url }}" alt="Profile" id="profileImage" 
-                             onerror="this.src='{% static 'img/default.png' %}'">
-                        <div class="image-overlay">
-                            <i class="fas fa-camera"></i>
-                            <span>Şəkli Dəyiş</span>
+        <!-- Profile Details Form -->
+        <div class="profile-details">
+            <form method="POST" class="profile-form">
+                {% csrf_token %}
+                <div class="form-grid">
+                    {% for field in user_form %}
+                        <div class="form-group">
+                            <label class="form-label">
+                                {% if field.name == 'username' %}
+                                    <i class="fas fa-user"></i>
+                                {% elif field.name == 'email' %}
+                                    <i class="fas fa-envelope"></i>
+                                {% else %}
+                                    <i class="fas fa-info"></i>
+                                {% endif %}
+                                {{ field.label }}
+                            </label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="error-message">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ field.errors|join:", " }}
+                                </div>
+                            {% endif %}
                         </div>
-                        <input type="file" id="imageInput" name="sekil" accept="image/*" style="display: none;">
-                    </div>
-                </form>
-                <h3 class="profile-name">{{ user.username }}</h3>
-                <p class="profile-email">
-                    <i class="fas fa-envelope"></i>
-                    {{ user.email }}
-                </p>
-                <a href="{% url 'password_change' %}" class="btn btn-outline-light">
-                    <i class="fas fa-key me-2"></i>
-                    Şifrəni Dəyiş
-                </a>
-            </div>
-
-            <!-- Profile Details Form -->
-            <div class="profile-details">
-                <form method="POST" class="profile-form">
-                    {% csrf_token %}
-                    <div class="form-grid">
-                        {% for field in user_form %}
+                    {% endfor %}
+                    
+                    {% for field in profile_form %}
+                        {% if field.name != 'sekil' %}
                             <div class="form-group">
                                 <label class="form-label">
-                                    {% if field.name == 'username' %}
+                                    {% if field.name == 'telefon' %}
+                                        <i class="fas fa-phone"></i>
+                                    {% elif field.name == 'unvan' %}
+                                        <i class="fas fa-map-marker-alt"></i>
+                                    {% elif field.name == 'ad' %}
                                         <i class="fas fa-user"></i>
-                                    {% elif field.name == 'email' %}
-                                        <i class="fas fa-envelope"></i>
+                                    {% elif field.name == 'soyad' %}
+                                        <i class="fas fa-user"></i>
                                     {% else %}
                                         <i class="fas fa-info"></i>
                                     {% endif %}
@@ -97,72 +102,44 @@
                                     </div>
                                 {% endif %}
                             </div>
-                        {% endfor %}
-                        
-                        {% for field in profile_form %}
-                            {% if field.name != 'sekil' %}
-                                <div class="form-group">
-                                    <label class="form-label">
-                                        {% if field.name == 'telefon' %}
-                                            <i class="fas fa-phone"></i>
-                                        {% elif field.name == 'unvan' %}
-                                            <i class="fas fa-map-marker-alt"></i>
-                                        {% elif field.name == 'ad' %}
-                                            <i class="fas fa-user"></i>
-                                        {% elif field.name == 'soyad' %}
-                                            <i class="fas fa-user"></i>
-                                        {% else %}
-                                            <i class="fas fa-info"></i>
-                                        {% endif %}
-                                        {{ field.label }}
-                                    </label>
-                                    {{ field }}
-                                    {% if field.errors %}
-                                        <div class="error-message">
-                                            <i class="fas fa-exclamation-circle"></i>
-                                            {{ field.errors|join:", " }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-2"></i>
-                            Məlumatları Yenilə
-                        </button>
-                    </div>
-                </form>
-            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>
+                        Məlumatları Yenilə
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
+</div>
 
-    <!-- Logout Confirm Dialog -->
-    <div class="logout-confirm-dialog" id="logoutDialog">
-        <div class="logout-confirm-content">
-            <div class="logout-icon-wrapper">
-                <i class="fas fa-sign-out-alt logout-icon"></i>
-            </div>
-            <h4>Çıxış etmək istədiyinizə əminsiniz?</h4>
-            <p class="logout-message">Hesabınızdan çıxış etmək üzrəsiniz.</p>
-            <div class="logout-buttons">
-                <button class="btn-cancel" onclick="closeLogoutDialog()">
-                    <i class="fas fa-times"></i>
-                    Ləğv et
-                </button>
-                <button class="btn-confirm" onclick="confirmLogout()">
-                    <i class="fas fa-sign-out-alt"></i>
-                    Çıxış et
-                </button>
-            </div>
+<!-- Logout Confirm Dialog -->
+<div class="logout-confirm-dialog" id="logoutDialog">
+    <div class="logout-confirm-content">
+        <div class="logout-icon-wrapper">
+            <i class="fas fa-sign-out-alt logout-icon"></i>
+        </div>
+        <h4>Çıxış etmək istədiyinizə əminsiniz?</h4>
+        <p class="logout-message">Hesabınızdan çıxış etmək üzrəsiniz.</p>
+        <div class="logout-buttons">
+            <button class="btn-cancel" onclick="closeLogoutDialog()">
+                <i class="fas fa-times"></i>
+                Ləğv et
+            </button>
+            <button class="btn-confirm" onclick="confirmLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Çıxış et
+            </button>
         </div>
     </div>
+</div>
+{% endblock %}
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{% static 'js/profile.js' %}"></script>
-    <script src="{% static 'js/loading.js' %}"></script>
-    
-</body>
-</html> 
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'js/profile.js' %}"></script>
+{% endblock %} 

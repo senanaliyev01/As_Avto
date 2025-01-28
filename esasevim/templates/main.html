@@ -1,214 +1,151 @@
-<!DOCTYPE html>
+{% extends 'base.html' %}
 {% load static %}
-<html lang="az">
-<head>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Avto Ehtiyat Hissələri</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="icon" type="image/png" sizes="128x128" href="{% static 'img/favicon.png' %}">
-    <link rel="stylesheet" href="{% static 'css/main.css' %}">
-  
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    {% csrf_token %}
-</head>
-<body>
-  
- 
-    <!-- aHeader Bölməsi -->
-    <header>
-        <div class="top-header">
-            <div class="logo">
-                <!-- <img src="{% static '/img/Logo_Winter.png' %}" alt="Logo"> -->
-                <img src="{% static '/img/Header_Logo.png' %}" alt="Logo">
-            </div>
-            <div class="header-right">
-                <a href="{% url 'profile' %}"><i class="fas fa-user"></i> {{ user.username }}</a>
-                <a href="{% url 'view_cart' %}" class="cart-link">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span id="cart-count" class="cart-badge">0</span>
-                </a>
-            </div>
-        </div>
-        <div class="working-hours">
-            <p>İş vaxtımız: 09:00 - 18:00</p>
-            <p class="current-time">Hazırki Saat: <span id="current-time"></span></p>
-        </div>
-    </header>
 
-    <!-- Naviqqasiya Bölməsi -->
-    <div class="nav-bar">
-        <a href="{%url 'main' %}"><i class="fa-solid fa-house"></i> Əsas Səhifə</a>
-        <a href="{% url 'sifaris_izle' %}"><i class="fa-solid fa-truck-fast"></i> Sifarişlərim</a>
-        <a href="{% url 'products_list' %}"><i class="fas fa-cogs"></i> Məhsullar</a>
-        <a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> Məlumat</a>
-       
+{% block title %}Əsas Səhifə{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<link rel="stylesheet" href="{% static 'css/main.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Statistika Bölməsi -->
+<div class="statistics-section">
+    <!-- İstifadəçi Statistikası -->
+    <div class="statistics-group user-stats">
+        <h2 class="stats-title">İstifadəçi Statistikası</h2>
+        <div class="statistics-card">
+            <i class="fas fa-users icon"></i>
+            <h3>Ümumi İstifadəçilər</h3>
+            <div class="count" data-type="users">0</div>
+        </div>
     </div>
 
- 
-
-   
-
-    <!-- Statistika Bölməsi -->
-    <div class="statistics-section">
-        <!-- İstifadəçi Statistikası -->
-        <div class="statistics-group user-stats">
-            <h2 class="stats-title">İstifadəçi Statistikası</h2>
+    <!-- Avtomobil Hissələri Statistikası -->
+    <div class="statistics-group parts-stats">
+        <h2 class="stats-title">Avtomobil Hissələri</h2>
+        <div class="statistics-container">
             <div class="statistics-card">
-                <i class="fas fa-users icon"></i>
-                <h3>Ümumi İstifadəçilər</h3>
-                <div class="count" data-type="users">0</div>
+                <i class="fas fa-tags icon"></i>
+                <h3>Kateqoriyalar</h3>
+                <div class="count" data-type="categories">0</div>
             </div>
-        </div>
 
-        <!-- Avtomobil Hissələri Statistikası -->
-        <div class="statistics-group parts-stats">
-            <h2 class="stats-title">Avtomobil Hissələri</h2>
-            <div class="statistics-container">
-                <div class="statistics-card">
-                    <i class="fas fa-tags icon"></i>
-                    <h3>Kateqoriyalar</h3>
-                    <div class="count" data-type="categories">0</div>
-                </div>
-
-                <div class="statistics-card">
-                    <i class="fas fa-industry icon"></i>
-                    <h3>Firmalar</h3>
-                    <div class="count" data-type="brands">0</div>
-                </div>
-
-                <div class="statistics-card">
-                    <i class="fas fa-car icon"></i>
-                    <h3>Avtomobillər</h3>
-                    <div class="count" data-type="car_brands">0</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Məhsul Statistikası -->
-        <div class="statistics-group product-stats">
-            <h2 class="stats-title">Məhsul Statistikası</h2>
             <div class="statistics-card">
-                <i class="fas fa-box-open icon"></i>
-                <h3>Ümumi Məhsullar</h3>
-                <div class="count" data-type="products">0</div>
+                <i class="fas fa-industry icon"></i>
+                <h3>Firmalar</h3>
+                <div class="count" data-type="brands">0</div>
+            </div>
+
+            <div class="statistics-card">
+                <i class="fas fa-car icon"></i>
+                <h3>Avtomobillər</h3>
+                <div class="count" data-type="car_brands">0</div>
             </div>
         </div>
     </div>
 
-    <!-- Müştəri Rəyləri Bölməsi -->
-    <section class="reviews-section">
-        <h2 class="section-title">Müştəri Rəyləri</h2>
+    <!-- Məhsul Statistikası -->
+    <div class="statistics-group product-stats">
+        <h2 class="stats-title">Məhsul Statistikası</h2>
+        <div class="statistics-card">
+            <i class="fas fa-box-open icon"></i>
+            <h3>Ümumi Məhsullar</h3>
+            <div class="count" data-type="products">0</div>
+        </div>
+    </div>
+</div>
+
+<!-- Müştəri Rəyləri Bölməsi -->
+<section class="reviews-section">
+    <h2 class="section-title">Müştəri Rəyləri</h2>
+    
+    <!-- Qiymətləndirmə Statistikası -->
+    <div class="rating-stats">
+        <div class="average-rating">
+            <h3>Ümumi Qiymətləndirmə</h3>
+            <div class="rating-value">
+                {{ rey_statistikasi.ortalama|default:"0"|floatformat:1 }}
+                <i class="fas fa-star"></i>
+            </div>
+            <div class="total-reviews">
+                {{ rey_statistikasi.toplam|default:"0" }} rəy
+            </div>
+        </div>
         
-        <!-- Qiymətləndirmə Statistikası -->
-        <div class="rating-stats">
-            <div class="average-rating">
-                <h3>Ümumi Qiymətləndirmə</h3>
-                <div class="rating-value">
-                    {{ rey_statistikasi.ortalama|default:"0"|floatformat:1 }}
-                    <i class="fas fa-star"></i>
+        <div class="rating-bars">
+            {% for stat in ulduz_statistikasi %}
+            <div class="rating-bar">
+                <span class="stars">{{ stat.qiymetlendirme }} <i class="fas fa-star"></i></span>
+                <div class="bar-container">
+                    {% if rey_statistikasi.toplam %}
+                        <div class="bar" style="width: {% widthratio stat.sayi rey_statistikasi.toplam 100 %}%"></div>
+                    {% else %}
+                        <div class="bar" style="width: 0%"></div>
+                    {% endif %}
                 </div>
-                <div class="total-reviews">
-                    {{ rey_statistikasi.toplam|default:"0" }} rəy
-                </div>
-            </div>
-            
-            <div class="rating-bars">
-                {% for stat in ulduz_statistikasi %}
-                <div class="rating-bar">
-                    <span class="stars">{{ stat.qiymetlendirme }} <i class="fas fa-star"></i></span>
-                    <div class="bar-container">
-                        {% if rey_statistikasi.toplam %}
-                            <div class="bar" style="width: {% widthratio stat.sayi rey_statistikasi.toplam 100 %}%"></div>
-                        {% else %}
-                            <div class="bar" style="width: 0%"></div>
-                        {% endif %}
-                    </div>
-                    <span class="count">{{ stat.sayi }}</span>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- Rəy Əlavə Etmə Formu -->
-        <div class="review-form">
-            <h3>Rəyinizi Bildirin</h3>
-            <form method="POST" action="{% url 'rey_elave_et' %}">
-                {% csrf_token %}
-                <div class="rating-input">
-                    <input type="radio" id="star5" name="qiymetlendirme" value="5">
-                    <label for="star5"><i class="fas fa-star"></i></label>
-                    <input type="radio" id="star4" name="qiymetlendirme" value="4">
-                    <label for="star4"><i class="fas fa-star"></i></label>
-                    <input type="radio" id="star3" name="qiymetlendirme" value="3">
-                    <label for="star3"><i class="fas fa-star"></i></label>
-                    <input type="radio" id="star2" name="qiymetlendirme" value="2">
-                    <label for="star2"><i class="fas fa-star"></i></label>
-                    <input type="radio" id="star1" name="qiymetlendirme" value="1">
-                    <label for="star1"><i class="fas fa-star"></i></label>
-                </div>
-                <textarea name="rey" placeholder="Rəyinizi yazın..." required></textarea>
-                <button type="submit">Göndər</button>
-            </form>
-        </div>
-
-        <!-- Təsdiqlənmiş Rəylər -->
-        <div class="reviews-container">
-            {% for rey in reyler %}
-            <div class="review-card">
-                <div class="review-header">
-                    <div class="reviewer-info">
-                        {% if rey.musteri.profile.sekil %}
-                            <img src="{{ rey.musteri.profile.sekil.url }}" alt="Profile">
-                        {% else %}
-                            <img src="{% static 'img/default-avatar.png' %}" alt="Default Profile">
-                        {% endif %}
-                        <div class="reviewer-details">
-                            <h4>{{ rey.musteri.profile.tam_ad|default:rey.musteri.username }}</h4>
-                            <div class="rating">
-                                {% for i in "12345"|make_list %}
-                                <i class="fas fa-star {% if forloop.counter <= rey.qiymetlendirme %}active{% endif %}"></i>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="review-date">
-                        {{ rey.tarix|date:"d.m.Y" }}
-                    </div>
-                </div>
-                <div class="review-content">
-                    {{ rey.rey }}
-                </div>
+                <span class="count">{{ stat.sayi }}</span>
             </div>
             {% endfor %}
         </div>
-    </section>
+    </div>
 
-  
-    <!-- Footer Bölməsi -->
-    <footer>
-        <div class="footer-left">
-            <!-- <img src="{% static '/img/Logo_Winter.png' %}" alt="Logo"> -->
-           <img src="{% static '/img/Header_Logo.png' %}" alt="Logo">
-            <a href="{%url 'main' %}"></a>
-        </div>
-        <div class="footer-center">
-            <a href="tel:+994501234567"><i class="fa-solid fa-tty"></i>+994 70 275 44 99</a>
-            <a href="tel:+994501234567"><i class="fas fa-phone-alt"></i>+994 77 305 95 85</a>
-            <a href="mailto:senan.eliyev.9997@gmail.com"><i class="fas fa-envelope"></i>senan.eliyev.9997@gmail.com</a>
-            <a href="https://maps.app.goo.gl/fU5jUAg8veccL3Zq9"><i class="fa-solid fa-location-dot"></i>Binəqədi R. M.Rəsulzadə qəs. As-Avto</a>
-        </div>
-        <div class="footer-right">
-            <a href="https://wa.me/994773059585" target="_blank"><i class="fab fa-whatsapp"></i></a>
-            <a href="https://www.tiktok.com/@a_avto_service" target="_blank"><i class="fab fa-tiktok"></i></a>
-        </div>
-    </footer>
-   
+    <!-- Rəy Əlavə Etmə Formu -->
+    <div class="review-form">
+        <h3>Rəyinizi Bildirin</h3>
+        <form method="POST" action="{% url 'rey_elave_et' %}">
+            {% csrf_token %}
+            <div class="rating-input">
+                <input type="radio" id="star5" name="qiymetlendirme" value="5">
+                <label for="star5"><i class="fas fa-star"></i></label>
+                <input type="radio" id="star4" name="qiymetlendirme" value="4">
+                <label for="star4"><i class="fas fa-star"></i></label>
+                <input type="radio" id="star3" name="qiymetlendirme" value="3">
+                <label for="star3"><i class="fas fa-star"></i></label>
+                <input type="radio" id="star2" name="qiymetlendirme" value="2">
+                <label for="star2"><i class="fas fa-star"></i></label>
+                <input type="radio" id="star1" name="qiymetlendirme" value="1">
+                <label for="star1"><i class="fas fa-star"></i></label>
+            </div>
+            <textarea name="rey" placeholder="Rəyinizi yazın..." required></textarea>
+            <button type="submit">Göndər</button>
+        </form>
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script src="{% static 'js/main.js' %}"></script>
-    <script src="{% static 'js/loading.js' %}"></script>
-    
-</body>
-</html>
+    <!-- Təsdiqlənmiş Rəylər -->
+    <div class="reviews-container">
+        {% for rey in reyler %}
+        <div class="review-card">
+            <div class="review-header">
+                <div class="reviewer-info">
+                    {% if rey.musteri.profile.sekil %}
+                        <img src="{{ rey.musteri.profile.sekil.url }}" alt="Profile">
+                    {% else %}
+                        <img src="{% static 'img/default-avatar.png' %}" alt="Default Profile">
+                    {% endif %}
+                    <div class="reviewer-details">
+                        <h4>{{ rey.musteri.profile.tam_ad|default:rey.musteri.username }}</h4>
+                        <div class="rating">
+                            {% for i in "12345"|make_list %}
+                            <i class="fas fa-star {% if forloop.counter <= rey.qiymetlendirme %}active{% endif %}"></i>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="review-date">
+                    {{ rey.tarix|date:"d.m.Y" }}
+                </div>
+            </div>
+            <div class="review-content">
+                {{ rey.rey }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="{% static 'js/main.js' %}"></script>
+{% endblock %}

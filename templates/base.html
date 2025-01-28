@@ -240,18 +240,7 @@
 
     <!-- Common Scripts -->
      <script>
-        // Səbət sayını yenilə
-function updateCartCount() {
-    fetch('/get_cart_count/')
-        .then(response => response.json())
-        .then(data => {
-            const cartCount = document.getElementById('cart-count');
-            if (cartCount) {
-                cartCount.textContent = data.count;
-            }
-        })
-        .catch(error => console.error('Error:', error));
-}
+
 
         // Saat elementlərini əldə et
 const currentTimeElement = document.getElementById('current-time');
@@ -272,8 +261,7 @@ function updateCurrentTime() {
         `;
     }
 }
-// Səbət sayını yenilə
-updateCartCount();
+
 // İş saatlarını yoxla və bildiriş göstər
 function checkWorkingHours() {
     const now = new Date();

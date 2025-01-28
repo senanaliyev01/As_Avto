@@ -239,6 +239,74 @@
     </footer>
 
     <!-- Common Scripts -->
+     <script>
+        // Səbət sayını yenilə
+function updateCartCount() {
+    fetch('/get_cart_count/')
+        .then(response => response.json())
+        .then(data => {
+            const cartCount = document.getElementById('cart-count');
+            if (cartCount) {
+                cartCount.textContent = data.count;
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+        // Saat elementlərini əldə et
+const currentTimeElement = document.getElementById('current-time');
+
+// Təkmilləşdirilmiş saat funksiyası
+function updateCurrentTime() {
+    if (currentTimeElement) {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        
+        // Animasiyalı rəqəm dəyişməsi
+        currentTimeElement.innerHTML = `
+            <span class="time-unit">${hours}</span>:
+            <span class="time-unit">${minutes}</span>:
+            <span class="time-unit">${seconds}</span>
+        `;
+    }
+}
+// Səbət sayını yenilə
+updateCartCount();
+// İş saatlarını yoxla və bildiriş göstər
+function checkWorkingHours() {
+    const now = new Date();
+    const currentHour = now.getHours();
+    const isWorkingHours = currentHour >= 9 && currentHour < 18;
+    
+    const workingHoursElement = document.querySelector('.working-hours p:first-child');
+    if (workingHoursElement) {
+        workingHoursElement.style.color = isWorkingHours ? '#4caf50' : '#ff5252';
+        workingHoursElement.innerHTML = `İş vaxtımız: 09:00 - 18:00 
+            <span class="status-badge" style="margin-left: 10px; font-size: 0.9em;">
+                ${isWorkingHours ? '🟢 Açıqdır' : '🔴 Bağlıdır'}
+            </span>`;
+    }
+}
+
+// DOM yükləndikdə
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        // Saatı başlat
+        updateCurrentTime();
+        setInterval(updateCurrentTime, 1000);
+
+        // İş saatlarını yoxla
+        checkWorkingHours();
+        setInterval(checkWorkingHours, 60000); // Hər dəqiqə yoxla
+
+    } catch (error) {
+        console.error('Saat funksiyası xətası:', error);
+    }
+});
+
+     </script>
     <script src="{% static 'js/loading.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>

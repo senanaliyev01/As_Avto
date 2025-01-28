@@ -214,7 +214,7 @@ body {
 
 .count {
     min-width: 50px;
-    text-align: right;
+    text-align: center;
     color: var(--text-secondary);
 }
 

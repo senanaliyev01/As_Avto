@@ -18,32 +18,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // Ümumi məbləği yeniləmə funksiyası
     function updateTotalAmount() {
         const rows = document.querySelectorAll('tbody tr');
-        let totalAmount = 0;
+        let total = 0;
 
         rows.forEach(row => {
-            const priceText = row.querySelector('.price').textContent;
-            const quantity = parseInt(row.querySelector('.quantity-input').value);
-            
-            // Qiyməti təmizlə və ədədə çevir
-            const price = parseFloat(priceText.replace(/[^0-9.]/g, ''));
-            
-            // Dəqiq hesablama üçün
-            const itemTotal = (price * quantity).toFixed(2);
-            totalAmount += parseFloat(itemTotal);
-            
-            // Sətrin cəmini yenilə
-            row.querySelector('.item-total').textContent = `${itemTotal} AZN`;
+            const itemTotal = parseFloat(row.querySelector('.item-total').textContent);
+            total += itemTotal;
         });
 
-        // Ümumi məbləği yenilə (2 rəqəm dəqiqliklə)
-        const totalAmountElement = document.getElementById('total-amount');
-        if (totalAmountElement) {
-            totalAmountElement.textContent = `${totalAmount.toFixed(2)} AZN`;
+        const totalElement = document.getElementById('total-amount');
+        if (totalElement) {
+            totalElement.textContent = total.toFixed(2) + ' AZN';
             
-            // Animasiya effekti
-            totalAmountElement.style.animation = 'none';
-            totalAmountElement.offsetHeight; // Reflow
-            totalAmountElement.style.animation = 'highlight 0.5s ease-out';
+            // Animasiya
+            totalElement.style.animation = 'fadeIn 0.3s ease';
         }
     }
 
@@ -255,49 +242,47 @@ document.addEventListener('DOMContentLoaded', function() {
             // Loading ikonu əlavə et
             confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Silinir...';
 
-            fetch(`/sebet/sil/${itemId}/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': getCookie('csrftoken')
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
+        fetch(`/sebet/sil/${itemId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
                     closeDeleteModal(modal);
                     
-                    const row = document.querySelector(`tr[data-item-id="${itemId}"]`);
+                const row = document.querySelector(`tr[data-item-id="${itemId}"]`);
                     if (row) {
                         // Sətri animasiya ilə sil
                         row.style.transition = 'all 0.3s ease';
                         row.style.transform = 'translateX(100%)';
                         row.style.opacity = '0';
-                        
-                        setTimeout(() => {
-                            row.remove();
-                            // Əvvəlcə ümumi məbləği yenilə
+                
+                setTimeout(() => {
+                    row.remove();
                             updateTotalAmount();
-                            // Sonra səbət sayını yenilə
                             updateCartCount();
                             
                             // Bildiriş göstər
                             showNotification('Məhsul səbətdən silindi', 'success');
-                            
-                            // Səbət boşdursa səhifəni yenilə
-                            if (document.querySelectorAll('tbody tr').length === 0) {
-                                location.reload();
-                            }
-                        }, 300);
+                    
+                    // Səbət boşdursa səhifəni yenilə
+                    if (document.querySelectorAll('tbody tr').length === 0) {
+                        location.reload();
                     }
-                } else {
+                }, 300);
+                    }
+            } else {
                     closeDeleteModal(modal);
-                    showNotification(data.message || 'Xəta baş verdi', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Xəta:', error);
+                showNotification(data.message || 'Xəta baş verdi', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Xəta:', error);
                 closeDeleteModal(modal);
-                showNotification('Xəta baş verdi', 'error');
+            showNotification('Xəta baş verdi', 'error');
             });
         });
     };
@@ -481,12 +466,12 @@ document.addEventListener('DOMContentLoaded', function() {
             modalContent.style.transform = 'scale(1)';
             modalContent.style.opacity = '1';
         }, 10);
-        
-        // Modal xaricində klikləmə
+
+    // Modal xaricində klikləmə
         modal.addEventListener('click', function(e) {
             if (e.target === modal) {
-                closeModal();
-            }
+            closeModal();
+        }
         });
     };
 
@@ -661,21 +646,6 @@ document.addEventListener('DOMContentLoaded', function() {
             to {
                 transform: scale(1);
                 opacity: 1;
-            }
-        }
-
-        @keyframes highlight {
-            0% {
-                transform: scale(1);
-                color: #64ffda;
-            }
-            50% {
-                transform: scale(1.1);
-                color: #64ffda;
-            }
-            100% {
-                transform: scale(1);
-                color: white;
             }
         }
     `;

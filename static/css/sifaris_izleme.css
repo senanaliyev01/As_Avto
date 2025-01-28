@@ -461,9 +461,7 @@ tfoot td {
     transition: var(--transition);
 }
 
-.progress-step.active {
-    color: var(--primary-color);
-}
+
 
 .progress-step i {
     font-size: 2rem;

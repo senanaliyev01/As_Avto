@@ -98,27 +98,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Məhsul silmə funksiyası
     window.removeItem = function(itemId) {
+        // Mövcud modalı təmizlə
+        const existingModal = document.querySelector('.delete-confirmation-modal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+
+        // Yeni modal yarat
         const modal = document.createElement('div');
         modal.className = 'delete-confirmation-modal';
-        modal.innerHTML = `
-            <div class="modal-content">
-                <div class="modal-icon">
-                    <i class="fas fa-trash-alt"></i>
-                </div>
-                <h3>Məhsulu silmək istədiyinizə əminsiniz?</h3>
-                <p>Bu əməliyyat geri qaytarıla bilməz.</p>
-                <div class="modal-buttons">
-                    <button class="cancel-btn">
-                        <i class="fas fa-times"></i> Xeyr
-                    </button>
-                    <button class="confirm-btn">
-                        <i class="fas fa-check"></i> Bəli
-                    </button>
-                </div>
-            </div>
-        `;
-
-        // Modal stilləri
         modal.style.cssText = `
             position: fixed;
             top: 0;
@@ -129,53 +117,131 @@ document.addEventListener('DOMContentLoaded', function() {
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            z-index: 9999;
         `;
 
-        const modalContent = modal.querySelector('.modal-content');
+        // Modal məzmunu
+        const modalContent = document.createElement('div');
+        modalContent.className = 'modal-content';
         modalContent.style.cssText = `
             background: linear-gradient(145deg, #0a1929, #1a2942);
-            padding: 2.5rem;
-            border-radius: 20px;
+            padding: 2rem;
+            border-radius: 15px;
             text-align: center;
             max-width: 400px;
             width: 90%;
-            color: #fff;
             position: relative;
             transform: scale(0.7);
-            transition: transform 0.3s ease;
+            opacity: 0;
+            transition: all 0.3s ease;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         `;
 
+        modalContent.innerHTML = `
+            <div class="modal-icon" style="
+                width: 70px;
+                height: 70px;
+                background: #ff5252;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 20px;
+            ">
+                <i class="fas fa-trash-alt" style="font-size: 30px; color: white;"></i>
+            </div>
+            <h3 style="color: white; margin-bottom: 10px; font-size: 1.5rem;">
+                Məhsulu silmək istədiyinizə əminsiniz?
+            </h3>
+            <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 25px;">
+                Bu əməliyyat geri qaytarıla bilməz.
+            </p>
+            <div class="modal-buttons" style="
+                display: flex;
+                gap: 15px;
+                justify-content: center;
+            ">
+                <button class="cancel-btn" style="
+                    padding: 12px 25px;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-weight: 600;
+                    background: #e0e0e0;
+                    color: #333;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    transition: transform 0.2s ease;
+                ">
+                    <i class="fas fa-times"></i> Xeyr
+                </button>
+                <button class="confirm-btn" style="
+                    padding: 12px 25px;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-weight: 600;
+                    background: #ff5252;
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    transition: transform 0.2s ease;
+                ">
+                    <i class="fas fa-check"></i> Bəli
+                </button>
+            </div>
+        `;
+
+        modal.appendChild(modalContent);
         document.body.appendChild(modal);
-        requestAnimationFrame(() => {
-            modal.style.opacity = '1';
+
+        // Modal animasiyası
+        setTimeout(() => {
             modalContent.style.transform = 'scale(1)';
+            modalContent.style.opacity = '1';
+        }, 10);
+
+        // Hover effektləri
+        const buttons = modalContent.querySelectorAll('button');
+        buttons.forEach(button => {
+            button.addEventListener('mouseover', () => {
+                button.style.transform = 'translateY(-2px)';
+                button.style.boxShadow = '0 5px 15px rgba(0,0,0,0.2)';
+            });
+            button.addEventListener('mouseout', () => {
+                button.style.transform = 'translateY(0)';
+                button.style.boxShadow = 'none';
+            });
         });
 
-        // Modalın xaricində klikləmə
+        // Modal xaricində klikləmə
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
-                modalContent.style.transform = 'scale(0.7)';
-                modal.style.opacity = '0';
-                setTimeout(() => modal.remove(), 300);
+                closeDeleteModal(modal);
             }
         });
 
-        // Təsdiq və ləğv düymələri
-        modal.querySelector('.cancel-btn').onclick = () => {
-            modalContent.style.transform = 'scale(0.7)';
-            modal.style.opacity = '0';
-            setTimeout(() => modal.remove(), 300);
-        };
+        // Ləğv et düyməsi
+        modalContent.querySelector('.cancel-btn').addEventListener('click', () => {
+            closeDeleteModal(modal);
+        });
 
-        modal.querySelector('.confirm-btn').onclick = () => {
-            modalContent.style.transform = 'scale(0.7)';
-            modal.style.opacity = '0';
-            
+        // Təsdiq düyməsi
+        modalContent.querySelector('.confirm-btn').addEventListener('click', () => {
+            // Düyməni deaktiv et
+            const confirmBtn = modalContent.querySelector('.confirm-btn');
+            const cancelBtn = modalContent.querySelector('.cancel-btn');
+            confirmBtn.disabled = true;
+            cancelBtn.disabled = true;
+            confirmBtn.style.opacity = '0.7';
+            cancelBtn.style.opacity = '0.7';
+
+            // Loading ikonu əlavə et
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Silinir...';
+
             fetch(`/sebet/sil/${itemId}/`, {
                 method: 'POST',
                 headers: {
@@ -185,98 +251,51 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    const row = document.querySelector(`tr[data-item-id="${itemId}"]`);
-                    row.style.animation = 'slideOut 0.3s ease forwards';
+                    closeDeleteModal(modal);
                     
-                    setTimeout(() => {
-                        row.remove();
-                        updateTotalAmount();
-                        updateCartCount();
-                        showNotification('Məhsul səbətdən silindi', 'success');
+                    const row = document.querySelector(`tr[data-item-id="${itemId}"]`);
+                    if (row) {
+                        // Sətri animasiya ilə sil
+                        row.style.transition = 'all 0.3s ease';
+                        row.style.transform = 'translateX(100%)';
+                        row.style.opacity = '0';
                         
-                        if (document.querySelectorAll('tbody tr').length === 0) {
-                            location.reload();
-                        }
-                    }, 300);
+                        setTimeout(() => {
+                            row.remove();
+                            updateTotalAmount();
+                            updateCartCount();
+                            
+                            // Bildiriş göstər
+                            showNotification('Məhsul səbətdən silindi', 'success');
+                            
+                            // Səbət boşdursa səhifəni yenilə
+                            if (document.querySelectorAll('tbody tr').length === 0) {
+                                location.reload();
+                            }
+                        }, 300);
+                    }
                 } else {
+                    closeDeleteModal(modal);
                     showNotification(data.message || 'Xəta baş verdi', 'error');
                 }
             })
             .catch(error => {
                 console.error('Xəta:', error);
+                closeDeleteModal(modal);
                 showNotification('Xəta baş verdi', 'error');
             });
-
-            setTimeout(() => modal.remove(), 300);
-        };
-
-        // Modal düymələrinin stilləri
-        const buttons = modal.querySelectorAll('button');
-        buttons.forEach(button => {
-            button.style.cssText = `
-                padding: 12px 25px;
-                border: none;
-                border-radius: 8px;
-                cursor: pointer;
-                font-weight: 600;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                transition: transform 0.2s ease;
-            `;
         });
-
-        const confirmBtn = modal.querySelector('.confirm-btn');
-        confirmBtn.style.cssText += `
-            background: #ff5252;
-            color: #fff;
-        `;
-
-        const cancelBtn = modal.querySelector('.cancel-btn');
-        cancelBtn.style.cssText += `
-            background: #e0e0e0;
-            color: #333;
-        `;
-
-        // Modal ikonunun stili
-        const modalIcon = modal.querySelector('.modal-icon');
-        modalIcon.style.cssText = `
-            width: 70px;
-            height: 70px;
-            background: #ff5252;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-        `;
-
-        modalIcon.querySelector('i').style.cssText = `
-            font-size: 30px;
-            color: #fff;
-        `;
-
-        // Modal mətnlərinin stilləri
-        const modalTitle = modal.querySelector('h3');
-        modalTitle.style.cssText = `
-            color: #fff;
-            margin-bottom: 10px;
-            font-size: 1.5rem;
-        `;
-
-        const modalText = modal.querySelector('p');
-        modalText.style.cssText = `
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 25px;
-        `;
-
-        const modalButtons = modal.querySelector('.modal-buttons');
-        modalButtons.style.cssText = `
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-        `;
     };
+
+    // Modal bağlama funksiyası
+    function closeDeleteModal(modal) {
+        const modalContent = modal.querySelector('.modal-content');
+        modalContent.style.transform = 'scale(0.7)';
+        modalContent.style.opacity = '0';
+        setTimeout(() => {
+            modal.remove();
+        }, 300);
+    }
 
     // Səbət sayını yeniləmə funksiyası
     function updateCartCount() {

@@ -434,37 +434,95 @@ document.addEventListener('DOMContentLoaded', function() {
         const modal = document.getElementById(modalId);
         const modalContent = modal.querySelector('.modal-content');
         
+        // Bağlanma animasiyası
         modalContent.style.transform = 'scale(0.7)';
         modalContent.style.opacity = '0';
         
         setTimeout(() => {
-            modal.classList.remove('show');
-            modalContent.style.transform = '';
-            modalContent.style.opacity = '';
-        }, 300);
+            modal.style.opacity = '0';
+            setTimeout(() => {
+                modal.style.display = 'none';
+                modalContent.style.transform = 'scale(1)';
+                modalContent.style.opacity = '1';
+            }, 300);
+        }, 200);
     };
 
     window.confirmOrder = function() {
         const modal = document.getElementById('confirmModal');
-        modal.classList.add('show');
-        
         const modalContent = modal.querySelector('.modal-content');
+        
+        // Modal və content-i sıfırla
+        modal.style.opacity = '0';
         modalContent.style.transform = 'scale(0.7)';
         modalContent.style.opacity = '0';
         
-        requestAnimationFrame(() => {
+        // Modalı göstər
+        modal.style.display = 'flex';
+        
+        // Açılma animasiyası
+        setTimeout(() => {
+            modal.style.opacity = '1';
             modalContent.style.transform = 'scale(1)';
             modalContent.style.opacity = '1';
+        }, 10);
+        
+        // Modal xaricində klikləmə
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
         });
     };
 
-    // Modal xaricində klikləmə
-    window.onclick = function(event) {
-        const modal = document.getElementById('confirmModal');
-        if (event.target === modal) {
-            closeModal();
-        }
-    };
+    // Uğurlu sifariş modalını göstər
+    function showSuccessModal() {
+        const modal = document.getElementById('successModal');
+        const modalContent = modal.querySelector('.modal-content');
+        
+        // Modal və content-i sıfırla
+        modal.style.opacity = '0';
+        modalContent.style.transform = 'scale(0.7)';
+        modalContent.style.opacity = '0';
+        
+        // Modalı göstər
+        modal.style.display = 'flex';
+        
+        // Açılma animasiyası
+        setTimeout(() => {
+            modal.style.opacity = '1';
+            modalContent.style.transform = 'scale(1)';
+            modalContent.style.opacity = '1';
+        }, 10);
+        
+        // Modal xaricində klikləmə
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeSuccessModal();
+            }
+        });
+    }
+
+    // Uğurlu sifariş modalını bağla
+    function closeSuccessModal() {
+        const modal = document.getElementById('successModal');
+        const modalContent = modal.querySelector('.modal-content');
+        
+        // Bağlanma animasiyası
+        modalContent.style.transform = 'scale(0.7)';
+        modalContent.style.opacity = '0';
+        
+        setTimeout(() => {
+            modal.style.opacity = '0';
+            setTimeout(() => {
+                modal.style.display = 'none';
+                modalContent.style.transform = 'scale(1)';
+                modalContent.style.opacity = '1';
+                // Səhifəni yenilə
+                window.location.href = '/';
+            }, 300);
+        }, 200);
+    }
 
     // CSS stilləri əlavə et
     const style = document.createElement('style');

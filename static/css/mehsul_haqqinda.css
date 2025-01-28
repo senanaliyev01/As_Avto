@@ -135,7 +135,7 @@ header {
     transform: translateY(-1px);
 }
 
-/* Main Container */
+/* Product Info Section */
 .mehsul-container {
     max-width: 1200px;
     margin: 2rem auto;
@@ -145,7 +145,6 @@ header {
     align-items: center;
 }
 
-/* Product Info Section */
 .mehsul-info {
     display: grid;
     grid-template-columns: auto 1fr;
@@ -197,18 +196,15 @@ header {
     filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4));
 }
 
-/* Şəkil hover effekti */
 .product-image:hover {
     transform: scale(1.02);
 }
 
-/* Şəkil aktiv olduqda */
 .product-image:active {
     cursor: grabbing;
     transform: scale(0.98);
 }
 
-/* Şəkil konteynerinin kölgə effekti */
 .model-viewer-container::after {
     content: '';
     position: absolute;

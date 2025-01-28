@@ -90,6 +90,7 @@ body {
 
 .product-image:active {
     cursor: grabbing;
+    transform: scale(0.98);
 }
 
 /* Product Details */

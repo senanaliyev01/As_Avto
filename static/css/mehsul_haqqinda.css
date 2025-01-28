@@ -36,20 +36,20 @@ header {
     justify-content: space-between;
     align-items: center;
     max-width: 1200px;
-    margin: 0 auto;
+    margin: 0 auto 2rem;
     padding: 0 1rem;
 }
 
 .back-button {
     background: rgba(255, 255, 255, 0.1);
-    color: #64ffda;
+    color: var(--accent-color);
     padding: 0.8rem 1.5rem;
     border-radius: 8px;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     gap: 0.8rem;
-    transition: all 0.3s ease;
+    transition: var(--transition);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(100, 255, 218, 0.2);
 }
@@ -145,12 +145,13 @@ header {
     align-items: center;
 }
 
+/* Product Info */
 .mehsul-info {
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 2rem;
     align-items: start;
-    background: linear-gradient(145deg, #0d2b4d 0%, #1a4980 100%);
+    background: linear-gradient(145deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     padding: 2rem;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
@@ -224,7 +225,7 @@ header {
 }
 
 .mehsul-details h1 {
-    color: #64ffda;
+    color: var(--accent-color);
     margin: 0 0 2rem 0;
     font-size: 2.2rem;
     border-bottom: 2px solid rgba(100, 255, 218, 0.2);
@@ -243,7 +244,7 @@ header {
     padding: 1.2rem;
     background: rgba(13, 43, 77, 0.5);
     border-radius: 12px;
-    transition: all 0.3s ease;
+    transition: var(--transition);
     border: 1px solid rgba(100, 255, 218, 0.1);
     backdrop-filter: blur(5px);
 }
@@ -256,22 +257,22 @@ header {
 
 .label {
     font-weight: 600;
-    color: #64ffda;
+    color: var(--accent-color);
     width: 130px;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .value {
-    color: #e6f1ff;
+    color: var(--text-primary);
 }
 
 .price-item {
-    background: linear-gradient(135deg, #1a4980 0%, #2a5788 100%);
+    background: linear-gradient(135deg, var(--secondary-color) 0%, #2a5788 100%);
     border: none;
 }
 
 .price {
-    color: #64ffda;
+    color: var(--accent-color);
     font-size: 1.6rem;
     font-weight: 700;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -295,9 +296,9 @@ header {
     padding: 0.5rem 1rem;
     border-radius: 6px;
     font-size: 0.9rem;
-    color: #64ffda;
+    color: var(--accent-color);
     border: 1px solid rgba(100, 255, 218, 0.2);
-    transition: all 0.3s ease;
+    transition: var(--transition);
 }
 
 .oem-code:hover {
@@ -310,7 +311,7 @@ header {
     margin: 3rem auto;
     width: 100%;
     max-width: 1500px;
-    background: linear-gradient(145deg, #0d2b4d 0%, #1a4980 100%);
+    background: linear-gradient(145deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     border-radius: 20px;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
     border: 2px solid rgba(100, 255, 218, 0.15);
@@ -319,7 +320,7 @@ header {
 }
 
 .description h2 {
-    color: #64ffda;
+    color: var(--accent-color);
     font-size: 2rem;
     margin-bottom: 2rem;
     padding-bottom: 1rem;
@@ -337,12 +338,12 @@ header {
     transform: translateX(-50%);
     width: 100px;
     height: 2px;
-    background: #64ffda;
+    background: var(--accent-color);
     box-shadow: 0 0 10px rgba(100, 255, 218, 0.5);
 }
 
 .description p {
-    color: #e6f1ff;
+    color: var(--text-primary);
     font-size: 1.1rem;
     line-height: 1.8;
     text-align: justify;
@@ -360,7 +361,7 @@ header {
 .brand-info {
     margin-top: 3rem;
     padding: 2.5rem;
-    background: linear-gradient(145deg, #0d2b4d 0%, #1a4980 100%);
+    background: linear-gradient(145deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(100, 255, 218, 0.1);
@@ -369,7 +370,7 @@ header {
 }
 
 .brand-info h2 {
-    color: #64ffda;
+    color: var(--accent-color);
     margin: 0 0 2rem 0;
     padding-bottom: 1rem;
     border-bottom: 2px solid rgba(100, 255, 218, 0.2);
@@ -419,11 +420,7 @@ header {
     text-align: center;
 }
 
-/* Mövcudluq statusları */
-.stock-item {
-    margin-bottom: 1rem;
-}
-
+/* Stock Status */
 .stock-status {
     display: flex;
     align-items: center;
@@ -437,54 +434,55 @@ header {
     font-size: 1.1rem;
 }
 
-/* Yoxdur */
 .out-of-stock {
     background: rgba(220, 38, 38, 0.2);
     color: #ff4d4d;
     border: 1px solid rgba(220, 38, 38, 0.3);
 }
 
-.out-of-stock i {
-    color: #ff4d4d;
-}
-
-/* Az var */
 .low-stock {
     background: rgba(245, 158, 11, 0.2);
     color: #ffd700;
     border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
-.low-stock i {
-    color: #ffd700;
-}
-
-/* Var */
 .in-stock {
     background: rgba(16, 185, 129, 0.2);
     color: #4ade80;
     border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
-.in-stock i {
-    color: #4ade80;
+/* Brand Images */
+.marka-image {
+    display: block;
+    max-width: 100px;
+    max-height: 100px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    margin: 5px;
+    background: transparent;
+    transition: transform 0.2s ease;
 }
 
-/* Hover effektləri */
-.stock-status:hover {
-    transform: translateX(5px);
+.marka-image:hover {
+    transform: scale(1.05);
 }
 
-.out-of-stock:hover {
-    background: rgba(220, 38, 38, 0.3);
+.marka-image-pr-list {
+    display: block;
+    max-width: 60px;
+    max-height: 60px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    margin: 5px;
+    background: transparent;
+    transition: transform 0.2s ease;
 }
 
-.low-stock:hover {
-    background: rgba(245, 158, 11, 0.3);
-}
-
-.in-stock:hover {
-    background: rgba(16, 185, 129, 0.3);
+.marka-image-pr-list:hover {
+    transform: scale(1.05);
 }
 
 /* Responsive Design */
@@ -572,36 +570,4 @@ header {
         font-size: 1rem;
         padding: 1rem;
     }
-} 
-
-.marka-image {
-    display: block;
-    max-width: 100px;
-    max-height: 100px;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    margin: 5px;
-    background: transparent;
-    transition: transform 0.2s ease;
-}
-
-.marka-image:hover {
-    transform: scale(1.05);
-}
-
-.marka-image-pr-list {
-    display: block;
-    max-width: 60px;
-    max-height: 60px;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    margin: 5px;
-    background: transparent;
-    transition: transform 0.2s ease;
-}
-
-.marka-image-pr-list:hover {
-    transform: scale(1.05);
 }

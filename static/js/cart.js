@@ -18,19 +18,32 @@ document.addEventListener('DOMContentLoaded', function() {
     // Ümumi məbləği yeniləmə funksiyası
     function updateTotalAmount() {
         const rows = document.querySelectorAll('tbody tr');
-        let total = 0;
+        let totalAmount = 0;
 
         rows.forEach(row => {
-            const itemTotal = parseFloat(row.querySelector('.item-total').textContent);
-            total += itemTotal;
+            const priceText = row.querySelector('.price').textContent;
+            const quantity = parseInt(row.querySelector('.quantity-input').value);
+            
+            // Qiyməti təmizlə və ədədə çevir
+            const price = parseFloat(priceText.replace(/[^0-9.]/g, ''));
+            
+            // Dəqiq hesablama üçün
+            const itemTotal = (price * quantity).toFixed(2);
+            totalAmount += parseFloat(itemTotal);
+            
+            // Sətrin cəmini yenilə
+            row.querySelector('.item-total').textContent = `${itemTotal} AZN`;
         });
 
-        const totalElement = document.getElementById('total-amount');
-        if (totalElement) {
-            totalElement.textContent = total.toFixed(2) + ' AZN';
+        // Ümumi məbləği yenilə (2 rəqəm dəqiqliklə)
+        const totalAmountElement = document.getElementById('total-amount');
+        if (totalAmountElement) {
+            totalAmountElement.textContent = `${totalAmount.toFixed(2)} AZN`;
             
-            // Animasiya
-            totalElement.style.animation = 'fadeIn 0.3s ease';
+            // Animasiya effekti
+            totalAmountElement.style.animation = 'none';
+            totalAmountElement.offsetHeight; // Reflow
+            totalAmountElement.style.animation = 'highlight 0.5s ease-out';
         }
     }
 
@@ -262,7 +275,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         
                         setTimeout(() => {
                             row.remove();
+                            // Əvvəlcə ümumi məbləği yenilə
                             updateTotalAmount();
+                            // Sonra səbət sayını yenilə
                             updateCartCount();
                             
                             // Bildiriş göstər
@@ -646,6 +661,21 @@ document.addEventListener('DOMContentLoaded', function() {
             to {
                 transform: scale(1);
                 opacity: 1;
+            }
+        }
+
+        @keyframes highlight {
+            0% {
+                transform: scale(1);
+                color: #64ffda;
+            }
+            50% {
+                transform: scale(1.1);
+                color: #64ffda;
+            }
+            100% {
+                transform: scale(1);
+                color: white;
             }
         }
     `;

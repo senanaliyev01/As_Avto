@@ -320,7 +320,6 @@ addToCartButtons.forEach(button => {
 });
 });
 
-
 document.addEventListener('DOMContentLoaded', function() {
     const searchForm = document.querySelector('form');
     const searchButton = document.getElementById('search-button');

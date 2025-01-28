@@ -240,9 +240,10 @@
 
     <!-- Common Scripts -->
     <script>
-        // Saat funksiyaları
+        // Saat elementlərini əldə et
         const currentTimeElement = document.getElementById('current-time');
 
+        // Təkmilləşdirilmiş saat funksiyası
         function updateCurrentTime() {
             if (currentTimeElement) {
                 const now = new Date();
@@ -250,6 +251,7 @@
                 const minutes = now.getMinutes().toString().padStart(2, '0');
                 const seconds = now.getSeconds().toString().padStart(2, '0');
                 
+                // Animasiyalı rəqəm dəyişməsi
                 currentTimeElement.innerHTML = `
                     <span class="time-unit">${hours}</span>:
                     <span class="time-unit">${minutes}</span>:
@@ -258,6 +260,7 @@
             }
         }
 
+        // İş saatlarını yoxla və bildiriş göstər
         function checkWorkingHours() {
             const now = new Date();
             const currentHour = now.getHours();
@@ -295,7 +298,7 @@
 
                 // İş saatlarını yoxla
                 checkWorkingHours();
-                setInterval(checkWorkingHours, 60000);
+                setInterval(checkWorkingHours, 60000); // Hər dəqiqə yoxla
 
                 // Səbət sayını yenilə
                 updateCartCount();

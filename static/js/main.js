@@ -108,19 +108,6 @@ function animateCount(element, target) {
     animate();
 }
 
-// Səbət sayını yenilə
-function updateCartCount() {
-    fetch('/get_cart_count/')
-        .then(response => response.json())
-        .then(data => {
-            const cartCount = document.getElementById('cart-count');
-            if (cartCount) {
-                cartCount.textContent = data.count;
-            }
-        })
-        .catch(error => console.error('Error:', error));
-}
-
 // Statistika yeniləmə funksiyası
 function updateStatistics() {
     fetch('/get_statistics/', {
@@ -177,9 +164,6 @@ document.addEventListener('DOMContentLoaded', function() {
     updateStatistics();
     setInterval(updateStatistics, 1000);
 
-    // Səbət sayını yenilə
-    updateCartCount();
-
     // Rəy formu
     const reviewForm = document.querySelector('.review-form form');
     if (reviewForm) {
@@ -208,14 +192,21 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showReviewNotification('success', 'Rəyiniz uğurla göndərildi. Təsdiqlənməsi gözlənilir');
+                    showReviewNotification(
+                        "Rəyiniz uğurla göndərildi. Təsdiqlənməsi gözlənilir.", 
+                        false, 
+                        data.mehsul
+                    );
                     reviewForm.reset();
                 } else {
-                    showReviewNotification('error', data.message || 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin');
+                    showReviewNotification(
+                        data.error || "Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.", 
+                        true
+                    );
                 }
             })
             .catch(error => {
-                showReviewNotification('error', 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin');
+                showReviewNotification("Serverdə xəta baş verdi.", true);
             });
         });
     }
@@ -237,37 +228,71 @@ function getCookie(name) {
     return cookieValue;
 }
 
-function showReviewNotification(type, message) {
-    const existingNotification = document.querySelector('.review-notification');
-    if (existingNotification) {
-        existingNotification.remove();
-    }
-
-    const notification = document.createElement('div');
-    notification.className = `review-notification ${type}`;
-    notification.innerHTML = `
-        <div class="icon">
-            <i class="fas fa-${type === 'success' ? 'check' : 'exclamation-circle'}"></i>
+function showReviewNotification(message, isError = false, mehsulData = null) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'animated-message';
+    
+    messageDiv.innerHTML = `
+        <div class="message-content">
+            ${!isError ? `
+                <div class="success-checkmark">
+                    <div class="check-icon">
+                        <i class="fas fa-check"></i>
                     </div>
-        <div class="content">
-            <h4>${type === 'success' ? 'Uğurlu!' : 'Xəta!'}</h4>
-            <p>${message}</p>
                 </div>
-        <div class="progress">
-            <div class="progress-bar"></div>
+                <div class="message-text">
+                    ${message}
+                    ${mehsulData && mehsulData.adi ? `
+                        <div class="product-info">
+                            ${mehsulData.sekil ? 
+                                `<img src="${mehsulData.sekil}" alt="${mehsulData.adi}" class="product-image">` 
+                                : ''
+                            }
+                            <span class="product-name">${mehsulData.adi}</span>
+                            <span class="product-name">${mehsulData.oem}</span>
+                        </div>
+                    ` : ''}
+                </div>
+            ` : `
+                <div class="error-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div class="message-text">${message}</div>
+            `}
         </div>
     `;
 
-    document.body.appendChild(notification);
+    // Stil əlavə et
+    Object.assign(messageDiv.style, {
+        position: 'fixed',
+        top: '20px',
+        right: '-400px',
+        backgroundColor: isError ? '#dc3545' : '#ffffff',
+        color: isError ? '#ffffff' : '#333333',
+        padding: '15px 25px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 15px rgba(0, 0, 0, 0.15)',
+        zIndex: '1000',
+        transition: 'all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+        minWidth: '300px',
+        border: isError ? 'none' : '1px solid #eee'
+    });
 
-    setTimeout(() => {
-        notification.classList.add('show');
-    }, 100);
+    document.body.appendChild(messageDiv);
 
+    // Mesajın görünməsi
+    requestAnimationFrame(() => {
+        messageDiv.style.right = '20px';
+        messageDiv.style.transform = 'translateY(0)';
+    });
+
+    // 3 saniyədən sonra mesajın yox olması
     setTimeout(() => {
-        notification.classList.remove('show');
+        messageDiv.style.right = '-400px';
+        messageDiv.style.transform = 'translateY(10px)';
+        
         setTimeout(() => {
-            notification.remove();
+            document.body.removeChild(messageDiv);
         }, 500);
     }, 3000);
 }

@@ -36,63 +36,156 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Bildiriş göstərmə funksiyası
     function showNotification(message, type = 'success') {
-        const notification = document.getElementById('notification');
-        notification.textContent = message;
-        notification.className = `notification ${type}`;
-        notification.classList.add('show');
+        const existingNotification = document.querySelector('.notification');
+        if (existingNotification) {
+            existingNotification.remove();
+        }
 
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <div class="notification-icon">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                </div>
+                <div class="notification-message">${message}</div>
+            </div>
+            <div class="notification-progress"></div>
+        `;
+
+        document.body.appendChild(notification);
+
+        // CSS stilləri
+        Object.assign(notification.style, {
+            position: 'fixed',
+            top: '20px',
+            right: '-400px',
+            backgroundColor: type === 'success' ? '#4CAF50' : '#f44336',
+            color: '#fff',
+            padding: '15px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
+            zIndex: '1000',
+            transition: 'all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+            minWidth: '300px'
+        });
+
+        // Bildirişi göstər
         setTimeout(() => {
-            notification.classList.remove('show');
+            notification.style.right = '20px';
+        }, 100);
+
+        // Progress bar animasiyası
+        const progress = notification.querySelector('.notification-progress');
+        progress.style.cssText = `
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.5);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            border-radius: 0 0 8px 8px;
+            animation: progress 3s linear forwards;
+        `;
+
+        // 3 saniyədən sonra bildirişi gizlət
+        setTimeout(() => {
+            notification.style.right = '-400px';
+            notification.style.opacity = '0';
+            setTimeout(() => notification.remove(), 500);
         }, 3000);
     }
 
     // Məhsul silmə funksiyası
     window.removeItem = function(itemId) {
-        if (!confirm('Bu məhsulu silmək istədiyinizə əminsiniz?')) return;
+        const modal = document.createElement('div');
+        modal.className = 'delete-confirmation-modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-icon">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+                <h3>Məhsulu silmək istədiyinizə əminsiniz?</h3>
+                <p>Bu əməliyyat geri qaytarıla bilməz.</p>
+                <div class="modal-buttons">
+                    <button class="cancel-btn">
+                        <i class="fas fa-times"></i> Xeyr
+                    </button>
+                    <button class="confirm-btn">
+                        <i class="fas fa-check"></i> Bəli
+                    </button>
+                </div>
+            </div>
+        `;
 
-        fetch(`/sebet/sil/${itemId}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const row = document.querySelector(`tr[data-item-id="${itemId}"]`);
-                
-                // Silmədən əvvəl animasiya
-                row.style.animation = 'slideOut 0.3s ease forwards';
-                
-                setTimeout(() => {
-                    // Sətri sil
-                    row.remove();
-                    
-                    // Ümumi cəmi yenilə
-                    const totalElement = document.getElementById('total-amount');
-                    if (totalElement) {
-                        totalElement.textContent = data.cemi_mebleg.toFixed(2) + ' AZN';
-                        totalElement.style.animation = 'fadeIn 0.3s ease';
-                    }
-                    
-                    // Səbət boşdursa səhifəni yenilə
-                    if (document.querySelectorAll('tbody tr').length === 0) {
-                        location.reload();
-                    }
-                }, 300);
-
-                // Səbət sayını yenilə
-                updateCartCount();
-                
-                showNotification('Məhsul səbətdən silindi');
-            } else {
-                showNotification(data.message || 'Xəta baş verdi', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Xəta:', error);
-            showNotification('Xəta baş verdi', 'error');
+        // Modal stilləri
+        Object.assign(modal.style, {
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: '1000',
+            opacity: '0',
+            transition: 'opacity 0.3s ease'
         });
+
+        document.body.appendChild(modal);
+        requestAnimationFrame(() => modal.style.opacity = '1');
+
+        const modalContent = modal.querySelector('.modal-content');
+        modalContent.style.transform = 'scale(0.7)';
+        modalContent.style.transition = 'transform 0.3s ease';
+        requestAnimationFrame(() => modalContent.style.transform = 'scale(1)');
+
+        // Təsdiq və ləğv düymələri
+        modal.querySelector('.cancel-btn').onclick = () => {
+            modalContent.style.transform = 'scale(0.7)';
+            modal.style.opacity = '0';
+            setTimeout(() => modal.remove(), 300);
+        };
+
+        modal.querySelector('.confirm-btn').onclick = () => {
+            modalContent.style.transform = 'scale(0.7)';
+            modal.style.opacity = '0';
+            
+            fetch(`/sebet/sil/${itemId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const row = document.querySelector(`tr[data-item-id="${itemId}"]`);
+                    row.style.animation = 'slideOut 0.3s ease forwards';
+                    
+                    setTimeout(() => {
+                        row.remove();
+                        updateTotalAmount();
+                        updateCartCount();
+                        showNotification('Məhsul səbətdən silindi', 'success');
+                        
+                        if (document.querySelectorAll('tbody tr').length === 0) {
+                            location.reload();
+                        }
+                    }, 300);
+                } else {
+                    showNotification(data.message || 'Xəta baş verdi', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Xəta:', error);
+                showNotification('Xəta baş verdi', 'error');
+            });
+
+            setTimeout(() => modal.remove(), 300);
+        };
     };
 
     // Səbət sayını yeniləmə funksiyası
@@ -230,12 +323,30 @@ document.addEventListener('DOMContentLoaded', function() {
     // Modal funksiyaları
     window.closeModal = function(modalId = 'confirmModal') {
         const modal = document.getElementById(modalId);
-        modal.classList.remove('show');
+        const modalContent = modal.querySelector('.modal-content');
+        
+        modalContent.style.transform = 'scale(0.7)';
+        modalContent.style.opacity = '0';
+        
+        setTimeout(() => {
+            modal.classList.remove('show');
+            modalContent.style.transform = '';
+            modalContent.style.opacity = '';
+        }, 300);
     };
 
     window.confirmOrder = function() {
         const modal = document.getElementById('confirmModal');
         modal.classList.add('show');
+        
+        const modalContent = modal.querySelector('.modal-content');
+        modalContent.style.transform = 'scale(0.7)';
+        modalContent.style.opacity = '0';
+        
+        requestAnimationFrame(() => {
+            modalContent.style.transform = 'scale(1)';
+            modalContent.style.opacity = '1';
+        });
     };
 
     // Modal xaricində klikləmə
@@ -245,4 +356,132 @@ document.addEventListener('DOMContentLoaded', function() {
             closeModal();
         }
     };
+
+    // CSS stilləri əlavə et
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideOut {
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        @keyframes progress {
+            to {
+                width: 0%;
+            }
+        }
+
+        .notification {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .notification-icon {
+            font-size: 24px;
+        }
+
+        .notification-message {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .delete-confirmation-modal .modal-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .delete-confirmation-modal .modal-icon {
+            width: 70px;
+            height: 70px;
+            background: #ff5252;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .delete-confirmation-modal .modal-icon i {
+            font-size: 30px;
+            color: #fff;
+        }
+
+        .delete-confirmation-modal h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        .delete-confirmation-modal p {
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .delete-confirmation-modal .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .delete-confirmation-modal button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s ease;
+        }
+
+        .delete-confirmation-modal button:hover {
+            transform: translateY(-2px);
+        }
+
+        .delete-confirmation-modal .confirm-btn {
+            background: #ff5252;
+            color: #fff;
+        }
+
+        .delete-confirmation-modal .cancel-btn {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        #confirmModal .modal-content {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .modal.show .modal-content {
+            animation: modalShow 0.3s ease forwards;
+        }
+
+        @keyframes modalShow {
+            from {
+                transform: scale(0.7);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    `;
+
+    document.head.appendChild(style);
 });

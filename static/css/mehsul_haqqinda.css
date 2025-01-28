@@ -1,5 +1,9 @@
 /* Professional Dark Blue Theme for Product Details */
-
+body {
+    margin: 0;
+    padding: 0;
+    background: #1a237e;
+}
 /* Container Styles */
 .mehsul-container {
     max-width: 1200px;

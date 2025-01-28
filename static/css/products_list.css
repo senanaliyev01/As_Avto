@@ -55,7 +55,7 @@ body {
 
 /* Search Bar - Professional Style */
 .search-bar {
-    background: linear-gradient(135deg, #1a237e, #0d47a1);
+
     padding: 2rem;
     border-radius: 15px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
@@ -103,7 +103,7 @@ body {
     padding: 0.8rem 2rem;
     border: none;
     border-radius: 8px;
-    background: linear-gradient(135deg, #00c853, #64dd17);
+    background: linear-gradient(135deg, #0029fb, #000000);
     color: white;
     font-size: 1rem;
     font-weight: 600;
@@ -116,7 +116,7 @@ body {
 }
 
 #search-button:hover {
-    background: linear-gradient(135deg, #00e676, #76ff03);
+    background: linear-gradient(135deg, #077eee, #038eff);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }

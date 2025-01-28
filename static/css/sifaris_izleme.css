@@ -81,7 +81,6 @@ body {
 }
 
 .stat-item h3 {
-    color: var(--primary-color);
     font-size: 1.1rem;
     margin: 0 0 1rem 0;
     font-weight: 600;
@@ -90,8 +89,17 @@ body {
 .amount-info {
     font-size: 1.8rem;
     font-weight: 700;
-    color: var(--secondary-color);
+    border-radius: 12px;
+    background: #1d4ed8;   
     margin: 0;
+}
+
+.amount-info-1{
+    font-size: 1.8rem;
+    font-weight: 700;
+    border-radius: 12px;
+    background: #1d4ed8;   
+    margin: 0; 
 }
 
 .qaliq-borc {
@@ -246,7 +254,7 @@ tfoot {
 
 tfoot td {
     padding: 1.25rem 1rem;
-    color: var(--primary-color);
+
 }
 
 .text-right {

@@ -2,7 +2,7 @@
 body {
     margin: 0;
     padding: 0;
-    background: #1a237e;
+    background: #0a1929;
 }
 /* Container Styles */
 .mehsul-container {
@@ -90,7 +90,6 @@ body {
 
 .product-image:active {
     cursor: grabbing;
-    transform: scale(0.98);
 }
 
 /* Product Details */
@@ -352,7 +351,7 @@ body {
     .mehsul-info {
         grid-template-columns: 1fr;
     }
-
+    
     .model-viewer-container {
         min-width: auto;
     }
@@ -366,16 +365,16 @@ body {
     .mehsul-container {
         padding: 0 1rem;
     }
-
+    
     .mehsul-details h1 {
         font-size: 1.8rem;
     }
-
+    
     .spec-item {
         flex-direction: column;
         align-items: flex-start;
     }
-
+    
     .label {
         width: 100%;
         margin-bottom: 0.5rem;

@@ -248,11 +248,11 @@ function showReviewNotification(type, message) {
     notification.innerHTML = `
         <div class="icon">
             <i class="fas fa-${type === 'success' ? 'check' : 'exclamation-circle'}"></i>
-        </div>
+                    </div>
         <div class="content">
             <h4>${type === 'success' ? 'Uğurlu!' : 'Xəta!'}</h4>
             <p>${message}</p>
-        </div>
+                </div>
         <div class="progress">
             <div class="progress-bar"></div>
         </div>

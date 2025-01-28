@@ -154,6 +154,11 @@ footer {
 /* Main Content Container */
 .main-content {
     min-height: calc(100vh - 200px);
+    padding: 0;
+}
+
+/* Add padding only for non-table content */
+.main-content > *:not(.table-container):not(.table-responsive) {
     padding: 2rem;
 }
 

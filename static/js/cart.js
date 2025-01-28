@@ -21,10 +21,26 @@ document.addEventListener('DOMContentLoaded', function() {
         let total = 0;
 
         rows.forEach(row => {
-            const itemTotal = parseFloat(row.querySelector('.item-total').textContent);
+            const priceText = row.querySelector('.price').textContent;
+            const quantity = parseInt(row.querySelector('.quantity-input').value);
+            
+            // Qiyməti təmizlə və ədədə çevir
+            const price = parseFloat(priceText.replace(' AZN', '').trim());
+            
+            // Hər məhsulun cəmini hesabla (2 rəqəmə qədər yuvarlaqlaşdır)
+            const itemTotal = Math.round((price * quantity) * 100) / 100;
+            
+            // Sətrin cəmini yenilə
+            row.querySelector('.item-total').textContent = itemTotal.toFixed(2) + ' AZN';
+            
+            // Ümumi cəmə əlavə et
             total += itemTotal;
         });
 
+        // Ümumi məbləği 2 rəqəmə qədər yuvarlaqlaşdır
+        total = Math.round(total * 100) / 100;
+        
+        // Ümumi məbləği yenilə
         const totalElement = document.getElementById('total-amount');
         if (totalElement) {
             totalElement.textContent = total.toFixed(2) + ' AZN';

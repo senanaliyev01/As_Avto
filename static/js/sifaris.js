@@ -1,119 +1,148 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Status ikonlarına hover effekti
-    const statusIcons = document.querySelectorAll('.status-badge i');
-    statusIcons.forEach(icon => {
-        icon.addEventListener('mouseenter', () => {
-            icon.style.transform = 'scale(1.2)';
-        });
-        icon.addEventListener('mouseleave', () => {
-            icon.style.transform = 'scale(1)';
+    // Initialize all tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Add smooth scroll behavior to order links
+    const orderLinks = document.querySelectorAll('.sifaris-link');
+    orderLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if (href.startsWith('#')) {
+                e.preventDefault();
+                const targetElement = document.querySelector(href);
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            }
         });
     });
 
-    // Statistika kartlarına hover effekti
+    // Add hover effects to statistics cards
     const statItems = document.querySelectorAll('.stat-item');
     statItems.forEach(item => {
-        item.addEventListener('mouseenter', () => {
-            item.style.transform = 'translateY(-10px)';
-            item.style.boxShadow = '0 8px 16px rgba(100, 255, 218, 0.15)';
+        item.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
         });
-        item.addEventListener('mouseleave', () => {
-            item.style.transform = 'translateY(0)';
-            item.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
-        });
-    });
-
-    // Cədvəl sətirlərinə hover effekti
-    const tableRows = document.querySelectorAll('tbody tr');
-    tableRows.forEach(row => {
-        row.addEventListener('mouseenter', () => {
-            row.style.transition = 'background-color 0.3s ease';
+        
+        item.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
         });
     });
 
-    // Progress bar animasiyası
+    // Animate progress steps on scroll
     const progressSteps = document.querySelectorAll('.progress-step');
     if (progressSteps.length > 0) {
-        progressSteps.forEach((step, index) => {
-            setTimeout(() => {
-                if (step.classList.contains('active')) {
-                    step.style.opacity = '0';
-                    step.style.transform = 'scale(0.8)';
-                    setTimeout(() => {
-                        step.style.transition = 'all 0.5s ease';
-                        step.style.opacity = '1';
-                        step.style.transform = 'scale(1)';
-                    }, 100);
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
                 }
-            }, index * 200);
+            });
+        }, {
+            threshold: 0.5
+        });
+
+        progressSteps.forEach(step => {
+            step.style.opacity = '0';
+            step.style.transform = 'translateY(20px)';
+            step.style.transition = 'all 0.5s ease';
+            observer.observe(step);
         });
     }
 
-    // Qiymət formatlaması
-    const formatPrice = (price) => {
-        return parseFloat(price).toLocaleString('az-AZ', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
+    // Add table row hover effects
+    const tableRows = document.querySelectorAll('tbody tr');
+    tableRows.forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.01)';
+            this.style.backgroundColor = 'rgba(100, 255, 218, 0.1)';
         });
-    };
-
-    // Qiymətləri formatla
-    const priceElements = document.querySelectorAll('.amount-info, .amount-info-1, .qaliq-borc');
-    priceElements.forEach(element => {
-        const price = element.textContent.replace('AZN', '').trim();
-        element.textContent = formatPrice(price) + ' AZN';
-    });
-
-    // Truck ikonuna tüstü effekti
-    const addSmokeEffect = () => {
-        const trucks = document.querySelectorAll('.truck-container');
-        trucks.forEach(truck => {
-            const smoke = truck.querySelector('.smoke');
-            if (smoke) {
-                setInterval(() => {
-                    const newSmoke = document.createElement('div');
-                    newSmoke.className = 'smoke-particle';
-                    smoke.appendChild(newSmoke);
-                    
-                    setTimeout(() => {
-                        newSmoke.remove();
-                    }, 1000);
-                }, 300);
-            }
-        });
-    };
-
-    addSmokeEffect();
-
-    // Sifariş linklərinə hover effekti
-    const orderLinks = document.querySelectorAll('.sifaris-link');
-    orderLinks.forEach(link => {
-        link.addEventListener('mouseenter', () => {
-            link.style.textDecoration = 'underline';
-        });
-        link.addEventListener('mouseleave', () => {
-            link.style.textDecoration = 'none';
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+            this.style.backgroundColor = '';
         });
     });
 
-    // Mobil responsivlik üçün cədvəl scroll indikatorı
-    const addTableScrollIndicator = () => {
-        const tables = document.querySelectorAll('.table-container');
-        tables.forEach(container => {
-            if (container.scrollWidth > container.clientWidth) {
-                const indicator = document.createElement('div');
-                indicator.className = 'scroll-indicator';
-                indicator.innerHTML = '<i class="fas fa-arrows-alt-h"></i>';
-                container.parentNode.insertBefore(indicator, container);
-                
-                setTimeout(() => {
-                    indicator.style.opacity = '0';
-                }, 3000);
+    // Animate numbers in statistics
+    function animateValue(element, start, end, duration) {
+        if (start === end) return;
+        const range = end - start;
+        let current = start;
+        const increment = end > start ? 1 : -1;
+        const stepTime = Math.abs(Math.floor(duration / range));
+        
+        const timer = setInterval(function() {
+            current += increment;
+            element.textContent = current.toFixed(2) + ' AZN';
+            if (current === end) {
+                clearInterval(timer);
             }
-        });
-    };
+        }, stepTime);
+    }
 
-    // Səhifə yükləndikdə və resize olduqda scroll indikatorunu yoxla
-    addTableScrollIndicator();
-    window.addEventListener('resize', addTableScrollIndicator);
+    // Animate statistics on page load
+    const amountElements = document.querySelectorAll('.amount-info, .amount-info-1, .qaliq-borc');
+    amountElements.forEach(element => {
+        const value = parseFloat(element.textContent);
+        if (!isNaN(value)) {
+            element.textContent = '0.00 AZN';
+            animateValue(element, 0, value, 1000);
+        }
+    });
+
+    // Add smooth transitions for status changes
+    const statusBadges = document.querySelectorAll('.status-badge');
+    statusBadges.forEach(badge => {
+        badge.style.transition = 'all 0.3s ease';
+    });
+
+    // Add loading animation for table
+    const tableContainer = document.querySelector('.table-container');
+    if (tableContainer) {
+        tableContainer.style.opacity = '0';
+        tableContainer.style.transform = 'translateY(20px)';
+        tableContainer.style.transition = 'all 0.5s ease';
+        
+        setTimeout(() => {
+            tableContainer.style.opacity = '1';
+            tableContainer.style.transform = 'translateY(0)';
+        }, 300);
+    }
+
+    // Add ripple effect to clickable elements
+    function createRipple(event) {
+        const button = event.currentTarget;
+        const ripple = document.createElement('span');
+        const rect = button.getBoundingClientRect();
+        
+        ripple.style.position = 'absolute';
+        ripple.style.borderRadius = '50%';
+        ripple.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+        ripple.style.width = ripple.style.height = '100px';
+        ripple.style.transform = 'scale(0)';
+        ripple.style.left = event.clientX - rect.left - 50 + 'px';
+        ripple.style.top = event.clientY - rect.top - 50 + 'px';
+        ripple.style.animation = 'ripple 0.6s linear';
+        
+        button.appendChild(ripple);
+        
+        setTimeout(() => {
+            ripple.remove();
+        }, 600);
+    }
+
+    const buttons = document.querySelectorAll('.stat-item, .sifaris-link');
+    buttons.forEach(button => {
+        button.style.position = 'relative';
+        button.style.overflow = 'hidden';
+        button.addEventListener('click', createRipple);
+    });
 });

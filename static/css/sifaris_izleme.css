@@ -1,107 +1,111 @@
-/* Əsas rəng dəyişənləri base.css-dən götürülüb */
+/* Shared Variables */
 :root {
-    --progress-bar-bg: #233554;
-    --progress-bar-active: #64ffda;
-    --status-gozleyir: #ffd700;
-    --status-hazirlanir: #ff7f50;
-    --status-yoldadir: #4169e1;
-    --status-catdirildi: #32cd32;
+    --primary-color: #0a192f;
+    --secondary-color: #172a45;
+    --accent-color: #64ffda;
+    --text-primary: #ffffff;
+    --text-secondary: #8892b0;
+    --success-color: #4caf50;
+    --warning-color: #ff9800;
+    --error-color: #f44336;
+    --border-radius: 8px;
+    --transition: all 0.3s ease;
 }
 
-/* Statistika Kartları */
+/* Statistics Section */
 .statistic {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
     padding: 2rem;
+    background-color: var(--secondary-color);
+    border-radius: var(--border-radius);
     margin-bottom: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .stat-item {
-    background: var(--secondary-color);
-    border-radius: 10px;
+    background-color: var(--primary-color);
     padding: 1.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: var(--border-radius);
+    text-align: center;
+    transition: var(--transition);
 }
 
 .stat-item:hover {
     transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
 
 .stat-item h3 {
     color: var(--text-secondary);
     margin-bottom: 1rem;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
 }
 
-.amount-info,
-.amount-info-1,
+.amount-info, .amount-info-1 {
+    color: var(--accent-color);
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin: 0;
+}
+
 .qaliq-borc {
     font-size: 1.8rem;
     font-weight: bold;
-    color: var(--text-primary);
+    margin: 0;
 }
 
 .qaliq-borc-pozitiv {
-    color: var(--accent-color);
+    color: var(--success-color);
 }
 
 .qaliq-borc-negativ {
-    color: #ff6b6b;
+    color: var(--error-color);
 }
 
-/* Cədvəl Dizaynı */
+/* Table Styles */
 .table-container {
-    margin: 2rem;
-    background: var(--secondary-color);
-    border-radius: 10px;
-    overflow: hidden;
+    background-color: var(--secondary-color);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    overflow-x: auto;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 table {
     width: 100%;
-    border-collapse: collapse;
-    background: var(--secondary-color);
+    border-collapse: separate;
+    border-spacing: 0;
+    color: var(--text-primary);
 }
 
 th {
-    background: var(--primary-color);
-    color: var(--text-primary);
+    background-color: var(--primary-color);
     padding: 1rem;
     text-align: left;
     font-weight: 600;
+    border-bottom: 2px solid var(--accent-color);
 }
 
 td {
     padding: 1rem;
-    color: var(--text-secondary);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-tr:hover {
-    background: rgba(100, 255, 218, 0.05);
+tbody tr {
+    transition: var(--transition);
 }
 
-/* Sifariş Linki */
-.sifaris-link {
-    color: var(--accent-color);
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.3s ease;
+tbody tr:hover {
+    background-color: rgba(100, 255, 218, 0.1);
 }
 
-.sifaris-link:hover {
-    color: #9cffeb;
-}
-
-/* Status Badge */
+/* Status Badge Styles */
 .status-container {
     display: flex;
+    justify-content: flex-start;
     align-items: center;
-    gap: 0.5rem;
 }
 
 .status-badge {
@@ -115,106 +119,86 @@ tr:hover {
 }
 
 .status-gozleyir {
-    background: rgba(255, 215, 0, 0.15);
-    color: var(--status-gozleyir);
+    background-color: rgba(255, 152, 0, 0.2);
+    color: #ffa726;
 }
 
 .status-hazirlanir {
-    background: rgba(255, 127, 80, 0.15);
-    color: var(--status-hazirlanir);
+    background-color: rgba(33, 150, 243, 0.2);
+    color: #42a5f5;
 }
 
 .status-yoldadir {
-    background: rgba(65, 105, 225, 0.15);
-    color: var(--status-yoldadir);
+    background-color: rgba(156, 39, 176, 0.2);
+    color: #ab47bc;
 }
 
 .status-catdirildi {
-    background: rgba(50, 205, 50, 0.15);
-    color: var(--status-catdirildi);
+    background-color: rgba(76, 175, 80, 0.2);
+    color: #66bb6a;
 }
 
-/* Sifariş Detalları Səhifəsi */
-.sifaris-info {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    padding: 2rem;
-}
-
-.info-row {
-    background: var(--secondary-color);
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.info-row h3 {
-    color: var(--text-primary);
-    margin-bottom: 1.5rem;
-    font-size: 1.3rem;
-}
-
-/* Progress Bar */
+/* Order Progress Bar */
 .order-progress {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    margin: 3rem 0;
-    position: relative;
+    align-items: center;
+    margin: 2rem 0;
+    padding: 0 2rem;
 }
 
 .progress-step {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
-    z-index: 1;
+    position: relative;
+    flex: 1;
 }
 
 .icon-wrapper {
     width: 50px;
     height: 50px;
-    background: var(--progress-bar-bg);
+    background-color: var(--primary-color);
     border-radius: 50%;
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    margin-bottom: 0.5rem;
     position: relative;
-    transition: all 0.3s ease;
+    border: 2px solid var(--secondary-color);
+    transition: var(--transition);
 }
 
 .progress-step.active .icon-wrapper {
-    background: var(--progress-bar-active);
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
     color: var(--primary-color);
 }
 
 .progress-line {
     flex: 1;
     height: 3px;
-    background: var(--progress-bar-bg);
-    margin: 0 -10px;
+    background-color: var(--secondary-color);
+    margin: 0 10px;
     position: relative;
     top: -25px;
-    z-index: 0;
 }
 
-.progress-step.active + .progress-line {
-    background: var(--progress-bar-active);
+.progress-step.active .progress-line {
+    background-color: var(--accent-color);
 }
 
 .check-icon {
     position: absolute;
     top: -5px;
     right: -5px;
-    background: var(--accent-color);
+    background-color: var(--success-color);
     border-radius: 50%;
-    padding: 3px;
-    font-size: 0.7rem;
-    color: var(--primary-color);
+    padding: 2px;
+    font-size: 0.8rem;
 }
 
-/* Animasiyalar */
+/* Animations */
 @keyframes pulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.1); }
@@ -242,31 +226,39 @@ tr:hover {
 .pulse { animation: pulse 2s infinite; }
 .bounce { animation: bounce 2s infinite; }
 .truck-icon { animation: truck-move 2s infinite alternate; }
-.tada { animation: tada 2s infinite; }
+.tada { animation: tada 1s infinite; }
 
 /* Responsive Design */
 @media (max-width: 768px) {
     .statistic {
         grid-template-columns: 1fr;
     }
-    
-    .table-container {
-        margin: 1rem;
-        overflow-x: auto;
-    }
-    
-    .sifaris-info {
-        grid-template-columns: 1fr;
-    }
-    
+
     .order-progress {
         flex-direction: column;
         gap: 2rem;
     }
-    
+
     .progress-line {
         width: 3px;
         height: 30px;
-        margin: 0;
+        margin: 10px 0;
     }
+    
+    .table-container {
+        margin: 0;
+        border-radius: 0;
+    }
+}
+
+/* Links */
+.sifaris-link {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.sifaris-link:hover {
+    color: var(--text-primary);
+    text-decoration: underline;
 }

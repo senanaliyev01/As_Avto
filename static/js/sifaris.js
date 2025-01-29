@@ -1,31 +1,56 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Utility funksiyaları
-    const addClass = (el, className) => el.classList.add(className);
-    const removeClass = (el, className) => el.classList.remove(className);
-    const hasClass = (el, className) => el.classList.contains(className);
-
-    // Animasiya effektləri
-    const animateElement = (element, animation) => {
-        element.style.animation = 'none';
-        element.offsetHeight; // Force reflow
-        element.style.animation = animation;
+    // Əsas dəyişənlər və konfiqurasiyalar
+    const config = {
+        animationDuration: 300,
+        scrollThreshold: 90,
+        hoverScaleAmount: 1.02
     };
 
-    // Hover effektləri
+    // Utility funksiyaları
+    const utils = {
+        debounce: (func, wait) => {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        },
+        
+        addClassName: (element, className) => {
+            if (element && !element.classList.contains(className)) {
+                element.classList.add(className);
+            }
+        },
+        
+        removeClassName: (element, className) => {
+            if (element && element.classList.contains(className)) {
+                element.classList.remove(className);
+            }
+        }
+    };
+
+    // Hover effektləri üçün təkmilləşdirilmiş funksiya
     const addHoverEffect = (elements, options = {}) => {
-        const defaults = {
-            scale: 1.02,
-            duration: 300,
+        const defaultOptions = {
+            scale: config.hoverScaleAmount,
+            duration: config.animationDuration,
             easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
         };
-        const settings = { ...defaults, ...options };
-
+        
+        const finalOptions = { ...defaultOptions, ...options };
+        
         elements.forEach(element => {
+            element.style.transition = `transform ${finalOptions.duration}ms ${finalOptions.easing}`;
+            
             element.addEventListener('mouseenter', () => {
-                element.style.transition = `all ${settings.duration}ms ${settings.easing}`;
-                element.style.transform = `scale(${settings.scale})`;
+                element.style.transform = `scale(${finalOptions.scale})`;
                 element.style.zIndex = '1';
             });
+            
             element.addEventListener('mouseleave', () => {
                 element.style.transform = 'scale(1)';
                 element.style.zIndex = '0';
@@ -33,159 +58,109 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     };
 
-    // Cədvəl sətirləri üçün hover
-    addHoverEffect(document.querySelectorAll('tbody tr'), { scale: 1.01 });
-
-    // Status badge-ləri üçün hover
-    addHoverEffect(document.querySelectorAll('.status-badge'), { scale: 1.05 });
-
-    // Statistika kartları üçün hover və animasiya
-    const statItems = document.querySelectorAll('.stat-item');
-    statItems.forEach((item, index) => {
-        // Giriş animasiyası
-        setTimeout(() => {
-            item.style.opacity = '1';
-            item.style.transform = 'translateY(0)';
-        }, index * 200);
-
-        // Hover effekti
-        item.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-5px)';
-            this.style.boxShadow = '0 15px 30px rgba(100, 255, 218, 0.15)';
-        });
-        item.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-            this.style.boxShadow = 'var(--shadow-lg)';
-        });
-    });
-
-    // Scroll animasiyası
-    const scrollElements = document.querySelectorAll('.stat-item, .table-container, .info-row');
-    
-    const elementInView = (el, offset = 0) => {
-        const elementTop = el.getBoundingClientRect().top;
-        const elementBottom = el.getBoundingClientRect().bottom;
-        const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+    // Statistika kartları üçün təkmilləşdirilmiş animasiyalar
+    const initializeStatCards = () => {
+        const statItems = document.querySelectorAll('.stat-item');
         
-        return (
-            elementTop <= windowHeight - offset &&
-            elementBottom >= 0
-        );
-    };
+        statItems.forEach((item, index) => {
+            // Giriş animasiyası
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                item.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                item.style.opacity = '1';
+                item.style.transform = 'translateY(0)';
+            }, index * 100);
 
-    const displayScrollElement = element => {
-        addClass(element, 'active');
-        animateElement(element, 'fadeInUp 0.6s forwards');
-    };
+            // Hover effekti
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px) scale(1.02)';
+                this.style.boxShadow = '0 20px 30px rgba(0,0,0,0.2)';
+            });
 
-    const hideScrollElement = element => {
-        removeClass(element, 'active');
-    };
-
-    const handleScrollAnimation = () => {
-        scrollElements.forEach((el) => {
-            if (elementInView(el, 100)) {
-                displayScrollElement(el);
-            } else {
-                hideScrollElement(el);
-            }
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+                this.style.boxShadow = 'var(--shadow-lg)';
+            });
         });
     };
 
-    // Debounce funksiyası
-    const debounce = (fn, delay) => {
-        let timeoutId;
-        return (...args) => {
-            if (timeoutId) {
-                clearTimeout(timeoutId);
-            }
-            timeoutId = setTimeout(() => {
-                fn.apply(null, args);
-            }, delay);
+    // Scroll animasiyası üçün təkmilləşdirilmiş funksiya
+    const initializeScrollAnimations = () => {
+        const scrollElements = document.querySelectorAll('.stat-item, .table-container, .info-row');
+        
+        const elementInView = (el, percentageScroll = config.scrollThreshold) => {
+            const elementTop = el.getBoundingClientRect().top;
+            const elementBottom = el.getBoundingClientRect().bottom;
+            const windowHeight = window.innerHeight;
+            
+            return (
+                elementTop <= windowHeight * (percentageScroll/100) &&
+                elementBottom >= 0
+            );
         };
-    };
 
-    // Scroll event with debounce
-    window.addEventListener('scroll', debounce(() => {
+        const displayScrollElement = element => {
+            utils.addClassName(element, 'active');
+            element.style.transform = 'translateY(0)';
+            element.style.opacity = '1';
+        };
+
+        const hideScrollElement = element => {
+            element.style.transform = 'translateY(20px)';
+            element.style.opacity = '0';
+        };
+
+        scrollElements.forEach(el => {
+            hideScrollElement(el);
+        });
+
+        const handleScrollAnimation = () => {
+            scrollElements.forEach((el) => {
+                if (elementInView(el, config.scrollThreshold)) {
+                    displayScrollElement(el);
+                }
+            });
+        };
+
+        window.addEventListener('scroll', utils.debounce(handleScrollAnimation, 10));
         handleScrollAnimation();
-    }, 100));
-
-    // İlk yükləmə
-    handleScrollAnimation();
-
-    // Status badge-ləri üçün pulsing effekt
-    const badges = document.querySelectorAll('.status-badge');
-    badges.forEach(badge => {
-        const pulseAnimation = () => {
-            animateElement(badge, 'pulse 2s infinite');
-        };
-        pulseAnimation();
-    });
+    };
 
     // Cədvəl sıralama funksiyası
-    const tableSort = (() => {
+    const initializeTableSorting = () => {
         const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
-        
-        const comparer = (idx, asc) => (a, b) => {
-            const v1 = getCellValue(asc ? a : b, idx);
-            const v2 = getCellValue(asc ? b : a, idx);
-            
-            // Tarix formatı üçün xüsusi yoxlama
-            if (v1.match(/^\d{2}\.\d{2}\.\d{4}$/)) {
-                const [d1, m1, y1] = v1.split('.');
-                const [d2, m2, y2] = v2.split('.');
-                return new Date(y1, m1-1, d1) - new Date(y2, m2-1, d2);
-            }
-            
-            // Rəqəm yoxlaması
-            if (!isNaN(v1) && !isNaN(v2)) {
-                return v1 - v2;
-            }
-            
-            return v1.toString().localeCompare(v2);
-        };
+
+        const comparer = (idx, asc) => (a, b) => ((v1, v2) => 
+            v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? 
+            v1 - v2 : v1.toString().localeCompare(v2)
+        )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
 
         document.querySelectorAll('th').forEach(th => {
-            th.addEventListener('click', function() {
+            th.addEventListener('click', (() => {
                 const table = th.closest('table');
                 const tbody = table.querySelector('tbody');
                 const rows = Array.from(tbody.querySelectorAll('tr'));
-                const index = Array.from(th.parentNode.children).indexOf(th);
                 
-                // Sort direction göstəricisi
-                const arrow = th.querySelector('.sort-arrow') || document.createElement('span');
-                arrow.className = 'sort-arrow';
-                
-                // Əvvəlki oxları təmizlə
-                th.parentNode.querySelectorAll('.sort-arrow').forEach(arr => {
-                    if (arr !== arrow) arr.remove();
-                });
-                
-                // Sort istiqamətini dəyiş
-                const isAsc = !hasClass(arrow, 'asc');
-                document.querySelectorAll('.sort-arrow').forEach(arr => {
-                    removeClass(arr, 'asc');
-                    removeClass(arr, 'desc');
-                });
-                
-                addClass(arrow, isAsc ? 'asc' : 'desc');
-                arrow.textContent = isAsc ? ' ↑' : ' ↓';
-                
-                if (!th.contains(arrow)) {
-                    th.appendChild(arrow);
-                }
-                
+                // Vizual feedback
+                th.style.transition = 'background-color 0.3s ease';
+                th.style.backgroundColor = 'var(--accent-color)';
+                setTimeout(() => {
+                    th.style.backgroundColor = '';
+                }, 300);
+
                 // Sıralama
-                rows.sort(comparer(index, isAsc))
+                rows.sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
                     .forEach(tr => tbody.appendChild(tr));
-            });
+            }));
         });
-    })();
+    };
 
     // Tüstü effekti
     const createSmoke = (truckContainer) => {
         const smoke = document.createElement('div');
-        addClass(smoke, 'smoke');
+        smoke.className = 'smoke';
         truckContainer.appendChild(smoke);
         
         setTimeout(() => {
@@ -193,30 +168,48 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 2000);
     };
 
-    // Tüstü effektini başlat
-    document.querySelectorAll('.truck-container').forEach(container => {
-        setInterval(() => {
-            createSmoke(container);
-        }, 300);
-    });
-
-    // Progress addımlarını animasiya et
-    document.querySelectorAll('.progress-step').forEach((step, index) => {
-        if (hasClass(step, 'active')) {
-            setTimeout(() => {
-                step.style.transform = 'scale(1.1)';
+    // Progress addımları animasiyası
+    const initializeProgressSteps = () => {
+        document.querySelectorAll('.progress-step').forEach((step, index) => {
+            if (step.classList.contains('active')) {
                 setTimeout(() => {
-                    step.style.transform = 'scale(1)';
-                }, 200);
-            }, index * 300);
-        }
-    });
+                    step.style.transform = 'scale(1.1)';
+                    setTimeout(() => {
+                        step.style.transform = 'scale(1)';
+                    }, 200);
+                }, index * 300);
+            }
+        });
 
-    // Browser-in geri düyməsini idarə et
-    const handleBrowserNavigation = () => {
-        window.history.pushState(null, '', window.location.href);
+        // Tüstü effektini başlat
+        document.querySelectorAll('.truck-container').forEach(container => {
+            setInterval(() => {
+                createSmoke(container);
+            }, 300);
+        });
     };
 
-    window.addEventListener('popstate', handleBrowserNavigation);
-    handleBrowserNavigation();
+    // Browser geri düyməsini deaktiv et
+    const disableBrowserBack = () => {
+        window.history.pushState(null, '', window.location.href);
+        window.onpopstate = function() {
+            window.history.pushState(null, '', window.location.href);
+        };
+    };
+
+    // Bütün funksiyaları işə sal
+    const initialize = () => {
+        initializeStatCards();
+        initializeScrollAnimations();
+        initializeTableSorting();
+        initializeProgressSteps();
+        disableBrowserBack();
+        
+        // Əlavə hover effektləri
+        addHoverEffect(document.querySelectorAll('tbody tr'), { scale: 1.01 });
+        addHoverEffect(document.querySelectorAll('.status-badge'), { scale: 1.05 });
+    };
+
+    // Səhifə yükləndikdə hər şeyi başlat
+    initialize();
 });

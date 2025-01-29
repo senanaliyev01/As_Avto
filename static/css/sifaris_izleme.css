@@ -1,40 +1,25 @@
-/* Shared Variables */
-:root {
-    --primary-color: #0a192f;
-    --secondary-color: #172a45;
-    --accent-color: #64ffda;
-    --text-primary: #ffffff;
-    --text-secondary: #8892b0;
-    --success-color: #4caf50;
-    --warning-color: #ff9800;
-    --error-color: #f44336;
-    --border-radius: 8px;
-    --transition: all 0.3s ease;
-}
-
-/* Statistics Section */
 .statistic {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    justify-content: space-between;
     gap: 2rem;
+    margin: 2rem;
     padding: 2rem;
-    background-color: var(--secondary-color);
-    border-radius: var(--border-radius);
-    margin-bottom: 2rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background: var(--secondary-color);
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .stat-item {
-    background-color: var(--primary-color);
+    flex: 1;
     padding: 1.5rem;
-    border-radius: var(--border-radius);
+    background: var(--primary-color);
+    border-radius: 10px;
     text-align: center;
-    transition: var(--transition);
+    transition: transform 0.3s ease;
 }
 
 .stat-item:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
 
 .stat-item h3 {
@@ -43,7 +28,8 @@
     font-size: 1.2rem;
 }
 
-.amount-info, .amount-info-1 {
+.amount-info,
+.amount-info-1 {
     color: var(--accent-color);
     font-size: 1.8rem;
     font-weight: bold;
@@ -57,20 +43,20 @@
 }
 
 .qaliq-borc-pozitiv {
-    color: var(--success-color);
+    color: #4CAF50;
 }
 
 .qaliq-borc-negativ {
-    color: var(--error-color);
+    color: #f44336;
 }
 
-/* Table Styles */
 .table-container {
-    background-color: var(--secondary-color);
-    border-radius: var(--border-radius);
+    margin: 2rem;
+    background: var(--secondary-color);
+    border-radius: 15px;
     padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     overflow-x: auto;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 table {
@@ -90,18 +76,29 @@ th {
 
 td {
     padding: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(100, 255, 218, 0.1);
 }
 
 tbody tr {
-    transition: var(--transition);
+    transition: background-color 0.3s ease;
 }
 
 tbody tr:hover {
-    background-color: rgba(100, 255, 218, 0.1);
+    background-color: rgba(23, 42, 69, 0.8);
 }
 
-/* Status Badge Styles */
+.sifaris-link {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.sifaris-link:hover {
+    color: #9CFFEB;
+}
+
+/* Status Badges */
 .status-container {
     display: flex;
     justify-content: flex-start;
@@ -109,7 +106,7 @@ tbody tr:hover {
 }
 
 .status-badge {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
@@ -119,32 +116,128 @@ tbody tr:hover {
 }
 
 .status-gozleyir {
-    background-color: rgba(255, 152, 0, 0.2);
-    color: #ffa726;
+    background-color: rgba(255, 193, 7, 0.2);
+    color: #FFC107;
 }
 
 .status-hazirlanir {
     background-color: rgba(33, 150, 243, 0.2);
-    color: #42a5f5;
+    color: #2196F3;
 }
 
 .status-yoldadir {
     background-color: rgba(156, 39, 176, 0.2);
-    color: #ab47bc;
+    color: #9C27B0;
 }
 
 .status-catdirildi {
     background-color: rgba(76, 175, 80, 0.2);
-    color: #66bb6a;
+    color: #4CAF50;
 }
 
-/* Order Progress Bar */
+/* Animations */
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.bounce {
+    animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.truck-container {
+    position: relative;
+    display: inline-block;
+}
+
+.truck-icon {
+    animation: drive 3s infinite linear;
+}
+
+@keyframes drive {
+    0% { transform: translateX(-10px); }
+    50% { transform: translateX(10px); }
+    100% { transform: translateX(-10px); }
+}
+
+.smoke {
+    position: absolute;
+    left: -10px;
+    top: 50%;
+    width: 4px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    animation: smoke 2s infinite;
+}
+
+@keyframes smoke {
+    0% { 
+        transform: translate(0, 0) scale(1);
+        opacity: 0.8;
+    }
+    100% { 
+        transform: translate(-20px, -20px) scale(2);
+        opacity: 0;
+    }
+}
+
+.tada {
+    animation: tada 1s infinite;
+}
+
+@keyframes tada {
+    0% { transform: scale(1); }
+    10%, 20% { transform: scale(0.9) rotate(-3deg); }
+    30%, 50%, 70%, 90% { transform: scale(1.1) rotate(3deg); }
+    40%, 60%, 80% { transform: scale(1.1) rotate(-3deg); }
+    100% { transform: scale(1) rotate(0); }
+}
+
+/* Sifariş Detalları Səhifəsi */
+.sifaris-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin: 2rem;
+}
+
+.info-row {
+    background: var(--secondary-color);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.info-row h3 {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    font-size: 1.3rem;
+}
+
+.info-row p {
+    color: var(--text-primary);
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+/* Order Progress */
 .order-progress {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin: 2rem 0;
-    padding: 0 2rem;
+    justify-content: space-between;
+    margin-top: 2rem;
+    padding: 1rem 0;
 }
 
 .progress-step {
@@ -158,80 +251,67 @@ tbody tr:hover {
 .icon-wrapper {
     width: 50px;
     height: 50px;
-    background-color: var(--primary-color);
+    background: var(--primary-color);
     border-radius: 50%;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     margin-bottom: 0.5rem;
     position: relative;
-    border: 2px solid var(--secondary-color);
-    transition: var(--transition);
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
 }
 
 .progress-step.active .icon-wrapper {
-    background-color: var(--accent-color);
     border-color: var(--accent-color);
-    color: var(--primary-color);
+    background: rgba(100, 255, 218, 0.1);
 }
 
-.progress-line {
-    flex: 1;
-    height: 3px;
-    background-color: var(--secondary-color);
-    margin: 0 10px;
-    position: relative;
-    top: -25px;
+.progress-step i {
+    font-size: 1.5rem;
+    color: var(--text-secondary);
 }
 
-.progress-step.active .progress-line {
-    background-color: var(--accent-color);
+.progress-step.active i {
+    color: var(--accent-color);
 }
 
 .check-icon {
     position: absolute;
     top: -5px;
     right: -5px;
-    background-color: var(--success-color);
+    background: var(--accent-color);
     border-radius: 50%;
     padding: 2px;
-    font-size: 0.8rem;
+    font-size: 0.8rem !important;
+    color: var(--primary-color) !important;
 }
 
-/* Animations */
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
+.progress-line {
+    flex: 1;
+    height: 2px;
+    background: var(--text-secondary);
+    margin: 0 10px;
+    position: relative;
+    top: -25px;
 }
 
-@keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
+.progress-step span {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
 }
 
-@keyframes truck-move {
-    0% { transform: translateX(-5px); }
-    100% { transform: translateX(5px); }
+.progress-step.active span {
+    color: var(--accent-color);
 }
-
-@keyframes tada {
-    0% { transform: scale(1); }
-    10%, 20% { transform: scale(0.9) rotate(-3deg); }
-    30%, 50%, 70%, 90% { transform: scale(1.1) rotate(3deg); }
-    40%, 60%, 80% { transform: scale(1.1) rotate(-3deg); }
-    100% { transform: scale(1) rotate(0); }
-}
-
-.pulse { animation: pulse 2s infinite; }
-.bounce { animation: bounce 2s infinite; }
-.truck-icon { animation: truck-move 2s infinite alternate; }
-.tada { animation: tada 1s infinite; }
 
 /* Responsive Design */
 @media (max-width: 768px) {
     .statistic {
-        grid-template-columns: 1fr;
+        flex-direction: column;
+        margin: 1rem;
+        padding: 1rem;
     }
 
     .order-progress {
@@ -240,25 +320,17 @@ tbody tr:hover {
     }
 
     .progress-line {
-        width: 3px;
-        height: 30px;
+        width: 2px;
+        height: 20px;
         margin: 10px 0;
     }
-    
-    .table-container {
-        margin: 0;
-        border-radius: 0;
+
+    .sifaris-info {
+        margin: 1rem;
     }
-}
 
-/* Links */
-.sifaris-link {
-    color: var(--accent-color);
-    text-decoration: none;
-    transition: var(--transition);
-}
-
-.sifaris-link:hover {
-    color: var(--text-primary);
-    text-decoration: underline;
+    .table-container {
+        margin: 1rem;
+        padding: 1rem;
+    }
 }

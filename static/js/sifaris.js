@@ -1,148 +1,171 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize all tooltips
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
+    // Status ikonlarının animasiyalarını idarə et
+    initializeStatusAnimations();
+    
+    // Cədvəl sətirlərinə hover effekti əlavə et
+    initializeTableHoverEffects();
+    
+    // Statistika kartlarına hover effekti əlavə et
+    initializeStatCardEffects();
+    
+    // Progress bar animasiyasını başlat
+    initializeProgressBar();
+});
 
-    // Add smooth scroll behavior to order links
-    const orderLinks = document.querySelectorAll('.sifaris-link');
-    orderLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            const href = this.getAttribute('href');
-            if (href.startsWith('#')) {
-                e.preventDefault();
-                const targetElement = document.querySelector(href);
-                if (targetElement) {
-                    targetElement.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            }
-        });
-    });
-
-    // Add hover effects to statistics cards
-    const statItems = document.querySelectorAll('.stat-item');
-    statItems.forEach(item => {
-        item.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-5px)';
-        });
-        
-        item.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-        });
-    });
-
-    // Animate progress steps on scroll
-    const progressSteps = document.querySelectorAll('.progress-step');
-    if (progressSteps.length > 0) {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, {
-            threshold: 0.5
-        });
-
-        progressSteps.forEach(step => {
-            step.style.opacity = '0';
-            step.style.transform = 'translateY(20px)';
-            step.style.transition = 'all 0.5s ease';
-            observer.observe(step);
-        });
-    }
-
-    // Add table row hover effects
-    const tableRows = document.querySelectorAll('tbody tr');
-    tableRows.forEach(row => {
-        row.addEventListener('mouseenter', function() {
-            this.style.transform = 'scale(1.01)';
-            this.style.backgroundColor = 'rgba(100, 255, 218, 0.1)';
-        });
-        
-        row.addEventListener('mouseleave', function() {
-            this.style.transform = 'scale(1)';
-            this.style.backgroundColor = '';
-        });
-    });
-
-    // Animate numbers in statistics
-    function animateValue(element, start, end, duration) {
-        if (start === end) return;
-        const range = end - start;
-        let current = start;
-        const increment = end > start ? 1 : -1;
-        const stepTime = Math.abs(Math.floor(duration / range));
-        
-        const timer = setInterval(function() {
-            current += increment;
-            element.textContent = current.toFixed(2) + ' AZN';
-            if (current === end) {
-                clearInterval(timer);
-            }
-        }, stepTime);
-    }
-
-    // Animate statistics on page load
-    const amountElements = document.querySelectorAll('.amount-info, .amount-info-1, .qaliq-borc');
-    amountElements.forEach(element => {
-        const value = parseFloat(element.textContent);
-        if (!isNaN(value)) {
-            element.textContent = '0.00 AZN';
-            animateValue(element, 0, value, 1000);
+function initializeStatusAnimations() {
+    // Tüstü effekti üçün çoxlu element yaratma
+    const truckContainers = document.querySelectorAll('.truck-container');
+    truckContainers.forEach(container => {
+        for (let i = 0; i < 3; i++) {
+            const smoke = document.createElement('div');
+            smoke.className = 'smoke';
+            smoke.style.animationDelay = `${i * 0.4}s`;
+            container.appendChild(smoke);
         }
     });
+}
 
-    // Add smooth transitions for status changes
-    const statusBadges = document.querySelectorAll('.status-badge');
-    statusBadges.forEach(badge => {
-        badge.style.transition = 'all 0.3s ease';
+function initializeTableHoverEffects() {
+    const tableRows = document.querySelectorAll('tbody tr');
+    
+    tableRows.forEach(row => {
+        row.addEventListener('mouseenter', () => {
+            row.style.transform = 'scale(1.01)';
+            row.style.transition = 'transform 0.3s ease';
+        });
+        
+        row.addEventListener('mouseleave', () => {
+            row.style.transform = 'scale(1)';
+        });
     });
+}
 
-    // Add loading animation for table
-    const tableContainer = document.querySelector('.table-container');
-    if (tableContainer) {
-        tableContainer.style.opacity = '0';
-        tableContainer.style.transform = 'translateY(20px)';
-        tableContainer.style.transition = 'all 0.5s ease';
-        
-        setTimeout(() => {
-            tableContainer.style.opacity = '1';
-            tableContainer.style.transform = 'translateY(0)';
-        }, 300);
-    }
+function initializeStatCardEffects() {
+    const statItems = document.querySelectorAll('.stat-item');
+    
+    statItems.forEach(item => {
+        item.addEventListener('mouseenter', () => {
+            // Parlama effekti
+            const glow = document.createElement('div');
+            glow.className = 'stat-glow';
+            item.appendChild(glow);
+            
+            setTimeout(() => {
+                glow.remove();
+            }, 1000);
+        });
+    });
+}
 
-    // Add ripple effect to clickable elements
-    function createRipple(event) {
-        const button = event.currentTarget;
-        const ripple = document.createElement('span');
-        const rect = button.getBoundingClientRect();
-        
-        ripple.style.position = 'absolute';
-        ripple.style.borderRadius = '50%';
-        ripple.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
-        ripple.style.width = ripple.style.height = '100px';
-        ripple.style.transform = 'scale(0)';
-        ripple.style.left = event.clientX - rect.left - 50 + 'px';
-        ripple.style.top = event.clientY - rect.top - 50 + 'px';
-        ripple.style.animation = 'ripple 0.6s linear';
-        
-        button.appendChild(ripple);
-        
-        setTimeout(() => {
-            ripple.remove();
-        }, 600);
-    }
+function initializeProgressBar() {
+    const progressSteps = document.querySelectorAll('.progress-step');
+    let delay = 0;
+    
+    progressSteps.forEach((step, index) => {
+        if (step.classList.contains('active')) {
+            setTimeout(() => {
+                step.style.opacity = '0';
+                step.style.transform = 'scale(0.8)';
+                
+                setTimeout(() => {
+                    step.style.opacity = '1';
+                    step.style.transform = 'scale(1)';
+                }, 200);
+            }, delay);
+            
+            delay += 300;
+        }
+    });
+}
 
-    const buttons = document.querySelectorAll('.stat-item, .sifaris-link');
-    buttons.forEach(button => {
-        button.style.position = 'relative';
-        button.style.overflow = 'hidden';
-        button.addEventListener('click', createRipple);
+// Səhifə yüklənərkən fade-in animasiyası
+window.addEventListener('load', () => {
+    document.body.style.opacity = '0';
+    document.body.style.transition = 'opacity 0.5s ease';
+    
+    setTimeout(() => {
+        document.body.style.opacity = '1';
+    }, 100);
+});
+
+// Scroll zamanı elementlərin animasiyası
+window.addEventListener('scroll', () => {
+    const elements = document.querySelectorAll('.table-container, .sifaris-info, .statistic');
+    
+    elements.forEach(element => {
+        const elementTop = element.getBoundingClientRect().top;
+        const elementBottom = element.getBoundingClientRect().bottom;
+        
+        if (elementTop < window.innerHeight && elementBottom > 0) {
+            if (!element.classList.contains('animated')) {
+                element.classList.add('animated');
+                element.style.animation = 'fadeInUp 0.5s ease forwards';
+            }
+        }
     });
 });
+
+// Fade-in-up animasiyası
+const fadeInUpKeyframes = `
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}`;
+
+// Stil əlavə et
+const style = document.createElement('style');
+style.textContent = fadeInUpKeyframes;
+document.head.appendChild(style);
+
+// Qiymət formatı
+function formatCurrency(amount) {
+    return parseFloat(amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+}
+
+// Tarix formatı
+function formatDate(dateString) {
+    const options = { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    };
+    return new Date(dateString).toLocaleDateString('az-AZ', options);
+}
+
+// Status rənglərini avtomatik yeniləmə
+function updateStatusColors() {
+    const statusBadges = document.querySelectorAll('.status-badge');
+    
+    statusBadges.forEach(badge => {
+        const status = badge.classList[1].split('-')[1];
+        let color;
+        
+        switch(status) {
+            case 'gozleyir':
+                color = '#FFC107';
+                break;
+            case 'hazirlanir':
+                color = '#2196F3';
+                break;
+            case 'yoldadir':
+                color = '#9C27B0';
+                break;
+            case 'catdirildi':
+                color = '#4CAF50';
+                break;
+        }
+        
+        badge.style.borderColor = color;
+    });
+}
+
+// Səhifə yüklənəndə status rənglərini yenilə
+document.addEventListener('DOMContentLoaded', updateStatusColors);

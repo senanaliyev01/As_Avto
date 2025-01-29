@@ -1,56 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Əsas dəyişənlər və konfiqurasiyalar
-    const config = {
-        animationDuration: 300,
-        scrollThreshold: 90,
-        hoverScaleAmount: 1.02
-    };
-
-    // Utility funksiyaları
-    const utils = {
-        debounce: (func, wait) => {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-        },
-        
-        addClassName: (element, className) => {
-            if (element && !element.classList.contains(className)) {
-                element.classList.add(className);
-            }
-        },
-        
-        removeClassName: (element, className) => {
-            if (element && element.classList.contains(className)) {
-                element.classList.remove(className);
-            }
-        }
-    };
-
-    // Hover effektləri üçün təkmilləşdirilmiş funksiya
-    const addHoverEffect = (elements, options = {}) => {
-        const defaultOptions = {
-            scale: config.hoverScaleAmount,
-            duration: config.animationDuration,
-            easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
-        };
-        
-        const finalOptions = { ...defaultOptions, ...options };
-        
+    // Hover effektləri
+    const addHoverEffect = (elements, scaleAmount = 1.02) => {
         elements.forEach(element => {
-            element.style.transition = `transform ${finalOptions.duration}ms ${finalOptions.easing}`;
-            
             element.addEventListener('mouseenter', () => {
-                element.style.transform = `scale(${finalOptions.scale})`;
+                element.style.transform = `scale(${scaleAmount})`;
                 element.style.zIndex = '1';
             });
-            
             element.addEventListener('mouseleave', () => {
                 element.style.transform = 'scale(1)';
                 element.style.zIndex = '0';
@@ -58,158 +13,204 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     };
 
-    // Statistika kartları üçün təkmilləşdirilmiş animasiyalar
-    const initializeStatCards = () => {
-        const statItems = document.querySelectorAll('.stat-item');
-        
-        statItems.forEach((item, index) => {
-            // Giriş animasiyası
-            item.style.opacity = '0';
-            item.style.transform = 'translateY(20px)';
-            
+    // Cədvəl sətirləri üçün hover
+    addHoverEffect(document.querySelectorAll('tbody tr'), 1.01);
+
+    // Status badge-ləri üçün hover
+    addHoverEffect(document.querySelectorAll('.status-badge'), 1.05);
+
+    // Statistika kartları üçün hover
+    const statItems = document.querySelectorAll('.stat-item');
+    statItems.forEach(item => {
+        item.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+            this.style.boxShadow = '0 15px 30px rgba(0,0,0,0.15)';
+        });
+        item.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'var(--shadow-lg)';
+        });
+    });
+
+    // Saat əqrəbinin fırlanması
+    const clockIcon = document.querySelector('.gozleyir-icon .fa-clock');
+    if (clockIcon) {
+        let rotation = 0;
+        setInterval(() => {
+            rotation += 6;
+            clockIcon.style.transform = `rotate(${rotation}deg)`;
+        }, 100);
+    }
+
+    // Qutu animasiyası
+    const boxIcon = document.querySelector('.hazirlanir-icon .fa-box-open');
+    if (boxIcon) {
+        setInterval(() => {
+            boxIcon.classList.add('fa-box');
+            boxIcon.classList.remove('fa-box-open');
             setTimeout(() => {
-                item.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-                item.style.opacity = '1';
-                item.style.transform = 'translateY(0)';
-            }, index * 100);
-
-            // Hover effekti
-            item.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-5px) scale(1.02)';
-                this.style.boxShadow = '0 20px 30px rgba(0,0,0,0.2)';
-            });
-
-            item.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0) scale(1)';
-                this.style.boxShadow = 'var(--shadow-lg)';
-            });
-        });
-    };
-
-    // Scroll animasiyası üçün təkmilləşdirilmiş funksiya
-    const initializeScrollAnimations = () => {
-        const scrollElements = document.querySelectorAll('.stat-item, .table-container, .info-row');
-        
-        const elementInView = (el, percentageScroll = config.scrollThreshold) => {
-            const elementTop = el.getBoundingClientRect().top;
-            const elementBottom = el.getBoundingClientRect().bottom;
-            const windowHeight = window.innerHeight;
-            
-            return (
-                elementTop <= windowHeight * (percentageScroll/100) &&
-                elementBottom >= 0
-            );
-        };
-
-        const displayScrollElement = element => {
-            utils.addClassName(element, 'active');
-            element.style.transform = 'translateY(0)';
-            element.style.opacity = '1';
-        };
-
-        const hideScrollElement = element => {
-            element.style.transform = 'translateY(20px)';
-            element.style.opacity = '0';
-        };
-
-        scrollElements.forEach(el => {
-            hideScrollElement(el);
-        });
-
-        const handleScrollAnimation = () => {
-            scrollElements.forEach((el) => {
-                if (elementInView(el, config.scrollThreshold)) {
-                    displayScrollElement(el);
-                }
-            });
-        };
-
-        window.addEventListener('scroll', utils.debounce(handleScrollAnimation, 10));
-        handleScrollAnimation();
-    };
-
-    // Cədvəl sıralama funksiyası
-    const initializeTableSorting = () => {
-        const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
-
-        const comparer = (idx, asc) => (a, b) => ((v1, v2) => 
-            v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? 
-            v1 - v2 : v1.toString().localeCompare(v2)
-        )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
-
-        document.querySelectorAll('th').forEach(th => {
-            th.addEventListener('click', (() => {
-                const table = th.closest('table');
-                const tbody = table.querySelector('tbody');
-                const rows = Array.from(tbody.querySelectorAll('tr'));
-                
-                // Vizual feedback
-                th.style.transition = 'background-color 0.3s ease';
-                th.style.backgroundColor = 'var(--accent-color)';
-                setTimeout(() => {
-                    th.style.backgroundColor = '';
-                }, 300);
-
-                // Sıralama
-                rows.sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
-                    .forEach(tr => tbody.appendChild(tr));
-            }));
-        });
-    };
-
-    // Tüstü effekti
-    const createSmoke = (truckContainer) => {
-        const smoke = document.createElement('div');
-        smoke.className = 'smoke';
-        truckContainer.appendChild(smoke);
-        
-        setTimeout(() => {
-            smoke.remove();
+                boxIcon.classList.remove('fa-box');
+                boxIcon.classList.add('fa-box-open');
+            }, 1000);
         }, 2000);
+    }
+
+    // Yük maşını animasiyası
+    const truckContainer = document.querySelector('.yoldadir-icon');
+    if (truckContainer) {
+        const truck = truckContainer.querySelector('.fa-truck');
+        
+        // Təkərlərin əlavə edilməsi
+        const addWheels = () => {
+            const wheelPositions = [
+                { left: '25%', bottom: '-2px' },
+                { left: '75%', bottom: '-2px' }
+            ];
+            
+            wheelPositions.forEach(pos => {
+                const wheel = document.createElement('div');
+                wheel.className = 'truck-wheel';
+                wheel.style.cssText = `
+                    position: absolute;
+                    width: 6px;
+                    height: 6px;
+                    background: #fff;
+                    border-radius: 50%;
+                    left: ${pos.left};
+                    bottom: ${pos.bottom};
+                    transform-origin: center;
+                    animation: wheelRotate 1s linear infinite;
+                `;
+                truckContainer.appendChild(wheel);
+            });
+        };
+        
+        addWheels();
+
+        // Yol və ağac effekti
+        const roadContainer = document.createElement('div');
+        roadContainer.className = 'road-container';
+        roadContainer.style.cssText = `
+            position: absolute;
+            bottom: -15px;
+            left: -20px;
+            right: -20px;
+            height: 2px;
+            background: #fff;
+            overflow: hidden;
+        `;
+        
+        const road = document.createElement('div');
+        road.className = 'road';
+        road.style.cssText = `
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, #fff 50%, transparent 50%);
+            background-size: 20px 100%;
+            animation: roadMove 1s linear infinite;
+        `;
+        
+        roadContainer.appendChild(road);
+        truckContainer.appendChild(roadContainer);
+
+        // Tüstü effekti
+        const createSmoke = () => {
+            const smoke = document.createElement('div');
+            smoke.className = 'smoke';
+            smoke.style.left = '10%';
+            smoke.style.bottom = '30%';
+            truckContainer.appendChild(smoke);
+            
+            setTimeout(() => smoke.remove(), 2000);
+        };
+
+        setInterval(createSmoke, 300);
+    }
+
+    // Çatdırıldı ikonu animasiyası
+    const checkIcon = document.querySelector('.catdirildi-icon .fa-check-circle');
+    if (checkIcon) {
+        setInterval(() => {
+            checkIcon.style.animation = 'tada 1s ease';
+            setTimeout(() => {
+                checkIcon.style.animation = '';
+            }, 1000);
+        }, 3000);
+    }
+
+    // CSS Animasiyaları
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes wheelRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes roadMove {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+        
+        .truck-container {
+            position: relative;
+            animation: truckBounce 1s ease-in-out infinite;
+        }
+        
+        @keyframes truckBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-2px); }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Scroll animasiyası
+    const scrollElements = document.querySelectorAll('.stat-item, .table-container, .info-row');
+    
+    const elementInView = (el, percentageScroll = 100) => {
+        const elementTop = el.getBoundingClientRect().top;
+        return (
+            elementTop <= 
+            ((window.innerHeight || document.documentElement.clientHeight) * (percentageScroll/100))
+        );
     };
 
-    // Progress addımları animasiyası
-    const initializeProgressSteps = () => {
-        document.querySelectorAll('.progress-step').forEach((step, index) => {
-            if (step.classList.contains('active')) {
-                setTimeout(() => {
-                    step.style.transform = 'scale(1.1)';
-                    setTimeout(() => {
-                        step.style.transform = 'scale(1)';
-                    }, 200);
-                }, index * 300);
+    const displayScrollElement = element => {
+        element.classList.add('active');
+    };
+
+    const handleScrollAnimation = () => {
+        scrollElements.forEach((el) => {
+            if (elementInView(el, 90)) {
+                displayScrollElement(el);
             }
         });
-
-        // Tüstü effektini başlat
-        document.querySelectorAll('.truck-container').forEach(container => {
-            setInterval(() => {
-                createSmoke(container);
-            }, 300);
-        });
     };
 
-    // Browser geri düyməsini deaktiv et
-    const disableBrowserBack = () => {
+    window.addEventListener('scroll', () => {
+        handleScrollAnimation();
+    });
+
+    handleScrollAnimation();
+
+    // Cədvəl sıralama
+    const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
+
+    const comparer = (idx, asc) => (a, b) => ((v1, v2) => 
+        v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
+    )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
+
+    document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
+        const table = th.closest('table');
+        const tbody = table.querySelector('tbody');
+        Array.from(tbody.querySelectorAll('tr'))
+            .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
+            .forEach(tr => tbody.appendChild(tr));
+    })));
+
+    // Browser-in geri düyməsini deaktiv et
+    window.history.pushState(null, '', window.location.href);
+    window.onpopstate = function() {
         window.history.pushState(null, '', window.location.href);
-        window.onpopstate = function() {
-            window.history.pushState(null, '', window.location.href);
-        };
     };
-
-    // Bütün funksiyaları işə sal
-    const initialize = () => {
-        initializeStatCards();
-        initializeScrollAnimations();
-        initializeTableSorting();
-        initializeProgressSteps();
-        disableBrowserBack();
-        
-        // Əlavə hover effektləri
-        addHoverEffect(document.querySelectorAll('tbody tr'), { scale: 1.01 });
-        addHoverEffect(document.querySelectorAll('.status-badge'), { scale: 1.05 });
-    };
-
-    // Səhifə yükləndikdə hər şeyi başlat
-    initialize();
 });

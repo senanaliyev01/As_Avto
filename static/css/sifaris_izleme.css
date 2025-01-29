@@ -11,32 +11,30 @@
     --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
     --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
     --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
-    --transition: all 0.3s ease;
 }
 
 body {
     background-color: var(--background-color);
     color: var(--text-color);
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
 /* Statistika Kartları */
 .statistic {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
     margin: 2rem auto;
-    max-width: 1200px;
+    max-width: 1400px;
     padding: 0 1rem;
 }
 
 .stat-item {
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     border-radius: 15px;
-    padding: 1.5rem;
+    padding: 2rem;
     color: white;
     box-shadow: var(--shadow-lg);
-    transition: var(--transition);
+    transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
 }
@@ -49,24 +47,21 @@ body {
     width: 100%;
     height: 100%;
     background: linear-gradient(45deg, rgba(255,255,255,0.1), transparent);
-    opacity: 0;
-    transition: var(--transition);
-}
-
-.stat-item:hover::before {
-    opacity: 1;
+    z-index: 1;
 }
 
 .stat-item h3 {
     font-size: 1.2rem;
     margin-bottom: 1rem;
-    font-weight: 500;
+    position: relative;
+    z-index: 2;
 }
 
 .amount-info, .amount-info-1, .qaliq-borc {
-    font-size: 1.8rem;
-    font-weight: 700;
-    margin: 0;
+    font-size: 2rem;
+    font-weight: bold;
+    position: relative;
+    z-index: 2;
 }
 
 /* Cədvəl Dizaynı */
@@ -75,7 +70,7 @@ body {
     border-radius: 15px;
     box-shadow: var(--shadow-lg);
     margin: 2rem auto;
-    max-width: 1200px;
+    max-width: 1400px;
     overflow: hidden;
     padding: 1rem;
 }
@@ -87,32 +82,28 @@ table {
 }
 
 th {
-    background-color: var(--primary-color);
+    background: var(--primary-color);
     color: white;
     padding: 1rem;
     text-align: left;
     font-weight: 600;
     position: relative;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.3s ease;
 }
 
 th:hover {
-    background-color: var(--secondary-color);
+    background: var(--secondary-color);
 }
 
 td {
     padding: 1rem;
     border-bottom: 1px solid var(--border-color);
-    transition: var(--transition);
+    transition: all 0.3s ease;
 }
 
-tbody tr {
-    transition: var(--transition);
-}
-
-tbody tr:hover {
-    background-color: rgba(26, 35, 126, 0.05);
+tr:hover td {
+    background: rgba(26, 35, 126, 0.05);
 }
 
 /* Status Badge */
@@ -120,28 +111,39 @@ tbody tr:hover {
     display: inline-flex;
     align-items: center;
     padding: 0.5rem 1rem;
-    border-radius: 50px;
+    border-radius: 25px;
     font-weight: 500;
     gap: 0.5rem;
-    background: var(--primary-color);
-    color: white;
-    transition: var(--transition);
+    transition: all 0.3s ease;
 }
 
-.status-gozleyir { background: var(--warning-color); }
-.status-hazirlanir { background: var(--accent-color); }
-.status-yoldadir { background: var(--primary-color); }
-.status-catdirildi { background: var(--success-color); }
+.status-gozleyir {
+    background: rgba(251, 140, 0, 0.1);
+    color: var(--warning-color);
+}
 
-/* Progress Steps */
+.status-hazirlanir {
+    background: rgba(26, 35, 126, 0.1);
+    color: var(--primary-color);
+}
+
+.status-yoldadir {
+    background: rgba(57, 73, 171, 0.1);
+    color: var(--accent-color);
+}
+
+.status-catdirildi {
+    background: rgba(67, 160, 71, 0.1);
+    color: var(--success-color);
+}
+
+/* Progress Bar */
 .order-progress {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin: 3rem 0;
-    position: relative;
-    max-width: 800px;
-    margin: 2rem auto;
+    padding: 0 2rem;
 }
 
 .progress-step {
@@ -153,16 +155,18 @@ tbody tr:hover {
 }
 
 .icon-wrapper {
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
+    background: white;
     border-radius: 50%;
-    background: var(--border-color);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    box-shadow: var(--shadow-md);
     position: relative;
-    transition: var(--transition);
+    transition: all 0.3s ease;
 }
 
 .progress-step.active .icon-wrapper {
@@ -176,8 +180,10 @@ tbody tr:hover {
     background: var(--border-color);
     margin: 0 1rem;
     position: relative;
-    top: -25px;
-    z-index: 0;
+}
+
+.progress-step.active ~ .progress-line {
+    background: var(--primary-color);
 }
 
 .check-icon {
@@ -185,10 +191,10 @@ tbody tr:hover {
     top: -5px;
     right: -5px;
     background: var(--success-color);
-    border-radius: 50%;
-    padding: 4px;
-    font-size: 0.8rem;
     color: white;
+    border-radius: 50%;
+    padding: 0.2rem;
+    font-size: 0.8rem;
 }
 
 /* Animasiyalar */
@@ -200,7 +206,12 @@ tbody tr:hover {
 
 @keyframes bounce {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes truck-move {
+    0% { transform: translateX(-5px); }
+    100% { transform: translateX(5px); }
 }
 
 @keyframes tada {
@@ -211,49 +222,7 @@ tbody tr:hover {
     100% { transform: scale(1) rotate(0); }
 }
 
-.pulse { animation: pulse 2s infinite; }
-.bounce { animation: bounce 2s infinite; }
-.tada { animation: tada 1s infinite; }
-
-/* Truck Animation */
-.truck-container {
-    position: relative;
-    display: inline-block;
-}
-
-.truck-icon {
-    animation: truck-move 2s infinite;
-}
-
-@keyframes truck-move {
-    0% { transform: translateX(0); }
-    50% { transform: translateX(5px); }
-    100% { transform: translateX(0); }
-}
-
-.smoke {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background: rgba(200, 200, 200, 0.5);
-    border-radius: 50%;
-    left: -15px;
-    top: 50%;
-    animation: smoke 2s forwards;
-}
-
-@keyframes smoke {
-    0% { 
-        transform: scale(1) translate(0, 0);
-        opacity: 0.5;
-    }
-    100% { 
-        transform: scale(2) translate(-20px, -20px);
-        opacity: 0;
-    }
-}
-
-/* Responsive Design */
+/* Responsiv Dizayn */
 @media (max-width: 768px) {
     .statistic {
         grid-template-columns: 1fr;
@@ -271,6 +240,55 @@ tbody tr:hover {
     .progress-line {
         width: 3px;
         height: 30px;
-        margin: 1rem 0;
+    }
+}
+
+/* Sifariş Detalları Səhifəsi */
+.sifaris-info {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.info-row {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-lg);
+}
+
+.info-row h3 {
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.qaliq-borc-pozitiv {
+    color: var(--success-color);
+}
+
+.qaliq-borc-negativ {
+    color: var(--danger-color);
+}
+
+/* Smoke Animation */
+.smoke {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: rgba(200, 200, 200, 0.4);
+    border-radius: 50%;
+    animation: smoke 2s linear infinite;
+}
+
+@keyframes smoke {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.5;
+    }
+    100% {
+        transform: translate(-20px, -20px) scale(2);
+        opacity: 0;
     }
 }

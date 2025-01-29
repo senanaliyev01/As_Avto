@@ -23,49 +23,13 @@ body {
     color: var(--text-primary);
 }
 
-/* Header Styles */
-.header-nav {
-    background: var(--primary-color);
-    backdrop-filter: blur(10px);
-    padding: 1rem;
+
+
+
+
+.h2 {
     margin: 0;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    box-shadow: var(--shadow-md);
-    box-sizing: border-box;
-}
-
-.working-hours {
-    background-color: var(--secondary-color);
-    color: var(--text-secondary);
-    text-align: center;
-    padding: 0.5rem 0;
-    font-size: 0.9rem;
-    letter-spacing: 0.5px;
-    width: 100%;
-}
-
-.header-nav a {
-    color: #bdcbe0;
-    text-decoration: none;
-    font-weight: 500;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    transition: var(--transition);
-    background: transparent;
-}
-
-.header-nav a:hover {
-    background: var(--primary-color);
     color: white;
-    transform: translateY(-2px);
-}
-
-.header-nav h2 {
-    margin: 0;
-    color: var(--primary-color);
     font-weight: 600;
     margin-left: auto;
 }

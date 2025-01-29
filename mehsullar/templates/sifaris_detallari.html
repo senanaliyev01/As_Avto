@@ -8,15 +8,15 @@
 {% endblock %}
 
 {% block content %}
-
-
+<nav class="header-nav">
+    <a href="{% url 'main' %}">Əsas Səhifə</a>
+    <a href="{% url 'sifaris_izle' %}">Sifarişlərim</a>
     <h2>Sifariş #{{ sifaris.id }}</h2>
-
+</nav>
 
 <div class="sifaris-info">
     <div class="info-row">
         <h3>Sifariş Məlumatları</h3>
-        <h2>Sifariş #{{ sifaris.id }}</h2>
         <p><strong>Tarix:</strong> {{ sifaris.formatted_tarix }}</p>
         <div class="order-progress">
             <div class="progress-step {% if sifaris.status == 'gozleyir' or sifaris.status == 'hazirlanir' or sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}active{% endif %}">

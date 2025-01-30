@@ -318,8 +318,8 @@ body {
 }
 
 .marka-image-pr-list {
-    width: 70px;
-    height: 70px;
+    width: 80px;
+    height: auto;
     display: inline-block;
     margin: 0 5px;
     vertical-align: middle;

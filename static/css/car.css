@@ -1,6 +1,6 @@
 /* Ümumi Stil */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Arial, sans-serif;
     background-color: #1a1a2e; /* Tünd göy fon */
     color: #ffffff; /* Ağ mətn */
 }
@@ -13,6 +13,8 @@ body {
 /* Başlıq */
 h1 {
     color: #64ffda; /* Açıq mavi başlıq */
+    text-align: center; /* Mərkəzə düzləşdir */
+    margin-bottom: 30px; /* Aşağıda boşluq */
 }
 
 /* Kartlar */
@@ -20,17 +22,21 @@ h1 {
     background-color: #162447; /* Tünd göy kart fonu */
     border: none; /* Kartın sərhədini sil */
     border-radius: 10px; /* Küncləri yuvarlaqlaşdır */
-    transition: transform 0.3s; /* Hover zamanı animasiya */
+    transition: transform 0.3s, box-shadow 0.3s; /* Hover zamanı animasiya */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Kartın kölgəsi */
 }
 
 .card:hover {
-    transform: scale(1.05); /* Hover zamanı kartın böyüməsi */
+    transform: translateY(-5px); /* Hover zamanı kartın yuxarıya qalxması */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3); /* Hover zamanı kölgənin artması */
 }
 
 /* Kart şəkli */
 .card-img-top {
     border-top-left-radius: 10px; /* Üst küncləri yuvarlaqlaşdır */
     border-top-right-radius: 10px; /* Üst küncləri yuvarlaqlaşdır */
+    height: 200px; /* Şəkil hündürlüyü */
+    object-fit: cover; /* Şəkilin ölçüsünü tənzimləyir */
 }
 
 /* Kartın içi */
@@ -67,4 +73,10 @@ strong {
 
 .btn:hover {
     background-color: #64ffda; /* Hover zamanı açıq mavi */
+}
+
+/* Default şəkil */
+.default-image {
+    height: 200px; /* Default şəkil hündürlüyü */
+    object-fit: cover; /* Şəkilin ölçüsünü tənzimləyir */
 }

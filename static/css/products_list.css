@@ -312,7 +312,7 @@ body {
 /* Brand Images */
 .marka-pr-image {
     width: 120px;
-    height: 90px;
+    height: auto;
     display: block;
     margin: 0 auto;
 }

@@ -1,153 +1,96 @@
-/* Variables */
-:root {
-    --primary-dark: #1a237e;
-    --primary: #283593;
-    --primary-light: #3949ab;
-    --accent: #1e88e5;
-    --text-light: #ffffff;
-    --text-dark: #212121;
-    --gray-light: #f5f5f5;
-    --shadow: rgba(0, 0, 0, 0.1);
-}
-
-/* General Styles */
+/* Ümumi Stil */
 body {
-    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-    color: var(--text-dark);
-    background-color: var(--gray-light);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: #1a1a2e; /* Tünd göy fon */
+    color: #ffffff; /* Ağ mətn */
 }
 
+/* Container */
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 15px;
+    margin-top: 20px;
 }
 
-/* Header Styles */
+/* Başlıq */
 h1 {
-    color: var(--primary-dark);
-    font-size: 2.5rem;
-    font-weight: 700;
-    text-align: center;
-    margin: 2rem 0;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    color: #64ffda; /* Açıq mavi başlıq */
+    text-align: center; /* Mərkəzə düzləşdir */
+    margin-bottom: 30px; /* Aşağıda boşluq */
 }
 
-/* Card Styles */
+/* Kartlar */
 .card {
-    border: none;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px var(--shadow);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    background: var(--text-light);
-    overflow: hidden;
+    background-color: #162447; /* Tünd göy kart fonu */
+    border: none; /* Kartın sərhədini sil */
+    border-radius: 10px; /* Küncləri yuvarlaqlaşdır */
+    transition: transform 0.3s, box-shadow 0.3s; /* Hover zamanı animasiya */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Kartın kölgəsi */
 }
 
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px); /* Hover zamanı kartın yuxarıya qalxması */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3); /* Hover zamanı kölgənin artması */
 }
 
+/* Kart şəkli */
 .card-img-top {
-    height: 200px;
-    object-fit: cover;
-    border-bottom: 3px solid var(--primary);
+    border-top-left-radius: 10px; /* Üst küncləri yuvarlaqlaşdır */
+    border-top-right-radius: 10px; /* Üst küncləri yuvarlaqlaşdır */
+    height: 200px; /* Şəkil hündürlüyü */
+    object-fit: cover; /* Şəkilin ölçüsünü tənzimləyir */
 }
 
+/* Kartın içi */
 .card-body {
-    padding: 1.5rem;
+    padding: 1.5rem; /* İç boşluq */
 }
 
-.card-title {
-    color: var(--primary-dark);
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-}
-
-.card-text {
-    color: var(--primary);
-    font-size: 1.1rem;
-    font-weight: 500;
-    margin-bottom: 1.5rem;
-}
-
-/* Button Styles */
-.btn-primary {
-    background-color: var(--primary);
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 5px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    transition: background-color 0.3s ease;
-}
-
-.btn-primary:hover {
-    background-color: var(--primary-dark);
-}
-
-/* Detail Page Styles */
+/* Şəkil qalereyası */
 .image-gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin: 2rem 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Şəkillər arasında boşluq */
 }
 
 .image-gallery img {
-    width: 100%;
-    height: 250px;
-    object-fit: cover;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px var(--shadow);
-    transition: transform 0.3s ease;
+    width: 300px; 
+    border-radius: 10px; /* Küncləri yuvarlaqlaşdır */
+    border: 2px solid #64ffda; /* Açıq mavi sərhəd */
 }
 
-.image-gallery img:hover {
-    transform: scale(1.02);
+/* Mətni vurğulamaq üçün */
+strong {
+    color: #64ffda; /* Açıq mavi vurğulama */
 }
 
-/* Car Details */
-.container p {
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-    line-height: 1.6;
+/* Buton */
+.btn {
+    background-color: #0f3460; /* Tünd göy fon */
+    color: #ffffff; /* Ağ mətn */
+    border: none; /* Sərhəd yoxdur */
+    border-radius: 5px; /* Küncləri yuvarlaqlaşdır */
+    padding: 10px 20px; /* Yuxarı/aşağı və sağ/sol boşluq */
+    font-size: 16px; /* Mətn ölçüsü */
+    font-weight: bold; /* Qalın mətn */
+    text-transform: uppercase; /* Böyük hərflərlə yaz */
+    cursor: pointer; /* İmleci göstərici halına gətir */
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s; /* Hover zamanı animasiya */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Butonun kölgəsi */
+    text-decoration: none;
 }
 
-.container p strong {
-    color: var(--primary-dark);
-    font-weight: 600;
+.btn:hover {
+    background-color: #64ffda; /* Hover zamanı açıq mavi */
+    transform: translateY(-2px); /* Hover zamanı yuxarıya qalxma effekti */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Hover zamanı kölgənin artması */
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    h1 {
-        font-size: 2rem;
-    }
-    
-    .card-img-top {
-        height: 180px;
-    }
-    
-    .image-gallery {
-        grid-template-columns: 1fr;
-    }
+.btn:active {
+    transform: translateY(0); /* Basıldıqda geri dönmə effekti */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Basıldıqda kölgənin azalması */
 }
 
-/* Loading Animation */
-.card img {
-    opacity: 0;
-    animation: fadeIn 0.5s ease forwards;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+/* Default şəkil */
+.default-image {
+    height: 200px; /* Default şəkil hündürlüyü */
+    object-fit: cover; /* Şəkilin ölçüsünü tənzimləyir */
 }

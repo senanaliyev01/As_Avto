@@ -14,7 +14,7 @@
         <div class="col-md-4 mb-4">
             <div class="card">
                 {% if car.images.all %}
-                    <img src="{{ car.images.all.0.image.url }}" class="card-img-top" alt="{{ car.name }}">
+                    <img src="{{ car.images.all.image.url }}" class="card-img-top" alt="{{ car.name }}">
                 {% else %}
                     <img src="{% static 'img/default.png' %}" class="card-img-top" alt="Default Image">
                 {% endif %}

@@ -3,6 +3,8 @@ body {
     font-family: 'Segoe UI', Arial, sans-serif;
     background-color: #1a1a2e; /* Tünd göy fon */
     color: #ffffff; /* Ağ mətn */
+    margin: 0;
+    padding: 0;
 }
 
 /* Container */

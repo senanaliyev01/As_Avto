@@ -43,15 +43,9 @@ h1 {
 }
 
 /* Kartın içi */
-.card-title{
-    text-align: center;
-    font-size: 18px;
-    
-}
-
-
 .card-body {
     padding: 1.5rem; /* İç boşluq */
+    text-align: center; /* Butonu mərkəzə düzləşdir */
 }
 
 /* Kartların düzülüşü */
@@ -102,6 +96,7 @@ strong {
     transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s; /* Hover zamanı animasiya */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Butonun kölgəsi */
     text-decoration: none;
+    display: inline-block; /* Butonu mərkəzə düzləşdirmək üçün */
 }
 
 .btn:hover {

@@ -37,12 +37,19 @@ h1 {
 /* Kart şəkli */
 .card-img-top {
     width: 100%; /* Kartın genişliyinə uyğunlaşdır */
-    height: 200px; /* Şəkil hündürlüyü */
+    height:auto; /* Şəkil hündürlüyü */
     object-fit: cover; /* Şəkilin ölçüsünü tənzimləyir */
     object-position: center; /* Şəkilin mərkəzini göstər */
 }
 
 /* Kartın içi */
+.card-title{
+    text-align: center;
+    font-size: 18px;
+    
+}
+
+
 .card-body {
     padding: 1.5rem; /* İç boşluq */
 }

@@ -13,7 +13,11 @@
         {% for car in cars %}
         <div class="col-md-4 mb-4">
             <div class="card">
-                <img src="{{ car.image.url }}" class="card-img-top" alt="{{ car.name }}">
+                {% if car.images.all %}
+                    <img src="{{ car.images.all.0.image.url }}" class="card-img-top" alt="{{ car.name }}">
+                {% else %}
+                    <img src="{% static 'img/default.png' %}" class="card-img-top" alt="Default Image">
+                {% endif %}
                 <div class="card-body">
                     <h5 class="card-title">{{ car.name }}</h5>
                     <p class="card-text">

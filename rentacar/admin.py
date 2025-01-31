@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import Car, CarImage
 
 class CarImageInline(admin.TabularInline):  # Inline sinifi
-    model = Car.images.through  # ManyToManyField üçün əlaqə modeli
+    model = CarImage  # CarImage modelini inline olaraq əlavə edirik
     extra = 1  # Yeni şəkil əlavə etmək üçün boş forma
 
 @admin.register(Car)
@@ -14,4 +14,4 @@ class CarAdmin(admin.ModelAdmin):
 
 @admin.register(CarImage)
 class CarImageAdmin(admin.ModelAdmin):
-    list_display = ('image',)
+    list_display = ('car', 'image')  # Car və image sahələrini göstər

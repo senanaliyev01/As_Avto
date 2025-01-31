@@ -26,6 +26,7 @@ h1 {
     border-radius: 10px; /* Küncləri yuvarlaqlaşdır */
     transition: transform 0.3s, box-shadow 0.3s; /* Hover zamanı animasiya */
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Kartın kölgəsi */
+    overflow: hidden; /* Kartın içindəki elementlərin kənara daşmaması üçün */
 }
 
 .card:hover {
@@ -35,10 +36,10 @@ h1 {
 
 /* Kart şəkli */
 .card-img-top {
-    border-top-left-radius: 10px; /* Üst küncləri yuvarlaqlaşdır */
-    border-top-right-radius: 10px; /* Üst küncləri yuvarlaqlaşdır */
+    width: 100%; /* Kartın genişliyinə uyğunlaşdır */
     height: 200px; /* Şəkil hündürlüyü */
     object-fit: cover; /* Şəkilin ölçüsünü tənzimləyir */
+    object-position: center; /* Şəkilin mərkəzini göstər */
 }
 
 /* Kartın içi */

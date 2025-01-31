@@ -7,10 +7,8 @@ body {
 
 /* Container */
 .container {
-    width: 100%; /* Ekran genişliyinə uyğunlaşsın */
-    margin: 0 auto;
+    margin-top: 20px;
 }
-
 
 /* Başlıq */
 h1 {
@@ -44,6 +42,18 @@ h1 {
 /* Kartın içi */
 .card-body {
     padding: 1.5rem; /* İç boşluq */
+}
+
+/* Kartların düzülüşü */
+.row {
+    display: flex;
+    flex-wrap: wrap; /* Kartların altına keçməsi üçün */
+    justify-content: center; /* Kartları mərkəzə düzləşdir */
+}
+
+.col-md-4 {
+    flex: 0 0 30%; /* Kartların genişliyi */
+    margin: 10px; /* Kartlar arasında boşluq */
 }
 
 /* Şəkil qalereyası */

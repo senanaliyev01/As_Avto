@@ -1,0 +1,63 @@
+/* Ümumi Stil */
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: #1a1a2e; /* Tünd göy fon */
+    color: #ffffff; /* Ağ mətn */
+}
+
+/* Container */
+.container {
+    margin-top: 20px;
+}
+
+/* Başlıq */
+h1 {
+    color: #64ffda; /* Açıq mavi başlıq */
+    text-align: center; /* Mərkəzə düzləşdir */
+    margin-bottom: 30px; /* Aşağıda boşluq */
+}
+
+/* Şəkil qalereyası */
+.image-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Şəkilləri mərkəzə düzləşdir */
+    gap: 10px; /* Şəkillər arasında boşluq */
+}
+
+.image-gallery img {
+    width: 300px; 
+    border-radius: 10px; /* Küncləri yuvarlaqlaşdır */
+    border: 2px solid #64ffda; /* Açıq mavi sərhəd */
+}
+
+/* Mətni vurğulamaq üçün */
+strong {
+    color: #64ffda; /* Açıq mavi vurğulama */
+}
+
+/* Buton */
+.btn {
+    background-color: #0f3460; /* Tünd göy fon */
+    color: #ffffff; /* Ağ mətn */
+    border: none; /* Sərhəd yoxdur */
+    border-radius: 5px; /* Küncləri yuvarlaqlaşdır */
+    padding: 10px 20px; /* Yuxarı/aşağı və sağ/sol boşluq */
+    font-size: 16px; /* Mətn ölçüsü */
+    font-weight: bold; /* Qalın mətn */
+    text-transform: uppercase; /* Böyük hərflərlə yaz */
+    cursor: pointer; /* İmleci göstərici halına gətir */
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s; /* Hover zamanı animasiya */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Butonun kölgəsi */
+}
+
+.btn:hover {
+    background-color: #64ffda; /* Hover zamanı açıq mavi */
+    transform: translateY(-2px); /* Hover zamanı yuxarıya qalxma effekti */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Hover zamanı kölgənin artması */
+}
+
+.btn:active {
+    transform: translateY(0); /* Basıldıqda geri dönmə effekti */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Basıldıqda kölgənin azalması */
+}

@@ -7,7 +7,7 @@ body {
 
 /* Container */
 .container {
-    width: auto; /* Ekran genişliyinə uyğunlaşsın */
+    width: 100%; /* Ekran genişliyinə uyğunlaşsın */
     margin: 0 auto;
 }
 

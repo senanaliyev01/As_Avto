@@ -1,99 +1,98 @@
 /* Ümumi Stil */
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
-    background-color: var(--primary-color); /* Baza CSS-dən */
-    color: var(--text-primary);
+    background-color: #1a1a2e; /* Tünd göy fon */
+    color: #ffffff; /* Ağ mətn */
 }
 
 /* Container */
 .container {
-    margin-top: 20px;
-    max-width: 1200px;
+    width: auto; /* Ekran genişliyinə uyğunlaşsın */
+    margin: 0 auto;
 }
+
 
 /* Başlıq */
 h1 {
-    color: var(--accent-color);
-    text-align: center;
-    margin-bottom: 30px;
+    color: #64ffda; /* Açıq mavi başlıq */
+    text-align: center; /* Mərkəzə düzləşdir */
+    margin-bottom: 30px; /* Aşağıda boşluq */
 }
 
 /* Kartlar */
 .card {
-    background-color: var(--secondary-color);
-    border: none;
-    border-radius: 10px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    background-color: #162447; /* Tünd göy kart fonu */
+    border: none; /* Kartın sərhədini sil */
+    border-radius: 10px; /* Küncləri yuvarlaqlaşdır */
+    transition: transform 0.3s, box-shadow 0.3s; /* Hover zamanı animasiya */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Kartın kölgəsi */
 }
 
 .card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    transform: translateY(-5px); /* Hover zamanı kartın yuxarıya qalxması */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3); /* Hover zamanı kölgənin artması */
 }
 
 /* Kart şəkli */
 .card-img-top {
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    height: 200px;
-    object-fit: cover;
+    border-top-left-radius: 10px; /* Üst küncləri yuvarlaqlaşdır */
+    border-top-right-radius: 10px; /* Üst küncləri yuvarlaqlaşdır */
+    height: 200px; /* Şəkil hündürlüyü */
+    object-fit: cover; /* Şəkilin ölçüsünü tənzimləyir */
+}
+
+/* Kartın içi */
+.card-body {
+    padding: 1.5rem; /* İç boşluq */
 }
 
 /* Şəkil qalereyası */
 .image-gallery {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
+    gap: 10px; /* Şəkillər arasında boşluq */
 }
 
 .image-gallery img {
-    width: 280px;
-    border-radius: 10px;
-    border: 2px solid var(--accent-color);
-    transition: transform 0.3s ease;
-}
-
-.image-gallery img:hover {
-    transform: scale(1.1);
+    width: 300px; 
+    border-radius: 10px; /* Küncləri yuvarlaqlaşdır */
+    border: 2px solid #64ffda; /* Açıq mavi sərhəd */
 }
 
 /* Mətni vurğulamaq üçün */
 strong {
-    color: var(--accent-color);
+    color: #64ffda; /* Açıq mavi vurğulama */
 }
 
 /* Buton */
-.btn-custom {
-    background-color: var(--primary-color);
-    color: var(--text-primary);
-    border: none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    font-size: 16px;
-    font-weight: bold;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+.btn {
+    background-color: #0f3460; /* Tünd göy fon */
+    color: #ffffff; /* Ağ mətn */
+    border: none; /* Sərhəd yoxdur */
+    border-radius: 5px; /* Küncləri yuvarlaqlaşdır */
+    padding: 10px 20px; /* Yuxarı/aşağı və sağ/sol boşluq */
+    font-size: 16px; /* Mətn ölçüsü */
+    font-weight: bold; /* Qalın mətn */
+    text-transform: uppercase; /* Böyük hərflərlə yaz */
+    cursor: pointer; /* İmleci göstərici halına gətir */
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s; /* Hover zamanı animasiya */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Butonun kölgəsi */
     text-decoration: none;
 }
 
-.btn-custom:hover {
-    background-color: var(--accent-color);
-    color: var(--primary-color);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+.btn:hover {
+    background-color: #64ffda; /* Hover zamanı açıq mavi */
+    transform: translateY(-2px); /* Hover zamanı yuxarıya qalxma effekti */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Hover zamanı kölgənin artması */
 }
 
-/* Responsive Dizayn */
-@media (max-width: 768px) {
-    .image-gallery img {
-        width: 100%;
-    }
+.btn:active {
+    transform: translateY(0); /* Basıldıqda geri dönmə effekti */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Basıldıqda kölgənin azalması */
+}
 
-    .card {
-        margin-bottom: 20px;
-    }
+/* Default şəkil */
+.default-image {
+    height: 200px; /* Default şəkil hündürlüyü */
+    object-fit: cover; /* Şəkilin ölçüsünü tənzimləyir */
 }

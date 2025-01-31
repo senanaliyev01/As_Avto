@@ -14,13 +14,13 @@ class Car(models.Model):
     sale_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Satış Qiyməti')
     rent_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='İcarə Qiyməti')
     description = models.TextField(verbose_name='Haqqında')
+    images = models.ManyToManyField('CarImage', related_name='cars', blank=True)
 
     def __str__(self):
         return self.name
 
 class CarImage(models.Model):
-    car = models.ForeignKey(Car, related_name='images', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='cars/', verbose_name='Maşının Şəkli')
 
     def __str__(self):
-        return f"{self.car.name} - Şəkil"
+        return f"Şəkil - {self.id}"

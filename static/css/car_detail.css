@@ -10,8 +10,6 @@ body {
 /* Container */
 .container {
     margin-top: 20px;
-    max-width: 1200px; /* Maksimum genişlik */
-    padding: 0 15px; /* Yanlarda boşluq */
 }
 
 /* Başlıq */
@@ -39,8 +37,6 @@ h1 {
 strong {
     color: #64ffda; /* Açıq mavi vurğulama */
     font-size: 20px;
-    display: block; /* Blok elementi halına gətir */
-    text-align: center; /* Mərkəzə düzləşdir */
 }
 
 /* Buton */
@@ -56,8 +52,6 @@ strong {
     cursor: pointer; /* İmleci göstərici halına gətir */
     transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s; /* Hover zamanı animasiya */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Butonun kölgəsi */
-    text-decoration: none;
-    display: inline-block; /* Butonu mərkəzə düzləşdirmək üçün */
 }
 
 .btn:hover {

@@ -52,7 +52,7 @@ h1 {
 }
 
 .image-gallery img {
-    width: calc(33.33% - 10px); /* Üç şəkil yan-yana */
+    width: 300px; 
     border-radius: 10px; /* Küncləri yuvarlaqlaşdır */
     border: 2px solid #64ffda; /* Açıq mavi sərhəd */
 }
@@ -68,11 +68,24 @@ strong {
     color: #ffffff; /* Ağ mətn */
     border: none; /* Sərhəd yoxdur */
     border-radius: 5px; /* Küncləri yuvarlaqlaşdır */
-    transition: background-color 0.3s; /* Hover zamanı animasiya */
+    padding: 10px 20px; /* Yuxarı/aşağı və sağ/sol boşluq */
+    font-size: 16px; /* Mətn ölçüsü */
+    font-weight: bold; /* Qalın mətn */
+    text-transform: uppercase; /* Böyük hərflərlə yaz */
+    cursor: pointer; /* İmleci göstərici halına gətir */
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s; /* Hover zamanı animasiya */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Butonun kölgəsi */
 }
 
 .btn:hover {
     background-color: #64ffda; /* Hover zamanı açıq mavi */
+    transform: translateY(-2px); /* Hover zamanı yuxarıya qalxma effekti */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Hover zamanı kölgənin artması */
+}
+
+.btn:active {
+    transform: translateY(0); /* Basıldıqda geri dönmə effekti */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Basıldıqda kölgənin azalması */
 }
 
 /* Default şəkil */

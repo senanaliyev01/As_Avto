@@ -29,11 +29,8 @@ h1 {
 
 .image-gallery img {
     width: 300px; 
-    height: 200px; /* Hündürlük əlavə edildi */
     border-radius: 10px; /* Küncləri yuvarlaqlaşdır */
     border: 2px solid #64ffda; /* Açıq mavi sərhəd */
-    object-fit: cover; /* Şəkilin ölçüsünü tənzimləyir */
-    object-position: center; /* Şəkilin mərkəzini göstər */
 }
 
 /* Mətni vurğulamaq üçün */

@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "/istifadeciler/password_change/",
                 "/istifadeciler/register/",
                 "/istifadeciler/login/",
+                /rent-a-car/,
             ],
             baseUrl: "https://as-avto.com"
         },

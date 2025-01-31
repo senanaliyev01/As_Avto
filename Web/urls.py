@@ -10,6 +10,7 @@ urlpatterns = [
     path('', include('anaevim.urls')),
     path('', include('esasevim.urls')),
     path('', include('mehsullar.urls')),
+    path('', include('rentacar.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 admin.site.site_title = 'AS-AVTO'

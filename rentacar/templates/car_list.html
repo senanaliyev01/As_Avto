@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Avtomobillər{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/car.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">Avtomobillər</h1>
+    <div class="row">
+        {% for car in cars %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <img src="{{ car.image.url }}" class="card-img-top" alt="{{ car.name }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ car.name }}</h5>
+                    <p class="card-text">
+                        {% if car.car_type == 'rent' %}
+                            İcarə Qiyməti: {{ car.rent_price }} AZN
+                        {% else %}
+                            Satış Qiyməti: {{ car.sale_price }} AZN
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'car_detail' car.id %}" class="btn btn-primary">Ətraflı</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

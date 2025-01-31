@@ -1,0 +1,70 @@
+/* Ümumi Stil */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #1a1a2e; /* Tünd göy fon */
+    color: #ffffff; /* Ağ mətn */
+}
+
+/* Container */
+.container {
+    margin-top: 20px;
+}
+
+/* Başlıq */
+h1 {
+    color: #64ffda; /* Açıq mavi başlıq */
+}
+
+/* Kartlar */
+.card {
+    background-color: #162447; /* Tünd göy kart fonu */
+    border: none; /* Kartın sərhədini sil */
+    border-radius: 10px; /* Küncləri yuvarlaqlaşdır */
+    transition: transform 0.3s; /* Hover zamanı animasiya */
+}
+
+.card:hover {
+    transform: scale(1.05); /* Hover zamanı kartın böyüməsi */
+}
+
+/* Kart şəkli */
+.card-img-top {
+    border-top-left-radius: 10px; /* Üst küncləri yuvarlaqlaşdır */
+    border-top-right-radius: 10px; /* Üst küncləri yuvarlaqlaşdır */
+}
+
+/* Kartın içi */
+.card-body {
+    padding: 1.5rem; /* İç boşluq */
+}
+
+/* Şəkil qalereyası */
+.image-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Şəkillər arasında boşluq */
+}
+
+.image-gallery img {
+    width: calc(33.33% - 10px); /* Üç şəkil yan-yana */
+    border-radius: 10px; /* Küncləri yuvarlaqlaşdır */
+    border: 2px solid #64ffda; /* Açıq mavi sərhəd */
+}
+
+/* Mətni vurğulamaq üçün */
+strong {
+    color: #64ffda; /* Açıq mavi vurğulama */
+}
+
+/* Buton */
+.btn {
+    background-color: #0f3460; /* Tünd göy fon */
+    color: #ffffff; /* Ağ mətn */
+    border: none; /* Sərhəd yoxdur */
+    border-radius: 5px; /* Küncləri yuvarlaqlaşdır */
+    transition: background-color 0.3s; /* Hover zamanı animasiya */
+}
+
+.btn:hover {
+    background-color: #64ffda; /* Hover zamanı açıq mavi */
+}

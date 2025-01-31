@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'istifadeciler',
     'mehsullar',
     'esasevim',
+    'rentacar',
 ]
 
 MIDDLEWARE = [

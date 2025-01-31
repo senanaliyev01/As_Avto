@@ -36,6 +36,9 @@ h1 {
 /* Mətni vurğulamaq üçün */
 strong {
     color: #64ffda; /* Açıq mavi vurğulama */
+    font-size: 20px;
+    display: block; /* Blok elementi halına gətir */
+    text-align: center; /* Mərkəzə düzləşdir */
 }
 
 /* Buton */

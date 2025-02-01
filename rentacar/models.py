@@ -9,7 +9,7 @@ class Car(models.Model):
     ]
     
     name = models.CharField(max_length=100, verbose_name='Maşının Adı')
-    car_year =models.CharField(max_length=100, verbose_name='Buraxılma Tarixi')
+    car_year = models.CharField(max_length=100, verbose_name='Buraxılma Tarixi')
     engine_capacity = models.FloatField(verbose_name='Motor Həcmi')
     car_type = models.CharField(max_length=4, choices=CAR_TYPE_CHOICES, verbose_name='İcarə/Satış')
     sale_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Satış Qiyməti')

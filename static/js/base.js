@@ -406,11 +406,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const searchForm = document.getElementById('header-search-form');
         if (searchForm) {
             searchForm.addEventListener('submit', function(e) {
+                e.preventDefault(); // Formanın standart təqdim edilməsini dayandır
                 const searchIcon = this.querySelector('button i');
                 if (searchIcon) {
                     searchIcon.classList.add('spinning');
                     setTimeout(() => {
                         searchIcon.classList.remove('spinning');
+                        // 2 saniyə sonra formanı təqdim et
+                        this.submit();
                     }, 2000);
                 }
             });

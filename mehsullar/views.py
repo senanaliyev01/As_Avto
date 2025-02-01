@@ -461,7 +461,7 @@ def quick_search(request):
     mehsullar = Mehsul.objects.filter(
         Q(brend_kod__icontains=search_text) |
         Q(oem__icontains=search_text)
-    )  # Limit aradan qaldırıldı
+    )
     
     results = []
     for mehsul in mehsullar:
@@ -471,7 +471,8 @@ def quick_search(request):
             'brend_kod': mehsul.brend_kod,
             'oem': mehsul.oem,
             'qiymet': str(mehsul.qiymet),
-            'url': f'/mehsullar/mehsul/{mehsul.id}/'
+            'url': f'/mehsullar/mehsul/{mehsul.id}/',
+            'sekil': mehsul.sekil.url if mehsul.sekil else None
         })
     
     return JsonResponse({'results': results})

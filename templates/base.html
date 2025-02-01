@@ -20,7 +20,12 @@
                 <img src="{% static '/img/Header_Logo.png' %}" alt="Logo">
             </div>
             <div class="quick-search">
-                <input type="text" id="quick-search-input" placeholder="Brend kod və ya OEM kod ilə axtar...">
+                <div class="search-container">
+                    <input type="text" id="quick-search-input" placeholder="Brend kod və ya OEM kod ilə axtar...">
+                    <button id="quick-search-button" type="button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
                 <div id="quick-search-results" class="quick-search-results"></div>
             </div>
             <div class="header-right">

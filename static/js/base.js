@@ -404,23 +404,32 @@ function initializeSearchForm() {
             const buttonText = searchButton.querySelector('.button-text');
             const spinner = searchButton.querySelector('.spinner');
 
-            form.addEventListener('submit', function(e) {
+            // Əvvəlcə mövcud event listener-ləri təmizləyək
+            const newForm = form.cloneNode(true);
+            form.parentNode.replaceChild(newForm, form);
+
+            // Yeni event listener əlavə edək
+            newForm.addEventListener('submit', function(e) {
                 e.preventDefault();
 
+                const newSearchButton = this.querySelector('#search-button');
+                const newButtonText = newSearchButton.querySelector('.button-text');
+                const newSpinner = newSearchButton.querySelector('.spinner');
+
                 // Əgər artıq loading vəziyyətindədirsə, təkrar işləməsin
-                if (searchButton.classList.contains('loading')) {
+                if (newSearchButton.classList.contains('loading')) {
                     return;
                 }
 
                 // Buttonu loading vəziyyətinə keçiririk
-                searchButton.classList.add('loading');
-                buttonText.style.opacity = '0.5';
-                spinner.style.display = 'inline-block';
+                newSearchButton.classList.add('loading');
+                newButtonText.style.opacity = '0.5';
+                newSpinner.style.display = 'inline-block';
 
                 // 2 saniyə gözləyirik
                 setTimeout(() => {
                     // Formanı göndəririk
-                    form.submit();
+                    this.submit();
                 }, 2000);
             });
         }

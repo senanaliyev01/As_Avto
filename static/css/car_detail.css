@@ -19,7 +19,7 @@ body {
 }
 
 /* Container */
-.container {
+.car-detail-container {
     margin-top: 20px;
     padding: 2rem 0;
     max-width: 1200px;
@@ -27,7 +27,7 @@ body {
 }
 
 /* Başlıq */
-h1 {
+.car-detail-title {
     color: var(--text-primary);
     font-weight: 600;
     text-align: center;
@@ -48,7 +48,7 @@ h1 {
 
 .image-gallery img {
     width: 100%;
-    height: 300px;
+    height: auto;
     object-fit: cover;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -61,7 +61,7 @@ h1 {
 }
 
 /* Mətni vurğulamaq üçün */
-p {
+.car-detail-info p {
     font-size: 1.1rem;
     line-height: 1.6;
     margin-bottom: 1rem;
@@ -72,7 +72,7 @@ p {
     border-left: 4px solid var(--accent-color);
 }
 
-strong {
+.car-detail-info strong {
     color: var(--text-primary);
     font-weight: 600;
     margin-right: 0.5rem;
@@ -105,7 +105,7 @@ strong {
 }
 
 @media (max-width: 768px) {
-    .container {
+    .car-detail-container {
         padding: 1rem;
     }
 
@@ -117,11 +117,11 @@ strong {
         height: 250px;
     }
 
-    h1 {
+    .car-detail-title {
         font-size: 1.5rem;
     }
 
-    p {
+    .car-detail-info p {
         font-size: 1rem;
         padding: 0.8rem;
     }

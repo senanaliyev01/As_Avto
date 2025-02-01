@@ -24,7 +24,7 @@ body {
 
 /* Başlıq */
 h1 {
-    color: var(--primary-color);
+    color: var(--accent-color);
     font-weight: 600;
     text-align: center;
     margin-bottom: 2rem;

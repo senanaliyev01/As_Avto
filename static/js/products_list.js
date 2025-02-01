@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     searchForm.addEventListener('submit', function(e) {
         e.preventDefault(); // Formanın default davranışını dayandırıq
 
-        // Buttonu loading vəziyyətinə keçiriri1111k
+        // Buttonu loading vəziyyətinə keçiririk
         searchButton.classList.add('loading');
         buttonText.style.opacity = '0.5';
         spinner.style.display = 'inline-block';

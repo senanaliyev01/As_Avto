@@ -19,14 +19,14 @@
             <div class="logo">
                 <img src="{% static '/img/Header_Logo.png' %}" alt="Logo">
             </div>
-            <div class="quick-search">
-                <div class="search-container">
-                    <input type="text" id="quick-search-input" placeholder="Brend kod və ya OEM kod ilə axtar...">
-                    <button id="quick-search-button" type="button">
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="header-search" placeholder="Brend kodu və ya OEM kodu daxil edin">
+                    <button type="button" id="header-search-btn">
                         <i class="fas fa-search"></i>
                     </button>
                 </div>
-                <div id="quick-search-results" class="quick-search-results"></div>
+                <div id="search-results-dropdown" class="search-results-dropdown"></div>
             </div>
             <div class="header-right">
                 <a href="{% url 'profile' %}"><i class="fas fa-user"></i> {{ user.username }}</a>

@@ -412,7 +412,7 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
 
     elements.append(table)
     
-    # Ümumi məbləğləri cədvəlin altında göstər
+    # Ümumi məbləği cədvəlin altında göstər
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq əlavə et
     total_amount = Paragraph(f"<strong>Ümumi Məbləğ: {sifaris.cemi_mebleg} AZN</strong>", styles['Normal'])
     elements.append(total_amount)
@@ -451,28 +451,33 @@ def mehsul_haqqinda(request, mehsul_id):
         'mehsul': mehsul
     })
 
-@login_required
-def quick_search(request):
-    search_text = request.GET.get('q', '')
-    if len(search_text) < 2:
-        return JsonResponse({'results': []})
+@csrf_exempt
+def real_time_search(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        search_query = data.get('query', '').strip()
+        
+        if len(search_query) < 2:
+            return JsonResponse({'results': []})
+            
+        # Brend kodu və ya OEM koduna görə axtarış
+        mehsullar = Mehsul.objects.filter(
+            Q(brend_kod__icontains=search_query) |
+            Q(oem__icontains=search_query)
+        )[:10]  # Maksimum 10 nəticə
+        
+        results = []
+        for mehsul in mehsullar:
+            results.append({
+                'id': mehsul.id,
+                'adi': mehsul.adi,
+                'brend_kod': mehsul.brend_kod,
+                'oem': mehsul.oem,
+                'qiymet': str(mehsul.qiymet),
+                'sekil_url': mehsul.sekil.url if mehsul.sekil else None,
+                'detail_url': f'/mehsullar/mehsul/{mehsul.id}/'
+            })
+            
+        return JsonResponse({'results': results})
     
-    # Yalnız brend kod və OEM koduna görə axtarış
-    mehsullar = Mehsul.objects.filter(
-        Q(brend_kod__icontains=search_text) |
-        Q(oem__icontains=search_text)
-    )
-    
-    results = []
-    for mehsul in mehsullar:
-        results.append({
-            'id': mehsul.id,
-            'adi': mehsul.adi,
-            'brend_kod': mehsul.brend_kod,
-            'oem': mehsul.oem,
-            'qiymet': str(mehsul.qiymet),
-            'url': f'/mehsullar/mehsul/{mehsul.id}/',
-            'sekil': mehsul.sekil.url if mehsul.sekil else None
-        })
-    
-    return JsonResponse({'results': results})
+    return JsonResponse({'error': 'Invalid request method'}, status=400)

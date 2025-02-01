@@ -50,7 +50,7 @@ h1 {
 /* Kart şəkli */
 .card-img-top {
     width: 100%; /* Kartın genişliyinə uyğunlaşdır */
-    height: 200px; /* Şəkil hündürlüyü */
+    height: auto; /* Şəkil hündürlüyü */
     object-fit: cover; /* Şəkilin ölçüsünü tənzimləyir */
     object-position: center; /* Şəkilin mərkəzini göstər */
 }

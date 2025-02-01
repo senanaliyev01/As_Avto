@@ -22,10 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 2 saniyə gözləyirik
         setTimeout(() => {
-            // 2 saniyədən sonra formanı göndəririk və loading-i dayandırırıq
-            searchButton.classList.remove('loading');
-            buttonText.style.opacity = '1';
-            spinner.style.display = 'none';
+            // Formanı göndəririk
             searchForm.submit();
         }, 2000);
     });

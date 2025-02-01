@@ -149,12 +149,13 @@ header {
     right: 0;
     background: white;
     border: 1px solid #e0e0e0;
-    border-radius: 5px;
+    border-radius: 0 0 5px 5px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     max-height: 400px;
     overflow-y: auto;
     z-index: 1000;
     display: none;
+    margin-top: -1px;
 }
 
 .search-results-dropdown.active {
@@ -162,12 +163,13 @@ header {
 }
 
 .search-result-item {
-    padding: 10px 15px;
+    padding: 12px 15px;
     border-bottom: 1px solid #e0e0e0;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
+    transition: background-color 0.2s;
 }
 
 .search-result-item:last-child {
@@ -175,13 +177,16 @@ header {
 }
 
 .search-result-item:hover {
-    background: #f5f5f5;
+    background: #f8f9fa;
 }
 
 .search-result-item img {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     object-fit: contain;
+    border-radius: 4px;
+    border: 1px solid #e0e0e0;
+    padding: 2px;
 }
 
 .search-result-info {
@@ -192,12 +197,33 @@ header {
     margin: 0;
     font-size: 14px;
     color: #333;
+    font-weight: 600;
 }
 
 .search-result-info p {
-    margin: 5px 0 0;
+    margin: 4px 0 0;
     font-size: 12px;
     color: #666;
+    line-height: 1.4;
+}
+
+/* Scrollbar style for search results */
+.search-results-dropdown::-webkit-scrollbar {
+    width: 8px;
+}
+
+.search-results-dropdown::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 0 5px 5px 0;
+}
+
+.search-results-dropdown::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.search-results-dropdown::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
 }
 
 /* Footer Styles */

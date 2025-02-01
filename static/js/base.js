@@ -542,7 +542,7 @@
 
                 // Debounce tətbiq edirik
                 searchTimeout = setTimeout(() => {
-                    fetch('/mehsullar/real-time-search/', {
+                    fetch('/mehsullar/mehsul/real-time-search/', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -579,7 +579,7 @@
                     .catch(error => {
                         console.error('Axtarış zamanı xəta:', error);
                     });
-                }, 300); // 300ms debounce
+                }, 100); // Debounce müddətini 300ms-dən 100ms-ə endirdik
             });
 
             // Axtarış düyməsinə klikləndikdə

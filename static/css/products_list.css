@@ -11,7 +11,6 @@
     --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.1);
     --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.2);
     --transition: all 0.3s ease;
-    --hover-color: #172a45;
 }
 
 /* Base Styles */
@@ -100,52 +99,30 @@ body {
     color: rgba(255, 255, 255, 0.7);
 }
 
-/* Search Button Styles */
-.search-bar button {
-    background-color: var(--primary-color);
-    color: white;
+#search-button {
+    padding: 0.8rem 2rem;
     border: none;
-    padding: 8px 16px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #0029fb, #000000);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s;
-    border-radius: 4px;
-    position: relative;
-    min-width: 40px;
-    height: 40px;
-}
-
-.search-bar button:hover {
-    background-color: var(--hover-color);
-}
-
-.search-bar button .button-text {
-    display: inline-flex;
+    transition: all 0.3s ease;
+    display: flex;
     align-items: center;
     justify-content: center;
-    transition: opacity 0.3s;
+    gap: 0.5rem;
 }
 
-.search-bar button .spinner {
-    display: none;
-    width: 16px;
-    height: 16px;
-    border: 2px solid #f3f3f3;
-    border-top: 2px solid #3498db;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+#search-button:hover {
+    background: linear-gradient(135deg, #077eee, #038eff);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.search-bar button.loading {
-    position: relative;
-}
-
-@keyframes spin {
-    0% { transform: translate(-50%, -50%) rotate(0deg); }
-    100% { transform: translate(-50%, -50%) rotate(360deg); }
+#search-button:active {
+    transform: translateY(0);
 }
 
 /* Stock Status Badges */

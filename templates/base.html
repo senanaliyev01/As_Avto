@@ -19,6 +19,10 @@
             <div class="logo">
                 <img src="{% static '/img/Header_Logo.png' %}" alt="Logo">
             </div>
+            <div class="quick-search">
+                <input type="text" id="quick-search-input" placeholder="Brend kod və ya OEM kod ilə axtar...">
+                <div id="quick-search-results" class="quick-search-results"></div>
+            </div>
             <div class="header-right">
                 <a href="{% url 'profile' %}"><i class="fas fa-user"></i> {{ user.username }}</a>
                 <a href="{% url 'view_cart' %}" class="cart-link">

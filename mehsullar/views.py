@@ -412,7 +412,7 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
 
     elements.append(table)
     
-    # Ümumi məbləği cədvəlin altında göstər
+    # Ümumi məbləğləri cədvəlin altında göstər
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq əlavə et
     total_amount = Paragraph(f"<strong>Ümumi Məbləğ: {sifaris.cemi_mebleg} AZN</strong>", styles['Normal'])
     elements.append(total_amount)
@@ -450,3 +450,28 @@ def mehsul_haqqinda(request, mehsul_id):
     return render(request, 'mehsul_haqqinda.html', {
         'mehsul': mehsul
     })
+
+@login_required
+def quick_search(request):
+    search_text = request.GET.get('q', '')
+    if len(search_text) < 2:
+        return JsonResponse({'results': []})
+    
+    # Yalnız brend kod və OEM koduna görə axtarış
+    mehsullar = Mehsul.objects.filter(
+        Q(brend_kod__icontains=search_text) |
+        Q(oem__icontains=search_text)
+    )  # Limit aradan qaldırıldı
+    
+    results = []
+    for mehsul in mehsullar:
+        results.append({
+            'id': mehsul.id,
+            'adi': mehsul.adi,
+            'brend_kod': mehsul.brend_kod,
+            'oem': mehsul.oem,
+            'qiymet': str(mehsul.qiymet),
+            'url': f'/mehsullar/mehsul/{mehsul.id}/'
+        })
+    
+    return JsonResponse({'results': results})

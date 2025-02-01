@@ -453,21 +453,22 @@ def mehsul_haqqinda(request, mehsul_id):
 
 @login_required
 def realtime_search(request):
-    search_text = request.GET.get('search_text', '')
-    if len(search_text) < 2:  # Minimum 2 simvol yazıldıqda axtarış et
+    search_text = request.GET.get('search_text', '').strip()
+    if len(search_text) < 2:
         return JsonResponse({'results': []})
     
-    # Məhsulları axtar
+    # Məhsulları axtar (case-insensitive)
     mehsullar = Mehsul.objects.filter(
         Q(adi__icontains=search_text) |
-        Q(oem__icontains=search_text)
-    )[:5]  # Maksimum 5 nəticə göstər
+        Q(oem__icontains=search_text) |
+        Q(brend__adi__icontains=search_text)  # Brend adına görə də axtarış
+    ).select_related('brend').distinct()[:5]
     
     results = []
     for mehsul in mehsullar:
         results.append({
             'id': mehsul.id,
-            'adi': mehsul.adi,
+            'adi': f"{mehsul.brend.adi if mehsul.brend else ''} {mehsul.adi}",
             'oem': mehsul.oem,
             'sekil': mehsul.sekil.url if mehsul.sekil else None,
             'url': f'/mehsullar/mehsul/{mehsul.id}/'

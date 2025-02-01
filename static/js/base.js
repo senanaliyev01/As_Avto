@@ -419,7 +419,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
 
-                // 300ms gözlə və sonra sorğu göndər
+                // 100ms gözlə və sonra sorğu göndər
                 searchTimeout = setTimeout(() => {
                     fetch(`/mehsullar/realtime-search/?search_text=${encodeURIComponent(searchText)}`)
                         .then(response => response.json())
@@ -442,8 +442,12 @@ document.addEventListener('DOMContentLoaded', function() {
                             } else {
                                 searchResults.style.display = 'none';
                             }
+                        })
+                        .catch(error => {
+                            console.error('Axtarış xətası:', error);
+                            searchResults.style.display = 'none';
                         });
-                }, 300);
+                }, 100);
             });
 
             // Səhifənin digər yerlərinə klikləndikdə nəticələri gizlət

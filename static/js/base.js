@@ -404,20 +404,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Axtarış formu təqdim edilərkən spinner əlavə et
         const searchForm = document.getElementById('header-search-form');
-        if (searchForm) {
-            searchForm.addEventListener('submit', function(e) {
-                e.preventDefault(); // Formanın standart təqdim edilməsini dayandır
-                const searchIcon = this.querySelector('button i');
-                if (searchIcon) {
-                    searchIcon.classList.add('spinning');
-                    // 2 saniyə gözləyirik
-                    setTimeout(() => {
-                        searchIcon.classList.remove('spinning');
-                        this.submit(); // Formanı təqdim edirik
-                    }, 2000);
-                }
-            });
-        }
+        const searchButton = searchForm.querySelector('button'); // Axtarış düyməsini seçirik
+        const buttonText = searchButton.querySelector('.button-text');
+        const spinner = searchButton.querySelector('.spinner');
+
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Formanın standart təqdim edilməsini dayandır
+            searchButton.classList.add('loading');
+            buttonText.style.opacity = '0.5';
+            spinner.style.display = 'inline-block';
+
+            // 2 saniyə gözləyirik
+            setTimeout(() => {
+                searchButton.classList.remove('loading');
+                buttonText.style.opacity = '1';
+                spinner.style.display = 'none';
+                this.submit(); // Formanı təqdim edirik
+            }, 2000);
+        });
 
         // İş saatlarını yoxla
         checkWorkingHours();

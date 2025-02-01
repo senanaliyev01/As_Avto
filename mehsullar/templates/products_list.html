@@ -10,7 +10,7 @@
 {% block content %}
 <!-- Axtarış Bölməsi -->
 <div class="search-bar">
-    <form method="GET" action="">
+    <form method="GET" action="" id="products-search-form">
         <select name="category" id="category">
             <option value="">Kateqoriya</option>
             {% for category in kateqoriyalar %}
@@ -38,10 +38,10 @@
             {% endfor %}
         </select>
 
-        <input type="text" name="search_text" placeholder="OEM və ya Brend kodunu daxil edin" value="{{ request.GET.search_text }}">
+        <input type="text" name="search_text" id="products-search-input" placeholder="OEM və ya Brend kodunu daxil edin" value="{{ request.GET.search_text }}">
 
-        <button type="submit" id="search-button">
-            <span class="button-text"><i class="fas fa-search"></i> Axtar</span>
+        <button type="submit" id="products-search-button">
+            <span class="button-text"><i class="fas fa-search"></i></span>
             <span class="spinner" style="display: none;"></span>
         </button>
     </form>

@@ -1,26 +1,40 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const searchForm = document.querySelector('.search-bar form');
-    const searchButton = document.getElementById('search-button');
-    const buttonText = searchButton.querySelector('.button-text');
-    const spinner = searchButton.querySelector('.spinner');
+    // Məhsullar axtarış forması
+    const productsSearchForm = document.getElementById('products-search-form');
+    const productsSearchButton = document.getElementById('products-search-button');
+    const productsSearchInput = document.getElementById('products-search-input');
+    
+    if (productsSearchForm && productsSearchButton) {
+        const buttonText = productsSearchButton.querySelector('.button-text');
+        const spinner = productsSearchButton.querySelector('.spinner');
 
-    searchForm.addEventListener('submit', function(e) {
-        e.preventDefault(); // Formanın default davranışını dayandırıq
+        productsSearchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
 
-        // Buttonu loading vəziyyətinə keçiririk
-        searchButton.classList.add('loading');
-        buttonText.style.opacity = '0.5';
-        spinner.style.display = 'inline-block';
+            // Loading effektini göstər
+            productsSearchButton.classList.add('loading');
+            buttonText.style.opacity = '0.5';
+            spinner.style.display = 'inline-block';
 
-        // 2 saniyə gözləyirik
-        setTimeout(() => {
-            // 2 saniyədən sonra formanı göndəririk
-            searchButton.classList.remove('loading');
-            buttonText.style.opacity = '1';
-            spinner.style.display = 'none';
-            
-            // Formanı göndəririk
-            this.submit();
-        }, 2000);
-    });
+            // 2 saniyə gözlə
+            setTimeout(() => {
+                // Loading effektini gizlət
+                productsSearchButton.classList.remove('loading');
+                buttonText.style.opacity = '1';
+                spinner.style.display = 'none';
+
+                // Formanı göndər
+                this.submit();
+            }, 2000);
+        });
+
+        // Enter düyməsinə basıldıqda formanı göndər
+        if (productsSearchInput) {
+            productsSearchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    productsSearchForm.submit();
+                }
+            });
+        }
+    }
 });

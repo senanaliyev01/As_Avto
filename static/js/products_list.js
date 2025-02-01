@@ -1,3 +1,6 @@
+// Bu fayl artıq base.js-dəki funksionallıqdan istifadə edir
+// Bütün axtarış forması funksionallığı base.js-ə köçürülüb
+
 document.addEventListener('DOMContentLoaded', function() {
     const searchForm = document.querySelector('form');
     const searchButton = document.getElementById('search-button');

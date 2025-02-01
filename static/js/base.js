@@ -395,9 +395,42 @@ function showAnimatedMessage(message, isError = false, mehsulData = null) {
     }, 3000);
 }
 
+// Axtarış forması funksionallığı
+function initializeSearchForm() {
+    const searchForms = document.querySelectorAll('form');
+    searchForms.forEach(form => {
+        if (form.querySelector('#search-button')) {
+            const searchButton = form.querySelector('#search-button');
+            const buttonText = searchButton.querySelector('.button-text');
+            const spinner = searchButton.querySelector('.spinner');
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                // Buttonu loading vəziyyətinə keçiririk
+                searchButton.classList.add('loading');
+                buttonText.style.opacity = '0.5';
+                spinner.style.display = 'inline-block';
+
+                // 1.5 saniyə gözləyirik
+                setTimeout(() => {
+                    // Formanı göndəririk
+                    searchButton.classList.remove('loading');
+                    buttonText.style.opacity = '1';
+                    spinner.style.display = 'none';
+                    this.submit();
+                }, 1500);
+            });
+        }
+    });
+}
+
 // DOM yükləndikdə
 document.addEventListener('DOMContentLoaded', function() {
     try {
+        // Axtarış formalarını inisializasiya et
+        initializeSearchForm();
+        
         // Saatı başlat
         updateCurrentTime();
         setInterval(updateCurrentTime, 1000);

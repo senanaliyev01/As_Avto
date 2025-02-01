@@ -399,8 +399,8 @@ function showAnimatedMessage(message, isError = false, mehsulData = null) {
 function initializeSearchForm() {
     const searchForms = document.querySelectorAll('form');
     searchForms.forEach(form => {
-        if (form.querySelector('#search-button')) {
-            const searchButton = form.querySelector('#search-button');
+        const searchButton = form.querySelector('#search-button');
+        if (searchButton) {
             const buttonText = searchButton.querySelector('.button-text');
             const spinner = searchButton.querySelector('.spinner');
 
@@ -418,22 +418,15 @@ function initializeSearchForm() {
                 buttonText.style.opacity = '0.5';
                 spinner.style.display = 'inline-block';
 
-                // 1.5 saniyə gözləyirik
+                // 2 saniyə gözləyirik
                 setTimeout(() => {
                     // Formanı göndəririk
-                    searchButton.classList.remove('loading');
-                    buttonText.style.opacity = '1';
-                    spinner.style.display = 'none';
                     form.submit();
-                }, 1500);
+                }, 2000);
             }
 
-            // Həm form submit hadisəsini, həm də düyməyə klikləməni izləyirik
+            // Form submit hadisəsini izləyirik (Enter və ya düymə kliki üçün)
             form.addEventListener('submit', handleFormSubmit);
-            searchButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                handleFormSubmit(e);
-            });
         }
     });
 }

@@ -7,13 +7,13 @@ body {
     padding: 0;
 }
 
+/* İstifadə olunan rənglər base.css-dən götürülüb */
 :root {
-    --primary-color: #1a237e;
-    --secondary-color: #283593;
-    --accent-color: #3949ab;
-    --text-color: #212121;
-    --light-text: #ffffff;
-    --hover-color: #303f9f;
+    --primary-color: #0a192f;
+    --secondary-color: #172a45;
+    --accent-color: #64ffda;
+    --text-primary: #ffffff;
+    --text-secondary: #8892b0;
 }
 
 /* Container */
@@ -34,17 +34,17 @@ h1 {
 
 /* Kartlar */
 .card {
-    background-color: #162447; /* Tünd göy kart fonu */
-    border: none; /* Kartın sərhədini sil */
-    border-radius: 10px; /* Küncləri yuvarlaqlaşdır */
-    transition: transform 0.3s, box-shadow 0.3s; /* Hover zamanı animasiya */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Kartın kölgəsi */
-    overflow: hidden; /* Kartın içindəki elementlərin kənara daşmaması üçün */
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    background-color: var(--secondary-color);
 }
 
 .card:hover {
-    transform: translateY(-5px); /* Hover zamanı kartın yuxarıya qalxması */
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); /* Hover zamanı kölgənin artması */
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
 
 /* Kart şəkli */
@@ -57,20 +57,19 @@ h1 {
 
 /* Kartın içi */
 .card-body {
-    padding: 1.5rem; /* İç boşluq */
-    background: linear-gradient(to bottom, #ffffff, #f8f9fa);
-    text-align: center; /* Butonu mərkəzə düzləşdir */
+    padding: 1.5rem;
+    background: var(--secondary-color);
 }
 
 .card-title {
-    color: var(--primary-color);
+    color: var(--text-primary);
     font-weight: 600;
     font-size: 1.25rem;
     margin-bottom: 1rem;
 }
 
 .card-text {
-    color: var(--text-color);
+    color: var(--text-secondary);
     font-size: 1rem;
     margin-bottom: 1.5rem;
 }
@@ -138,18 +137,21 @@ strong {
 }
 
 .btn-primary {
-    background-color: var(--primary-color);
+    background-color: var(--accent-color);
     border: none;
     padding: 0.5rem 1.5rem;
     border-radius: 5px;
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
+    color: var(--primary-color);
 }
 
 .btn-primary:hover {
-    background-color: var(--hover-color);
+    background-color: var(--text-primary);
+    color: var(--primary-color);
+    transform: translateY(-2px);
 }
 
 /* Default şəkil */

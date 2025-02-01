@@ -8,7 +8,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const spinner = searchButton.querySelector('.spinner');
 
     searchForm.addEventListener('submit', function(e) {
-        e.preventDefault(); // Formanın default davranışını dayandırıq
+        e.preventDefault();
+
+        // Əgər artıq loading vəziyyətindədirsə, təkrar işləməsin
+        if (searchButton.classList.contains('loading')) {
+            return;
+        }
 
         // Buttonu loading vəziyyətinə keçiririk
         searchButton.classList.add('loading');
@@ -17,13 +22,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 2 saniyə gözləyirik
         setTimeout(() => {
-            // 2 saniyədən sonra formanı göndəririk
+            // 2 saniyədən sonra formanı göndəririk və loading-i dayandırırıq
             searchButton.classList.remove('loading');
             buttonText.style.opacity = '1';
             spinner.style.display = 'none';
-            
-            // Formanı göndəririk
-            this.submit();
+            searchForm.submit();
         }, 2000);
     });
 });

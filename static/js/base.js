@@ -404,8 +404,7 @@ function initializeSearchForm() {
             const buttonText = searchButton.querySelector('.button-text');
             const spinner = searchButton.querySelector('.spinner');
 
-            // Formanın təqdim edilməsi funksiyası
-            function handleFormSubmit(e) {
+            form.addEventListener('submit', function(e) {
                 e.preventDefault();
 
                 // Əgər artıq loading vəziyyətindədirsə, təkrar işləməsin
@@ -420,13 +419,13 @@ function initializeSearchForm() {
 
                 // 2 saniyə gözləyirik
                 setTimeout(() => {
-                    // Formanı göndəririk
+                    // 2 saniyədən sonra formanı göndəririk və loading-i dayandırırıq
+                    searchButton.classList.remove('loading');
+                    buttonText.style.opacity = '1';
+                    spinner.style.display = 'none';
                     form.submit();
                 }, 2000);
-            }
-
-            // Form submit hadisəsini izləyirik (Enter və ya düymə kliki üçün)
-            form.addEventListener('submit', handleFormSubmit);
+            });
         }
     });
 }

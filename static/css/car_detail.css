@@ -7,36 +7,72 @@ body {
     padding: 0;
 }
 
+:root {
+    --primary-color: #1a237e;
+    --secondary-color: #283593;
+    --accent-color: #3949ab;
+    --text-color: #212121;
+    --light-text: #ffffff;
+    --hover-color: #303f9f;
+}
+
 /* Container */
 .container {
     margin-top: 20px;
+    padding: 2rem 0;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 /* Başlıq */
 h1 {
-    color: #64ffda; /* Açıq mavi başlıq */
-    text-align: center; /* Mərkəzə düzləşdir */
-    margin-bottom: 30px; /* Aşağıda boşluq */
+    color: var(--primary-color);
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 3px solid var(--accent-color);
+    padding-bottom: 1rem;
 }
 
 /* Şəkil qalereyası */
 .image-gallery {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center; /* Şəkilləri mərkəzə düzləşdir */
-    gap: 10px; /* Şəkillər arasında boşluq */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
 }
 
 .image-gallery img {
-    width: 300px; 
-    border-radius: 10px; /* Küncləri yuvarlaqlaşdır */
-    border: 2px solid #64ffda; /* Açıq mavi sərhəd */
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.image-gallery img:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
 
 /* Mətni vurğulamaq üçün */
+p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid var(--accent-color);
+}
+
 strong {
-    color: #64ffda; /* Açıq mavi vurğulama */
-    font-size: 20px;
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-right: 0.5rem;
 }
 
 /* Buton */
@@ -63,4 +99,27 @@ strong {
 .btn:active {
     transform: translateY(0); /* Basıldıqda geri dönmə effekti */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Basıldıqda kölgənin azalması */
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .image-gallery {
+        grid-template-columns: 1fr;
+    }
+
+    .image-gallery img {
+        height: 250px;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    p {
+        font-size: 1rem;
+        padding: 0.8rem;
+    }
 }

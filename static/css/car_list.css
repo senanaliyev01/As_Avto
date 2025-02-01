@@ -7,16 +7,29 @@ body {
     padding: 0;
 }
 
+:root {
+    --primary-color: #1a237e;
+    --secondary-color: #283593;
+    --accent-color: #3949ab;
+    --text-color: #212121;
+    --light-text: #ffffff;
+    --hover-color: #303f9f;
+}
+
 /* Container */
 .container {
     margin-top: 20px;
+    padding: 2rem 0;
 }
 
 /* Başlıq */
 h1 {
-    color: #64ffda; /* Açıq mavi başlıq */
-    text-align: center; /* Mərkəzə düzləşdir */
-    margin-bottom: 30px; /* Aşağıda boşluq */
+    color: var(--primary-color);
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 /* Kartlar */
@@ -25,19 +38,19 @@ h1 {
     border: none; /* Kartın sərhədini sil */
     border-radius: 10px; /* Küncləri yuvarlaqlaşdır */
     transition: transform 0.3s, box-shadow 0.3s; /* Hover zamanı animasiya */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Kartın kölgəsi */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Kartın kölgəsi */
     overflow: hidden; /* Kartın içindəki elementlərin kənara daşmaması üçün */
 }
 
 .card:hover {
     transform: translateY(-5px); /* Hover zamanı kartın yuxarıya qalxması */
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3); /* Hover zamanı kölgənin artması */
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); /* Hover zamanı kölgənin artması */
 }
 
 /* Kart şəkli */
 .card-img-top {
     width: 100%; /* Kartın genişliyinə uyğunlaşdır */
-    height:auto; /* Şəkil hündürlüyü */
+    height: 200px; /* Şəkil hündürlüyü */
     object-fit: cover; /* Şəkilin ölçüsünü tənzimləyir */
     object-position: center; /* Şəkilin mərkəzini göstər */
 }
@@ -45,7 +58,21 @@ h1 {
 /* Kartın içi */
 .card-body {
     padding: 1.5rem; /* İç boşluq */
+    background: linear-gradient(to bottom, #ffffff, #f8f9fa);
     text-align: center; /* Butonu mərkəzə düzləşdir */
+}
+
+.card-title {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.card-text {
+    color: var(--text-color);
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
 }
 
 /* Kartların düzülüşü */
@@ -110,8 +137,33 @@ strong {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Basıldıqda kölgənin azalması */
 }
 
+.btn-primary {
+    background-color: var(--primary-color);
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 5px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--hover-color);
+}
+
 /* Default şəkil */
 .default-image {
     height: 200px; /* Default şəkil hündürlüyü */
     object-fit: cover; /* Şəkilin ölçüsünü tənzimləyir */
+}
+
+@media (max-width: 768px) {
+    .card-img-top {
+        height: 180px;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
 }

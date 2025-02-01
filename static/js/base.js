@@ -395,53 +395,9 @@ function showAnimatedMessage(message, isError = false, mehsulData = null) {
     }, 3000);
 }
 
-// Axtarış forması funksionallığı
-function initializeSearchForm() {
-    const searchForms = document.querySelectorAll('form');
-    searchForms.forEach(form => {
-        const searchButton = form.querySelector('#search-button');
-        if (searchButton) {
-            const buttonText = searchButton.querySelector('.button-text');
-            const spinner = searchButton.querySelector('.spinner');
-
-            // Əvvəlcə mövcud event listener-ləri təmizləyək
-            const newForm = form.cloneNode(true);
-            form.parentNode.replaceChild(newForm, form);
-
-            // Yeni event listener əlavə edək
-            newForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                const newSearchButton = this.querySelector('#search-button');
-                const newButtonText = newSearchButton.querySelector('.button-text');
-                const newSpinner = newSearchButton.querySelector('.spinner');
-
-                // Əgər artıq loading vəziyyətindədirsə, təkrar işləməsin
-                if (newSearchButton.classList.contains('loading')) {
-                    return;
-                }
-
-                // Buttonu loading vəziyyətinə keçiririk
-                newSearchButton.classList.add('loading');
-                newButtonText.style.opacity = '0.5';
-                newSpinner.style.display = 'inline-block';
-
-                // 2 saniyə gözləyirik
-                setTimeout(() => {
-                    // Formanı göndəririk
-                    this.submit();
-                }, 2000);
-            });
-        }
-    });
-}
-
 // DOM yükləndikdə
 document.addEventListener('DOMContentLoaded', function() {
     try {
-        // Axtarış formalarını inisializasiya et
-        initializeSearchForm();
-        
         // Saatı başlat
         updateCurrentTime();
         setInterval(updateCurrentTime, 1000);

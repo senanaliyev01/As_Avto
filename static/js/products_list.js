@@ -1,6 +1,3 @@
-// Bu fayl artıq base.js-dəki funksionallıqdan istifadə edir
-// Bütün axtarış forması funksionallığı base.js-ə köçürülüb
-
 document.addEventListener('DOMContentLoaded', function() {
     const searchForm = document.querySelector('form');
     const searchButton = document.getElementById('search-button');
@@ -8,22 +5,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const spinner = searchButton.querySelector('.spinner');
 
     searchForm.addEventListener('submit', function(e) {
-        e.preventDefault();
+        e.preventDefault(); // Formanın default davranışını dayandırıq
 
-        // Əgər artıq loading vəziyyətindədirsə, təkrar işləməsin
-        if (searchButton.classList.contains('loading')) {
-            return;
-        }
-
-        // Buttonu loading vəziyyətinə keçiririk
+        // Buttonu loading vəziyyətinə keçiriri1111k
         searchButton.classList.add('loading');
         buttonText.style.opacity = '0.5';
         spinner.style.display = 'inline-block';
 
         // 2 saniyə gözləyirik
         setTimeout(() => {
+            // 2 saniyədən sonra formanı göndəririk
+            searchButton.classList.remove('loading');
+            buttonText.style.opacity = '1';
+            spinner.style.display = 'none';
+            
             // Formanı göndəririk
-            searchForm.submit();
+            this.submit();
         }, 2000);
     });
 });

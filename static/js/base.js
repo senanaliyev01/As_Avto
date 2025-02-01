@@ -395,6 +395,47 @@ function showAnimatedMessage(message, isError = false, mehsulData = null) {
     }, 3000);
 }
 
+// Quick Search functionality
+function performSearch() {
+    const searchInput = document.getElementById('quick-search-input');
+    const searchResults = document.getElementById('quick-search-results');
+    const query = searchInput.value.trim();
+    
+    if (query.length < 2) {
+        searchResults.innerHTML = '';
+        searchResults.classList.remove('active');
+        return;
+    }
+
+    fetch(`/mehsullar/quick-search/?q=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.results.length > 0) {
+                searchResults.innerHTML = data.results.map(item => `
+                    <div class="search-result-item" onclick="window.location.href='${item.url}'">
+                        ${item.sekil ? 
+                            `<img src="${item.sekil}" alt="${item.adi}" class="search-result-image">` :
+                            '<div class="search-result-image" style="background: #f8f9fa;"></div>'
+                        }
+                        <div class="search-result-info">
+                            <h4>${item.adi}</h4>
+                            <p>Brend kod: ${item.brend_kod || 'N/A'}</p>
+                            <p>OEM: ${item.oem || 'N/A'}</p>
+                        </div>
+                        <div class="search-result-price">${item.qiymet} AZN</div>
+                    </div>
+                `).join('');
+                searchResults.classList.add('active');
+            } else {
+                searchResults.innerHTML = '<div class="search-result-item">Heç bir nəticə tapılmadı</div>';
+                searchResults.classList.add('active');
+            }
+        })
+        .catch(error => {
+            console.error('Axtarış zamanı xəta:', error);
+        });
+}
+
 // DOM yükləndikdə
 document.addEventListener('DOMContentLoaded', function() {
     try {
@@ -404,10 +445,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // İş saatlarını yoxla
         checkWorkingHours();
-        setInterval(checkWorkingHours, 60000); // Hər dəqiqə yoxla
+        setInterval(checkWorkingHours, 60000);
 
         // Səbət sayını yenilə
         updateCartCount();
+
+        // Quick Search Event Listeners
+        const searchInput = document.getElementById('quick-search-input');
+        const searchButton = document.getElementById('quick-search-button');
+        const searchResults = document.getElementById('quick-search-results');
+        let searchTimeout;
+
+        if (searchInput && searchButton && searchResults) {
+            // Real-time axtarış
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(performSearch, 300);
+            });
+
+            // Düymə ilə axtarış
+            searchButton.addEventListener('click', performSearch);
+
+            // Enter düyməsi ilə axtarış
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+
+            // Axtarış nəticələrini kənar kliklərə görə gizlət
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && 
+                    !searchButton.contains(e.target) && 
+                    !searchResults.contains(e.target)) {
+                    searchResults.classList.remove('active');
+                }
+            });
+        }
 
         // Səbətə məhsul əlavə etmək
         const cartLinks = document.querySelectorAll('.cart-icon');
@@ -522,75 +596,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
         }
-
-        // Quick Search functionality
-        const searchInput = document.getElementById('quick-search-input');
-        const searchButton = document.getElementById('quick-search-button');
-        const searchResults = document.getElementById('quick-search-results');
-        let searchTimeout;
-
-        function performSearch() {
-            const query = searchInput.value.trim();
-            
-            if (query.length < 2) {
-                searchResults.innerHTML = '';
-                searchResults.classList.remove('active');
-                return;
-            }
-
-            fetch(`/mehsullar/quick-search/?q=${encodeURIComponent(query)}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.results.length > 0) {
-                        searchResults.innerHTML = data.results.map(item => `
-                            <div class="search-result-item" onclick="window.location.href='${item.url}'">
-                                ${item.sekil ? 
-                                    `<img src="${item.sekil}" alt="${item.adi}" class="search-result-image">` :
-                                    '<div class="search-result-image" style="background: #f8f9fa;"></div>'
-                                }
-                                <div class="search-result-info">
-                                    <h4>${item.adi}</h4>
-                                    <p>Brend kod: ${item.brend_kod || 'N/A'}</p>
-                                    <p>OEM: ${item.oem || 'N/A'}</p>
-                                </div>
-                                <div class="search-result-price">${item.qiymet} AZN</div>
-                            </div>
-                        `).join('');
-                        searchResults.classList.add('active');
-                    } else {
-                        searchResults.innerHTML = '<div class="search-result-item">Heç bir nəticə tapılmadı</div>';
-                        searchResults.classList.add('active');
-                    }
-                })
-                .catch(error => {
-                    console.error('Axtarış zamanı xəta:', error);
-                });
-        }
-
-        // Real-time axtarış
-        searchInput.addEventListener('input', function() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(performSearch, 300);
-        });
-
-        // Düymə ilə axtarış
-        searchButton.addEventListener('click', performSearch);
-
-        // Enter düyməsi ilə axtarış
-        searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                performSearch();
-            }
-        });
-
-        // Axtarış nəticələrini kənar kliklərə görə gizlət
-        document.addEventListener('click', function(e) {
-            if (!searchInput.contains(e.target) && 
-                !searchButton.contains(e.target) && 
-                !searchResults.contains(e.target)) {
-                searchResults.classList.remove('active');
-            }
-        });
 
     } catch (error) {
         console.error('Funksiya xətası:', error);

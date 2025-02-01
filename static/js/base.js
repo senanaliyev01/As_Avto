@@ -402,23 +402,6 @@ document.addEventListener('DOMContentLoaded', function() {
         updateCurrentTime();
         setInterval(updateCurrentTime, 1000);
 
-        // Axtarış formu təqdim edilərkən spinner əlavə et
-        const searchForm = document.getElementById('header-search-form');
-        if (searchForm) {
-            searchForm.addEventListener('submit', function(e) {
-                e.preventDefault(); // Formanın standart təqdim edilməsini dayandır
-                const searchIcon = this.querySelector('button i');
-                if (searchIcon) {
-                    searchIcon.classList.add('spinning');
-                    setTimeout(() => {
-                        searchIcon.classList.remove('spinning');
-                        // 2 saniyə sonra formanı təqdim et
-                        this.submit();
-                    }, 2000);
-                }
-            });
-        }
-
         // İş saatlarını yoxla
         checkWorkingHours();
         setInterval(checkWorkingHours, 60000); // Hər dəqiqə yoxla
@@ -540,29 +523,42 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // Header axtarış funksiyası
-        const headerSearchForm = document.getElementById('header-search-form');
-        const headerSearchInput = document.getElementById('header-search-input');
+        // Axtarış formu təqdim edilərkən spinner əlavə et
+        const searchForm = document.querySelector('.search-bar form');
+        const searchButton = document.getElementById('search-button');
+        const buttonText = searchButton.querySelector('.button-text');
+        const spinner = searchButton.querySelector('.spinner');
 
-        if (headerSearchForm && headerSearchInput) {
-            headerSearchForm.addEventListener('submit', function(e) {
-                const searchText = headerSearchInput.value.trim();
-                if (!searchText) {
-                    e.preventDefault();
-                    return;
-                }
-                
-                // Xüsusi simvolları təmizləyirik
-                headerSearchInput.value = searchText.replace(/[^a-zA-Z0-9]/g, '');
-            });
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            searchButton.classList.add('loading');
+            buttonText.style.opacity = '0.5';
+            spinner.style.display = 'inline-block';
 
-            // Enter düyməsinə basıldıqda formanı göndər
-            headerSearchInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    headerSearchForm.submit();
-                }
-            });
-        }
+            setTimeout(() => {
+                searchButton.classList.remove('loading');
+                buttonText.style.opacity = '1';
+                spinner.style.display = 'none';
+                this.submit();
+            }, 2000);
+        });
+
+        // Enter düyməsinə basıldıqda da eyni funksiyanı işə salırıq
+        searchForm.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchButton.classList.add('loading');
+                buttonText.style.opacity = '0.5';
+                spinner.style.display = 'inline-block';
+
+                setTimeout(() => {
+                    searchButton.classList.remove('loading');
+                    buttonText.style.opacity = '1';
+                    spinner.style.display = 'none';
+                    this.submit();
+                }, 2000);
+            }
+        });
 
     } catch (error) {
         console.error('Funksiya xətası:', error);

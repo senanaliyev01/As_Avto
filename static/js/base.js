@@ -410,10 +410,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 const searchIcon = this.querySelector('button i');
                 if (searchIcon) {
                     searchIcon.classList.add('spinning');
+                    // 2 saniyə gözləyirik
                     setTimeout(() => {
                         searchIcon.classList.remove('spinning');
-                        // 2 saniyə sonra formanı təqdim et
-                        this.submit();
+                        this.submit(); // Formanı təqdim edirik
                     }, 2000);
                 }
             });

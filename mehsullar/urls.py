@@ -14,4 +14,5 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('update_quantity/<int:item_id>/<int:new_quantity>/', views.update_quantity, name='update_quantity'),
     path('sifaris/<int:sifaris_id>/pdf/', views.generate_pdf, name='sifaris_pdf'),
+    path('realtime-search/', views.realtime_search, name='realtime_search'),
 ]

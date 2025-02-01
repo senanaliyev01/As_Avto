@@ -402,10 +402,75 @@ document.addEventListener('DOMContentLoaded', function() {
         updateCurrentTime();
         setInterval(updateCurrentTime, 1000);
 
-        // Axtarış formu təqdim edilərkən spinner əlavə et
+        // Real-time axtarış
+        const searchInput = document.getElementById('header-search-input');
+        const searchResults = document.getElementById('search-results');
         const searchForm = document.getElementById('header-search-form');
-        if (searchForm) {
+        let searchTimeout;
+
+        if (searchInput && searchResults && searchForm) {
+            // Input dəyişdikdə
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                const searchText = this.value.trim();
+
+                if (searchText.length < 2) {
+                    searchResults.style.display = 'none';
+                    return;
+                }
+
+                // 300ms gözlə və sonra sorğu göndər
+                searchTimeout = setTimeout(() => {
+                    fetch(`/mehsullar/realtime-search/?search_text=${encodeURIComponent(searchText)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.results.length > 0) {
+                                let html = '';
+                                data.results.forEach(result => {
+                                    html += `
+                                        <a href="${result.url}" class="search-result-item">
+                                            <img src="${result.sekil || '/static/img/no-image.png'}" class="search-result-image" alt="${result.adi}">
+                                            <div class="search-result-info">
+                                                <div class="search-result-name">${result.adi}</div>
+                                                <div class="search-result-oem">OEM: ${result.oem}</div>
+                                            </div>
+                                        </a>
+                                    `;
+                                });
+                                searchResults.innerHTML = html;
+                                searchResults.style.display = 'block';
+                            } else {
+                                searchResults.style.display = 'none';
+                            }
+                        });
+                }, 300);
+            });
+
+            // Səhifənin digər yerlərinə klikləndikdə nəticələri gizlət
+            document.addEventListener('click', function(e) {
+                if (!searchResults.contains(e.target) && !searchInput.contains(e.target)) {
+                    searchResults.style.display = 'none';
+                }
+            });
+
+            // Form submit
             searchForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const searchIcon = this.querySelector('button i');
+                if (searchIcon) {
+                    searchIcon.classList.add('spinning');
+                    setTimeout(() => {
+                        searchIcon.classList.remove('spinning');
+                        this.submit();
+                    }, 2000);
+                }
+            });
+        }
+
+        // Axtarış formu təqdim edilərkən spinner əlavə et
+        const searchForm2 = document.getElementById('header-search-form');
+        if (searchForm2) {
+            searchForm2.addEventListener('submit', function(e) {
                 e.preventDefault(); // Formanın standart təqdim edilməsini dayandır
                 const searchIcon = this.querySelector('button i');
                 if (searchIcon) {

@@ -19,14 +19,13 @@
             <div class="logo">
                 <img src="{% static '/img/Header_Logo.png' %}" alt="Logo">
             </div>
-            <div class="search-container">
-                <div class="search-box">
-                    <input type="text" id="header-search" placeholder="Brend kodu və ya OEM kodu daxil edin">
-                    <button type="button" id="header-search-btn">
+            <div class="header-search">
+                <form method="GET" action="{% url 'products_list' %}" id="header-search-form">
+                    <input type="text" name="search_text" id="header-search-input" placeholder="OEM və ya Brend kodunu daxil edin">
+                    <button type="submit">
                         <i class="fas fa-search"></i>
                     </button>
-                </div>
-                <div id="search-results-dropdown" class="search-results-dropdown"></div>
+                </form>
             </div>
             <div class="header-right">
                 <a href="{% url 'profile' %}"><i class="fas fa-user"></i> {{ user.username }}</a>

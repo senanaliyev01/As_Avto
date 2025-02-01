@@ -450,34 +450,3 @@ def mehsul_haqqinda(request, mehsul_id):
     return render(request, 'mehsul_haqqinda.html', {
         'mehsul': mehsul
     })
-
-@csrf_exempt
-def real_time_search(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        search_query = data.get('query', '').strip()
-        
-        if len(search_query) < 2:
-            return JsonResponse({'results': []})
-            
-        # Brend kodu və ya OEM koduna görə axtarış
-        mehsullar = Mehsul.objects.filter(
-            Q(brend_kod__icontains=search_query) |
-            Q(oem__icontains=search_query)
-        )[:10]  # Maksimum 10 nəticə
-        
-        results = []
-        for mehsul in mehsullar:
-            results.append({
-                'id': mehsul.id,
-                'adi': mehsul.adi,
-                'brend_kod': mehsul.brend_kod,
-                'oem': mehsul.oem,
-                'qiymet': str(mehsul.qiymet),
-                'sekil_url': mehsul.sekil.url if mehsul.sekil else None,
-                'detail_url': f'/mehsullar/mehsul/{mehsul.id}/'
-            })
-            
-        return JsonResponse({'results': results})
-    
-    return JsonResponse({'error': 'Invalid request method'}, status=400)

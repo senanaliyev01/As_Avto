@@ -404,8 +404,14 @@ function initializeSearchForm() {
             const buttonText = searchButton.querySelector('.button-text');
             const spinner = searchButton.querySelector('.spinner');
 
-            form.addEventListener('submit', function(e) {
+            // Formanın təqdim edilməsi funksiyası
+            function handleFormSubmit(e) {
                 e.preventDefault();
+
+                // Əgər artıq loading vəziyyətindədirsə, təkrar işləməsin
+                if (searchButton.classList.contains('loading')) {
+                    return;
+                }
 
                 // Buttonu loading vəziyyətinə keçiririk
                 searchButton.classList.add('loading');
@@ -418,8 +424,15 @@ function initializeSearchForm() {
                     searchButton.classList.remove('loading');
                     buttonText.style.opacity = '1';
                     spinner.style.display = 'none';
-                    this.submit();
+                    form.submit();
                 }, 1500);
+            }
+
+            // Həm form submit hadisəsini, həm də düyməyə klikləməni izləyirik
+            form.addEventListener('submit', handleFormSubmit);
+            searchButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                handleFormSubmit(e);
             });
         }
     });

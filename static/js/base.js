@@ -398,6 +398,35 @@ function showAnimatedMessage(message, isError = false, mehsulData = null) {
 // DOM yükləndikdə
 document.addEventListener('DOMContentLoaded', function() {
     try {
+        // Header axtarış forması
+        const headerSearchForm = document.getElementById('header-search-form');
+        const headerSearchButton = document.getElementById('header-search-button');
+        
+        if (headerSearchForm && headerSearchButton) {
+            const buttonText = headerSearchButton.querySelector('.button-text');
+            const spinner = headerSearchButton.querySelector('.spinner');
+
+            headerSearchForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                // Loading effektini göstər
+                headerSearchButton.classList.add('loading');
+                buttonText.style.opacity = '0.5';
+                spinner.style.display = 'inline-block';
+
+                // 2 saniyə gözlə
+                setTimeout(() => {
+                    // Loading effektini gizlət
+                    headerSearchButton.classList.remove('loading');
+                    buttonText.style.opacity = '1';
+                    spinner.style.display = 'none';
+
+                    // Formanı göndər
+                    this.submit();
+                }, 2000);
+            });
+        }
+
         // Saatı başlat
         updateCurrentTime();
         setInterval(updateCurrentTime, 1000);
@@ -541,22 +570,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Header axtarış funksiyası
-        const headerSearchForm = document.getElementById('header-search-form');
         const headerSearchInput = document.getElementById('header-search-input');
 
-        if (headerSearchForm && headerSearchInput) {
-            headerSearchForm.addEventListener('submit', function(e) {
-                const searchText = headerSearchInput.value.trim();
-                if (!searchText) {
-                    e.preventDefault();
-                    return;
-                }
-                
-                // Xüsusi simvolları təmizləyirik
-                headerSearchInput.value = searchText.replace(/[^a-zA-Z0-9]/g, '');
-            });
-
-            // Enter düyməsinə basıldıqda formanı göndər
+        if (headerSearchInput) {
             headerSearchInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     headerSearchForm.submit();

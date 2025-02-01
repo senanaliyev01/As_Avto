@@ -126,6 +126,30 @@ header {
     font-size: 0.9rem;
 }
 
+/* Header Search Button Spinner */
+.header-search button .spinner {
+    display: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.header-search button.loading {
+    position: relative;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
 /* Navbar Styles */
 .nav-bar {
     background-color: var(--secondary-color);

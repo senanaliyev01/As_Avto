@@ -6,7 +6,7 @@
     --text-secondary: #8892b0;
 }
 
-/* Header Styless */
+/* Header Styles */
 header {
     background-color: var(--primary-color);
     padding: 1rem 0;
@@ -67,6 +67,19 @@ header {
 
 .header-search button:hover {
     background-color: #0056b3;
+}
+
+.header-search button i {
+    transition: transform 0.3s ease;
+}
+
+.header-search button i.spinning {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 .header-right {

@@ -402,6 +402,20 @@ document.addEventListener('DOMContentLoaded', function() {
         updateCurrentTime();
         setInterval(updateCurrentTime, 1000);
 
+        // Axtarış formu təqdim edilərkən spinner əlavə et
+        const searchForm = document.getElementById('header-search-form');
+        if (searchForm) {
+            searchForm.addEventListener('submit', function(e) {
+                const searchIcon = this.querySelector('button i');
+                if (searchIcon) {
+                    searchIcon.classList.add('spinning');
+                    setTimeout(() => {
+                        searchIcon.classList.remove('spinning');
+                    }, 2000);
+                }
+            });
+        }
+
         // İş saatlarını yoxla
         checkWorkingHours();
         setInterval(checkWorkingHours, 60000); // Hər dəqiqə yoxla

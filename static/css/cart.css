@@ -55,11 +55,16 @@ body {
 /* Cart Container */
 .cart-container {
     background-color: var(--secondary-color);
-    border-radius: 1rem;
+    border-radius: 0;
     box-shadow: var(--shadow-md);
-    width: 100%;
+    width: 100vw;
+    height: 100vh;
     overflow: hidden;
-    margin-bottom: 2rem;
+    margin: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999;
 }
 
 /* Table Styles */

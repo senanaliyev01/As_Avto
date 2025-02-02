@@ -306,7 +306,7 @@ body {
     text-align: center;
     vertical-align: middle;
     border: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 20px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Brand Images */

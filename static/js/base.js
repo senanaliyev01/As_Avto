@@ -67,14 +67,14 @@
                         // Animasiyanı təmizlə
                         setTimeout(() => {
                             card.classList.remove('updating');
-                        }, 1000);
+                        }, 5000);
                     }
                 }
             });
         })
         .catch(error => {
             console.error('Statistika yeniləmə xətası:', error);
-            setTimeout(updateStatistics, 1000);
+            setTimeout(updateStatistics, 5000);
         });
     }
 

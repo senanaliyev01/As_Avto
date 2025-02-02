@@ -67,7 +67,7 @@
                         // Animasiyanı təmizlə
                         setTimeout(() => {
                             card.classList.remove('updating');
-                        }, 5000);
+                        }, 8000);
                     }
                 }
             });

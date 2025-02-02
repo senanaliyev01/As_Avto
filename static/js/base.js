@@ -74,7 +74,7 @@
         })
         .catch(error => {
             console.error('Statistika yeniləmə xətası:', error);
-            setTimeout(updateStatistics, 5000);
+            setTimeout(updateStatistics, 3600000); // 1 saatdan sonra yenidən cəhd et
         });
     }
 
@@ -475,7 +475,7 @@
 
             // İlkin statistikaları yüklə
             updateStatistics();
-            setInterval(updateStatistics, 1000);
+            setInterval(updateStatistics, 3600000); // 1 saatdan bir yenilə
 
             // Rəy formu
             const reviewForm = document.querySelector('.review-form form');

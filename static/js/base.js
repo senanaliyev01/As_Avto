@@ -237,8 +237,8 @@
             position: 'fixed',
             top: '20px',
             right: '-400px',
-            backgroundColor: isError ? '#dc3545' : '#ffffff',
-            color: isError ? '#ffffff' : '#333333',
+            backgroundColor: isError ? '#dc3545' : '#003366',
+            color: isError ? '#ffffff' : '#ffffff',
             padding: '15px 25px',
             borderRadius: '8px',
             boxShadow: '0 4px 15px rgba(0, 0, 0, 0.15)',
@@ -361,8 +361,8 @@
             }
             
             .product-image {
-                width: 50px;
-                height: 50px;
+                width: 60px;
+                height: auto;
                 object-fit: cover;
                 border-radius: 4px;
                 border: 1px solid #dee2e6;

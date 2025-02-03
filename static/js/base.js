@@ -238,7 +238,7 @@
             top: '20px',
             right: '-400px',
             backgroundColor: isError ? '#dc3545' : '#003366',
-            color: isError ? '#ffffff' : '#ffffff',
+            color: '#ffffff',
             padding: '15px 25px',
             borderRadius: '8px',
             boxShadow: '0 4px 15px rgba(0, 0, 0, 0.15)',
@@ -287,63 +287,6 @@
             .check-icon i {
                 color: white;
                 font-size: 16px;
-            }
-            .checkout-icon {
-                display: flex;
-                align-items: center;
-                gap: 5px;
-                margin-top: 5px;
-                color: #4CAF50;
-                font-size: 0.9em;
-            }
-            .checkout-icon i {
-                animation: cartBounce 1s ease-in-out;
-            }
-            .checkout-plus {
-                color: #4CAF50;
-                font-weight: bold;
-                animation: plusPulse 1s ease-in-out;
-            }
-            .checkout-item {
-                width: 8px;
-                height: 8px;
-                background-color: #4CAF50;
-                border-radius: 50%;
-                animation: itemSlide 1s ease-in-out;
-            }
-            @keyframes cartBounce {
-                0%, 20%, 50%, 80%, 100% {
-                    transform: translateY(0);
-                }
-                40% {
-                    transform: translateY(-5px);
-                }
-                60% {
-                    transform: translateY(-3px);
-                }
-            }
-            @keyframes plusPulse {
-                0%, 100% {
-                    transform: scale(1);
-                    opacity: 1;
-                }
-                50% {
-                    transform: scale(1.5);
-                    opacity: 0.7;
-                }
-            }
-            @keyframes itemSlide {
-                0% {
-                    transform: translateX(-20px);
-                    opacity: 0;
-                }
-                50% {
-                    opacity: 1;
-                }
-                100% {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
             }
             @keyframes pop {
                 0% { transform: scale(0) }
@@ -420,11 +363,8 @@
                     const url = this.getAttribute('href');
 
                     // Loading effektini göstər
-                    const loadingIcon = document.createElement('span');
-                    loadingIcon.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                    this.innerHTML = ''; // Kartın içini boşaldın
-                    this.appendChild(loadingIcon); // Yalnız loading simvolunu əlavə edin
-                    this.style.pointerEvents = 'none'; // İstifadəçi klikləməsini dayandırın
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    this.style.pointerEvents = 'none';
                     this.style.opacity = '0.7';
 
                     // 2 saniyə loading göstər

@@ -238,7 +238,7 @@
             top: '20px',
             right: '-400px',
             backgroundColor: isError ? '#dc3545' : '#003366',
-            color: '#ffffff',
+            color: isError ? '#ffffff' : '#ffffff',
             padding: '15px 25px',
             borderRadius: '8px',
             boxShadow: '0 4px 15px rgba(0, 0, 0, 0.15)',
@@ -254,7 +254,6 @@
             .animated-message {
                 display: flex;
                 align-items: center;
-                animation: slideIn 0.5s forwards;
             }
             .message-content {
                 display: flex;
@@ -373,14 +372,6 @@
                 font-size: 0.9em;
                 font-weight: 500;
                 color: #495057;
-            }
-            @keyframes slideIn {
-                from {
-                    right: -400px;
-                }
-                to {
-                    right: 20px;
-                }
             }
         `;
 

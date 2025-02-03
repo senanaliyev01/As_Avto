@@ -56,7 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'as_avto.middlewares.Force404Middleware',
+    'AS-AVTO.middlewares.Force404Middleware',
 ]
 
 ROOT_URLCONF = 'Web.urls'
@@ -77,8 +77,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'as_avto.wsgi.application'
-
+WSGI_APPLICATION = 'Web.wsgi.application'
 
 
 #1123213232332 Database

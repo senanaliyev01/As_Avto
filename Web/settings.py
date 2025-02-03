@@ -77,7 +77,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'Web.wsgi.application'
+WSGI_APPLICATION = 'as_avto.wsgi.application'
+
 
 
 #1123213232332 Database

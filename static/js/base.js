@@ -242,7 +242,7 @@
             padding: '15px 25px',
             borderRadius: '8px',
             boxShadow: '0 4px 15px rgba(0, 0, 0, 0.15)',
-            zIndex: '1000',
+            zIndex: '2000',
             transition: 'all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
             minWidth: '300px',
             border: isError ? 'none' : '1px solid #eee'

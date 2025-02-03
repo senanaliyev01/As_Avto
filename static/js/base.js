@@ -49,7 +49,7 @@
         })
         .then(response => response.json())
         .then(data => {
-            // Hər bir statistika kartını yenilə
+            // Hər bir1 statistika kartını yenilə
             Object.keys(data).forEach(key => {
                 const element = document.querySelector(`.statistics-card .count[data-type="${key}"]`);
                 if (element) {

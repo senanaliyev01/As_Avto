@@ -420,8 +420,11 @@
                     const url = this.getAttribute('href');
 
                     // Loading effektini göstər
-                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                    this.style.pointerEvents = 'none';
+                    const loadingIcon = document.createElement('span');
+                    loadingIcon.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    this.innerHTML = ''; // Kartın içini boşaldın
+                    this.appendChild(loadingIcon); // Yalnız loading simvolunu əlavə edin
+                    this.style.pointerEvents = 'none'; // İstifadəçi klikləməsini dayandırın
                     this.style.opacity = '0.7';
 
                     // 2 saniyə loading göstər

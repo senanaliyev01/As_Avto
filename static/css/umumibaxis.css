@@ -33,9 +33,9 @@ body {
 }
 
 /* Məhsul şəkli */
-.product-image img {
-    width: 300px;
-    height: 250px;
+.product-image12 img {
+    width: 100%;
+    height: auto;
 }
 
 /* Məhsul detalları */

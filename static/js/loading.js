@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "/istifadeciler/register/",
                 "/istifadeciler/login/",
                 "/rent-a-car/",
+                "/products-look-all/",
             ],
             baseUrl: "https://as-avto.com"
         },

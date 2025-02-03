@@ -1,0 +1,90 @@
+/* umumi_baxis.css */
+body {
+    background-color: #1a1a2e; /* Tünd göy fon */
+    color: #ffffff; /* Ağ mətn */
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.product-list {
+    display: flex;
+    flex-direction: column; /* Kartları alt-alta düzür */
+    gap: 20px; /* Kartlar arasında boşluq */
+    padding: 20px;
+}
+
+.product-card {
+    background-color: #162447; /* Tünd göy kart fonu */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    transition: transform 0.3s;
+}
+
+.product-card:hover {
+    transform: scale(1.02); /* Hover zamanı kartın böyüməsi */
+}
+
+.product-image img {
+    width: 100%;
+    height: auto;
+}
+
+.product-details {
+    padding: 15px;
+}
+
+.product-title {
+    font-size: 1.5em;
+    margin: 0;
+}
+
+.product-category,
+.product-brand,
+.product-model,
+.product-oem,
+.product-price {
+    margin: 5px 0;
+}
+
+.product-stock-status {
+    margin-top: 10px;
+}
+
+.stock-status {
+    font-weight: bold;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.out-of-stock {
+    color: white;
+    background-color: red;
+}
+
+.low-stock {
+    color: white;
+    background-color: orange;
+}
+
+.in-stock {
+    color: white;
+    background-color: green;
+}
+
+.product-actions {
+    margin-top: 10px;
+}
+
+.info-link,
+.cart-icon {
+    display: inline-block;
+    margin-top: 10px;
+    text-decoration: none;
+    color: #00adb5; /* Açıq mavi */
+    transition: color 0.3s;
+}
+
+.info-link:hover,
+.cart-icon:hover {
+    color: #e84545; /* Hover zamanı rəng dəyişir */
+}

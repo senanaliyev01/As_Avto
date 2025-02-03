@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ümumi Baxış{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/umumibaxis.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="product-list">
+    {% for mehsul in mehsullar %}
+    <div class="product-card">
+        <div class="product-image">
+            {% if mehsul.sekil %}
+                <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
+            {% else %}
+                <img src="{% static 'images/default-product.png' %}" alt="Default Image"> <!-- Default image -->
+            {% endif %}
+        </div>
+        <div class="product-details">
+            <h3 class="product-title">{{ mehsul.adi }}</h3>
+            <p class="product-category">Kateqoriya: {{ mehsul.kateqoriya }}</p>
+            <p class="product-brand">Firma: {{ mehsul.brend.adi }}</p>
+            <p class="product-model">Avtomobil: {{ mehsul.marka.adi }}</p>
+            <p class="product-oem">OEM: {{ mehsul.oem }}</p>
+            <p class="product-price">Qiymət: {{ mehsul.qiymet }} AZN</p>
+            <p class="product-stock-status">
+                {% if mehsul.stok == 0 %}
+                    <span class="stock-status out-of-stock">Yoxdur</span>
+                {% elif mehsul.stok <= 20 %}
+                    <span class="stock-status low-stock">Az var</span>
+                {% else %}
+                    <span class="stock-status in-stock">Var</span>
+                {% endif %}
+            </p>
+            <div class="product-actions">
+                <a href="{% url 'mehsul_haqqinda' mehsul.id %}" class="info-link">Ətraflı</a>
+                <a href="{% url 'sebet_ekle' mehsul.id %}" class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i> Səbətə əlavə et
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/umumi_baxis.js' %}"></script>
+{% endblock %}

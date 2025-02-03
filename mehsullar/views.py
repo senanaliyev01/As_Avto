@@ -21,6 +21,18 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import Image
 from istifadeciler.models import Profile
 
+@login_required
+def umumibaxis(request):
+    # Bütün məhsulları əldə edirik
+    mehsullar = Mehsul.objects.all()
+    
+    # Şablona göndəriləcək konteksti yaradırıq
+    context = {
+        'mehsullar': mehsullar,
+    }
+    
+    return render(request, 'umumibaxis.html', context)
+
 
 @login_required
 def about(request):

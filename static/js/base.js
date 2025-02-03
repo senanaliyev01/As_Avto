@@ -361,7 +361,7 @@
             }
             
             .product-image {
-                width: 80px;
+                width: 100%;
                 height: auto;
                 object-fit: cover;
                 border-radius: 4px;

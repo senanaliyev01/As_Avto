@@ -35,7 +35,7 @@ body {
 /* Məhsul şəkli */
 .product-image img {
     width: 300px;
-    height: auto;
+    height: 250px;
 }
 
 /* Məhsul detalları */

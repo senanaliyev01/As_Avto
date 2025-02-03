@@ -307,8 +307,6 @@
                 width: 80px;
                 height: auto;
                 object-fit: cover;
-                border-radius: 4px;
-                border: 1px solid #dee2e6;
             }
             
             .product-name {

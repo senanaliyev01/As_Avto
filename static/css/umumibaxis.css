@@ -34,7 +34,7 @@ body {
 
 /* Məhsul şəkli */
 .product-image img {
-    width: 100%;
+    width: 300px;
     height: auto;
 }
 
@@ -114,11 +114,3 @@ body {
     background-color: #e65c50; /* Hover zamanı tünd qırmızı */
 }
 
-/* Mesaj divinin tərzi */
-.animated-message {
-    position: fixed;
-    top: 20px;
-    right: 20px; /* Sağda sabit yer */
-    z-index: 2000; /* Yuxarıda görünməsi üçün */
-    transition: all 0.5s ease; /* Yavaşca görünməsi */
-}

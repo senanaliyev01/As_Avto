@@ -73,6 +73,7 @@ header {
     font-size: 0.9rem;
 }
 
+
 /* Navbar Styles */
 .nav-bar {
     background-color: var(--secondary-color);
@@ -81,6 +82,9 @@ header {
     justify-content: center;
     gap: 2rem;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    position: sticky; /* Sticky pozisiya */
+    top: 0; /* Yuxarıda qalması üçün */
+    z-index: 1000; /* Üst səviyyədə görünməsi üçün */
 }
 
 .nav-bar a {

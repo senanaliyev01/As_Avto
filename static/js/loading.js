@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         createLoadingText() {
             const loadingText = document.createElement("p");
-            loadingText.textContent = "Yüklənir...";
+            loadingText.textContent = "";
             loadingText.style.cssText = `
                 color: white;
                 margin-top: 20px;

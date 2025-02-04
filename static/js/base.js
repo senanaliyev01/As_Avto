@@ -471,6 +471,7 @@
 
 
    
+    
     document.getElementById('search-form').addEventListener('submit', function(event) {
         event.preventDefault(); // Formun dərhal göndərilməsini dayandır
         document.getElementById('loading-spinner').style.display = 'flex'; // Spinneri göstər
@@ -480,3 +481,4 @@
             this.submit(); // Formu göndər
         }, 2000);
     });
+

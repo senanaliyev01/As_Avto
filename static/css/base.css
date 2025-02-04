@@ -137,15 +137,28 @@ header {
     background-color: #56d6b0; /* Hover effekti */
 }
 
+#search-button {
+    position: relative; /* Spinnerin düzgün yerləşməsi üçün */
+    padding: 0.5rem 1rem; /* Daxili boşluq */
+    background-color: var(--accent-color); /* Fon rəngi */
+    color: var(--primary-color); /* Mətn rəngi */
+    border: none; /* Sərhəd olmaması */
+    border-radius: 4px; /* Künclərin yuvarlanması */
+    cursor: pointer; /* İmlecin göstəricisi */
+    transition: background-color 0.3s ease; /* Fon rənginin keçidi */
+}
+
+#search-button:hover {
+    background-color: #56d6b0; /* Hover effekti */
+}
+
 /* Loading Spinner */
 .loading-spinner {
     position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: none; /* Başlanğıcda gizli */
 }
 
 .spinner {

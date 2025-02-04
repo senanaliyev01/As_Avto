@@ -33,7 +33,7 @@
         </div>
     </header>
           
-   <!-- Axtarış Forması -->
+<!-- Axtarış Forması -->
 <div class="search-bar">
     <form id="search-form" method="GET" action="{% url 'products_list' %}">
         <select name="category" id="category">
@@ -65,12 +65,12 @@
 
         <input type="text" name="search_text" placeholder="Brend kodu və ya OEM kodu daxil edin" value="{{ request.GET.search_text }}">
         
-        <button type="submit" id="search-button">Axtar</button>
-        
-        <!-- Loading Spinner -->
-        <div id="loading-spinner" class="loading-spinner" style="display: none;">
-            <div class="spinner"></div>
-        </div>
+        <button type="submit" id="search-button">
+            Axtar
+            <div id="loading-spinner" class="loading-spinner" style="display: none;">
+                <div class="spinner"></div>
+            </div>
+        </button>
     </form>
 </div>
 

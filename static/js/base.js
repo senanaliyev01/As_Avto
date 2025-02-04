@@ -474,11 +474,25 @@
     
     document.getElementById('search-form').addEventListener('submit', function(event) {
         event.preventDefault(); // Formun dərhal göndərilməsini dayandır
-        document.getElementById('loading-spinner').style.display = 'flex'; // Spinneri göstər
-
+    
+        let searchButton = document.getElementById('search-button');
+        let spinner = document.getElementById('loading-spinner');
+    
+        // Butonun ölçüsünü qorumaq üçün enini və hündürlüyünü sabit saxla
+        searchButton.style.width = `${searchButton.offsetWidth}px`;
+        searchButton.style.height = `${searchButton.offsetHeight}px`;
+        
+        // Axtarış yazısını gizlət, amma spinneri saxla
+        searchButton.childNodes[0].nodeValue = ''; // Axtar sözünü sil
+        spinner.style.display = 'inline-block'; // Spinneri göstər
+    
+        // Butonu deaktiv et ki, yenidən klik olunmasın
+        searchButton.disabled = true; 
+    
         // 2 saniyə sonra formu göndər
         setTimeout(() => {
             this.submit(); // Formu göndər
         }, 2000);
     });
+    
 

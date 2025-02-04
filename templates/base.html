@@ -35,7 +35,7 @@
           
    <!-- Axtarış Forması -->
 <div class="search-bar">
-    <form method="GET" action="{% url 'products_list' %}">
+    <form id="search-form" method="GET" action="{% url 'products_list' %}">
         <select name="category" id="category">
             <option value="">Kateqoriya</option>
             {% for category in request.kateqoriyalar %}
@@ -65,7 +65,12 @@
 
         <input type="text" name="search_text" placeholder="Brend kodu və ya OEM kodu daxil edin" value="{{ request.GET.search_text }}">
         
-        <button type="submit">Axtar</button>
+        <button type="submit" id="search-button">Axtar</button>
+        
+        <!-- Loading Spinner -->
+        <div id="loading-spinner" class="loading-spinner" style="display: none;">
+            <div class="spinner"></div>
+        </div>
     </form>
 </div>
 

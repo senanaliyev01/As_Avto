@@ -468,3 +468,15 @@
             console.error('Funksiya xətası:', error);
         }
     });
+
+
+   
+    document.getElementById('search-form').addEventListener('submit', function(event) {
+        event.preventDefault(); // Formun dərhal göndərilməsini dayandır
+        document.getElementById('loading-spinner').style.display = 'flex'; // Spinneri göstər
+
+        // 2 saniyə sonra formu göndər
+        setTimeout(() => {
+            this.submit(); // Formu göndər
+        }, 2000);
+    });

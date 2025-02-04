@@ -53,7 +53,7 @@ body {
     box-shadow: var(--shadow-sm);
 }
 
-/* Search Bar - Professional Style */
+/* Search Bar - Professional Style
 .search-bar {
 
     padding: 2rem;
@@ -123,7 +123,7 @@ body {
 
 #search-button:active {
     transform: translateY(0);
-}
+} */
 
 /* Stock Status Badges */
 .stock-status {

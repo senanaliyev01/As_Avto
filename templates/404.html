@@ -1,17 +1,46 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="az">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" sizes="128x128" href="{% static 'img/favicon.png' %}">
     <title>Səhifə Tapılmadı</title>
     <style>
-        body { text-align: center; padding: 50px; font-family: Arial, sans-serif; }
-        h1 { font-size: 50px; color: red; }
-        p { font-size: 20px; }
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #0a1929; /* Tünd göy fon */
+            color: #ffffff; /* Ağ mətn */
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+        }
+        h1 {
+            font-size: 80px; /* Daha böyük başlıq */
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Başlıq üçün kölgə */
+        }
+        p {
+            font-size: 24px; /* Daha böyük alt başlıq */
+            margin-top: 20px;
+            opacity: 0.8; /* Şəffaflıq */
+        }
+        .container {
+            background: rgba(10, 25, 41, 0.8); /* Tünd göy fonun şəffaf versiyası */
+            padding: 40px;
+            border-radius: 15px; /* Künclərin yuvarlanması */
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); /* Kölgə */
+        }
     </style>
 </head>
 <body>
-    <h1>404</h1>
-    <p>Üzr istəyirik, bu səhifə mövcud deyil.</p>
+    <div class="container">
+        <h1>404</h1>
+        <p>Üzr istəyirik, bu səhifə mövcud deyil.</p>
+    </div>
 </body>
 </html>

@@ -101,6 +101,51 @@ header {
     transform: translateY(-2px);
 }
 
+/* Axtarış Forması Üçün Stil */
+.search-bar {
+    background-color: rgba(10, 25, 41, 0.9); /* Tünd göy fon */
+    padding: 1rem; /* Daxili boşluq */
+    border-radius: 8px; /* Künclərin yuvarlanması */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* Kölgə */
+    display: flex;
+    justify-content: center; /* Mərkəzləşdirmək */
+    align-items: center; /* Mərkəzləşdirmək */
+    gap: 1rem; /* Elementlər arasında boşluq */
+    margin: 1rem 0; /* Üst və alt boşluq */
+}
+
+.search-bar select,
+.search-bar input[type="text"] {
+    padding: 0.5rem; /* Daxili boşluq */
+    border: 1px solid var(--accent-color); /* Sərhəd rəngi */
+    border-radius: 4px; /* Künclərin yuvarlanması */
+    background-color: var(--primary-color); /* Fon rəngi */
+    color: var(--text-primary); /* Mətn rəngi */
+    font-size: 1rem; /* Mətn ölçüsü */
+    transition: border-color 0.3s ease; /* Sərhəd rənginin keçidi */
+}
+
+.search-bar select:focus,
+.search-bar input[type="text"]:focus {
+    border-color: var(--accent-color); /* Fokusda sərhəd rəngi */
+    outline: none; /* Fokusda kontur olmaması */
+}
+
+.search-bar button {
+    padding: 0.5rem 1rem; /* Daxili boşluq */
+    background-color: var(--accent-color); /* Fon rəngi */
+    color: var(--primary-color); /* Mətn rəngi */
+    border: none; /* Sərhəd olmaması */
+    border-radius: 4px; /* Künclərin yuvarlanması */
+    cursor: pointer; /* İmlecin göstəricisi */
+    transition: background-color 0.3s ease; /* Fon rənginin keçidi */
+}
+
+.search-bar button:hover {
+    background-color: #56d6b0; /* Hover effekti */
+}
+
+
 /* Footer Styles */
 footer {
     background-color: var(--primary-color);

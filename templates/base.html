@@ -32,6 +32,37 @@
             <p class="current-time">Hazırki Saat: <span id="current-time"></span></p>
         </div>
     </header>
+          
+    <div class="search-bar">
+        <form method="GET" action="{% url 'products_list' %}">
+            <select name="category" id="category">
+                <option value="">Kateqoriya</option>
+                {% for category in request.kateqoriyalar %}
+                    <option value="{{ category.adi }}" {% if request.GET.category == category.adi %}selected{% endif %}>
+                        {{ category.adi }}
+                    </option>
+                {% endfor %}
+            </select>
+    
+            <select name="brand" id="brand">
+                <option value="">Firma</option>
+                {% for brand in request.brendler %}
+                    <option value="{{ brand.adi }}" {% if request.GET.brand == brand.adi %}selected{% endif %}>
+                        {{ brand.adi }}
+                    </option>
+                {% endfor %}
+            </select>
+    
+            <select name="model" id="model">
+                <option value="">Avtomobil</option>
+                {% for marka in request.markalar %}
+                    <option value="{{ marka.adi }}" {% if request.GET.model == marka.adi %}selected{% endif %}>
+                        {{ marka.adi }}
+                    </option>
+                {% endfor %}
+            </select>
+    
+            <input type="text" name="search_text" placeholder="Brend kodu və ya OEM kodu daxil edin" value="{{ request.GET.search_text }}">
 
     <!-- Navbarr 2-->
     <div class="nav-bar">

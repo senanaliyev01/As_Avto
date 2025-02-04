@@ -57,6 +57,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'Web.middlewares.Force404Middleware',
+    'Web.middlewares.AddSearchDataMiddleware',
 ]
 
 ROOT_URLCONF = 'Web.urls'

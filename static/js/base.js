@@ -478,9 +478,10 @@
 
         const searchButton = document.getElementById('search-button');
         const loadingSpinner = document.getElementById('loading-spinner');
+        const buttonText = searchButton.querySelector('.button-text');
 
         // Axtar yazısını gizlət
-        searchButton.innerHTML = ''; // Axtar yazısını sil
+        buttonText.style.display = 'none'; // Axtar yazısını gizlət
 
         // Spinneri göstər
         loadingSpinner.style.display = 'flex'; // Spinneri göstər

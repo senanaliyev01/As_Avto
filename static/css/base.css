@@ -137,6 +137,10 @@ header {
     background-color: #56d6b0; /* Hover effekti */
 }
 
+.button-text {
+    display: inline; /* Axtar yazısını göstər */
+}
+
 #search-button {
     position: relative; /* Spinnerin düzgün yerləşməsi üçün */
     padding: 0.5rem 1rem; /* Daxili boşluq */
@@ -146,10 +150,13 @@ header {
     border-radius: 4px; /* Künclərin yuvarlanması */
     cursor: pointer; /* İmlecin göstəricisi */
     transition: background-color 0.3s ease; /* Fon rənginin keçidi */
+    display: flex; /* Flex konteyner */
+    align-items: center; /* Mərkəzləşdirmək */
+    justify-content: center; /* Mərkəzləşdirmək */
 }
 
 #search-button:hover {
-    background-color: #56d6b0; /* Hover effekti */
+    background-color: #56d6b0;
 }
 
 /* Loading Spinner */
@@ -159,6 +166,8 @@ header {
     top: 50%;
     transform: translate(-50%, -50%);
     display: none; /* Başlanğıcda gizli */
+    width: 30px; /* Spinnerin genişliyi */
+    height: 30px; /* Spinnerin hündürlüyü */
 }
 
 .spinner {

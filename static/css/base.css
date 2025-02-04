@@ -140,7 +140,7 @@ header {
 #search-button {
     position: relative; /* Spinnerin düzgün yerləşməsi üçün */
     padding: 0.5rem 1rem; /* Daxili boşluq */
-    background-color: var(--accent-color); /* Fon rəngi */
+    background-color: #38a7e5; /* Fon rəngi */
     color: var(--primary-color); /* Mətn rəngi */
     border: none; /* Sərhəd olmaması */
     border-radius: 4px; /* Künclərin yuvarlanması */

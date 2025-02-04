@@ -114,8 +114,10 @@ header {
     margin: 1rem 0; /* Üst və alt boşluq */
 }
 
+/* Axtarış Forması Elementləri */
 .search-bar select,
-.search-bar input[type="text"] {
+.search-bar input[type="text"],
+.search-bar button {
     padding: 0.5rem; /* Daxili boşluq */
     border: 1px solid var(--accent-color); /* Sərhəd rəngi */
     border-radius: 4px; /* Künclərin yuvarlanması */
@@ -125,20 +127,10 @@ header {
     transition: border-color 0.3s ease; /* Sərhəd rənginin keçidi */
 }
 
-.search-bar select:focus,
-.search-bar input[type="text"]:focus {
-    border-color: var(--accent-color); /* Fokusda sərhəd rəngi */
-    outline: none; /* Fokusda kontur olmaması */
-}
-
 .search-bar button {
-    padding: 0.5rem 1rem; /* Daxili boşluq */
     background-color: var(--accent-color); /* Fon rəngi */
     color: var(--primary-color); /* Mətn rəngi */
-    border: none; /* Sərhəd olmaması */
-    border-radius: 4px; /* Künclərin yuvarlanması */
     cursor: pointer; /* İmlecin göstəricisi */
-    transition: background-color 0.3s ease; /* Fon rənginin keçidi */
 }
 
 .search-bar button:hover {

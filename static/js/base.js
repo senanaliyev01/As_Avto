@@ -474,22 +474,11 @@
     
     document.getElementById('search-form').addEventListener('submit', function(event) {
         event.preventDefault(); // Formun dərhal göndərilməsini dayandır
-        
-        let searchButton = document.getElementById('search-button');
-        let spinner = document.getElementById('loading-spinner');
-    
-        // Axtarış yazısını gizlət, lakin boşaltma
-        searchButton.style.width = `${searchButton.offsetWidth}px`; // Butonun ölçüsünü sabit saxla
-        searchButton.style.height = `${searchButton.offsetHeight}px`;
-        searchButton.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
-        
-        searchButton.disabled = true; // Butonu deaktiv et
-        spinner.style.display = 'flex'; // Spinneri göstər
-    
+        document.getElementById('loading-spinner').style.display = 'flex'; // Spinneri göstər
+
         // 2 saniyə sonra formu göndər
         setTimeout(() => {
             this.submit(); // Formu göndər
         }, 2000);
     });
-    
 

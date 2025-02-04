@@ -152,6 +152,12 @@ header {
     background-color: #56d6b0; /* Hover effekti */
 }
 
+#loading-spinner {
+    display: inline-block;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
 /* Loading Spinner */
 .loading-spinner {
     position: absolute;

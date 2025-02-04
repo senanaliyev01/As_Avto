@@ -138,14 +138,13 @@ header {
 }
 
 #search-button {
-    position: relative; /* Spinnerin düzgün yerləşməsi üçün */
-    padding: 0.5rem 1rem; /* Daxili boşluq */
-    background-color: var(--accent-color); /* Fon rəngi */
-    color: var(--primary-color); /* Mətn rəngi */
-    border: none; /* Sərhəd olmaması */
-    border-radius: 4px; /* Künclərin yuvarlanması */
-    cursor: pointer; /* İmlecin göstəricisi */
-    transition: background-color 0.3s ease; /* Fon rənginin keçidi */
+    position: relative; /* Spinnerin butonun içində düzgün yerləşməsi üçün */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px; /* Butonun kiçilməsinin qarşısını alır */
+    height: 40px; /* Butonun hündürlüyünü sabit saxlayır */
+    overflow: hidden; /* Spinnerin butondan kənara çıxmasının qarşısını alır */
 }
 
 #search-button:hover {
@@ -158,21 +157,24 @@ header {
     vertical-align: middle;
 }
 
-/* Loading Spinner */
-.loading-spinner {
+
+
+#loading-spinner {
     position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    display: none; /* Başlanğıcda gizli */
+    display: none;
+    width: 20px; /* Spinnerin ölçüsünü kiçilt */
+    height: 20px;
 }
 
 .spinner {
-    border: 4px solid rgba(255, 255, 255, 0.3);
-    border-top: 4px solid var(--accent-color);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid var(--accent-color);
     border-radius: 50%;
-    width: 30px;
-    height: 30px;
+    width: 100%;
+    height: 100%;
     animation: spin 1s linear infinite;
 }
 

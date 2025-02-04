@@ -10,21 +10,6 @@
 
 {% block content %}
 
-<!-- Məhsul Şəkilləri Slaytı -->
-<div class="product-slider swiper">
-    <div class="swiper-wrapper">
-        {% for mehsul in mehsullar %}
-        <div class="swiper-slide">
-            <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
-        </div>
-        {% endfor %}
-    </div>
-    <!-- Add Pagination -->
-    <div class="swiper-pagination"></div>
-    <!-- Add Navigation -->
-    <div class="swiper-button-next"></div>
-    <div class="swiper-button-prev"></div>
-</div>
 
 
 <!-- Statistika Bölməsi -->

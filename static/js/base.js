@@ -472,14 +472,15 @@
 
    
     
+   
     document.getElementById('search-form').addEventListener('submit', function(event) {
         event.preventDefault(); // Formun dərhal göndərilməsini dayandır
 
         const searchButton = document.getElementById('search-button');
         const loadingSpinner = document.getElementById('loading-spinner');
 
-        // "Axtar" yazısını gizlət
-        searchButton.innerHTML = ''; // "Axtar" yazısını sil
+        // Axtar yazısını gizlət
+        searchButton.innerHTML = ''; // Axtar yazısını sil
 
         // Spinneri göstər
         loadingSpinner.style.display = 'flex'; // Spinneri göstər

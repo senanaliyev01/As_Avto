@@ -38,7 +38,15 @@ class SifarisAdmin(admin.ModelAdmin):
 
 # 1Sifariş məhsulları admin paneli
 class SifarisMehsulAdmin(admin.ModelAdmin):
-    list_display = ('sifaris', 'mehsul', 'miqdar', 'qiymet')
+    list_display = ('sifaris', 'mehsul', 'miqdar', 'qiymet', 'get_brend_kod', 'get_oem')
+
+    def get_brend_kod(self, obj):
+        return obj.mehsul.brend_kod
+    get_brend_kod.short_description = 'Brend Kodu'  # Sütun başlığı
+
+    def get_oem(self, obj):
+        return obj.mehsul.oem
+    get_oem.short_description = 'OEM Kodu'  # Sütun başlığı
 
 # Məhsul admin paneli
 class MehsulAdmin(admin.ModelAdmin):

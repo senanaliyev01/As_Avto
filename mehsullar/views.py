@@ -403,7 +403,7 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     # Sifariş məhsulları üçün cədvəl
     data = [['№', 'Məhsul Adı', 'Firma',  'Brend', 'Avtomobil', 'Oem', 'Miqdar', 'Qiymət', 'Cəmi']]
     for index, mehsul in enumerate(sifaris_mehsullari, start=1):
-        data.append([index, mehsul.mehsul.adi, mehsul.mehsul.brend.adi, mehsul.mehsul.marka.adi, mehsul.mehsul.brend_kod, mehsul.mehsul.oem, mehsul.miqdar, f"{mehsul.qiymet} AZN", f"{mehsul.cemi} AZN"])
+        data.append([index, mehsul.mehsul.adi, mehsul.mehsul.brend.adi,  mehsul.mehsul.brend_kod, mehsul.mehsul.marka.adi, mehsul.mehsul.oem, mehsul.miqdar, f"{mehsul.qiymet} AZN", f"{mehsul.cemi} AZN"])
 
     # Cədvəl yaradılması
     table = Table(data, colWidths=[30, 100, 100, 100, 50, 70, 70])  # Cədvəl sütun genişliklərini tənzimlədik

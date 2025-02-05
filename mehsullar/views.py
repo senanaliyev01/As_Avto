@@ -406,7 +406,7 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
         data.append([index, mehsul.mehsul.adi, mehsul.mehsul.brend.adi,  mehsul.mehsul.brend_kod, mehsul.mehsul.marka.adi, mehsul.mehsul.oem, mehsul.miqdar, f"{mehsul.qiymet} AZN", f"{mehsul.cemi} AZN"])
 
     # Cədvəl yaradılması
-    table = Table(data)  # colWidths parametrini çıxardıq
+    table = Table(data, colWidths=[None] * len(data[0]))  # Sütun genişliklərini avtomatik tənzimləmək üçün None istifadə edirik
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # Başlıq arxa planı
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),  # Başlıq mətni
@@ -421,11 +421,6 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
         ('BOTTOMPADDING', (0, 1), (-1, -1), 5),  # Cədvəl alt padding
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),  # Mətni mərkəzləşdir
     ]))
-
-    # Cədvəl hüceyrələrindəki mətni sıxmaq üçün
-    for row in range(len(data)):
-        for col in range(len(data[row])):
-            table._cellvalues[row][col] = f"{data[row][col]:<15}"  # Mətni sıxmaq üçün
 
     elements.append(table)
     

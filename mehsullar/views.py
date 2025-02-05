@@ -373,7 +373,7 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     response['Content-Disposition'] = f'attachment; filename="sifaris_{sifaris.id}.pdf"'
 
     buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=20, leftMargin=20, topMargin=0, bottomMargin=20)
+    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=0, leftMargin=0, topMargin=20, bottomMargin=20)  # Yanlardan boşluqları 0 etdik
     elements = []
 
     # Fontu qeyd edirik
@@ -410,7 +410,7 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # Başlıq arxa planı
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),  # Başlıq mətni
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),  # Mətni solda hizala
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),  # Mətni solda hizala
         ('FONTNAME', (0, 0), (-1, 0), 'NotoSans'),  # Başlıq fontu
         ('FONTNAME', (0, 1), (-1, -1), 'NotoSans'),  # Cədvəl mətni üçün fontu NotoSans ilə dəyişdirin
         ('BOTTOMPADDING', (0, 0), (-1, 0), 0),  # Başlıq padding

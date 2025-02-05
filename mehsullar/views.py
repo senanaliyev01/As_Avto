@@ -400,7 +400,7 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     elements.append(Paragraph(f"Qalıq Borc: {sifaris.qaliq_borc} AZN", styles['Normal']))
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq əlavə et
 
-      # Sifariş məhsulları üçün cədvəl
+    # Sifariş məhsulları üçün cədvəl
     data = [['№', 'Məhsul Adı', 'Firma',  'Brend', 'Avtomobil', 'Oem', 'Miqdar', 'Qiymət', 'Cəmi']]
     for index, mehsul in enumerate(sifaris_mehsullari, start=1):
         data.append([index, mehsul.mehsul.adi, mehsul.mehsul.brend.adi,  mehsul.mehsul.brend_kod, mehsul.mehsul.marka.adi, mehsul.mehsul.oem, mehsul.miqdar, f"{mehsul.qiymet} AZN", f"{mehsul.cemi} AZN"])
@@ -460,7 +460,6 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     buffer.seek(0)
     response.write(buffer.read())
     return response
-
 
 def mehsul_haqqinda(request, mehsul_id):
     mehsul = get_object_or_404(Mehsul, id=mehsul_id)

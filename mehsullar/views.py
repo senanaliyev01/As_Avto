@@ -373,7 +373,7 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     response['Content-Disposition'] = f'attachment; filename="sifaris_{sifaris.id}.pdf"'
 
     buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=0, leftMargin=0, topMargin=20, bottomMargin=20)  # Yanlardan boşluqları 0 etdik
+    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=20, leftMargin=20, topMargin=0, bottomMargin=20)
     elements = []
 
     # Fontu qeyd edirik
@@ -401,25 +401,25 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq əlavə et
 
     # Sifariş məhsulları üçün cədvəl
-    data = [['№', 'Adı', 'Firma',  'Brend', 'Oem', 'Say', 'Qiymət', 'Cəmi']]
+    data = [['№', 'Məhsul Adı', 'Brend', 'Oem', 'Miqdar', 'Qiymət', 'Cəmi']]
     for index, mehsul in enumerate(sifaris_mehsullari, start=1):
-        data.append([index, mehsul.mehsul.adi, mehsul.mehsul.brend.adi,  mehsul.mehsul.brend_kod,  mehsul.mehsul.oem, mehsul.miqdar, f"{mehsul.qiymet} AZN", f"{mehsul.cemi} AZN"])
+        data.append([index, mehsul.mehsul.adi, mehsul.mehsul.brend_kod, mehsul.mehsul.oem, mehsul.miqdar, f"{mehsul.qiymet} AZN", f"{mehsul.cemi} AZN"])
 
     # Cədvəl yaradılması
-    table = Table(data, colWidths=[None] * len(data[0]))  # Sütun genişliklərini avtomatik tənzimləmək üçün None istifadə edirik
+    table = Table(data, colWidths=[30, 100, 100, 100, 50, 70, 70])  # Cədvəl sütun genişliklərini tənzimlədik
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # Başlıq arxa planı
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),  # Başlıq mətni
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),  # Mətni solda hizala
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),  # Mərkəzləşdirmək
         ('FONTNAME', (0, 0), (-1, 0), 'NotoSans'),  # Başlıq fontu
         ('FONTNAME', (0, 1), (-1, -1), 'NotoSans'),  # Cədvəl mətni üçün fontu NotoSans ilə dəyişdirin
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 0),  # Başlıq padding
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),  # Başlıq padding
         ('BACKGROUND', (0, 1), (-1, -1), colors.beige),  # Cədvəl arxa planı
         ('GRID', (0, 0), (-1, -1), 1, colors.black),  # Cədvəl xətləri
         ('FONTSIZE', (0, 0), (-1, -1), 10),  # Font ölçüsünü tənzimləyin
-        ('TOPPADDING', (0, 0), (-1, 0), 0),  # Başlıq üst padding
-        ('BOTTOMPADDING', (0, 1), (-1, -1), 0),  # Cədvəl alt padding
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),  # Mətni mərkəzləşdir
+        ('TOPPADDING', (0, 0), (-1, 0), 10),  # Başlıq üst padding
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 5),  # Cədvəl alt padding
+        
     ]))
 
     elements.append(table)
@@ -455,6 +455,7 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     buffer.seek(0)
     response.write(buffer.read())
     return response
+
 
 def mehsul_haqqinda(request, mehsul_id):
     mehsul = get_object_or_404(Mehsul, id=mehsul_id)

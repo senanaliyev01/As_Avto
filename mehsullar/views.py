@@ -400,17 +400,17 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     elements.append(Paragraph(f"Qalıq Borc: {sifaris.qaliq_borc} AZN", styles['Normal']))
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq əlavə et
 
-    # Sifariş məhsulları üçün cədvəl
+    # Cədvəl yaradılması
     data = [['№', 'Məhsul Adı', 'Brend', 'Oem', 'Miqdar', 'Qiymət', 'Cəmi']]
     for index, mehsul in enumerate(sifaris_mehsullari, start=1):
         data.append([index, mehsul.mehsul.adi, mehsul.mehsul.brend_kod, mehsul.mehsul.oem, mehsul.miqdar, f"{mehsul.qiymet} AZN", f"{mehsul.cemi} AZN"])
 
     # Cədvəl yaradılması
-    table = Table(data, colWidths=[30, 100, 100, 100, 50, 70, 70])  # Cədvəl sütun genişliklərini tənzimlədik
+    table = Table(data)  # Sütun genişliklərini təyin etmədən cədvəl yaradın
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # Başlıq arxa planı
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),  # Başlıq mətni
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),  # Mərkəzləşdirmək
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),  # Mərkəzləşdirmək
         ('FONTNAME', (0, 0), (-1, 0), 'NotoSans'),  # Başlıq fontu
         ('FONTNAME', (0, 1), (-1, -1), 'NotoSans'),  # Cədvəl mətni üçün fontu NotoSans ilə dəyişdirin
         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),  # Başlıq padding
@@ -419,8 +419,7 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
         ('FONTSIZE', (0, 0), (-1, -1), 10),  # Font ölçüsünü tənzimləyin
         ('TOPPADDING', (0, 0), (-1, 0), 10),  # Başlıq üst padding
         ('BOTTOMPADDING', (0, 1), (-1, -1), 5),  # Cədvəl alt padding
-        ('LEFTPADDING', (0, 0), (-1, -1), 0),  # Sol paddingi sıfırla
-        ('RIGHTPADDING', (0, 0), (-1, -1), 0),  # Sağ paddingi sıfırla
+        ('WORD_WRAP', (0, 0), (-1, -1), 'CJK'),  # Yazıların sığması üçün
     ]))
 
     elements.append(table)

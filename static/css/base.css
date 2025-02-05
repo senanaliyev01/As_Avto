@@ -122,7 +122,6 @@ header {
 .search-bar select,
 .search-bar input[type="text"],
 .search-bar button {
-    width: 300px;
     padding: 0.5rem; /* Daxili boşluq */
     border: 1px solid var(--accent-color); /* Sərhəd rəngi */
     border-radius: 4px; /* Künclərin yuvarlanması */

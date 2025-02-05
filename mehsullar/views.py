@@ -419,7 +419,8 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
         ('FONTSIZE', (0, 0), (-1, -1), 10),  # Font ölçüsünü tənzimləyin
         ('TOPPADDING', (0, 0), (-1, 0), 10),  # Başlıq üst padding
         ('BOTTOMPADDING', (0, 1), (-1, -1), 5),  # Cədvəl alt padding
-        
+        ('LEFTPADDING', (0, 0), (-1, -1), 0),  # Sol paddingi sıfırla
+        ('RIGHTPADDING', (0, 0), (-1, -1), 0),  # Sağ paddingi sıfırla
     ]))
 
     elements.append(table)

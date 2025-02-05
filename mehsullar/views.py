@@ -401,9 +401,9 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq əlavə et
 
     # Sifariş məhsulları üçün cədvəl
-    data = [['№', 'Məhsul Adı', 'Firma',  'Brend', 'Avtomobil', 'Oem', 'Miqdar', 'Qiymət', 'Cəmi']]
+    data = [['№', 'Adı', 'Firma',  'Brend', 'Oem', 'Say', 'Qiymət', 'Cəmi']]
     for index, mehsul in enumerate(sifaris_mehsullari, start=1):
-        data.append([index, mehsul.mehsul.adi, mehsul.mehsul.brend.adi,  mehsul.mehsul.brend_kod, mehsul.mehsul.marka.adi, mehsul.mehsul.oem, mehsul.miqdar, f"{mehsul.qiymet} AZN", f"{mehsul.cemi} AZN"])
+        data.append([index, mehsul.mehsul.adi, mehsul.mehsul.brend.adi,  mehsul.mehsul.brend_kod,  mehsul.mehsul.oem, mehsul.miqdar, f"{mehsul.qiymet} AZN", f"{mehsul.cemi} AZN"])
 
     # Cədvəl yaradılması
     table = Table(data, colWidths=[None] * len(data[0]))  # Sütun genişliklərini avtomatik tənzimləmək üçün None istifadə edirik
@@ -413,15 +413,14 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),  # Mətni solda hizala
         ('FONTNAME', (0, 0), (-1, 0), 'NotoSans'),  # Başlıq fontu
         ('FONTNAME', (0, 1), (-1, -1), 'NotoSans'),  # Cədvəl mətni üçün fontu NotoSans ilə dəyişdirin
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 0),  # Başlıq padding
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),  # Cədvəl arxa planı
         ('GRID', (0, 0), (-1, -1), 1, colors.black),  # Cədvəl xətləri
         ('FONTSIZE', (0, 0), (-1, -1), 10),  # Font ölçüsünü tənzimləyin
+        ('TOPPADDING', (0, 0), (-1, 0), 0),  # Başlıq üst padding
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 0),  # Cədvəl alt padding
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),  # Mətni mərkəzləşdir
     ]))
-
-    # Cədvəl hüceyrələrindəki mətni sıxmaq üçün
-    for row in range(len(data)):
-        for col in range(len(data[row])):
-            table._cellvalues[row][col] = f"{data[row][col]:<15}"  # Mətni sıxmaq üçün
 
     elements.append(table)
     
@@ -442,8 +441,8 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     imza_table = Table(imza_data, colWidths=[200, 200])  # İmzaların genişliyini tənzimləyin
     imza_table.setStyle(TableStyle([
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),  # Sol hizalama
-        ('TOPPADDING', (0, 0), (-1, -1), 0),  # Üst padding
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 0),  # Alt padding
+        ('TOPPADDING', (0, 0), (-1, -1), 10),  # Üst padding
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 10),  # Alt padding
     ]))
 
     elements.append(imza_table)

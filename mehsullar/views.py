@@ -400,14 +400,13 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     elements.append(Paragraph(f"Qalıq Borc: {sifaris.qaliq_borc} AZN", styles['Normal']))
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq əlavə et
 
-    # Sifariş məhsulları üçün cədvəl
+      # Sifariş məhsulları üçün cədvəl
     data = [['№', 'Məhsul Adı', 'Firma',  'Brend', 'Avtomobil', 'Oem', 'Miqdar', 'Qiymət', 'Cəmi']]
     for index, mehsul in enumerate(sifaris_mehsullari, start=1):
         data.append([index, mehsul.mehsul.adi, mehsul.mehsul.brend.adi,  mehsul.mehsul.brend_kod, mehsul.mehsul.marka.adi, mehsul.mehsul.oem, mehsul.miqdar, f"{mehsul.qiymet} AZN", f"{mehsul.cemi} AZN"])
 
     # Cədvəl yaradılması
-   # Cədvəl yaradılması
-    table = Table(data, colWidths=[30, 120, 100, 100, 70, 70, 70, 70, 70])  # Genişlikləri tənzimlədik
+    table = Table(data)  # colWidths parametrini çıxardıq
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # Başlıq arxa planı
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),  # Başlıq mətni
@@ -420,9 +419,13 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
         ('FONTSIZE', (0, 0), (-1, -1), 10),  # Font ölçüsünü tənzimləyin
         ('TOPPADDING', (0, 0), (-1, 0), 10),  # Başlıq üst padding
         ('BOTTOMPADDING', (0, 1), (-1, -1), 5),  # Cədvəl alt padding
-        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),  # Alternativ arxa plan
-        ('BACKGROUND', (0, 2), (-1, -1), colors.whitesmoke),  # Alternativ arxa plan
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),  # Mətni mərkəzləşdir
     ]))
+
+    # Cədvəl hüceyrələrindəki mətni sıxmaq üçün
+    for row in range(len(data)):
+        for col in range(len(data[row])):
+            table._cellvalues[row][col] = f"{data[row][col]:<15}"  # Mətni sıxmaq üçün
 
     elements.append(table)
     

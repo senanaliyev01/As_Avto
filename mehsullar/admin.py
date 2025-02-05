@@ -38,9 +38,7 @@ class SifarisAdmin(admin.ModelAdmin):
 
 # 1Sifariş məhsulları admin paneli
 class SifarisMehsulAdmin(admin.ModelAdmin):
-    list_display = ('sifaris', 'mehsul', 'miqdar', 'qiymet', 'brend_kod', 'oem')
-
-
+    list_display = ('sifaris', 'mehsul', 'miqdar', 'qiymet')
 
 # Məhsul admin paneli
 class MehsulAdmin(admin.ModelAdmin):

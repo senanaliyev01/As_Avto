@@ -21,7 +21,8 @@ header {
 }
 
 .logo img {
-    height: 60px;
+    width: 400px;
+    height: auto;
     transition: transform 0.3s ease;
 }
 
@@ -193,7 +194,8 @@ footer {
 }
 
 .footer-left img {
-    height: 50px;
+    width: 300px;
+    height: auto;
 }
 
 .footer-center {

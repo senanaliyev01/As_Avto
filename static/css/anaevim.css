@@ -177,7 +177,7 @@ button {
 }
 
 .header__logo img {
-    width: 200px;
+    width: 250px;
     height: auto;
     object-fit: contain;
     transition: transform var(--transition-normal);

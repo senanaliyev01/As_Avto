@@ -397,11 +397,11 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     elements.append(Paragraph(f"Müştəri Ünvanı: {profile.unvan}", styles['Normal']))
     elements.append(Paragraph(f"Sifariş Nömrəsi: №{sifaris.id}", styles['Normal']))
     elements.append(Paragraph(f"Tarix: {sifaris.tarix.astimezone(timezone.get_current_timezone()).strftime('%Y-%m-%d %H:%M:%S')}", styles['Normal']))
-    elements.append(Paragraph(f"Qalıq Borc: {sifaris.qaliq_borc} AZN", styles['Normal']))
+    elements.append(Paragraph(f"Qalıq Borc (Qaimə Daxil): {sifaris.qaliq_borc} AZN", styles['Normal']))
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq əlavə et
 
     # Cədvəl yaradılması
-    data = [['№', 'Məhsul Adı', 'Brend', 'Oem', 'Miqdar', 'Qiymət', 'Cəmi']]
+    data = [['№', 'Adı', 'Brend', 'Oem', 'Say', 'Qiymət', 'Cəmi']]
     for index, mehsul in enumerate(sifaris_mehsullari, start=1):
         data.append([index, mehsul.mehsul.adi, mehsul.mehsul.brend_kod, mehsul.mehsul.oem, mehsul.miqdar, f"{mehsul.qiymet} AZN", f"{mehsul.cemi} AZN"])
 
@@ -449,7 +449,7 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
 
     # Ödənilən məbləği ortada yerləşdirin
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq
-    elements.append(Paragraph("Ödənilən Məbləğ: ___________________________", styles['Normal']))
+    elements.append(Paragraph("Ödənilən Məbləğ: ___________________________ AZN", styles['Normal']))
 
     doc.build(elements)
     buffer.seek(0)

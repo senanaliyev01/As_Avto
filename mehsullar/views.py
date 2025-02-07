@@ -411,7 +411,7 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     for index, mehsul in enumerate(sifaris_mehsullari, start=1):
         data.append([index, mehsul.mehsul.adi, mehsul.mehsul.brend.adi, mehsul.mehsul.brend_kod, mehsul.mehsul.oem, mehsul.miqdar, f"{mehsul.qiymet} AZN", f"{mehsul.cemi} AZN"])
 
-    # Cədvəl yaradılması
+    # Cədvəl yaradılması1
     table = Table(data)  # Sütun genişliklərini təyin etmədən cədvəl yaradın
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # Başlıq arxa planı

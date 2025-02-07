@@ -396,8 +396,12 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     elements.append(Paragraph(f"Müştəri: {sifaris.user.username}", styles['Normal']))
     elements.append(Paragraph(f"Müştəri Nömrəsi: {profile.telefon}", styles['Normal']))
     elements.append(Paragraph(f"Müştəri Ünvanı: {profile.unvan}", styles['Normal']))
-    elements.append(Paragraph(f"Sifariş Nömrəsi: №{sifaris.id}", styles['Heading1']))
-    elements[-1].alignment = 1  # Sağ hizalama (1 - sağ, 0 - sol, 2 - mərkəz)
+    
+    # Yeni cədvəl yaradaraq Sifariş Nömrəsini sağa hizalayırıq
+    order_number_table = Table([[Paragraph(f"Sifariş Nömrəsi: №{sifaris.id}", styles['Normal'])]], colWidths=[400])
+    order_number_table.setStyle([('ALIGN', (0, 0), (0, 0), 'RIGHT')])  # Sağ hizalama
+    elements.append(order_number_table)
+
     elements.append(Paragraph(f"Tarix: {sifaris.tarix.astimezone(timezone.get_current_timezone()).strftime('%Y-%m-%d %H:%M:%S')}", styles['Normal']))
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq əlavə et
 

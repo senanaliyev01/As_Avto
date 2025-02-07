@@ -395,7 +395,9 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     order_number_table = Table([[Paragraph(f"Sifariş Nömrəsi: №{sifaris.id}", styles['Title'])]], colWidths=[None])  # H1 stili üçün 'Title' istifadə edin
     order_number_table.setStyle([('ALIGN', (0, 0), (0, 0), 'CENTER')])  # Mərkəzləşdirmək
     elements.append(order_number_table)
-
+ 
+    elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq əlavə et
+ 
     # Sifariş məlumatları
     elements.append(Paragraph(f"Satıcı: AS-AVTO ", styles['Normal']))
     elements.append(Paragraph(f"Müştəri: {sifaris.user.username}", styles['Normal']))

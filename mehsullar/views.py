@@ -396,12 +396,7 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     elements.append(Paragraph(f"Müştəri: {sifaris.user.username}", styles['Normal']))
     elements.append(Paragraph(f"Müştəri Nömrəsi: {profile.telefon}", styles['Normal']))
     elements.append(Paragraph(f"Müştəri Ünvanı: {profile.unvan}", styles['Normal']))
-    
-    # Yeni cədvəl yaradaraq Sifariş Nömrəsini sağa hizalayırıq
-    order_number_table = Table([[Paragraph(f"Sifariş Nömrəsi: №{sifaris.id}", styles['Normal'])]], colWidths=[None])  # None allows the table to take full width
-    order_number_table.setStyle([('ALIGN', (0, 0), (0, 0), 'RIGHT')])  # Sağ hizalama
-    elements.append(order_number_table)
-
+    elements.append(Paragraph(f"Sifariş Nömrəsi: №{sifaris.id}", styles['Normal']))
     elements.append(Paragraph(f"Tarix: {sifaris.tarix.astimezone(timezone.get_current_timezone()).strftime('%Y-%m-%d %H:%M:%S')}", styles['Normal']))
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq əlavə et
 
@@ -433,7 +428,7 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq əlavə et
     total_amount = Paragraph(f"<strong>Ümumi Məbləğ: {sifaris.cemi_mebleg} AZN</strong>", styles['Normal'])
     elements.append(total_amount)
-    
+    elements.append(Paragraph("<br/><br/>", styles['Normal']))
     elements.append(Paragraph(f"Qalıq Borc (Qaimə Daxil): {sifaris.qaliq_borc} AZN", styles['Normal']))
 
     # İmza üçün xətt

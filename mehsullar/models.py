@@ -98,6 +98,12 @@ class SifarisMehsul(models.Model):
     def total_price(self):
         return self.miqdar * self.qiymet
 
+    def save(self, *args, **kwargs):
+        # Sifarişin cəmini yeniləyin
+        super().save(*args, **kwargs)  # İlk öncə məhsulu saxlayın
+        self.sifaris.cemi_mebleg = sum(item.total_price() for item in self.sifaris.mehsullar.all())
+        self.sifaris.save()  # Sifarişi yeniləyin
+
 
 class OEMKod(models.Model):
     kod = models.CharField(max_length=100)

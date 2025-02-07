@@ -392,7 +392,7 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     elements.append(Paragraph("", styles['Normal']))  # Boşluq əlavə et
 
     # Sifariş nömrəsini mərkəzləşdirərək H1 formatında yazırıq
-    order_number_table = Table([[Paragraph(f"Sifariş: №{sifaris.id}", styles['Title'])]], colWidths=[None])  # H1 stili üçün 'Title' istifadə edin
+    order_number_table = Table([[Paragraph(f"Sifariş №{sifaris.id}", styles['Title'])]], colWidths=[None])  # H1 stili üçün 'Title' istifadə edin
     order_number_table.setStyle([('ALIGN', (0, 0), (0, 0), 'CENTER')])  # Mərkəzləşdirmək
     elements.append(order_number_table)
  

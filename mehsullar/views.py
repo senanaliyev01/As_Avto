@@ -457,7 +457,7 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
 
     # Ödənilən məbləği ortada yerləşdirin
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq
-    elements.append(Paragraph("Ödənilən Məbləğ: ___________________________ AZN", styles['Normal']))
+    elements.append(Paragraph("Ödənilən Məbləğ: ___________________________ AZN | İmza:____________________", styles['Normal']))
 
     doc.build(elements)
     buffer.seek(0)

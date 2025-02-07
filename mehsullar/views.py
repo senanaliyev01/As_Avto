@@ -398,7 +398,7 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     elements.append(Paragraph(f"Müştəri Ünvanı: {profile.unvan}", styles['Normal']))
     
     # Yeni cədvəl yaradaraq Sifariş Nömrəsini sağa hizalayırıq
-    order_number_table = Table([[Paragraph(f"Sifariş Nömrəsi: №{sifaris.id}", styles['Normal'])]], colWidths=[400])
+    order_number_table = Table([[Paragraph(f"Sifariş Nömrəsi: №{sifaris.id}", styles['Normal'])]], colWidths=[None])  # None allows the table to take full width
     order_number_table.setStyle([('ALIGN', (0, 0), (0, 0), 'RIGHT')])  # Sağ hizalama
     elements.append(order_number_table)
 

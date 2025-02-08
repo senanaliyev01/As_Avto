@@ -48,11 +48,11 @@
                             </span>
                         {% elif item.mehsul.stok <= 20 %}
                             <span class="stock-status low-stock">
-                                <i class="fas fa-exclamation-circle"></i> Az var
+                                <i class="fas fa-exclamation-circle"></i> Az var ({{mehsul.stok}})
                             </span>
                         {% else %}
                             <span class="stock-status in-stock">
-                                <i class="fas fa-check-circle"></i> Var
+                                <i class="fas fa-check-circle"></i> Var ({{mehsul.stok}})
                             </span>
                         {% endif %}
                     </td>

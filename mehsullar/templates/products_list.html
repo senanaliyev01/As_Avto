@@ -63,9 +63,9 @@
                             {% if mehsul.stok == 0 %}
                                 <span class="stock-status out-of-stock">Yoxdur</span>
                             {% elif mehsul.stok <= 20 %}
-                                <span class="stock-status low-stock">Az var ( {{mehsul.stok}} )</span>
+                                <span class="stock-status low-stock">Az var ({{mehsul.stok}})</span>
                             {% else %}
-                                <span class="stock-status in-stock">Var ( {{mehsul.stok}} )</span>
+                                <span class="stock-status in-stock">Var ({{mehsul.stok}})</span>
                             {% endif %}
                         </td>
                         <td class="price-column">

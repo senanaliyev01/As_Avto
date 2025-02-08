@@ -99,7 +99,7 @@ def get_stock_class(stok):
 
 @login_required
 def products_list(request):
-    # Başlanğıc olaraq bütün məhsulları götürürük
+    # Başlanğıc olaraq bütün məhsulları götürürük1
     mehsullar = Mehsul.objects.all()
     kateqoriyalar = Kateqoriya.objects.all()
     brendler = Brend.objects.all()

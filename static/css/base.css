@@ -52,6 +52,14 @@ header {
 
 .cart-link {
     position: relative;
+    border: 2px solid #007bff; /* Sərhədin qalınlığı və rəngi */
+    border-radius: 5px; /* Künclərin yumşaldılması */
+    padding: 5px; /* İçəriyə boşluq əlavə etmək */
+    transition: border-color 0.3s; /* Sərhədin rənginin keçid effekti */
+}
+
+.cart-link:hover {
+    border-color: #0056b3; /* Hover zamanı sərhədin rəngini dəyişmək */
 }
 
 .cart-badge {

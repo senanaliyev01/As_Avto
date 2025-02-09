@@ -24,7 +24,7 @@
                 <a href="{% url 'view_cart' %}" class="cart-link">
                     <i class="fas fa-shopping-cart"></i>
                     <span id="cart-count" class="cart-badge">0</span>
-                    <span class="total-amount-container" id="total-amount">{{ cemi_mebleg }} AZN</span>
+                    
                 </a>
                 {% csrf_token %}
                 <a href="{% url 'logout_view' %}" id="logout-link" onclick="confirmLogout(event); return false;">

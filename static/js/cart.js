@@ -45,6 +45,15 @@ document.addEventListener('DOMContentLoaded', function() {
         if (totalElement) {
             totalElement.textContent = total.toFixed(2) + ' AZN';
             
+            // Real vaxtda cəmi məbləği base.html-da güncəlləyin
+            fetch('/get_cart_total/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        totalElement.textContent = data.total.toFixed(2) + ' AZN';
+                    }
+                });
+
             // Animasiya
             totalElement.classList.remove('update-animation');
             void totalElement.offsetWidth; // Reflow

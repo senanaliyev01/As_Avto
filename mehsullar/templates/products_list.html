@@ -57,8 +57,16 @@
                                 <span>{{ mehsul.marka.adi }}</span>
                             {% endif %}
                         </td>
-                        <td>{{ mehsul.brend_kod }}</td>
-                        <td>{{ mehsul.oem }}</td>
+                        <td>{{ mehsul.brend_kod }}
+                            <a href="https://www.google.com/search?q={{ mehsul.brend_kod }}" target="_blank" title="Brend kodunu axtar">
+                                <i class="fas fa-camera" style="margin-left: 5px; cursor: pointer;"></i>
+                            </a>
+                        </td>
+                        <td>{{ mehsul.oem }}
+                            <a href="https://www.google.com/search?q={{ mehsul.oem }}" target="_blank" title="OEM kodunu axtar">
+                                <i class="fas fa-camera" style="margin-left: 5px; cursor: pointer;"></i>
+                            </a>
+                        </td>
                         <td>
                             {% if mehsul.stok == 0 %}
                                 <span class="stock-status out-of-stock">Yoxdur</span>

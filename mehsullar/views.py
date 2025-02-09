@@ -77,8 +77,7 @@ def view_cart(request):
 
     return render(request, 'cart.html', {
         'sebet': sebet,
-        'cemi_mebleg': cemi_mebleg,
-        'base_cemi_mebleg': cemi_mebleg  # Yeni əlavə
+        'cemi_mebleg': cemi_mebleg
     })
 
 def get_stock_status(stok):

@@ -499,10 +499,11 @@
     function confirmLogout(event) {
         event.preventDefault();  // Default davranışı dayandırır
         if (confirm("Çıxış etmək istədiyinizə əminsiniz?")) {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;  // CSRF token-i al
             fetch(event.target.href, {  // URL burada event.target.href-dən alınır
                 method: 'POST',
                 headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    'X-CSRFToken': csrfToken  // CSRF token-i burada göndər
                 }
             }).then(response => {
                 if (response.ok) {

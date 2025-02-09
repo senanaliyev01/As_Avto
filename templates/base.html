@@ -2,7 +2,6 @@
 <!DOCTYPE html>
 <html lang="az">
 <head>
-    {% csrf_token %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}AS-Avto{% endblock %}</title>
@@ -26,6 +25,7 @@
                     <i class="fas fa-shopping-cart"></i>
                     <span id="cart-count" class="cart-badge">0</span>
                 </a>
+                {% csrf_token %}
                 <a href="{% url 'logout_view' %}" id="logout-link" onclick="confirmLogout(event); return false;">
                     <i class="fas fa-sign-out-alt"></i> Çıxış
                 </a>

@@ -74,11 +74,11 @@ def view_cart(request):
         item.stok_status = get_stock_status(item.mehsul.stok)
         item.stok_class = get_stock_class(item.mehsul.stok)
         item.cemi = item.mehsul.qiymet * item.miqdar  # Hər məhsul üçün cəmi məbləğ
-        
 
     return render(request, 'cart.html', {
         'sebet': sebet,
-        'cemi_mebleg': cemi_mebleg
+        'cemi_mebleg': cemi_mebleg,
+        'base_cemi_mebleg': cemi_mebleg  # Yeni əlavə
     })
 
 def get_stock_status(stok):

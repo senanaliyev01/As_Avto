@@ -268,16 +268,15 @@ footer {
 }
 
 .total-amount-container {
-    display: inline-flex;
-    align-items: center;
+    display: inline-flex; /* Elementləri yan-yana düzür */
+    align-items: center; /* Mərkəzləşdirir */
     gap: 0.5rem; /* İki element arasında boşluq */
-    background: linear-gradient(145deg, #0a1929, #1a2942);
-    padding: 0.5rem 1rem; /* İçəriyə boşluq əlavə etmək */
+    background: linear-gradient(145deg, #0a1929, #1a2942); /* Fon gradienti */
+    padding: 0.5rem 1rem; /* Daxili boşluq */
     border-radius: 5px; /* Künclərin yumşaldılması */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    position: absolute; /* Səbət linkinin içində görünməsi üçün */
-    top: 100%; /* Səbət linkinin altına yerləşdirmək */
-    left: 50%; /* Mərkəzləşdirmək */
-    transform: translateX(-50%); /* Mərkəzləşdirmək */
-    z-index: 10; /* Üst səviyyədə görünməsi üçün */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Kölgə */
+    color: var(--accent-color); /* Rəng */
+    font-size: 1rem; /* Mətn ölçüsü */
+    font-weight: bold; /* Qalın mətn */
 }
+

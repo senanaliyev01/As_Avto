@@ -266,3 +266,18 @@ footer {
         text-align: center;
     }
 }
+
+.total-amount-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem; /* İki element arasında boşluq */
+    background: linear-gradient(145deg, #0a1929, #1a2942);
+    padding: 0.5rem 1rem; /* İçəriyə boşluq əlavə etmək */
+    border-radius: 5px; /* Künclərin yumşaldılması */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    position: absolute; /* Səbət linkinin içində görünməsi üçün */
+    top: 100%; /* Səbət linkinin altına yerləşdirmək */
+    left: 50%; /* Mərkəzləşdirmək */
+    transform: translateX(-50%); /* Mərkəzləşdirmək */
+    z-index: 10; /* Üst səviyyədə görünməsi üçün */
+}

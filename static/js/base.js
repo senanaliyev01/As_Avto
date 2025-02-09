@@ -190,17 +190,8 @@
             .then(response => response.json())
             .then(data => {
                 const cartCount = document.getElementById('cart-count');
-                const totalAmountContainer = document.getElementById('total-amount-container');
-                const totalAmount = document.getElementById('total-amount');
-
                 if (cartCount) {
                     cartCount.textContent = data.count;
-                }
-
-                // Cəmi məbləği yeniləyin
-                if (totalAmount) {
-                    totalAmount.textContent = data.total_amount + ' AZN'; // Cəmi məbləği burada yeniləyin
-                    totalAmountContainer.style.display = data.count > 0 ? 'flex' : 'none'; // Səbət boşdursa gizlədin
                 }
             })
             .catch(error => console.error('Error:', error));

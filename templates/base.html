@@ -26,10 +26,6 @@
                     <span id="cart-count" class="cart-badge">0</span>
                     
                 </a>
-                <div>
-                    <strong style="color: #64ffda; font-size: 1.2rem;">Ümumi Cəmi:</strong>
-                    <span id="total-amount" style="color: white; font-size: 1.2rem; font-weight: 600;">{{ cemi_mebleg }} AZN</span>
-                </div>
                 {% csrf_token %}
                 <a href="{% url 'logout_view' %}" id="logout-link" onclick="confirmLogout(event); return false;">
                     <i class="fas fa-sign-out-alt"></i> Çıxış

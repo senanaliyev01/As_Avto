@@ -206,7 +206,7 @@ def register(request):
 
             return JsonResponse({
                 'status': 'success',
-                'message': 'Qeydiyyat uğurla tamamlandı! Zəhmət olmasa admin təsdiqini gözləyin.'
+                'message': 'Qeydiyyatınız uğurla tamamlandı! Hesabınızın təsdiqi üçün 24 saat ərzində gözləməyinizi xahiş edirik. Sizinlə əməkdaşlıq etməyə hazırıq!'
             })
 
         except Exception as e:

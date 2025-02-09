@@ -496,48 +496,18 @@
     });
     
 
-    // Logout funksiyaları
-    function logout() {
-        const dialog = document.getElementById('logoutDialog');
-        if (dialog) {
-            dialog.classList.add('show');
-            dialog.querySelector('.logout-confirm-content').classList.add('show');
-        }
-    }
-
-    function closeLogoutDialog() {
-        const dialog = document.getElementById('logoutDialog');
-        if (dialog) {
-            dialog.classList.remove('show');
-            dialog.querySelector('.logout-confirm-content').classList.remove('show');
-        }
-    }
-
-    function confirmLogout() {
-        const content = document.querySelector('.logout-confirm-content');
-        if (content) {
-            content.innerHTML = `
-                <div class="success-icon-wrapper">
-                    <i class="fas fa-check success-icon"></i>
-                </div>
-                <h4 class="logout-success">Uğurla çıxış edildi!</h4>
-                <div class="redirect-message">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <span>Yönləndirilirsiniz...</span>
-                </div>
-            `;
-
-            fetch('/istifadeciler/logout/', {
+    function confirmLogout(event) {
+        event.preventDefault();  // Default davranışı dayandırır
+        if (confirm("Çıxış etmək istədiyinizə əminsiniz?")) {
+            fetch(event.target.href, {  // URL burada event.target.href-dən alınır
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
                 }
             }).then(() => {
-                setTimeout(() => {
-                    window.location.href = '/';
-                }, 1500);
+                window.location.href = '/';  // Çıxış etdikdən sonra ana səhifəyə yönləndirin
             });
         }
     }
-    
+
 

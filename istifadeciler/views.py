@@ -104,10 +104,9 @@ def password_change(request):
 @require_POST
 def logout_view(request):
     logout(request)
-    return HttpResponse(status=200)
-
-
-
+    response = HttpResponse(status=200)
+    response['Cache-Control'] = 'no-store'  # Cache-i təmizləmək üçün
+    return response
 
 @csrf_exempt
 def register(request):

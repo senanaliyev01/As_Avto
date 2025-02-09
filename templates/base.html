@@ -25,7 +25,7 @@
                     <i class="fas fa-shopping-cart"></i>
                     <span id="cart-count" class="cart-badge">0</span>
                 </a>
-                <a href="javascript:void(0);" onclick="logout();" class="logout-link">
+                <a href="{% url 'logout_views' %}" id="logout-link" onclick="confirmLogout(event); return false;">
                     <i class="fas fa-sign-out-alt"></i> Çıxış
                 </a>
             </div>
@@ -116,14 +116,5 @@
     <script src="{% static 'js/loading.js' %}"></script>
     <script src="{% static 'js/base.js' %}"></script>
     {% block extra_js %}{% endblock %}
-
-    <!-- Logout Dialog -->
-    <div id="logoutDialog" class="logout-dialog">
-        <div class="logout-confirm-content">
-            <p>Çıxış etmək istədiyinizə əminsiniz?</p>
-            <button onclick="confirmLogout()">Bəli</button>
-            <button onclick="closeLogoutDialog()">Xeyr</button>
-        </div>
-    </div>
 </body>
 </html>

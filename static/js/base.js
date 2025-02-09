@@ -504,8 +504,15 @@
                 headers: {
                     'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
                 }
-            }).then(() => {
-                window.location.href = '/';  // Çıxış etdikdən sonra ana səhifəyə yönləndirin
+            }).then(response => {
+                if (response.ok) {
+                    window.location.href = '/';  // Çıxış etdikdən sonra ana səhifəyə yönləndirin
+                } else {
+                    alert('Çıxış zamanı xəta baş verdi. Yenidən cəhd edin.');
+                }
+            }).catch(error => {
+                console.error('Xəta:', error);
+                alert('Çıxış zamanı xəta baş verdi. Yenidən cəhd edin.');
             });
         }
     }

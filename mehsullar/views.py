@@ -470,11 +470,3 @@ def mehsul_haqqinda(request, mehsul_id):
     return render(request, 'mehsul_haqqinda.html', {
         'mehsul': mehsul
     })
-
-@login_required
-def get_cart_total(request):
-    try:
-        total = Sebet.objects.filter(user=request.user).aggregate(total=Sum(F('miqdar') * F('mehsul__qiymet')))['total'] or 0
-        return JsonResponse({'success': True, 'total': total})
-    except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)}, status=500)

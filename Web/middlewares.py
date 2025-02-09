@@ -16,9 +16,9 @@ class AddSearchDataMiddleware(MiddlewareMixin):
         request.brendler = Brend.objects.all()
         request.markalar = Marka.objects.all()
 
-class CartTotalMiddleware(MiddlewareMixin):
+class AddCartTotalMiddleware(MiddlewareMixin):
     def process_request(self, request):
         if request.user.is_authenticated:
-            # İstifadəçinin səbətindəki cəmi məbləği hesablayır
+            # İstifadəçinin səbətindəki cəmi məbləği hesablayırıq
             cart_total = Sebet.objects.filter(user=request.user).aggregate(total=Sum(F('miqdar') * F('mehsul__qiymet')))['total'] or 0
-            request.cart_total = cart_total  # Cəmi məbləği request obyektinə əlavə et
+            request.cart_total = cart_total  # Cəmi məbləği request obyektinə əlavə edirik

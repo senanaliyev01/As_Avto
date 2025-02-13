@@ -52,8 +52,8 @@ INSTALLED_APPS = [
 # 3. Jazzmin tənzimləmələri
 JAZZMIN_SETTINGS = {
     # Başlıq
-    "site_title": "Admin Panel",
-    "site_header": "Mənim Layihəm",
+    "site_title": "AS-AVTO",
+    "site_header": "İdarə Etmə",
     "site_brand": "Admin",
     "site_logo": "img/favicon.png",
     "site_icon": "img/favicon.png",

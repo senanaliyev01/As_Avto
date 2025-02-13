@@ -55,9 +55,9 @@ JAZZMIN_SETTINGS = {
     "site_title": "Admin Panel",
     "site_header": "Mənim Layihəm",
     "site_brand": "Admin",
-    "site_logo": "/static/img/favicon.png",
-    "site_icon": "/static/img/favicon.png",
-     "login_logo": "/static/img/favicon.png",
+    "site_logo": "img/favicon.png",
+    "site_icon": "img/favicon.png",
+     "login_logo": "img/favicon.png",
     
     # Admin panelin rəng sxemi
     "theme": "default",
@@ -93,8 +93,10 @@ JAZZMIN_SETTINGS = {
         "mehsullar.Mehsul": "fa-solid fa-boxes-stacked",
         "mehsullar.MusteriReyi": "fa-solid fa-comment",
         "mehsullar.Sebet": "fa-solid fa-cart-shopping",
-        "mehsullar.SebetItem": "fa-solid fa-cart-plus",
+        "mehsullar.SifarisMehsul": "fa-solid fa-cart-plus",
         "mehsullar.Sifaris": "fa-solid fa-bell",
+        "mehsullar.CarImage": "fa-solid fa-car-side",
+        "mehsullar.Car": "fa-solid fa-car",
     },
 }
 

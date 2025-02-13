@@ -115,6 +115,10 @@ class SifarisMehsul(models.Model):
     mehsul = models.ForeignKey(Mehsul, on_delete=models.CASCADE)
     miqdar = models.PositiveIntegerField()
     qiymet = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    class Meta:
+            verbose_name = 'Sifariş Məhsulları'
+            verbose_name_plural = 'Sifariş Məhsulları'
 
     def __str__(self):
         return f"{self.mehsul.adi} - {self.mehsul.kateqoriya} - {self.mehsul.brend_kod} - {self.mehsul.oem} - {self.miqdar} ədəd"
@@ -128,9 +132,7 @@ class SifarisMehsul(models.Model):
         self.sifaris.cemi_mebleg = sum(item.total_price() for item in self.sifaris.mehsullar.all())
         self.sifaris.save()  # Sifarişi yeniləyin
         
-        class Meta:
-            verbose_name = 'Sifariş Məhsulları'
-            verbose_name_plural = 'Sifariş Məhsulları'
+        
 
 
 class OEMKod(models.Model):

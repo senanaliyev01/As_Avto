@@ -11,6 +11,7 @@ class Kateqoriya(models.Model):
     
     class Meta:
         verbose_name = 'Kateqoriyalar'
+        verbose_name_plural = 'Kateqoriyalar'
 
 class Brend(models.Model):
     adi = models.CharField(max_length=100, unique=True)
@@ -23,6 +24,7 @@ class Brend(models.Model):
     
     class Meta:
         verbose_name = 'Firmalar'
+        verbose_name_plural = 'Firmalar'
 
 class Marka(models.Model):
     adi = models.CharField(max_length=100, unique=True)
@@ -32,6 +34,7 @@ class Marka(models.Model):
     
     class Meta:
         verbose_name = 'Markalar'
+        verbose_name_plural = 'Markalar'
 
 class MarkaSekil(models.Model):
     marka = models.ForeignKey(Marka, related_name='sekiller', on_delete=models.CASCADE)
@@ -57,6 +60,7 @@ class Mehsul(models.Model):
     
     class Meta:
         verbose_name = 'Məhsullar'
+        verbose_name_plural = 'Məhsullar'
 
     @property
     def butun_oem_kodlar(self):
@@ -74,6 +78,7 @@ class Sebet(models.Model):
     
     class Meta:
         verbose_name = 'Səbət'
+        verbose_name_plural = 'Səbət'
 
 
 from django.db import models
@@ -102,6 +107,7 @@ class Sifaris(models.Model):
     
     class Meta:
         verbose_name = 'Sifarişlər'
+        verbose_name_plural = 'Sifarişlər'
 
 
 class SifarisMehsul(models.Model):
@@ -124,6 +130,7 @@ class SifarisMehsul(models.Model):
         
         class Meta:
             verbose_name = 'Sifariş Məhsulları'
+            verbose_name_plural = 'Sifariş Məhsulları'
 
 
 class OEMKod(models.Model):

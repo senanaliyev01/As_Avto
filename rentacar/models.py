@@ -21,7 +21,9 @@ class Car(models.Model):
     
     class Meta:
         verbose_name = 'Avtomobillər'
-
+        verbose_name_plural = 'Avtomobillər'
+        
+        
 class CarImage(models.Model):
     car = models.ForeignKey(Car, related_name='images', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='cars/', verbose_name='Maşının Şəkli')
@@ -31,3 +33,4 @@ class CarImage(models.Model):
     
     class Meta:
         verbose_name = 'Avtomobil Şəkilləri'
+        verbose_name_plural = 'Avtomobil Şəkilləri'

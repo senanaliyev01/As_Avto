@@ -66,9 +66,8 @@ JAZZMIN_SETTINGS = {
     "show_sidebar": True,
     "navigation_expanded": True,
     
-      "custom_context": {
-        "user_avatar_field": "profile.sekil",  # Profile modelindəki sahə adı
-    },
+    # İstifadəçi interfeysi
+    "user_avatar": None,
     
     # Top navbarda axtarış
     "search_model": ["auth.User", "auth.Group"],

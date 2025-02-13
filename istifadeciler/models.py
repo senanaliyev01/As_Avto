@@ -14,6 +14,10 @@ class Profile(models.Model):
     
     def __str__(self):
         return f'{self.user.username} Profili'
+    
+    class Meta:
+        verbose_name = 'Profillər'
+        verbose_name_plural = 'Profillər'
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

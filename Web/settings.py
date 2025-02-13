@@ -95,8 +95,8 @@ JAZZMIN_SETTINGS = {
         "mehsullar.Sebet": "fa-solid fa-cart-shopping",
         "mehsullar.SifarisMehsul": "fa-solid fa-cart-plus",
         "mehsullar.Sifaris": "fa-solid fa-bell",
-        "mehsullar.CarImage": "fa-solid fa-car-side",
-        "mehsullar.Car": "fa-solid fa-car",
+        "rentacar.CarImage": "fa-solid fa-car-side",
+        "rentacar.Car": "fa-solid fa-car",
     },
 }
 

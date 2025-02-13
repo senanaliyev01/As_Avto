@@ -18,6 +18,9 @@ class Car(models.Model):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        verbose_name = 'Avtomobillər'
 
 class CarImage(models.Model):
     car = models.ForeignKey(Car, related_name='images', on_delete=models.CASCADE)
@@ -25,3 +28,6 @@ class CarImage(models.Model):
 
     def __str__(self):
         return f"{self.car.name} - Şəkil"
+    
+    class Meta:
+        verbose_name = 'Avtomobil Şəkilləri'

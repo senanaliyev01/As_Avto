@@ -8,6 +8,9 @@ class Kateqoriya(models.Model):
 
     def __str__(self):
         return self.adi
+    
+    class Meta:
+        verbose_name = 'Kateqoriyalar'
 
 class Brend(models.Model):
     adi = models.CharField(max_length=100, unique=True)
@@ -17,12 +20,18 @@ class Brend(models.Model):
 
     def __str__(self):
         return self.adi
+    
+    class Meta:
+        verbose_name = 'Firmalar'
 
 class Marka(models.Model):
     adi = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.adi
+    
+    class Meta:
+        verbose_name = 'Markalar'
 
 class MarkaSekil(models.Model):
     marka = models.ForeignKey(Marka, related_name='sekiller', on_delete=models.CASCADE)
@@ -45,6 +54,9 @@ class Mehsul(models.Model):
 
     def __str__(self):
         return self.adi
+    
+    class Meta:
+        verbose_name = 'Məhsullar'
 
     @property
     def butun_oem_kodlar(self):
@@ -59,6 +71,9 @@ class Sebet(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.mehsul.adi}"
+    
+    class Meta:
+        verbose_name = 'Səbət'
 
 
 from django.db import models
@@ -84,6 +99,9 @@ class Sifaris(models.Model):
 
     def __str__(self):
         return f"Sifariş {self.id} - {self.tarix}"
+    
+    class Meta:
+        verbose_name = 'Sifarişlər'
 
 
 class SifarisMehsul(models.Model):
@@ -103,6 +121,9 @@ class SifarisMehsul(models.Model):
         super().save(*args, **kwargs)  # İlk öncə məhsulu saxlayın
         self.sifaris.cemi_mebleg = sum(item.total_price() for item in self.sifaris.mehsullar.all())
         self.sifaris.save()  # Sifarişi yeniləyin
+        
+        class Meta:
+            verbose_name = 'Sifariş Məhsulları'
 
 
 class OEMKod(models.Model):

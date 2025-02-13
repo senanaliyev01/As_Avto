@@ -67,7 +67,7 @@ JAZZMIN_SETTINGS = {
     "navigation_expanded": True,
     
     # İstifadəçi interfeysi
-    "user_avatar": "istifadeciler.Profile.sekil.url",
+    "user_avatar": "istifadeciler.Profile.sekil", 
     
     # Top navbarda axtarış
     "search_model": ["auth.User", "auth.Group"],

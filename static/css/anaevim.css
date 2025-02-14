@@ -1037,7 +1037,7 @@ html {
 }
 
 .slider-item {
-    flex: 0 0 280px; /* Elementlərin ölçüsünü bir az azaltdıq */
+    flex: 0 0 280px;
 }
 
 @keyframes slideTrack {
@@ -1045,7 +1045,7 @@ html {
         transform: translateX(0);
     }
     100% {
-        transform: translateX(calc(-50% - var(--spacing-md))); /* Yarısı qədər sürüşmə */
+        transform: translateX(calc(-50% - var(--spacing-md)));
     }
 }
 

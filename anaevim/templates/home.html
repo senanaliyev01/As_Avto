@@ -67,50 +67,79 @@
     <section class="hero" id="home">
         <div class="hero__slider">
             <div class="hero__slides">
-                <!-- Brend Slaydları -->
-                {% for brend in brendler %}
-                    {% if brend.sekil %}
-                    <div class="hero__slide">
-                        <div class="hero__image" style="background-image: url('{{ brend.sekil.url }}');">
-                            <div class="hero__overlay"></div>
-                        </div>
-                        <div class="hero__content container">
-                            <h1 class="hero__title">{{ brend.adi }}</h1>
-                            <p class="hero__description">{{ brend.haqqinda|truncatewords:20 }}</p>
-                        </div>
+                <div class="hero__slide active">
+                    <div class="hero__image" style="background-image: url('{% static 'img/muherrik_yagi.webp' %}');">
+                        <div class="hero__overlay"></div>
                     </div>
-                    {% endif %}
-                {% endfor %}
+                    <div class="hero__content container">
+                        <h1 class="hero__title">Premium Mühərrik Yağları</h1>
+                        <p class="hero__description">Avtomobiliniz üçün ən yüksək keyfiyyətli mühərrik yağları</p>
+                      
+                    </div>
+                </div>
 
-                <!-- Marka Slaydları -->
-                {% for sekil in marka_sekiller %}
-                    {% if sekil.sekil %}
-                    <div class="hero__slide">
-                        <div class="hero__image" style="background-image: url('{{ sekil.sekil.url }}');">
-                            <div class="hero__overlay"></div>
-                        </div>
-                        <div class="hero__content container">
-                            <h1 class="hero__title">{{ sekil.marka.adi }}</h1>
-                        </div>
+                <div class="hero__slide">
+                    <div class="hero__image" style="background-image: url('{% static 'img/antifiriz.webp' %}');">
+                        <div class="hero__overlay"></div>
                     </div>
-                    {% endif %}
-                {% endfor %}
+                    <div class="hero__content container">
+                        <h1 class="hero__title">Antifriz və Soyuducu Mayelər</h1>
+                        <p class="hero__description">Mühərrikinizi hərtərəfli qoruyun</p>
+                      
+                    </div>
+                </div>
 
-                <!-- Məhsul Slaydları -->
-                {% for mehsul in mehsullar %}
-                    {% if mehsul.sekil %}
-                    <div class="hero__slide">
-                        <div class="hero__image" style="background-image: url('{{ mehsul.sekil.url }}');">
-                            <div class="hero__overlay"></div>
-                        </div>
-                        <div class="hero__content container">
-                            <h1 class="hero__title">{{ mehsul.adi }}</h1>
-                            <p class="hero__description">{{ mehsul.haqqinda|truncatewords:20 }}</p>
-                        </div>
+                <div class="hero__slide">
+                    <div class="hero__image" style="background-image: url('{% static 'img/filterler_sekil.webp' %}');">
+                        <div class="hero__overlay"></div>
                     </div>
-                    {% endif %}
-                {% endfor %}
+                    <div class="hero__content container">
+                        <h1 class="hero__title">Orijinal Filterlər</h1>
+                        <p class="hero__description">Avtomobiliniz üçün yüksək keyfiyyətli filterlər</p>
+                       
+                    </div>
+                </div>
             </div>
+
+            <div class="hero__slide">
+                <div class="hero__image" style="background-image: url('{% static 'img/alt_sekil.webp' %}');">
+                    <div class="hero__overlay"></div>
+                </div>
+                <div class="hero__content container">
+                    <h1 class="hero__title">Orijinal Alt Hissələr</h1>
+                    <p class="hero__description">Avtomobiliniz üçün yüksək keyfiyyətli Alt Hissələr</p>
+                  
+                </div>
+            </div>
+        </div>
+
+
+        <div class="hero__slide">
+            <div class="hero__image" style="background-image: url('{% static 'img/remen_sekil.webp' %}');">
+                <div class="hero__overlay"></div>
+            </div>
+            <div class="hero__content container">
+                <h1 class="hero__title">Orijinal Remen İç Və Çöl </h1>
+                <p class="hero__description">Avtomobiliniz üçün yüksək keyfiyyətli Remen İç Və Çöl</p>
+               
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="hero__slide">
+        <div class="hero__image" style="background-image: url('{% static 'img/potrubka.webp' %}');">
+            <div class="hero__overlay"></div>
+        </div>
+        <div class="hero__content container">
+            <h1 class="hero__title">Orijinal Potrubka </h1>
+            <p class="hero__description">Avtomobiliniz üçün yüksək keyfiyyətli Potrubka</p>
+           
+        </div>
+    </div>
+</div>
+
 
             <button class="hero__arrow hero__arrow--prev" aria-label="Previous slide">
                 <i class="fas fa-chevron-left"></i>
@@ -120,6 +149,58 @@
             </button>
 
             <div class="hero__dots"></div>
+        </div>
+    </section>
+
+    <!-- Products Slider Section -->
+    <section class="products-slider">
+        <div class="container">
+            <h2 class="section__title">Məhsullarımız</h2>
+            <div class="products-grid">
+                <!-- Brend Slaydları -->
+                {% for brend in brendler %}
+                    {% if brend.sekil %}
+                    <div class="product-card">
+                        <div class="product-card__image">
+                            <img src="{{ brend.sekil.url }}" alt="{{ brend.adi }}">
+                        </div>
+                        <div class="product-card__content">
+                            <h3 class="product-card__title">{{ brend.adi }}</h3>
+                            <p class="product-card__description">{{ brend.haqqinda|truncatewords:10 }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+
+                <!-- Marka Slaydları -->
+                {% for sekil in marka_sekiller %}
+                    {% if sekil.sekil %}
+                    <div class="product-card">
+                        <div class="product-card__image">
+                            <img src="{{ sekil.sekil.url }}" alt="{{ sekil.marka.adi }}">
+                        </div>
+                        <div class="product-card__content">
+                            <h3 class="product-card__title">{{ sekil.marka.adi }}</h3>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+
+                <!-- Məhsul Slaydları -->
+                {% for mehsul in mehsullar %}
+                    {% if mehsul.sekil %}
+                    <div class="product-card">
+                        <div class="product-card__image">
+                            <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
+                        </div>
+                        <div class="product-card__content">
+                            <h3 class="product-card__title">{{ mehsul.adi }}</h3>
+                            <p class="product-card__description">{{ mehsul.haqqinda|truncatewords:10 }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
         </div>
     </section>
 

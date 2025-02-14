@@ -914,8 +914,6 @@ button {
     box-shadow: 0 2px 10px rgba(34, 197, 94, 0.2);
 }
 
-
-
 /* Scrollbar Genişliyi */
 ::-webkit-scrollbar {
     width: 10px;
@@ -942,4 +940,74 @@ button {
 html {
     scrollbar-color: #1e6091 #0a192f; /* Thumb və Track rəngləri */
     scrollbar-width: thin; /* Nazik scrollbar */
+}
+
+/* Products Slider Section */
+.products-slider {
+    padding: var(--spacing-4xl) 0;
+    background-color: var(--color-primary);
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-2xl);
+}
+
+.product-card {
+    background-color: var(--color-secondary);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    transition: transform var(--transition-normal);
+    cursor: pointer;
+}
+
+.product-card:hover {
+    transform: translateY(-10px);
+}
+
+.product-card__image {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+}
+
+.product-card__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-normal);
+}
+
+.product-card:hover .product-card__image img {
+    transform: scale(1.1);
+}
+
+.product-card__content {
+    padding: var(--spacing-lg);
+}
+
+.product-card__title {
+    font-size: var(--font-size-lg);
+    color: var(--color-white);
+    margin-bottom: var(--spacing-sm);
+}
+
+.product-card__description {
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-400);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    .products-grid {
+        grid-template-columns: 1fr;
+    }
 }

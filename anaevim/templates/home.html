@@ -198,12 +198,14 @@
                                         </div>
                                         <div class="product-card__content">
                                             <h3 class="product-card__title">{{ mehsul.adi }}</h3>
-                                            <p class="product-card__description">{{ mehsul.marka.adi }}</p>
-                                            <p class="product-card__description">{{ mehsul.brend.adi }}</p>
-                                            <p class="product-card__description">{{ mehsul.brend_kod }}</p>
-                                            <p class="product-card__description">{{ mehsul.oem }}</p>
-                                            <p class="product-card__description">{{ mehsul.qiymet }}</p>
-
+                                            <p class="product-card__description">Marka: {{ mehsul.marka.adi }}</p>
+                                            <p class="product-card__description">Brend: {{ mehsul.brend.adi }}</p>
+                                            <p class="product-card__description">Brend Kodu: {{ mehsul.brend_kod }}</p>
+                                            <p class="product-card__description">OEM: {{ mehsul.oem }}</p>
+                                            <p class="product-card__description">Qiymət: {{ mehsul.qiymet }} ₼</p>
+                                            <a href="{% url 'mehsul_about' mehsul.id %}" class="product-card__link">
+                                                Ətraflı Məlumat <i class="fas fa-arrow-right"></i>
+                                            </a>
                                         </div>
                                     </div>
                                 </div>

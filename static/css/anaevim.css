@@ -1045,7 +1045,6 @@ html {
     gap: var(--spacing-md);
     padding-left: 0;
     width: max-content;
-    will-change: transform;
 }
 
 .slider-item {
@@ -1062,7 +1061,12 @@ html {
     }
 }
 
-/* Hover olduqda animasiyanı dayandır */
+/* Bütün slayderlər üçün əsas animasiya */
+.slider-track {
+    animation: slideTrack 400s linear infinite;
+}
+
+/* Hover effekti */
 .slider-container:hover .slider-track {
     animation-play-state: paused;
 }
@@ -1102,12 +1106,6 @@ html {
     width: 100%;
     max-width: 100%;
     overflow: hidden;
-}
-
-/* Bütün slayderlər üçün eyni animasiya */
-.slider-section .slider-track {
-    animation: slideTrack 300s linear infinite !important;
-    animation-timing-function: linear !important;
 }
 
 /* Məhsul kartı linki */

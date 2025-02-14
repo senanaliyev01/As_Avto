@@ -353,6 +353,7 @@ class ProductSlider {
         this.container = container;
         this.track = container.querySelector('.slider-track');
         this.items = container.querySelectorAll('.slider-item');
+        this.cloneCount = 2; // Neçə dəfə klonlanacaq
         
         this.init();
     }
@@ -362,13 +363,21 @@ class ProductSlider {
     }
 
     setupInfiniteScroll() {
-        // Clone items for infinite scroll effect
         const itemsToClone = Array.from(this.items);
         
-        // Elementləri bir dəfə klonlayaq
-        itemsToClone.forEach(item => {
-            const clone = item.cloneNode(true);
-            this.track.appendChild(clone);
+        // Elementləri klonla
+        for (let i = 0; i < this.cloneCount; i++) {
+            itemsToClone.forEach(item => {
+                const clone = item.cloneNode(true);
+                this.track.appendChild(clone);
+            });
+        }
+        
+        // Animasiyanı yenidən başlat
+        this.track.addEventListener('animationend', () => {
+            this.track.style.animation = 'none';
+            this.track.offsetHeight; // Force reflow
+            this.track.style.animation = null;
         });
     }
 }

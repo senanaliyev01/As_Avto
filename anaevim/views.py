@@ -15,9 +15,3 @@ def anaevim(request):
     
     return render(request, 'home.html', context)
 
-def mehsul_about(request, mehsul_id):
-    mehsul = get_object_or_404(Mehsul, id=mehsul_id)
-    context = {
-        'mehsul': mehsul
-    }
-    return render(request, 'mehsul_about.html', context)

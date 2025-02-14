@@ -203,7 +203,10 @@
                                             <p class="product-card__description">Brend Kodu: {{ mehsul.brend_kod }}</p>
                                             <p class="product-card__description">OEM: {{ mehsul.oem }}</p>
                                             <p class="product-card__description">Qiymət: {{ mehsul.qiymet }} ₼</p>
-                                           
+                                            <a href="{% url 'mehsul_etrafli' mehsul.id %}" class="product-card__button">
+                                                Ətraflı Məlumat
+                                                <i class="fas fa-arrow-right"></i>
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -380,8 +383,8 @@
             <div class="container">
                 <p>&copy; 2024-2025 AS AVTO. Bütün hüquqlar qorunur.</p>
                 <div class="footer__payments">
-                    <img src="{% static 'img/visa.png' %}" alt="Visa">
-                    <img src="{% static 'img/mastercard.png' %}" alt="Mastercard">
+                    {% comment %} <img src="{% static 'img/visa.png' %}" alt="Visa">
+                    <img src="{% static 'img/mastercard.png' %}" alt="Mastercard"> {% endcomment %}
                 </div>
             </div>
         </div>

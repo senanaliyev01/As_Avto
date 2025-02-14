@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ mehsul.adi }} | AS AVTO</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="128x128" href="{% static 'img/favicon.png' %}">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/mehsul_etrafli.css' %}">
+</head>
+<body>
+    <!-- Preloader -->
+    <div class="preloader">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header__container container">
+            
+            
+            <a href="{% url 'anaevim' %}" class="header__back">
+                <i class="fas fa-arrow-left"></i>
+                Ana Səhifəyə Qayıt
+            </a>
+        </div>
+    </header>
+
+    <!-- Product Detail Section -->
+    <section class="product-detail">
+        <div class="container">
+            <div class="product-detail__grid">
+                <div class="product-detail__image">
+                    <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
+                </div>
+                <div class="product-detail__content">
+                    <h1 class="product-detail__title">{{ mehsul.adi }}</h1>
+                    <div class="product-detail__info">
+                        <div class="info-item">
+                            <span class="label">Marka:</span>
+                            <span class="value">{{ mehsul.marka.adi }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Brend:</span>
+                            <span class="value">{{ mehsul.brend.adi }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Brend Kodu:</span>
+                            <span class="value">{{ mehsul.brend_kod }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">OEM:</span>
+                            <span class="value">{{ mehsul.oem }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Qiymət:</span>
+                            <span class="value price">{{ mehsul.qiymet }} ₼</span>
+                        </div>
+                    </div>
+                    {% if mehsul.tesvir %}
+                    <div class="product-detail__description">
+                        <h2>Məhsul Haqqında</h2>
+                        <p>{{ mehsul.tesvir }}</p>
+                    </div>
+                    {% endif %}
+                    <div class="product-detail__contact">
+                        <h2>Əlaqə</h2>
+                        <div class="contact-buttons">
+                            <a href="tel:+994773059585" class="contact-button phone">
+                                <i class="fas fa-phone"></i>
+                                Zəng Et
+                            </a>
+                            <a href="https://wa.me/994773059585" class="contact-button whatsapp" target="_blank">
+                                <i class="fab fa-whatsapp"></i>
+                                WhatsApp
+                            </a>
+                            <a href="{% url 'register' %}" class="btn btn--primary btn--register">
+                                <i class="fas fa-sign-in-alt"></i>
+                                <span>B4B Qeydiyyat</span>
+                            </a>
+                            <a href="{% url 'login' %}" class="btn btn--primary btn--login">
+                                <i class="fas fa-sign-in-alt"></i>
+                                <span>B4B Giriş</span>
+                            </a>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+  
+
+    <!-- Scripts -->
+    <script src="{% static 'js/loading.js' %}"></script>
+</body>
+</html> 

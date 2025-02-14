@@ -1,0 +1,242 @@
+/* Global styles */
+:root {
+    --color-primary: #007bff;
+    --color-primary-dark: #0056b3;
+    --color-text: #333;
+    --color-gray-300: #e2e8f0;
+    --color-gray-400: #94a3b8;
+    --color-gray-600: #475569;
+    --color-whatsapp: #25d366;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.6;
+    color: var(--color-text);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+/* Header styles */
+.header {
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header__container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header__logo img {
+    height: 40px;
+}
+
+.header__back {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.header__back:hover {
+    color: var(--color-primary-dark);
+}
+
+/* Product detail styles */
+.product-detail {
+    padding: 2rem 0;
+}
+
+.product-detail__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+.product-detail__image {
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.product-detail__image img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.product-detail__title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--color-text);
+}
+
+.product-detail__info {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    background-color: #f8fafc;
+    border-radius: 0.5rem;
+}
+
+.label {
+    font-weight: 500;
+    color: var(--color-gray-600);
+    min-width: 100px;
+}
+
+.value {
+    color: var(--color-text);
+}
+
+.value.price {
+    font-weight: 600;
+    color: var(--color-primary);
+    font-size: 1.25rem;
+}
+
+.product-detail__description {
+    margin-bottom: 2rem;
+}
+
+.product-detail__description h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--color-text);
+}
+
+.product-detail__description p {
+    color: var(--color-gray-600);
+    line-height: 1.8;
+}
+
+.product-detail__contact h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--color-text);
+}
+
+.contact-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.contact-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: 500;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.contact-button.phone {
+    background-color: var(--color-primary);
+}
+
+.contact-button.phone:hover {
+    background-color: var(--color-primary-dark);
+}
+
+.contact-button.whatsapp {
+    background-color: var(--color-whatsapp);
+}
+
+.contact-button.whatsapp:hover {
+    background-color: #1fa855;
+}
+
+/* Footer styles */
+.footer {
+    background-color: #f8fafc;
+    padding: 1.5rem 0;
+    text-align: center;
+    margin-top: 4rem;
+}
+
+.footer p {
+    color: var(--color-gray-600);
+}
+
+/* Preloader styles */
+.preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.loader {
+    width: 48px;
+    height: 48px;
+    border: 5px solid var(--color-gray-300);
+    border-bottom-color: var(--color-primary);
+    border-radius: 50%;
+    animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .product-detail__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .product-detail__title {
+        font-size: 1.75rem;
+    }
+
+    .contact-buttons {
+        flex-direction: column;
+    }
+
+    .contact-button {
+        width: 100%;
+        justify-content: center;
+    }
+} 

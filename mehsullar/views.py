@@ -464,6 +464,7 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     return response
 
 
+@login_required
 def mehsul_haqqinda(request, mehsul_id):
     mehsul = get_object_or_404(Mehsul, id=mehsul_id)
     return render(request, 'mehsul_haqqinda.html', {

@@ -69,7 +69,7 @@ def esasevim(request):
     }
     
     return render(request, 'main.html', context)
-
+@login_required
 @never_cache
 def get_statistics(request):
     try:

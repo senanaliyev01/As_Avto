@@ -15,8 +15,8 @@ def anaevim(request):
     
     return render(request, 'home.html', context)
 
-def mehsul_etrafli(request, mehsul_id):
-    mehsul = get_object_or_404(Mehsul, id=mehsul_id)
+def mehsul_etrafli(request, mehsul_id, mehsul_adi, mehsul_brend_adi, mehsul_marka_adi, mehsul_brend_kod, mehsul_oem, mehsul_kateqoriya_adi):
+    mehsul = get_object_or_404(Mehsul, id=mehsul_id , adi=mehsul_adi, brend=mehsul_brend_adi, marka=mehsul_marka_adi,brend_kod=mehsul_brend_kod,oem=mehsul_oem,kateqoriya=mehsul_kateqoriya_adi)
     context = {
         'mehsul': mehsul
     }

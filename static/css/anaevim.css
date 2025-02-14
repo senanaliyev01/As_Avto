@@ -242,20 +242,7 @@ button {
     transition: all var(--transition-fast);
 }
 
-.btn--primary {
-    background-color: var(--color-accent);
-    color: var(--color-white);
-}
 
-.btn--primary:hover {
-    background-color: var(--color-accent-dark);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-}
-
-.btn--primary:active {
-    transform: translateY(0);
-}
 
 /* Hero Section */
 .hero {
@@ -1378,3 +1365,5 @@ html {
         width: 100%;
     }
 }
+
+

@@ -242,8 +242,6 @@ button {
     transition: all var(--transition-fast);
 }
 
-
-
 /* Hero Section */
 .hero {
     margin-top: var(--header-height);
@@ -1293,12 +1291,65 @@ html {
     color: var(--color-white);
     margin-bottom: var(--spacing-lg);
     font-weight: 600;
+    text-align: center;
 }
 
 .contact-buttons {
     display: flex;
     gap: var(--spacing-md);
     flex-wrap: wrap;
+    justify-content: center;
+}
+
+.contact-buttons .btn {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border: 2px solid transparent;
+    border-radius: var(--border-radius-md);
+    transition: all var(--transition-fast);
+    min-width: 180px;
+    justify-content: center;
+}
+
+.contact-buttons .btn i {
+    font-size: var(--font-size-base);
+}
+
+.contact-buttons .btn--primary.btn--login {
+    background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark));
+    color: var(--color-white);
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+}
+
+.contact-buttons .btn--primary.btn--login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+    background: linear-gradient(135deg, var(--color-accent-dark), var(--color-accent));
+}
+
+.contact-buttons .btn--primary.btn--login:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(59, 130, 246, 0.2);
+}
+
+.contact-buttons .btn--primary.btn--register {
+    background: linear-gradient(135deg, var(--color-success), #16a34a);
+    color: var(--color-white);
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2);
+}
+
+.contact-buttons .btn--primary.btn--register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.3);
+    background: linear-gradient(135deg, #16a34a, var(--color-success));
+}
+
+.contact-buttons .btn--primary.btn--register:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(34, 197, 94, 0.2);
 }
 
 /* Responsive Design for Product Detail */
@@ -1365,5 +1416,3 @@ html {
         width: 100%;
     }
 }
-
-

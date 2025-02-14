@@ -353,13 +353,14 @@ class ProductSlider {
         this.container = container;
         this.track = container.querySelector('.slider-track');
         this.items = container.querySelectorAll('.slider-item');
-        this.cloneCount = 2; // Neçə dəfə klonlanacaq
+        this.cloneCount = 3; // Daha səlis sonsuz slayd üçün
         
         this.init();
     }
 
     init() {
         this.setupInfiniteScroll();
+        this.setupHoverPause();
     }
 
     setupInfiniteScroll() {
@@ -378,6 +379,17 @@ class ProductSlider {
             this.track.style.animation = 'none';
             this.track.offsetHeight; // Force reflow
             this.track.style.animation = null;
+        });
+    }
+
+    setupHoverPause() {
+        // Mouse hover zamanı animasiyanı dayandır
+        this.container.addEventListener('mouseenter', () => {
+            this.track.style.animationPlayState = 'paused';
+        });
+
+        this.container.addEventListener('mouseleave', () => {
+            this.track.style.animationPlayState = 'running';
         });
     }
 }

@@ -12,7 +12,7 @@ const utils = {
         return element;
     },
     
-    // Scroll position
+    // Scroll positionn
     getScrollPosition: () => window.pageYOffset || document.documentElement.scrollTop,
     
     // Debounce function

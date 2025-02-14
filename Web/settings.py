@@ -67,7 +67,7 @@ JAZZMIN_SETTINGS = {
     "navigation_expanded": True,
     
     # İstifadəçi interfeysi
-    "user_avatar": None,
+    "user_avatar":"fa-solid fa-user-tie",
     
     # Top navbarda axtarış
     "search_model": ["auth.User", "auth.Group"],

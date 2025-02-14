@@ -59,7 +59,7 @@
                     <span class="label">OEM:</span>
                     <span class="value">{{ mehsul.oem }}</span>
                 </div>
-                {% if mehsul.oem_kodlar.all %}
+                {% comment %} {% if mehsul.oem_kodlar.all %}
                 <div class="spec-item oem-list">
                     <span class="label">Dəyişən OEM Kodlar:</span>
                     <div class="value oem-codes">
@@ -67,7 +67,7 @@
                             <span class="oem-code">{{ oem.kod }}</span>
                         {% endfor %}
                     </div>
-                </div>
+                </div> {% endcomment %}
                 {% endif %}
                 <div class="spec-item stock-item">
                     <span class="label">Mövcudluq:</span>

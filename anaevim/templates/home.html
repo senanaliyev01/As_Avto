@@ -170,7 +170,6 @@
                                         </div>
                                         <div class="product-card__content">
                                             <h3 class="product-card__title">{{ brend.adi }}</h3>
-                                            <p class="product-card__description">{{ brend.haqqinda|truncatewords:10 }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -199,7 +198,12 @@
                                         </div>
                                         <div class="product-card__content">
                                             <h3 class="product-card__title">{{ mehsul.adi }}</h3>
-                                            <p class="product-card__description">{{ mehsul.haqqinda|truncatewords:10 }}</p>
+                                            <p class="product-card__description">{{ mehsul.marka.adi }}</p>
+                                            <p class="product-card__description">{{ mehsul.brend.adi }}</p>
+                                            <p class="product-card__description">{{ mehsul.brend_kod }}</p>
+                                            <p class="product-card__description">{{ mehsul.oem }}</p>
+                                            <p class="product-card__description">{{ mehsul.qiymet }}</p>
+
                                         </div>
                                     </div>
                                 </div>

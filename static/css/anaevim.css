@@ -1043,10 +1043,8 @@ html {
 .slider-track {
     display: flex;
     gap: var(--spacing-md);
-    animation: slideTrack 180s linear infinite;
     padding-left: 0;
     width: max-content;
-    transition: none;
     will-change: transform;
 }
 
@@ -1090,26 +1088,13 @@ html {
 .product-card__image img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    transition: transform var(--transition-normal);
+    object-fit: contain;
+    background-color: white;
+    padding: 10px;
 }
 
-.product-card:hover .product-card__image img {
-    transform: scale(1.1);
-}
-
-@media (max-width: 768px) {
-    .slider-item {
-        flex: 0 0 240px;
-        min-width: 240px;
-    }
-}
-
-@media (max-width: 480px) {
-    .slider-item {
-        flex: 0 0 180px;
-        min-width: 180px;
-    }
+.product-card__content {
+    padding: var(--spacing-lg);
 }
 
 /* Full width container for sliders */
@@ -1119,8 +1104,8 @@ html {
     overflow: hidden;
 }
 
-/* Bütün slayderlər üçün eyni animasiya tətbiq et */
+/* Bütün slayderlər üçün eyni animasiya */
 .slider-section .slider-track {
-    animation-duration: 120s !important;
+    animation: slideTrack 180s linear infinite !important;
     animation-timing-function: linear !important;
 }

@@ -15,5 +15,5 @@ urlpatterns = [
     path('update_quantity/<int:item_id>/<int:new_quantity>/', views.update_quantity, name='update_quantity'),
     path('sifaris/<int:sifaris_id>/pdf/', views.generate_pdf, name='sifaris_pdf'),
     path('products-look-all/', views.umumibaxis, name='umumi_baxis'),
-    path('hesabatlar/', views.hesabatlar, name='hesabatlar'),
+    path('reports/', views.hesabatlar, name='hesabatlar'),
 ]

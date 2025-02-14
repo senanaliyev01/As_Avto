@@ -88,14 +88,9 @@
                             <span class="value price">{{ mehsul.qiymet }} ₼</span>
                         </div>
                     </div>
-                    {% if mehsul.tesvir %}
-                    <div class="product-detail__description">
-                        <h2>Məhsul Haqqında</h2>
-                        <p>{{ mehsul.tesvir }}</p>
-                    </div>
-                    {% endif %}
+                   
                     <div class="product-detail__contact">
-                        <h2>Əlaqə və Sifariş</h2>
+                        <h2>Sifariş Etmək üçün Hesabınızı Yaradın</h2>
                         <div class="contact-buttons">
                             <a href="{% url 'register' %}" class="btn btn--primary btn--register">
                                 <i class="fas fa-sign-in-alt"></i>

@@ -368,12 +368,6 @@ class ProductSlider {
             const clone = item.cloneNode(true);
             this.track.appendChild(clone);
         });
-        
-        // İkinci dəfə klonlama (daha səlis keçid üçün)
-        itemsToClone.forEach(item => {
-            const clone = item.cloneNode(true);
-            this.track.appendChild(clone);
-        });
     }
 }
 

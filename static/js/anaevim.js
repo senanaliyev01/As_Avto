@@ -353,44 +353,100 @@ class ProductSlider {
         this.container = container;
         this.track = container.querySelector('.slider-track');
         this.items = container.querySelectorAll('.slider-item');
-        this.cloneCount = 3; // Daha səlis sonsuz slayd üçün
+        this.position = 0;
+        this.speed = 0.3; // Daha yavaş sürət
+        this.isPaused = false;
+        this.lastTime = null;
+        this.totalWidth = 0;
         
         this.init();
     }
 
     init() {
         this.setupInfiniteScroll();
-        this.setupHoverPause();
+        this.setupEventListeners();
+        this.calculateTotalWidth();
+        this.startAnimation();
     }
 
     setupInfiniteScroll() {
         const itemsToClone = Array.from(this.items);
         
-        // Elementləri klonla
-        for (let i = 0; i < this.cloneCount; i++) {
+        // Bütün elementləri 2 dəfə klonla
+        for (let i = 0; i < 2; i++) {
             itemsToClone.forEach(item => {
                 const clone = item.cloneNode(true);
                 this.track.appendChild(clone);
             });
         }
-        
-        // Animasiyanı yenidən başlat
-        this.track.addEventListener('animationend', () => {
-            this.track.style.animation = 'none';
-            this.track.offsetHeight; // Force reflow
-            this.track.style.animation = null;
-        });
     }
 
-    setupHoverPause() {
-        // Mouse hover zamanı animasiyanı dayandır
+    calculateTotalWidth() {
+        // Bütün elementlərin ümumi enini hesabla
+        this.totalWidth = this.track.scrollWidth;
+        
+        // Elementlər arasındakı boşluğu hesabla
+        const gap = parseInt(window.getComputedStyle(this.track).gap);
+        this.totalWidth += (this.items.length * gap);
+    }
+
+    setupEventListeners() {
+        // Mouse hover
         this.container.addEventListener('mouseenter', () => {
-            this.track.style.animationPlayState = 'paused';
+            this.isPaused = true;
         });
 
         this.container.addEventListener('mouseleave', () => {
-            this.track.style.animationPlayState = 'running';
+            this.isPaused = false;
+            this.lastTime = null;
         });
+        
+        // Visibility change
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                this.isPaused = true;
+            } else {
+                this.isPaused = false;
+                this.lastTime = null;
+            }
+        });
+
+        // Pəncərə ölçüsü dəyişdikdə
+        window.addEventListener('resize', () => {
+            this.calculateTotalWidth();
+        });
+    }
+
+    startAnimation() {
+        const animate = (currentTime) => {
+            if (this.lastTime === null) {
+                this.lastTime = currentTime;
+            }
+
+            const deltaTime = currentTime - this.lastTime;
+
+            if (!this.isPaused) {
+                // Pozisiyanı yenilə
+                this.position -= this.speed * deltaTime;
+
+                // Bütün elementlər göründükdən sonra başa qaytar
+                const itemWidth = this.items[0].offsetWidth;
+                const gap = parseInt(window.getComputedStyle(this.track).gap);
+                const resetPosition = -(itemWidth + gap) * this.items.length;
+
+                if (Math.abs(this.position) >= Math.abs(resetPosition)) {
+                    this.position = 0;
+                }
+
+                // Transform tətbiq et
+                this.track.style.transform = `translateX(${this.position}px)`;
+            }
+
+            this.lastTime = currentTime;
+            requestAnimationFrame(animate);
+        };
+
+        requestAnimationFrame(animate);
     }
 }
 

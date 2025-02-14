@@ -1045,35 +1045,11 @@ html {
     gap: var(--spacing-md);
     padding-left: 0;
     width: max-content;
-    transform: translateX(0);
 }
 
 .slider-item {
     flex: 0 0 280px;
     min-width: 280px;
-}
-
-/* Brend və məhsul slayderlərini ayrı-ayrı tənzimləyək */
-.slider-section:nth-child(1) .slider-track {
-    animation: slideTrack 200s linear infinite;
-}
-
-.slider-section:nth-child(2) .slider-track {
-    animation: slideTrack 200s linear infinite;
-}
-
-@keyframes slideTrack {
-    0% {
-        transform: translateX(0);
-    }
-    100% {
-        transform: translateX(-33.33%);
-    }
-}
-
-/* Hover effekti */
-.slider-container:hover .slider-track {
-    animation-play-state: paused;
 }
 
 /* Product Card modifications */

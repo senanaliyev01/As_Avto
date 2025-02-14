@@ -1043,9 +1043,9 @@ html {
 .slider-track {
     display: flex;
     gap: var(--spacing-md);
-    transition: transform 0.5s ease;
-    animation: slideTrack 30s linear infinite;
+    animation: slideTrack 20s linear infinite;
     padding-left: 0;
+    width: max-content;
 }
 
 .slider-item {
@@ -1058,7 +1058,7 @@ html {
         transform: translateX(0);
     }
     100% {
-        transform: translateX(calc(-100% + 100vw));
+        transform: translateX(-50%);
     }
 }
 

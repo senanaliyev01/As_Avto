@@ -469,3 +469,33 @@ def mehsul_haqqinda(request, mehsul_id):
     return render(request, 'mehsul_haqqinda.html', {
         'mehsul': mehsul
     })
+
+@login_required
+def hesabatlar(request):
+    sifarisler = Sifaris.objects.filter(user=request.user)
+
+    toplam_mebleg = sum(sifaris.cemi_mebleg for sifaris in sifarisler)
+    odenilen_mebleg = sum(sifaris.odenilen_mebleg for sifaris in sifarisler)
+    qaliq_borc = toplam_mebleg - odenilen_mebleg
+
+    status_text = {
+        'gozleyir': 'Gözləyir',
+        'hazirlanir': 'Hazırlanır',
+        'yoldadir': 'Yoldadır',
+        'catdirildi': 'Çatdırıldı'
+    }
+
+    # Hər sifarişə status əlavə edirik
+    for sifaris in sifarisler:
+        sifaris.display_status = status_text.get(sifaris.status, 'Gözləyir')
+        # Tarixi Bakı saatına uyğunlaşdırırıq
+        sifaris.tarix = sifaris.tarix.astimezone(timezone.get_current_timezone())
+        # Tarixi formatlayırıq
+        sifaris.formatted_tarix = sifaris.tarix.strftime('%Y-%m-%d %H:%M:%S')
+
+    return render(request, 'hesabatlar.html', {
+        'sifarisler': sifarisler,
+        'toplam_mebleg': toplam_mebleg,
+        'odenilen_mebleg': odenilen_mebleg,
+        'qaliq_borc': qaliq_borc,
+    })

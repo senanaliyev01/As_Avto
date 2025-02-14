@@ -1043,10 +1043,10 @@ html {
 .slider-track {
     display: flex;
     gap: var(--spacing-md);
-    animation: slideTrack 60s linear infinite;
+    animation: slideTrack 120s linear infinite;
     padding-left: 0;
     width: max-content;
-    transition: transform 0.3s ease-out;
+    transition: transform 0.5s ease-in-out;
     will-change: transform;
 }
 
@@ -1060,7 +1060,7 @@ html {
         transform: translateX(0);
     }
     100% {
-        transform: translateX(-33.33%);
+        transform: translateX(-25%);
     }
 }
 
@@ -1117,4 +1117,10 @@ html {
     width: 100%;
     max-width: 100%;
     overflow: hidden;
+}
+
+/* Bütün slayderlər üçün eyni animasiya tətbiq et */
+.slider-section .slider-track {
+    animation-duration: 120s !important;
+    animation-timing-function: linear !important;
 }

@@ -67,7 +67,7 @@ JAZZMIN_SETTINGS = {
     "navigation_expanded": True,
     
     # İstifadəçi interfeysi
-    "user_avatar": "istifadeciler.Profile.sekil.url",
+     "user_avatar": lambda request: request.user.profile.sekil.url if hasattr(request.user, "profile") and request.user.profile.sekil else "/static/vendor/adminlte/img/user2-160x160.jpg",
     
     # Top navbarda axtarış
     "search_model": ["auth.User", "auth.Group"],

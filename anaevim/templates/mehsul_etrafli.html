@@ -31,12 +31,32 @@
                 <img src="{% static 'img/Header_Logo.png' %}" alt="AS AVTO Logo">
             </a>
             
-            <div class="header__actions">
-                <a href="{% url 'anaevim' %}" class="header__back">
-                    <i class="fas fa-arrow-left"></i>
-                    Ana Səhifəyə Qayıt
-                </a>
-            </div>
+            <nav class="header__nav">
+                <ul class="header__menu">
+                    <li><a href="{% url 'anaevim' %}#home" class="header__link">Ana Səhifə</a></li>
+                    <li><a href="{% url 'anaevim' %}#about" class="header__link">Haqqımızda</a></li>
+                    <li><a href="{% url 'anaevim' %}#contact" class="header__link">Əlaqə</a></li>
+                </ul>
+                <div class="header__actions">
+                    <a href="{% url 'register' %}" class="btn btn--primary btn--register">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>B4B Qeydiyyat</span>
+                    </a>
+                </div>
+
+                <div class="header__actions">
+                    <a href="{% url 'login' %}" class="btn btn--primary btn--login">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>B4B Giriş</span>
+                    </a>
+                </div>
+            </nav>
+
+            <button class="header__toggle" aria-label="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
     </header>
 
@@ -80,14 +100,6 @@
                     <div class="product-detail__contact">
                         <h2>Əlaqə və Sifariş</h2>
                         <div class="contact-buttons">
-                            <a href="tel:+994773059585" class="contact-button phone">
-                                <i class="fas fa-phone"></i>
-                                Zəng Et
-                            </a>
-                            <a href="https://wa.me/994773059585" class="contact-button whatsapp" target="_blank">
-                                <i class="fab fa-whatsapp"></i>
-                                WhatsApp
-                            </a>
                             <a href="{% url 'register' %}" class="btn btn--primary btn--register">
                                 <i class="fas fa-sign-in-alt"></i>
                                 <span>B4B Qeydiyyat</span>
@@ -102,6 +114,57 @@
             </div>
         </div>
     </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer__top">
+            <div class="container">
+                <div class="footer__grid">
+                    <div class="footer__brand">
+                         <img src="{% static 'img/Header_Logo.png' %}" alt="AS AVTO Logo">
+                        <p>Azərbaycanın avtomobil ehtiyat hissələri bazarında 10 ildən artıq təcrübə</p>
+                        <div class="footer__social">
+                            <a href="https://www.tiktok.com/@a_avto_service" target="_blank" rel="noopener" aria-label="TikTok">
+                                <i class="fab fa-tiktok"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="footer__links">
+                        <h3>Sürətli Keçid</h3>
+                        <ul>
+                            <li><a href="{% url 'anaevim' %}#home">Ana Səhifə</a></li>
+                            <li><a href="{% url 'anaevim' %}#about">Haqqımızda</a></li>
+                            <li><a href="{% url 'anaevim' %}#contact">Əlaqə</a></li>
+                            <li><a href="{% url 'login' %}">B4B Giriş</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="footer__contact">
+                        <h3>Əlaqə Məlumatları</h3>
+                        <ul>
+                            <li>
+                                <i class="fas fa-envelope"></i>
+                                <a href="mailto:senan.eliyev.9997@gmail.com">senan.eliyev.9997@gmail.com</a>
+                            </li>
+                            <li>
+                                <i class="fas fa-clock"></i>
+                                <span>Bazar ertəsi - Bazar: 09:00 - 18:00</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer__bottom">
+            <div class="container">
+                <p>&copy; 2024-2025 AS AVTO. Bütün hüquqlar qorunur.</p>
+                <div class="footer__payments">
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <!-- Scripts -->
     <script src="{% static 'js/anaevim.js' %}"></script>

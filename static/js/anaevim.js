@@ -364,12 +364,8 @@ class ProductSlider {
     setupInfiniteScroll() {
         // Clone items for infinite scroll effect
         const itemsToClone = Array.from(this.items);
-        itemsToClone.forEach(item => {
-            const clone = item.cloneNode(true);
-            this.track.appendChild(clone);
-        });
         
-        // İkinci dəfə klonlama (daha səlis sonsuz slayd üçün)
+        // Elementləri bir dəfə klonlayaq
         itemsToClone.forEach(item => {
             const clone = item.cloneNode(true);
             this.track.appendChild(clone);

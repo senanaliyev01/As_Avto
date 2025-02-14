@@ -11,7 +11,6 @@ def anaevim(request):
         'brendler': brendler,
         'markalar': markalar,
         'mehsullar': mehsullar,
-        'marka_sekiller': marka_sekiller,
     }
     
     return render(request, 'home.html', context)

@@ -181,37 +181,6 @@
                 </div>
             </div>
 
-            <!-- Markalar -->
-            <div class="slider-section">
-                <h2 class="section__title">Markalarımız</h2>
-                <div class="slider-container">
-                    <button class="slider-arrow slider-arrow--prev">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <div class="slider-wrapper">
-                        <div class="slider-track">
-                            {% for sekil in marka_sekiller %}
-                                {% if sekil.sekil %}
-                                <div class="slider-item">
-                                    <div class="product-card">
-                                        <div class="product-card__image">
-                                            <img src="{{ sekil.sekil.url }}" alt="{{ sekil.marka.adi }}">
-                                        </div>
-                                        <div class="product-card__content">
-                                            <h3 class="product-card__title">{{ sekil.marka.adi }}</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <button class="slider-arrow slider-arrow--next">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
-            </div>
-
             <!-- Məhsullar -->
             <div class="slider-section">
                 <h2 class="section__title">Məhsullarımız</h2>

@@ -1019,22 +1019,25 @@ html {
 
 .slider-container {
     position: relative;
-    padding: 0 var(--spacing-lg);
+    width: 100%;
+    overflow: hidden;
 }
 
 .slider-wrapper {
     overflow: hidden;
+    width: 100%;
 }
 
 .slider-track {
     display: flex;
+    gap: var(--spacing-md);
     transition: transform 0.5s ease;
     animation: slideTrack 30s linear infinite;
+    width: max-content; /* Bütün elementləri bir sətirdə saxlamaq üçün */
 }
 
 .slider-item {
-    flex: 0 0 300px;
-    padding: 0 var(--spacing-md);
+    flex: 0 0 280px; /* Elementlərin ölçüsünü bir az azaltdıq */
 }
 
 @keyframes slideTrack {
@@ -1042,7 +1045,7 @@ html {
         transform: translateX(0);
     }
     100% {
-        transform: translateX(-100%);
+        transform: translateX(calc(-50% - var(--spacing-md))); /* Yarısı qədər sürüşmə */
     }
 }
 
@@ -1082,12 +1085,12 @@ html {
 
 @media (max-width: 768px) {
     .slider-item {
-        flex: 0 0 250px;
+        flex: 0 0 230px;
     }
 }
 
 @media (max-width: 480px) {
     .slider-item {
-        flex: 0 0 200px;
+        flex: 0 0 180px;
     }
 }

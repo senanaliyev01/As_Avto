@@ -37,7 +37,7 @@
                 <th>Tarix</th>
                 <th>Cəmi Məbləğ</th>
                 <th>Ödənilən Məbləğ</th>
-            
+                <th>Status</th>
             </tr>
         </thead>
         <tbody>
@@ -47,7 +47,25 @@
                 <td>{{ sifaris.formatted_tarix }}</td>
                 <td>{{ sifaris.cemi_mebleg }} AZN</td>
                 <td>{{ sifaris.odenilen_mebleg }} AZN</td>
-              
+                <td>
+                    <div class="status-container">
+                        <span class="status-badge1 status-{{ sifaris.status }}">
+                            {% if sifaris.status == 'gozleyir' %}
+                                <i class="fas fa-clock pulse"></i>
+                            {% elif sifaris.status == 'hazirlanir' %}
+                                <i class="fas fa-box-open bounce"></i>
+                            {% elif sifaris.status == 'yoldadir' %}
+                                <div class="truck-container">
+                                    <i class="fas fa-truck truck-icon"></i>
+                                    <div class="smoke"></div>
+                                </div>
+                            {% elif sifaris.status == 'catdirildi' %}
+                                <i class="fas fa-check-circle tada"></i>
+                            {% endif %}
+                            {{ sifaris.display_status }}
+                        </span>
+                    </div>
+                </td>
             </tr>
             {% endfor %}
         </tbody>

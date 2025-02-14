@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "/istifadeciler/login/",
                 "/rent-a-car/",
                 "/products-look-all/",
+                "/reports/",
             ],
             baseUrl: "https://as-avto.com"
         },

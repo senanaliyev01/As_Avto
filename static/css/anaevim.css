@@ -1024,12 +1024,12 @@ html {
 
 .slider-wrapper {
     overflow: hidden;
-    margin: 0 var(--spacing-xl);
 }
 
 .slider-track {
     display: flex;
     transition: transform 0.5s ease;
+    animation: slideTrack 30s linear infinite;
 }
 
 .slider-item {
@@ -1037,34 +1037,18 @@ html {
     padding: 0 var(--spacing-md);
 }
 
-.slider-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 40px;
-    height: 40px;
-    background-color: var(--color-accent);
-    color: var(--color-white);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    z-index: 1;
+@keyframes slideTrack {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
 }
 
-.slider-arrow:hover {
-    background-color: var(--color-accent-dark);
-    transform: translateY(-50%) scale(1.1);
-}
-
-.slider-arrow--prev {
-    left: 0;
-}
-
-.slider-arrow--next {
-    right: 0;
+/* Hover olduqda animasiyanı dayandır */
+.slider-container:hover .slider-track {
+    animation-play-state: paused;
 }
 
 /* Product Card modifications */

@@ -27,12 +27,16 @@
     <!-- Header -->
     <header class="header">
         <div class="header__container container">
-            
-            
-            <a href="{% url 'anaevim' %}" class="header__back">
-                <i class="fas fa-arrow-left"></i>
-                Ana Səhifəyə Qayıt
+            <a href="{% url 'anaevim' %}" class="header__logo">
+                <img src="{% static 'img/Header_Logo.png' %}" alt="AS AVTO Logo">
             </a>
+            
+            <div class="header__actions">
+                <a href="{% url 'anaevim' %}" class="header__back">
+                    <i class="fas fa-arrow-left"></i>
+                    Ana Səhifəyə Qayıt
+                </a>
+            </div>
         </div>
     </header>
 
@@ -74,7 +78,7 @@
                     </div>
                     {% endif %}
                     <div class="product-detail__contact">
-                        <h2>Əlaqə</h2>
+                        <h2>Əlaqə və Sifariş</h2>
                         <div class="contact-buttons">
                             <a href="tel:+994773059585" class="contact-button phone">
                                 <i class="fas fa-phone"></i>
@@ -92,7 +96,6 @@
                                 <i class="fas fa-sign-in-alt"></i>
                                 <span>B4B Giriş</span>
                             </a>
-                            
                         </div>
                     </div>
                 </div>
@@ -100,10 +103,7 @@
         </div>
     </section>
 
-  
-
     <!-- Scripts -->
-     <script src="{% static 'js/anaevim.js' %}"></script>
     <script src="{% static 'js/loading.js' %}"></script>
 </body>
 </html> 

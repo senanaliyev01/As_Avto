@@ -126,7 +126,7 @@ header {
     justify-content: center; /* Mərkəzləşdirmək */
     align-items: center; /* Mərkəzləşdirmək */
     gap: 1rem; /* Elementlər arasında boşluq */
-    margin: 1rem 0; /* Üst və alt boşluq */
+    /* margin: 1rem 0; Üst və alt boşluq */
 }
 
 /* Axtarış Forması Elementləri */

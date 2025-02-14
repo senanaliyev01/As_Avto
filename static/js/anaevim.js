@@ -51,6 +51,10 @@ class App {
             this.mobileMenu.init();
             this.scrollAnimations.init();
             
+            // Initialize product sliders
+            const sliderContainers = utils.selectAll('.slider-container');
+            this.productSliders = sliderContainers.map(container => new ProductSlider(container));
+            
         } catch (error) {
             console.error('Application initialization error:', error);
         }
@@ -340,6 +344,98 @@ class ScrollAnimations {
             // Fallback for older browsers
             this.elements.forEach(element => element.classList.add('fade-in'));
         }
+    }
+}
+
+// Product Slider Component
+class ProductSlider {
+    constructor(container) {
+        this.container = container;
+        this.track = container.querySelector('.slider-track');
+        this.items = container.querySelectorAll('.slider-item');
+        this.prevBtn = container.querySelector('.slider-arrow--prev');
+        this.nextBtn = container.querySelector('.slider-arrow--next');
+        
+        this.itemWidth = 0;
+        this.position = 0;
+        this.slidesToShow = 0;
+        this.maxPosition = 0;
+        
+        this.init();
+    }
+
+    init() {
+        this.calculateDimensions();
+        this.setupEventListeners();
+        
+        // Recalculate on window resize
+        window.addEventListener('resize', utils.debounce(() => {
+            this.calculateDimensions();
+            this.setPosition();
+        }, 250));
+    }
+
+    calculateDimensions() {
+        this.itemWidth = this.items[0].offsetWidth;
+        this.slidesToShow = Math.floor(this.track.parentElement.offsetWidth / this.itemWidth);
+        this.maxPosition = this.items.length - this.slidesToShow;
+        
+        // Reset position if needed
+        if (Math.abs(this.position) > this.maxPosition) {
+            this.position = -this.maxPosition;
+            this.setPosition();
+        }
+    }
+
+    setupEventListeners() {
+        this.prevBtn.addEventListener('click', () => this.slide('prev'));
+        this.nextBtn.addEventListener('click', () => this.slide('next'));
+        
+        // Touch events
+        let startX, isDragging = false;
+        
+        this.track.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            isDragging = true;
+        }, { passive: true });
+        
+        this.track.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            
+            const currentX = e.touches[0].clientX;
+            const diff = currentX - startX;
+            
+            if (Math.abs(diff) > 20) {
+                e.preventDefault();
+            }
+        });
+        
+        this.track.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            
+            const endX = e.changedTouches[0].clientX;
+            const diff = endX - startX;
+            
+            if (Math.abs(diff) > 50) {
+                this.slide(diff > 0 ? 'prev' : 'next');
+            }
+            
+            isDragging = false;
+        });
+    }
+
+    slide(direction) {
+        if (direction === 'prev' && this.position < 0) {
+            this.position++;
+        } else if (direction === 'next' && Math.abs(this.position) < this.maxPosition) {
+            this.position--;
+        }
+        
+        this.setPosition();
+    }
+
+    setPosition() {
+        this.track.style.transform = `translateX(${this.position * this.itemWidth}px)`;
     }
 }
 

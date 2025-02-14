@@ -155,51 +155,99 @@
     <!-- Products Slider Section -->
     <section class="products-slider">
         <div class="container">
-            <h2 class="section__title">Məhsullarımız</h2>
-            <div class="products-grid">
-                <!-- Brend Slaydları -->
-                {% for brend in brendler %}
-                    {% if brend.sekil %}
-                    <div class="product-card">
-                        <div class="product-card__image">
-                            <img src="{{ brend.sekil.url }}" alt="{{ brend.adi }}">
-                        </div>
-                        <div class="product-card__content">
-                            <h3 class="product-card__title">{{ brend.adi }}</h3>
-                            <p class="product-card__description">{{ brend.haqqinda|truncatewords:10 }}</p>
+            <!-- Brendlər -->
+            <div class="slider-section">
+                <h2 class="section__title">Brendlərimiz</h2>
+                <div class="slider-container">
+                    <button class="slider-arrow slider-arrow--prev">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="slider-wrapper">
+                        <div class="slider-track">
+                            {% for brend in brendler %}
+                                {% if brend.sekil %}
+                                <div class="slider-item">
+                                    <div class="product-card">
+                                        <div class="product-card__image">
+                                            <img src="{{ brend.sekil.url }}" alt="{{ brend.adi }}">
+                                        </div>
+                                        <div class="product-card__content">
+                                            <h3 class="product-card__title">{{ brend.adi }}</h3>
+                                            <p class="product-card__description">{{ brend.haqqinda|truncatewords:10 }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
                         </div>
                     </div>
-                    {% endif %}
-                {% endfor %}
+                    <button class="slider-arrow slider-arrow--next">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
 
-                <!-- Marka Slaydları -->
-                {% for sekil in marka_sekiller %}
-                    {% if sekil.sekil %}
-                    <div class="product-card">
-                        <div class="product-card__image">
-                            <img src="{{ sekil.sekil.url }}" alt="{{ sekil.marka.adi }}">
-                        </div>
-                        <div class="product-card__content">
-                            <h3 class="product-card__title">{{ sekil.marka.adi }}</h3>
+            <!-- Markalar -->
+            <div class="slider-section">
+                <h2 class="section__title">Markalarımız</h2>
+                <div class="slider-container">
+                    <button class="slider-arrow slider-arrow--prev">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="slider-wrapper">
+                        <div class="slider-track">
+                            {% for sekil in marka_sekiller %}
+                                {% if sekil.sekil %}
+                                <div class="slider-item">
+                                    <div class="product-card">
+                                        <div class="product-card__image">
+                                            <img src="{{ sekil.sekil.url }}" alt="{{ sekil.marka.adi }}">
+                                        </div>
+                                        <div class="product-card__content">
+                                            <h3 class="product-card__title">{{ sekil.marka.adi }}</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
                         </div>
                     </div>
-                    {% endif %}
-                {% endfor %}
+                    <button class="slider-arrow slider-arrow--next">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
 
-                <!-- Məhsul Slaydları -->
-                {% for mehsul in mehsullar %}
-                    {% if mehsul.sekil %}
-                    <div class="product-card">
-                        <div class="product-card__image">
-                            <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
-                        </div>
-                        <div class="product-card__content">
-                            <h3 class="product-card__title">{{ mehsul.adi }}</h3>
-                            <p class="product-card__description">{{ mehsul.haqqinda|truncatewords:10 }}</p>
+            <!-- Məhsullar -->
+            <div class="slider-section">
+                <h2 class="section__title">Məhsullarımız</h2>
+                <div class="slider-container">
+                    <button class="slider-arrow slider-arrow--prev">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="slider-wrapper">
+                        <div class="slider-track">
+                            {% for mehsul in mehsullar %}
+                                {% if mehsul.sekil %}
+                                <div class="slider-item">
+                                    <div class="product-card">
+                                        <div class="product-card__image">
+                                            <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
+                                        </div>
+                                        <div class="product-card__content">
+                                            <h3 class="product-card__title">{{ mehsul.adi }}</h3>
+                                            <p class="product-card__description">{{ mehsul.haqqinda|truncatewords:10 }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
                         </div>
                     </div>
-                    {% endif %}
-                {% endfor %}
+                    <button class="slider-arrow slider-arrow--next">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </section>

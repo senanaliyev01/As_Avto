@@ -116,29 +116,51 @@ document.querySelectorAll('.truck-container').forEach(container => {
     }, 300);
 });
 
-// Progress animasiyaları
+// Progress Tracker Animasiyaları
 function initProgressTracker() {
     const steps = document.querySelectorAll('.progress-step');
     
     steps.forEach((step, index) => {
         if (step.classList.contains('active')) {
             setTimeout(() => {
-                const icon = step.querySelector('.step-icon');
-                const check = step.querySelector('.step-check');
-                
                 // İkon animasiyası
-                icon.style.transform = 'scale(1.1)';
+                const icon = step.querySelector('.step-icon');
+                if (icon) {
+                    icon.style.transform = 'scale(1.1)';
+                    icon.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                }
                 
                 // Check ikonu animasiyası
+                const check = step.querySelector('.step-check');
                 if (check) {
-                    check.style.transform = 'scale(1.2)';
-                    setTimeout(() => check.style.transform = 'scale(1)', 200);
+                    check.style.opacity = '0';
+                    check.style.transform = 'scale(0)';
+                    
+                    setTimeout(() => {
+                        check.style.opacity = '1';
+                        check.style.transform = 'scale(1)';
+                    }, 200);
                 }
                 
                 // Progress line animasiyası
                 const nextLine = step.nextElementSibling;
                 if (nextLine && nextLine.classList.contains('progress-line')) {
+                    nextLine.style.background = 'linear-gradient(90deg, #64ffda, #0a192f)';
                     nextLine.style.transition = 'background 0.5s ease';
+                }
+                
+                // İkon rəng animasiyası
+                const mainIcon = step.querySelector('.step-main-icon');
+                if (mainIcon) {
+                    mainIcon.style.color = '#64ffda';
+                    mainIcon.style.transition = 'color 0.3s ease';
+                }
+                
+                // Başlıq animasiyası
+                const title = step.querySelector('.step-title');
+                if (title) {
+                    title.style.color = '#64ffda';
+                    title.style.transition = 'color 0.3s ease';
                 }
             }, index * 300);
         }
@@ -148,6 +170,28 @@ function initProgressTracker() {
 // Səhifə yükləndikdə
 document.addEventListener('DOMContentLoaded', function() {
     initProgressTracker();
+    
+    // Hover effektləri
+    const steps = document.querySelectorAll('.progress-step');
+    steps.forEach(step => {
+        step.addEventListener('mouseenter', () => {
+            if (step.classList.contains('active')) {
+                const icon = step.querySelector('.step-icon');
+                if (icon) {
+                    icon.style.transform = 'scale(1.15)';
+                }
+            }
+        });
+        
+        step.addEventListener('mouseleave', () => {
+            if (step.classList.contains('active')) {
+                const icon = step.querySelector('.step-icon');
+                if (icon) {
+                    icon.style.transform = 'scale(1.1)';
+                }
+            }
+        });
+    });
 });
 
 // Success check ikonları üçün animasiya

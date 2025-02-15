@@ -81,7 +81,7 @@
                         </td>
                         <td><a href="{% url 'sebet_ekle' mehsul.id %}" class="cart-icon"><i class="fas fa-shopping-cart"></i></a></td>
                         <td>
-                            <a href="{% url 'mehsul_haqqinda' mehsul.id %}" class="info-link">
+                            <a href="{% url 'mehsul_haqqinda' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="info-link">
                                 <i class="fas fa-info"></i>
                                 Ətraflı
                             </a>

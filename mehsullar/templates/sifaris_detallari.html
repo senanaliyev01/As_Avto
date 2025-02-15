@@ -28,12 +28,12 @@
                         <div class="step-icon">
                             <i class="fas fa-clock"></i>
                             {% if sifaris.status != 'gozleyir' %}
-                                <i class="fas fa-check step-check"></i>
+                              <i class="fa-solid fa-check"></i>
                             {% endif %}
                         </div>
                         <div class="step-content">
                             <h4>Gözləyir</h4>
-                            <span>{{ sifaris.formatted_tarix }}</span>
+                            
                         </div>
                     </div>
 
@@ -42,12 +42,12 @@
                         <div class="step-icon">
                             <i class="fas fa-box-open"></i>
                             {% if sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}
-                                <i class="fas fa-check step-check"></i>
+                                <i class="fa-solid fa-check"></i>
                             {% endif %}
                         </div>
                         <div class="step-content">
                             <h4>Hazırlanır</h4>
-                            <span>{{ sifaris.hazirlanma_tarixi|default:"-" }}</span>
+                            
                         </div>
                     </div>
 
@@ -56,26 +56,26 @@
                         <div class="step-icon">
                             <i class="fas fa-truck"></i>
                             {% if sifaris.status == 'catdirildi' %}
-                                <i class="fas fa-check step-check"></i>
+                                <i class="fa-solid fa-check"></i>
                             {% endif %}
                         </div>
                         <div class="step-content">
                             <h4>Yoldadır</h4>
-                            <span>{{ sifaris.yola_cixma_tarixi|default:"-" }}</span>
+                           
                         </div>
                     </div>
 
                     <!-- Çatdırıldı -->
                     <div class="progress-step {% if sifaris.status == 'catdirildi' %}current completed{% endif %}">
                         <div class="step-icon">
-                            <i class="fas fa-box-check"></i>
+                            <i class="fa-solid fa-circle-check"></i>
                             {% if sifaris.status == 'catdirildi' %}
-                                <i class="fas fa-check step-check"></i>
+                            <i class="fa-solid fa-check"></i>
                             {% endif %}
                         </div>
                         <div class="step-content">
                             <h4>Çatdırıldı</h4>
-                            <span>{{ sifaris.catdirilma_tarixi|default:"-" }}</span>
+                           
                         </div>
                     </div>
                 </div>

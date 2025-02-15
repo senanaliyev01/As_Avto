@@ -148,8 +148,5 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.parentElement.classList.remove('has-value');
             }
         });
-
-        // Placeholder əlavə et
-        input.setAttribute('placeholder', ' ');
     });
 }); 

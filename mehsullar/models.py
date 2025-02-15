@@ -1,5 +1,4 @@
 from pickle import FALSE
-from django.utils.text import slugify
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -55,7 +54,6 @@ class Mehsul(models.Model):
     qiymet = models.DecimalField(max_digits=10, decimal_places=2)
     sekil = models.ImageField(upload_to='mehsul_sekilleri/', null=True, blank=True)
     haqqinda = models.TextField(null=True, blank=True)
-    slug = models.SlugField(max_length=255, blank=True)
 
     def __str__(self):
         return self.adi
@@ -69,24 +67,6 @@ class Mehsul(models.Model):
         kodlar = [self.oem]
         kodlar.extend([oem.kod for oem in self.oem_kodlar.all()])
         return kodlar
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            # Bütün məlumatları birləşdirib təmiz bir slug yaradırıq
-            slug_parts = [
-                str(self.adi),
-                str(self.kateqoriya.adi),
-                str(self.brend.adi),
-                str(self.marka.adi),
-                str(self.brend_kod),
-                str(self.oem),
-                str(self.qiymet)
-            ]
-            # Boş olmayan dəyərləri birləşdiririk
-            slug_string = '-'.join(filter(None, slug_parts))
-            # Əlavə olaraq ID əlavə edirik ki, unikal olsun
-            self.slug = f"{slugify(slug_string)}"
-        super().save(*args, **kwargs)
 
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

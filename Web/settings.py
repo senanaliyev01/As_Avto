@@ -1,5 +1,3 @@
-
-
 from pathlib import Path
 from dotenv import load_dotenv
 import os
@@ -30,6 +28,19 @@ CSRF_TRUSTED_ORIGINS = [
     'http://www.as-avto.com',
 
 ]
+
+# Security Settings
+SECURE_SSL_REDIRECT = True
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+# Cookie Security
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = True
+
 ####
 
 # Application definition
@@ -42,12 +53,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',
+    'django.contrib.sites',
     'anaevim',
     'istifadeciler',
     'mehsullar',
     'esasevim',
     'rentacar',
 ]
+
+SITE_ID = 1
 
 # 3. Jazzmin tənzimləmələri
 JAZZMIN_SETTINGS = {
@@ -231,3 +246,14 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Cache Settings
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',
+    }
+}
+
+# Static Files
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'

@@ -1,6 +1,5 @@
 from pickle import FALSE
 from django.utils.text import slugify
-from django.urls import reverse
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -75,16 +74,8 @@ class Mehsul(models.Model):
         if not self.slug:
             # Bütün məlumatları birləşdirib slug yaradırıq
             slug_string = f"{self.adi}-{self.kateqoriya.adi}-{self.brend.adi}-{self.marka.adi}-{self.brend_kod}-{self.oem}-{self.qiymet}"
-            # Qiyməti formatla (vergülü nöqtə ilə əvəz et)
-            slug_string = slug_string.replace(',', '.')
             self.slug = slugify(slug_string)
         super().save(*args, **kwargs)
-
-    def get_absolute_url(self):
-        return reverse('mehsul_etrafli', kwargs={
-            'mehsul_id': self.id,
-            'slug': self.slug
-        })
 
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

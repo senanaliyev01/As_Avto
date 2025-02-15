@@ -1,5 +1,3 @@
-
-
 from pathlib import Path
 from dotenv import load_dotenv
 import os
@@ -9,31 +7,28 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-#1 SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG')
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-
-ALLOWED_HOSTS = ['188.245.112.154','localost','127.0.0.1','0.0.0.0', 'as-avto.com', 'www.as-avto.com']
-# ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['188.245.112.154','localhost','127.0.0.1','0.0.0.0', 'as-avto.com', 'www.as-avto.com']
 
 CSRF_TRUSTED_ORIGINS = [
     'https://as-avto.com',
     'https://www.as-avto.com',
     'http://as-avto.com',
     'http://www.as-avto.com',
-
 ]
-####
+
+# Basic Security Settings
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 # Application definition
-
 INSTALLED_APPS = [
     'jazzmin',
     'django.contrib.admin',
@@ -42,12 +37,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',
+    'django.contrib.sites',
     'anaevim',
     'istifadeciler',
     'mehsullar',
     'esasevim',
     'rentacar',
 ]
+
+SITE_ID = 1
 
 # 3. Jazzmin tənzimləmələri
 JAZZMIN_SETTINGS = {

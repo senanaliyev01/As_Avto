@@ -24,7 +24,7 @@
             <div class="progress-container">
                 <div class="progress-tracker">
                     <!-- Gözləyir -->
-                    <div class="progress-step {% if sifaris.status == 'gozleyir' %}current{% elif sifaris.status in 'hazirlanir,yoldadir,catdirildi'|split:',' %}completed{% endif %}">
+                    <div class="progress-step {% if sifaris.status == 'gozleyir' %}current{% elif sifaris.status == 'hazirlanir' or sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}completed{% endif %}">
                         <div class="step-icon">
                             <i class="fas fa-clock"></i>
                             {% if sifaris.status != 'gozleyir' %}
@@ -38,10 +38,10 @@
                     </div>
 
                     <!-- Hazırlanır -->
-                    <div class="progress-step {% if sifaris.status == 'hazirlanir' %}current{% elif sifaris.status in 'yoldadir,catdirildi'|split:',' %}completed{% endif %}">
+                    <div class="progress-step {% if sifaris.status == 'hazirlanir' %}current{% elif sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}completed{% endif %}">
                         <div class="step-icon">
                             <i class="fas fa-box-open"></i>
-                            {% if sifaris.status in 'yoldadir,catdirildi'|split:',' %}
+                            {% if sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}
                                 <i class="fas fa-check step-check"></i>
                             {% endif %}
                         </div>

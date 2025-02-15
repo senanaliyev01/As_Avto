@@ -657,44 +657,53 @@ tfoot td {
     z-index: 1;
 }
 
-.progress-step.active .step-icon {
-    background: var(--accent-color);
-    transform: scale(1.1);
-}
-
-.step-icon i {
+/* Əsas ikon üçün stil */
+.step-icon .main-icon {
     font-size: 1.5rem;
     color: var(--text-secondary);
     transition: all 0.3s ease;
 }
 
-.progress-step.active .step-icon i {
-    color: var(--primary-color);
-}
-
-.check-mark {
+/* Check ikonu üçün stil */
+.step-icon .check-icon {
     position: absolute;
     top: -5px;
     right: -5px;
     background: #22c55e;
+    color: white;
     border-radius: 50%;
     padding: 4px;
     font-size: 0.7rem;
-    color: white;
     border: 2px solid var(--primary-color);
+    z-index: 2;
 }
 
-.progress-line {
-    flex: 1;
-    height: 3px;
-    background: rgba(255, 255, 255, 0.1);
-    position: relative;
-    margin: 0 0.5rem;
-}
-
-.progress-step.active + .progress-line {
+/* Aktiv status üçün stillər */
+.progress-step.active .step-icon {
     background: var(--accent-color);
 }
+
+.progress-step.active .step-icon .main-icon {
+    color: var(--primary-color);
+}
+
+/* İkon rəngləri */
+.gozleyir-icon .main-icon { color: #f59e0b; }
+.hazirlanir-icon .main-icon { color: #3b82f6; }
+.yoldadir-icon .main-icon { color: #8b5cf6; }
+.catdirildi-icon .main-icon { color: #10b981; }
+
+/* Aktiv status üçün arxa plan rəngləri */
+.progress-step.active .gozleyir-icon { background: #fef3c7; }
+.progress-step.active .hazirlanir-icon { background: #dbeafe; }
+.progress-step.active .yoldadir-icon { background: #ede9fe; }
+.progress-step.active .catdirildi-icon { background: #d1fae5; }
+
+/* Aktiv status üçün ikon rəngləri */
+.progress-step.active .gozleyir-icon .main-icon { color: #d97706; }
+.progress-step.active .hazirlanir-icon .main-icon { color: #2563eb; }
+.progress-step.active .yoldadir-icon .main-icon { color: #7c3aed; }
+.progress-step.active .catdirildi-icon .main-icon { color: #059669; }
 
 .step-label {
     color: var(--text-secondary);

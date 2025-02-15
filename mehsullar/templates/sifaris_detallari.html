@@ -24,7 +24,7 @@
             <div class="progress-tracker">
                 <div class="progress-step {% if sifaris.status == 'gozleyir' or sifaris.status == 'hazirlanir' or sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}active{% endif %}">
                     <div class="step-icon gozleyir-icon">
-                        <i class="fas fa-clock"></i>
+                        <i class="fas fa-clock main-icon"></i>
                         {% if sifaris.status != 'gozleyir' %}
                             <i class="fas fa-check check-icon"></i>
                         {% endif %}

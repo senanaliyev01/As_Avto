@@ -451,6 +451,26 @@ tfoot td {
         text-align: center;
         gap: 0.5rem;
     }
+
+    .statistic {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin: 1rem;
+    }
+
+    .stat-item {
+        padding: 1rem;
+    }
+
+    .stat-item h3 {
+        font-size: 1.1rem;
+    }
+
+    .amount-info,
+    .amount-info-1,
+    .qaliq-borc {
+        font-size: 1.5rem;
+    }
 }
 
 /* Links */
@@ -463,4 +483,65 @@ tfoot td {
 .sifaris-link:hover {
     color: var(--text-primary);
     text-decoration: underline;
+}
+
+/* Statistics Section */
+.statistic {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin: 2rem auto;
+    max-width: 1200px;
+    padding: 0 1rem;
+}
+
+.stat-item {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: var(--transition);
+    text-align: center;
+}
+
+.stat-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.stat-item h3 {
+    color: var(--text-secondary);
+    margin: 0 0 1rem 0;
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.amount-info {
+    color: var(--accent-color);
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.amount-info-1 {
+    color: var(--success-color);
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.qaliq-borc {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.qaliq-borc-pozitiv {
+    color: var(--success-color);
+}
+
+.qaliq-borc-negativ {
+    color: var(--error-color);
 }

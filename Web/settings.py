@@ -23,21 +23,101 @@ CSRF_TRUSTED_ORIGINS = [
     'http://www.as-avto.com',
 ]
 
-# Enhanced Security Settings
+# SSL və HTTPS Təhlükəsizlik Tənzimləmələri
 SECURE_SSL_REDIRECT = True  # HTTP -> HTTPS yönləndirmə
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True  # Session cookie-lər yalnız HTTPS üzərindən
+CSRF_COOKIE_SECURE = True    # CSRF token-lər yalnız HTTPS üzərindən
 
-# HSTS Settings
-SECURE_HSTS_SECONDS = 3153600  # 1 il
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
+# HSTS (HTTP Strict Transport Security) Tənzimləmələri
+SECURE_HSTS_SECONDS = 31536000  # 1 il (saniyə ilə)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Bütün alt domainlər üçün HTTPS
+SECURE_HSTS_PRELOAD = True  # HSTS preload siyahısına əlavə edir
 
-# XSS & Content Security
+# SSL/TLS Təhlükəsizlik Başlıqları
+SECURE_BROWSER_XSS_FILTER = True  # XSS qoruması
+SECURE_CONTENT_TYPE_NOSNIFF = True  # MIME type sniffing qoruması
+X_FRAME_OPTIONS = 'DENY'  # Clickjacking qoruması
+
+# Content Security Policy (CSP) Tənzimləmələri
+CSP_DEFAULT_SRC = ("'self'", "https:", "data:", "ws:")
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "https:")
+CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'", "https:")
+CSP_IMG_SRC = ("'self'", "https:", "data:", "blob:")
+CSP_FONT_SRC = ("'self'", "https:", "data:")
+CSP_CONNECT_SRC = ("'self'", "https:", "wss:")
+CSP_FRAME_SRC = ("'self'", "https:")
+CSP_MEDIA_SRC = ("'self'", "https:", "data:")
+CSP_OBJECT_SRC = ("'none'",)
+CSP_BASE_URI = ("'self'",)
+CSP_FRAME_ANCESTORS = ("'none'",)
+CSP_FORM_ACTION = ("'self'", "https:")
+CSP_INCLUDE_NONCE_IN = ('script-src',)
+CSP_REQUIRE_SRI_FOR = ('script', 'style')
+
+# SSL Session və Cookie Təhlükəsizliyi
+SESSION_COOKIE_HTTPONLY = True  # JavaScript-dən qorunma
+SESSION_COOKIE_SAMESITE = 'Strict'  # CSRF hücumlarından qorunma
+SESSION_COOKIE_AGE = 1209600  # 2 həftə
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Browser bağlandıqda session silinməsin
+
+# CSRF Təhlükəsizliyi
+CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = 'Strict'
+CSRF_COOKIE_AGE = 31536000  # 1 il
+CSRF_USE_SESSIONS = True
+CSRF_COOKIE_NAME = '__Secure-csrftoken'  # Secure prefix
+
+# Əlavə Təhlükəsizlik Başlıqları
+SECURE_REFERRER_POLICY = 'same-origin'
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
 SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'DENY'
+
+# SSL Sertifikat Yenilənmə Tənzimləmələri
+SECURE_SSL_REDIRECT_EXEMPT = []  # HTTPS yönləndirməsindən azad olan URL-lər
+SECURE_REDIRECT_EXEMPT = []      # Ümumi yönləndirmədən azad olan URL-lər
+
+# SSL/TLS Version Məhdudiyyətləri
+SECURE_SSL_CIPHERS = (
+    'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:'
+    'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:'
+    'ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:'
+    'DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384'
+)
+
+# Əlavə Təhlükəsizlik Tənzimləmələri
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
+SECURE_SSL_HOST = 'as-avto.com'  # SSL sertifikatının domain adı
+
+# CORS Tənzimləmələri
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = [
+    'https://as-avto.com',
+    'https://www.as-avto.com',
+]
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS'
+]
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+CORS_EXPOSE_HEADERS = ['content-type', 'x-csrftoken']
+CORS_ALLOW_CREDENTIALS = True
 
 # DDoS Protection Settings
 REST_FRAMEWORK = {
@@ -50,10 +130,6 @@ REST_FRAMEWORK = {
         'user': '1000/day'  # Qeydiyyatlı istifadəçilər üçün
     }
 }
-
-# Session Security
-SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_AGE = 1209600  # 2 həftə
 
 # Application definition
 INSTALLED_APPS = [

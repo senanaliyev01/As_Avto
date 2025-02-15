@@ -11,6 +11,8 @@
     --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.1);
     --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.2);
     --transition: all 0.3s ease;
+    --card-bg: rgba(23, 42, 69, 0.8);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 /* Base Styles */
@@ -453,8 +455,9 @@ tfoot td {
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
-    color: #94a3b8;
-    transition: var(--transition);
+    position: relative;
+    flex: 1;
+    z-index: 1;
 }
 
 .progress-step i {
@@ -536,15 +539,14 @@ tfoot td {
 
 .check-icon {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: -5px;
+    right: -5px;
     background: #22c55e;
     color: white;
     border-radius: 50%;
     padding: 4px;
     font-size: 0.7rem;
-    border: 2px solid white;
+    border: 2px solid var(--primary-color);
     z-index: 2;
 }
 
@@ -642,15 +644,6 @@ tfoot td {
     padding: 1rem 0;
 }
 
-.progress-step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    position: relative;
-    flex: 1;
-}
-
 .step-icon {
     width: 50px;
     height: 50px;
@@ -661,6 +654,7 @@ tfoot td {
     background: rgba(255, 255, 255, 0.1);
     position: relative;
     transition: all 0.3s ease;
+    z-index: 1;
 }
 
 .progress-step.active .step-icon {

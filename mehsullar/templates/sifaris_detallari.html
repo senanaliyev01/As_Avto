@@ -26,7 +26,7 @@
                     <div class="step-icon gozleyir-icon">
                         <i class="fas fa-clock"></i>
                         {% if sifaris.status != 'gozleyir' %}
-                            <i class="fas fa-check check-mark"></i>
+                            <i class="fas fa-check check-icon"></i>
                         {% endif %}
                     </div>
                     <span class="step-label">Gözləyir</span>
@@ -38,7 +38,7 @@
                     <div class="step-icon hazirlanir-icon">
                         <i class="fas fa-box-open"></i>
                         {% if sifaris.status != 'gozleyir' and sifaris.status != 'hazirlanir' %}
-                            <i class="fas fa-check check-mark"></i>
+                            <i class="fas fa-check check-icon"></i>
                         {% endif %}
                     </div>
                     <span class="step-label">Hazırlanır</span>
@@ -50,7 +50,7 @@
                     <div class="step-icon yoldadir-icon">
                         <i class="fas fa-truck"></i>
                         {% if sifaris.status == 'catdirildi' %}
-                            <i class="fas fa-check check-mark"></i>
+                            <i class="fas fa-check check-icon"></i>
                         {% endif %}
                     </div>
                     <span class="step-label">Yoldadır</span>
@@ -62,7 +62,7 @@
                     <div class="step-icon catdirildi-icon">
                         <i class="fas fa-check-circle"></i>
                         {% if sifaris.status == 'catdirildi' %}
-                            <i class="fas fa-check check-mark"></i>
+                            <i class="fas fa-check check-icon"></i>
                         {% endif %}
                     </div>
                     <span class="step-label">Çatdırıldı</span>

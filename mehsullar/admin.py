@@ -36,9 +36,35 @@ class SifarisAdmin(admin.ModelAdmin):
         return format_html('<a href="{}" target="_blank">PDF-yə Çevir</a>', reverse('sifaris_detallari', args=[obj.id]) + '?pdf=1')
     pdf_link.short_description = 'PDF-yə Çevir'
 
-# 1Sifariş məhsulları admin paneli
+# Sifariş məhsulları admin paneli
 class SifarisMehsulAdmin(admin.ModelAdmin):
-    list_display = ('sifaris', 'mehsul', 'miqdar', 'qiymet')
+    list_display = ('sifaris', 'get_mehsul_adi', 'get_brend_adi', 'get_brend_kod', 'get_oem', 'miqdar', 'qiymet', 'get_total')
+    list_filter = ('sifaris', 'mehsul__brend')
+    search_fields = ('mehsul__adi', 'mehsul__brend_kod', 'mehsul__oem')
+
+    def get_mehsul_adi(self, obj):
+        return obj.mehsul.adi
+    get_mehsul_adi.short_description = 'Məhsul Adı'
+    get_mehsul_adi.admin_order_field = 'mehsul__adi'
+
+    def get_brend_adi(self, obj):
+        return obj.mehsul.brend.adi
+    get_brend_adi.short_description = 'Firma'
+    get_brend_adi.admin_order_field = 'mehsul__brend__adi'
+
+    def get_brend_kod(self, obj):
+        return obj.mehsul.brend_kod
+    get_brend_kod.short_description = 'Brend Kodu'
+    get_brend_kod.admin_order_field = 'mehsul__brend_kod'
+
+    def get_oem(self, obj):
+        return obj.mehsul.oem
+    get_oem.short_description = 'OEM'
+    get_oem.admin_order_field = 'mehsul__oem'
+
+    def get_total(self, obj):
+        return f"{obj.miqdar * obj.qiymet} AZN"
+    get_total.short_description = 'Cəmi'
 
 # Məhsul admin paneli
 class MehsulAdmin(admin.ModelAdmin):

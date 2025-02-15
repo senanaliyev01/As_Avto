@@ -100,6 +100,13 @@
                 <div class="payment-row">
                     <span>Qalıq Borc:</span>
                     <span class="amount remaining-amount {% if sifaris.qaliq_borc < 0 %}positive{% else %}negative{% endif %}">
+                        {{ sifaris.borc }} AZN
+                    </span>
+                </div>
+
+                <div class="payment-row">
+                    <span>Qalıq Borc:</span>
+                    <span class="amount remaining-amount {% if sifaris.qaliq_borc < 0 %}positive{% else %}negative{% endif %}">
                         {{ sifaris.qaliq_borc }} AZN
                     </span>
                 </div>

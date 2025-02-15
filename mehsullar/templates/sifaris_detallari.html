@@ -24,9 +24,9 @@
             <div class="progress-tracker">
                 <div class="progress-step {% if sifaris.status == 'gozleyir' or sifaris.status == 'hazirlanir' or sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}active{% endif %}">
                     <div class="step-icon gozleyir-icon">
-                        <i class="fas fa-clock main-icon"></i>
+                        <i class="fas fa-clock waiting-icon"></i>
                         {% if sifaris.status != 'gozleyir' %}
-                            <i class="fas fa-check check-icon"></i>
+                            <i class="fas fa-check success-check-icon"></i>
                         {% endif %}
                     </div>
                     <span class="step-label">Gözləyir</span>
@@ -36,9 +36,9 @@
                 
                 <div class="progress-step {% if sifaris.status == 'hazirlanir' or sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}active{% endif %}">
                     <div class="step-icon hazirlanir-icon">
-                        <i class="fas fa-box-open"></i>
+                        <i class="fas fa-box-open preparing-icon"></i>
                         {% if sifaris.status != 'gozleyir' and sifaris.status != 'hazirlanir' %}
-                            <i class="fas fa-check check-icon"></i>
+                            <i class="fas fa-check success-check-icon"></i>
                         {% endif %}
                     </div>
                     <span class="step-label">Hazırlanır</span>
@@ -48,9 +48,9 @@
                 
                 <div class="progress-step {% if sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}active{% endif %}">
                     <div class="step-icon yoldadir-icon">
-                        <i class="fas fa-truck"></i>
+                        <i class="fas fa-truck shipping-icon"></i>
                         {% if sifaris.status == 'catdirildi' %}
-                            <i class="fas fa-check check-icon"></i>
+                            <i class="fas fa-check success-check-icon"></i>
                         {% endif %}
                     </div>
                     <span class="step-label">Yoldadır</span>
@@ -60,9 +60,9 @@
                 
                 <div class="progress-step {% if sifaris.status == 'catdirildi' %}active{% endif %}">
                     <div class="step-icon catdirildi-icon">
-                        <i class="fas fa-check-circle"></i>
+                        <i class="fas fa-check-circle delivered-icon"></i>
                         {% if sifaris.status == 'catdirildi' %}
-                            <i class="fas fa-check check-icon"></i>
+                            <i class="fas fa-check success-check-icon"></i>
                         {% endif %}
                     </div>
                     <span class="step-label">Çatdırıldı</span>

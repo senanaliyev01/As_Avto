@@ -476,12 +476,13 @@ tfoot td {
 .progress-line {
     flex: 1;
     height: 3px;
-    background: #e5e7eb;
+    background: rgba(255, 255, 255, 0.1);
     position: relative;
+    margin: 0 0.5rem;
 }
 
 .progress-step.active + .progress-line {
-    background: #22c55e;
+    background: var(--accent-color);
 }
 
 /* Status ikonları üçün yeni stillər */
@@ -506,8 +507,7 @@ tfoot td {
 }
 
 .progress-step.active .gozleyir-icon {
-    background: #fef3c7;
-    color: #d97706;
+    background: rgba(245, 158, 11, 0.15);
 }
 
 .hazirlanir-icon {
@@ -515,8 +515,7 @@ tfoot td {
 }
 
 .progress-step.active .hazirlanir-icon {
-    background: #dbeafe;
-    color: #2563eb;
+    background: rgba(59, 130, 246, 0.15);
 }
 
 .yoldadir-icon {
@@ -524,8 +523,7 @@ tfoot td {
 }
 
 .progress-step.active .yoldadir-icon {
-    background: #ede9fe;
-    color: #7c3aed;
+    background: rgba(139, 92, 246, 0.15);
 }
 
 .catdirildi-icon {
@@ -533,8 +531,7 @@ tfoot td {
 }
 
 .progress-step.active .catdirildi-icon {
-    background: #d1fae5;
-    color: #059669;
+    background: rgba(16, 185, 129, 0.15);
 }
 
 .check-icon {
@@ -688,22 +685,73 @@ tfoot td {
 }
 
 /* İkon rəngləri */
-.gozleyir-icon .main-icon { color: #f59e0b; }
-.hazirlanir-icon .main-icon { color: #3b82f6; }
-.yoldadir-icon .main-icon { color: #8b5cf6; }
-.catdirildi-icon .main-icon { color: #10b981; }
+.waiting-icon { 
+    color: #f59e0b; 
+    font-size: 1.5rem;
+}
+
+.preparing-icon { 
+    color: #3b82f6; 
+    font-size: 1.5rem;
+}
+
+.shipping-icon { 
+    color: #8b5cf6; 
+    font-size: 1.5rem;
+}
+
+.delivered-icon { 
+    color: #10b981; 
+    font-size: 1.5rem;
+}
+
+.success-check-icon {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #22c55e;
+    color: white;
+    border-radius: 50%;
+    padding: 4px;
+    font-size: 0.7rem;
+    border: 2px solid var(--primary-color);
+    z-index: 2;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
 
 /* Aktiv status üçün arxa plan rəngləri */
-.progress-step.active .gozleyir-icon { background: #fef3c7; }
-.progress-step.active .hazirlanir-icon { background: #dbeafe; }
-.progress-step.active .yoldadir-icon { background: #ede9fe; }
-.progress-step.active .catdirildi-icon { background: #d1fae5; }
+.progress-step.active .gozleyir-icon { 
+    background: rgba(245, 158, 11, 0.15); 
+}
+
+.progress-step.active .hazirlanir-icon { 
+    background: rgba(59, 130, 246, 0.15); 
+}
+
+.progress-step.active .yoldadir-icon { 
+    background: rgba(139, 92, 246, 0.15); 
+}
+
+.progress-step.active .catdirildi-icon { 
+    background: rgba(16, 185, 129, 0.15); 
+}
 
 /* Aktiv status üçün ikon rəngləri */
-.progress-step.active .gozleyir-icon .main-icon { color: #d97706; }
-.progress-step.active .hazirlanir-icon .main-icon { color: #2563eb; }
-.progress-step.active .yoldadir-icon .main-icon { color: #7c3aed; }
-.progress-step.active .catdirildi-icon .main-icon { color: #059669; }
+.progress-step.active .waiting-icon { 
+    color: #d97706; 
+}
+
+.progress-step.active .preparing-icon { 
+    color: #2563eb; 
+}
+
+.progress-step.active .shipping-icon { 
+    color: #7c3aed; 
+}
+
+.progress-step.active .delivered-icon { 
+    color: #059669; 
+}
 
 .step-label {
     color: var(--text-secondary);

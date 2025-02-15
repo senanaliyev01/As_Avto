@@ -55,7 +55,7 @@ class Mehsul(models.Model):
     qiymet = models.DecimalField(max_digits=10, decimal_places=2)
     sekil = models.ImageField(upload_to='mehsul_sekilleri/', null=True, blank=True)
     haqqinda = models.TextField(null=True, blank=True)
-    slug = models.SlugField(max_length=255, unique=True, blank=True)
+    slug = models.SlugField(max_length=255, blank=True)
 
     def __str__(self):
         return self.adi
@@ -72,9 +72,20 @@ class Mehsul(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            # Bütün məlumatları birləşdirib slug yaradırıq
-            slug_string = f"{self.adi}-{self.kateqoriya.adi}-{self.brend.adi}-{self.marka.adi}-{self.brend_kod}-{self.oem}-{self.qiymet}"
-            self.slug = slugify(slug_string)
+            # Bütün məlumatları birləşdirib təmiz bir slug yaradırıq
+            slug_parts = [
+                str(self.adi),
+                str(self.kateqoriya.adi),
+                str(self.brend.adi),
+                str(self.marka.adi),
+                str(self.brend_kod),
+                str(self.oem),
+                str(self.qiymet)
+            ]
+            # Boş olmayan dəyərləri birləşdiririk
+            slug_string = '-'.join(filter(None, slug_parts))
+            # Əlavə olaraq ID əlavə edirik ki, unikal olsun
+            self.slug = f"{slugify(slug_string)}"
         super().save(*args, **kwargs)
 
 class Sebet(models.Model):

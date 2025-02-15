@@ -15,10 +15,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG')
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 
-ALLOWED_HOSTS = ['188.245.112.154','localost','127.0.0.1','0.0.0.0', 'as-avto.com', 'www.as-avto.com']
+ALLOWED_HOSTS = ['188.245.112.154','localhost','127.0.0.1','0.0.0.0', 'as-avto.com', 'www.as-avto.com']
 # ALLOWED_HOSTS = ['*']
 
 CSRF_TRUSTED_ORIGINS = [
@@ -29,17 +29,18 @@ CSRF_TRUSTED_ORIGINS = [
 
 ]
 
-# Security Settings
-SECURE_SSL_REDIRECT = True
-SECURE_HSTS_SECONDS = 31536000
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
-
-# Cookie Security
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_HTTPONLY = True
-CSRF_COOKIE_HTTPONLY = True
+# Security Settings - Only in Production
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_HTTPONLY = True
+else:
+    SECURE_SSL_REDIRECT = False
 
 ####
 
@@ -248,12 +249,22 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Cache Settings
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/1',
+if not DEBUG:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': 'redis://127.0.0.1:6379/1',
+        }
     }
-}
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        }
+    }
 
 # Static Files
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+if not DEBUG:
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+else:
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'

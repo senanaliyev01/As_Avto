@@ -24,12 +24,45 @@ class RequestLoggingMiddleware(MiddlewareMixin):
     def process_request(self, request):
         request.start_time = time.time()
 
+    def get_user_info(self, request):
+        """İstifadəçi məlumatlarını əldə etmək üçün köməkçi funksiya"""
+        if hasattr(request, 'user') and request.user.is_authenticated:
+            return {
+                'username': request.user.username,
+                'email': request.user.email,
+                'id': request.user.id
+            }
+        
+        # Session-dan istifadəçi məlumatlarını yoxla
+        if request.session.get('_auth_user_id'):
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            try:
+                user = User.objects.get(pk=request.session['_auth_user_id'])
+                return {
+                    'username': user.username,
+                    'email': user.email,
+                    'id': user.id
+                }
+            except User.DoesNotExist:
+                pass
+        
+        return {'username': 'AnonymousUser', 'email': None, 'id': None}
+
     def process_response(self, request, response):
         if hasattr(request, 'start_time'):
             total_time = int((time.time() - request.start_time) * 1000)
-            user = request.user.username if request.user.is_authenticated else 'AnonymousUser'
-            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', ''))
             
+            # İstifadəçi məlumatlarını əldə et
+            user_info = self.get_user_info(request)
+            
+            # IP ünvanını əldə et
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', '')
+            if ip:
+                ip = ip.split(',')[0].strip()
+            else:
+                ip = request.META.get('REMOTE_ADDR', '')
+
             # Request data-nı əldə et
             if request.method == 'GET':
                 data = dict(request.GET.items())
@@ -42,14 +75,22 @@ class RequestLoggingMiddleware(MiddlewareMixin):
             if 'csrfmiddlewaretoken' in data:
                 data['csrfmiddlewaretoken'] = '*****'
             
+            # Session məlumatlarını əlavə et (təhlükəsiz şəkildə)
+            session_data = {}
+            for key in request.session.keys():
+                if 'password' not in key.lower() and 'token' not in key.lower():
+                    session_data[key] = request.session[key]
+            
             log_data = {
                 'ip': ip,
-                'user': user,
+                'user': user_info['username'],
+                'user_id': user_info['id'],
                 'method': request.method,
                 'path': request.path,
                 'status': response.status_code,
                 'time': total_time,
-                'data': str(data)
+                'data': str(data),
+                'session': str(session_data)
             }
 
             # Status koduna görə log səviyyəsini təyin et
@@ -63,16 +104,14 @@ class RequestLoggingMiddleware(MiddlewareMixin):
         return response
 
     def process_exception(self, request, exception):
-        user = request.user.username if request.user.is_authenticated else 'AnonymousUser'
+        user_info = self.get_user_info(request)
         ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', ''))
         
-        # Request data-nı əldə et
         if request.method == 'GET':
             data = dict(request.GET.items())
         else:
             data = dict(request.POST.items())
         
-        # Həssas məlumatları təmizlə
         if 'password' in data:
             data['password'] = '*****'
         if 'csrfmiddlewaretoken' in data:
@@ -80,7 +119,8 @@ class RequestLoggingMiddleware(MiddlewareMixin):
         
         log_data = {
             'ip': ip,
-            'user': user,
+            'user': user_info['username'],
+            'user_id': user_info['id'],
             'method': request.method,
             'path': request.path,
             'exc_info': str(exception),

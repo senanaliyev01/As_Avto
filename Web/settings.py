@@ -238,11 +238,11 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'request_format': {
-            'format': '[{asctime}] [{levelname}] {message} - IP: {ip} - User: {user} - Method: {method} - Path: {path} - Status: {status} - Time: {time}ms - Data: {data}',
+            'format': '[{asctime}] [{levelname}] {message} - IP: {ip} - User: {user} (ID: {user_id}) - Method: {method} - Path: {path} - Status: {status} - Time: {time}ms - Data: {data} - Session: {session}',
             'style': '{',
         },
         'error_format': {
-            'format': '[{asctime}] [{levelname}] {message}\nException: {exc_info}\nPath: {path}\nMethod: {method}\nUser: {user}\nIP: {ip}\nData: {data}',
+            'format': '[{asctime}] [{levelname}] {message}\nException: {exc_info}\nPath: {path}\nMethod: {method}\nUser: {user} (ID: {user_id})\nIP: {ip}\nData: {data}\nSession: {session}',
             'style': '{',
         }
     },

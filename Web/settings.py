@@ -128,6 +128,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'Web.middlewares.Force404Middleware',
     'Web.middlewares.AddSearchDataMiddleware',
+    'Web.middlewares.RequestLoggingMiddleware',
 ]
 
 ROOT_URLCONF = 'Web.urls'
@@ -230,3 +231,51 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Logging konfiqurasiyası
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'request_format': {
+            'format': '[{asctime}] [{levelname}] {message} - IP: {ip} - User: {user} - Method: {method} - Path: {path} - Status: {status} - Time: {time}ms',
+            'style': '{',
+        },
+        'error_format': {
+            'format': '[{asctime}] [{levelname}] {message}\nException: {exc_info}\nPath: {path}\nMethod: {method}\nUser: {user}\nIP: {ip}',
+            'style': '{',
+        }
+    },
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+    },
+    'handlers': {
+        'request_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/requests.log'),
+            'formatter': 'request_format',
+        },
+        'error_file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/errors.log'),
+            'formatter': 'error_format',
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler',
+            'include_html': True,
+        }
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['request_file', 'error_file', 'mail_admins'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    }
+}

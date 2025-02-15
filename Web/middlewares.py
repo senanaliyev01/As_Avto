@@ -1,5 +1,9 @@
 from django.shortcuts import render
 from django.utils.deprecation import MiddlewareMixin
+import time
+import logging
+
+request_logger = logging.getLogger('django.request')
 
 class Force404Middleware(MiddlewareMixin):
     def process_response(self, request, response):
@@ -15,5 +19,48 @@ class AddSearchDataMiddleware(MiddlewareMixin):
         request.kateqoriyalar = Kateqoriya.objects.all()
         request.brendler = Brend.objects.all()
         request.markalar = Marka.objects.all()
+        
+class RequestLoggingMiddleware(MiddlewareMixin):
+    def process_request(self, request):
+        request.start_time = time.time()
+
+    def process_response(self, request, response):
+        if hasattr(request, 'start_time'):
+            total_time = int((time.time() - request.start_time) * 1000)
+            user = request.user.username if request.user.is_authenticated else 'AnonymousUser'
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', ''))
+            
+            log_data = {
+                'ip': ip,
+                'user': user,
+                'method': request.method,
+                'path': request.path,
+                'status': response.status_code,
+                'time': total_time
+            }
+
+            # Status koduna görə log səviyyəsini təyin et
+            if 200 <= response.status_code < 400:
+                request_logger.info('Request completed successfully', extra=log_data)
+            elif 400 <= response.status_code < 500:
+                request_logger.warning('Client error occurred', extra=log_data)
+            else:
+                request_logger.error('Server error occurred', extra=log_data)
+
+        return response
+
+    def process_exception(self, request, exception):
+        user = request.user.username if request.user.is_authenticated else 'AnonymousUser'
+        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', ''))
+        
+        log_data = {
+            'ip': ip,
+            'user': user,
+            'method': request.method,
+            'path': request.path,
+            'exc_info': str(exception)
+        }
+        
+        request_logger.error('Exception occurred', extra=log_data)
         
         

@@ -1,7 +1,8 @@
 from django.contrib import admin
-from .models import Kateqoriya, Brend, Marka, Mehsul, Sebet, Sifaris, SifarisMehsul, OEMKod, MusteriReyi,MarkaSekil
+from .models import Kateqoriya, Brend, Marka, Mehsul, Sebet, Sifaris, SifarisMehsul, OEMKod, MusteriReyi, MarkaSekil
 from django.urls import reverse
 from django.utils.html import format_html
+from django.utils import timezone
 
 class MarkaSekilInline(admin.TabularInline):
     model = MarkaSekil
@@ -48,7 +49,7 @@ class SifarisAdmin(admin.ModelAdmin):
     get_musteri.admin_order_field = 'user__username'
 
     def get_tarix(self, obj):
-        return obj.tarix.strftime('%d-%m-%Y %H:%M')
+        return obj.tarix.astimezone(timezone.get_current_timezone()).strftime('%d-%m-%Y %H:%M')
     get_tarix.short_description = 'Tarix'
     get_tarix.admin_order_field = 'tarix'
 

@@ -23,10 +23,37 @@ CSRF_TRUSTED_ORIGINS = [
     'http://www.as-avto.com',
 ]
 
-# Basic Security Settings
+# Enhanced Security Settings
+SECURE_SSL_REDIRECT = True  # HTTP -> HTTPS yönləndirmə
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+
+# HSTS Settings
+SECURE_HSTS_SECONDS = 3153600  # 1 il
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+# XSS & Content Security
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+
+# DDoS Protection Settings
+REST_FRAMEWORK = {
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/day',  # Anonim istifadəçilər üçün
+        'user': '1000/day'  # Qeydiyyatlı istifadəçilər üçün
+    }
+}
+
+# Session Security
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_AGE = 1209600  # 2 həftə
 
 # Application definition
 INSTALLED_APPS = [
@@ -39,6 +66,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
     'django.contrib.sites',
+    'rest_framework',
     'anaevim',
     'istifadeciler',
     'mehsullar',

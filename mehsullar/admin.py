@@ -17,6 +17,47 @@ class MarkaAdmin(admin.ModelAdmin):
 class SifarisMehsulInline(admin.TabularInline):
     model = SifarisMehsul
     extra = 0
+    fields = ('mehsul', 'miqdar', 'qiymet')
+    readonly_fields = ('get_brend_adi', 'get_brend_kod', 'get_oem', 'get_total')
+    
+    def get_brend_adi(self, obj):
+        return format_html('<span style="color: #1a73e8;">{}</span>', obj.mehsul.brend.adi)
+    get_brend_adi.short_description = 'Firma'
+
+    def get_brend_kod(self, obj):
+        return format_html('<span style="font-family: monospace;">{}</span>', obj.mehsul.brend_kod)
+    get_brend_kod.short_description = 'Brend Kodu'
+
+    def get_oem(self, obj):
+        return format_html(
+            '<span style="font-family: monospace;">{}</span>'
+            '<a href="https://www.google.com/search?tbm=isch&q={}" target="_blank" style="margin-left: 5px;">'
+            '<i class="fas fa-camera" style="color: green;"></i></a>',
+            obj.mehsul.oem, obj.mehsul.oem
+        )
+    get_oem.short_description = 'OEM'
+
+    def get_total(self, obj):
+        if obj.id:  # Yalnız mövcud obyektlər üçün
+            return format_html('<span style="color: #008000; font-weight: bold;">{} AZN</span>', 
+                             obj.miqdar * obj.qiymet)
+        return '-'
+    get_total.short_description = 'Cəmi'
+
+    # Əlavə sütunları göstərmək üçün
+    def get_fields(self, request, obj=None):
+        fields = list(super().get_fields(request, obj))
+        if obj:  # Mövcud sifariş üçün
+            fields.extend(['get_brend_adi', 'get_brend_kod', 'get_oem', 'get_total'])
+        return fields
+
+    # CSS əlavə etmək üçün
+    class Media:
+        css = {
+            'all': [
+                'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css',
+            ]
+        }
 
 # OEMKodInline klassını əvvəldə təyin edirik
 class OEMKodInline(admin.TabularInline):

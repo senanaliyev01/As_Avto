@@ -238,7 +238,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'request_format': {
-            'format': '[{asctime}] [{levelname}] {message} - IP: {ip} - User: {user} - Method: {method} - Path: {path} - Status: {status} - Time: {time}ms',
+            'format': '[{asctime}] [{levelname}] {message} - IP: {ip} - User: {user.username} - Method: {method} - Path: {path} - Status: {status} - Time: {time}ms',
             'style': '{',
         },
         'error_format': {

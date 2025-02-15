@@ -26,15 +26,79 @@ class OEMKodInline(admin.TabularInline):
 @admin.register(Sifaris)
 class SifarisAdmin(admin.ModelAdmin):
     inlines = [SifarisMehsulInline]
-    list_display = ('id', 'user', 'tarix', 'cemi_mebleg', 'odenilen_mebleg', 'borc', 'status', 'tamamlandi', 'pdf_link')
+    list_display = (
+        'id', 
+        'get_musteri', 
+        'get_tarix', 
+        'get_cemi_mebleg', 
+        'get_odenilen_mebleg', 
+        'get_borc', 
+        'get_status', 
+        'get_tamamlanma',
+        'pdf_link'
+    )
     search_fields = ('id', 'user__username', 'status')
     list_filter = ('status', 'tamamlandi')
     fields = ('user', 'cemi_mebleg', 'odenilen_mebleg', 'status', 'tamamlandi')
     readonly_fields = ('borc',)
 
+    def get_musteri(self, obj):
+        return f"{obj.user.first_name} {obj.user.last_name}" if obj.user.first_name else obj.user.username
+    get_musteri.short_description = 'Müştəri'
+    get_musteri.admin_order_field = 'user__username'
+
+    def get_tarix(self, obj):
+        return obj.tarix.strftime('%d-%m-%Y %H:%M')
+    get_tarix.short_description = 'Tarix'
+    get_tarix.admin_order_field = 'tarix'
+
+    def get_cemi_mebleg(self, obj):
+        return f"{obj.cemi_mebleg} AZN"
+    get_cemi_mebleg.short_description = 'Ümumi Məbləğ'
+    get_cemi_mebleg.admin_order_field = 'cemi_mebleg'
+
+    def get_odenilen_mebleg(self, obj):
+        return f"{obj.odenilen_mebleg} AZN"
+    get_odenilen_mebleg.short_description = 'Ödənilən'
+    get_odenilen_mebleg.admin_order_field = 'odenilen_mebleg'
+
+    def get_borc(self, obj):
+        return f"{obj.borc()} AZN"
+    get_borc.short_description = 'Qalıq Borc'
+
+    def get_status(self, obj):
+        status_classes = {
+            'gozleyir': 'background: #FFA500;',  # Narıncı
+            'hazirlanir': 'background: #FFD700;', # Sarı
+            'yoldadir': 'background: #87CEEB;',   # Mavi
+            'catdirildi': 'background: #90EE90;'  # Yaşıl
+        }
+        status_text = {
+            'gozleyir': 'Gözləyir',
+            'hazirlanir': 'Hazırlanır',
+            'yoldadir': 'Yoldadır',
+            'catdirildi': 'Çatdırıldı'
+        }
+        style = status_classes.get(obj.status, '')
+        text = status_text.get(obj.status, obj.status)
+        return format_html('<span style="padding: 5px 10px; border-radius: 4px; color: black; {}">{}</span>', style, text)
+    get_status.short_description = 'Status'
+    get_status.admin_order_field = 'status'
+
+    def get_tamamlanma(self, obj):
+        if obj.tamamlandi:
+            return format_html('<span style="color: green;">✓</span>')
+        return format_html('<span style="color: red;">✗</span>')
+    get_tamamlanma.short_description = 'Tamamlandı'
+    get_tamamlanma.admin_order_field = 'tamamlandi'
+
     def pdf_link(self, obj):
-        return format_html('<a href="{}" target="_blank">PDF-yə Çevir</a>', reverse('sifaris_detallari', args=[obj.id]) + '?pdf=1')
-    pdf_link.short_description = 'PDF-yə Çevir'
+        return format_html(
+            '<a href="{}" target="_blank" style="background-color: #4CAF50; color: white; padding: 5px 10px; '
+            'text-decoration: none; border-radius: 4px;">PDF-yə Çevir</a>', 
+            reverse('sifaris_detallari', args=[obj.id]) + '?pdf=1'
+        )
+    pdf_link.short_description = 'PDF'
 
 # Sifariş məhsulları admin paneli
 class SifarisMehsulAdmin(admin.ModelAdmin):

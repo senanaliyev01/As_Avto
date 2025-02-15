@@ -29,12 +29,7 @@ class SifarisMehsulInline(admin.TabularInline):
     get_brend_kod.short_description = 'Brend Kodu'
 
     def get_oem(self, obj):
-        return format_html(
-            '<span style="font-family: monospace;">{}</span>'
-            '<a href="https://www.google.com/search?tbm=isch&q={}" target="_blank" style="margin-left: 5px;">'
-            '<i class="fas fa-camera" style="color: green;"></i></a>',
-            obj.mehsul.oem, obj.mehsul.oem
-        )
+        return format_html('<span style="font-family: monospace;">{}</span>', obj.mehsul.oem)
     get_oem.short_description = 'OEM'
 
     def get_total(self, obj):
@@ -50,14 +45,6 @@ class SifarisMehsulInline(admin.TabularInline):
         if obj:  # Mövcud sifariş üçün
             fields.extend(['get_brend_adi', 'get_brend_kod', 'get_oem', 'get_total'])
         return fields
-
-    # CSS əlavə etmək üçün
-    class Media:
-        css = {
-            'all': [
-                'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css',
-            ]
-        }
 
 # OEMKodInline klassını əvvəldə təyin edirik
 class OEMKodInline(admin.TabularInline):

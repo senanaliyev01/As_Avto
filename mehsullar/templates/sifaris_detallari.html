@@ -21,51 +21,74 @@
                 <i class="fas fa-info-circle"></i>
                 <h3>Sifariş Məlumatları</h3>
             </div>
-            <div class="progress-tracker">
-                <div class="progress-step {% if sifaris.status == 'gozleyir' or sifaris.status == 'hazirlanir' or sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}active{% endif %}">
-                    <div class="step-icon">
-                        <i class="fas fa-clock waiting-icon"></i>
-                        {% if sifaris.status != 'gozleyir' %}
-                            <i class="fas fa-check success-check-icon"></i>
-                        {% endif %}
-                    </div>
-                    <span class="step-label">Gözləyir</span>
+            <div class="progress-container">
+                <div class="progress-header">
+                    <i class="fas fa-route route-icon"></i>
+                    <h3>Sifariş İzləmə</h3>
                 </div>
                 
-                <div class="progress-line"></div>
-                
-                <div class="progress-step {% if sifaris.status == 'hazirlanir' or sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}active{% endif %}">
-                    <div class="step-icon">
-                        <i class="fas fa-box-open preparing-icon"></i>
-                        {% if sifaris.status != 'gozleyir' and sifaris.status != 'hazirlanir' %}
-                            <i class="fas fa-check success-check-icon"></i>
-                        {% endif %}
+                <div class="progress-tracker">
+                    <!-- Gözləyir -->
+                    <div class="progress-step {% if sifaris.status == 'gozleyir' or sifaris.status == 'hazirlanir' or sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}active{% endif %}">
+                        <div class="step-icon">
+                            <i class="fas fa-clock-rotate-left step-main-icon"></i>
+                            {% if sifaris.status != 'gozleyir' %}
+                                <i class="fas fa-check step-check"></i>
+                            {% endif %}
+                        </div>
+                        <div class="step-content">
+                            <span class="step-title">Gözləyir</span>
+                            <span class="step-date">{{ sifaris.formatted_tarix }}</span>
+                        </div>
                     </div>
-                    <span class="step-label">Hazırlanır</span>
-                </div>
-                
-                <div class="progress-line"></div>
-                
-                <div class="progress-step {% if sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}active{% endif %}">
-                    <div class="step-icon">
-                        <i class="fas fa-truck shipping-icon"></i>
-                        {% if sifaris.status == 'catdirildi' %}
-                            <i class="fas fa-check success-check-icon"></i>
-                        {% endif %}
+                    
+                    <div class="progress-line"></div>
+                    
+                    <!-- Hazırlanır -->
+                    <div class="progress-step {% if sifaris.status == 'hazirlanir' or sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}active{% endif %}">
+                        <div class="step-icon">
+                            <i class="fas fa-box-open step-main-icon"></i>
+                            {% if sifaris.status != 'gozleyir' and sifaris.status != 'hazirlanir' %}
+                                <i class="fas fa-check step-check"></i>
+                            {% endif %}
+                        </div>
+                        <div class="step-content">
+                            <span class="step-title">Hazırlanır</span>
+                            <span class="step-date">{{ sifaris.hazirlanma_tarixi|default:"-" }}</span>
+                        </div>
                     </div>
-                    <span class="step-label">Yoldadır</span>
-                </div>
-                
-                <div class="progress-line"></div>
-                
-                <div class="progress-step {% if sifaris.status == 'catdirildi' %}active{% endif %}">
-                    <div class="step-icon">
-                        <i class="fas fa-check-circle delivered-icon"></i>
-                        {% if sifaris.status == 'catdirildi' %}
-                            <i class="fas fa-check success-check-icon"></i>
-                        {% endif %}
+                    
+                    <div class="progress-line"></div>
+                    
+                    <!-- Yoldadır -->
+                    <div class="progress-step {% if sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}active{% endif %}">
+                        <div class="step-icon">
+                            <i class="fas fa-truck step-main-icon"></i>
+                            {% if sifaris.status == 'catdirildi' %}
+                                <i class="fas fa-check step-check"></i>
+                            {% endif %}
+                        </div>
+                        <div class="step-content">
+                            <span class="step-title">Yoldadır</span>
+                            <span class="step-date">{{ sifaris.yola_cixma_tarixi|default:"-" }}</span>
+                        </div>
                     </div>
-                    <span class="step-label">Çatdırıldı</span>
+                    
+                    <div class="progress-line"></div>
+                    
+                    <!-- Çatdırıldı -->
+                    <div class="progress-step {% if sifaris.status == 'catdirildi' %}active{% endif %}">
+                        <div class="step-icon">
+                            <i class="fas fa-box-check step-main-icon"></i>
+                            {% if sifaris.status == 'catdirildi' %}
+                                <i class="fas fa-check step-check"></i>
+                            {% endif %}
+                        </div>
+                        <div class="step-content">
+                            <span class="step-title">Çatdırıldı</span>
+                            <span class="step-date">{{ sifaris.catdirilma_tarixi|default:"-" }}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

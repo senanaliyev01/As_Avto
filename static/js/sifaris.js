@@ -116,40 +116,38 @@ document.querySelectorAll('.truck-container').forEach(container => {
     }, 300);
 });
 
-// Progress addımlarını animasiya et
-function animateProgressSteps() {
-    document.querySelectorAll('.progress-step').forEach((step, index) => {
+// Progress animasiyaları
+function initProgressTracker() {
+    const steps = document.querySelectorAll('.progress-step');
+    
+    steps.forEach((step, index) => {
         if (step.classList.contains('active')) {
             setTimeout(() => {
                 const icon = step.querySelector('.step-icon');
-                step.style.opacity = '1';
+                const check = step.querySelector('.step-check');
+                
+                // İkon animasiyası
                 icon.style.transform = 'scale(1.1)';
                 
-                setTimeout(() => {
-                    icon.style.transform = 'scale(1)';
-                }, 200);
+                // Check ikonu animasiyası
+                if (check) {
+                    check.style.transform = 'scale(1.2)';
+                    setTimeout(() => check.style.transform = 'scale(1)', 200);
+                }
+                
+                // Progress line animasiyası
+                const nextLine = step.nextElementSibling;
+                if (nextLine && nextLine.classList.contains('progress-line')) {
+                    nextLine.style.transition = 'background 0.5s ease';
+                }
             }, index * 300);
         }
     });
 }
 
-// Kamaz animasiyası
-function initTruckAnimation() {
-    const truckIcon = document.querySelector('.shipping-icon');
-    if (truckIcon) {
-        setInterval(() => {
-            truckIcon.style.transform = 'translateX(5px)';
-            setTimeout(() => {
-                truckIcon.style.transform = 'translateX(-5px)';
-            }, 1000);
-        }, 2000);
-    }
-}
-
 // Səhifə yükləndikdə
 document.addEventListener('DOMContentLoaded', function() {
-    animateProgressSteps();
-    initTruckAnimation();
+    initProgressTracker();
 });
 
 // Success check ikonları üçün animasiya

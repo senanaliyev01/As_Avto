@@ -438,14 +438,38 @@ tfoot td {
     }
 }
 
-/* Progress Tracker Container */
+/* Progress Container */
+.progress-container {
+    background: linear-gradient(145deg, rgba(23, 42, 69, 0.95), rgba(10, 25, 47, 0.98));
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(100, 255, 218, 0.1);
+}
+
+.progress-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(100, 255, 218, 0.1);
+}
+
+.route-icon {
+    font-size: 1.5rem;
+    background: linear-gradient(135deg, #64ffda, #0a192f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Progress Tracker */
 .progress-tracker {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 2rem 1rem;
     position: relative;
-    z-index: 1;
+    padding: 0 1rem;
 }
 
 /* Progress Steps */
@@ -456,43 +480,32 @@ tfoot td {
     gap: 1rem;
     position: relative;
     flex: 1;
-    z-index: 1;
+    z-index: 2;
 }
 
 .step-icon {
-    width: 60px;
-    height: 60px;
+    width: 54px;
+    height: 54px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(100, 255, 218, 0.2);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid rgba(100, 255, 218, 0.15);
     position: relative;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* İkon Rəngləri və Effektləri - Base */
-.step-icon i {
-    font-size: 1.5rem;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+.step-main-icon {
+    font-size: 1.3rem;
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
 }
 
-/* İkon Rəngləri */
-.waiting-icon { color: #fbbf24; }
-.preparing-icon { color: #60a5fa; }
-.shipping-icon { color: #a78bfa; }
-.delivered-icon { color: #34d399; }
-
-/* Success Check Icon */
-.success-check-icon {
+.step-check {
     position: absolute;
-    top: -5px;
-    right: -5px;
+    top: -6px;
+    right: -6px;
     width: 20px;
     height: 20px;
     display: flex;
@@ -503,15 +516,26 @@ tfoot td {
     border-radius: 50%;
     font-size: 0.7rem;
     border: 2px solid var(--primary-color);
-    z-index: 2;
     box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
 }
 
-/* Aktiv Status Effektləri */
-.progress-step.active .step-icon {
-    transform: scale(1.1);
-    box-shadow: 0 0 20px rgba(100, 255, 218, 0.3);
-    border-color: var(--accent-color);
+.step-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.step-title {
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.step-date {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    opacity: 0.7;
 }
 
 /* Progress Line */
@@ -521,45 +545,53 @@ tfoot td {
     background: rgba(255, 255, 255, 0.1);
     position: relative;
     margin: 0 1rem;
-    overflow: hidden;
+    z-index: 1;
 }
 
-.progress-step.active + .progress-line::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    background: linear-gradient(90deg, var(--accent-color), #64ffda);
-    animation: progressLine 0.5s ease forwards;
+/* Active States */
+.progress-step.active .step-icon {
+    background: rgba(100, 255, 218, 0.1);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 20px rgba(100, 255, 218, 0.2);
+    transform: scale(1.1);
 }
 
-/* Step Labels */
-.step-label {
-    color: var(--text-secondary);
-    font-size: 0.95rem;
-    font-weight: 500;
-    text-align: center;
-    transition: all 0.3s ease;
-}
-
-.progress-step.active .step-label {
+.progress-step.active .step-main-icon {
     color: var(--accent-color);
-    text-shadow: 0 0 10px rgba(100, 255, 218, 0.3);
 }
+
+.progress-step.active .step-title {
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+.progress-step.active + .progress-line {
+    background: linear-gradient(90deg, var(--accent-color), #64ffda);
+}
+
+/* Icon Colors */
+.fa-clock-rotate-left { color: #fbbf24; }
+.fa-box-open { color: #60a5fa; }
+.fa-truck { color: #a78bfa; }
+.fa-box-check { color: #34d399; }
 
 /* Responsive Design */
 @media (max-width: 768px) {
     .progress-tracker {
         flex-direction: column;
         gap: 2rem;
+        padding: 1rem 0;
     }
 
     .progress-line {
         width: 3px;
-        height: 20px;
-        margin: 0;
+        height: 30px;
+        margin: 0.5rem 0;
+    }
+
+    .step-content {
+        flex-direction: row;
+        gap: 1rem;
     }
 }
 
@@ -670,51 +702,6 @@ tfoot td {
     color: #ef4444;
 }
 
-/* Progress Tracker Styles */
-.progress-tracker {
-    padding: 2rem 1rem;
-    position: relative;
-    z-index: 1;
-}
-
-.step-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(100, 255, 218, 0.2);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* İkon Rəngləri və Effektləri */
-.waiting-icon {
-    color: #fbbf24;
-    filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.5));
-}
-
-.preparing-icon {
-    color: #60a5fa;
-    filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.5));
-}
-
-.shipping-icon {
-    color: #a78bfa;
-    filter: drop-shadow(0 0 8px rgba(167, 139, 250, 0.5));
-}
-
-.delivered-icon {
-    color: #34d399;
-    filter: drop-shadow(0 0 8px rgba(52, 211, 153, 0.5));
-}
-
-/* Aktiv Status Effektləri */
-.progress-step.active .step-icon {
-    transform: scale(1.1);
-    box-shadow: 0 0 20px rgba(100, 255, 218, 0.3);
-    border-color: var(--accent-color);
-}
-
 /* Animasiyalar */
 @keyframes progressLine {
     from { width: 0; }
@@ -729,18 +716,4 @@ tfoot td {
     0% { transform: translateX(-5px); }
     50% { transform: translateX(5px); }
     100% { transform: translateX(-5px); }
-}
-
-/* Step Labels */
-.step-label {
-    margin-top: 1rem;
-    font-weight: 500;
-    font-size: 0.95rem;
-    color: var(--text-secondary);
-    transition: all 0.3s ease;
-}
-
-.progress-step.active .step-label {
-    color: var(--accent-color);
-    text-shadow: 0 0 10px rgba(100, 255, 218, 0.3);
 }

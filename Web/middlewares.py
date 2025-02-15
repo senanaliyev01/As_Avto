@@ -30,13 +30,26 @@ class RequestLoggingMiddleware(MiddlewareMixin):
             user = request.user.username if request.user.is_authenticated else 'AnonymousUser'
             ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', ''))
             
+            # Request data-nı əldə et
+            if request.method == 'GET':
+                data = dict(request.GET.items())
+            else:
+                data = dict(request.POST.items())
+            
+            # Həssas məlumatları təmizlə
+            if 'password' in data:
+                data['password'] = '*****'
+            if 'csrfmiddlewaretoken' in data:
+                data['csrfmiddlewaretoken'] = '*****'
+            
             log_data = {
                 'ip': ip,
                 'user': user,
                 'method': request.method,
                 'path': request.path,
                 'status': response.status_code,
-                'time': total_time
+                'time': total_time,
+                'data': str(data)
             }
 
             # Status koduna görə log səviyyəsini təyin et
@@ -53,12 +66,25 @@ class RequestLoggingMiddleware(MiddlewareMixin):
         user = request.user.username if request.user.is_authenticated else 'AnonymousUser'
         ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', ''))
         
+        # Request data-nı əldə et
+        if request.method == 'GET':
+            data = dict(request.GET.items())
+        else:
+            data = dict(request.POST.items())
+        
+        # Həssas məlumatları təmizlə
+        if 'password' in data:
+            data['password'] = '*****'
+        if 'csrfmiddlewaretoken' in data:
+            data['csrfmiddlewaretoken'] = '*****'
+        
         log_data = {
             'ip': ip,
             'user': user,
             'method': request.method,
             'path': request.path,
-            'exc_info': str(exception)
+            'exc_info': str(exception),
+            'data': str(data)
         }
         
         request_logger.error('Exception occurred', extra=log_data)

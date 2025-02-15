@@ -238,20 +238,20 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'request_format': {
-            'format': '[{asctime}] [{levelname}] {message} - IP: {ip} - User: {user.username} - Method: {method} - Path: {path} - Status: {status} - Time: {time}ms',
+            'format': '[{asctime}] [{levelname}] {message} - IP: {ip} - User: {user} - Method: {method} - Path: {path} - Status: {status} - Time: {time}ms - Data: {data}',
             'style': '{',
         },
         'error_format': {
-            'format': '[{asctime}] [{levelname}] {message}\nException: {exc_info}\nPath: {path}\nMethod: {method}\nUser: {user}\nIP: {ip}',
+            'format': '[{asctime}] [{levelname}] {message}\nException: {exc_info}\nPath: {path}\nMethod: {method}\nUser: {user}\nIP: {ip}\nData: {data}',
             'style': '{',
         }
     },
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse',
-        },
-    },
     'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'request_format',
+        },
         'request_file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
@@ -263,17 +263,11 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': os.path.join(BASE_DIR, 'logs/errors.log'),
             'formatter': 'error_format',
-        },
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler',
-            'include_html': True,
         }
     },
     'loggers': {
         'django.request': {
-            'handlers': ['request_file', 'error_file', 'mail_admins'],
+            'handlers': ['request_file', 'error_file', 'console'],
             'level': 'INFO',
             'propagate': True,
         },

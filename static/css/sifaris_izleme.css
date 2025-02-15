@@ -121,7 +121,7 @@ body {
 }
 
 .qaliq-borc-negativ {
-    color: var(--danger-color);
+    color: var(--error-color);
     background: rgba(220, 38, 38, 0.1);
 }
 
@@ -561,4 +561,211 @@ tfoot td {
 /* Çatdırıldı ikonu üçün xüsusi stil */
 .catdirildi-icon i.fa-box-check {
     font-size: 1.5rem;
+}
+
+/* Əlavə CSS - mövcud CSS-in sonuna əlavə edin */
+
+.order-details-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.order-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--accent-color);
+}
+
+.order-header h2 {
+    font-size: 2rem;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.order-date {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    background: rgba(100, 255, 218, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+}
+
+.order-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.info-card {
+    background: rgba(23, 42, 69, 0.8);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.card-header i {
+    font-size: 1.5rem;
+    color: var(--accent-color);
+}
+
+.card-header h3 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.3rem;
+}
+
+/* Progress Tracker Styles */
+.progress-tracker {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    flex: 1;
+}
+
+.step-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.progress-step.active .step-icon {
+    background: var(--accent-color);
+    transform: scale(1.1);
+}
+
+.step-icon i {
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+}
+
+.progress-step.active .step-icon i {
+    color: var(--primary-color);
+}
+
+.check-mark {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #22c55e;
+    border-radius: 50%;
+    padding: 4px;
+    font-size: 0.7rem;
+    color: white;
+    border: 2px solid var(--primary-color);
+}
+
+.progress-line {
+    flex: 1;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    position: relative;
+    margin: 0 0.5rem;
+}
+
+.progress-step.active + .progress-line {
+    background: var(--accent-color);
+}
+
+.step-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.progress-step.active .step-label {
+    color: var(--accent-color);
+    font-weight: 500;
+}
+
+/* Payment Info Styles */
+.payment-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.payment-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.amount {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.total-amount {
+    color: var(--accent-color);
+}
+
+.paid-amount {
+    color: #22c55e;
+}
+
+.remaining-amount.positive {
+    color: #22c55e;
+}
+
+.remaining-amount.negative {
+    color: #ef4444;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .order-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .progress-tracker {
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .progress-line {
+        width: 3px;
+        height: 20px;
+        margin: 0;
+    }
 }

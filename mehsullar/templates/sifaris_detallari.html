@@ -1,71 +1,98 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Sifariş #{{ sifaris.id }} - Detallar{% endblock %}
+{% block title %}Sifariş #{{ sifaris.id }} Detalları{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/sifaris_izleme.css' %}">
 {% endblock %}
 
 {% block content %}
+<div class="order-details-container">
+    <div class="order-header">
+        <h2>Sifariş #{{ sifaris.id }}</h2>
+        <span class="order-date">{{ sifaris.formatted_tarix }}</span>
+    </div>
 
-   
-<h2>Sifariş #{{ sifaris.id }}</h2>
-
-
-<div class="sifaris-info">
-    <div class="info-row">
-        <h3>Sifariş Məlumatları</h3>
-        <p><strong>Tarix:</strong> {{ sifaris.formatted_tarix }}</p>
-        <div class="order-progress">
-            <div class="progress-step {% if sifaris.status == 'gozleyir' or sifaris.status == 'hazirlanir' or sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}active{% endif %}">
-                <div class="icon-wrapper gozleyir-icon">
-                    <i class="fas fa-clock"></i>
-                    {% if sifaris.status != 'gozleyir' %}
-                        <i class="fas fa-check check-icon"></i>
-                    {% endif %}
-                </div>
-                <span>Gözləyir</span>
+    <div class="order-info-grid">
+        <!-- Sifariş Məlumatları -->
+        <div class="info-card">
+            <div class="card-header">
+                <i class="fas fa-info-circle"></i>
+                <h3>Sifariş Məlumatları</h3>
             </div>
-            <div class="progress-line"></div>
-            <div class="progress-step {% if sifaris.status == 'hazirlanir' or sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}active{% endif %}">
-                <div class="icon-wrapper hazirlanir-icon">
-                    <i class="fas fa-box-open"></i>
-                    {% if sifaris.status != 'gozleyir' and sifaris.status != 'hazirlanir' %}
-                        <i class="fas fa-check check-icon"></i>
-                    {% endif %}
+            <div class="progress-tracker">
+                <div class="progress-step {% if sifaris.status == 'gozleyir' or sifaris.status == 'hazirlanir' or sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}active{% endif %}">
+                    <div class="step-icon gozleyir-icon">
+                        <i class="fas fa-clock"></i>
+                        {% if sifaris.status != 'gozleyir' %}
+                            <i class="fas fa-check check-mark"></i>
+                        {% endif %}
+                    </div>
+                    <span class="step-label">Gözləyir</span>
                 </div>
-                <span>Hazırlanır</span>
-            </div>
-            <div class="progress-line"></div>
-            <div class="progress-step {% if sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}active{% endif %}">
-                <div class="icon-wrapper yoldadir-icon">
-                    <i class="fas fa-truck"></i>
-                    {% if sifaris.status == 'catdirildi' %}
-                        <i class="fas fa-check check-icon"></i>
-                    {% endif %}
+                
+                <div class="progress-line"></div>
+                
+                <div class="progress-step {% if sifaris.status == 'hazirlanir' or sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}active{% endif %}">
+                    <div class="step-icon hazirlanir-icon">
+                        <i class="fas fa-box-open"></i>
+                        {% if sifaris.status != 'gozleyir' and sifaris.status != 'hazirlanir' %}
+                            <i class="fas fa-check check-mark"></i>
+                        {% endif %}
+                    </div>
+                    <span class="step-label">Hazırlanır</span>
                 </div>
-                <span>Yoldadır</span>
-            </div>
-            <div class="progress-line"></div>
-            <div class="progress-step {% if sifaris.status == 'catdirildi' %}active{% endif %}">
-                <div class="icon-wrapper catdirildi-icon">
-                    <i class="fas fa-check-circle"></i>
-                    {% if sifaris.status == 'catdirildi' %}
-                        <i class="fas fa-check check-icon"></i>
-                    {% endif %}
+                
+                <div class="progress-line"></div>
+                
+                <div class="progress-step {% if sifaris.status == 'yoldadir' or sifaris.status == 'catdirildi' %}active{% endif %}">
+                    <div class="step-icon yoldadir-icon">
+                        <i class="fas fa-truck"></i>
+                        {% if sifaris.status == 'catdirildi' %}
+                            <i class="fas fa-check check-mark"></i>
+                        {% endif %}
+                    </div>
+                    <span class="step-label">Yoldadır</span>
                 </div>
-                <span>Çatdırıldı</span>
+                
+                <div class="progress-line"></div>
+                
+                <div class="progress-step {% if sifaris.status == 'catdirildi' %}active{% endif %}">
+                    <div class="step-icon catdirildi-icon">
+                        <i class="fas fa-check-circle"></i>
+                        {% if sifaris.status == 'catdirildi' %}
+                            <i class="fas fa-check check-mark"></i>
+                        {% endif %}
+                    </div>
+                    <span class="step-label">Çatdırıldı</span>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="info-row">
-        <h3>Ödəniş Məlumatları</h3>
-        <p><strong>Ümumi Məbləğ:</strong> {{ sifaris.cemi_mebleg }} AZN</p>
-        <p><strong>Ödənilən Məbləğ:</strong> {{ sifaris.odenilen_mebleg }} AZN</p>
-        <p class="qaliq-borc {% if sifaris.qaliq_borc < 0 %}qaliq-borc-pozitiv{% else %}qaliq-borc-negativ{% endif %}">
-            <strong>Qalıq Borc:</strong> {{ sifaris.qaliq_borc }} AZN
-        </p>
+
+        <!-- Ödəniş Məlumatları -->
+        <div class="info-card payment-info">
+            <div class="card-header">
+                <i class="fas fa-money-bill-wave"></i>
+                <h3>Ödəniş Məlumatları</h3>
+            </div>
+            <div class="payment-details">
+                <div class="payment-row">
+                    <span>Ümumi Məbləğ:</span>
+                    <span class="amount total-amount">{{ sifaris.cemi_mebleg }} AZN</span>
+                </div>
+                <div class="payment-row">
+                    <span>Ödənilən Məbləğ:</span>
+                    <span class="amount paid-amount">{{ sifaris.odenilen_mebleg }} AZN</span>
+                </div>
+                <div class="payment-row">
+                    <span>Qalıq Borc:</span>
+                    <span class="amount remaining-amount {% if sifaris.qaliq_borc < 0 %}positive{% else %}negative{% endif %}">
+                        {{ sifaris.qaliq_borc }} AZN
+                    </span>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

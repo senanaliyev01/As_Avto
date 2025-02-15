@@ -438,132 +438,132 @@ tfoot td {
     }
 }
 
-/* Sifariş Progress */
-.order-progress {
+/* Progress Tracker Container */
+.progress-tracker {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 2rem;
-    margin: 2rem 0;
-    background: var(--card-bg);
-    border-radius: 16px;
-    box-shadow: var(--shadow-lg);
+    justify-content: space-between;
+    padding: 2rem 1rem;
+    position: relative;
+    z-index: 1;
 }
 
+/* Progress Steps */
 .progress-step {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
+    gap: 1rem;
     position: relative;
     flex: 1;
     z-index: 1;
 }
 
-.progress-step i {
-    font-size: 2rem;
-    padding: 1rem;
+.step-icon {
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
-    background: rgba(203, 213, 225, 0.2);
-    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(100, 255, 218, 0.2);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
 }
 
-.progress-step.active i {
-    background: var(--primary-color);
+/* İkon Rəngləri və Effektləri - Base */
+.step-icon i {
+    font-size: 1.5rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* İkon Rəngləri */
+.waiting-icon { color: #fbbf24; }
+.preparing-icon { color: #60a5fa; }
+.shipping-icon { color: #a78bfa; }
+.delivered-icon { color: #34d399; }
+
+/* Success Check Icon */
+.success-check-icon {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
     color: white;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    border: 2px solid var(--primary-color);
+    z-index: 2;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
 }
 
+/* Aktiv Status Effektləri */
+.progress-step.active .step-icon {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(100, 255, 218, 0.3);
+    border-color: var(--accent-color);
+}
+
+/* Progress Line */
 .progress-line {
     flex: 1;
     height: 3px;
     background: rgba(255, 255, 255, 0.1);
     position: relative;
-    margin: 0 0.5rem;
+    margin: 0 1rem;
+    overflow: hidden;
 }
 
-.progress-step.active + .progress-line {
-    background: var(--accent-color);
-}
-
-/* Status ikonları üçün yeni stillər */
-.icon-wrapper {
-    position: relative;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f3f4f6;
-    margin-bottom: 8px;
-}
-
-.progress-step.active .icon-wrapper {
-    transform: scale(1.1);
-}
-
-.gozleyir-icon {
-    color: #f59e0b;
-}
-
-.progress-step.active .gozleyir-icon {
-    background: rgba(245, 158, 11, 0.15);
-}
-
-.hazirlanir-icon {
-    color: #3b82f6;
-}
-
-.progress-step.active .hazirlanir-icon {
-    background: rgba(59, 130, 246, 0.15);
-}
-
-.yoldadir-icon {
-    color: #8b5cf6;
-}
-
-.progress-step.active .yoldadir-icon {
-    background: rgba(139, 92, 246, 0.15);
-}
-
-.catdirildi-icon {
-    color: #10b981;
-}
-
-.progress-step.active .catdirildi-icon {
-    background: rgba(16, 185, 129, 0.15);
-}
-
-.check-icon {
+.progress-step.active + .progress-line::after {
+    content: '';
     position: absolute;
-    top: -5px;
-    right: -5px;
-    background: #22c55e;
-    color: white;
-    border-radius: 50%;
-    padding: 4px;
-    font-size: 0.7rem;
-    border: 2px solid var(--primary-color);
-    z-index: 2;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, var(--accent-color), #64ffda);
+    animation: progressLine 0.5s ease forwards;
 }
 
-.icon-wrapper i:not(.check-icon) {
-    font-size: 1.5rem;
-    z-index: 1;
+/* Step Labels */
+.step-label {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.3s ease;
 }
 
-/* Aktiv olmayan addımlar üçün check ikonunu gizlət */
-.progress-step:not(.active) .check-icon {
-    display: none;
+.progress-step.active .step-label {
+    color: var(--accent-color);
+    text-shadow: 0 0 10px rgba(100, 255, 218, 0.3);
 }
 
-/* Çatdırıldı ikonu üçün xüsusi stil */
-.catdirildi-icon i.fa-box-check {
-    font-size: 1.5rem;
+/* Responsive Design */
+@media (max-width: 768px) {
+    .progress-tracker {
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .progress-line {
+        width: 3px;
+        height: 20px;
+        margin: 0;
+    }
 }
 
-/* Əlavə CSS - mövcud CSS-in sonuna əlavə edin */
-
+/* Order Details Styles */
 .order-details-container {
     max-width: 1200px;
     margin: 2rem auto;
@@ -633,137 +633,6 @@ tfoot td {
     font-size: 1.3rem;
 }
 
-/* Progress Tracker Styles */
-.progress-tracker {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 0;
-}
-
-.step-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.1);
-    position: relative;
-    transition: all 0.3s ease;
-    z-index: 1;
-}
-
-/* Əsas ikon üçün stil */
-.step-icon .main-icon {
-    font-size: 1.5rem;
-    color: var(--text-secondary);
-    transition: all 0.3s ease;
-}
-
-/* Check ikonu üçün stil */
-.step-icon .check-icon {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background: #22c55e;
-    color: white;
-    border-radius: 50%;
-    padding: 4px;
-    font-size: 0.7rem;
-    border: 2px solid var(--primary-color);
-    z-index: 2;
-}
-
-/* Aktiv status üçün stillər */
-.progress-step.active .step-icon {
-    background: var(--accent-color);
-}
-
-.progress-step.active .step-icon .main-icon {
-    color: var(--primary-color);
-}
-
-/* İkon rəngləri */
-.waiting-icon { 
-    color: #f59e0b; 
-    font-size: 1.5rem;
-}
-
-.preparing-icon { 
-    color: #3b82f6; 
-    font-size: 1.5rem;
-}
-
-.shipping-icon { 
-    color: #8b5cf6; 
-    font-size: 1.5rem;
-}
-
-.delivered-icon { 
-    color: #10b981; 
-    font-size: 1.5rem;
-}
-
-.success-check-icon {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background: #22c55e;
-    color: white;
-    border-radius: 50%;
-    padding: 4px;
-    font-size: 0.7rem;
-    border: 2px solid var(--primary-color);
-    z-index: 2;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-/* Aktiv status üçün arxa plan rəngləri */
-.progress-step.active .gozleyir-icon { 
-    background: rgba(245, 158, 11, 0.15); 
-}
-
-.progress-step.active .hazirlanir-icon { 
-    background: rgba(59, 130, 246, 0.15); 
-}
-
-.progress-step.active .yoldadir-icon { 
-    background: rgba(139, 92, 246, 0.15); 
-}
-
-.progress-step.active .catdirildi-icon { 
-    background: rgba(16, 185, 129, 0.15); 
-}
-
-/* Aktiv status üçün ikon rəngləri */
-.progress-step.active .waiting-icon { 
-    color: #d97706; 
-}
-
-.progress-step.active .preparing-icon { 
-    color: #2563eb; 
-}
-
-.progress-step.active .shipping-icon { 
-    color: #7c3aed; 
-}
-
-.progress-step.active .delivered-icon { 
-    color: #059669; 
-}
-
-.step-label {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    text-align: center;
-}
-
-.progress-step.active .step-label {
-    color: var(--accent-color);
-    font-weight: 500;
-}
-
 /* Payment Info Styles */
 .payment-details {
     display: flex;
@@ -801,26 +670,6 @@ tfoot td {
     color: #ef4444;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .order-header {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
-    }
-
-    .progress-tracker {
-        flex-direction: column;
-        gap: 2rem;
-    }
-
-    .progress-line {
-        width: 3px;
-        height: 20px;
-        margin: 0;
-    }
-}
-
 /* Progress Tracker Container */
 .order-status-card {
     background: linear-gradient(145deg, rgba(23, 42, 69, 0.9), rgba(10, 25, 47, 0.95));
@@ -831,76 +680,6 @@ tfoot td {
     background: linear-gradient(135deg, #64ffda, #0a192f);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-}
-
-/* Progress Steps */
-.progress-tracker {
-    padding: 2rem 1rem;
-    position: relative;
-    z-index: 1;
-}
-
-.step-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(100, 255, 218, 0.2);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* İkon Rəngləri və Effektləri */
-.waiting-icon {
-    color: #fbbf24;
-    filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.5));
-}
-
-.preparing-icon {
-    color: #60a5fa;
-    filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.5));
-}
-
-.shipping-icon {
-    color: #a78bfa;
-    filter: drop-shadow(0 0 8px rgba(167, 139, 250, 0.5));
-}
-
-.delivered-icon {
-    color: #34d399;
-    filter: drop-shadow(0 0 8px rgba(52, 211, 153, 0.5));
-}
-
-/* Aktiv Status Effektləri */
-.progress-step.active .step-icon {
-    transform: scale(1.1);
-    box-shadow: 0 0 20px rgba(100, 255, 218, 0.3);
-    border-color: var(--accent-color);
-}
-
-/* Progress Line */
-.progress-line {
-    height: 3px;
-    background: rgba(255, 255, 255, 0.1);
-    position: relative;
-    overflow: hidden;
-}
-
-.progress-step.active + .progress-line::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    background: linear-gradient(90deg, var(--accent-color), #64ffda);
-    animation: progressLine 0.5s ease forwards;
-}
-
-/* Success Check Icon */
-.success-check-icon {
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-    box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
 }
 
 /* Animasiyalar */

@@ -171,7 +171,7 @@ body {
 .input-wrap label {
     position: absolute;
     left: 2.5rem;
-    top: 50%;
+    /* top: 50%; */
     transform: translateY(-50%);
     color: rgba(255, 255, 255, 0.7);
     pointer-events: none;

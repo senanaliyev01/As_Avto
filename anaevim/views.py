@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from mehsullar.models import Brend, Marka, Mehsul, MarkaSekil
+from django.utils.text import slugify
 
 def anaevim(request):
     brendler = Brend.objects.all()
@@ -15,10 +16,10 @@ def anaevim(request):
     
     return render(request, 'home.html', context)
 
-def mehsul_etrafli(request, mehsul_id):
+def clean_url_param(param):
+    return slugify(str(param))
+
+def mehsul_etrafli(request, mehsul_id, marka, brend, brend_kod, oem, qiymet):
     mehsul = get_object_or_404(Mehsul, id=mehsul_id)
-    context = {
-        'mehsul': mehsul
-    }
-    return render(request, 'mehsul_etrafli.html', context)
+    return render(request, 'mehsul_etrafli.html', {'mehsul': mehsul})
 

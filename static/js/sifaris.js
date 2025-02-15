@@ -116,14 +116,43 @@ document.querySelectorAll('.truck-container').forEach(container => {
     }, 300);
 });
 
-// Progresss addımlarını animasiya et
+// Progress addımlarını animasiya et
 document.querySelectorAll('.progress-step').forEach((step, index) => {
     if (step.classList.contains('active')) {
         setTimeout(() => {
-            step.style.transform = 'scale(1.1)';
+            step.style.transform = 'scale(1.05)';
+            step.style.opacity = '1';
+            
+            // İkon animasiyası
+            const icon = step.querySelector('.step-icon');
+            icon.style.transform = 'scale(1.1)';
+            
             setTimeout(() => {
                 step.style.transform = 'scale(1)';
+                icon.style.transform = 'scale(1)';
             }, 200);
         }, index * 300);
     }
+});
+
+// Kamaz animasiyası
+const truckIcon = document.querySelector('.shipping-icon');
+if (truckIcon) {
+    setInterval(() => {
+        truckIcon.style.transform = 'translateX(5px)';
+        setTimeout(() => {
+            truckIcon.style.transform = 'translateX(-5px)';
+        }, 1000);
+    }, 2000);
+}
+
+// Success check ikonları üçün animasiya
+document.querySelectorAll('.success-check-icon').forEach(icon => {
+    icon.addEventListener('mouseover', () => {
+        icon.classList.add('tada');
+    });
+    
+    icon.addEventListener('mouseout', () => {
+        icon.classList.remove('tada');
+    });
 });

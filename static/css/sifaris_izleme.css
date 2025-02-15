@@ -820,3 +820,115 @@ tfoot td {
         margin: 0;
     }
 }
+
+/* Progress Tracker Container */
+.order-status-card {
+    background: linear-gradient(145deg, rgba(23, 42, 69, 0.9), rgba(10, 25, 47, 0.95));
+    border: 1px solid rgba(100, 255, 218, 0.1);
+}
+
+.status-header-icon {
+    background: linear-gradient(135deg, #64ffda, #0a192f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Progress Steps */
+.progress-tracker {
+    padding: 2rem 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+.step-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(100, 255, 218, 0.2);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* İkon Rəngləri və Effektləri */
+.waiting-icon {
+    color: #fbbf24;
+    filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.5));
+}
+
+.preparing-icon {
+    color: #60a5fa;
+    filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.5));
+}
+
+.shipping-icon {
+    color: #a78bfa;
+    filter: drop-shadow(0 0 8px rgba(167, 139, 250, 0.5));
+}
+
+.delivered-icon {
+    color: #34d399;
+    filter: drop-shadow(0 0 8px rgba(52, 211, 153, 0.5));
+}
+
+/* Aktiv Status Effektləri */
+.progress-step.active .step-icon {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(100, 255, 218, 0.3);
+    border-color: var(--accent-color);
+}
+
+/* Progress Line */
+.progress-line {
+    height: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-step.active + .progress-line::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, var(--accent-color), #64ffda);
+    animation: progressLine 0.5s ease forwards;
+}
+
+/* Success Check Icon */
+.success-check-icon {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+}
+
+/* Animasiyalar */
+@keyframes progressLine {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+.truck-animation {
+    animation: truckMove 2s infinite;
+}
+
+@keyframes truckMove {
+    0% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    100% { transform: translateX(-5px); }
+}
+
+/* Step Labels */
+.step-label {
+    margin-top: 1rem;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+}
+
+.progress-step.active .step-label {
+    color: var(--accent-color);
+    text-shadow: 0 0 10px rgba(100, 255, 218, 0.3);
+}

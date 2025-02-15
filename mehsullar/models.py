@@ -1,4 +1,6 @@
 from pickle import FALSE
+from django.utils.text import slugify
+from django.urls import reverse
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -54,6 +56,7 @@ class Mehsul(models.Model):
     qiymet = models.DecimalField(max_digits=10, decimal_places=2)
     sekil = models.ImageField(upload_to='mehsul_sekilleri/', null=True, blank=True)
     haqqinda = models.TextField(null=True, blank=True)
+    slug = models.SlugField(max_length=255, unique=True, blank=True)
 
     def __str__(self):
         return self.adi
@@ -67,6 +70,21 @@ class Mehsul(models.Model):
         kodlar = [self.oem]
         kodlar.extend([oem.kod for oem in self.oem_kodlar.all()])
         return kodlar
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            # Bütün məlumatları birləşdirib slug yaradırıq
+            slug_string = f"{self.adi}-{self.kateqoriya.adi}-{self.brend.adi}-{self.marka.adi}-{self.brend_kod}-{self.oem}-{self.qiymet}"
+            # Qiyməti formatla (vergülü nöqtə ilə əvəz et)
+            slug_string = slug_string.replace(',', '.')
+            self.slug = slugify(slug_string)
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('mehsul_etrafli', kwargs={
+            'mehsul_id': self.id,
+            'slug': self.slug
+        })
 
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

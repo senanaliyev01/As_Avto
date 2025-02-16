@@ -101,9 +101,9 @@
         </table>
 
         <div class="cart-actions">
-            <form action="{% url 'sifarisi_gonder' %}" method="post" style="display: inline;">
+            <form action="{% url 'sifarisi_gonder' %}" method="post" style="display: inline;" onsubmit="return handleOrderSubmit(event)">
                 {% csrf_token %}
-                <button type="submit" class="order-btn" onclick="return confirm('Sifarişi təsdiqləmək istədiyinizə əminsiniz?')">
+                <button type="submit" class="order-btn">
                     <i class="fas fa-shopping-cart"></i>
                     Sifarişi Təsdiqlə
                 </button>
@@ -167,4 +167,32 @@
 
 {% block extra_js %}
 <script src="{% static 'js/cart.js' %}"></script>
+<script>
+function handleOrderSubmit(event) {
+    event.preventDefault();
+    
+    if (confirm('Sifarişi təsdiqləmək istədiyinizə əminsiniz?')) {
+        const form = event.target;
+        
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Sifarişiniz uğurla qeydə alındı. Sifarişlərim səhifəsinə yönləndirilirsiniz.');
+                window.location.href = '{% url "sifaris_izle" %}';
+            } else {
+                alert('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+            }
+        })
+        .catch(error => {
+            alert('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+        });
+    }
+    return false;
+}
+</script>
 {% endblock %}

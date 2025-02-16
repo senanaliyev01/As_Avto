@@ -326,6 +326,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Logs qovluğunu yarat
+LOGS_DIR = os.path.join(BASE_DIR, 'logs')
+if not os.path.exists(LOGS_DIR):
+    os.makedirs(LOGS_DIR)
+
 # Logging konfiqurasiyası
 LOGGING = {
     'version': 1,
@@ -340,13 +345,18 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs/django.log'),
+            'filename': os.path.join(LOGS_DIR, 'django.log'),
+            'formatter': 'verbose',
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
     },
     'loggers': {
         'django': {
-            'handlers': ['file'],
+            'handlers': ['file', 'console'],
             'level': 'INFO',
             'propagate': True,
         },
@@ -363,7 +373,7 @@ SESSION_COOKIE_SAMESITE = 'Strict'
 
 # Authentication Tənzimləmələri
 LOGIN_URL = '/istifadeciler/login/'  # Login səhifəsinin URL-i
-LOGIN_REDIRECT_URL = '/'  # Uğurlu giriş zamanı yönləndirilən səhifə
+LOGIN_REDIRECT_URL = '/main/'  # Uğurlu giriş zamanı yönləndirilən səhifə
 LOGOUT_REDIRECT_URL = '/istifadeciler/login/'  # Çıxış zamanı yönləndirilən səhifə
 
 # Remember Me funksionallığı üçün

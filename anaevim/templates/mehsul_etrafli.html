@@ -35,6 +35,8 @@
             "@type": "Offer",
             "url": "https://as-avto.com{{ request.path }}",
             "priceCurrency": "AZN",
+            "price": "{{ mehsul.qiymet }}",
+            "priceValidUntil": "{% now 'Y' %}-12-31",
             "seller": {
                 "@type": "Organization",
                 "name": "AS-AVTO",
@@ -49,6 +51,23 @@
                 "telephone": "+994773059585",
                 "email": "senan.eliyev.9997@gmail.com"
             }
+        },
+        "review": {
+            "@type": "Review",
+            "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5",
+                "bestRating": "5"
+            },
+            "author": {
+                "@type": "Organization",
+                "name": "AS-AVTO"
+            }
+        },
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "5",
+            "reviewCount": "1"
         }
     }
     </script>

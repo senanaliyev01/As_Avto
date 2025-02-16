@@ -24,7 +24,7 @@ def login_view(request):
             messages.info(request, 'Sessiya müddəti bitdi. Zəhmət olmasa yenidən daxil olun.')
             return redirect('login')
         # Remember me seçilibsə və ya session aktiv isə ana səhifəyə yönləndir
-        return redirect('esasevim:main')
+        return redirect('esasevim')
 
     if request.method == 'POST':
         username = request.POST.get('username')

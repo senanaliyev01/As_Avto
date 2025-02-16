@@ -336,31 +336,151 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
+        'json': {
+            'format': '{"timestamp":"%(asctime)s","level":"%(levelname)s","logger":"%(name)s","message":"%(message)s","path":"%(pathname)s","line":%(lineno)d}',
+            'datefmt': '%Y-%m-%d %H:%M:%S'
+        },
         'verbose': {
+            'format': '[{asctime}] [{levelname}] [{name}] [{pathname}:{lineno}] - {message}',
+            'style': '{',
+            'datefmt': '%Y-%m-%d %H:%M:%S'
+        },
+        'simple': {
             'format': '[{asctime}] [{levelname}] {message}',
             'style': '{',
+            'datefmt': '%Y-%m-%d %H:%M:%S'
+        }
+    },
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
         },
     },
     'handlers': {
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(LOGS_DIR, 'django.log'),
-            'formatter': 'verbose',
-        },
         'console': {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
+            'formatter': 'simple',
+            'filters': ['require_debug_true'],
         },
+        'file_error': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': os.path.join(LOGS_DIR, 'error.log'),
+            'when': 'midnight',
+            'interval': 1,
+            'backupCount': 30,
+            'formatter': 'json',
+            'encoding': 'utf-8',
+        },
+        'file_info': {
+            'level': 'INFO',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': os.path.join(LOGS_DIR, 'info.log'),
+            'when': 'midnight',
+            'interval': 1,
+            'backupCount': 30,
+            'formatter': 'json',
+            'encoding': 'utf-8',
+        },
+        'file_debug': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': os.path.join(LOGS_DIR, 'debug.log'),
+            'when': 'midnight',
+            'interval': 1,
+            'backupCount': 7,
+            'formatter': 'verbose',
+            'encoding': 'utf-8',
+            'filters': ['require_debug_true'],
+        },
+        'file_request': {
+            'level': 'INFO',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': os.path.join(LOGS_DIR, 'requests.log'),
+            'when': 'midnight',
+            'interval': 1,
+            'backupCount': 30,
+            'formatter': 'json',
+            'encoding': 'utf-8',
+        },
+        'file_security': {
+            'level': 'INFO',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': os.path.join(LOGS_DIR, 'security.log'),
+            'when': 'midnight',
+            'interval': 1,
+            'backupCount': 90,
+            'formatter': 'json',
+            'encoding': 'utf-8',
+        },
+        'file_performance': {
+            'level': 'INFO',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': os.path.join(LOGS_DIR, 'performance.log'),
+            'when': 'midnight',
+            'interval': 1,
+            'backupCount': 30,
+            'formatter': 'json',
+            'encoding': 'utf-8',
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler',
+            'formatter': 'verbose',
+        }
     },
     'loggers': {
         'django': {
-            'handlers': ['file', 'console'],
+            'handlers': ['console', 'file_info', 'mail_admins'],
             'level': 'INFO',
             'propagate': True,
         },
-    },
+        'django.request': {
+            'handlers': ['file_request', 'mail_admins'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.server': {
+            'handlers': ['file_request'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.security': {
+            'handlers': ['file_security', 'mail_admins'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.db.backends': {
+            'handlers': ['file_performance', 'file_error'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.template': {
+            'handlers': ['file_debug'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'Web': {
+            'handlers': ['console', 'file_info', 'file_error', 'file_debug'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'Web.security': {
+            'handlers': ['file_security', 'mail_admins'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'Web.performance': {
+            'handlers': ['file_performance'],
+            'level': 'INFO',
+            'propagate': False,
+        }
+    }
 }
 
 # Session Tənzimləmələri

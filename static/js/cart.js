@@ -551,7 +551,31 @@ document.addEventListener('DOMContentLoaded', function() {
         .update-animation {
             animation: updateAnimation 0.5s ease;
         }
+
+        .highlight {
+            animation: highlight 0.3s ease;
+        }
+
+        @keyframes highlight {
+            0% {
+                background-color: transparent;
+            }
+            50% {
+                background-color: rgba(100, 255, 218, 0.2);
+            }
+            100% {
+                background-color: transparent;
+            }
+        }
     `;
 
     document.head.appendChild(style);
+
+    // Event listener for order confirmation button
+    const orderBtn = document.querySelector('.order-btn');
+    if (orderBtn) {
+        orderBtn.addEventListener('click', function() {
+            window.confirmOrder(); // This function is defined in base.js
+        });
+    }
 });

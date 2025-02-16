@@ -66,7 +66,8 @@
                                    class="quantity-input" 
                                    value="{{ item.miqdar }}"
                                    min="1"
-                                   onchange="updateQuantity({{ item.id }}, this.value)"
+                                   data-item-id="{{ item.id }}"
+                                   onchange="handleQuantityInput(this)"
                                    onkeypress="return (event.charCode >= 48 && event.charCode <= 57)">
                             <button type="button" class="quantity-btn plus" onclick="updateQuantity({{ item.id }}, 1)">
                                 <i class="fas fa-plus"></i>
@@ -95,7 +96,7 @@
         </table>
 
         <div class="cart-actions">
-            <button class="order-btn" onclick="confirmOrder()">
+            <button class="order-btn">
                 <i class="fas fa-shopping-cart"></i>
                 Sifarişi Təsdiqlə
             </button>
@@ -121,10 +122,10 @@
         <h2>Sifarişi Təsdiqləyin</h2>
         <p>Sifarişinizi təsdiqləmək istədiyinizə əminsiniz?</p>
         <div class="modal-actions">
-            <button onclick="submitOrder()" class="confirm-btn">
+            <button class="confirm-btn">
                 <i class="fas fa-check"></i> Bəli
             </button>
-            <button onclick="closeModal()" class="cancel-btn">
+            <button class="cancel-btn">
                 <i class="fas fa-times"></i> Xeyr
             </button>
         </div>

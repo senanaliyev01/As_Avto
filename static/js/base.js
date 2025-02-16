@@ -693,13 +693,10 @@
 
     // Miqdar dəyişikliyi
     window.handleQuantityInput = debounce(function(input) {
-        const value = parseInt(input.value) || 1;
+        const value = parseInt(input.value);
         const itemId = input.dataset.itemId;
         
-        if (value < 1) {
-            input.value = 1;
-            updateQuantity(itemId, 'set', 1);
-        } else {
+        if (!isNaN(value)) {
             updateQuantity(itemId, 'set', value);
         }
     }, 300);
@@ -716,9 +713,8 @@
             newQuantity = parseInt(value);
         }
 
-        if (isNaN(newQuantity) || newQuantity < 1) {
-            newQuantity = 1;
-            input.value = 1;
+        if (isNaN(newQuantity)) {
+            return;
         }
 
         // Düyməni deaktiv et və loading göstər

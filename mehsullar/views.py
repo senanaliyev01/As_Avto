@@ -279,8 +279,6 @@ def update_quantity(request, item_id, new_quantity):
         
         try:
             new_quantity = int(new_quantity)
-            if new_quantity < 1:
-                new_quantity = 1
         except ValueError:
             return JsonResponse({
                 'success': False,

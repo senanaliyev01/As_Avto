@@ -1,8 +1,13 @@
 User-agent: *
 Allow: /
+Allow: /product/
 Disallow: /admin-as-avto-1983-2002/
-Disallow: /istifadeciler/profile/
+Disallow: /istifadeciler/
+Disallow: /main/
 Disallow: /cart/
 Disallow: /orders/
+Disallow: /products_list/
+Disallow: /cars/
+Disallow: /reports/
 
 Sitemap: https://as-avto.com/sitemap.xml 

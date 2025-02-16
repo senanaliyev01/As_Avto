@@ -13,6 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 import re
+from esasevim.views import *
 
 def login_view(request):
     # Əgər istifadəçi artıq daxil olubsa

@@ -62,19 +62,18 @@ class SifarisAdmin(admin.ModelAdmin):
         'get_cemi_mebleg', 
         'get_odenilen_mebleg', 
         'get_borc', 
-        'get_status', 
-        'get_tamamlanma',
+        'get_status',
         'pdf_link'
     )
     search_fields = ('id', 'user__username', 'status')
-    list_filter = ('status', 'tamamlandi')
-    fields = ('user', 'cemi_mebleg', 'odenilen_mebleg', 'status', 'tamamlandi')
-    readonly_fields = ('borc',)
+    list_filter = ('status',)
+    fields = ('istifadeci', 'cemi_mebleg', 'odenilen_mebleg', 'status')
+    readonly_fields = ('borc', 'qaliq_borc')
 
     def get_musteri(self, obj):
-        return f"{obj.user.first_name} {obj.user.last_name}" if obj.user.first_name else obj.user.username
+        return f"{obj.istifadeci.first_name} {obj.istifadeci.last_name}" if obj.istifadeci.first_name else obj.istifadeci.username
     get_musteri.short_description = 'Müştəri'
-    get_musteri.admin_order_field = 'user__username'
+    get_musteri.admin_order_field = 'istifadeci__username'
 
     def get_tarix(self, obj):
         return obj.tarix.astimezone(timezone.get_current_timezone()).strftime('%d-%m-%Y %H:%M')
@@ -82,17 +81,17 @@ class SifarisAdmin(admin.ModelAdmin):
     get_tarix.admin_order_field = 'tarix'
 
     def get_cemi_mebleg(self, obj):
-        return f"{obj.cemi_mebleg} AZN"
+        return f"{obj.formatted_cemi_mebleg} AZN"
     get_cemi_mebleg.short_description = 'Ümumi Məbləğ'
     get_cemi_mebleg.admin_order_field = 'cemi_mebleg'
 
     def get_odenilen_mebleg(self, obj):
-        return f"{obj.odenilen_mebleg} AZN"
+        return f"{obj.formatted_odenilen_mebleg} AZN"
     get_odenilen_mebleg.short_description = 'Ödənilən'
     get_odenilen_mebleg.admin_order_field = 'odenilen_mebleg'
 
     def get_borc(self, obj):
-        return f"{obj.borc()} AZN"
+        return f"{obj.formatted_borc} AZN"
     get_borc.short_description = 'Qalıq Borc'
 
     def get_status(self, obj):
@@ -113,13 +112,6 @@ class SifarisAdmin(admin.ModelAdmin):
         return format_html('<span style="padding: 5px 10px; border-radius: 4px; color: black; {}">{}</span>', style, text)
     get_status.short_description = 'Status'
     get_status.admin_order_field = 'status'
-
-    def get_tamamlanma(self, obj):
-        if obj.tamamlandi:
-            return format_html('<span style="color: green;">✓</span>')
-        return format_html('<span style="color: red;">✗</span>')
-    get_tamamlanma.short_description = 'Tamamlandı'
-    get_tamamlanma.admin_order_field = 'tamamlandi'
 
     def pdf_link(self, obj):
         return format_html(

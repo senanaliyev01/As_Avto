@@ -518,4 +518,145 @@
         }
     }
 
+    // Sifariş funksiyaları
+    function confirmOrder() {
+        const modal = document.getElementById('confirmModal');
+        modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('confirmModal');
+        modal.style.display = 'none';
+    }
+
+    function submitOrder() {
+        const submitButton = document.querySelector('.confirm-btn');
+        const originalContent = submitButton.innerHTML;
+        
+        // Loading effekti
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Göndərilir...';
+        submitButton.disabled = true;
+
+        fetch('/submit_order/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Təsdiq modalını bağla
+                document.getElementById('confirmModal').style.display = 'none';
+                
+                // Uğurlu sifariş modalını göstər
+                const successModal = document.getElementById('successModal');
+                successModal.style.display = 'flex';
+                
+                // 3 saniyə sonra yönləndir
+                setTimeout(() => {
+                    window.location.href = '/sifaris_izle/';
+                }, 3000);
+            } else {
+                showAnimatedMessage(data.error || "Sifariş zamanı xəta baş verdi", true);
+                submitButton.innerHTML = originalContent;
+                submitButton.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Xəta:', error);
+            showAnimatedMessage("Server xətası baş verdi", true);
+            submitButton.innerHTML = originalContent;
+            submitButton.disabled = false;
+        });
+    }
+
+    // Səbət funksiyaları
+    function updateQuantity(itemId, change) {
+        const row = document.querySelector(`tr[data-item-id="${itemId}"]`);
+        const input = row.querySelector('.quantity-input');
+        const currentValue = parseInt(input.value);
+        
+        let newValue;
+        if (typeof change === 'number') {
+            newValue = currentValue + change;
+        } else {
+            newValue = parseInt(change);
+        }
+
+        if (newValue < 1) newValue = 1;
+
+        const price = parseFloat(row.getAttribute('data-price'));
+        
+        fetch(`/update_cart/${itemId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                quantity: newValue
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                input.value = newValue;
+                row.querySelector('.item-total').textContent = `${(price * newValue).toFixed(2)} AZN`;
+                document.getElementById('total-amount').textContent = `${data.total} AZN`;
+                updateCartCount();
+            } else {
+                showAnimatedMessage(data.error || "Miqdar yeniləmə xətası", true);
+            }
+        })
+        .catch(error => {
+            console.error('Xəta:', error);
+            showAnimatedMessage("Server xətası baş verdi", true);
+        });
+    }
+
+    function removeItem(itemId) {
+        if (confirm('Bu məhsulu səbətdən silmək istədiyinizə əminsiniz?')) {
+            fetch(`/remove_from_cart/${itemId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const row = document.querySelector(`tr[data-item-id="${itemId}"]`);
+                    row.remove();
+                    document.getElementById('total-amount').textContent = `${data.total} AZN`;
+                    updateCartCount();
+                    
+                    // Səbət boşdursa, boş səbət mesajını göstər
+                    if (data.is_empty) {
+                        location.reload();
+                    }
+                } else {
+                    showAnimatedMessage(data.error || "Silmə xətası baş verdi", true);
+                }
+            })
+            .catch(error => {
+                console.error('Xəta:', error);
+                showAnimatedMessage("Server xətası baş verdi", true);
+            });
+        }
+    }
+
+    // Modal bağlama
+    window.onclick = function(event) {
+        const confirmModal = document.getElementById('confirmModal');
+        const successModal = document.getElementById('successModal');
+        if (event.target === confirmModal) {
+            confirmModal.style.display = 'none';
+        }
+        if (event.target === successModal) {
+            successModal.style.display = 'none';
+        }
+    }
+
 

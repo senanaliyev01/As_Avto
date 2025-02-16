@@ -15,38 +15,40 @@ from django.core.exceptions import ValidationError
 import re
 
 def login_view(request):
-    # Əgər istifadəçi artıq daxil olubsa və remember_me seçilməyibsə
+    # Əgər istifadəçi artıq daxil olubsa
     if request.user.is_authenticated:
-        if not request.session.get('remember_me', False):
+        # Remember me seçilməyibsə və session müddəti bitibsə
+        if not request.session.get('remember_me', False) and request.session.get_expiry_age() <= 0:
             logout(request)
             messages.info(request, 'Sessiya müddəti bitdi. Zəhmət olmasa yenidən daxil olun.')
             return redirect('login')
+        # Remember me seçilibsə və ya session aktiv isə ana səhifəyə yönləndir
+        return redirect('home')
 
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        remember_me = request.POST.get('remember_me')
+        remember_me = request.POST.get('remember_me') == 'on'
         
         user = authenticate(request, username=username, password=password)
         
         if user is not None:
             # İstifadəçinin təsdiq statusunu yoxla
             if not user.profile.is_approved:
-                messages.error(request, 
-                    'Giriş üçün icazəniz yoxdur.')
+                messages.error(request, 'Giriş üçün icazəniz yoxdur.')
                 return render(request, 'login.html')
                 
             login(request, user)
             
             # Remember Me yoxlaması
-            if not remember_me:
-                # Browser bağlandıqda session silinəcək
-                request.session.set_expiry(0)
-                request.session['remember_me'] = False
-            else:
+            if remember_me:
                 # 1 illik session
                 request.session.set_expiry(31536000)  # 365 gün
                 request.session['remember_me'] = True
+            else:
+                # Browser bağlandıqda session silinəcək
+                request.session.set_expiry(0)
+                request.session['remember_me'] = False
             
             # Əgər istifadəçi admin panelə giriş etməyə çalışırdısa
             next_url = request.GET.get('next')

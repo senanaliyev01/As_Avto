@@ -331,41 +331,26 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
-        'request_format': {
-            'format': '[{asctime}] [{levelname}] {message} - IP: {ip} - User: {user} - Method: {method} - Path: {path} - Status: {status} - Time: {time}ms - Data: {data}',
+        'verbose': {
+            'format': '[{asctime}] [{levelname}] {message}',
             'style': '{',
         },
-        'error_format': {
-            'format': '[{asctime}] [{levelname}] {message}\nException: {exc_info}\nPath: {path}\nMethod: {method}\nUser: {user}\nIP: {ip}\nData: {data}',
-            'style': '{',
-        }
     },
     'handlers': {
-        'console': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'request_format',
-        },
-        'request_file': {
+        'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs/requests.log'),
-            'formatter': 'request_format',
+            'filename': os.path.join(BASE_DIR, 'logs/django.log'),
+            'formatter': 'verbose',
         },
-        'error_file': {
-            'level': 'ERROR',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs/errors.log'),
-            'formatter': 'error_format',
-        }
     },
     'loggers': {
-        'django.request': {
-            'handlers': ['request_file', 'error_file', 'console'],
+        'django': {
+            'handlers': ['file'],
             'level': 'INFO',
             'propagate': True,
         },
-    }
+    },
 }
 
 # Session Tənzimləmələri

@@ -192,9 +192,15 @@
                 const cartCount = document.getElementById('cart-count');
                 if (cartCount) {
                     cartCount.textContent = data.count;
+                    
+                    // Animasiya əlavə et
+                    cartCount.classList.add('update-animation');
+                    setTimeout(() => {
+                        cartCount.classList.remove('update-animation');
+                    }, 500);
                 }
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => console.error('Error updating cart count:', error));
     }
 
     // Mesaj animasiyası
@@ -518,58 +524,94 @@
         }
     }
 
-    // Sifariş funksiyaları
+    // Sifariş təsdiqləmə funksiyası
     function confirmOrder() {
         const modal = document.getElementById('confirmModal');
-        modal.style.display = 'flex';
+        if (modal) {
+            modal.style.display = 'block';
+        }
     }
 
+    // Modal bağlama funksiyası
     function closeModal() {
         const modal = document.getElementById('confirmModal');
-        modal.style.display = 'none';
+        if (modal) {
+            modal.style.display = 'none';
+        }
     }
 
+    // Sifarişi göndərmə funksiyası
     function submitOrder() {
-        const submitButton = document.querySelector('.confirm-btn');
-        const originalContent = submitButton.innerHTML;
-        
         // Loading effekti
-        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Göndərilir...';
-        submitButton.disabled = true;
+        const loadingSpinner = document.createElement('div');
+        loadingSpinner.className = 'loading-spinner';
+        document.body.appendChild(loadingSpinner);
 
-        fetch('/submit_order/', {
+        // CSRF token
+        const csrftoken = getCookie('csrftoken');
+
+        // Sifarişi göndər
+        fetch('/sifaris/gonder/', {
             method: 'POST',
             headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
             }
         })
         .then(response => response.json())
         .then(data => {
+            // Loading-i gizlət
+            document.body.removeChild(loadingSpinner);
+
             if (data.success) {
                 // Təsdiq modalını bağla
-                document.getElementById('confirmModal').style.display = 'none';
-                
-                // Uğurlu sifariş modalını göstər
+                closeModal();
+
+                // Uğurlu modal göstər
                 const successModal = document.getElementById('successModal');
-                successModal.style.display = 'flex';
-                
+                if (successModal) {
+                    successModal.style.display = 'block';
+                }
+
+                // Səbət sayını yenilə
+                updateCartCount();
+
                 // 3 saniyə sonra yönləndir
                 setTimeout(() => {
-                    window.location.href = '/sifaris_izle/';
+                    window.location.href = '/orders/';
                 }, 3000);
             } else {
-                showAnimatedMessage(data.error || "Sifariş zamanı xəta baş verdi", true);
-                submitButton.innerHTML = originalContent;
-                submitButton.disabled = false;
+                // Xəta mesajı göstər
+                showAnimatedMessage(data.error || 'Sifariş göndərilməsində xəta baş verdi', true);
             }
         })
         .catch(error => {
-            console.error('Xəta:', error);
-            showAnimatedMessage("Server xətası baş verdi", true);
-            submitButton.innerHTML = originalContent;
-            submitButton.disabled = false;
+            // Loading-i gizlət
+            document.body.removeChild(loadingSpinner);
+            
+            // Xəta mesajı göstər
+            showAnimatedMessage('Sistem xətası baş verdi', true);
+            console.error('Error:', error);
         });
+    }
+
+    // Səbətdəki məhsul sayını yeniləmə
+    function updateCartCount() {
+        fetch('/get_cart_count/')
+            .then(response => response.json())
+            .then(data => {
+                const cartCount = document.getElementById('cart-count');
+                if (cartCount) {
+                    cartCount.textContent = data.count;
+                    
+                    // Animasiya əlavə et
+                    cartCount.classList.add('update-animation');
+                    setTimeout(() => {
+                        cartCount.classList.remove('update-animation');
+                    }, 500);
+                }
+            })
+            .catch(error => console.error('Error updating cart count:', error));
     }
 
     // Səbət funksiyaları

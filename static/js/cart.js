@@ -412,11 +412,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Sifariş təsdiqləmə funksiyası
     window.submitOrder = function() {
+        const confirmBtn = document.querySelector('.confirm-btn');
+        const cancelBtn = document.querySelector('.cancel-btn');
+        
+        // Düymələri deaktiv et
+        confirmBtn.disabled = true;
+        cancelBtn.disabled = true;
+        
+        // Loading göstər
+        confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Göndərilir...';
+
         fetch('/sifaris/gonder/', {
             method: 'POST',
             headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
-                'Content-Type': 'application/json'
+                'X-CSRFToken': getCookie('csrftoken')
             }
         })
         .then(response => response.json())
@@ -429,22 +438,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 const successModal = document.getElementById('successModal');
                 successModal.classList.add('show');
                 
-                // 3 saniyə sonra yönləndir və browser tarixçəsini təmizlə
+                // 3 saniyə sonra yönləndir
                 setTimeout(() => {
-                    // Yeni URL-ə yönləndir və browser tarixçəsini əvəz et
-                    window.location.replace('/orders/');
-                    
-                    // Əlavə təhlükəsizlik üçün history-ni təmizlə
-                    window.history.pushState(null, '', '/orders/');
-                    window.onpopstate = function(event) {
-                        window.history.pushState(null, '', '/orders/');
-                    };
+                    window.location.href = '/orders/';
                 }, 3000);
             } else {
                 throw new Error(data.message || 'Sifariş göndərilmədi');
             }
         })
         .catch(error => {
+            // Xəta baş verdikdə düymələri aktiv et
+            confirmBtn.disabled = false;
+            cancelBtn.disabled = false;
+            confirmBtn.innerHTML = '<i class="fas fa-check"></i> Bəli';
+            
             closeModal('confirmModal');
             showNotification(error.message || 'Xəta baş verdi', 'error');
         });

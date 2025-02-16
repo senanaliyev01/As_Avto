@@ -693,14 +693,14 @@
 
     // Miqdar dəyişikliyi
     window.handleQuantityInput = debounce(function(input) {
-        const value = input.value.replace(/[^0-9]/g, '');
+        const value = parseInt(input.value) || 1;
         const itemId = input.dataset.itemId;
         
-        if (value === '' || value === '0') {
-            input.value = '1';
+        if (value < 1) {
+            input.value = 1;
             updateQuantity(itemId, 'set', 1);
         } else {
-            updateQuantity(itemId, 'set', parseInt(value));
+            updateQuantity(itemId, 'set', value);
         }
     }, 300);
 

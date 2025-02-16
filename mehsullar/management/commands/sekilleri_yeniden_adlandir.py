@@ -5,35 +5,51 @@ from mehsullar.models import Mehsul, Brend, MarkaSekil
 import os
 from django.conf import settings
 import shutil
+import hashlib
 from datetime import datetime
-import uuid
 
 class Command(BaseCommand):
     help = 'Mövcud şəkillərin adlarını yenidən təyin edir'
+
+    def generate_unique_name(self, original_name, identifier, category):
+        # Şəklin hash-ini yaradırıq
+        hash_object = hashlib.md5(original_name.encode())
+        file_hash = hash_object.hexdigest()[:8]
+        
+        # Faylın uzantısını alırıq
+        ext = os.path.splitext(original_name)[1].lower()
+        
+        # Tarixi əlavə edirik
+        timestamp = datetime.now().strftime('%Y%m%d')
+        
+        # Təmiz ad yaradırıq
+        clean_identifier = ''.join(e for e in identifier if e.isalnum() or e == '_').lower()
+        
+        # Yeni adı formalaşdırırıq
+        new_name = f"{category}/{clean_identifier}_{timestamp}_{file_hash}{ext}"
+        
+        return new_name
 
     def handle(self, *args, **options):
         # Məhsul şəkillərini yenidən adlandır
         for mehsul in Mehsul.objects.all():
             if mehsul.sekil:
                 try:
-                    # Köhnə fayl yolunu al
                     old_path = mehsul.sekil.path
                     if os.path.exists(old_path):
-                        # Unikal ad yarat
-                        unique_id = str(uuid.uuid4())[:8]
-                        ext = os.path.splitext(old_path)[1]  # Faylın uzantısını al
-                        new_name = f"mehsul_sekilleri/{mehsul.brend.adi}_{mehsul.brend_kod}_{mehsul.id}_{unique_id}{ext}"
-                        new_name = new_name.replace(' ', '_').lower()
-                        new_path = os.path.join(settings.MEDIA_ROOT, new_name)
+                        # Unikal identifikator yaradırıq
+                        identifier = f"{mehsul.brend.adi}_{mehsul.brend_kod}_{mehsul.id}"
+                        new_name = self.generate_unique_name(
+                            mehsul.sekil.name,
+                            identifier,
+                            "mehsul_sekilleri"
+                        )
                         
-                        # Əmin ol ki, hədəf qovluq mövcuddur
+                        new_path = os.path.join(settings.MEDIA_ROOT, new_name)
                         os.makedirs(os.path.dirname(new_path), exist_ok=True)
                         
-                        # Faylı yeni ada kopyala
                         shutil.copy2(old_path, new_path)
-                        # Köhnə faylı sil
                         os.remove(old_path)
-                        # Məhsulun şəkil sahəsini yenilə
                         mehsul.sekil.name = new_name
                         mehsul.save(update_fields=['sekil'])
                         self.stdout.write(self.style.SUCCESS(f'Məhsul şəkli yenidən adlandırıldı: {new_name}'))
@@ -46,12 +62,14 @@ class Command(BaseCommand):
                 try:
                     old_path = brend.sekil.path
                     if os.path.exists(old_path):
-                        unique_id = str(uuid.uuid4())[:8]
-                        ext = os.path.splitext(old_path)[1]
-                        new_name = f"brend_sekilleri/brend_{brend.adi}_{brend.id}_{unique_id}{ext}"
-                        new_name = new_name.replace(' ', '_').lower()
-                        new_path = os.path.join(settings.MEDIA_ROOT, new_name)
+                        identifier = f"brend_{brend.adi}_{brend.id}"
+                        new_name = self.generate_unique_name(
+                            brend.sekil.name,
+                            identifier,
+                            "brend_sekilleri"
+                        )
                         
+                        new_path = os.path.join(settings.MEDIA_ROOT, new_name)
                         os.makedirs(os.path.dirname(new_path), exist_ok=True)
                         
                         shutil.copy2(old_path, new_path)
@@ -62,17 +80,18 @@ class Command(BaseCommand):
                 except Exception as e:
                     self.stdout.write(self.style.ERROR(f'Xəta: {str(e)} - Brend ID: {brend.id}'))
 
-            # Brend yazı şəkillərini də yenidən adlandır
             if brend.sekilyazi:
                 try:
                     old_path = brend.sekilyazi.path
                     if os.path.exists(old_path):
-                        unique_id = str(uuid.uuid4())[:8]
-                        ext = os.path.splitext(old_path)[1]
-                        new_name = f"brend_yazilari/brend_yazi_{brend.adi}_{brend.id}_{unique_id}{ext}"
-                        new_name = new_name.replace(' ', '_').lower()
-                        new_path = os.path.join(settings.MEDIA_ROOT, new_name)
+                        identifier = f"brend_yazi_{brend.adi}_{brend.id}"
+                        new_name = self.generate_unique_name(
+                            brend.sekilyazi.name,
+                            identifier,
+                            "brend_yazilari"
+                        )
                         
+                        new_path = os.path.join(settings.MEDIA_ROOT, new_name)
                         os.makedirs(os.path.dirname(new_path), exist_ok=True)
                         
                         shutil.copy2(old_path, new_path)
@@ -89,12 +108,14 @@ class Command(BaseCommand):
                 try:
                     old_path = marka_sekil.sekil.path
                     if os.path.exists(old_path):
-                        unique_id = str(uuid.uuid4())[:8]
-                        ext = os.path.splitext(old_path)[1]
-                        new_name = f"marka_sekilleri/marka_{marka_sekil.marka.adi}_{marka_sekil.id}_{unique_id}{ext}"
-                        new_name = new_name.replace(' ', '_').lower()
-                        new_path = os.path.join(settings.MEDIA_ROOT, new_name)
+                        identifier = f"marka_{marka_sekil.marka.adi}_{marka_sekil.id}"
+                        new_name = self.generate_unique_name(
+                            marka_sekil.sekil.name,
+                            identifier,
+                            "marka_sekilleri"
+                        )
                         
+                        new_path = os.path.join(settings.MEDIA_ROOT, new_name)
                         os.makedirs(os.path.dirname(new_path), exist_ok=True)
                         
                         shutil.copy2(old_path, new_path)

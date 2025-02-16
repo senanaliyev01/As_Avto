@@ -15,16 +15,16 @@
 <div class="statistic">
     <div class="stat-item">
         <h3>Ümumi Məbləğ</h3>
-        <p class="amount-info">{{ toplam_mebleg }} AZN</p>
+        <p class="amount-info">{{ toplam_mebleg|floatformat:2 }} AZN</p>
     </div>
     <div class="stat-item">
         <h3>Ödənilən Məbləğ</h3>
-        <p class="amount-info-1">{{ odenilen_mebleg }} AZN</p>
+        <p class="amount-info-1">{{ odenilen_mebleg|floatformat:2 }} AZN</p>
     </div>
     <div class="stat-item">
         <h3>Qalıq Borc</h3>
         <p class="qaliq-borc {% if qaliq_borc < 0 %}qaliq-borc-pozitiv{% else %}qaliq-borc-negativ{% endif %}">
-            {{ qaliq_borc }} AZN
+            {{ qaliq_borc|floatformat:2 }} AZN
         </p>
     </div>
 </div>
@@ -45,8 +45,8 @@
             <tr>
                 <td><a href="{% url 'sifaris_detallari' sifaris.id %}" class="sifaris-link">{{ sifaris.id }}</a></td>
                 <td>{{ sifaris.formatted_tarix }}</td>
-                <td>{{ sifaris.cemi_mebleg }} AZN</td>
-                <td>{{ sifaris.odenilen_mebleg }} AZN</td>
+                <td>{{ sifaris.cemi_mebleg|floatformat:2 }} AZN</td>
+                <td>{{ sifaris.odenilen_mebleg|floatformat:2 }} AZN</td>
                 <td>
                     <div class="status-container">
                         <span class="status-badge1 status-{{ sifaris.status }}">

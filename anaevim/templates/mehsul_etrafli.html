@@ -35,45 +35,7 @@
             "@type": "Offer",
             "url": "https://as-avto.com{{ request.path }}",
             "priceCurrency": "AZN",
-            "price": "{{ mehsul.qiymet|floatformat:2 }}",
-            "priceValidUntil": "{% now 'Y' %}-12-31",
-            "availability": "https://schema.org/InStock",
-            "shippingDetails": {
-                "@type": "OfferShippingDetails",
-                "shippingRate": {
-                    "@type": "MonetaryAmount",
-                    "value": "0",
-                    "currency": "AZN"
-                },
-                "shippingDestination": {
-                    "@type": "DefinedRegion",
-                    "addressCountry": "AZ"
-                },
-                "deliveryTime": {
-                    "@type": "ShippingDeliveryTime",
-                    "handlingTime": {
-                        "@type": "QuantitativeValue",
-                        "minValue": "0",
-                        "maxValue": "1",
-                        "unitCode": "DAY"
-                    },
-                    "transitTime": {
-                        "@type": "QuantitativeValue",
-                        "minValue": "1",
-                        "maxValue": "2",
-                        "unitCode": "DAY"
-                    }
-                }
-            },
-            "hasMerchantReturnPolicy": {
-                "@type": "MerchantReturnPolicy",
-                "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
-                "returnWindow": {
-                    "@type": "QuantitativeValue",
-                    "value": "30",
-                    "unitCode": "DAY"
-                }
-            },
+            "price": "{{ mehsul.formatted_qiymet }}",
             "seller": {
                 "@type": "Organization",
                 "name": "AS-AVTO",
@@ -88,23 +50,6 @@
                 "telephone": "+994773059585",
                 "email": "senan.eliyev.9997@gmail.com"
             }
-        },
-        "review": {
-            "@type": "Review",
-            "reviewRating": {
-                "@type": "Rating",
-                "ratingValue": "5",
-                "bestRating": "5"
-            },
-            "author": {
-                "@type": "Organization",
-                "name": "AS-AVTO"
-            }
-        },
-        "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "5",
-            "reviewCount": "1"
         }
     }
     </script>
@@ -204,7 +149,7 @@
                         </div>
                         <div class="info-item">
                             <span class="label">Qiymət:</span>
-                            <span class="value price">{{ mehsul.qiymet }} ₼</span>
+                            <span class="value price">{{ mehsul.formatted_qiymet }} ₼</span>
                         </div>
                     </div>
                    

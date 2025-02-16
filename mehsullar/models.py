@@ -63,6 +63,10 @@ class Mehsul(models.Model):
         verbose_name_plural = 'Məhsullar'
 
     @property
+    def formatted_qiymet(self):
+        return str(self.qiymet).replace(',', '.')
+
+    @property
     def butun_oem_kodlar(self):
         kodlar = [self.oem]
         kodlar.extend([oem.kod for oem in self.oem_kodlar.all()])

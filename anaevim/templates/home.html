@@ -13,6 +13,140 @@
     <meta name="robots" content="index, follow">
     <meta name="revisit-after" content="1 days">
     
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "AutoPartsStore",
+        "name": "AS-AVTO",
+        "image": "https://as-avto.com{% static 'img/Header_Logo.png' %}",
+        "description": "Azərbaycanın ən böyük avtomobil ehtiyat hissələri mağazası. Orijinal və keyfiyyətli avtomobil hissələri, filterlər, yağlar və digər avtomobil aksesuarları.",
+        "@id": "https://as-avto.com",
+        "url": "https://as-avto.com",
+        "telephone": "+994773059585",
+        "email": "senan.eliyev.9997@gmail.com",
+        "priceRange": "₼₼₼",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Binəqədi R. M.Rəsulzadə qəs. As-Avto",
+            "addressLocality": "Bakı",
+            "addressCountry": "AZ"
+        },
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 40.4385,
+            "longitude": 49.8447
+        },
+        "openingHoursSpecification": {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday"
+            ],
+            "opens": "09:00",
+            "closes": "18:00"
+        },
+        "sameAs": [
+            "https://www.tiktok.com/@a_avto_service",
+            "https://wa.me/994773059585"
+        ],
+        "potentialAction": {
+            "@type": "JoinAction",
+            "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://as-avto.com/istifadeciler/register/",
+                "actionPlatform": [
+                    "http://schema.org/DesktopWebPlatform",
+                    "http://schema.org/MobileWebPlatform"
+                ]
+            },
+            "name": "B4B Qeydiyyat"
+        }
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "url": "https://as-avto.com",
+        "name": "AS-AVTO",
+        "description": "Azərbaycanın ən böyük avtomobil ehtiyat hissələri mağazası",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://as-avto.com/products_list/?search_text={search_term}"
+            },
+            "query-input": "required name=search_term"
+        }
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [{
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Ana Səhifə",
+            "item": "https://as-avto.com"
+        }]
+    }
+    </script>
+
+    <!-- Məhsullar üçün strukturlaşdırılmış data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "itemListElement": [
+            {% for mehsul in mehsullar %}
+            {
+                "@type": "Product",
+                "name": "{{ mehsul.adi }}",
+                "image": "{{ mehsul.sekil.url }}",
+                "description": "{{ mehsul.adi }} - {{ mehsul.marka.adi }} üçün",
+                "brand": {
+                    "@type": "Brand",
+                    "name": "{{ mehsul.brend.adi }}"
+                },
+                "offers": {
+                    "@type": "Offer",
+                    "price": "{{ mehsul.qiymet }}",
+                    "priceCurrency": "AZN",
+                    "availability": "{% if mehsul.stok > 0 %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}"
+                }
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ]
+    }
+    </script>
+
+    <!-- Brendlər üçün strukturlaşdırılmış data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "itemListElement": [
+            {% for brend in brendler %}
+            {
+                "@type": "Brand",
+                "position": {{ forloop.counter }},
+                "name": "{{ brend.adi }}",
+                "image": "{{ brend.sekil.url }}"
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ]
+    }
+    </script>
+    
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="AS-AVTO | Avtomobil Ehtiyat Hissələri Mağazası">
     <meta property="og:description" content="Azərbaycanın ən böyük avtomobil ehtiyat hissələri mağazası. B2B platforma ilə topdan və pərakəndə satış.">

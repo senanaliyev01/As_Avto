@@ -5,6 +5,9 @@ from django.http import HttpResponseForbidden
 import logging
 import time
 import json
+import requests
+from django.core.cache import cache
+from datetime import datetime, timedelta
 
 # Ayrı logger-lər yaradırıq
 request_logger = logging.getLogger('django.request')
@@ -108,5 +111,25 @@ class RequestLoggingMiddleware(MiddlewareMixin):
             f"Exception occurred - {json.dumps(log_data)}",
             exc_info=True
         )
+
+class SearchEnginePingMiddleware(MiddlewareMixin):
+    def process_request(self, request):
+        # Hər 24 saatda bir ping göndər
+        last_ping = cache.get('last_search_engine_ping')
+        now = datetime.now()
+        
+        if not last_ping or (now - last_ping) > timedelta(hours=24):
+            try:
+                # Google-a ping
+                requests.get('https://www.google.com/ping?sitemap=https://as-avto.com/sitemap.xml')
+                
+                # Bing-ə ping
+                requests.get('https://www.bing.com/ping?sitemap=https://as-avto.com/sitemap.xml')
+                
+                # Son ping vaxtını yadda saxla
+                cache.set('last_search_engine_ping', now)
+                
+            except Exception as e:
+                print(f"Search engine ping error: {str(e)}")
         
         

@@ -220,6 +220,7 @@ MIDDLEWARE = [
     'Web.middlewares.Force404Middleware',
     'Web.middlewares.AddSearchDataMiddleware',
     'Web.middlewares.RequestLoggingMiddleware',
+    'Web.middlewares.SearchEnginePingMiddleware',
 ]
 
 ROOT_URLCONF = 'Web.urls'

@@ -68,7 +68,9 @@
                                    min="1"
                                    data-item-id="{{ item.id }}"
                                    onchange="handleQuantityInput(this)"
-                                   onkeypress="return (event.charCode >= 48 && event.charCode <= 57)">
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                   onkeyup="if(this.value < 1) this.value = 1"
+                                   style="width: 60px; text-align: center;">
                             <button type="button" class="quantity-btn plus" onclick="updateQuantity({{ item.id }}, 1)">
                                 <i class="fas fa-plus"></i>
                             </button>

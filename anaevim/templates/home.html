@@ -13,19 +13,17 @@
     <meta name="robots" content="index, follow">
     <meta name="revisit-after" content="1 days">
     
-    <!-- Structured Data -->
+    <!-- Structured Data - Organization -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "AutoPartsStore",
         "name": "AS-AVTO",
         "image": "https://as-avto.com{% static 'img/Header_Logo.png' %}",
-        "description": "Azərbaycanın ən böyük avtomobil ehtiyat hissələri mağazası. Orijinal və keyfiyyətli avtomobil hissələri, filterlər, yağlar və digər avtomobil aksesuarları.",
-        "@id": "https://as-avto.com",
+        "description": "Azərbaycanın ən böyük avtomobil ehtiyat hissələri mağazası",
         "url": "https://as-avto.com",
         "telephone": "+994773059585",
         "email": "senan.eliyev.9997@gmail.com",
-        "priceRange": "₼₼₼",
         "address": {
             "@type": "PostalAddress",
             "streetAddress": "Binəqədi R. M.Rəsulzadə qəs. As-Avto",
@@ -40,15 +38,7 @@
         },
         "openingHoursSpecification": {
             "@type": "OpeningHoursSpecification",
-            "dayOfWeek": [
-                "Monday",
-                "Tuesday",
-                "Wednesday",
-                "Thursday",
-                "Friday",
-                "Saturday",
-                "Sunday"
-            ],
+            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
             "opens": "09:00",
             "closes": "18:00"
         },
@@ -59,7 +49,7 @@
     }
     </script>
 
-    <!-- Məhsullar üçün strukturlaşdırılmış data -->
+    <!-- Structured Data - Products -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -82,16 +72,9 @@
                     "mpn": "{{ mehsul.oem }}",
                     "offers": {
                         "@type": "Offer",
-                        "url": "https://as-avto.com{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}",
-                        "priceCurrency": "AZN",
                         "price": "{{ mehsul.qiymet }}",
-                        "priceValidUntil": "{% now 'Y-m-d' %}",
-                        "availability": "{% if mehsul.stok > 0 %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}",
-                        "seller": {
-                            "@type": "Organization",
-                            "name": "AS-AVTO",
-                            "url": "https://as-avto.com"
-                        }
+                        "priceCurrency": "AZN",
+                      
                     }
                 }
             }{% if not forloop.last %},{% endif %}
@@ -100,58 +83,14 @@
     }
     </script>
 
-    <!-- Brendlər üçün strukturlaşdırılmış data -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "ItemList",
-        "itemListElement": [
-            {% for brend in brendler %}
-            {
-                "@type": "ListItem",
-                "position": {{ forloop.counter }},
-                "item": {
-                    "@type": "Brand",
-                    "name": "{{ brend.adi }}",
-                    "image": "https://as-avto.com{{ brend.sekil.url }}",
-                    "url": "https://as-avto.com/brend/{{ brend.adi|slugify }}/"
-                }
-            }{% if not forloop.last %},{% endif %}
-            {% endfor %}
-        ]
-    }
-    </script>
-
-    <!-- WebSite strukturlaşdırılmış data -->
+    <!-- Structured Data - Website -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "WebSite",
         "url": "https://as-avto.com",
         "name": "AS-AVTO",
-        "description": "Azərbaycanın ən böyük avtomobil ehtiyat hissələri mağazası",
-        "potentialAction": {
-            "@type": "SearchAction",
-            "target": {
-                "@type": "EntryPoint",
-                "urlTemplate": "https://as-avto.com/products_list/?search_text={search_term}"
-            },
-            "query-input": "required name=search_term"
-        }
-    }
-    </script>
-
-    <!-- Structured Data -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [{
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Ana Səhifə",
-            "item": "https://as-avto.com"
-        }]
+        "description": "Azərbaycanın ən böyük avtomobil ehtiyat hissələri mağazası"
     }
     </script>
 

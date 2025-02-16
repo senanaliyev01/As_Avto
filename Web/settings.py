@@ -321,28 +321,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Media fayllari ucun elave security settings
-FILE_UPLOAD_PERMISSIONS = 0o644
-FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o755
-
-# Nginx ucun MIME type security
-MIME_TYPES = {
-    'image/png': '.png',
-    'image/jpeg': '.jpg',
-    'image/jpg': '.jpg',
-    'image/gif': '.gif',
-    'image/webp': '.webp',
-}
-
-# Media security headers
-MIDDLEWARE += [
-    'django.middleware.security.SecurityMiddleware',
-]
-
-# Media serving in production
-if not DEBUG:
-    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
-    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 #11 Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

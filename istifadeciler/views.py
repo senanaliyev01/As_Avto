@@ -13,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 import re
-from esasevim.views import *
+from esasevim.views import esasevim
 
 def login_view(request):
     # Əgər istifadəçi artıq daxil olubsa
@@ -24,7 +24,7 @@ def login_view(request):
             messages.info(request, 'Sessiya müddəti bitdi. Zəhmət olmasa yenidən daxil olun.')
             return redirect('login')
         # Remember me seçilibsə və ya session aktiv isə ana səhifəyə yönləndir
-        return redirect('esasevim')
+        return redirect('main')
 
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -55,7 +55,7 @@ def login_view(request):
             next_url = request.GET.get('next')
             if next_url:
                 return redirect(next_url)
-            return redirect('esasevim:main')
+            return redirect('main')
         else:
             messages.error(request, 'İstifadəçi adı və ya şifrə yanlışdır!')
     

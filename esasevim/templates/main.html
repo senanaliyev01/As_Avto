@@ -96,7 +96,7 @@
     <!-- Rəy Əlavə Etmə Formu -->
     <div class="review-form">
         <h3>Rəyinizi Bildirin</h3>
-        <form method="POST" action="{% url 'rey_elave_et' %}">
+        <form method="POST" action="{% url 'esasevim:rey_elave_et' %}">
             {% csrf_token %}
             <div class="rating-input">
                 <input type="radio" id="star5" name="qiymetlendirme" value="5">

@@ -6,6 +6,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ mehsul.adi }} | AS AVTO</title>
     
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="{{ mehsul.adi }} - {{ mehsul.marka.adi }} üçün {{ mehsul.brend.adi }} markalı orijinal ehtiyat hissəsi. OEM: {{ mehsul.oem }}, Brend Kodu: {{ mehsul.brend_kod }}">
+    <meta name="keywords" content="{{ mehsul.adi }}, {{ mehsul.marka.adi }}, {{ mehsul.brend.adi }}, {{ mehsul.oem }}, {{ mehsul.brend_kod }}, avtomobil hissələri">
+    <meta name="author" content="AS-Avto">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Structured Data - Product -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": "{{ mehsul.adi }}",
+        "image": "https://as-avto.com{{ mehsul.sekil.url }}",
+        "description": "{{ mehsul.adi }} - {{ mehsul.marka.adi }} üçün {{ mehsul.brend.adi }} markalı orijinal ehtiyat hissəsi",
+        "brand": {
+            "@type": "Brand",
+            "name": "{{ mehsul.brend.adi }}"
+        },
+        "manufacturer": {
+            "@type": "Organization",
+            "name": "{{ mehsul.brend.adi }}"
+        },
+        "sku": "{{ mehsul.brend_kod }}",
+        "mpn": "{{ mehsul.oem }}",
+        "category": "Auto Parts",
+        "offers": {
+            "@type": "Offer",
+            "url": "https://as-avto.com{{ request.path }}",
+            "priceCurrency": "AZN",
+            "price": "{{ mehsul.qiymet }}",
+            "seller": {
+                "@type": "Organization",
+                "name": "AS-AVTO"
+            }
+        }
+    }
+    </script>
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="{{ mehsul.adi }} | AS AVTO">
+    <meta property="og:description" content="{{ mehsul.adi }} - {{ mehsul.marka.adi }} üçün {{ mehsul.brend.adi }} markalı orijinal ehtiyat hissəsi">
+    <meta property="og:image" content="https://as-avto.com{{ mehsul.sekil.url }}">
+    <meta property="og:url" content="https://as-avto.com{{ request.path }}">
+    <meta property="og:type" content="product">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ mehsul.adi }} | AS AVTO">
+    <meta name="twitter:description" content="{{ mehsul.adi }} - {{ mehsul.marka.adi }} üçün {{ mehsul.brend.adi }} markalı orijinal ehtiyat hissəsi">
+    <meta name="twitter:image" content="https://as-avto.com{{ mehsul.sekil.url }}">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://as-avto.com{{ request.path }}">
+    
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="128x128" href="{% static 'img/favicon.png' %}">
     

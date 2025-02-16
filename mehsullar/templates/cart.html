@@ -76,9 +76,12 @@
                     </td>
                     <td class="item-total">{{ item.cemi }} AZN</td>
                     <td>
-                        <button class="delete-btn" onclick="removeItem({{ item.id }})" title="Sil">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
+                        <form action="{% url 'sebetden_sil' item.id %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="delete-btn" title="Sil" onclick="return confirm('Məhsulu silmək istədiyinizə əminsiniz?')">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
                     </td>
                 </tr>
                 {% endfor %}
@@ -96,10 +99,13 @@
         </table>
 
         <div class="cart-actions">
-            <button class="order-btn">
-                <i class="fas fa-shopping-cart"></i>
-                Sifarişi Təsdiqlə
-            </button>
+            <form action="{% url 'sifarisi_gonder' %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="order-btn" onclick="return confirm('Sifarişi təsdiqləmək istədiyinizə əminsiniz?')">
+                    <i class="fas fa-shopping-cart"></i>
+                    Sifarişi Təsdiqlə
+                </button>
+            </form>
         </div>
     </div>
     {% else %}

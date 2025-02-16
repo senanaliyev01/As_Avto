@@ -1,6 +1,5 @@
 from django.urls import path
 from . import views
-from esasevim.views import *
 
 urlpatterns = [
     path('login/', views.login_view, name='login'),

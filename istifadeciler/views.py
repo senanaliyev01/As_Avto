@@ -15,6 +15,13 @@ from django.core.exceptions import ValidationError
 import re
 
 def login_view(request):
+    # Əgər istifadəçi artıq daxil olubsa və remember_me seçilməyibsə
+    if request.user.is_authenticated:
+        if not request.session.get('remember_me', False):
+            logout(request)
+            messages.info(request, 'Sessiya müddəti bitdi. Zəhmət olmasa yenidən daxil olun.')
+            return redirect('login')
+
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -26,8 +33,7 @@ def login_view(request):
             # İstifadəçinin təsdiq statusunu yoxla
             if not user.profile.is_approved:
                 messages.error(request, 
-                    'Giriş üçün icazəniz yoxdur.',
-                    extra_tags='auth-error')
+                    'Giriş üçün icazəniz yoxdur.')
                 return render(request, 'login.html')
                 
             login(request, user)
@@ -48,13 +54,7 @@ def login_view(request):
                 return redirect(next_url)
             return redirect('home')
         else:
-            messages.error(request, 'İstifadəçi adı və ya şifrə yanlışdır!', extra_tags='error')
-    
-    # Əgər istifadəçi artıq daxil olubsa və remember_me seçilməyibsə
-    if request.user.is_authenticated:
-        if not request.session.get('remember_me', False):
-            logout(request)
-            messages.info(request, 'Sessiya müddəti bitdi. Zəhmət olmasa yenidən daxil olun.', extra_tags='info')
+            messages.error(request, 'İstifadəçi adı və ya şifrə yanlışdır!')
     
     return render(request, 'login.html')
 

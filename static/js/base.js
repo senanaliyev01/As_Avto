@@ -696,8 +696,11 @@
         const value = parseInt(input.value);
         const itemId = input.dataset.itemId;
         
-        if (!isNaN(value)) {
+        if (!isNaN(value) && value > 0) {
             updateQuantity(itemId, 'set', value);
+        } else {
+            input.value = 1;
+            updateQuantity(itemId, 'set', 1);
         }
     }, 300);
 
@@ -709,12 +712,14 @@
 
         if (typeof value === 'number') {
             newQuantity = parseInt(input.value) + value;
+        } else if (value === 'set') {
+            newQuantity = parseInt(input.value);
         } else {
             newQuantity = parseInt(value);
         }
 
-        if (isNaN(newQuantity)) {
-            return;
+        if (isNaN(newQuantity) || newQuantity < 1) {
+            newQuantity = 1;
         }
 
         // Düyməni deaktiv et və loading göstər

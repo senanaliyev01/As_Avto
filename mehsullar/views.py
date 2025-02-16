@@ -279,6 +279,8 @@ def update_quantity(request, item_id, new_quantity):
         
         try:
             new_quantity = int(new_quantity)
+            if new_quantity < 1:
+                new_quantity = 1
         except ValueError:
             return JsonResponse({
                 'success': False,
@@ -290,18 +292,18 @@ def update_quantity(request, item_id, new_quantity):
         cart_item.save()
 
         # Yeni məbləğləri hesabla
-        item_total = round(float(cart_item.mehsul.qiymet * new_quantity), 2)
+        item_total = float(cart_item.mehsul.qiymet * new_quantity)
         
         # Ümumi səbət məbləğini hesabla
-        cart_total = round(float(Sebet.objects.filter(user=request.user).aggregate(
+        cart_total = float(Sebet.objects.filter(user=request.user).aggregate(
             total=Sum(F('miqdar') * F('mehsul__qiymet'))
-        )['total'] or 0), 2)
+        )['total'] or 0)
 
         return JsonResponse({
             'success': True,
             'new_quantity': new_quantity,
-            'item_total': item_total,
-            'total_amount': cart_total
+            'item_total': round(item_total, 2),
+            'total_amount': round(cart_total, 2)
         })
             
     except Exception as e:

@@ -362,9 +362,9 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Strict'
 
 # Authentication Tənzimləmələri
-LOGIN_URL = '/login/'  # Login səhifəsinin URL-i
+LOGIN_URL = '/istifadeciler/login/'  # Login səhifəsinin URL-i
 LOGIN_REDIRECT_URL = '/'  # Uğurlu giriş zamanı yönləndirilən səhifə
-LOGOUT_REDIRECT_URL = '/login/'  # Çıxış zamanı yönləndirilən səhifə
+LOGOUT_REDIRECT_URL = '/istifadeciler/login/'  # Çıxış zamanı yönləndirilən səhifə
 
 # Remember Me funksionallığı üçün
 AUTH_USER_MODEL = 'auth.User'

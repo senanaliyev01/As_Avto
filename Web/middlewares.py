@@ -1,18 +1,13 @@
 from django.shortcuts import render
 from django.utils.deprecation import MiddlewareMixin
-import time
-import logging
+from mehsullar.models import Kateqoriya, Brend, Marka
 from django.http import HttpResponseForbidden
-
-request_logger = logging.getLogger('django.request')
 
 class Force404Middleware(MiddlewareMixin):
     def process_response(self, request, response):
         if response.status_code == 404:
             return render(request, "404.html", status=404)
         return response
-
-from mehsullar.models import Kateqoriya, Brend, Marka
 
 class AddSearchDataMiddleware(MiddlewareMixin):
     def process_request(self, request):
@@ -21,20 +16,6 @@ class AddSearchDataMiddleware(MiddlewareMixin):
         request.brendler = Brend.objects.all()
         request.markalar = Marka.objects.all()
         
-class RequestLoggingMiddleware(MiddlewareMixin):
-    def process_request(self, request):
-        request.start_time = time.time()
-        
-        # Təhlükəsizlik yoxlamaları
-        if request.method not in ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']:
-            return HttpResponseForbidden('Method not allowed')
-            
-        # Host başlığı yoxlaması
-        allowed_hosts = ['as-avto.com', 'www.as-avto.com']
-        host = request.get_host().split(':')[0]
-        if host not in allowed_hosts:
-            return HttpResponseForbidden('Invalid host header')
-
     def process_response(self, request, response):
         if hasattr(request, 'start_time'):
             total_time = int((time.time() - request.start_time) * 1000)

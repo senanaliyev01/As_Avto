@@ -23,7 +23,7 @@ def login_view(request):
             messages.info(request, 'Sessiya müddəti bitdi. Zəhmət olmasa yenidən daxil olun.')
             return redirect('login')
         # Remember me seçilibsə və ya session aktiv isə ana səhifəyə yönləndir
-        return redirect('home')
+        return redirect('esasevim:main')  # esasevim app-indəki main view-a yönləndir
 
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -54,7 +54,7 @@ def login_view(request):
             next_url = request.GET.get('next')
             if next_url:
                 return redirect(next_url)
-            return redirect('home')
+            return redirect('esasevim:main')  # esasevim app-indəki main view-a yönləndir
         else:
             messages.error(request, 'İstifadəçi adı və ya şifrə yanlışdır!')
     

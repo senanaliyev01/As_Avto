@@ -113,8 +113,8 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.UserRateThrottle'
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '100/day',  # Anonim istifadəçilər üçün
-        'user': '1000/day'  # Qeydiyyatlı istifadəçilər üçün
+        'anon': '1000/day',  # Anonim istifadəçilər üçün
+        'user': '5000/day'  # Qeydiyyatlı istifadəçilər üçün
     }
 }
 

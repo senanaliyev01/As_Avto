@@ -3,6 +3,8 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import render
+from django.contrib.sitemaps.views import sitemap
+from .sitemaps import sitemaps
 
 urlpatterns = [
     path('admin-as-avto-1983-2002/', admin.site.urls),
@@ -11,6 +13,10 @@ urlpatterns = [
     path('', include('esasevim.urls', namespace='esasevim')),
     path('', include('mehsullar.urls')),
     path('', include('rentacar.urls')),
+    
+    # Sitemap URL
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps},
+         name='django.contrib.sitemaps.views.sitemap'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 admin.site.site_title = 'AS-AVTO'

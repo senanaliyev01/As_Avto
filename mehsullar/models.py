@@ -96,41 +96,22 @@ class Sifaris(models.Model):
         ('catdirildi', 'Çatdırıldı'),
     ]
 
-    istifadeci = models.ForeignKey(User, on_delete=models.CASCADE)
-    tarix = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='gozleyir')
-    cemi_mebleg = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    cemi_mebleg = models.DecimalField(max_digits=10, decimal_places=2)
     odenilen_mebleg = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    borc = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    qaliq_borc = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    tarix = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='gozleyir')
+    tamamlandi = models.BooleanField(default=False)
 
-    class Meta:
-        verbose_name = 'Sifariş'
-        verbose_name_plural = 'Sifarişlər'
-        ordering = ['-tarix']
+    def borc(self):
+        return self.cemi_mebleg - self.odenilen_mebleg
 
     def __str__(self):
-        return f"Sifariş #{self.id} - {self.istifadeci.username}"
-
-    @property
-    def formatted_tarix(self):
-        return self.tarix.strftime("%d.%m.%Y %H:%M")
-
-    @property
-    def formatted_cemi_mebleg(self):
-        return str(self.cemi_mebleg).replace(',', '.')
-
-    @property
-    def formatted_odenilen_mebleg(self):
-        return str(self.odenilen_mebleg).replace(',', '.')
-
-    @property
-    def formatted_borc(self):
-        return str(self.borc).replace(',', '.')
-
-    @property
-    def formatted_qaliq_borc(self):
-        return str(self.qaliq_borc).replace(',', '.')
+        return f"Sifariş {self.id} - {self.tarix}"
+    
+    class Meta:
+        verbose_name = 'Sifarişlər'
+        verbose_name_plural = 'Sifarişlər'
 
 
 class SifarisMehsul(models.Model):
@@ -146,13 +127,8 @@ class SifarisMehsul(models.Model):
     def __str__(self):
         return f"{self.mehsul.adi} - {self.mehsul.kateqoriya} - {self.mehsul.brend_kod} - {self.mehsul.oem} - {self.miqdar} ədəd"
 
-    @property
-    def formatted_qiymet(self):
-        return str(self.qiymet).replace(',', '.')
-
     def total_price(self):
-        from decimal import Decimal
-        return Decimal(str(self.miqdar)) * self.qiymet
+        return self.miqdar * self.qiymet
 
     def save(self, *args, **kwargs):
         # Sifarişin cəmini yeniləyin

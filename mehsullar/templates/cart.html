@@ -115,22 +115,17 @@
 <!-- Təsdiqləmə Modalı -->
 <div id="confirmModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header">
-            <h2>Sifarişi Təsdiqləyin</h2>
+        <div class="modal-icon-wrapper">
+            <i class="fas fa-question-circle modal-icon"></i>
         </div>
-        <div class="modal-body">
-            <p>Sifarişinizi təsdiqləmək istədiyinizə əminsiniz?</p>
-            <div class="total-amount">
-                <strong>Ümumi Məbləğ:</strong>
-                <span>{{ cemi_mebleg }} AZN</span>
-            </div>
-        </div>
-        <div class="modal-footer">
+        <h2>Sifarişi Təsdiqləyin</h2>
+        <p>Sifarişinizi təsdiqləmək istədiyinizə əminsiniz?</p>
+        <div class="modal-actions">
             <button onclick="submitOrder()" class="confirm-btn">
-                <i class="fas fa-check"></i> Bəli, Təsdiqlə
+                <i class="fas fa-check"></i> Bəli
             </button>
             <button onclick="closeModal()" class="cancel-btn">
-                <i class="fas fa-times"></i> Xeyr, Ləğv Et
+                <i class="fas fa-times"></i> Xeyr
             </button>
         </div>
     </div>
@@ -139,25 +134,22 @@
 <!-- Uğurlu Sifariş Modalı -->
 <div id="successModal" class="modal">
     <div class="modal-content success">
-        <div class="success-icon">
-            <i class="fas fa-check-circle"></i>
+        <div class="modal-icon-wrapper success">
+            <i class="fas fa-check-circle modal-icon"></i>
         </div>
         <h2>Təbriklər!</h2>
-        <p>Sifarişiniz uğurla qeydə alındı</p>
-        <div class="success-message">
-            <p>Sifariş izləmə səhifəsinə yönləndirilirsiniz...</p>
-            <div class="loading-dots">
-                <span></span>
-                <span></span>
-                <span></span>
+        <p>Sifarişiniz uğurla tamamlandı</p>
+        <div class="success-details">
+            <div class="success-item">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Sifariş qeydə alındı</span>
+            </div>
+            <div class="success-item">
+                <i class="fas fa-clock"></i>
+                <span>Status: Gözləmədə</span>
             </div>
         </div>
     </div>
-</div>
-
-<!-- Loading Spinner -->
-<div class="loading-spinner" style="display: none;">
-    <div class="spinner"></div>
 </div>
 
 <!-- Notification -->

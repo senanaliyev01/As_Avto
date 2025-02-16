@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.utils.deprecation import MiddlewareMixin
 import time
 import logging
+from django.http import HttpResponseForbidden
 
 request_logger = logging.getLogger('django.request')
 
@@ -23,6 +24,16 @@ class AddSearchDataMiddleware(MiddlewareMixin):
 class RequestLoggingMiddleware(MiddlewareMixin):
     def process_request(self, request):
         request.start_time = time.time()
+        
+        # Təhlükəsizlik yoxlamaları
+        if request.method not in ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']:
+            return HttpResponseForbidden('Method not allowed')
+            
+        # Host başlığı yoxlaması
+        allowed_hosts = ['as-avto.com', 'www.as-avto.com']
+        host = request.get_host().split(':')[0]
+        if host not in allowed_hosts:
+            return HttpResponseForbidden('Invalid host header')
 
     def process_response(self, request, response):
         if hasattr(request, 'start_time'):
@@ -37,10 +48,10 @@ class RequestLoggingMiddleware(MiddlewareMixin):
                 data = dict(request.POST.items())
             
             # Həssas məlumatları təmizlə
-            if 'password' in data:
-                data['password'] = '*****'
-            if 'csrfmiddlewaretoken' in data:
-                data['csrfmiddlewaretoken'] = '*****'
+            sensitive_fields = ['password', 'csrfmiddlewaretoken', 'token', 'key', 'secret']
+            for field in sensitive_fields:
+                if field in data:
+                    data[field] = '*****'
             
             log_data = {
                 'ip': ip,
@@ -49,7 +60,9 @@ class RequestLoggingMiddleware(MiddlewareMixin):
                 'path': request.path,
                 'status': response.status_code,
                 'time': total_time,
-                'data': str(data)
+                'data': str(data),
+                'user_agent': request.META.get('HTTP_USER_AGENT', ''),
+                'referer': request.META.get('HTTP_REFERER', '')
             }
 
             # Status koduna görə log səviyyəsini təyin et
@@ -73,10 +86,10 @@ class RequestLoggingMiddleware(MiddlewareMixin):
             data = dict(request.POST.items())
         
         # Həssas məlumatları təmizlə
-        if 'password' in data:
-            data['password'] = '*****'
-        if 'csrfmiddlewaretoken' in data:
-            data['csrfmiddlewaretoken'] = '*****'
+        sensitive_fields = ['password', 'csrfmiddlewaretoken', 'token', 'key', 'secret']
+        for field in sensitive_fields:
+            if field in data:
+                data[field] = '*****'
         
         log_data = {
             'ip': ip,

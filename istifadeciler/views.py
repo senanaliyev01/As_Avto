@@ -18,6 +18,8 @@ def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
+        remember_me = request.POST.get('remember_me')
+        
         user = authenticate(request, username=username, password=password)
         
         if user is not None:
@@ -29,12 +31,22 @@ def login_view(request):
                 return render(request, 'login.html')
                 
             login(request, user)
-            return redirect('main')
+            
+            # Remember Me yoxlaması
+            if not remember_me:
+                request.session.set_expiry(0)  # Browser bağlandıqda session silinəcək
+            else:
+                # 1 illik session
+                request.session.set_expiry(31536000)  # 365 gün
+            
+            # Əgər istifadəçi admin panelə giriş etməyə çalışırdısa
+            next_url = request.GET.get('next')
+            if next_url:
+                return redirect(next_url)
+            return redirect('home')
         else:
-            messages.error(request, 
-                'İstifadəçi adı və ya şifrə yanlışdır.',
-                extra_tags='auth-error')
-                
+            messages.error(request, 'İstifadəçi adı və ya şifrə yanlışdır!')
+    
     return render(request, 'login.html')
 
 @login_required

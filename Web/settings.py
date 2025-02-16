@@ -19,8 +19,6 @@ ALLOWED_HOSTS = ['188.245.112.154','localhost','127.0.0.1','0.0.0.0', 'as-avto.c
 CSRF_TRUSTED_ORIGINS = [
     'https://as-avto.com',
     'https://www.as-avto.com',
-    'http://as-avto.com',
-    'http://www.as-avto.com',
 ]
 
 # SSL və HTTPS Təhlükəsizlik Tənzimləmələri
@@ -30,7 +28,7 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
 # HSTS (HTTP Strict Transport Security) Tənzimləmələri
-SECURE_HSTS_SECONDS = 31536000000  # Ömürlük (1000 il)
+SECURE_HSTS_SECONDS = 31536000  # 1 il
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
@@ -51,7 +49,7 @@ SECURE_MIN_TLS_VERSION = 'TLSv1.3'
 # SSL Session və Cookie Təhlükəsizliyi
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Strict'
-SESSION_COOKIE_AGE = 86400  # 24 saat
+SESSION_COOKIE_AGE = 31536000  # 1 il (365 gün)
 CSRF_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SAMESITE = 'Strict'
 CSRF_USE_SESSIONS = True
@@ -285,6 +283,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 8,
+        }
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
@@ -366,3 +367,22 @@ LOGGING = {
         },
     }
 }
+
+# Session Tənzimləmələri
+SESSION_COOKIE_AGE = 31536000  # 1 il (365 gün)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Browser bağlandıqda session silinməsin
+SESSION_SAVE_EVERY_REQUEST = True  # Hər sorğuda session-u yenilə
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Strict'
+
+# Authentication Tənzimləmələri
+LOGIN_URL = '/login/'  # Login səhifəsinin URL-i
+LOGIN_REDIRECT_URL = '/'  # Uğurlu giriş zamanı yönləndirilən səhifə
+LOGOUT_REDIRECT_URL = '/login/'  # Çıxış zamanı yönləndirilən səhifə
+
+# Remember Me funksionallığı üçün
+AUTH_USER_MODEL = 'auth.User'
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]

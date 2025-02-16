@@ -30,7 +30,7 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
 # HSTS (HTTP Strict Transport Security) Tənzimləmələri
-SECURE_HSTS_SECONDS = 63072000  # 2 il
+SECURE_HSTS_SECONDS = 31536000000  # Ömürlük (1000 il)
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
@@ -42,34 +42,21 @@ X_FRAME_OPTIONS = 'DENY'
 # SSL/TLS Version və Cipher Məhdudiyyətləri
 SECURE_SSL_CIPHERS = (
     'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:'
-    'ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:'
-    'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:'
-    'DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256'
+    'ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305'
 )
 
-# Content Security Policy (CSP) Tənzimləmələri
-CSP_DEFAULT_SRC = ("'self'", "https:", "data:", "ws:")
-CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "https:")
-CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'", "https:")
-CSP_IMG_SRC = ("'self'", "https:", "data:", "blob:")
-CSP_FONT_SRC = ("'self'", "https:", "data:")
-CSP_CONNECT_SRC = ("'self'", "https:", "wss:")
-CSP_FRAME_SRC = ("'self'", "https:")
-CSP_MEDIA_SRC = ("'self'", "https:", "data:")
-CSP_OBJECT_SRC = ("'none'",)
-CSP_BASE_URI = ("'self'",)
-CSP_FRAME_ANCESTORS = ("'none'",)
-CSP_FORM_ACTION = ("'self'", "https:")
-CSP_INCLUDE_NONCE_IN = ('script-src',)
-CSP_REQUIRE_SRI_FOR = ('script', 'style')
+# TLS Version
+SECURE_MIN_TLS_VERSION = 'TLSv1.3'
 
 # SSL Session və Cookie Təhlükəsizliyi
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Strict'
+SESSION_COOKIE_AGE = 86400  # 24 saat
 CSRF_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SAMESITE = 'Strict'
 CSRF_USE_SESSIONS = True
 CSRF_COOKIE_NAME = '__Secure-csrftoken'
+CSRF_COOKIE_AGE = 86400  # 24 saat
 
 # Əlavə Təhlükəsizlik Başlıqları
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'

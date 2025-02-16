@@ -73,9 +73,46 @@
                     "offers": {
                         "@type": "Offer",
                         "priceCurrency": "AZN",
-                        "price": "{{ mehsul.qiymet }}",
+                        "price": "{{ mehsul.qiymet|floatformat:2 }}",
                         "priceValidUntil": "{% now 'Y' %}-12-31",
                         "url": "https://as-avto.com{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}",
+                        "availability": "https://schema.org/InStock",
+                        "shippingDetails": {
+                            "@type": "OfferShippingDetails",
+                            "shippingRate": {
+                                "@type": "MonetaryAmount",
+                                "value": "0",
+                                "currency": "AZN"
+                            },
+                            "shippingDestination": {
+                                "@type": "DefinedRegion",
+                                "addressCountry": "AZ"
+                            },
+                            "deliveryTime": {
+                                "@type": "ShippingDeliveryTime",
+                                "handlingTime": {
+                                    "@type": "QuantitativeValue",
+                                    "minValue": "0",
+                                    "maxValue": "1",
+                                    "unitCode": "DAY"
+                                },
+                                "transitTime": {
+                                    "@type": "QuantitativeValue",
+                                    "minValue": "1",
+                                    "maxValue": "2",
+                                    "unitCode": "DAY"
+                                }
+                            }
+                        },
+                        "hasMerchantReturnPolicy": {
+                            "@type": "MerchantReturnPolicy",
+                            "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+                            "returnWindow": {
+                                "@type": "QuantitativeValue",
+                                "value": "30",
+                                "unitCode": "DAY"
+                            }
+                        },
                         "seller": {
                             "@type": "Organization",
                             "name": "AS-AVTO",

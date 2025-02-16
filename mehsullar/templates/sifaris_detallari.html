@@ -140,8 +140,8 @@
                     <td>{{ mehsul.mehsul.brend_kod }}</td>
                     <td>{{ mehsul.mehsul.oem }}</td>
                     <td class="text-center">{{ mehsul.miqdar }}</td>
-                    <td class="text-right">{{ mehsul.qiymet|floatformat:2 }} AZN</td>
-                    <td class="text-right">{{ mehsul.cemi|floatformat:2 }} AZN</td>
+                    <td class="text-right">{{ mehsul.formatted_qiymet }} AZN</td>
+                    <td class="text-right">{{ mehsul.total_price }} AZN</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -149,7 +149,7 @@
                 <tr>
                     <td colspan="6"></td>
                     <td colspan="2"><strong>Ümumi Cəmi:</strong></td>
-                    <td class="text-right"><strong>{{ sifaris.cemi_mebleg|floatformat:2 }} AZN</strong></td>
+                    <td class="text-right"><strong>{{ sifaris.formatted_cemi_mebleg }} AZN</strong></td>
                 </tr>
             </tfoot>
         </table>

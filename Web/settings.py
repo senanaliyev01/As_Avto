@@ -24,20 +24,28 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 # SSL və HTTPS Təhlükəsizlik Tənzimləmələri
-SECURE_SSL_REDIRECT = True  # HTTP -> HTTPS yönləndirmə
+SECURE_SSL_REDIRECT = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SESSION_COOKIE_SECURE = True  # Session cookie-lər yalnız HTTPS üzərindən
-CSRF_COOKIE_SECURE = True    # CSRF token-lər yalnız HTTPS üzərindən
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 # HSTS (HTTP Strict Transport Security) Tənzimləmələri
-SECURE_HSTS_SECONDS = 31536000  # 1 il (saniyə ilə)
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Bütün alt domainlər üçün HTTPS
-SECURE_HSTS_PRELOAD = True  # HSTS preload siyahısına əlavə edir
+SECURE_HSTS_SECONDS = 63072000  # 2 il
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 
 # SSL/TLS Təhlükəsizlik Başlıqları
-SECURE_BROWSER_XSS_FILTER = True  # XSS qoruması
-SECURE_CONTENT_TYPE_NOSNIFF = True  # MIME type sniffing qoruması
-X_FRAME_OPTIONS = 'DENY'  # Clickjacking qoruması
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+
+# SSL/TLS Version və Cipher Məhdudiyyətləri
+SECURE_SSL_CIPHERS = (
+    'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:'
+    'ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:'
+    'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:'
+    'DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256'
+)
 
 # Content Security Policy (CSP) Tənzimləmələri
 CSP_DEFAULT_SRC = ("'self'", "https:", "data:", "ws:")
@@ -56,22 +64,16 @@ CSP_INCLUDE_NONCE_IN = ('script-src',)
 CSP_REQUIRE_SRI_FOR = ('script', 'style')
 
 # SSL Session və Cookie Təhlükəsizliyi
-SESSION_COOKIE_HTTPONLY = True  # JavaScript-dən qorunma
-SESSION_COOKIE_SAMESITE = 'Strict'  # CSRF hücumlarından qorunma
-SESSION_COOKIE_AGE = 1209600  # 2 həftə
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Browser bağlandıqda session silinməsin
-
-# CSRF Təhlükəsizliyi
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Strict'
 CSRF_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SAMESITE = 'Strict'
-CSRF_COOKIE_AGE = 31536000  # 1 il
 CSRF_USE_SESSIONS = True
-CSRF_COOKIE_NAME = '__Secure-csrftoken'  # Secure prefix
+CSRF_COOKIE_NAME = '__Secure-csrftoken'
 
 # Əlavə Təhlükəsizlik Başlıqları
-SECURE_REFERRER_POLICY = 'same-origin'
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
-SECURE_BROWSER_XSS_FILTER = True
 
 # SSL Sertifikat Yenilənmə Tənzimləmələri
 SECURE_SSL_REDIRECT_EXEMPT = []  # HTTPS yönləndirməsindən azad olan URL-lər

@@ -659,4 +659,144 @@
         }
     }
 
+    // Bildiriş göstərmə funksiyası
+    window.showNotification = function(message, type = 'success') {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: ${type === 'success' ? '#4CAF50' : '#f44336'};
+            color: white;
+            padding: 15px;
+            border-radius: 4px;
+            z-index: 1000;
+        `;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 3000);
+    };
+
+    // Miqdar dəyişikliyi üçün debounce funksiyası
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    // Miqdar dəyişikliyi
+    window.handleQuantityInput = debounce(function(input) {
+        const value = input.value.replace(/[^0-9]/g, '');
+        const itemId = input.dataset.itemId;
+        
+        if (value === '' || value === '0') {
+            input.value = '1';
+            updateQuantity(itemId, 'set', 1);
+        } else {
+            updateQuantity(itemId, 'set', parseInt(value));
+        }
+    }, 300);
+
+    // Miqdar yeniləmə funksiyası
+    window.updateQuantity = function(itemId, value) {
+        const row = document.querySelector(`tr[data-item-id="${itemId}"]`);
+        const input = row.querySelector('.quantity-input');
+        let newQuantity;
+
+        if (typeof value === 'number') {
+            newQuantity = parseInt(input.value) + value;
+        } else {
+            newQuantity = parseInt(value);
+        }
+
+        if (isNaN(newQuantity) || newQuantity < 1) {
+            newQuantity = 1;
+            input.value = 1;
+        }
+
+        // Düyməni deaktiv et və loading göstər
+        const buttons = row.querySelectorAll('.quantity-btn');
+        buttons.forEach(btn => {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+        });
+        input.disabled = true;
+
+        // Loading ikonunu göstər
+        const loadingIcon = document.createElement('span');
+        loadingIcon.className = 'loading-icon';
+        loadingIcon.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        input.parentNode.appendChild(loadingIcon);
+
+        fetch(`/update_quantity/${itemId}/${newQuantity}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    input.value = data.new_quantity;
+                    const itemTotalElement = row.querySelector('.item-total');
+                    itemTotalElement.textContent = data.item_total.toFixed(2) + ' AZN';
+                    
+                    const totalElement = document.getElementById('total-amount');
+                    if (totalElement) {
+                        totalElement.textContent = data.total_amount.toFixed(2) + ' AZN';
+                        totalElement.classList.add('highlight');
+                        setTimeout(() => totalElement.classList.remove('highlight'), 300);
+                    }
+
+                    row.classList.add('highlight');
+                    setTimeout(() => row.classList.remove('highlight'), 300);
+                } else {
+                    input.value = input.defaultValue;
+                    window.showNotification(data.error || 'Xəta baş verdi', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Xəta:', error);
+                input.value = input.defaultValue;
+                window.showNotification('Xəta baş verdi', 'error');
+            })
+            .finally(() => {
+                // Düymələri və inputu yenidən aktiv et
+                buttons.forEach(btn => {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                });
+                input.disabled = false;
+                
+                // Loading ikonunu sil
+                const loadingIcon = row.querySelector('.loading-icon');
+                if (loadingIcon) {
+                    loadingIcon.remove();
+                }
+            });
+    };
+
+    // CSS stilləri
+    const cartStyles = document.createElement('style');
+    cartStyles.textContent = `
+        .highlight {
+            animation: highlight 0.3s ease;
+        }
+
+        @keyframes highlight {
+            0% {
+                background-color: transparent;
+            }
+            50% {
+                background-color: rgba(100, 255, 218, 0.2);
+            }
+            100% {
+                background-color: transparent;
+            }
+        }
+    `;
+    document.head.appendChild(cartStyles);
+
 

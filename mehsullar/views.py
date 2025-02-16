@@ -284,9 +284,10 @@ def update_quantity(request, item_id, new_quantity):
         except ValueError:
             return JsonResponse({
                 'success': False,
-                'error': 'Düzgün miqdar daxil edin.'
+                'error': 'Düzgün miqdar daxil edin'
             }, status=400)
 
+        # Miqdarı yenilə
         cart_item.miqdar = new_quantity
         cart_item.save()
 

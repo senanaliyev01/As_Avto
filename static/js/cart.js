@@ -105,41 +105,41 @@ document.addEventListener('DOMContentLoaded', function() {
         const input = row.querySelector('.quantity-input');
         let newQuantity;
 
-        // Düymə ilə artırma/azaltma və ya birbaşa dəyər daxil etmə
         if (typeof value === 'number') {
             newQuantity = parseInt(input.value) + value;
         } else {
             newQuantity = parseInt(value);
         }
 
-        // Minimum 1 olmasını təmin et
         if (isNaN(newQuantity) || newQuantity < 1) {
             newQuantity = 1;
             input.value = 1;
         }
 
+        // Düyməni deaktiv et və loading göstər
+        const buttons = row.querySelectorAll('.quantity-btn');
+        buttons.forEach(btn => {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+        });
+        input.disabled = true;
+
         fetch(`/update_quantity/${itemId}/${newQuantity}/`)
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Input dəyərini yenilə
                     input.value = data.new_quantity;
-                    
-                    // Sətir cəmini yenilə
                     const itemTotalElement = row.querySelector('.item-total');
                     itemTotalElement.textContent = data.item_total.toFixed(2) + ' AZN';
                     
-                    // Ümumi cəmi yenilə
                     const totalElement = document.getElementById('total-amount');
                     if (totalElement) {
                         totalElement.textContent = data.total_amount.toFixed(2) + ' AZN';
                     }
 
-                    // Animasiya
                     row.classList.add('highlight');
                     setTimeout(() => row.classList.remove('highlight'), 300);
                 } else {
-                    // Xəta baş verdikdə əvvəlki dəyərə qayıt
                     input.value = input.defaultValue;
                     showNotification(data.error || 'Xəta baş verdi', 'error');
                 }
@@ -148,6 +148,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Xəta:', error);
                 input.value = input.defaultValue;
                 showNotification('Xəta baş verdi', 'error');
+            })
+            .finally(() => {
+                // Düymələri və inputu yenidən aktiv et
+                buttons.forEach(btn => {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                });
+                input.disabled = false;
             });
     };
 

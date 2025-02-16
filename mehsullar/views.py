@@ -20,6 +20,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import Image
 from istifadeciler.models import Profile
+from django.contrib import messages
 
 @login_required
 def umumibaxis(request):
@@ -154,15 +155,25 @@ def sebetden_sil(request, sebet_id):
         # Float-a çevir və yuvarlaqlaşdır
         cemi_mebleg = round(float(cemi_mebleg), 2)
         
-        return JsonResponse({
-            'success': True,
-            'cemi_mebleg': cemi_mebleg
-        })
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'total': cemi_mebleg,
+                'is_empty': not sebet.exists()
+            })
+        else:
+            messages.success(request, 'Məhsul səbətdən silindi')
+            return redirect('view_cart')
+            
     except Sebet.DoesNotExist:
-        return JsonResponse({
-            'success': False,
-            'message': 'Məhsul tapılmadı'
-        }, status=404)
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': False,
+                'message': 'Məhsul tapılmadı'
+            }, status=404)
+        else:
+            messages.error(request, 'Məhsul tapılmadı')
+            return redirect('view_cart')
 
 @login_required
 def sifarisi_gonder(request):
@@ -171,10 +182,11 @@ def sifarisi_gonder(request):
             # Səbətdəki məhsulları yoxla
             sebet = Sebet.objects.filter(user=request.user)
             if not sebet.exists():
-                return JsonResponse({
-                    'success': False,
-                    'message': 'Səbətiniz boşdur'
-                }, status=400)
+                messages.error(request, 'Səbətiniz boşdur')
+                return redirect('view_cart')
+
+            # Stok yoxlaması
+           
 
             # Yeni sifarişi yarat
             sifaris = Sifaris.objects.create(
@@ -203,21 +215,14 @@ def sifarisi_gonder(request):
             # Səbəti təmizlə
             sebet.delete()
 
-            return JsonResponse({
-                'success': True,
-                'message': 'Sifarişiniz uğurla qeydə alındı'
-            })
+            messages.success(request, 'Sifarişiniz uğurla qeydə alındı')
+            return redirect('sifaris_izle')
 
         except Exception as e:
-            return JsonResponse({
-                'success': False,
-                'message': 'Xəta baş verdi: ' + str(e)
-            }, status=500)
+            messages.error(request, f'Xəta baş verdi: {str(e)}')
+            return redirect('view_cart')
 
-    return JsonResponse({
-        'success': False,
-        'message': 'Yanlış sorğu metodu'
-    }, status=400)
+    return redirect('view_cart')
 
 
 from django.contrib.auth.decorators import login_required

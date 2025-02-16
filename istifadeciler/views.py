@@ -34,10 +34,13 @@ def login_view(request):
             
             # Remember Me yoxlaması
             if not remember_me:
-                request.session.set_expiry(0)  # Browser bağlandıqda session silinəcək
+                # Browser bağlandıqda session silinəcək
+                request.session.set_expiry(0)
+                request.session['remember_me'] = False
             else:
                 # 1 illik session
                 request.session.set_expiry(31536000)  # 365 gün
+                request.session['remember_me'] = True
             
             # Əgər istifadəçi admin panelə giriş etməyə çalışırdısa
             next_url = request.GET.get('next')
@@ -45,7 +48,13 @@ def login_view(request):
                 return redirect(next_url)
             return redirect('home')
         else:
-            messages.error(request, 'İstifadəçi adı və ya şifrə yanlışdır!')
+            messages.error(request, 'İstifadəçi adı və ya şifrə yanlışdır!', extra_tags='error')
+    
+    # Əgər istifadəçi artıq daxil olubsa və remember_me seçilməyibsə
+    if request.user.is_authenticated:
+        if not request.session.get('remember_me', False):
+            logout(request)
+            messages.info(request, 'Sessiya müddəti bitdi. Zəhmət olmasa yenidən daxil olun.', extra_tags='info')
     
     return render(request, 'login.html')
 

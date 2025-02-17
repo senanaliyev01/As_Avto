@@ -1,7 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from mehsullar.models import Brend, Marka, Mehsul, MarkaSekil
 from django.template.defaultfilters import slugify
-from django.urls import reverse
 
 def anaevim(request):
     brendler = Brend.objects.all()
@@ -20,18 +19,15 @@ def anaevim(request):
 def mehsul_etrafli(request, mehsul_id, mehsul_adi, mehsul_oem, mehsul_brend_kod):
     mehsul = get_object_or_404(Mehsul, id=mehsul_id)
     
-    # Düzgün URL-i yarat
-    duzgun_url = reverse('mehsul_etrafli', kwargs={
-        'mehsul_id': mehsul.id,
-        'mehsul_adi': mehsul.adi.replace(' ', '-'),
-        'mehsul_oem': mehsul.oem,
-        'mehsul_brend_kod': mehsul.brend_kod
-    })
+    # Düzgün URL formatını yoxlayırıq
+    duzgun_mehsul_adi = slugify(mehsul.mehsul_adi)
+    duzgun_oem = slugify(mehsul.oem)
+    duzgun_brend_kod = slugify(mehsul.brend_kodu)
     
-    # Cari URL ilə düzgün URL-i müqayisə et
-    cari_url = request.path
-    if cari_url != duzgun_url:
-        return redirect(duzgun_url, permanent=True)  # 301 yönləndirmə
+    # Əgər URL parametrləri düzgün deyilsə, düzgün URL-ə 301 yönləndirmə edirik
+    if mehsul_adi != duzgun_mehsul_adi or mehsul_oem != duzgun_oem or mehsul_brend_kod != duzgun_brend_kod:
+        duzgun_url = f'/product/{duzgun_mehsul_adi}-{duzgun_oem}-{duzgun_brend_kod}/{mehsul_id}/'
+        return redirect(duzgun_url, permanent=True)  # permanent=True 301 yönləndirməsini təmin edir
     
     context = {
         'mehsul': mehsul

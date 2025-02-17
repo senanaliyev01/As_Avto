@@ -25,6 +25,10 @@ class MehsulSitemap(Sitemap):
     changefreq = "always"
     priority = 0.9
 
+    def __init__(self, *args, **kwargs):
+        self.protocol = 'https'
+        super(MehsulSitemap, self).__init__(*args, **kwargs)
+
     def items(self):
         return Mehsul.objects.all()
 
@@ -55,6 +59,21 @@ class MehsulSitemap(Sitemap):
 
     def image_title(self, mehsul):
         return mehsul.adi
+
+    def get_urls(self, site=None, **kwargs):
+        urls = []
+        for mehsul in self.items():
+            loc = self._full_url(self.location(mehsul))
+            url_info = {
+                'mehsul': mehsul,
+                'location': loc,
+                'lastmod': self.lastmod(mehsul),
+                'changefreq': self.changefreq,
+                'priority': self.priority,
+                'images': [{'loc': f"https://as-avto.com{mehsul.sekil.url}"}] if mehsul.sekil else []
+            }
+            urls.append(url_info)
+        return urls
 
 # Yalnız anaevim app üçün sitemaps
 sitemaps = {

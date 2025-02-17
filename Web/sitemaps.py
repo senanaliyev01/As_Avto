@@ -6,7 +6,7 @@ from django.utils.text import slugify
 from urllib.parse import quote
 
 class StaticViewSitemap(Sitemap):
-    changefreq = "always"
+    changefreq = "daily"  # hər gün yenilənə bilər
     priority = 0.9
 
     def items(self):
@@ -21,8 +21,12 @@ class StaticViewSitemap(Sitemap):
         return timezone.now()
 
 class MehsulSitemap(Sitemap):
-    changefreq = "always"
+    changefreq = "weekly"  # həftəlik yenilənə bilər
     priority = 0.9
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.protocol = 'https'
 
     def items(self):
         return Mehsul.objects.all()
@@ -43,16 +47,40 @@ class MehsulSitemap(Sitemap):
             'mehsul_id': obj.id
         })
 
-    def image_location(self, item):
-        if item.sekil:
-            return f"https://as-avto.com{item.sekil.url}"
-        return None
+    def _urls(self, page, protocol, domain):
+        urls = []
+        latest_lastmod = None
+        all_items = self.items()
 
-    def image_title(self, item):
-        return f"{item.adi} {item.brend_kod}"
+        for item in all_items:
+            loc = f"{protocol}://{domain}{self.location(item)}"
+            priority = self.priority
+            lastmod = self.lastmod(item) if self.lastmod is not None else None
 
-    def image_caption(self, item):
-        return f"{item.adi} - {item.brend.adi} {item.marka.adi} {item.brend_kod} {item.oem}"
+            url_info = {
+                'item': item,
+                'location': loc,
+                'lastmod': lastmod,
+                'changefreq': self.changefreq,
+                'priority': str(priority if priority is not None else ''),
+            }
+
+            if item.sekil:  # Əgər şəkil varsa
+                url_info['images'] = [{
+                    'loc': f"{protocol}://{domain}{item.sekil.url}",
+                    'title': f"{item.adi} {item.brend_kod}",
+                    'caption': f"{item.adi} - {item.brend.adi} {item.marka.adi} {item.brend_kod} {item.oem}"
+                }]
+
+            urls.append(url_info)
+            if lastmod is not None:
+                if latest_lastmod is None or lastmod > latest_lastmod:
+                    latest_lastmod = lastmod
+
+        if latest_lastmod:
+            self.latest_lastmod = latest_lastmod
+
+        return urls
 
 # Yalnız anaevim app üçün sitemaps
 sitemaps = {

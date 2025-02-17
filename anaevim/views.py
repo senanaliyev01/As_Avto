@@ -23,8 +23,8 @@ def mehsul_etrafli(request, mehsul_id, mehsul_adi, mehsul_oem, mehsul_brend_kod)
     # Düzgün URL-i yarat
     duzgun_url = reverse('mehsul_etrafli', kwargs={
         'mehsul_id': mehsul.id,
-        'mehsul_adi': mehsul.ad.replace(' ', '-'),
-        'mehsul_oem': mehsul.oem_kod,
+        'mehsul_adi': mehsul.adi.replace(' ', '-'),
+        'mehsul_oem': mehsul.oem,
         'mehsul_brend_kod': mehsul.brend_kod
     })
     

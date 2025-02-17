@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 from django.shortcuts import render
 from django.contrib.sitemaps.views import sitemap
 from .sitemaps import sitemaps
+from django.views.generic.base import RedirectView
 
 urlpatterns = [
     path('admin-as-avto-1983-2002/', admin.site.urls),
@@ -13,6 +14,10 @@ urlpatterns = [
     path('', include('esasevim.urls', namespace='esasevim')),
     path('', include('mehsullar.urls')),
     path('', include('rentacar.urls')),
+    
+    # Köhnə URL-ləri yeni URL-lərə yönləndir (301 Permanent Redirect)
+    path('auth/register/', RedirectView.as_view(url='/istifadeciler/register/', permanent=True)),
+    path('auth/login/', RedirectView.as_view(url='/istifadeciler/login/', permanent=True)),
     
     # Sitemap URL - şəkil dəstəyi ilə
     path('sitemap.xml', sitemap, {

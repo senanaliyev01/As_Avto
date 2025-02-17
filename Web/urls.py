@@ -14,9 +14,11 @@ urlpatterns = [
     path('', include('mehsullar.urls')),
     path('', include('rentacar.urls')),
     
-    # Sitemap URL
-    path('sitemap.xml', sitemap, {'sitemaps': sitemaps},
-         name='django.contrib.sitemaps.views.sitemap'),
+    # Sitemap URL - şəkil dəstəyi ilə
+    path('sitemap.xml', sitemap, {
+        'sitemaps': sitemaps,
+        'template_name': 'sitemap_template.xml'
+    }, name='django.contrib.sitemaps.views.sitemap'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 admin.site.site_title = 'AS-AVTO'

@@ -42,12 +42,47 @@ class MehsulSitemap(Sitemap):
             'mehsul_brend_kod': encoded_brand_code,
             'mehsul_id': obj.id
         })
-    
-    def image_location(self, item):
-        # Əgər məhsulun şəkli varsa, onun tam URL-ni qaytarırıq
-        if item.sekil:
-            return item.sekil.url
-        return None
+
+    def _urls(self, page, protocol, domain):
+        urls = []
+        latest_lastmod = None
+        all_items_lastmod = True  # track if all items have a lastmod
+
+        for item in self.paginator.page(page).object_list:
+            loc = f"{protocol}://{domain}{self._location(item)}"
+            priority = self._get('priority', item)
+            lastmod = self._get('lastmod', item)
+
+            if all_items_lastmod and lastmod is None:
+                all_items_lastmod = False
+            elif all_items_lastmod:
+                if latest_lastmod is None:
+                    latest_lastmod = lastmod
+                else:
+                    latest_lastmod = max(latest_lastmod, lastmod)
+
+            url_info = {
+                'item': item,
+                'location': loc,
+                'lastmod': lastmod,
+                'changefreq': self._get('changefreq', item),
+                'priority': str(priority if priority is not None else ''),
+            }
+
+            # Şəkil məlumatlarını əlavə edirik
+            if hasattr(item, 'sekil') and item.sekil:
+                url_info['images'] = [{
+                    'loc': f"{protocol}://{domain}{item.sekil.url}",
+                    'title': item.adi,
+                    'caption': f"{item.adi} - {item.brend_kod}"
+                }]
+
+            urls.append(url_info)
+
+        if all_items_lastmod and latest_lastmod:
+            self.latest_lastmod = latest_lastmod
+
+        return urls
 
 # Yalnız anaevim app üçün sitemaps
 sitemaps = {

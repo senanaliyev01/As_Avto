@@ -64,7 +64,7 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
 SECURE_SSL_REDIRECT_EXEMPT = []  # HTTPS yönləndirməsindən azad olan URL-lər
 SECURE_REDIRECT_EXEMPT = []      # Ümumi yönləndirmədən azad olan URL-lər
 
-# SSL/TLS Version Məhdudiyyətləri
+# SSL/TLS Version Məhdudiyyətlərii
 SECURE_SSL_CIPHERS = (
     'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:'
     'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:'

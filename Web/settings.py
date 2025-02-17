@@ -139,6 +139,9 @@ INSTALLED_APPS = [
 
 SITE_ID = 1
 
+# Sitemap cache müddəti (6 saat = 21600 saniyə)
+SITEMAP_CACHE_TIMEOUT = 21600
+
 # 3. Jazzmin tənzimləmələri
 JAZZMIN_SETTINGS = {
     # Başlıq

@@ -6,7 +6,7 @@ from django.utils.text import slugify
 from urllib.parse import quote
 
 class StaticViewSitemap(Sitemap):
-    changefreq = "always"
+    changefreq = "daily"
     priority = 0.9
 
     def items(self):
@@ -21,7 +21,7 @@ class StaticViewSitemap(Sitemap):
         return timezone.now()
 
 class MehsulSitemap(Sitemap):
-    changefreq = "always"
+    changefreq = "daily"
     priority = 0.9
 
     def items(self):

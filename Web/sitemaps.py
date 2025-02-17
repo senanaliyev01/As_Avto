@@ -31,15 +31,15 @@ class MehsulSitemap(Sitemap):
         return timezone.now()
 
     def location(self, obj):
-        # Xüsusi simvolları təmizləyirik və URL-friendly formatda kodlaşdırırıq
-        safe_name = slugify(obj.adi, allow_unicode=True)
-        safe_oem = slugify(obj.oem, allow_unicode=True)
-        safe_brand_code = slugify(obj.brend_kod, allow_unicode=True)
+        # URL-dəki xüsusi simvolları düzgün kodlaşdırırıq
+        encoded_name = quote(obj.adi)
+        encoded_oem = quote(obj.oem)
+        encoded_brand_code = quote(obj.brend_kod)
         
         return reverse('mehsul_etrafli', kwargs={
-            'mehsul_adi': safe_name,
-            'mehsul_oem': safe_oem,
-            'mehsul_brend_kod': safe_brand_code,
+            'mehsul_adi': encoded_name,
+            'mehsul_oem': encoded_oem,
+            'mehsul_brend_kod': encoded_brand_code,
             'mehsul_id': obj.id
         })
 

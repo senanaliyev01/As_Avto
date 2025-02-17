@@ -8,10 +8,11 @@ from urllib.parse import quote
 class StaticViewSitemap(Sitemap):
     changefreq = "always"
     priority = 0.9
-    protocol = 'https'
 
     def items(self):
-        return ['anaevim']
+        return [
+            'anaevim',  # Ana səhifə
+        ]
 
     def location(self, item):
         return reverse(item)
@@ -22,48 +23,27 @@ class StaticViewSitemap(Sitemap):
 class MehsulSitemap(Sitemap):
     changefreq = "always"
     priority = 0.9
-    protocol = 'https'
 
     def items(self):
         return Mehsul.objects.all()
 
-    def lastmod(self, mehsul):
+    def lastmod(self, obj):
         return timezone.now()
 
-    def location(self, mehsul):
+    def location(self, obj):
+        # URL-dəki xüsusi simvolları düzgün kodlaşdırırıq
+        encoded_name = quote(obj.adi)
+        encoded_oem = quote(obj.oem)
+        encoded_brand_code = quote(obj.brend_kod)
+        
         return reverse('mehsul_etrafli', kwargs={
-            'mehsul_adi': slugify(mehsul.adi),
-            'mehsul_oem': slugify(mehsul.oem),
-            'mehsul_brend_kod': slugify(mehsul.brend_kod),
-            'mehsul_id': mehsul.id
+            'mehsul_adi': encoded_name,
+            'mehsul_oem': encoded_oem,
+            'mehsul_brend_kod': encoded_brand_code,
+            'mehsul_id': obj.id
         })
 
-    def _urls(self, page, protocol, domain):
-        urls = []
-        for item in self.paginator.page(page).object_list:
-            loc = f"{protocol}://{domain}{self.location(item)}"
-            priority = self.priority
-            changefreq = self.changefreq
-            lastmod = self.lastmod(item) if self.lastmod is not None else None
-
-            url_info = {
-                'item': item,
-                'location': loc,
-                'lastmod': lastmod,
-                'changefreq': changefreq,
-                'priority': priority,
-            }
-
-            if item.sekil:
-                url_info['images'] = [{
-                    'loc': f"{protocol}://{domain}{item.sekil.url}",
-                    'title': item.adi,
-                    'caption': f"{item.adi} - {item.brend.adi} - {item.oem} - {item.brend_kod}"
-                }]
-
-            urls.append(url_info)
-        return urls
-
+# Yalnız anaevim app üçün sitemaps
 sitemaps = {
     'static': StaticViewSitemap,
     'mehsullar': MehsulSitemap,

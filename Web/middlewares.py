@@ -117,15 +117,26 @@ class RequestLoggingMiddleware(MiddlewareMixin):
 class SearchEnginePingMiddleware(MiddlewareMixin):
     def process_request(self, request):
         try:
-            # Hər sorğuda sitemap-i yenilə
-            sitemap(request, sitemaps)
+            # Cache-dən son yenilənmə vaxtını yoxla
+            last_ping = cache.get('sitemap_last_ping')
+            current_time = datetime.now()
             
-            # Google və Bing-ə ping göndər
-            requests.get('https://www.google.com/ping?sitemap=https://as-avto.com/sitemap.xml', timeout=1)
-            requests.get('https://www.bing.com/ping?sitemap=https://as-avto.com/sitemap.xml', timeout=1)
+            # Əgər son yenilənmədən 6 saat keçibsə və ya heç yenilənməyibsə
+            if not last_ping or (current_time - last_ping) > timedelta(hours=6):
+                # Sitemap-i yenilə
+                sitemap(request, sitemaps)
+                
+                # Search engine-lərə ping göndər
+                requests.get('https://www.google.com/ping?sitemap=https://as-avto.com/sitemap.xml', timeout=1)
+                requests.get('https://www.bing.com/ping?sitemap=https://as-avto.com/sitemap.xml', timeout=1)
+                
+                # Son yenilənmə vaxtını cache-də saxla
+                cache.set('sitemap_last_ping', current_time)
+                
+                app_logger.info("Sitemap yeniləndi və search engine-lərə ping göndərildi")
             
         except Exception as e:
-            print(f"Sitemap yeniləmə xətası: {str(e)}")
+            error_logger.error(f"Sitemap yeniləmə xətası: {str(e)}", exc_info=True)
             
         return None
         

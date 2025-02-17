@@ -18,6 +18,7 @@ class StaticViewSitemap(Sitemap):
         return reverse(item)
 
     def lastmod(self, obj):
+        # Hər saniyə yenilənmə üçün cari vaxtı qaytarırıq
         return timezone.now()
 
 class MehsulSitemap(Sitemap):
@@ -28,6 +29,7 @@ class MehsulSitemap(Sitemap):
         return Mehsul.objects.all()
 
     def lastmod(self, mehsul):
+        # Hər saniyə yenilənmə üçün cari vaxtı qaytarırıq
         return timezone.now()
 
     def location(self, mehsul):

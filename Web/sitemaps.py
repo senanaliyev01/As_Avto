@@ -8,75 +8,62 @@ from urllib.parse import quote
 class StaticViewSitemap(Sitemap):
     changefreq = "always"
     priority = 0.9
+    protocol = 'https'
 
     def items(self):
-        return [
-            'anaevim',  # Ana səhifə
-        ]
+        return ['anaevim']
 
     def location(self, item):
         return reverse(item)
 
     def lastmod(self, obj):
-        # Hər saniyə yenilənmə üçün cari vaxtı qaytarırıq
         return timezone.now()
 
 class MehsulSitemap(Sitemap):
     changefreq = "always"
     priority = 0.9
-
-    def __init__(self, *args, **kwargs):
-        self.protocol = 'https'
-        super(MehsulSitemap, self).__init__(*args, **kwargs)
+    protocol = 'https'
 
     def items(self):
         return Mehsul.objects.all()
 
     def lastmod(self, mehsul):
-        # Hər saniyə yenilənmə üçün cari vaxtı qaytarırıq
         return timezone.now()
 
     def location(self, mehsul):
-        # URL-dəki xüsusi simvolları düzgün kodlaşdırırıq
-        encoded_name = quote(mehsul.adi)
-        encoded_oem = quote(mehsul.oem)
-        encoded_brand_code = quote(mehsul.brend_kod)
-        
         return reverse('mehsul_etrafli', kwargs={
-            'mehsul_adi': encoded_name,
-            'mehsul_oem': encoded_oem,
-            'mehsul_brend_kod': encoded_brand_code,
+            'mehsul_adi': slugify(mehsul.adi),
+            'mehsul_oem': slugify(mehsul.oem),
+            'mehsul_brend_kod': slugify(mehsul.brend_kod),
             'mehsul_id': mehsul.id
         })
-        
-    def image_location(self, mehsul):
-        if mehsul.sekil:
-            return f"https://as-avto.com{mehsul.sekil.url}"
-        return None
 
-    def image_caption(self, mehsul):
-        return f"{mehsul.adi} - {mehsul.brend.adi} - {mehsul.oem} - {mehsul.brend_kod}"
-
-    def image_title(self, mehsul):
-        return mehsul.adi
-
-    def get_urls(self, site=None, **kwargs):
+    def _urls(self, page, protocol, domain):
         urls = []
-        latest_lastmod = None
-        for mehsul in self.items():
-            loc = f"https://as-avto.com{self.location(mehsul)}"
+        for item in self.paginator.page(page).object_list:
+            loc = f"{protocol}://{domain}{self.location(item)}"
+            priority = self.priority
+            changefreq = self.changefreq
+            lastmod = self.lastmod(item) if self.lastmod is not None else None
+
             url_info = {
-                'mehsul': mehsul,
+                'item': item,
                 'location': loc,
-                'lastmod': self.lastmod(mehsul),
-                'changefreq': self.changefreq,
-                'priority': self.priority,
-                'images': [{'loc': f"https://as-avto.com{mehsul.sekil.url}"}] if mehsul.sekil else []
+                'lastmod': lastmod,
+                'changefreq': changefreq,
+                'priority': priority,
             }
+
+            if item.sekil:
+                url_info['images'] = [{
+                    'loc': f"{protocol}://{domain}{item.sekil.url}",
+                    'title': item.adi,
+                    'caption': f"{item.adi} - {item.brend.adi} - {item.oem} - {item.brend_kod}"
+                }]
+
             urls.append(url_info)
         return urls
 
-# Yalnız anaevim app üçün sitemaps
 sitemaps = {
     'static': StaticViewSitemap,
     'mehsullar': MehsulSitemap,

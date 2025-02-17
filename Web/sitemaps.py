@@ -6,7 +6,7 @@ from django.utils.text import slugify
 from urllib.parse import quote
 
 class StaticViewSitemap(Sitemap):
-    changefreq = "always"  # hər zaman yenilənə bilər
+    changefreq = "always"
     priority = 0.9
 
     def items(self):
@@ -21,12 +21,8 @@ class StaticViewSitemap(Sitemap):
         return timezone.now()
 
 class MehsulSitemap(Sitemap):
-    changefreq = "always"  # hər zaman yenilənə bilər
+    changefreq = "always"
     priority = 0.9
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.protocol = 'https'
 
     def items(self):
         return Mehsul.objects.all()
@@ -46,41 +42,12 @@ class MehsulSitemap(Sitemap):
             'mehsul_brend_kod': encoded_brand_code,
             'mehsul_id': obj.id
         })
-
-    def _urls(self, page, protocol, domain):
-        urls = []
-        latest_lastmod = None
-        all_items = self.items()
-
-        for item in all_items:
-            loc = f"{protocol}://{domain}{self.location(item)}"
-            priority = self.priority
-            lastmod = self.lastmod(item) if self.lastmod is not None else None
-
-            url_info = {
-                'item': item,
-                'location': loc,
-                'lastmod': lastmod,
-                'changefreq': self.changefreq,
-                'priority': str(priority if priority is not None else ''),
-            }
-
-            if item.sekil:  # Əgər şəkil varsa
-                url_info['images'] = [{
-                    'loc': f"{protocol}://{domain}{item.sekil.url}",
-                    'title': f"{item.adi} {item.brend_kod}",
-                    'caption': f"{item.adi} - {item.brend.adi} {item.marka.adi} {item.brend_kod} {item.oem}"
-                }]
-
-            urls.append(url_info)
-            if lastmod is not None:
-                if latest_lastmod is None or lastmod > latest_lastmod:
-                    latest_lastmod = lastmod
-
-        if latest_lastmod:
-            self.latest_lastmod = latest_lastmod
-
-        return urls
+    
+    def image_location(self, item):
+        # Əgər məhsulun şəkli varsa, onun tam URL-ni qaytarırıq
+        if item.sekil:
+            return item.sekil.url
+        return None
 
 # Yalnız anaevim app üçün sitemaps
 sitemaps = {

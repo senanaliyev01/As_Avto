@@ -4,8 +4,6 @@ from mehsullar.models import Mehsul
 from django.utils import timezone
 from django.utils.text import slugify
 from urllib.parse import quote
-from datetime import datetime
-import pytz
 
 class StaticViewSitemap(Sitemap):
     changefreq = "always"
@@ -25,19 +23,12 @@ class StaticViewSitemap(Sitemap):
 class MehsulSitemap(Sitemap):
     changefreq = "always"
     priority = 0.9
-    last_modified = None
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.last_modified = timezone.now()
-        
     def items(self):
-        # Son yenilənmə vaxtını yenilə
-        self.last_modified = timezone.now()
         return Mehsul.objects.all()
 
     def lastmod(self, mehsul):
-        return self.last_modified
+        return timezone.now()
 
     def location(self, mehsul):
         # URL-dəki xüsusi simvolları düzgün kodlaşdırırıq
@@ -62,10 +53,6 @@ class MehsulSitemap(Sitemap):
 
     def image_title(self, mehsul):
         return mehsul.adi
-
-    @classmethod
-    def get_last_modified(cls):
-        return cls.last_modified.strftime("%Y-%m-%d %H:%M:%S") if cls.last_modified else "Hələ yenilənməyib"
 
 # Yalnız anaevim app üçün sitemaps
 sitemaps = {

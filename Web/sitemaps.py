@@ -74,7 +74,7 @@ class MehsulSitemap(Sitemap):
                 url_info['images'] = [{
                     'loc': f"{protocol}://{domain}{item.sekil.url}",
                     'title': item.adi,
-                    'caption': f"{item.adi} - {item.brend_kod}"
+                    'caption': f"{item.adi} - {item.brend.adi} - {item.brend_kod} - {item.oem}"
                 }]
 
             urls.append(url_info)

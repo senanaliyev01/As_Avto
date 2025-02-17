@@ -62,8 +62,9 @@ class MehsulSitemap(Sitemap):
 
     def get_urls(self, site=None, **kwargs):
         urls = []
+        latest_lastmod = None
         for mehsul in self.items():
-            loc = self._full_url(self.location(mehsul))
+            loc = f"https://as-avto.com{self.location(mehsul)}"
             url_info = {
                 'mehsul': mehsul,
                 'location': loc,

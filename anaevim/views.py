@@ -1,8 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from mehsullar.models import Brend, Marka, Mehsul, MarkaSekil
 from django.template.defaultfilters import slugify
-from django.http import HttpResponsePermanentRedirect
-from urllib.parse import quote
+from django.urls import reverse
 
 def anaevim(request):
     brendler = Brend.objects.all()
@@ -21,15 +20,18 @@ def anaevim(request):
 def mehsul_etrafli(request, mehsul_id, mehsul_adi, mehsul_oem, mehsul_brend_kod):
     mehsul = get_object_or_404(Mehsul, id=mehsul_id)
     
-    # URL-in düzgün formatda olub-olmadığını yoxlayırıq
-    duzgun_mehsul_adi = slugify(mehsul.ad)
-    duzgun_oem = quote(mehsul.oem_kod) if mehsul.oem_kod else ''
-    duzgun_brend = quote(mehsul.brend.kod) if mehsul.brend else ''
+    # Düzgün URL-i yarat
+    duzgun_url = reverse('mehsul_etrafli', kwargs={
+        'mehsul_id': mehsul.id,
+        'mehsul_adi': mehsul.ad.replace(' ', '-'),
+        'mehsul_oem': mehsul.oem_kod,
+        'mehsul_brend_kod': mehsul.brend_kod
+    })
     
-    # Əgər URL parametrləri düzgün deyilsə, 301 yönləndirmə edirik
-    if mehsul_adi != duzgun_mehsul_adi or mehsul_oem != duzgun_oem or mehsul_brend_kod != duzgun_brend:
-        duzgun_url = f'/product/{duzgun_mehsul_adi}-{duzgun_oem}-{duzgun_brend}/{mehsul_id}/'
-        return HttpResponsePermanentRedirect(duzgun_url)
+    # Cari URL ilə düzgün URL-i müqayisə et
+    cari_url = request.path
+    if cari_url != duzgun_url:
+        return redirect(duzgun_url, permanent=True)  # 301 yönləndirmə
     
     context = {
         'mehsul': mehsul

@@ -43,6 +43,17 @@ class MehsulSitemap(Sitemap):
             'mehsul_id': obj.id
         })
 
+    def image_location(self, item):
+        if item.sekil:
+            return f"https://as-avto.com{item.sekil.url}"
+        return None
+
+    def image_title(self, item):
+        return f"{item.adi} {item.brend_kod}"
+
+    def image_caption(self, item):
+        return f"{item.adi} - {item.brend.adi} {item.marka.adi} {item.brend_kod} {item.oem}"
+
 # Yalnız anaevim app üçün sitemaps
 sitemaps = {
     'static': StaticViewSitemap,

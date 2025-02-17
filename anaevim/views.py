@@ -16,18 +16,16 @@ def anaevim(request):
     
     return render(request, 'home.html', context)
 
-def mehsul_etrafli(request, mehsul_id, mehsul_adi, mehsul_oem, mehsul_brend_kod):
+def mehsul_etrafli(request, mehsul_id, mehsul_adi=None, mehsul_oem=None, mehsul_brend_kod=None):
     mehsul = get_object_or_404(Mehsul, id=mehsul_id)
     
-    # Düzgün URL formatını yoxlayırıq
-    duzgun_mehsul_adi = slugify(mehsul.mehsul_adi)
-    duzgun_oem = slugify(mehsul.oem)
-    duzgun_brend_kod = slugify(mehsul.brend_kodu)
+    # Düzgün URL-i yarat
+    duzgun_url = f'/product/{slugify(mehsul.adi)}-{mehsul.oem}-{mehsul.brend_kod}/{mehsul.id}/'
     
-    # Əgər URL parametrləri düzgün deyilsə, düzgün URL-ə 301 yönləndirmə edirik
-    if mehsul_adi != duzgun_mehsul_adi or mehsul_oem != duzgun_oem or mehsul_brend_kod != duzgun_brend_kod:
-        duzgun_url = f'/product/{duzgun_mehsul_adi}-{duzgun_oem}-{duzgun_brend_kod}/{mehsul_id}/'
-        return redirect(duzgun_url, permanent=True)  # permanent=True 301 yönləndirməsini təmin edir
+    # Cari URL ilə düzgün URL-i müqayisə et
+    current_url = request.path
+    if current_url != duzgun_url:
+        return redirect(duzgun_url, permanent=True)  # 301 yönləndirmə
     
     context = {
         'mehsul': mehsul

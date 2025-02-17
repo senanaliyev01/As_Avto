@@ -27,21 +27,32 @@ class MehsulSitemap(Sitemap):
     def items(self):
         return Mehsul.objects.all()
 
-    def lastmod(self, obj):
+    def lastmod(self, mehsul):
         return timezone.now()
 
-    def location(self, obj):
+    def location(self, mehsul):
         # URL-dəki xüsusi simvolları düzgün kodlaşdırırıq
-        encoded_name = quote(obj.adi)
-        encoded_oem = quote(obj.oem)
-        encoded_brand_code = quote(obj.brend_kod)
+        encoded_name = quote(mehsul.adi)
+        encoded_oem = quote(mehsul.oem)
+        encoded_brand_code = quote(mehsul.brend_kod)
         
         return reverse('mehsul_etrafli', kwargs={
             'mehsul_adi': encoded_name,
             'mehsul_oem': encoded_oem,
             'mehsul_brend_kod': encoded_brand_code,
-            'mehsul_id': obj.id
+            'mehsul_id': mehsul.id
         })
+        
+    def image_location(self, mehsul):
+        if mehsul.sekil:
+            return f"https://as-avto.com{mehsul.sekil.url}"
+        return None
+
+    def image_caption(self, mehsul):
+        return f"{mehsul.adi} - {mehsul.brend.adi} - {mehsul.oem} - {mehsul.brend_kod}"
+
+    def image_title(self, mehsul):
+        return mehsul.adi
 
 # Yalnız anaevim app üçün sitemaps
 sitemaps = {

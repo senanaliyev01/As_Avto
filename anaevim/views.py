@@ -22,10 +22,9 @@ def mehsul_etrafli(request, mehsul_id, mehsul_adi=None, mehsul_oem=None, mehsul_
     # Düzgün URL-i yarat
     duzgun_url = f'/product/{slugify(mehsul.adi)}-{mehsul.oem}-{mehsul.brend_kod}/{mehsul.id}/'
     
-    # Cari URL ilə düzgün URL-i müqayisə et
-    current_url = request.path
-    if current_url != duzgun_url:
-        return redirect(duzgun_url, permanent=True)  # 301 yönləndirmə
+    # Əgər URL düzgün deyilsə, 301 yönləndirmə et
+    if request.path != duzgun_url:
+        return redirect(duzgun_url, permanent=True)
     
     context = {
         'mehsul': mehsul

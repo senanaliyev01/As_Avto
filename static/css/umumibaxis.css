@@ -61,24 +61,65 @@ body {
 }
 
 /* Stok statusu */
-.product-stock-status {
-    margin: 10px 0;
-}
-
 .stock-status {
-    font-weight: bold;
-}
-
-.out-of-stock {
-    color: #ff4d4d; /* Qırmızı - Yoxdur */
-}
-
-.low-stock {
-    color: #ffcc00; /* Sarı - Az var */
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 15px;
+    display: inline-block;
+    text-transform: uppercase;
+    color: white;
 }
 
 .in-stock {
-    color: #4caf50; /* Yaşıl - Var */
+    background: linear-gradient(135deg, #00897b, #00695c);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.in-stock::before {
+    content: "\f00c";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 5px;
+}
+
+.low-stock {
+    background: linear-gradient(135deg, #ffd54f, #ffb300);
+    color: black;
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.low-stock::before {
+    content: "\f071";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 5px;
+}
+
+.out-of-stock {
+    background: linear-gradient(135deg, #e53935, #c62828);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.out-of-stock::before {
+    content: "\f00d";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 5px;
 }
 
 /* Məhsul əməliyyatları */

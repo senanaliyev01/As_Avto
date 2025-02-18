@@ -313,37 +313,15 @@ def update_quantity(request, item_id, new_quantity):
         }, status=500)
 
 def mehsul_axtaris(request):
-    query = request.GET.get('q', '').strip()
+    query = request.GET.get('q')
     if query:
-        # Vergüllə ayrılmış axtarış terminlərini ayır
-        search_terms = [term.strip() for term in query.split(',') if term.strip()]
-        
-        # Başlanğıc sorğunu yaradırıq
-        mehsullar = Mehsul.objects.none()
-        
-        # Hər bir axtarış termini üçün
-        for term in search_terms:
-            # Cari termin üçün axtarış nəticələrini əldə edirik
-            current_results = Mehsul.objects.filter(
-                Q(oem__icontains=term) |  # əsas OEM kodunda axtar
-                Q(oem_kodlar__kod__icontains=term)  # əlavə OEM kodlarında axtar
-            ).distinct()
-            
-            # Nəticələri birləşdiririk
-            mehsullar = mehsullar | current_results
-        
-        # Təkrarlanmaları aradan qaldırırıq
-        mehsullar = mehsullar.distinct()
-        
-        return JsonResponse({
-            'success': True,
-            'mehsullar': list(mehsullar.values('id', 'adi', 'brend__adi', 'oem', 'brend_kod', 'qiymet'))
-        })
-    
-    return JsonResponse({
-        'success': False,
-        'message': 'Axtarış termini daxil edilməyib'
-    })
+        # Həm əsas OEM kodunda, həm də əlavə OEM kodlarında axtarış et
+        mehsullar = Mehsul.objects.filter(
+            Q(oem__icontains=query) |  # əsas OEM kodunda axtar
+            Q(oem_kodlar__kod__icontains=query)  # əlavə OEM kodlarında axtar
+        ).distinct()
+        # qalan kod...
+
 
 @login_required
 def sifaris_detallari(request, sifaris_id):

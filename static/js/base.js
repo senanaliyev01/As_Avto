@@ -477,6 +477,8 @@
     
         let searchButton = document.getElementById('search-button');
         let spinner = document.getElementById('loading-spinner');
+        let searchInput = document.getElementById('search_text');
+        let query = searchInput.value.trim();
     
         // Butonun ölçüsünü qorumaq üçün enini və hündürlüyünü sabit saxla
         searchButton.style.width = `${searchButton.offsetWidth}px`;
@@ -489,10 +491,27 @@
         // Butonu deaktiv et ki, yenidən klik olunmasın
         searchButton.disabled = true; 
     
-        // 2 saniyə sonra formu göndər
-        setTimeout(() => {
-            this.submit(); // Formu göndər
-        }, 2000);
+        // Əgər axtarış sözü varsa
+        if (query.length >= 2) {
+            fetch(`/realtime-search/?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.results.length > 0) {
+                        // Axtarış nəticələri varsa, ilk nəticəyə yönləndir
+                        window.location.href = data.results[0].url;
+                    } else {
+                        // Nəticə yoxdursa, ümumi axtarış səhifəsinə yönləndir
+                        this.submit();
+                    }
+                })
+                .catch(error => {
+                    console.error('Axtarış xətası:', error);
+                    this.submit(); // Xəta baş verərsə, ümumi axtarışa yönləndir
+                });
+        } else {
+            // Axtarış sözü 2 simvoldan azdırsa, ümumi axtarış səhifəsinə yönləndir
+            this.submit();
+        }
     });
     
 
@@ -868,6 +887,15 @@
         searchInput.addEventListener('focus', function() {
             if (this.value.trim().length >= 2) {
                 searchResults.style.display = 'block';
+            }
+        });
+
+        // Enter düyməsinə basıldıqda
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const searchForm = document.getElementById('search-form');
+                searchForm.dispatchEvent(new Event('submit'));
             }
         });
     });

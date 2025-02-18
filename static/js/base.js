@@ -838,7 +838,7 @@
                             <div class="search-result-info">
                                 <h4>${result.adi}</h4>
                                 <p>Brend: ${result.brend} | OEM: ${result.oem}</p>
-                                <p>Marka: ${result.marka} | Kod: ${result.brend_kod}</p>
+                                <p>Marka: ${result.marka} | Brend Kod: ${result.brend_kod}</p>
                             </div>
                             <div class="search-result-price">
                                 <div class="stock-status ${result.stok === 0 ? 'out-of-stock' : result.stok <= 20 ? 'low-stock' : 'in-stock'}">

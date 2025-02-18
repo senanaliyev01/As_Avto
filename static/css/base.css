@@ -405,8 +405,30 @@ html {
 }
 
 .search-result-price {
-    display: ruby;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
     color: var(--accent-color);
     font-weight: bold;
     margin-left: 15px;
+}
+
+.stock-status {
+    font-size: 0.9rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: #fff;
+}
+
+.stock-status.out-of-stock {
+    background-color: #dc3545;
+}
+
+.stock-status.low-stock {
+    background-color: #ffc107;
+}
+
+.stock-status.in-stock {
+    background-color: #28a745;
 }

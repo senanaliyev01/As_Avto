@@ -149,7 +149,7 @@ class OEMKod(models.Model):
     def save(self, *args, **kwargs):
         # Əgər yeni yaradılırsa və ya kod dəyişdirilibsə
         if self.pk is None or self._state.adding:
-            # Boşluqla ayrılmış kodları ayırıb hər birini ayrı-ayrı yaradaq
+            # Boşluqla ayrılmış kodları ayırıb hər birini ayrı-ayrı yaradaqq
             kodlar = self.kod.split()
             if kodlar:
                 # İlk kodu bu obyektdə saxlayaq

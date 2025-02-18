@@ -415,20 +415,62 @@ html {
 }
 
 .stock-status {
-    font-size: 0.9rem;
     padding: 4px 8px;
-    border-radius: 4px;
-    color: #fff;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 15px;
+    display: inline-block;
+    text-transform: uppercase;
+    color: white;
 }
 
-.stock-status.out-of-stock {
-    background-color: #dc3545;
+.in-stock {
+    background: linear-gradient(135deg, #00897b, #00695c);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.stock-status.low-stock {
-    background-color: #ffc107;
+.in-stock::before {
+    content: "\f00c";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 5px;
 }
 
-.stock-status.in-stock {
-    background-color: #28a745;
+.low-stock {
+    background: linear-gradient(135deg, #ffd54f, #ffb300);
+    color: black;
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.low-stock::before {
+    content: "\f071";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 5px;
+}
+
+.out-of-stock {
+    background: linear-gradient(135deg, #e53935, #c62828);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.out-of-stock::before {
+    content: "\f00d";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 5px;
 }

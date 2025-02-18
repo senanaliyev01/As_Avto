@@ -72,6 +72,15 @@ class Mehsul(models.Model):
         kodlar.extend([oem.kod for oem in self.oem_kodlar.all()])
         return kodlar
 
+    def add_oem_codes(self, codes_string):
+        """Vergüllə ayrılmış OEM kodlarını əlavə edir"""
+        if codes_string:
+            # Boşluqları təmizlə və vergüllə ayır
+            codes = [code.strip() for code in codes_string.split(',') if code.strip()]
+            # Hər bir kodu əlavə et
+            for code in codes:
+                OEMKod.objects.create(mehsul=self, kod=code)
+
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     mehsul = models.ForeignKey(Mehsul, on_delete=models.CASCADE)

@@ -3,6 +3,7 @@ from .models import Kateqoriya, Brend, Marka, Mehsul, Sebet, Sifaris, SifarisMeh
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils import timezone
+from django import forms
 
 class MarkaSekilInline(admin.TabularInline):
     model = MarkaSekil
@@ -164,6 +165,22 @@ class MehsulAdmin(admin.ModelAdmin):
     list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'oem', 'stok')
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem')
     inlines = [OEMKodInline]
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        # Əgər əlavə OEM kodları varsa
+        if 'additional_oem_codes' in request.POST:
+            obj.add_oem_codes(request.POST['additional_oem_codes'])
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        form.base_fields['additional_oem_codes'] = forms.CharField(
+            required=False,
+            widget=forms.Textarea(attrs={'rows': 3}),
+            help_text='Əlavə OEM kodlarını vergüllə ayıraraq daxil edin. Məsələn: kod1, kod2, kod3',
+            label='Əlavə OEM Kodları'
+        )
+        return form
 
 # Qeydiyyatları düzəltdik
 admin.site.register(SifarisMehsul, SifarisMehsulAdmin)

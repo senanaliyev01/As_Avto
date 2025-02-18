@@ -315,13 +315,30 @@ def update_quantity(request, item_id, new_quantity):
 def mehsul_axtaris(request):
     query = request.GET.get('q')
     if query:
-        # Həm əsas OEM kodunda, həm də əlavə OEM kodlarında axtarış et
-        mehsullar = Mehsul.objects.filter(
-            Q(oem__icontains=query) |  # əsas OEM kodunda axtar
-            Q(oem_kodlar__kod__icontains=query)  # əlavə OEM kodlarında axtar
-        ).distinct()
-        # qalan kod...
-
+        # Axtarış sözlərini boşluqla ayırırıq
+        search_terms = query.split()
+        # Başlanğıc sorğunu yaradırıq
+        mehsullar = Mehsul.objects.all()
+        
+        for term in search_terms:
+            # Xüsusi simvolları təmizləyirik
+            term = re.sub(r'[^a-zA-Z0-9]', '', term)
+            # Hər bir söz üçün axtarış edirik
+            mehsullar = mehsullar.filter(
+                Q(oem__icontains=term) |  # əsas OEM kodunda axtar
+                Q(oem_kodlar__kod__icontains=term) |  # əlavə OEM kodlarında axtar
+                Q(brend_kod__icontains=term)  # brend kodunda axtar
+            ).distinct()
+        
+        return JsonResponse({
+            'success': True,
+            'mehsullar': list(mehsullar.values('id', 'adi', 'brend__adi', 'oem', 'brend_kod', 'qiymet'))
+        })
+    
+    return JsonResponse({
+        'success': False,
+        'message': 'Axtarış parametri daxil edilməyib'
+    })
 
 @login_required
 def sifaris_detallari(request, sifaris_id):

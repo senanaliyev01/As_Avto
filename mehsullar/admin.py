@@ -3,7 +3,7 @@ from .models import Kateqoriya, Brend, Marka, Mehsul, Sebet, Sifaris, SifarisMeh
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils import timezone
-from django import forms
+from django.db import models
 
 class MarkaSekilInline(admin.TabularInline):
     model = MarkaSekil
@@ -51,6 +51,10 @@ class SifarisMehsulInline(admin.TabularInline):
 class OEMKodInline(admin.TabularInline):
     model = OEMKod
     extra = 1
+    formfield_overrides = {
+        models.TextField: {'widget': admin.widgets.AdminTextareaWidget(
+            attrs={'rows': 3, 'style': 'width: 100%; font-family: monospace;'})},
+    }
 
 # Sifariş admin paneli
 @admin.register(Sifaris)
@@ -165,40 +169,6 @@ class MehsulAdmin(admin.ModelAdmin):
     list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'oem', 'stok')
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem')
     inlines = [OEMKodInline]
-    fields = ('adi', 'kateqoriya', 'brend', 'marka', 'brend_kod', 'oem', 'stok', 'qiymet', 'sekil', 'haqqinda', 'extra_oem_codes')
-
-    def get_form(self, request, obj=None, **kwargs):
-        form = super().get_form(request, obj, **kwargs)
-        if obj:
-            # Mövcud OEM kodlarını bir sətirdə boşluqla ayıraraq göstər
-            oem_codes = ' '.join([oem.kod for oem in obj.oem_kodlar.all()])
-            form.base_fields['extra_oem_codes'] = forms.CharField(
-                required=False,
-                widget=forms.Textarea(attrs={
-                    'rows': 3,
-                    'style': 'width: 100%; font-family: monospace;',
-                    'placeholder': 'OEM kodlarını boşluqla ayırın (məsələn: 123456 789012 345678)'
-                }),
-                initial=oem_codes,
-                help_text='Əlavə OEM kodlarını boşluqla ayırın. Hər dəyişiklikdə köhnə kodlar silinəcək və yeniləri əlavə olunacaq.'
-            )
-        else:
-            form.base_fields['extra_oem_codes'] = forms.CharField(
-                required=False,
-                widget=forms.Textarea(attrs={
-                    'rows': 3,
-                    'style': 'width: 100%; font-family: monospace;',
-                    'placeholder': 'OEM kodlarını boşluqla ayırın (məsələn: 123456 789012 345678)'
-                }),
-                help_text='Əlavə OEM kodlarını boşluqla ayırın.'
-            )
-        return form
-
-    def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
-        # OEM kodlarını əlavə et
-        if 'extra_oem_codes' in form.cleaned_data:
-            OEMKod.parse_and_create(obj, form.cleaned_data['extra_oem_codes'])
 
 # Qeydiyyatları düzəltdik
 admin.site.register(SifarisMehsul, SifarisMehsulAdmin)

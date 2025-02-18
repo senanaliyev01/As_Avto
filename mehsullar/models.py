@@ -140,26 +140,33 @@ class SifarisMehsul(models.Model):
 
 
 class OEMKod(models.Model):
-    kod = models.CharField(max_length=100)
+    kod = models.TextField(help_text="OEM kodlarını boşluqla ayırın. Hər bir kod avtomatik olaraq ayrı-ayrı saxlanılacaq.")
     mehsul = models.ForeignKey('Mehsul', on_delete=models.CASCADE, related_name='oem_kodlar')
 
     def __str__(self):
         return self.kod
 
+    def save(self, *args, **kwargs):
+        # Əgər yeni yaradılırsa və ya kod dəyişdirilibsə
+        if self.pk is None or self._state.adding:
+            # Boşluqla ayrılmış kodları ayırıb hər birini ayrı-ayrı yaradaq
+            kodlar = self.kod.split()
+            if kodlar:
+                # İlk kodu bu obyektdə saxlayaq
+                self.kod = kodlar[0]
+                super().save(*args, **kwargs)
+                # Qalan kodlar üçün yeni OEMKod obyektləri yaradaq
+                for kod in kodlar[1:]:
+                    OEMKod.objects.create(
+                        kod=kod,
+                        mehsul=self.mehsul
+                    )
+            return
+        super().save(*args, **kwargs)
+
     class Meta:
         verbose_name = 'OEM Kod'
         verbose_name_plural = 'OEM Kodlar'
-
-    @classmethod
-    def parse_and_create(cls, mehsul, oem_text):
-        # Əvvəlki OEM kodlarını sil
-        cls.objects.filter(mehsul=mehsul).delete()
-        
-        # Boşluqlarla ayrılmış OEM kodlarını parçala və yeni kodlar yarat
-        if oem_text:
-            oem_codes = [code.strip() for code in oem_text.split() if code.strip()]
-            for code in oem_codes:
-                cls.objects.create(mehsul=mehsul, kod=code)
 
 
 class SebetItem(models.Model):

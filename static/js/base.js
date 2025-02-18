@@ -861,7 +861,7 @@
         // Input event listener with debounce
         searchInput.addEventListener('input', () => {
             clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(performSearch, 1000);
+            searchTimeout = setTimeout(performSearch, 300);
         });
         
         // Select elements change listener

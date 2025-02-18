@@ -73,11 +73,11 @@
                     <span class="label">Mövcudluq:</span>
                     <span class="value stock-status {% if mehsul.stok == 0 %}out-of-stock{% elif mehsul.stok <= 20 %}low-stock{% else %}in-stock{% endif %}">
                         {% if mehsul.stok == 0 %}
-                            <i class="fas fa-times-circle"></i> Yoxdur 
+                             Yoxdur 
                         {% elif mehsul.stok <= 20 %}
-                            <i class="fas fa-exclamation-circle"></i> Az var ({{mehsul.stok}})
+                             Az var 
                         {% else %}
-                            <i class="fas fa-check-circle"></i> Var ({{mehsul.stok}})
+                             Var 
                         {% endif %}
                     </span>
                 </div>

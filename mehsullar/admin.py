@@ -165,6 +165,7 @@ class MehsulAdmin(admin.ModelAdmin):
     list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'oem', 'stok')
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem')
     inlines = [OEMKodInline]
+    fields = ('adi', 'kateqoriya', 'brend', 'marka', 'brend_kod', 'oem', 'stok', 'qiymet', 'sekil', 'haqqinda', 'extra_oem_codes')
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)

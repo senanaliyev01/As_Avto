@@ -164,33 +164,31 @@ class SifarisMehsulAdmin(admin.ModelAdmin):
 class MehsulAdmin(admin.ModelAdmin):
     list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'oem', 'stok')
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem')
-    inlines = [OEMKodInline]
-
-    def save_related(self, request, form, formsets, change):
-        super().save_related(request, form, formsets, change)
-        # Əlavə OEM kodlarını əlavə et
-        if 'oem_kodlari' in request.POST:
-            mehsul = form.instance
-            # Mövcud OEM kodlarını sil
-            mehsul.oem_kodlar.all().delete()
-            # Yeni kodları əlavə et
-            for kod in OEMKod.parse_oem_codes(request.POST['oem_kodlari']):
-                OEMKod.objects.create(mehsul=mehsul, kod=kod)
-
+    
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
-        # Əlavə sahə əlavə et
-        form.base_fields['oem_kodlari'] = forms.CharField(
-            required=False,
-            widget=forms.Textarea(attrs={'rows': 3}),
-            help_text='OEM kodlarını vergüllə ayırın. Məsələn: 123456, 789012, 345678'
-        )
-        if obj:
-            # Mövcud OEM kodlarını sahəyə doldur
-            form.base_fields['oem_kodlari'].initial = ', '.join(
-                obj.oem_kodlar.values_list('kod', flat=True)
+        if obj:  # Mövcud məhsul üçün
+            # Bütün OEM kodlarını bir sətirdə göstər
+            oem_kodlar = ' '.join([oem.kod for oem in obj.oem_kodlar.all()])
+            form.base_fields['elave_oem_kodlar'] = forms.CharField(
+                required=False,
+                initial=oem_kodlar,
+                widget=forms.Textarea(attrs={'rows': 3}),
+                help_text='OEM kodlarını boşluqla ayırın. Sistem avtomatik olaraq kodları ayıracaq.'
+            )
+        else:  # Yeni məhsul üçün
+            form.base_fields['elave_oem_kodlar'] = forms.CharField(
+                required=False,
+                widget=forms.Textarea(attrs={'rows': 3}),
+                help_text='OEM kodlarını boşluqla ayırın. Sistem avtomatik olaraq kodları ayıracaq.'
             )
         return form
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        # Əlavə OEM kodlarını emal et
+        if 'elave_oem_kodlar' in form.cleaned_data:
+            obj.oem_kodlari_elave_et(form.cleaned_data['elave_oem_kodlar'])
 
 # Qeydiyyatları düzəltdik
 admin.site.register(SifarisMehsul, SifarisMehsulAdmin)

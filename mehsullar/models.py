@@ -72,6 +72,17 @@ class Mehsul(models.Model):
         kodlar.extend([oem.kod for oem in self.oem_kodlar.all()])
         return kodlar
 
+    def oem_kodlari_elave_et(self, kodlar_string):
+        # Mövcud OEM kodlarını təmizlə
+        self.oem_kodlar.all().delete()
+        
+        # Boşluqlara görə kodları ayır və vergüllə birləşdir
+        kodlar = [kod.strip() for kod in kodlar_string.split() if kod.strip()]
+        
+        # Hər bir kodu əlavə et
+        for kod in kodlar:
+            OEMKod.objects.create(mehsul=self, kod=kod)
+
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     mehsul = models.ForeignKey(Mehsul, on_delete=models.CASCADE)
@@ -149,16 +160,6 @@ class OEMKod(models.Model):
     class Meta:
         verbose_name = 'OEM Kod'
         verbose_name_plural = 'OEM Kodlar'
-
-    @staticmethod
-    def parse_oem_codes(codes_string):
-        # Vergüllə ayrılmış kodları təmizləyib siyahıya çevirir
-        if not codes_string:
-            return []
-        # Boşluqları və xüsusi simvolları təmizləyir
-        codes = [code.strip() for code in codes_string.split(',') if code.strip()]
-        # Təkrarlanan kodları silir
-        return list(set(codes))
 
 
 class SebetItem(models.Model):

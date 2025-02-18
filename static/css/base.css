@@ -360,11 +360,38 @@ html {
     border: 1px solid var(--accent-color);
     border-radius: 4px;
     margin-top: 5px;
-    max-height: 300px;
-    overflow-y: auto;
+    max-height: 500px;
     z-index: 1000;
     display: none;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.search-results-scroll {
+    max-height: 450px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-color) var(--primary-color);
+}
+
+.search-results-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.search-results-scroll::-webkit-scrollbar-track {
+    background: var(--primary-color);
+}
+
+.search-results-scroll::-webkit-scrollbar-thumb {
+    background-color: var(--accent-color);
+    border-radius: 3px;
+}
+
+.search-result-count {
+    padding: 10px;
+    color: var(--accent-color);
+    font-weight: bold;
+    border-bottom: 1px solid var(--secondary-color);
+    background-color: rgba(100, 255, 218, 0.1);
 }
 
 .search-result-item {
@@ -373,7 +400,7 @@ html {
     padding: 10px;
     border-bottom: 1px solid var(--secondary-color);
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .search-result-item:last-child {
@@ -382,6 +409,7 @@ html {
 
 .search-result-item:hover {
     background-color: var(--secondary-color);
+    transform: translateX(5px);
 }
 
 .search-result-image {
@@ -390,6 +418,7 @@ html {
     object-fit: cover;
     margin-right: 10px;
     border-radius: 4px;
+    border: 1px solid var(--accent-color);
 }
 
 .search-result-info {
@@ -407,8 +436,16 @@ html {
     font-size: 0.9em;
 }
 
+.search-result-details span {
+    display: inline-block;
+    margin-right: 5px;
+}
+
 .search-result-price {
     color: var(--accent-color);
     font-weight: bold;
     margin-left: 10px;
+    font-size: 1.1em;
+    min-width: 80px;
+    text-align: right;
 }

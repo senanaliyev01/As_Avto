@@ -823,8 +823,29 @@
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('search_text');
         const searchResults = document.getElementById('search-results');
+        const searchForm = document.getElementById('search-form');
         let searchTimeout;
 
+        // Form submit hadisəsi
+        searchForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const searchButton = document.getElementById('search-button');
+            const spinner = document.getElementById('loading-spinner');
+            
+            // Loading effektini göstər
+            searchButton.style.width = `${searchButton.offsetWidth}px`;
+            searchButton.style.height = `${searchButton.offsetHeight}px`;
+            searchButton.childNodes[0].nodeValue = '';
+            spinner.style.display = 'inline-block';
+            searchButton.disabled = true;
+
+            // Formu göndər
+            setTimeout(() => {
+                this.submit();
+            }, 500);
+        });
+
+        // Real-time axtarış
         searchInput.addEventListener('input', function() {
             clearTimeout(searchTimeout);
             const query = this.value.trim();
@@ -835,13 +856,17 @@
                 return;
             }
 
-            // Debounce tətbiq edirik
             searchTimeout = setTimeout(() => {
                 fetch(`/realtime-search/?q=${encodeURIComponent(query)}`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.results.length > 0) {
                             searchResults.innerHTML = '';
+                            
+                            // Scroll container əlavə et
+                            const scrollContainer = document.createElement('div');
+                            scrollContainer.className = 'search-results-scroll';
+                            
                             data.results.forEach(result => {
                                 const resultItem = document.createElement('div');
                                 resultItem.className = 'search-result-item';
@@ -860,8 +885,16 @@
                                 resultItem.addEventListener('click', () => {
                                     window.location.href = result.url;
                                 });
-                                searchResults.appendChild(resultItem);
+                                scrollContainer.appendChild(resultItem);
                             });
+                            
+                            // Nəticələrin sayını göstər
+                            const resultCount = document.createElement('div');
+                            resultCount.className = 'search-result-count';
+                            resultCount.textContent = `${data.results.length} nəticə tapıldı`;
+                            
+                            searchResults.appendChild(resultCount);
+                            searchResults.appendChild(scrollContainer);
                             searchResults.style.display = 'block';
                         } else {
                             searchResults.innerHTML = '<div class="search-result-item">Heç bir nəticə tapılmadı</div>';
@@ -873,7 +906,7 @@
                         searchResults.innerHTML = '<div class="search-result-item">Xəta baş verdi</div>';
                         searchResults.style.display = 'block';
                     });
-            }, 300); // 300ms gecikme
+            }, 300);
         });
 
         // Klik ediləndə axtarış nəticələrini gizlət
@@ -894,7 +927,6 @@
         searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                const searchForm = document.getElementById('search-form');
                 searchForm.dispatchEvent(new Event('submit'));
             }
         });

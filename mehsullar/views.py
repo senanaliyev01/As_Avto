@@ -537,7 +537,7 @@ def realtime_search(request):
             Q(oem__icontains=clean_query) |
             Q(oem_kodlar__kod__icontains=clean_query) |
             Q(adi__icontains=clean_query)
-        ).distinct()[:5]  # Maksimum 5 nəticə
+        ).distinct()  # limit silindi
 
         results = []
         for mehsul in mehsullar:

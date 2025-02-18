@@ -3,6 +3,7 @@ from .models import Kateqoriya, Brend, Marka, Mehsul, Sebet, Sifaris, SifarisMeh
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils import timezone
+from django.db import models
 from django.forms import Textarea
 
 class MarkaSekilInline(admin.TabularInline):

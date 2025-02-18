@@ -834,11 +834,14 @@
                 if (data.results.length > 0) {
                     dropdownContainer.innerHTML = data.results.map(result => `
                         <div class="search-result-item" onclick="window.location.href='/product-detail/${encodeURIComponent(result.adi)}-${encodeURIComponent(result.oem)}-${encodeURIComponent(result.brend_kod)}/${result.id}/'">
-                            ${result.sekil_url ? `<img src="${result.sekil_url}" alt="${result.adi}">` : ''}
+                            ${result.sekil_url ? `<img src="${result.sekil_url}" alt="${result.adi}">` : 
+                            '<div class="no-image"><i class="fas fa-image"></i></div>'}
                             <div class="search-result-info">
                                 <h4>${result.adi}</h4>
-                                <p>Brend: ${result.brend} | OEM: ${result.oem}</p>
-                                <p>Marka: ${result.marka} | Kod: ${result.brend_kod}</p>
+                                <p><strong>Brend:</strong> ${result.brend}</p>
+                                <p><strong>OEM:</strong> ${result.oem}</p>
+                                <p><strong>Kod:</strong> ${result.brend_kod}</p>
+                                <p><strong>Marka:</strong> ${result.marka}</p>
                             </div>
                             <div class="search-result-price">
                                 ${result.qiymet} AZN

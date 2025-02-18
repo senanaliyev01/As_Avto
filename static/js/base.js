@@ -841,10 +841,10 @@
                                 <p>Marka: ${result.marka} | Kod: ${result.brend_kod}</p>
                             </div>
                             <div class="search-result-price">
-                                ${result.qiymet} AZN
                                 <div class="stock-status ${result.stok === 0 ? 'out-of-stock' : result.stok <= 20 ? 'low-stock' : 'in-stock'}">
                                     ${result.stok === 0 ? 'Yoxdur' : result.stok <= 20 ? 'Az var' : 'Var'}
                                 </div>
+                                ${result.qiymet} AZN
                             </div>
                         </div>
                     `).join('');

@@ -379,8 +379,8 @@ html {
 }
 
 .search-result-item img {
-    width: 50px;
-    height: 50px;
+    width: 100px;
+    height: 100px;
     object-fit: cover;
     margin-right: 15px;
     border-radius: 4px;
@@ -393,16 +393,19 @@ html {
 .search-result-info h4 {
     color: var(--text-primary);
     margin: 0 0 5px 0;
-    font-size: 1rem;
+    font-size: 1.5rem;
 }
 
 .search-result-info p {
+    font-size: large;
+    display: inline-flex;
     color: var(--text-secondary);
     margin: 0;
-    font-size: 0.9rem;
+    font-size: 1rem;
 }
 
 .search-result-price {
+    display: ruby;
     color: var(--accent-color);
     font-weight: bold;
     margin-left: 15px;

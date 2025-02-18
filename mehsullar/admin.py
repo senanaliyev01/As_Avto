@@ -180,9 +180,12 @@ class MehsulAdminForm(forms.ModelForm):
             self.fields['elave_oem_kodlari'].initial = existing_codes
 
     def save(self, commit=True):
-        mehsul = super().save(commit=True)
-        # OEM kodlarını əlavə et
-        mehsul.elave_oem_kodlari(self.cleaned_data['elave_oem_kodlari'])
+        mehsul = super().save(commit=False)
+        if commit:
+            mehsul.save()
+            # OEM kodlarını əlavə et
+            mehsul.elave_oem_kodlari(self.cleaned_data.get('elave_oem_kodlari', ''))
+            self.save_m2m = lambda: None  # Django admin üçün lazım olan save_m2m metodu
         return mehsul
 
 class MehsulAdmin(admin.ModelAdmin):

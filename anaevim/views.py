@@ -19,8 +19,12 @@ def anaevim(request):
 def mehsul_etrafli(request, mehsul_id, mehsul_adi=None, mehsul_oem=None, mehsul_brend_kod=None):
     mehsul = get_object_or_404(Mehsul, id=mehsul_id)
     
-    # Düzgün URL-i yarat
-    duzgun_url = f'/product/{slugify(mehsul.adi)}-{mehsul.oem}-{mehsul.brend_kod}/{mehsul.id}/'
+    # Düzgün URL-i yarat və % işarələrini təmizlə
+    temiz_adi = slugify(mehsul.adi.replace('%', ''))
+    temiz_oem = mehsul.oem.replace('%', '')
+    temiz_brend_kod = mehsul.brend_kod.replace('%', '')
+    
+    duzgun_url = f'/product/{temiz_adi}-{temiz_oem}-{temiz_brend_kod}/{mehsul.id}/'
     
     # Əgər URL düzgün deyilsə, 301 yönləndirmə et
     if request.path != duzgun_url:

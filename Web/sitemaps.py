@@ -32,9 +32,9 @@ class MehsulSitemap(Sitemap):
 
     def location(self, obj):
         # URL-dəki xüsusi simvolları düzgün kodlaşdırırıq
-        encoded_name = quote(obj.adi)
-        encoded_oem = quote(obj.oem)
-        encoded_brand_code = quote(obj.brend_kod)
+        encoded_name = quote(obj.adi.replace('%', ''))
+        encoded_oem = quote(obj.oem.replace('%', ''))
+        encoded_brand_code = quote(obj.brend_kod.replace('%', ''))
         
         return reverse('mehsul_etrafli', kwargs={
             'mehsul_adi': encoded_name,

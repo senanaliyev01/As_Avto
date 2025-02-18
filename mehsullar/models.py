@@ -49,7 +49,7 @@ class Mehsul(models.Model):
     brend = models.ForeignKey(Brend, on_delete=models.CASCADE)
     marka = models.ForeignKey(Marka, on_delete=models.CASCADE)
     brend_kod = models.CharField(max_length=50, unique=True)
-    oem = models.TextField(help_text="OEM kodlarını boşluqla ayırın. Məsələn: 123456 789012 345678")
+    oem = models.CharField(max_length=100)
     stok = models.IntegerField()
     qiymet = models.DecimalField(max_digits=10, decimal_places=2)
     sekil = models.ImageField(upload_to='mehsul_sekilleri/', null=True, blank=True)
@@ -68,22 +68,9 @@ class Mehsul(models.Model):
 
     @property
     def butun_oem_kodlar(self):
-        return [kod.strip() for kod in self.oem.split() if kod.strip()]
-
-    def save(self, *args, **kwargs):
-        # OEM kodlarını təmizlə və normallaşdır
-        if self.oem:
-            # Bütün boşluqları normallaşdır və artıq boşluqları təmizlə
-            self.oem = ' '.join(kod.strip() for kod in self.oem.split() if kod.strip())
-        
-        super().save(*args, **kwargs)
-
-        # Mövcud OEM kodlarını təmizlə
-        self.oem_kodlar.all().delete()
-
-        # Yeni OEM kodlarını əlavə et
-        for kod in self.butun_oem_kodlar[1:]:  # İlk kod əsas OEM olduğu üçün 1-dən başlayırıq
-            OEMKod.objects.create(mehsul=self, kod=kod)
+        kodlar = [self.oem]
+        kodlar.extend([oem.kod for oem in self.oem_kodlar.all()])
+        return kodlar
 
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

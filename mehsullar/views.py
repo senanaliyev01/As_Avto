@@ -315,22 +315,13 @@ def update_quantity(request, item_id, new_quantity):
 def mehsul_axtaris(request):
     query = request.GET.get('q')
     if query:
-        # Axtarış sözünü təmizlə
-        query = query.strip()
-        
-        # Həm əsas OEM-də, həm də boşluqla ayrılmış OEM kodlarında axtar
+        # Həm əsas OEM kodunda, həm də əlavə OEM kodlarında axtarış et
         mehsullar = Mehsul.objects.filter(
-            Q(oem__icontains=query)  # əsas OEM mətnində axtar
+            Q(oem__icontains=query) |  # əsas OEM kodunda axtar
+            Q(oem_kodlar__kod__icontains=query)  # əlavə OEM kodlarında axtar
         ).distinct()
-        
-        return JsonResponse({
-            'success': True,
-            'mehsullar': list(mehsullar.values('id', 'adi', 'oem', 'brend_kod', 'qiymet'))
-        })
-    return JsonResponse({
-        'success': False,
-        'message': 'Axtarış parametri təyin edilməyib'
-    })
+        # qalan kod...
+
 
 @login_required
 def sifaris_detallari(request, sifaris_id):

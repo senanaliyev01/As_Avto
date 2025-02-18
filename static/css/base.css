@@ -360,30 +360,10 @@ html {
     border: 1px solid var(--accent-color);
     border-radius: 4px;
     margin-top: 5px;
-    max-height: 500px;
+    max-height: none;
     z-index: 1000;
     display: none;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.search-results-scroll {
-    max-height: 450px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--accent-color) var(--primary-color);
-}
-
-.search-results-scroll::-webkit-scrollbar {
-    width: 6px;
-}
-
-.search-results-scroll::-webkit-scrollbar-track {
-    background: var(--primary-color);
-}
-
-.search-results-scroll::-webkit-scrollbar-thumb {
-    background-color: var(--accent-color);
-    border-radius: 3px;
 }
 
 .search-result-count {
@@ -434,11 +414,15 @@ html {
 .search-result-details {
     color: var(--text-secondary);
     font-size: 0.9em;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .search-result-details span {
-    display: inline-block;
-    margin-right: 5px;
+    background-color: rgba(100, 255, 218, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
 }
 
 .search-result-price {

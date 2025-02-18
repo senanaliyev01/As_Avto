@@ -469,51 +469,85 @@
         }
     });
 
+    // Real-time axtarış funksiyası
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('search_text');
+        const searchResults = document.getElementById('search-results');
+        const searchForm = document.getElementById('search-form');
+        let searchTimeout;
 
-   
-    
-    document.getElementById('search-form').addEventListener('submit', function(event) {
-        event.preventDefault(); // Formun dərhal göndərilməsini dayandır
-    
-        let searchButton = document.getElementById('search-button');
-        let spinner = document.getElementById('loading-spinner');
-        let searchInput = document.getElementById('search_text');
-        let query = searchInput.value.trim();
-    
-        // Butonun ölçüsünü qorumaq üçün enini və hündürlüyünü sabit saxla
-        searchButton.style.width = `${searchButton.offsetWidth}px`;
-        searchButton.style.height = `${searchButton.offsetHeight}px`;
-        
-        // Axtarış yazısını gizlət, amma spinneri saxla
-        searchButton.childNodes[0].nodeValue = ''; // Axtar sözünü sil
-        spinner.style.display = 'inline-block'; // Spinneri göstər
-    
-        // Butonu deaktiv et ki, yenidən klik olunmasın
-        searchButton.disabled = true; 
-    
-        // Əgər axtarış sözü varsa
-        if (query.length >= 2) {
-            fetch(`/realtime-search/?q=${encodeURIComponent(query)}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.results.length > 0) {
-                        // Axtarış nəticələri varsa, ilk nəticəyə yönləndir
-                        window.location.href = data.results[0].url;
-                    } else {
-                        // Nəticə yoxdursa, ümumi axtarış səhifəsinə yönləndir
-                        this.submit();
-                    }
-                })
-                .catch(error => {
-                    console.error('Axtarış xətası:', error);
-                    this.submit(); // Xəta baş verərsə, ümumi axtarışa yönləndir
-                });
-        } else {
-            // Axtarış sözü 2 simvoldan azdırsa, ümumi axtarış səhifəsinə yönləndir
-            this.submit();
-        }
+        // Real-time axtarış
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const query = this.value.trim();
+            
+            if (query.length >= 2) {
+                searchTimeout = setTimeout(() => {
+                    fetch(`/realtime-search/?q=${encodeURIComponent(query)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.results.length > 0) {
+                                let resultsHtml = `<div class="search-result-count">${data.results.length} Nəticə tapıldı</div>`;
+                                resultsHtml += '<div class="search-results-scroll">';
+                                
+                                data.results.forEach(result => {
+                                    resultsHtml += `
+                                        <div class="search-result-item" onclick="window.location.href='${result.url}'">
+                                            <img src="${result.sekil || '/static/img/no-image.png'}" alt="${result.adi}" class="search-result-image">
+                                            <div class="search-result-info">
+                                                <div class="search-result-name">${result.adi}</div>
+                                                <div class="search-result-details">
+                                                    <span>Firma: ${result.brend}</span>
+                                                    <span>Brend: ${result.brend_kod}</span>
+                                                    <span>OEM: ${result.oem}</span>
+                                                </div>
+                                            </div>
+                                            <div class="search-result-price">${result.qiymet} AZN</div>
+                                        </div>
+                                    `;
+                                });
+                                
+                                resultsHtml += '</div>';
+                                searchResults.innerHTML = resultsHtml;
+                                searchResults.style.display = 'block';
+                            } else {
+                                searchResults.innerHTML = '<div class="search-result-count">Nəticə tapılmadı</div>';
+                                searchResults.style.display = 'block';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Axtarış xətası:', error);
+                            searchResults.innerHTML = '<div class="search-result-count">Xəta baş verdi</div>';
+                            searchResults.style.display = 'block';
+                        });
+                }, 300);
+            } else {
+                searchResults.style.display = 'none';
+            }
+        });
+
+        // Klik hadisəsini izlə
+        document.addEventListener('click', function(e) {
+            if (!searchResults.contains(e.target) && e.target !== searchInput) {
+                searchResults.style.display = 'none';
+            }
+        });
+
+        // Input fokuslandıqda
+        searchInput.addEventListener('focus', function() {
+            if (this.value.trim().length >= 2) {
+                searchResults.style.display = 'block';
+            }
+        });
+
+        // Form submit
+        searchForm.addEventListener('submit', function(e) {
+            const loadingSpinner = document.getElementById('loading-spinner');
+            if (loadingSpinner) {
+                loadingSpinner.style.display = 'block';
+            }
+        });
     });
-    
 
     function confirmLogout(event) {
         event.preventDefault();  // Default davranışı dayandırır
@@ -818,118 +852,5 @@
         }
     `;
     document.head.appendChild(cartStyles);
-
-    // Real-time axtarış funksionallığı
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('search_text');
-        const searchResults = document.getElementById('search-results');
-        const searchForm = document.getElementById('search-form');
-        let searchTimeout;
-
-        // Form submit hadisəsi
-        searchForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const searchButton = document.getElementById('search-button');
-            const spinner = document.getElementById('loading-spinner');
-            
-            // Loading effektini göstər
-            searchButton.style.width = `${searchButton.offsetWidth}px`;
-            searchButton.style.height = `${searchButton.offsetHeight}px`;
-            searchButton.childNodes[0].nodeValue = '';
-            spinner.style.display = 'inline-block';
-            searchButton.disabled = true;
-
-            // Formu göndər
-            setTimeout(() => {
-                this.submit();
-            }, 500);
-        });
-
-        // Real-time axtarış
-        searchInput.addEventListener('input', function() {
-            clearTimeout(searchTimeout);
-            const query = this.value.trim();
-
-            if (query.length < 2) {
-                searchResults.style.display = 'none';
-                searchResults.innerHTML = '';
-                return;
-            }
-
-            searchTimeout = setTimeout(() => {
-                fetch(`/realtime-search/?q=${encodeURIComponent(query)}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.results.length > 0) {
-                            searchResults.innerHTML = '';
-                            
-                            // Scroll container əlavə et
-                            const scrollContainer = document.createElement('div');
-                            scrollContainer.className = 'search-results-scroll';
-                            
-                            data.results.forEach(result => {
-                                const resultItem = document.createElement('div');
-                                resultItem.className = 'search-result-item';
-                                resultItem.innerHTML = `
-                                    ${result.sekil ? `<img src="${result.sekil}" alt="${result.adi}" class="search-result-image">` : ''}
-                                    <div class="search-result-info">
-                                        <div class="search-result-name">${result.adi}</div>
-                                        <div class="search-result-details">
-                                            <span>${result.brend}</span> | 
-                                            <span>OEM: ${result.oem}</span> | 
-                                            <span>Brend Kodu: ${result.brend_kod}</span>
-                                        </div>
-                                    </div>
-                                    <div class="search-result-price">${result.qiymet} AZN</div>
-                                `;
-                                resultItem.addEventListener('click', () => {
-                                    window.location.href = result.url;
-                                });
-                                scrollContainer.appendChild(resultItem);
-                            });
-                            
-                            // Nəticələrin sayını göstər
-                            const resultCount = document.createElement('div');
-                            resultCount.className = 'search-result-count';
-                            resultCount.textContent = `${data.results.length} nəticə tapıldı`;
-                            
-                            searchResults.appendChild(resultCount);
-                            searchResults.appendChild(scrollContainer);
-                            searchResults.style.display = 'block';
-                        } else {
-                            searchResults.innerHTML = '<div class="search-result-item">Heç bir nəticə tapılmadı</div>';
-                            searchResults.style.display = 'block';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Axtarış xətası:', error);
-                        searchResults.innerHTML = '<div class="search-result-item">Xəta baş verdi</div>';
-                        searchResults.style.display = 'block';
-                    });
-            }, 300);
-        });
-
-        // Klik ediləndə axtarış nəticələrini gizlət
-        document.addEventListener('click', function(e) {
-            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-                searchResults.style.display = 'none';
-            }
-        });
-
-        // Axtarış inputuna fokus olanda nəticələri göstər
-        searchInput.addEventListener('focus', function() {
-            if (this.value.trim().length >= 2) {
-                searchResults.style.display = 'block';
-            }
-        });
-
-        // Enter düyməsinə basıldıqda
-        searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                searchForm.dispatchEvent(new Event('submit'));
-            }
-        });
-    });
 
 

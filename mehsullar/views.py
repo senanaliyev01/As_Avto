@@ -523,3 +523,34 @@ def hesabatlar(request):
         'odenilen_mebleg': odenilen_mebleg,
         'qaliq_borc': qaliq_borc,
     })
+
+@login_required
+def realtime_search(request):
+    query = request.GET.get('q', '')
+    if query:
+        # Xüsusi simvolları təmizləyirik
+        clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
+        
+        # Məhsulları axtar
+        mehsullar = Mehsul.objects.filter(
+            Q(brend_kod__icontains=clean_query) |
+            Q(oem__icontains=clean_query) |
+            Q(oem_kodlar__kod__icontains=clean_query) |
+            Q(adi__icontains=clean_query)
+        ).distinct()[:5]  # Maksimum 5 nəticə
+
+        results = []
+        for mehsul in mehsullar:
+            results.append({
+                'id': mehsul.id,
+                'adi': mehsul.adi,
+                'brend': mehsul.brend.adi if mehsul.brend else '',
+                'oem': mehsul.oem,
+                'brend_kod': mehsul.brend_kod,
+                'qiymet': str(mehsul.qiymet),
+                'sekil': mehsul.sekil.url if mehsul.sekil else None,
+                'url': f'/product-detail/{mehsul.adi}-{mehsul.oem}-{mehsul.brend_kod}/{mehsul.id}/'
+            })
+        
+        return JsonResponse({'results': results})
+    return JsonResponse({'results': []})

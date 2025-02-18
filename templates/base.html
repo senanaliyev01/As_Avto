@@ -82,7 +82,10 @@
             {% endfor %}
         </select>
 
-        <input type="text" name="search_text" placeholder="Brend kodu və ya OEM daxil edin" value="{{ request.GET.search_text }}">
+        <div class="search-container">
+            <input type="text" name="search_text" id="search_text" placeholder="Brend kodu və ya OEM daxil edin" value="{{ request.GET.search_text }}">
+            <div id="search-results" class="search-results"></div>
+        </div>
         
         <button type="submit" id="search-button">
             Axtar

@@ -18,4 +18,5 @@ urlpatterns = [
     path('sifaris/<int:sifaris_id>/pdf/', views.generate_pdf, name='sifaris_pdf'),
     path('products-look-all/', views.umumibaxis, name='umumi_baxis'),
     path('reports/', views.hesabatlar, name='hesabatlar'),
+    path('realtime-search/', views.realtime_search, name='realtime_search'),
 ]

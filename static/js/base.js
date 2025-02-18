@@ -800,4 +800,76 @@
     `;
     document.head.appendChild(cartStyles);
 
+    // Real-time axtarış funksionallığı
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('search_text');
+        const searchResults = document.getElementById('search-results');
+        let searchTimeout;
+
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const query = this.value.trim();
+
+            if (query.length < 2) {
+                searchResults.style.display = 'none';
+                searchResults.innerHTML = '';
+                return;
+            }
+
+            // Debounce tətbiq edirik
+            searchTimeout = setTimeout(() => {
+                fetch(`/realtime-search/?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.results.length > 0) {
+                            searchResults.innerHTML = '';
+                            data.results.forEach(result => {
+                                const resultItem = document.createElement('div');
+                                resultItem.className = 'search-result-item';
+                                resultItem.innerHTML = `
+                                    ${result.sekil ? `<img src="${result.sekil}" alt="${result.adi}" class="search-result-image">` : ''}
+                                    <div class="search-result-info">
+                                        <div class="search-result-name">${result.adi}</div>
+                                        <div class="search-result-details">
+                                            <span>${result.brend}</span> | 
+                                            <span>OEM: ${result.oem}</span> | 
+                                            <span>Brend Kodu: ${result.brend_kod}</span>
+                                        </div>
+                                    </div>
+                                    <div class="search-result-price">${result.qiymet} AZN</div>
+                                `;
+                                resultItem.addEventListener('click', () => {
+                                    window.location.href = result.url;
+                                });
+                                searchResults.appendChild(resultItem);
+                            });
+                            searchResults.style.display = 'block';
+                        } else {
+                            searchResults.innerHTML = '<div class="search-result-item">Heç bir nəticə tapılmadı</div>';
+                            searchResults.style.display = 'block';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Axtarış xətası:', error);
+                        searchResults.innerHTML = '<div class="search-result-item">Xəta baş verdi</div>';
+                        searchResults.style.display = 'block';
+                    });
+            }, 300); // 300ms gecikme
+        });
+
+        // Klik ediləndə axtarış nəticələrini gizlət
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.style.display = 'none';
+            }
+        });
+
+        // Axtarış inputuna fokus olanda nəticələri göstər
+        searchInput.addEventListener('focus', function() {
+            if (this.value.trim().length >= 2) {
+                searchResults.style.display = 'block';
+            }
+        });
+    });
+
 

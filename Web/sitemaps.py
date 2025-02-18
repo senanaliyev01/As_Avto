@@ -71,18 +71,10 @@ class MehsulSitemap(Sitemap):
 
             # Şəkil məlumatlarını əlavə edirik
             if hasattr(item, 'sekil') and item.sekil:
-                # Şəkil URL-ni düzgün formaya gətiririk
+                # Şəkil URL-ni olduğu kimi saxlayırıq
                 sekil_path = item.sekil.url
-                # URL-dəki kodlaşdırılmış simvolları decode edirik
-                sekil_path = unquote(sekil_path)
-                # Xüsusi simvolları təmizləyirik
-                sekil_path = sekil_path.replace('%', '')
-                # Azərbaycan hərflərini latın hərflərinə çeviririk
-                az_to_latin = {
-                    'ə': 'e', 'ı': 'i', 'ğ': 'g', 'ü': 'u', 'ş': 's', 'ç': 'c', 'ö': 'o'
-                }
-                for az, latin in az_to_latin.items():
-                    sekil_path = sekil_path.replace(az, latin)
+                # Yalnız % işarələrini təmizləyirik
+                sekil_path = sekil_path.replace('%25', '%').replace('%20', ' ')
                 
                 url_info['images'] = [{
                     'loc': f"{protocol}://{domain}{sekil_path}",

@@ -381,7 +381,7 @@ html {
 .search-result-item img {
     width: 100px;
     height: 100px;
-    object-fit: cover;
+    object-fit: contain;
     margin-right: 15px;
     border-radius: 4px;
 }

@@ -3,7 +3,7 @@ from django.urls import reverse
 from mehsullar.models import Mehsul
 from django.utils import timezone
 from django.utils.text import slugify
-from urllib.parse import quote
+from urllib.parse import quote, unquote
 
 class StaticViewSitemap(Sitemap):
     changefreq = "daily"
@@ -71,10 +71,21 @@ class MehsulSitemap(Sitemap):
 
             # Şəkil məlumatlarını əlavə edirik
             if hasattr(item, 'sekil') and item.sekil:
-                # Şəkil URL-ni təmizləyirik
-                sekil_url = item.sekil.url.replace('%', '')
+                # Şəkil URL-ni düzgün formaya gətiririk
+                sekil_path = item.sekil.url
+                # URL-dəki kodlaşdırılmış simvolları decode edirik
+                sekil_path = unquote(sekil_path)
+                # Xüsusi simvolları təmizləyirik
+                sekil_path = sekil_path.replace('%', '')
+                # Azərbaycan hərflərini latın hərflərinə çeviririk
+                az_to_latin = {
+                    'ə': 'e', 'ı': 'i', 'ğ': 'g', 'ü': 'u', 'ş': 's', 'ç': 'c', 'ö': 'o'
+                }
+                for az, latin in az_to_latin.items():
+                    sekil_path = sekil_path.replace(az, latin)
+                
                 url_info['images'] = [{
-                    'loc': f"{protocol}://{domain}{sekil_url}",
+                    'loc': f"{protocol}://{domain}{sekil_path}",
                     'title': item.adi,
                     'caption': f"{item.adi} - {item.brend.adi} - {item.brend_kod} - {item.oem}"
                 }]

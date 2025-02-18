@@ -49,7 +49,7 @@ class Mehsul(models.Model):
     brend = models.ForeignKey(Brend, on_delete=models.CASCADE)
     marka = models.ForeignKey(Marka, on_delete=models.CASCADE)
     brend_kod = models.CharField(max_length=50, unique=True)
-    oem = models.CharField(max_length=100)
+    oem = models.TextField(help_text="OEM kodlarını boşluqla ayırın. Məsələn: 123456 789012 345678")
     stok = models.IntegerField()
     qiymet = models.DecimalField(max_digits=10, decimal_places=2)
     sekil = models.ImageField(upload_to='mehsul_sekilleri/', null=True, blank=True)
@@ -68,33 +68,22 @@ class Mehsul(models.Model):
 
     @property
     def butun_oem_kodlar(self):
-        kodlar = [self.oem]
-        kodlar.extend([oem.kod for oem in self.oem_kodlar.all()])
-        return kodlar
+        return [kod.strip() for kod in self.oem.split() if kod.strip()]
 
     def save(self, *args, **kwargs):
-        # Əvvəlcə məhsulu yadda saxlayırıq
+        # OEM kodlarını təmizlə və normallaşdır
+        if self.oem:
+            # Bütün boşluqları normallaşdır və artıq boşluqları təmizlə
+            self.oem = ' '.join(kod.strip() for kod in self.oem.split() if kod.strip())
+        
         super().save(*args, **kwargs)
-        
-        # OEM kodunu boşluqlara görə ayırırıq
-        oem_kodlari = self.oem.split()
-        
-        # İlk OEM kodunu əsas OEM kimi saxlayırıq
-        if oem_kodlari:
-            self.oem = oem_kodlari[0]
-            
-            # Mövcud əlavə OEM kodlarını silirik
-            self.oem_kodlar.all().delete()
-            
-            # Qalan OEM kodlarını əlavə edirik
-            for kod in oem_kodlari[1:]:
-                if kod.strip():  # Boş olmayan kodları əlavə edirik
-                    OEMKod.objects.create(mehsul=self, kod=kod.strip())
-        
-        # Yenidən yadda saxlayırıq, amma rekursiyadan qaçınmaq üçün
-        if 'force_insert' in kwargs:
-            kwargs.pop('force_insert')
-        super().save(*args, **kwargs)
+
+        # Mövcud OEM kodlarını təmizlə
+        self.oem_kodlar.all().delete()
+
+        # Yeni OEM kodlarını əlavə et
+        for kod in self.butun_oem_kodlar[1:]:  # İlk kod əsas OEM olduğu üçün 1-dən başlayırıq
+            OEMKod.objects.create(mehsul=self, kod=kod)
 
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

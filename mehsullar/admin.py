@@ -3,6 +3,7 @@ from .models import Kateqoriya, Brend, Marka, Mehsul, Sebet, Sifaris, SifarisMeh
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils import timezone
+from django.forms import Textarea
 
 class MarkaSekilInline(admin.TabularInline):
     model = MarkaSekil
@@ -50,8 +51,6 @@ class SifarisMehsulInline(admin.TabularInline):
 class OEMKodInline(admin.TabularInline):
     model = OEMKod
     extra = 1
-    verbose_name = 'Əlavə OEM Kodu'
-    verbose_name_plural = 'Əlavə OEM Kodları'
 
 # Sifariş admin paneli
 @admin.register(Sifaris)
@@ -162,38 +161,20 @@ class SifarisMehsulAdmin(admin.ModelAdmin):
     get_total.short_description = 'Cəmi'
 
 # Məhsul admin paneli
-@admin.register(Mehsul)
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'get_all_oem_codes', 'stok')
+    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'oem', 'stok')
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem')
-    list_filter = ('kateqoriya', 'brend', 'marka')
     inlines = [OEMKodInline]
-    
-    def get_all_oem_codes(self, obj):
-        # Əsas OEM kodunu və əlavə OEM kodlarını birləşdiririk
-        all_codes = [obj.oem] + [oem.kod for oem in obj.oem_kodlar.all()]
-        return ' | '.join(all_codes)
-    get_all_oem_codes.short_description = 'OEM Kodları'
-
-    fieldsets = (
-        ('Əsas Məlumatlar', {
-            'fields': ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'stok')
-        }),
-        ('Kodlar', {
-            'fields': ('brend_kod', 'oem'),
-            'description': 'Əsas OEM kodunu buraya yazın. Əlavə OEM kodlarını aşağıdakı bölmədən əlavə edə bilərsiniz.'
-        }),
-        ('Əlavə Məlumatlar', {
-            'fields': ('sekil', 'haqqinda'),
-            'classes': ('collapse',)
-        }),
-    )
+    formfield_overrides = {
+        models.TextField: {'widget': Textarea(attrs={'rows': 5, 'cols': 100})},
+    }
 
 # Qeydiyyatları düzəltdik
 admin.site.register(SifarisMehsul, SifarisMehsulAdmin)
 admin.site.register(Kateqoriya)
 admin.site.register(Brend)
 admin.site.register(Sebet)
+admin.site.register(Mehsul, MehsulAdmin)
 
 @admin.register(MusteriReyi)
 class MusteriReyiAdmin(admin.ModelAdmin):

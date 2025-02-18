@@ -150,6 +150,17 @@ class OEMKod(models.Model):
         verbose_name = 'OEM Kod'
         verbose_name_plural = 'OEM Kodlar'
 
+    @classmethod
+    def parse_and_create(cls, mehsul, oem_text):
+        # Əvvəlki OEM kodlarını sil
+        cls.objects.filter(mehsul=mehsul).delete()
+        
+        # Boşluqlarla ayrılmış OEM kodlarını parçala və yeni kodlar yarat
+        if oem_text:
+            oem_codes = [code.strip() for code in oem_text.split() if code.strip()]
+            for code in oem_codes:
+                cls.objects.create(mehsul=mehsul, kod=code)
+
 
 class SebetItem(models.Model):
     mehsul = models.ForeignKey(Mehsul, on_delete=models.CASCADE)

@@ -72,6 +72,21 @@ class Mehsul(models.Model):
         kodlar.extend([oem.kod for oem in self.oem_kodlar.all()])
         return kodlar
 
+    def elave_oem_kodlari(self, kodlar_string):
+        """
+        Vergüllə ayrılmış OEM kodlarını qəbul edir və hər birini ayrı-ayrı OEMKod obyekti kimi yaradır.
+        Kodlar string formatında olmalıdır, məsələn: "1234567, 7654321, 9876543"
+        """
+        if kodlar_string:
+            # Mövcud OEM kodlarını sil
+            self.oem_kodlar.all().delete()
+            
+            # Yeni kodları əlavə et
+            kodlar = [kod.strip() for kod in kodlar_string.split(',') if kod.strip()]
+            for kod in kodlar:
+                if kod != self.oem:  # Əsas OEM kodu təkrar əlavə etməmək üçün
+                    OEMKod.objects.create(mehsul=self, kod=kod)
+
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     mehsul = models.ForeignKey(Mehsul, on_delete=models.CASCADE)

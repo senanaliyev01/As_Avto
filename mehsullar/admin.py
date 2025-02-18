@@ -3,6 +3,7 @@ from .models import Kateqoriya, Brend, Marka, Mehsul, Sebet, Sifaris, SifarisMeh
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils import timezone
+from django import forms
 
 class MarkaSekilInline(admin.TabularInline):
     model = MarkaSekil
@@ -49,7 +50,8 @@ class SifarisMehsulInline(admin.TabularInline):
 # OEMKodInline klassını əvvəldə təyin edirik
 class OEMKodInline(admin.TabularInline):
     model = OEMKod
-    extra = 1
+    extra = 0
+    readonly_fields = ('kod',)
 
 # Sifariş admin paneli
 @admin.register(Sifaris)
@@ -159,11 +161,39 @@ class SifarisMehsulAdmin(admin.ModelAdmin):
         return f"{obj.miqdar * obj.qiymet} AZN"
     get_total.short_description = 'Cəmi'
 
-# Məhsul admin paneli
+class MehsulAdminForm(forms.ModelForm):
+    elave_oem_kodlari = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'rows': 3}),
+        help_text='OEM kodlarını vergüllə ayırın. Məsələn: 1234567, 7654321, 9876543'
+    )
+
+    class Meta:
+        model = Mehsul
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:  # Əgər mövcud məhsuldursa
+            # Mövcud OEM kodlarını vergüllə ayırılmış formata çevir
+            existing_codes = ', '.join([oem.kod for oem in self.instance.oem_kodlar.all()])
+            self.fields['elave_oem_kodlari'].initial = existing_codes
+
+    def save(self, commit=True):
+        mehsul = super().save(commit=True)
+        # OEM kodlarını əlavə et
+        mehsul.elave_oem_kodlari(self.cleaned_data['elave_oem_kodlari'])
+        return mehsul
+
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'oem', 'stok')
-    search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem')
+    form = MehsulAdminForm
+    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'oem', 'stok', 'get_elave_oem_kodlar')
+    search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'oem_kodlar__kod')
     inlines = [OEMKodInline]
+
+    def get_elave_oem_kodlar(self, obj):
+        return ', '.join([oem.kod for oem in obj.oem_kodlar.all()])
+    get_elave_oem_kodlar.short_description = 'Əlavə OEM Kodları'
 
 # Qeydiyyatları düzəltdik
 admin.site.register(SifarisMehsul, SifarisMehsulAdmin)

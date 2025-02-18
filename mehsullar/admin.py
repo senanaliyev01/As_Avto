@@ -3,6 +3,7 @@ from .models import Kateqoriya, Brend, Marka, Mehsul, Sebet, Sifaris, SifarisMeh
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils import timezone
+from django import forms
 
 class MarkaSekilInline(admin.TabularInline):
     model = MarkaSekil
@@ -164,6 +165,32 @@ class MehsulAdmin(admin.ModelAdmin):
     list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'oem', 'stok')
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem')
     inlines = [OEMKodInline]
+
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        # Əlavə OEM kodlarını əlavə et
+        if 'oem_kodlari' in request.POST:
+            mehsul = form.instance
+            # Mövcud OEM kodlarını sil
+            mehsul.oem_kodlar.all().delete()
+            # Yeni kodları əlavə et
+            for kod in OEMKod.parse_oem_codes(request.POST['oem_kodlari']):
+                OEMKod.objects.create(mehsul=mehsul, kod=kod)
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        # Əlavə sahə əlavə et
+        form.base_fields['oem_kodlari'] = forms.CharField(
+            required=False,
+            widget=forms.Textarea(attrs={'rows': 3}),
+            help_text='OEM kodlarını vergüllə ayırın. Məsələn: 123456, 789012, 345678'
+        )
+        if obj:
+            # Mövcud OEM kodlarını sahəyə doldur
+            form.base_fields['oem_kodlari'].initial = ', '.join(
+                obj.oem_kodlar.values_list('kod', flat=True)
+            )
+        return form
 
 # Qeydiyyatları düzəltdik
 admin.site.register(SifarisMehsul, SifarisMehsulAdmin)

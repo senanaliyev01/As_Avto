@@ -150,6 +150,16 @@ class OEMKod(models.Model):
         verbose_name = 'OEM Kod'
         verbose_name_plural = 'OEM Kodlar'
 
+    @staticmethod
+    def parse_oem_codes(codes_string):
+        # Vergüllə ayrılmış kodları təmizləyib siyahıya çevirir
+        if not codes_string:
+            return []
+        # Boşluqları və xüsusi simvolları təmizləyir
+        codes = [code.strip() for code in codes_string.split(',') if code.strip()]
+        # Təkrarlanan kodları silir
+        return list(set(codes))
+
 
 class SebetItem(models.Model):
     mehsul = models.ForeignKey(Mehsul, on_delete=models.CASCADE)

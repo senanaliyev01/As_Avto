@@ -546,7 +546,7 @@ def realtime_search(request):
             Q(brend_kod__icontains=query) |
             Q(oem__icontains=query) |
             Q(oem_kodlar__kod__icontains=query)
-        ).distinct()[:10]  # Limit to 10 results for performance
+        ).distinct()
     
     results = []
     for mehsul in mehsullar:

@@ -366,6 +366,7 @@ html {
 }
 
 .search-result-item {
+    color: white;
     display: flex;
     align-items: center;
     padding: 10px;

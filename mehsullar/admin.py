@@ -3,7 +3,6 @@ from .models import Kateqoriya, Brend, Marka, Mehsul, Sebet, Sifaris, SifarisMeh
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils import timezone
-from django import forms
 
 class MarkaSekilInline(admin.TabularInline):
     model = MarkaSekil
@@ -164,45 +163,7 @@ class SifarisMehsulAdmin(admin.ModelAdmin):
 class MehsulAdmin(admin.ModelAdmin):
     list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'oem', 'stok')
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem')
-    
-    def get_fieldsets(self, request, obj=None):
-        fieldsets = [
-            (None, {
-                'fields': ('adi', 'kateqoriya', 'brend', 'marka', 'brend_kod', 'oem', 'stok', 'qiymet', 'sekil', 'haqqinda')
-            }),
-            ('Əlavə OEM Kodları', {
-                'fields': ('elave_oem_kodlar',),
-                'classes': ('collapse',),
-                'description': 'OEM kodlarını boşluqla ayırın. Sistem avtomatik olaraq kodları ayıracaq.'
-            })
-        ]
-        return fieldsets
-
-    def get_form(self, request, obj=None, **kwargs):
-        if 'fields' in kwargs:
-            kwargs['fields'] = list(kwargs['fields']) + ['elave_oem_kodlar']
-        
-        form = super().get_form(request, obj, **kwargs)
-        
-        # Əlavə OEM kodları üçün xüsusi sahə
-        form.base_fields['elave_oem_kodlar'] = forms.CharField(
-            required=False,
-            widget=forms.Textarea(attrs={'rows': 3}),
-            help_text='OEM kodlarını boşluqla ayırın. Sistem avtomatik olaraq kodları ayıracaq.'
-        )
-        
-        if obj:
-            # Mövcud OEM kodlarını bir sətirdə göstər
-            oem_kodlar = ' '.join([oem.kod for oem in obj.oem_kodlar.all()])
-            form.base_fields['elave_oem_kodlar'].initial = oem_kodlar
-            
-        return form
-
-    def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
-        # Əlavə OEM kodlarını emal et
-        if 'elave_oem_kodlar' in form.cleaned_data:
-            obj.oem_kodlari_elave_et(form.cleaned_data['elave_oem_kodlar'])
+    inlines = [OEMKodInline]
 
 # Qeydiyyatları düzəltdik
 admin.site.register(SifarisMehsul, SifarisMehsulAdmin)

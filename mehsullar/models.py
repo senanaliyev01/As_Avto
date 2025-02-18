@@ -72,16 +72,29 @@ class Mehsul(models.Model):
         kodlar.extend([oem.kod for oem in self.oem_kodlar.all()])
         return kodlar
 
-    def oem_kodlari_elave_et(self, kodlar_string):
-        # Mövcud OEM kodlarını təmizlə
-        self.oem_kodlar.all().delete()
+    def save(self, *args, **kwargs):
+        # Əvvəlcə məhsulu yadda saxlayırıq
+        super().save(*args, **kwargs)
         
-        # Boşluqlara görə kodları ayır və vergüllə birləşdir
-        kodlar = [kod.strip() for kod in kodlar_string.split() if kod.strip()]
+        # OEM kodunu boşluqlara görə ayırırıq
+        oem_kodlari = self.oem.split()
         
-        # Hər bir kodu əlavə et
-        for kod in kodlar:
-            OEMKod.objects.create(mehsul=self, kod=kod)
+        # İlk OEM kodunu əsas OEM kimi saxlayırıq
+        if oem_kodlari:
+            self.oem = oem_kodlari[0]
+            
+            # Mövcud əlavə OEM kodlarını silirik
+            self.oem_kodlar.all().delete()
+            
+            # Qalan OEM kodlarını əlavə edirik
+            for kod in oem_kodlari[1:]:
+                if kod.strip():  # Boş olmayan kodları əlavə edirik
+                    OEMKod.objects.create(mehsul=self, kod=kod.strip())
+        
+        # Yenidən yadda saxlayırıq, amma rekursiyadan qaçınmaq üçün
+        if 'force_insert' in kwargs:
+            kwargs.pop('force_insert')
+        super().save(*args, **kwargs)
 
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

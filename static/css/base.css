@@ -130,57 +130,94 @@ header {
     transform: scale(1.1);
 }
 
+/* Search Bar Container */
+.search-bar-container {
+    background-color: var(--primary-color);
+    padding: 1rem 0;
+    position: relative;
+    z-index: 1002;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 /* Axtarış Forması Üçün Stil */
 .search-bar {
-    background-color: rgba(10, 25, 41, 0.9); /* Tünd göy fon */
-    padding: 1rem; /* Daxili boşluq */
-    border-radius: 8px; /* Künclərin yuvarlanması */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* Kölgə */
+    background-color: rgba(10, 25, 41, 0.9);
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
     display: flex;
-    justify-content: center; /* Mərkəzləşdirmək */
-    align-items: center; /* Mərkəzləşdirmək */
-    gap: 1rem; /* Elementlər arasında boşluq */
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
     position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.search-bar form {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 /* Axtarış Forması Elementləri */
 .search-bar select,
-.search-bar input[type="text"],
-.search-bar button {
-    padding: 0.5rem; /* Daxili boşluq */
-    border: 1px solid var(--accent-color); /* Sərhəd rəngi */
-    border-radius: 4px; /* Künclərin yuvarlanması */
-    background-color: var(--primary-color); /* Fon rəngi */
-    color: var(--text-primary); /* Mətn rəngi */
-    font-size: 1rem; /* Mətn ölçüsü */
-    transition: border-color 0.3s ease; /* Sərhəd rənginin keçidi */
+.search-bar input[type="text"] {
+    padding: 0.8rem;
+    border: 1px solid var(--accent-color);
+    border-radius: 4px;
+    background-color: var(--primary-color);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    min-width: 150px;
+    flex: 1;
 }
 
-.search-bar button {
-    background-color: var(--accent-color); /* Fon rəngi */
-    color: var(--primary-color); /* Mətn rəngi */
-    cursor: pointer; /* İmlecin göstəricisi */
+.search-bar input[type="text"] {
+    flex: 2;
+    min-width: 200px;
 }
 
-.search-bar button:hover {
-    background-color: #56d6b0; /* Hover effekti */
+.search-bar select:hover,
+.search-bar input[type="text"]:hover {
+    border-color: #56d6b0;
+}
+
+.search-bar select:focus,
+.search-bar input[type="text"]:focus {
+    outline: none;
+    border-color: #56d6b0;
+    box-shadow: 0 0 0 2px rgba(86, 214, 176, 0.2);
 }
 
 #search-button {
-    position: relative; /* Spinnerin düzgün yerləşməsi üçün */
-    padding: 0.5rem 1rem; /* Daxili boşluq */
-    background-color: #38a7e5; /* Fon rəngi */
-    color: var(--primary-color); /* Mətn rəngi */
-    border: none; /* Sərhəd olmaması */
-    border-radius: 4px; /* Künclərin yuvarlanması */
-    cursor: pointer; /* İmlecin göstəricisi */
-    transition: background-color 0.3s ease; /* Fon rənginin keçidi */
+    padding: 0.8rem 2rem;
+    background: linear-gradient(135deg, #38a7e5, #1565c0);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
 #search-button:hover {
-    background-color: #56d6b0; /* Hover effekti */
+    background: linear-gradient(135deg, #1565c0, #38a7e5);
+    transform: translateY(-2px);
 }
 
+#search-button:active {
+    transform: translateY(0);
+}
 
 /* Loading Spinner */
 .loading-spinner {
@@ -279,6 +316,10 @@ footer {
         padding: 0.6rem 1rem;
         font-size: 0.9rem;
     }
+
+    .search-bar {
+        margin: 0 1rem;
+    }
 }
 
 @media (max-width: 992px) {
@@ -308,6 +349,18 @@ footer {
         text-align: center;
         padding: 0.8rem;
         min-width: 120px;
+    }
+
+    .search-bar form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-bar select,
+    .search-bar input[type="text"],
+    #search-button {
+        width: 100%;
+        min-width: unset;
     }
 }
 
@@ -348,14 +401,14 @@ html {
 /* Real-time Search Results Dropdown */
 .search-results-dropdown {
     position: absolute;
-    top: 100%;
+    top: calc(100% + 5px);
     left: 0;
     right: 0;
     background: var(--primary-color);
     border: 1px solid var(--accent-color);
-    border-radius: 0 0 8px 8px;
+    border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
+    z-index: 1003;
     max-height: 400px;
     overflow-y: auto;
     display: none;

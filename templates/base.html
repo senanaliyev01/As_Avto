@@ -14,6 +14,49 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    <!-- Axtarış Forması -->
+    <div class="search-bar-container">
+        <div class="search-bar">
+            <form id="search-form" method="GET" action="{% url 'products_list' %}">
+                <select name="category" id="category">
+                    <option value="">Kateqoriya</option>
+                    {% for category in request.kateqoriyalar %}
+                        <option value="{{ category.adi }}" {% if request.GET.category == category.adi %}selected{% endif %}>
+                            {{ category.adi }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <select name="brand" id="brand">
+                    <option value="">Firma</option>
+                    {% for brand in request.brendler %}
+                        <option value="{{ brand.adi }}" {% if request.GET.brand == brand.adi %}selected{% endif %}>
+                            {{ brand.adi }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <select name="model" id="model">
+                    <option value="">Avtomobil</option>
+                    {% for marka in request.markalar %}
+                        <option value="{{ marka.adi }}" {% if request.GET.model == marka.adi %}selected{% endif %}>
+                            {{ marka.adi }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <input type="text" name="search_text" placeholder="Brend kodu və ya OEM daxil edin" value="{{ request.GET.search_text }}">
+                
+                <button type="submit" id="search-button">
+                    Axtar
+                    <div id="loading-spinner" class="loading-spinner" style="display: none;">
+                        <div class="spinner"></div>
+                    </div>
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- Navbarr -->
     <div class="nav-bar">
         <a href="{% url 'esasevim:main' %}"><i class="fa-solid fa-house"></i> Ana Səhifə</a>
@@ -51,47 +94,6 @@
             <p class="current-time">Hazırki Saat: <span id="current-time"></span></p>
         </div>
     </header>
-          
-<!-- Axtarış Forması -->
-<div class="search-bar">
-    <form id="search-form" method="GET" action="{% url 'products_list' %}">
-        <select name="category" id="category">
-            <option value="">Kateqoriya</option>
-            {% for category in request.kateqoriyalar %}
-                <option value="{{ category.adi }}" {% if request.GET.category == category.adi %}selected{% endif %}>
-                    {{ category.adi }}
-                </option>
-            {% endfor %}
-        </select>
-
-        <select name="brand" id="brand">
-            <option value="">Firma</option>
-            {% for brand in request.brendler %}
-                <option value="{{ brand.adi }}" {% if request.GET.brand == brand.adi %}selected{% endif %}>
-                    {{ brand.adi }}
-                </option>
-            {% endfor %}
-        </select>
-
-        <select name="model" id="model">
-            <option value="">Avtomobil</option>
-            {% for marka in request.markalar %}
-                <option value="{{ marka.adi }}" {% if request.GET.model == marka.adi %}selected{% endif %}>
-                    {{ marka.adi }}
-                </option>
-            {% endfor %}
-        </select>
-
-        <input type="text" name="search_text" placeholder="Brend kodu və ya OEM daxil edin" value="{{ request.GET.search_text }}">
-        
-        <button type="submit" id="search-button">
-            Axtar
-            <div id="loading-spinner" class="loading-spinner" style="display: none;">
-                <div class="spinner"></div>
-            </div>
-        </button>
-    </form>
-</div>
 
     <!-- Main Content -->
     <div class="main-content">

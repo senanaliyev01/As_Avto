@@ -51,25 +51,23 @@ class SifarisMehsulInline(admin.TabularInline):
 class OEMKodInline(admin.TabularInline):
     model = OEMKod
     extra = 1
-    classes = ['collapse']
     formfield_overrides = {
         models.TextField: {'widget': admin.widgets.AdminTextareaWidget(
             attrs={
                 'rows': 5,
-                'cols': 80,
                 'style': '''
                     width: 100%;
-                    font-family: "Consolas", monospace;
+                    font-family: 'Consolas', monospace;
                     font-size: 14px;
-                    padding: 10px;
-                    border: 1px solid #ddd;
-                    border-radius: 4px;
+                    padding: 12px;
+                    border-radius: 6px;
                     background-color: #f8f9fa;
-                    margin: 5px 0;
-                    min-height: 120px;
+                    border: 1px solid #dee2e6;
+                    line-height: 1.5;
                 '''
             })},
     }
+    classes = ['collapse']
 
 # Sifariş admin paneli
 @admin.register(Sifaris)

@@ -50,7 +50,7 @@ class SifarisMehsulInline(admin.TabularInline):
 # OEMKodInline klassını əvvəldə təyin edirik
 class OEMKodInline(admin.TabularInline):
     model = OEMKod
-    extra = 1
+    extra = 0
     formfield_overrides = {
         models.TextField: {'widget': admin.widgets.AdminTextareaWidget(
             attrs={'rows': 5, 'style': 'width: 100%; font-family: monospace;'})},

@@ -38,14 +38,12 @@ class App {
     async initializeComponents() {
         try {
             // Initialize components
-            this.preloader = new Preloader();
             this.header = new Header();
             this.heroSlider = new HeroSlider();
             this.mobileMenu = new MobileMenu();
             this.scrollAnimations = new ScrollAnimations();
             
             // Start components
-            await this.preloader.init();
             this.header.init();
             this.heroSlider.init();
             this.mobileMenu.init();
@@ -58,33 +56,6 @@ class App {
         } catch (error) {
             console.error('Application initialization error:', error);
         }
-    }
-}
-
-// Preloader Component
-class Preloader {
-    constructor() {
-        this.preloader = utils.select('.preloader');
-    }
-
-    async init() {
-        if (!this.preloader) return;
-
-        return new Promise(resolve => {
-            if (document.readyState === 'complete') {
-                this.hide(resolve);
-            } else {
-                window.addEventListener('load', () => this.hide(resolve));
-            }
-        });
-    }
-
-    hide(callback) {
-        this.preloader.style.opacity = '0';
-        setTimeout(() => {
-            this.preloader.style.display = 'none';
-            callback?.();
-        }, 500);
     }
 }
 

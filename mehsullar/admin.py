@@ -53,21 +53,8 @@ class OEMKodInline(admin.TabularInline):
     extra = 1
     formfield_overrides = {
         models.TextField: {'widget': admin.widgets.AdminTextareaWidget(
-            attrs={
-                'rows': 5,
-                'style': '''
-                    width: 100%;
-                    font-family: 'Consolas', monospace;
-                    font-size: 14px;
-                    padding: 12px;
-                    border-radius: 6px;
-                    background-color: #f8f9fa;
-                    border: 1px solid #dee2e6;
-                    line-height: 1.5;
-                '''
-            })},
+            attrs={'rows': 5, 'style': 'width: 100%; font-family: monospace;'})},
     }
-    classes = ['collapse']
 
 # Sifariş admin paneli
 @admin.register(Sifaris)

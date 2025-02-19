@@ -100,28 +100,64 @@ td {
 
 /* Stock Status Styles */
 .stock-status {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 1rem;
-    font-size: 0.9rem;
-    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 15px;
+    display: inline-block;
+    text-transform: uppercase;
+    color: white;
 }
 
 .in-stock {
-    background-color: rgba(22, 163, 74, 0.2);
-    color: #4ade80;
+    background: linear-gradient(135deg, #00897b, #00695c);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.in-stock::before {
+    content: "\f00c";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 5px;
 }
 
 .low-stock {
-    background-color: rgba(217, 119, 6, 0.2);
-    color: #fbbf24;
+    background: linear-gradient(135deg, #ffd54f, #ffb300);
+    color: black;
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.low-stock::before {
+    content: "\f071";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 5px;
 }
 
 .out-of-stock {
-    background-color: rgba(220, 38, 38, 0.2);
-    color: #f87171;
+    background: linear-gradient(135deg, #e53935, #c62828);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.out-of-stock::before {
+    content: "\f00d";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 5px;
 }
 
 /* Quantity Controls */

@@ -121,15 +121,14 @@ def products_list(request):
     if model:
         mehsullar = mehsullar.filter(marka__adi=model)
 
-    # Brend kodu, OEM kodu və məhsul adı üçün hissəvi axtarış
+    # Brend kodu və OEM kodu üçün hissəvi axtarış
     if search_text:
         # Xüsusi simvolları təmizləyirik
-        search_text = re.sub(r'[^a-zA-Z0-9\s]', '', search_text)
-        # Brend kodu, OEM kodu və ya məhsul adına görə hissəvi axtarış
+        search_text = re.sub(r'[^a-zA-Z0-9]', '', search_text)
+        # Brend kodu və ya OEM koduna görə hissəvi axtarış
         mehsullar = mehsullar.filter(
             Q(brend_kod__icontains=search_text) |  # Hissəvi uyğunluq
             Q(oem__icontains=search_text) |        # Hissəvi uyğunluq
-            Q(adi__icontains=search_text) |        # Məhsul adına görə axtarış
             Q(oem_kodlar__kod__icontains=search_text)  # Əlavə OEM kodlarında hissəvi uyğunluq
         ).distinct()
 
@@ -323,12 +322,11 @@ def mehsul_axtaris(request):
         
         for term in search_terms:
             # Xüsusi simvolları təmizləyirik
-            term = re.sub(r'[^a-zA-Z0-9\s]', '', term)
+            term = re.sub(r'[^a-zA-Z0-9]', '', term)
             # Hər bir söz üçün axtarış edirik
             mehsullar = mehsullar.filter(
                 Q(oem__icontains=term) |  # əsas OEM kodunda axtar
                 Q(oem_kodlar__kod__icontains=term) |  # əlavə OEM kodlarında axtar
-                Q(adi__icontains=term) |  # məhsul adında axtar
                 Q(brend_kod__icontains=term)  # brend kodunda axtar
             ).distinct()
         
@@ -543,11 +541,10 @@ def realtime_search(request):
         mehsullar = mehsullar.filter(marka__adi=model)
     
     if query:
-        query = re.sub(r'[^a-zA-Z0-9\s]', '', query)
+        query = re.sub(r'[^a-zA-Z0-9]', '', query)
         mehsullar = mehsullar.filter(
             Q(brend_kod__icontains=query) |
             Q(oem__icontains=query) |
-            Q(adi__icontains=query) |
             Q(oem_kodlar__kod__icontains=query)
         ).distinct()
     

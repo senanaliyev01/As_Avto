@@ -98,28 +98,10 @@ def get_stock_class(stok):
         return "in-stock"
 
 def normalize_search_text(text):
+    # Xüsusi simvolları və artıq boşluqları təmizləyən funksiya
     if not text:
         return ""
-    
-    # Azərbaycan hərflərinin qarşılıqları
-    az_chars = {
-        'ə': 'e', 'Ə': 'E',
-        'ı': 'i', 'I': 'I',
-        'ğ': 'g', 'Ğ': 'G',
-        'ü': 'u', 'Ü': 'U',
-        'ş': 's', 'Ş': 'S',
-        'ç': 'c', 'Ç': 'C',
-        'ö': 'o', 'Ö': 'O'
-    }
-    
-    # Mətni kiçik hərflərə çevir
-    text = text.lower()
-    
-    # Azərbaycan hərflərini müvafiq latin hərfləri ilə əvəz et
-    for az_char, lat_char in az_chars.items():
-        text = text.replace(az_char, lat_char)
-    
-    # Xüsusi simvolları və artıq boşluqları təmizlə
+    # Bütün xüsusi simvolları boşluqla əvəz et
     normalized = re.sub(r'[^\w\s]', ' ', text)
     # Birdən çox boşluğu tək boşluqla əvəz et
     normalized = re.sub(r'\s+', ' ', normalized)
@@ -154,25 +136,17 @@ def products_list(request):
     if search_text:
         # Axtarış mətnini normalize et
         normalized_search = normalize_search_text(search_text)
-        search_terms = normalized_search.split()
         
-        # Hər bir axtarış termini üçün ayrı sorğu yaradırıq
-        query = Q()
-        for term in search_terms:
-            # Məhsul adında axtarış üçün
-            name_query = Q(adi__icontains=term)
-            
-            # Brend kodu və OEM üçün təmizlənmiş termin
-            clean_term = re.sub(r'[^a-zA-Z0-9]', '', term)
-            if clean_term:  # Əgər təmizlənmiş termin boş deyilsə
-                code_query = (Q(brend_kod__icontains=clean_term) |
-                            Q(oem__icontains=clean_term) |
-                            Q(oem_kodlar__kod__icontains=clean_term))
-                query |= name_query | code_query
-            else:
-                query |= name_query
+        # Xüsusi simvolları təmizlə (brend kodu və OEM üçün)
+        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_text)
         
-        mehsullar = mehsullar.filter(query).distinct()
+        # Axtarış sorğusunu yarat
+        mehsullar = mehsullar.filter(
+            Q(adi__icontains=normalized_search) |  # Məhsul adında axtarış
+            Q(brend_kod__icontains=clean_search) |  # Brend kodunda axtarış
+            Q(oem__icontains=clean_search) |  # OEM kodunda axtarış
+            Q(oem_kodlar__kod__icontains=clean_search)  # Əlavə OEM kodlarında axtarış
+        ).distinct()
 
     return render(request, 'products_list.html', {
         'mehsullar': mehsullar,
@@ -372,9 +346,9 @@ def mehsul_axtaris(request):
             # Hər bir söz üçün axtarış edirik
             mehsullar = mehsullar.filter(
                 Q(adi__icontains=normalized_term) |  # Məhsul adında axtarış
-                Q(brend_kod__icontains=clean_term) |  # Brend kodunda axtarış
-                Q(oem__icontains=clean_term) |  # OEM kodunda axtarış
-                Q(oem_kodlar__kod__icontains=clean_term)  # Əlavə OEM kodlarında axtarış
+                Q(oem__icontains=clean_term) |  # əsas OEM kodunda axtar
+                Q(oem_kodlar__kod__icontains=clean_term) |  # əlavə OEM kodlarında axtar
+                Q(brend_kod__icontains=clean_term)  # brend kodunda axtar
             ).distinct()
         
         # Nəticələri qaytarırıq
@@ -598,27 +572,17 @@ def realtime_search(request):
         mehsullar = mehsullar.filter(marka__adi=model)
     
     if query:
-        # Axtarış mətnini normalize et
+        # Məhsul adı üçün normalize edilmiş axtarış
         normalized_query = normalize_search_text(query)
-        search_terms = normalized_query.split()
+        # Brend kodu və OEM üçün təmizlənmiş axtarış
+        clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
         
-        # Hər bir axtarış termini üçün ayrı sorğu yaradırıq
-        combined_query = Q()
-        for term in search_terms:
-            # Məhsul adında axtarış üçün
-            name_query = Q(adi__icontains=term)
-            
-            # Brend kodu və OEM üçün təmizlənmiş termin
-            clean_term = re.sub(r'[^a-zA-Z0-9]', '', term)
-            if clean_term:
-                code_query = (Q(brend_kod__icontains=clean_term) |
-                            Q(oem__icontains=clean_term) |
-                            Q(oem_kodlar__kod__icontains=clean_term))
-                combined_query |= name_query | code_query
-            else:
-                combined_query |= name_query
-        
-        mehsullar = mehsullar.filter(combined_query).distinct()
+        mehsullar = mehsullar.filter(
+            Q(adi__icontains=normalized_query) |
+            Q(brend_kod__icontains=clean_query) |
+            Q(oem__icontains=clean_query) |
+            Q(oem_kodlar__kod__icontains=clean_query)
+        ).distinct()
     
     results = []
     for mehsul in mehsullar:

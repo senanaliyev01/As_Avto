@@ -98,15 +98,38 @@ def get_stock_class(stok):
         return "in-stock"
 
 def normalize_search_text(text):
-    # Xüsusi simvolları və artıq boşluqları təmizləyən funksiya
     if not text:
         return ""
+    
+    # Azərbaycan hərflərini ingilis hərflərinə çevirmək üçün mapping
+    az_to_en = {
+        'ə': 'e', 'Ə': 'E',
+        'ı': 'i', 'İ': 'I',
+        'ö': 'o', 'Ö': 'O',
+        'ü': 'u', 'Ü': 'U',
+        'ş': 's', 'Ş': 'S',
+        'ç': 'c', 'Ç': 'C',
+        'ğ': 'g', 'Ğ': 'G'
+    }
+    
+    # Bütün mətni kiçik hərflərə çevir
+    text = text.lower()
+    
+    # Azərbaycan hərflərini ingilis hərflərinə çevir
+    for az, en in az_to_en.items():
+        text = text.replace(az, en)
+    
+    # Xüsusi simvolları və artıq boşluqları təmizlə
     # Bütün xüsusi simvolları boşluqla əvəz et
     normalized = re.sub(r'[^\w\s]', ' ', text)
+    
     # Birdən çox boşluğu tək boşluqla əvəz et
     normalized = re.sub(r'\s+', ' ', normalized)
+    
     # Əvvəl və sondakı boşluqları sil
-    return normalized.strip()
+    normalized = normalized.strip()
+    
+    return normalized
 
 @login_required
 def products_list(request):
@@ -137,12 +160,20 @@ def products_list(request):
         # Axtarış mətnini normalize et
         normalized_search = normalize_search_text(search_text)
         
+        # Məhsul adlarını normalize edib axtarış
+        mehsul_ids = []
+        for mehsul in mehsullar:
+            normalized_mehsul_adi = normalize_search_text(mehsul.adi)
+            # Əgər normalize edilmiş məhsul adı normalize edilmiş axtarış sözünü əhatə edirsə
+            if normalized_search in normalized_mehsul_adi:
+                mehsul_ids.append(mehsul.id)
+        
         # Xüsusi simvolları təmizlə (brend kodu və OEM üçün)
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_text)
         
         # Axtarış sorğusunu yarat
         mehsullar = mehsullar.filter(
-            Q(adi__icontains=normalized_search) |  # Məhsul adında axtarış
+            Q(id__in=mehsul_ids) |  # Normalize edilmiş ad axtarışı
             Q(brend_kod__icontains=clean_search) |  # Brend kodunda axtarış
             Q(oem__icontains=clean_search) |  # OEM kodunda axtarış
             Q(oem_kodlar__kod__icontains=clean_search)  # Əlavə OEM kodlarında axtarış
@@ -331,25 +362,30 @@ def update_quantity(request, item_id, new_quantity):
 def mehsul_axtaris(request):
     query = request.GET.get('q')
     if query:
-        # Axtarış sözlərini boşluqla ayırırıq
-        search_terms = query.split()
         # Başlanğıc sorğunu yaradırıq
         mehsullar = Mehsul.objects.all()
         
-        # Hər bir axtarış termini üçün
-        for term in search_terms:
-            # Məhsul adı üçün normalize edilmiş axtarış
-            normalized_term = normalize_search_text(term)
-            # Brend kodu və OEM üçün təmizlənmiş axtarış
-            clean_term = re.sub(r'[^a-zA-Z0-9]', '', term)
-            
-            # Hər bir söz üçün axtarış edirik
-            mehsullar = mehsullar.filter(
-                Q(adi__icontains=normalized_term) |  # Məhsul adında axtarış
-                Q(oem__icontains=clean_term) |  # əsas OEM kodunda axtar
-                Q(oem_kodlar__kod__icontains=clean_term) |  # əlavə OEM kodlarında axtar
-                Q(brend_kod__icontains=clean_term)  # brend kodunda axtar
-            ).distinct()
+        # Axtarış mətnini normalize et
+        normalized_query = normalize_search_text(query)
+        
+        # Məhsul adlarını normalize edib axtarış
+        mehsul_ids = []
+        for mehsul in mehsullar:
+            normalized_mehsul_adi = normalize_search_text(mehsul.adi)
+            # Əgər normalize edilmiş məhsul adı normalize edilmiş axtarış sözünü əhatə edirsə
+            if normalized_query in normalized_mehsul_adi:
+                mehsul_ids.append(mehsul.id)
+        
+        # Xüsusi simvolları təmizlə (brend kodu və OEM üçün)
+        clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
+        
+        # Axtarış sorğusunu yarat
+        mehsullar = mehsullar.filter(
+            Q(id__in=mehsul_ids) |  # Normalize edilmiş ad axtarışı
+            Q(brend_kod__icontains=clean_query) |  # Brend kodunda axtarış
+            Q(oem__icontains=clean_query) |  # OEM kodunda axtarış
+            Q(oem_kodlar__kod__icontains=clean_query)  # Əlavə OEM kodlarında axtarış
+        ).distinct()
         
         # Nəticələri qaytarırıq
         return JsonResponse({
@@ -358,11 +394,11 @@ def mehsul_axtaris(request):
                 'id', 
                 'adi', 
                 'brend__adi', 
-                'marka__adi',  # Marka məlumatını əlavə edirik
+                'marka__adi',
                 'oem', 
                 'brend_kod', 
                 'qiymet',
-                'stok'  # Stok məlumatını əlavə edirik
+                'stok'
             ))
         })
     
@@ -574,11 +610,19 @@ def realtime_search(request):
     if query:
         # Məhsul adı üçün normalize edilmiş axtarış
         normalized_query = normalize_search_text(query)
+        
+        # Məhsul adlarını normalize edib axtarış
+        mehsul_ids = []
+        for mehsul in mehsullar:
+            normalized_mehsul_adi = normalize_search_text(mehsul.adi)
+            if normalized_query in normalized_mehsul_adi:
+                mehsul_ids.append(mehsul.id)
+        
         # Brend kodu və OEM üçün təmizlənmiş axtarış
         clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
         
         mehsullar = mehsullar.filter(
-            Q(adi__icontains=normalized_query) |
+            Q(id__in=mehsul_ids) |
             Q(brend_kod__icontains=clean_query) |
             Q(oem__icontains=clean_query) |
             Q(oem_kodlar__kod__icontains=clean_query)

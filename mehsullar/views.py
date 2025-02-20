@@ -99,7 +99,7 @@ def get_stock_class(stok):
 
 def normalize_search_text(text):
     if not text:
-        return ""
+        return "", ""  # Boş string halında iki dəyər qaytarırıq
     
     # Azərbaycan hərflərini ingilis hərflərinə çevirmək üçün mapping
     az_to_en = {

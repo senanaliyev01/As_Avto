@@ -97,9 +97,20 @@ def get_stock_class(stok):
     else:
         return "in-stock"
 
+def normalize_search_text(text):
+    # Xüsusi simvolları və artıq boşluqları təmizləyən funksiya
+    if not text:
+        return ""
+    # Bütün xüsusi simvolları boşluqla əvəz et
+    normalized = re.sub(r'[^\w\s]', ' ', text)
+    # Birdən çox boşluğu tək boşluqla əvəz et
+    normalized = re.sub(r'\s+', ' ', normalized)
+    # Əvvəl və sondakı boşluqları sil
+    return normalized.strip()
+
 @login_required
 def products_list(request):
-    # Başlanğıc olaraq bütün məhsulları götürürük1
+    # Başlanğıc olaraq bütün məhsulları götürürük
     mehsullar = Mehsul.objects.all()
     kateqoriyalar = Kateqoriya.objects.all()
     brendler = Brend.objects.all()
@@ -121,15 +132,20 @@ def products_list(request):
     if model:
         mehsullar = mehsullar.filter(marka__adi=model)
 
-    # Brend kodu və OEM kodu üçün hissəvi axtarış
+    # Axtarış mətni varsa
     if search_text:
-        # Xüsusi simvolları təmizləyirik
-        search_text = re.sub(r'[^a-zA-Z0-9]', '', search_text)
-        # Brend kodu və ya OEM koduna görə hissəvi axtarış
+        # Axtarış mətnini normalize et
+        normalized_search = normalize_search_text(search_text)
+        
+        # Xüsusi simvolları təmizlə (brend kodu və OEM üçün)
+        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_text)
+        
+        # Axtarış sorğusunu yarat
         mehsullar = mehsullar.filter(
-            Q(brend_kod__icontains=search_text) |  # Hissəvi uyğunluq
-            Q(oem__icontains=search_text) |        # Hissəvi uyğunluq
-            Q(oem_kodlar__kod__icontains=search_text)  # Əlavə OEM kodlarında hissəvi uyğunluq
+            Q(adi__icontains=normalized_search) |  # Məhsul adında axtarış
+            Q(brend_kod__icontains=clean_search) |  # Brend kodunda axtarış
+            Q(oem__icontains=clean_search) |  # OEM kodunda axtarış
+            Q(oem_kodlar__kod__icontains=clean_search)  # Əlavə OEM kodlarında axtarış
         ).distinct()
 
     return render(request, 'products_list.html', {
@@ -320,19 +336,34 @@ def mehsul_axtaris(request):
         # Başlanğıc sorğunu yaradırıq
         mehsullar = Mehsul.objects.all()
         
+        # Hər bir axtarış termini üçün
         for term in search_terms:
-            # Xüsusi simvolları təmizləyirik
-            term = re.sub(r'[^a-zA-Z0-9]', '', term)
+            # Məhsul adı üçün normalize edilmiş axtarış
+            normalized_term = normalize_search_text(term)
+            # Brend kodu və OEM üçün təmizlənmiş axtarış
+            clean_term = re.sub(r'[^a-zA-Z0-9]', '', term)
+            
             # Hər bir söz üçün axtarış edirik
             mehsullar = mehsullar.filter(
-                Q(oem__icontains=term) |  # əsas OEM kodunda axtar
-                Q(oem_kodlar__kod__icontains=term) |  # əlavə OEM kodlarında axtar
-                Q(brend_kod__icontains=term)  # brend kodunda axtar
+                Q(adi__icontains=normalized_term) |  # Məhsul adında axtarış
+                Q(oem__icontains=clean_term) |  # əsas OEM kodunda axtar
+                Q(oem_kodlar__kod__icontains=clean_term) |  # əlavə OEM kodlarında axtar
+                Q(brend_kod__icontains=clean_term)  # brend kodunda axtar
             ).distinct()
         
+        # Nəticələri qaytarırıq
         return JsonResponse({
             'success': True,
-            'mehsullar': list(mehsullar.values('id', 'adi', 'brend__adi', 'oem', 'brend_kod', 'qiymet'))
+            'mehsullar': list(mehsullar.values(
+                'id', 
+                'adi', 
+                'brend__adi', 
+                'marka__adi',  # Marka məlumatını əlavə edirik
+                'oem', 
+                'brend_kod', 
+                'qiymet',
+                'stok'  # Stok məlumatını əlavə edirik
+            ))
         })
     
     return JsonResponse({
@@ -541,11 +572,16 @@ def realtime_search(request):
         mehsullar = mehsullar.filter(marka__adi=model)
     
     if query:
-        query = re.sub(r'[^a-zA-Z0-9]', '', query)
+        # Məhsul adı üçün normalize edilmiş axtarış
+        normalized_query = normalize_search_text(query)
+        # Brend kodu və OEM üçün təmizlənmiş axtarış
+        clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
+        
         mehsullar = mehsullar.filter(
-            Q(brend_kod__icontains=query) |
-            Q(oem__icontains=query) |
-            Q(oem_kodlar__kod__icontains=query)
+            Q(adi__icontains=normalized_query) |
+            Q(brend_kod__icontains=clean_query) |
+            Q(oem__icontains=clean_query) |
+            Q(oem_kodlar__kod__icontains=clean_query)
         ).distinct()
     
     results = []

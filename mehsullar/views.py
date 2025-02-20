@@ -129,7 +129,10 @@ def normalize_search_text(text):
     # Əvvəl və sondakı boşluqları sil
     normalized = normalized.strip()
     
-    return normalized
+    # Bütün boşluqları silərək birləşik variant yarat
+    concatenated = normalized.replace(' ', '')
+    
+    return normalized, concatenated
 
 @login_required
 def products_list(request):
@@ -158,14 +161,14 @@ def products_list(request):
     # Axtarış mətni varsa
     if search_text:
         # Axtarış mətnini normalize et
-        normalized_search = normalize_search_text(search_text)
+        normalized_search, concatenated_search = normalize_search_text(search_text)
         
         # Məhsul adlarını normalize edib axtarış
         mehsul_ids = []
         for mehsul in mehsullar:
-            normalized_mehsul_adi = normalize_search_text(mehsul.adi)
+            normalized_mehsul_adi = normalize_search_text(mehsul.adi)[0]
             # Əgər normalize edilmiş məhsul adı normalize edilmiş axtarış sözünü əhatə edirsə
-            if normalized_search in normalized_mehsul_adi:
+            if normalized_search in normalized_mehsul_adi or concatenated_search in normalized_mehsul_adi:
                 mehsul_ids.append(mehsul.id)
         
         # Xüsusi simvolları təmizlə (brend kodu və OEM üçün)
@@ -365,15 +368,18 @@ def mehsul_axtaris(request):
         # Başlanğıc sorğunu yaradırıq
         mehsullar = Mehsul.objects.all()
         
-        # Axtarış mətnini normalize et
-        normalized_query = normalize_search_text(query)
+        # Axtarış mətnini normalize et və birləşik variantını al
+        normalized_query, concatenated_query = normalize_search_text(query)
         
         # Məhsul adlarını normalize edib axtarış
         mehsul_ids = []
         for mehsul in mehsullar:
-            normalized_mehsul_adi = normalize_search_text(mehsul.adi)
-            # Əgər normalize edilmiş məhsul adı normalize edilmiş axtarış sözünü əhatə edirsə
-            if normalized_query in normalized_mehsul_adi:
+            normalized_mehsul_adi, concatenated_mehsul_adi = normalize_search_text(mehsul.adi)
+            # Normal və ya birləşik variantda uyğunluq yoxla
+            if (normalized_query in normalized_mehsul_adi or 
+                concatenated_query in normalized_mehsul_adi or
+                normalized_query in concatenated_mehsul_adi or
+                concatenated_query in concatenated_mehsul_adi):
                 mehsul_ids.append(mehsul.id)
         
         # Xüsusi simvolları təmizlə (brend kodu və OEM üçün)
@@ -609,12 +615,12 @@ def realtime_search(request):
     
     if query:
         # Məhsul adı üçün normalize edilmiş axtarış
-        normalized_query = normalize_search_text(query)
+        normalized_query = normalize_search_text(query)[0]
         
         # Məhsul adlarını normalize edib axtarış
         mehsul_ids = []
         for mehsul in mehsullar:
-            normalized_mehsul_adi = normalize_search_text(mehsul.adi)
+            normalized_mehsul_adi = normalize_search_text(mehsul.adi)[0]
             if normalized_query in normalized_mehsul_adi:
                 mehsul_ids.append(mehsul.id)
         

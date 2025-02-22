@@ -99,7 +99,7 @@ def get_stock_class(stok):
 
 def normalize_search_text(text):
     if not text:
-        return ""
+        return "", "", []
     
     # Azərbaycan hərflərini ingilis hərflərinə çevirmək üçün mapping
     az_to_en = {
@@ -120,19 +120,32 @@ def normalize_search_text(text):
         text = text.replace(az, en)
     
     # Xüsusi simvolları və artıq boşluqları təmizlə
-    # Bütün xüsusi simvolları boşluqla əvəz et
     normalized = re.sub(r'[^\w\s]', ' ', text)
-    
-    # Birdən çox boşluğu tək boşluqla əvəz et
     normalized = re.sub(r'\s+', ' ', normalized)
-    
-    # Əvvəl və sondakı boşluqları sil
     normalized = normalized.strip()
     
     # Bütün boşluqları silərək birləşik variant yarat
     concatenated = normalized.replace(' ', '')
     
-    return normalized, concatenated
+    # Sözləri ayır və bütün mümkün kombinasiyaları yarat
+    words = normalized.split()
+    combinations = []
+    
+    # Əsas sözləri əlavə et
+    combinations.extend(words)
+    
+    # İki sözün birləşməsindən yaranan variantları əlavə et
+    if len(words) >= 2:
+        for i in range(len(words)-1):
+            for j in range(i+1, len(words)):
+                combined = words[i] + words[j]
+                combinations.append(combined)
+                combinations.append(words[j] + words[i])  # Əks sıra ilə də
+    
+    # Dublikatları təmizlə
+    combinations = list(set(combinations))
+    
+    return normalized, concatenated, combinations
 
 @login_required
 def products_list(request):
@@ -161,19 +174,19 @@ def products_list(request):
     # Axtarış mətni varsa
     if search_text:
         # Axtarış mətnini normalize et
-        normalized_search, concatenated_search = normalize_search_text(search_text)
+        normalized_search, concatenated_search, _ = normalize_search_text(search_text)
         
         # Məhsul adlarını və haqqında məlumatlarını normalize edib axtarış
         mehsul_ids = []
         for mehsul in mehsullar:
             # Məhsul adını normalize et
-            normalized_mehsul_adi, concatenated_mehsul_adi = normalize_search_text(mehsul.adi)
+            normalized_mehsul_adi, concatenated_mehsul_adi, _ = normalize_search_text(mehsul.adi)
             
             # Məhsul haqqında məlumatını normalize et (əgər varsa)
             if mehsul.haqqinda:
-                normalized_haqqinda, concatenated_haqqinda = normalize_search_text(mehsul.haqqinda)
+                normalized_haqqinda, concatenated_haqqinda, _ = normalize_search_text(mehsul.haqqinda)
             else:
-                normalized_haqqinda, concatenated_haqqinda = "", ""
+                normalized_haqqinda, concatenated_haqqinda, _ = "", "", []
             
             # Normal və ya birləşik variantda uyğunluq yoxla (həm ad, həm haqqında üçün)
             if (normalized_search in normalized_mehsul_adi or 
@@ -377,38 +390,42 @@ def update_quantity(request, item_id, new_quantity):
             'error': str(e)
         }, status=500)
 
+@login_required
 def mehsul_axtaris(request):
     query = request.GET.get('q')
     if query:
         # Başlanğıc sorğunu yaradırıq
         mehsullar = Mehsul.objects.all()
         
-        # Axtarış mətnini normalize et və birləşik variantını al
-        normalized_query, concatenated_query = normalize_search_text(query)
+        # Axtarış mətnini normalize et və kombinasiyaları al
+        normalized_query, concatenated_query, query_combinations = normalize_search_text(query)
         
         # Məhsul adlarını və haqqında məlumatlarını normalize edib axtarış
         mehsul_ids = []
         for mehsul in mehsullar:
             # Məhsul adını normalize et
-            normalized_mehsul_adi, concatenated_mehsul_adi = normalize_search_text(mehsul.adi)
+            normalized_mehsul_adi, concatenated_mehsul_adi, mehsul_combinations = normalize_search_text(mehsul.adi)
             
             # Məhsul haqqında məlumatını normalize et (əgər varsa)
             if mehsul.haqqinda:
-                normalized_haqqinda, concatenated_haqqinda = normalize_search_text(mehsul.haqqinda)
+                normalized_haqqinda, concatenated_haqqinda, haqqinda_combinations = normalize_search_text(mehsul.haqqinda)
             else:
-                normalized_haqqinda, concatenated_haqqinda = "", ""
+                normalized_haqqinda, concatenated_haqqinda, haqqinda_combinations = "", "", []
             
-            # Normal və ya birləşik variantda uyğunluq yoxla (həm ad, həm haqqında üçün)
+            # Bütün mümkün kombinasiyaları birləşdir
+            all_combinations = set(mehsul_combinations + haqqinda_combinations)
+            
+            # Uyğunluqları yoxla
             if (normalized_query in normalized_mehsul_adi or 
-                concatenated_query in normalized_mehsul_adi or
-                normalized_query in concatenated_mehsul_adi or
                 concatenated_query in concatenated_mehsul_adi or
                 normalized_query in normalized_haqqinda or
-                concatenated_query in normalized_haqqinda or
-                normalized_query in concatenated_haqqinda or
-                concatenated_query in concatenated_haqqinda):
+                concatenated_query in concatenated_haqqinda or
+                # Kombinasiyaları yoxla
+                any(qc in all_combinations for qc in query_combinations) or
+                any(qc in concatenated_mehsul_adi for qc in query_combinations) or
+                any(qc in concatenated_haqqinda for qc in query_combinations)):
                 mehsul_ids.append(mehsul.id)
-        
+
         # Xüsusi simvolları təmizlə (brend kodu və OEM üçün)
         clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
         
@@ -420,7 +437,6 @@ def mehsul_axtaris(request):
             Q(oem_kodlar__kod__icontains=clean_query)  # Əlavə OEM kodlarında axtarış
         ).distinct()
         
-        # Nəticələri qaytarırıq
         return JsonResponse({
             'success': True,
             'mehsullar': list(mehsullar.values(
@@ -643,29 +659,32 @@ def realtime_search(request):
     
     if query:
         # Məhsul adı və haqqında üçün normalize edilmiş axtarış
-        normalized_query, concatenated_query = normalize_search_text(query)
+        normalized_query, concatenated_query, query_combinations = normalize_search_text(query)
         
         # Məhsul adlarını və haqqında məlumatlarını normalize edib axtarış
         mehsul_ids = []
         for mehsul in mehsullar:
             # Məhsul adını normalize et
-            normalized_mehsul_adi, concatenated_mehsul_adi = normalize_search_text(mehsul.adi)
+            normalized_mehsul_adi, concatenated_mehsul_adi, mehsul_combinations = normalize_search_text(mehsul.adi)
             
             # Məhsul haqqında məlumatını normalize et (əgər varsa)
             if mehsul.haqqinda:
-                normalized_haqqinda, concatenated_haqqinda = normalize_search_text(mehsul.haqqinda)
+                normalized_haqqinda, concatenated_haqqinda, haqqinda_combinations = normalize_search_text(mehsul.haqqinda)
             else:
-                normalized_haqqinda, concatenated_haqqinda = "", ""
+                normalized_haqqinda, concatenated_haqqinda, haqqinda_combinations = "", "", []
             
-            # Normal və ya birləşik variantda uyğunluq yoxla (həm ad, həm haqqında üçün)
+            # Bütün mümkün kombinasiyaları birləşdir
+            all_combinations = set(mehsul_combinations + haqqinda_combinations)
+            
+            # Uyğunluqları yoxla
             if (normalized_query in normalized_mehsul_adi or 
-                concatenated_query in normalized_mehsul_adi or
-                normalized_query in concatenated_mehsul_adi or
                 concatenated_query in concatenated_mehsul_adi or
                 normalized_query in normalized_haqqinda or
-                concatenated_query in normalized_haqqinda or
-                normalized_query in concatenated_haqqinda or
-                concatenated_query in concatenated_haqqinda):
+                concatenated_query in concatenated_haqqinda or
+                # Kombinasiyaları yoxla
+                any(qc in all_combinations for qc in query_combinations) or
+                any(qc in concatenated_mehsul_adi for qc in query_combinations) or
+                any(qc in concatenated_haqqinda for qc in query_combinations)):
                 mehsul_ids.append(mehsul.id)
         
         # Brend kodu və OEM üçün təmizlənmiş axtarış

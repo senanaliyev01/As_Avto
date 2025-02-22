@@ -322,8 +322,8 @@ def mehsul_axtaris(request):
         mehsullar = Mehsul.objects.all()
         
         for term in search_terms:
-            # Xüsusi simvolları təmizləyirik
-            term = re.sub(r'[^a-zA-Z0-9ğüşəçİĞÜŞƏÇ\s]', '', term)
+            # Xüsusi simvolları və boşluqları təmizləyirik
+            term = re.sub(r'[^a-zA-Z0-9ğüşəçİĞÜŞƏÇ\s]', '', term).strip()
             # Hər bir söz üçün axtarış edirik
             mehsullar = mehsullar.filter(
                 Q(oem__icontains=term) |  # əsas OEM kodunda axtar
@@ -543,7 +543,8 @@ def realtime_search(request):
         mehsullar = mehsullar.filter(marka__adi=model)
     
     if query:
-        query = re.sub(r'[^a-zA-Z0-9ğüşəçİĞÜŞƏÇ\s]', '', query)
+        # Xüsusi simvolları və boşluqları təmizləyirik
+        query = re.sub(r'[^a-zA-Z0-9ğüşəçİĞÜŞƏÇ\s]', '', query).strip()
         mehsullar = mehsullar.filter(
             Q(brend_kod__icontains=query) |
             Q(oem__icontains=query) |

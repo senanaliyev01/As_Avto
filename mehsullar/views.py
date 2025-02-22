@@ -123,6 +123,7 @@ def products_list(request):
 
     # Brend kodu, OEM kodu və axtarış sözləri üçün hissəvi axtarış
     if search_text:
+        search_text = convert_letters(search_text)  # Hərfi çevirmək
         # Xüsusi simvolları təmizləyirik
         search_text = re.sub(r'[^a-zA-Z0-9əƏüÜöÖğĞıİşŞçÇ]', '', search_text)
         # Brend kodu, OEM kodu və axtarış sözləri üçün hissəvi axtarış
@@ -313,6 +314,29 @@ def update_quantity(request, item_id, new_quantity):
             'error': str(e)
         }, status=500)
 
+def convert_letters(text):
+    az_to_en = {
+        'a': 'a', 'b': 'b', 'c': 'c', 'ç': 'ch', 'd': 'd', 'e': 'e', 'f': 'f',
+        'g': 'g', 'ğ': 'gh', 'h': 'h', 'ı': 'i', 'i': 'i', 'j': 'j', 'k': 'k',
+        'l': 'l', 'm': 'm', 'n': 'n', 'o': 'o', 'ö': 'o', 'p': 'p', 'q': 'q',
+        'r': 'r', 's': 's', 'ş': 'sh', 't': 't', 'u': 'u', 'ü': 'u', 'v': 'v',
+        'y': 'y', 'z': 'z'
+    }
+    
+    en_to_az = {v: k for k, v in az_to_en.items()}
+
+    converted_text = []
+    for char in text:
+        if char in az_to_en:
+            converted_text.append(az_to_en[char])
+        elif char in en_to_az:
+            converted_text.append(en_to_az[char])
+        else:
+            converted_text.append(char)
+    
+    return ''.join(converted_text)
+
+@login_required
 def mehsul_axtaris(request):
     query = request.GET.get('q')
     if query:
@@ -322,6 +346,8 @@ def mehsul_axtaris(request):
         mehsullar = Mehsul.objects.all()
         
         for term in search_terms:
+            # Hər bir sözü çevirmək
+            term = convert_letters(term)
             # Xüsusi simvolları təmizləyirik
             term = re.sub(r'[^a-zA-Z0-9əƏüÜöÖğĞıİşŞçÇ]', '', term)
             # Hər bir söz üçün axtarış edirik
@@ -543,6 +569,7 @@ def realtime_search(request):
         mehsullar = mehsullar.filter(marka__adi=model)
     
     if query:
+        query = convert_letters(query)  # Hərfi çevirmək
         query = re.sub(r'[^a-zA-Z0-9əƏüÜöÖğĞıİşŞçÇ]', '', query)
         mehsullar = mehsullar.filter(
             Q(brend_kod__icontains=query) |

@@ -22,6 +22,44 @@ from reportlab.platypus import Image
 from istifadeciler.models import Profile
 from django.contrib import messages
 
+def convert_letters(text):
+    # Hərf qarşılıqları
+    letter_map = {
+        'ə': 'e', 'e': 'ə',
+        'ü': 'u', 'u': 'ü',
+        'ö': 'o', 'o': 'ö',
+        'ğ': 'g', 'g': 'ğ',
+        'ı': 'i', 'i': 'ı',
+        'ş': 's', 's': 'ş',
+        'ç': 'c', 'c': 'ç',
+        'Ə': 'E', 'E': 'Ə',
+        'Ü': 'U', 'U': 'Ü',
+        'Ö': 'O', 'O': 'Ö',
+        'Ğ': 'G', 'G': 'Ğ',
+        'I': 'İ', 'İ': 'I',
+        'Ş': 'S', 'S': 'Ş',
+        'Ç': 'C', 'C': 'Ç'
+    }
+    
+    converted_text = ''
+    for char in text:
+        converted_text += letter_map.get(char, char)
+    return converted_text
+
+def create_search_query(search_text):
+    # Orijinal mətn və çevrilmiş mətn üçün axtarış
+    converted_text = convert_letters(search_text)
+    return (
+        Q(brend_kod__icontains=search_text) |
+        Q(brend_kod__icontains=converted_text) |
+        Q(oem__icontains=search_text) |
+        Q(oem__icontains=converted_text) |
+        Q(oem_kodlar__kod__icontains=search_text) |
+        Q(oem_kodlar__kod__icontains=converted_text) |
+        Q(axtaris_sozleri__icontains=search_text) |
+        Q(axtaris_sozleri__icontains=converted_text)
+    )
+
 @login_required
 def umumibaxis(request):
     # Bütün məhsulları əldə edirik
@@ -99,7 +137,7 @@ def get_stock_class(stok):
 
 @login_required
 def products_list(request):
-    # Başlanğıc olaraq bütün məhsulları götürürük11
+    # Başlanğıc olaraq bütün məhsulları götürürük
     mehsullar = Mehsul.objects.all()
     kateqoriyalar = Kateqoriya.objects.all()
     brendler = Brend.objects.all()
@@ -125,13 +163,9 @@ def products_list(request):
     if search_text:
         # Xüsusi simvolları təmizləyirik
         search_text = re.sub(r'[^a-zA-Z0-9əƏüÜöÖğĞıİşŞçÇ]', '', search_text)
-        # Brend kodu, OEM kodu və axtarış sözləri üçün hissəvi axtarış
-        mehsullar = mehsullar.filter(
-            Q(brend_kod__icontains=search_text) |  # Hissəvi uyğunluq
-            Q(oem__icontains=search_text) |        # Hissəvi uyğunluq
-            Q(oem_kodlar__kod__icontains=search_text) |  # Əlavə OEM kodlarında hissəvi uyğunluq
-            Q(axtaris_sozleri__icontains=search_text)  # Axtarış sözlərində hissəvi uyğunluq
-        ).distinct()
+        # Axtarış sorğusunu yaradırıq
+        search_query = create_search_query(search_text)
+        mehsullar = mehsullar.filter(search_query).distinct()
 
     return render(request, 'products_list.html', {
         'mehsullar': mehsullar,
@@ -324,13 +358,9 @@ def mehsul_axtaris(request):
         for term in search_terms:
             # Xüsusi simvolları təmizləyirik
             term = re.sub(r'[^a-zA-Z0-9əƏüÜöÖğĞıİşŞçÇ]', '', term)
-            # Hər bir söz üçün axtarış edirik
-            mehsullar = mehsullar.filter(
-                Q(oem__icontains=term) |  # əsas OEM kodunda axtar
-                Q(oem_kodlar__kod__icontains=term) |  # əlavə OEM kodlarında axtar
-                Q(brend_kod__icontains=term) |  # brend kodunda axtar
-                Q(axtaris_sozleri__icontains=term)  # axtarış sözlərində axtar
-            ).distinct()
+            # Axtarış sorğusunu yaradırıq
+            search_query = create_search_query(term)
+            mehsullar = mehsullar.filter(search_query).distinct()
         
         return JsonResponse({
             'success': True,
@@ -543,13 +573,11 @@ def realtime_search(request):
         mehsullar = mehsullar.filter(marka__adi=model)
     
     if query:
+        # Xüsusi simvolları təmizləyirik
         query = re.sub(r'[^a-zA-Z0-9əƏüÜöÖğĞıİşŞçÇ]', '', query)
-        mehsullar = mehsullar.filter(
-            Q(brend_kod__icontains=query) |
-            Q(oem__icontains=query) |
-            Q(oem_kodlar__kod__icontains=query) |
-            Q(axtaris_sozleri__icontains=query)
-        ).distinct()
+        # Axtarış sorğusunu yaradırıq
+        search_query = create_search_query(query)
+        mehsullar = mehsullar.filter(search_query).distinct()
     
     results = []
     for mehsul in mehsullar:

@@ -54,7 +54,6 @@ class Mehsul(models.Model):
     qiymet = models.DecimalField(max_digits=10, decimal_places=2)
     sekil = models.ImageField(upload_to='mehsul_sekilleri/', null=True, blank=True)
     haqqinda = models.TextField(null=True, blank=True)
-    search_keywords = models.TextField(null=True, blank=True, help_text='Axtarış sözlərini dırnaq içində və boşluqla ayırın. Məsələn: "arxa fara" "stop işığı" "tail light"')
 
     def __str__(self):
         return self.adi
@@ -72,15 +71,6 @@ class Mehsul(models.Model):
         kodlar = [self.oem]
         kodlar.extend([oem.kod for oem in self.oem_kodlar.all()])
         return kodlar
-
-    @property
-    def get_search_keywords(self):
-        if not self.search_keywords:
-            return []
-        # Dırnaq içindəki sözləri tapır və siyahıya çevirir
-        import re
-        pattern = r'"([^"]*)"'
-        return re.findall(pattern, self.search_keywords)
 
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

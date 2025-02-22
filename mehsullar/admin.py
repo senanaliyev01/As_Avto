@@ -166,9 +166,16 @@ class SifarisMehsulAdmin(admin.ModelAdmin):
 
 # Məhsul admin paneli
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'oem', 'stok')
-    search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem')
+    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'oem', 'stok', 'get_search_keywords_display')
+    search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'search_keywords')
     inlines = [OEMKodInline]
+
+    def get_search_keywords_display(self, obj):
+        keywords = obj.get_search_keywords
+        if not keywords:
+            return '-'
+        return ', '.join(keywords)
+    get_search_keywords_display.short_description = 'Axtarış Sözləri'
 
 # Qeydiyyatları düzəltdik
 admin.site.register(SifarisMehsul, SifarisMehsulAdmin)

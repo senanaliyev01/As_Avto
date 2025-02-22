@@ -54,7 +54,6 @@ class Mehsul(models.Model):
     qiymet = models.DecimalField(max_digits=10, decimal_places=2)
     sekil = models.ImageField(upload_to='mehsul_sekilleri/', null=True, blank=True)
     haqqinda = models.TextField(null=True, blank=True)
-    axtaris_sozleri = models.TextField(null=True, blank=True, help_text="Əlavə axtarış sözlərini vergüllə ayırın. Məsələn: yağ filteri, hava filteri, yanacaq filteri")
 
     def __str__(self):
         return self.adi
@@ -72,22 +71,6 @@ class Mehsul(models.Model):
         kodlar = [self.oem]
         kodlar.extend([oem.kod for oem in self.oem_kodlar.all()])
         return kodlar
-
-    def save(self, *args, **kwargs):
-        # Axtarış sözlərini avtomatik yaradın
-        self.axtaris_sozleri = self.generate_search_terms()
-        super().save(*args, **kwargs)  # İlk öncə məhsulu saxlayın
-
-    def generate_search_terms(self):
-        """Axtarış sözlərini yaradır"""
-        terms = []
-        if self.adi:
-            terms.append(self.adi)
-        if self.haqqinda:
-            terms.append(self.haqqinda)
-        # Burada əlavə axtarış sözlərini əlavə edə bilərsiniz
-        # Məsələn: terms.append('yağ filter')
-        return ', '.join(terms)  # Sözləri vergüllə ayıraraq qaytarır
 
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

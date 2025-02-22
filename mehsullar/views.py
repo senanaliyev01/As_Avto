@@ -97,30 +97,9 @@ def get_stock_class(stok):
     else:
         return "in-stock"
 
-def normalize_search_text(text):
-    # Azərbaycan hərflərini latın hərflərinə çeviririk
-    replacements = {
-        'ə': 'e', 'Ə': 'E',
-        'ü': 'u', 'Ü': 'U',
-        'ö': 'o', 'Ö': 'O',
-        'ğ': 'g', 'Ğ': 'G',
-        'ı': 'i', 'İ': 'I',
-        'ş': 's', 'Ş': 'S',
-        'ç': 'c', 'Ç': 'C',
-        'ć': 'c', 'Ć': 'C',
-        'č': 'c', 'Č': 'C'
-    }
-    
-    for az, en in replacements.items():
-        text = text.replace(az, en)
-    
-    # Xüsusi simvolları təmizləyirik, yalnız hərflər və rəqəmlər qalır
-    text = re.sub(r'[^a-zA-Z0-9]', '', text)
-    return text.lower()
-
 @login_required
 def products_list(request):
-    # Başlanğıc olaraq bütün məhsulları götürürük
+    # Başlanğıc olaraq bütün məhsulları götürürük11
     mehsullar = Mehsul.objects.all()
     kateqoriyalar = Kateqoriya.objects.all()
     brendler = Brend.objects.all()
@@ -144,12 +123,14 @@ def products_list(request):
 
     # Brend kodu, OEM kodu və axtarış sözləri üçün hissəvi axtarış
     if search_text:
-        normalized_search = normalize_search_text(search_text)
+        # Xüsusi simvolları təmizləyirik
+        search_text = re.sub(r'[^a-zA-Z0-9əƏüÜöÖğĞıİşŞçÇ]', '', search_text)
+        # Brend kodu, OEM kodu və axtarış sözləri üçün hissəvi axtarış
         mehsullar = mehsullar.filter(
-            Q(brend_kod__iregex=normalized_search) |
-            Q(oem__iregex=normalized_search) |
-            Q(oem_kodlar__kod__iregex=normalized_search) |
-            Q(axtaris_sozleri__iregex=normalized_search)
+            Q(brend_kod__icontains=search_text) |  # Hissəvi uyğunluq
+            Q(oem__icontains=search_text) |        # Hissəvi uyğunluq
+            Q(oem_kodlar__kod__icontains=search_text) |  # Əlavə OEM kodlarında hissəvi uyğunluq
+            Q(axtaris_sozleri__icontains=search_text)  # Axtarış sözlərində hissəvi uyğunluq
         ).distinct()
 
     return render(request, 'products_list.html', {
@@ -341,12 +322,14 @@ def mehsul_axtaris(request):
         mehsullar = Mehsul.objects.all()
         
         for term in search_terms:
-            normalized_term = normalize_search_text(term)
+            # Xüsusi simvolları təmizləyirik
+            term = re.sub(r'[^a-zA-Z0-9əƏüÜöÖğĞıİşŞçÇ]', '', term)
+            # Hər bir söz üçün axtarış edirik
             mehsullar = mehsullar.filter(
-                Q(oem__iregex=normalized_term) |
-                Q(oem_kodlar__kod__iregex=normalized_term) |
-                Q(brend_kod__iregex=normalized_term) |
-                Q(axtaris_sozleri__iregex=normalized_term)
+                Q(oem__icontains=term) |  # əsas OEM kodunda axtar
+                Q(oem_kodlar__kod__icontains=term) |  # əlavə OEM kodlarında axtar
+                Q(brend_kod__icontains=term) |  # brend kodunda axtar
+                Q(axtaris_sozleri__icontains=term)  # axtarış sözlərində axtar
             ).distinct()
         
         return JsonResponse({
@@ -560,12 +543,12 @@ def realtime_search(request):
         mehsullar = mehsullar.filter(marka__adi=model)
     
     if query:
-        normalized_query = normalize_search_text(query)
+        query = re.sub(r'[^a-zA-Z0-9əƏüÜöÖğĞıİşŞçÇ]', '', query)
         mehsullar = mehsullar.filter(
-            Q(brend_kod__iregex=normalized_query) |
-            Q(oem__iregex=normalized_query) |
-            Q(oem_kodlar__kod__iregex=normalized_query) |
-            Q(axtaris_sozleri__iregex=normalized_query)
+            Q(brend_kod__icontains=query) |
+            Q(oem__icontains=query) |
+            Q(oem_kodlar__kod__icontains=query) |
+            Q(axtaris_sozleri__icontains=query)
         ).distinct()
     
     results = []

@@ -516,7 +516,7 @@ def hesabatlar(request):
         sifaris.display_status = status_text.get(sifaris.status, 'Gözləyir')
         # Tarixi Bakı saatına uyğunlaşdırırıq
         sifaris.tarix = sifaris.tarix.astimezone(timezone.get_current_timezone())
-        # Tarixi formatlayırıq
+        # Tarixi formatlayır2ıq
         sifaris.formatted_tarix = sifaris.tarix.strftime('%Y-%m-%d %H:%M:%S')
 
     return render(request, 'hesabatlar.html', {

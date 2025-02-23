@@ -54,7 +54,6 @@ class Mehsul(models.Model):
     qiymet = models.DecimalField(max_digits=10, decimal_places=2)
     sekil = models.ImageField(upload_to='mehsul_sekilleri/', null=True, blank=True)
     haqqinda = models.TextField(null=True, blank=True)
-    axtaris_sozleri = models.TextField(null=True, blank=True, help_text='Axtarış sözlərini dırnaq içində yazın və vergüllə ayırın. Məsələn: "təkər", "disk", "yağ"')
 
     def __str__(self):
         return self.adi

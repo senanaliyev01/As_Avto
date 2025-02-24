@@ -21,6 +21,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import Image
 from istifadeciler.models import Profile
 from django.contrib import messages
+from itertools import permutations
 
 @login_required
 def umumibaxis(request):
@@ -134,6 +135,10 @@ def normalize_search_text(text):
     
     return normalized, concatenated
 
+def get_permutations(text):
+    words = text.split()
+    return [' '.join(p) for p in permutations(words)]
+
 @login_required
 def products_list(request):
     # Başlanğıc olaraq bütün məhsulları götürürük
@@ -163,6 +168,9 @@ def products_list(request):
         # Axtarış mətnini normalize et
         normalized_search, concatenated_search = normalize_search_text(search_text)
         
+        # Sözlərin bütün mümkün permutasyonlarını alırıq
+        search_permutations = get_permutations(normalized_search)
+        
         # Məhsul adlarını və haqqında məlumatlarını normalize edib axtarış
         mehsul_ids = []
         for mehsul in mehsullar:
@@ -185,6 +193,13 @@ def products_list(request):
                 normalized_search in concatenated_haqqinda or
                 concatenated_search in concatenated_haqqinda):
                 mehsul_ids.append(mehsul.id)
+
+            # Permutasiya ilə axtarış
+            for perm in search_permutations:
+                if (perm in normalized_mehsul_adi or 
+                    perm in normalized_haqqinda):
+                    mehsul_ids.append(mehsul.id)
+                    break
         
         # Xüsusi simvolları təmizlə (brend kodu və OEM üçün)
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_text)
@@ -377,6 +392,7 @@ def update_quantity(request, item_id, new_quantity):
             'error': str(e)
         }, status=500)
 
+@login_required
 def mehsul_axtaris(request):
     query = request.GET.get('q')
     if query:
@@ -385,6 +401,9 @@ def mehsul_axtaris(request):
         
         # Axtarış mətnini normalize et və birləşik variantını al
         normalized_query, concatenated_query = normalize_search_text(query)
+        
+        # Sözlərin bütün mümkün permutasyonlarını alırıq
+        search_permutations = get_permutations(normalized_query)
         
         # Məhsul adlarını və haqqında məlumatlarını normalize edib axtarış
         mehsul_ids = []
@@ -408,6 +427,13 @@ def mehsul_axtaris(request):
                 normalized_query in concatenated_haqqinda or
                 concatenated_query in concatenated_haqqinda):
                 mehsul_ids.append(mehsul.id)
+
+            # Permutasiya ilə axtarış
+            for perm in search_permutations:
+                if (perm in normalized_mehsul_adi or 
+                    perm in normalized_haqqinda):
+                    mehsul_ids.append(mehsul.id)
+                    break
         
         # Xüsusi simvolları təmizlə (brend kodu və OEM üçün)
         clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
@@ -420,7 +446,6 @@ def mehsul_axtaris(request):
             Q(oem_kodlar__kod__icontains=clean_query)  # Əlavə OEM kodlarında axtarış
         ).distinct()
         
-        # Nəticələri qaytarırıq
         return JsonResponse({
             'success': True,
             'mehsullar': list(mehsullar.values(
@@ -645,6 +670,9 @@ def realtime_search(request):
         # Məhsul adı və haqqında üçün normalize edilmiş axtarış
         normalized_query, concatenated_query = normalize_search_text(query)
         
+        # Sözlərin bütün mümkün permutasyonlarını alırıq
+        search_permutations = get_permutations(normalized_query)
+        
         # Məhsul adlarını və haqqında məlumatlarını normalize edib axtarış
         mehsul_ids = []
         for mehsul in mehsullar:
@@ -667,6 +695,13 @@ def realtime_search(request):
                 normalized_query in concatenated_haqqinda or
                 concatenated_query in concatenated_haqqinda):
                 mehsul_ids.append(mehsul.id)
+            
+            # Permutasiya ilə axtarış
+            for perm in search_permutations:
+                if (perm in normalized_mehsul_adi or 
+                    perm in normalized_haqqinda):
+                    mehsul_ids.append(mehsul.id)
+                    break
         
         # Brend kodu və OEM üçün təmizlənmiş axtarış
         clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)

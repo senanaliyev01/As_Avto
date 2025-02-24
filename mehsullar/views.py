@@ -407,7 +407,7 @@ def mehsul_axtaris(request):
             
             # Normal və ya birləşik variantda uyğunluq yoxla (həm ad, həm haqqında üçün)
             if (normalized_query in normalized_mehsul_adi or 
-                concatenated_query in normalized_mehsul_adi or
+                concatenated_query in concatenated_mehsul_adi or
                 normalized_query in concatenated_mehsul_adi or
                 concatenated_query in concatenated_mehsul_adi or
                 normalized_query in normalized_haqqinda or

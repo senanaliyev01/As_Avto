@@ -21,7 +21,6 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import Image
 from istifadeciler.models import Profile
 from django.contrib import messages
-from itertools import permutations
 
 @login_required
 def umumibaxis(request):
@@ -100,7 +99,7 @@ def get_stock_class(stok):
 
 def normalize_search_text(text):
     if not text:
-        return ""
+        return "", [], ""
     
     # Azərbaycan hərflərini ingilis hərflərinə çevirmək üçün mapping
     az_to_en = {
@@ -121,7 +120,6 @@ def normalize_search_text(text):
         text = text.replace(az, en)
     
     # Xüsusi simvolları və artıq boşluqları təmizlə
-    # Bütün xüsusi simvolları boşluqla əvəz et
     normalized = re.sub(r'[^\w\s]', ' ', text)
     
     # Birdən çox boşluğu tək boşluqla əvəz et
@@ -130,14 +128,17 @@ def normalize_search_text(text):
     # Əvvəl və sondakı boşluqları sil
     normalized = normalized.strip()
     
+    # Sözləri siyahıya çevir
+    words = normalized.split()
+    
     # Bütün boşluqları silərək birləşik variant yarat
     concatenated = normalized.replace(' ', '')
     
-    return normalized, concatenated
+    return normalized, words, concatenated
 
-def get_permutations(text):
-    words = text.split()
-    return [' '.join(p) for p in permutations(words)]
+def check_words_match(search_words, target_words):
+    # Bütün axtarış sözlərinin hədəf sözlər içində olub-olmadığını yoxlayır
+    return all(any(search_word in target_word for target_word in target_words) for search_word in search_words)
 
 @login_required
 def products_list(request):
@@ -166,40 +167,30 @@ def products_list(request):
     # Axtarış mətni varsa
     if search_text:
         # Axtarış mətnini normalize et
-        normalized_search, concatenated_search = normalize_search_text(search_text)
-        
-        # Sözlərin bütün mümkün permutasyonlarını alırıq
-        search_permutations = get_permutations(normalized_search)
+        normalized_search, search_words, concatenated_search = normalize_search_text(search_text)
         
         # Məhsul adlarını və haqqında məlumatlarını normalize edib axtarış
         mehsul_ids = []
         for mehsul in mehsullar:
             # Məhsul adını normalize et
-            normalized_mehsul_adi, concatenated_mehsul_adi = normalize_search_text(mehsul.adi)
+            normalized_mehsul_adi, words_mehsul_adi, concatenated_mehsul_adi = normalize_search_text(mehsul.adi)
             
             # Məhsul haqqında məlumatını normalize et (əgər varsa)
             if mehsul.haqqinda:
-                normalized_haqqinda, concatenated_haqqinda = normalize_search_text(mehsul.haqqinda)
+                normalized_haqqinda, words_haqqinda, concatenated_haqqinda = normalize_search_text(mehsul.haqqinda)
             else:
-                normalized_haqqinda, concatenated_haqqinda = "", ""
+                normalized_haqqinda, words_haqqinda, concatenated_haqqinda = "", [], ""
             
-            # Normal və ya birləşik variantda uyğunluq yoxla (həm ad, həm haqqında üçün)
-            if (normalized_search in normalized_mehsul_adi or 
-                concatenated_search in normalized_mehsul_adi or
-                normalized_search in concatenated_mehsul_adi or
-                concatenated_search in concatenated_mehsul_adi or
-                normalized_search in normalized_haqqinda or
-                concatenated_search in normalized_haqqinda or
-                normalized_search in concatenated_haqqinda or
-                concatenated_search in concatenated_haqqinda):
+            # Sözlərin uyğunluğunu yoxla
+            words_match_adi = check_words_match(search_words, words_mehsul_adi)
+            words_match_haqqinda = check_words_match(search_words, words_haqqinda)
+            
+            # Birləşik variantda uyğunluq yoxla
+            concat_match_adi = concatenated_search in concatenated_mehsul_adi
+            concat_match_haqqinda = concatenated_search in concatenated_haqqinda
+            
+            if words_match_adi or words_match_haqqinda or concat_match_adi or concat_match_haqqinda:
                 mehsul_ids.append(mehsul.id)
-
-            # Permutasiya ilə axtarış
-            for perm in search_permutations:
-                if (perm in normalized_mehsul_adi or 
-                    perm in normalized_haqqinda):
-                    mehsul_ids.append(mehsul.id)
-                    break
         
         # Xüsusi simvolları təmizlə (brend kodu və OEM üçün)
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_text)
@@ -400,26 +391,19 @@ def mehsul_axtaris(request):
         mehsullar = Mehsul.objects.all()
         
         # Axtarış mətnini normalize et və birləşik variantını al
-        normalized_query, concatenated_query = normalize_search_text(query)
-        print(f"Normalized Query: {normalized_query}, Concatenated Query: {concatenated_query}")
-        
-        # Sözlərin bütün mümkün permutasyonlarını alırıq
-        search_permutations = get_permutations(normalized_query)
-        print(f"Search Permutations: {search_permutations}")
+        normalized_query, words, concatenated_query = normalize_search_text(query)
         
         # Məhsul adlarını və haqqında məlumatlarını normalize edib axtarış
         mehsul_ids = []
         for mehsul in mehsullar:
             # Məhsul adını normalize et
-            normalized_mehsul_adi, concatenated_mehsul_adi = normalize_search_text(mehsul.adi)
-            print(f"Product Name: {normalized_mehsul_adi}, Concatenated Product Name: {concatenated_mehsul_adi}")
+            normalized_mehsul_adi, words_mehsul_adi, concatenated_mehsul_adi = normalize_search_text(mehsul.adi)
             
             # Məhsul haqqında məlumatını normalize et (əgər varsa)
             if mehsul.haqqinda:
-                normalized_haqqinda, concatenated_haqqinda = normalize_search_text(mehsul.haqqinda)
+                normalized_haqqinda, words_haqqinda, concatenated_haqqinda = normalize_search_text(mehsul.haqqinda)
             else:
-                normalized_haqqinda, concatenated_haqqinda = "", ""
-            print(f"Product Description: {normalized_haqqinda}, Concatenated Product Description: {concatenated_haqqinda}")
+                normalized_haqqinda, words_haqqinda, concatenated_haqqinda = "", [], ""
             
             # Normal və ya birləşik variantda uyğunluq yoxla (həm ad, həm haqqında üçün)
             if (normalized_query in normalized_mehsul_adi or 
@@ -431,15 +415,6 @@ def mehsul_axtaris(request):
                 normalized_query in concatenated_haqqinda or
                 concatenated_query in concatenated_haqqinda):
                 mehsul_ids.append(mehsul.id)
-                print(f"Matched Product ID: {mehsul.id}")
-
-            # Permutasiya ilə axtarış
-            for perm in search_permutations:
-                if (perm in normalized_mehsul_adi or 
-                    perm in normalized_haqqinda):
-                    mehsul_ids.append(mehsul.id)
-                    print(f"Matched Product ID (Permutation): {mehsul.id}")
-                    break
         
         # Xüsusi simvolları təmizlə (brend kodu və OEM üçün)
         clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
@@ -450,8 +425,9 @@ def mehsul_axtaris(request):
             Q(brend_kod__icontains=clean_query) |  # Brend kodunda axtarış
             Q(oem__icontains=clean_query) |  # OEM kodunda axtarış
             Q(oem_kodlar__kod__icontains=clean_query)  # Əlavə OEM kodlarında axtarış
-        ).distinct()
+            ).distinct()
         
+        # Nəticələri qaytarırıq
         return JsonResponse({
             'success': True,
             'mehsullar': list(mehsullar.values(
@@ -673,57 +649,40 @@ def realtime_search(request):
         mehsullar = mehsullar.filter(marka__adi=model)
     
     if query:
-        # Axtarış mətnini normalize et və birləşik variantını al
-        normalized_query, concatenated_query = normalize_search_text(query)
-        print(f"Normalized Query: {normalized_query}, Concatenated Query: {concatenated_query}")
-        
-        # Sözlərin bütün mümkün permutasyonlarını alırıq
-        search_permutations = get_permutations(normalized_query)
-        print(f"Search Permutations: {search_permutations}")
+        # Məhsul adı və haqqında üçün normalize edilmiş axtarış
+        normalized_query, search_words, concatenated_query = normalize_search_text(query)
         
         # Məhsul adlarını və haqqında məlumatlarını normalize edib axtarış
         mehsul_ids = []
         for mehsul in mehsullar:
             # Məhsul adını normalize et
-            normalized_mehsul_adi, concatenated_mehsul_adi = normalize_search_text(mehsul.adi)
-            print(f"Product Name: {normalized_mehsul_adi}, Concatenated Product Name: {concatenated_mehsul_adi}")
+            normalized_mehsul_adi, words_mehsul_adi, concatenated_mehsul_adi = normalize_search_text(mehsul.adi)
             
             # Məhsul haqqında məlumatını normalize et (əgər varsa)
             if mehsul.haqqinda:
-                normalized_haqqinda, concatenated_haqqinda = normalize_search_text(mehsul.haqqinda)
+                normalized_haqqinda, words_haqqinda, concatenated_haqqinda = normalize_search_text(mehsul.haqqinda)
             else:
-                normalized_haqqinda, concatenated_haqqinda = "", ""
-            print(f"Product Description: {normalized_haqqinda}, Concatenated Product Description: {concatenated_haqqinda}")
+                normalized_haqqinda, words_haqqinda, concatenated_haqqinda = "", [], ""
             
-            # Normal və ya birləşik variantda uyğunluq yoxla (həm ad, həm haqqında üçün)
-            if (normalized_query in normalized_mehsul_adi or 
-                concatenated_query in normalized_mehsul_adi or
-                normalized_query in concatenated_mehsul_adi or
-                concatenated_query in concatenated_mehsul_adi or
-                normalized_query in normalized_haqqinda or
-                concatenated_query in normalized_haqqinda or
-                normalized_query in concatenated_haqqinda or
-                concatenated_query in concatenated_haqqinda):
+            # Sözlərin uyğunluğunu yoxla
+            words_match_adi = check_words_match(search_words, words_mehsul_adi)
+            words_match_haqqinda = check_words_match(search_words, words_haqqinda)
+            
+            # Birləşik variantda uyğunluq yoxla
+            concat_match_adi = concatenated_query in concatenated_mehsul_adi
+            concat_match_haqqinda = concatenated_query in concatenated_haqqinda
+            
+            if words_match_adi or words_match_haqqinda or concat_match_adi or concat_match_haqqinda:
                 mehsul_ids.append(mehsul.id)
-                print(f"Matched Product ID: {mehsul.id}")
-
-            # Permutasiya ilə axtarış
-            for perm in search_permutations:
-                if (perm in normalized_mehsul_adi or 
-                    perm in normalized_haqqinda):
-                    mehsul_ids.append(mehsul.id)
-                    print(f"Matched Product ID (Permutation): {mehsul.id}")
-                    break
         
-        # Xüsusi simvolları təmizlə (brend kodu və OEM üçün)
+        # Brend kodu və OEM üçün təmizlənmiş axtarış
         clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
         
-        # Axtarış sorğusunu yarat
         mehsullar = mehsullar.filter(
-            Q(id__in=mehsul_ids) |  # Normalize edilmiş ad və haqqında axtarışı
-            Q(brend_kod__icontains=clean_query) |  # Brend kodunda axtarış
-            Q(oem__icontains=clean_query) |  # OEM kodunda axtarış
-            Q(oem_kodlar__kod__icontains=clean_query)  # Əlavə OEM kodlarında axtarış
+            Q(id__in=mehsul_ids) |
+            Q(brend_kod__icontains=clean_query) |
+            Q(oem__icontains=clean_query) |
+            Q(oem_kodlar__kod__icontains=clean_query)
         ).distinct()
     
     results = []

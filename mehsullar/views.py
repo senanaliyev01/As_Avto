@@ -667,7 +667,7 @@ def realtime_search(request):
         mehsullar = mehsullar.filter(marka__adi=model)
     
     if query:
-        # Məhsul adı və haqqında üçün normalize edilmiş axtarış
+        # Axtarış mətnini normalize et və birləşik variantını al
         normalized_query, concatenated_query = normalize_search_text(query)
         
         # Sözlərin bütün mümkün permutasyonlarını alırıq

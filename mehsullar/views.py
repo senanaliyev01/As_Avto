@@ -119,8 +119,8 @@ def normalize_search_text(text):
     for az, en in az_to_en.items():
         text = text.replace(az, en)
     
-    # Xüsusi simvolları və artıq boşluqları təmizlə
-    normalized = re.sub(r'[^\w\s]', ' ', text)
+    # Yalnız hərf və rəqəmləri saxla, digər bütün simvolları boşluqla əvəz et
+    normalized = re.sub(r'[^a-zA-Z0-9\s]', '', text)
     
     # Birdən çox boşluğu tək boşluqla əvəz et
     normalized = re.sub(r'\s+', ' ', normalized)

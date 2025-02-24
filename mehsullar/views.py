@@ -413,7 +413,9 @@ def mehsul_axtaris(request):
                 normalized_query in normalized_haqqinda or
                 concatenated_query in normalized_haqqinda or
                 normalized_query in concatenated_haqqinda or
-                concatenated_query in concatenated_haqqinda):
+                concatenated_query in concatenated_haqqinda or
+                concatenated_query in normalized_mehsul_adi or
+                concatenated_query in normalized_haqqinda):
                 mehsul_ids.append(mehsul.id)
         
         # Xüsusi simvolları təmizlə (brend kodu və OEM üçün)

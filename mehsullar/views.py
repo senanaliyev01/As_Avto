@@ -401,21 +401,25 @@ def mehsul_axtaris(request):
         
         # Axtarış mətnini normalize et və birləşik variantını al
         normalized_query, concatenated_query = normalize_search_text(query)
+        print(f"Normalized Query: {normalized_query}, Concatenated Query: {concatenated_query}")
         
         # Sözlərin bütün mümkün permutasyonlarını alırıq
         search_permutations = get_permutations(normalized_query)
+        print(f"Search Permutations: {search_permutations}")
         
         # Məhsul adlarını və haqqında məlumatlarını normalize edib axtarış
         mehsul_ids = []
         for mehsul in mehsullar:
             # Məhsul adını normalize et
             normalized_mehsul_adi, concatenated_mehsul_adi = normalize_search_text(mehsul.adi)
+            print(f"Product Name: {normalized_mehsul_adi}, Concatenated Product Name: {concatenated_mehsul_adi}")
             
             # Məhsul haqqında məlumatını normalize et (əgər varsa)
             if mehsul.haqqinda:
                 normalized_haqqinda, concatenated_haqqinda = normalize_search_text(mehsul.haqqinda)
             else:
                 normalized_haqqinda, concatenated_haqqinda = "", ""
+            print(f"Product Description: {normalized_haqqinda}, Concatenated Product Description: {concatenated_haqqinda}")
             
             # Normal və ya birləşik variantda uyğunluq yoxla (həm ad, həm haqqında üçün)
             if (normalized_query in normalized_mehsul_adi or 
@@ -427,12 +431,14 @@ def mehsul_axtaris(request):
                 normalized_query in concatenated_haqqinda or
                 concatenated_query in concatenated_haqqinda):
                 mehsul_ids.append(mehsul.id)
+                print(f"Matched Product ID: {mehsul.id}")
 
             # Permutasiya ilə axtarış
             for perm in search_permutations:
                 if (perm in normalized_mehsul_adi or 
                     perm in normalized_haqqinda):
                     mehsul_ids.append(mehsul.id)
+                    print(f"Matched Product ID (Permutation): {mehsul.id}")
                     break
         
         # Xüsusi simvolları təmizlə (brend kodu və OEM üçün)
@@ -669,21 +675,25 @@ def realtime_search(request):
     if query:
         # Axtarış mətnini normalize et və birləşik variantını al
         normalized_query, concatenated_query = normalize_search_text(query)
+        print(f"Normalized Query: {normalized_query}, Concatenated Query: {concatenated_query}")
         
         # Sözlərin bütün mümkün permutasyonlarını alırıq
         search_permutations = get_permutations(normalized_query)
+        print(f"Search Permutations: {search_permutations}")
         
         # Məhsul adlarını və haqqında məlumatlarını normalize edib axtarış
         mehsul_ids = []
         for mehsul in mehsullar:
             # Məhsul adını normalize et
             normalized_mehsul_adi, concatenated_mehsul_adi = normalize_search_text(mehsul.adi)
+            print(f"Product Name: {normalized_mehsul_adi}, Concatenated Product Name: {concatenated_mehsul_adi}")
             
             # Məhsul haqqında məlumatını normalize et (əgər varsa)
             if mehsul.haqqinda:
                 normalized_haqqinda, concatenated_haqqinda = normalize_search_text(mehsul.haqqinda)
             else:
                 normalized_haqqinda, concatenated_haqqinda = "", ""
+            print(f"Product Description: {normalized_haqqinda}, Concatenated Product Description: {concatenated_haqqinda}")
             
             # Normal və ya birləşik variantda uyğunluq yoxla (həm ad, həm haqqında üçün)
             if (normalized_query in normalized_mehsul_adi or 
@@ -695,12 +705,14 @@ def realtime_search(request):
                 normalized_query in concatenated_haqqinda or
                 concatenated_query in concatenated_haqqinda):
                 mehsul_ids.append(mehsul.id)
-            
+                print(f"Matched Product ID: {mehsul.id}")
+
             # Permutasiya ilə axtarış
             for perm in search_permutations:
                 if (perm in normalized_mehsul_adi or 
                     perm in normalized_haqqinda):
                     mehsul_ids.append(mehsul.id)
+                    print(f"Matched Product ID (Permutation): {mehsul.id}")
                     break
         
         # Xüsusi simvolları təmizlə (brend kodu və OEM üçün)

@@ -703,14 +703,15 @@ def realtime_search(request):
                     mehsul_ids.append(mehsul.id)
                     break
         
-        # Brend kodu və OEM üçün təmizlənmiş axtarış
+        # Xüsusi simvolları təmizlə (brend kodu və OEM üçün)
         clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
         
+        # Axtarış sorğusunu yarat
         mehsullar = mehsullar.filter(
-            Q(id__in=mehsul_ids) |
-            Q(brend_kod__icontains=clean_query) |
-            Q(oem__icontains=clean_query) |
-            Q(oem_kodlar__kod__icontains=clean_query)
+            Q(id__in=mehsul_ids) |  # Normalize edilmiş ad və haqqında axtarışı
+            Q(brend_kod__icontains=clean_query) |  # Brend kodunda axtarış
+            Q(oem__icontains=clean_query) |  # OEM kodunda axtarış
+            Q(oem_kodlar__kod__icontains=clean_query)  # Əlavə OEM kodlarında axtarış
         ).distinct()
     
     results = []

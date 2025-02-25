@@ -98,23 +98,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchTerm = new URLSearchParams(window.location.search).get('search'); // Axtarış terminini al
-        if (searchTerm) {
-            const productRows = document.querySelectorAll('.products-table tbody tr'); // Cədvəldəki məhsul sətirləri
-            productRows.forEach(row => {
-                const cells = row.querySelectorAll('td'); // Hər bir sətirdəki hüceyrələr
-                cells.forEach(cell => {
-                    cell.innerHTML = highlightSearchTerm(cell.innerHTML, searchTerm); // Axtarış terminini işarələyin
-                });
-            });
-        }
-    });
 
-    function highlightSearchTerm(text, searchTerm) {
-        const regex = new RegExp(`(${searchTerm})`, 'gi'); // Axtarış terminini tap
-        return text.replace(regex, '<span class="highlight">$1</span>'); // İşarələnmiş termin
-    }
-</script>
 {% endblock %}

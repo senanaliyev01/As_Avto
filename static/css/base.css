@@ -488,6 +488,6 @@ html {
 }
 
 .highlight {
-    background-color: yellow; /* Sarı rəng */
+    background-color: rgb(206, 206, 83); /* Sarı rəng */
     font-weight: bold; /* Qalın yazı */
 }

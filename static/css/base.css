@@ -486,3 +486,8 @@ html {
     font-weight: 900;
     margin-right: 5px;
 }
+
+.highlight {
+    background-color: yellow; /* Sarı rəng */
+    font-weight: bold; /* Qalın yazı */
+}

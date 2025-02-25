@@ -832,22 +832,28 @@
                 const data = await response.json();
                 
                 if (data.results.length > 0) {
-                    dropdownContainer.innerHTML = data.results.map(result => `
-                        <div class="search-result-item" onclick="window.location.href='/product-detail/${encodeURIComponent(result.adi)}-${encodeURIComponent(result.oem)}-${encodeURIComponent(result.brend_kod)}/${result.id}/'">
-                            ${result.sekil_url ? `<img src="${result.sekil_url}" alt="${result.adi}">` : ''}
-                            <div class="search-result-info">
-                                <h4>${result.adi}</h4>
-                                <p>Brend: ${result.brend} | OEM: ${result.oem}</p>
-                                <p>Marka: ${result.marka} | Brend Kod: ${result.brend_kod}</p>
-                            </div>
-                            <div class="search-result-price">
-                                <div class="stock-status ${result.stok === 0 ? 'out-of-stock' : result.stok <= 20 ? 'low-stock' : 'in-stock'}">
-                                    ${result.stok === 0 ? 'Yoxdur' : result.stok <= 20 ? 'Az var' : 'Var'}
+                    dropdownContainer.innerHTML = data.results.map(result => {
+                        const highlightTerm = (text, term) => {
+                            const regex = new RegExp(`(${term})`, 'gi');
+                            return text.replace(regex, '<span class="highlight">$1</span>');
+                        };
+                        return `
+                            <div class="search-result-item" onclick="window.location.href='/product-detail/${encodeURIComponent(result.adi)}-${encodeURIComponent(result.oem)}-${encodeURIComponent(result.brend_kod)}/${result.id}/'">
+                                ${result.sekil_url ? `<img src="${result.sekil_url}" alt="${result.adi}">` : ''}
+                                <div class="search-result-info">
+                                    <h4>${highlightTerm(result.adi, query)}</h4>
+                                    <p>Brend: ${highlightTerm(result.brend, query)} | OEM: ${highlightTerm(result.oem, query)}</p>
+                                    <p>Marka: ${highlightTerm(result.marka, query)} | Brend Kod: ${highlightTerm(result.brend_kod, query)}</p>
                                 </div>
-                                ${result.qiymet} AZN
+                                <div class="search-result-price">
+                                    <div class="stock-status ${result.stok === 0 ? 'out-of-stock' : result.stok <= 20 ? 'low-stock' : 'in-stock'}">
+                                        ${result.stok === 0 ? 'Yoxdur' : result.stok <= 20 ? 'Az var' : 'Var'}
+                                    </div>
+                                    ${result.qiymet} AZN
+                                </div>
                             </div>
-                        </div>
-                    `).join('');
+                        `;
+                    }).join('');
                     dropdownContainer.classList.add('active');
                 } else {
                     dropdownContainer.innerHTML = '<div class="search-result-item">Heç bir nəticə tapılmadı</div>';
@@ -884,5 +890,10 @@
             }
         });
     });
+
+    function highlightSearchTerm(text, searchTerm) {
+        const regex = new RegExp(`(${searchTerm})`, 'gi');
+        return text.replace(regex, '<span class="highlight">$1</span>');
+    }
 
 

@@ -39,13 +39,13 @@
                                     <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="marka-pr-image">
                             {% endif %}
                         </td>
-                        <td>{{ mehsul.adi }}</td>
-                        <td>{{ mehsul.kateqoriya }}</td>
+                        <td>{{ highlightSearchTerm(mehsul.adi, request.GET.q) }}</td>
+                        <td>{{ highlightSearchTerm(mehsul.kateqoriya, request.GET.q) }}</td>
                         <td>
                             {% if mehsul.brend.sekilyazi %}
                                     <img src="{{ mehsul.brend.sekilyazi.url }}" alt="{{ mehsul.brend.adi }}" class="marka-image">
                             {% else %}
-                                <span>{{ mehsul.brend.adi }}</span>
+                                <span>{{ highlightSearchTerm(mehsul.brend.adi, request.GET.q) }}</span>
                             {% endif %}
                         </td>
                         <td >
@@ -54,10 +54,10 @@
                                     <img src="{{ sekil.sekil.url }}" alt="{{ mehsul.marka.adi }}" class="marka-image-pr-list">
                                 {% endfor %}
                             {% else %}
-                                <span>{{ mehsul.marka.adi }}</span>
+                                <span>{{ highlightSearchTerm(mehsul.marka.adi, request.GET.q) }}</span>
                             {% endif %}
                         </td>
-                        <td>{{ mehsul.brend_kod }}</td>
+                        <td>{{ highlightSearchTerm(mehsul.oem, request.GET.q) }}</td>
                         <td>{{ mehsul.oem }}
                         <a href="#" title="OEM kodunu axtar" onclick="window.open('https://www.google.com/search?tbm=isch&q={{ mehsul.oem }}', 'googleImages', 'width=600,height=600'); return false;">
                                 <i class="fas fa-camera" style="color:green; margin-left: 5px; cursor: pointer; transition: all 0.3s ease-in-out;"

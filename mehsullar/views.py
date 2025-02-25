@@ -440,7 +440,7 @@ def mehsul_axtaris(request):
             Q(brend_kod__icontains=clean_query) |
             Q(oem__icontains=clean_query) |
             Q(oem_kodlar__kod__icontains=clean_query)
-        ).distinct()
+            ).distinct()
         
         # Nəticələri qaytarırıq
         return JsonResponse({

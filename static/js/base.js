@@ -807,11 +807,15 @@
         const categorySelect = document.getElementById('category');
         const brandSelect = document.getElementById('brand');
         const modelSelect = document.getElementById('model');
+        const searchButton = document.getElementById('search-button');
         
-        // Create dropdown container
-        const dropdownContainer = document.createElement('div');
-        dropdownContainer.className = 'search-results-dropdown';
-        searchForm.appendChild(dropdownContainer);
+        // Create dropdown container if it doesn't exist
+        let dropdownContainer = document.querySelector('.search-results-dropdown');
+        if (!dropdownContainer) {
+            dropdownContainer = document.createElement('div');
+            dropdownContainer.className = 'search-results-dropdown';
+            searchForm.appendChild(dropdownContainer);
+        }
         
         let searchTimeout;
         
@@ -831,29 +835,23 @@
                 const response = await fetch(`/realtime-search/?q=${encodeURIComponent(query)}&category=${encodeURIComponent(category)}&brand=${encodeURIComponent(brand)}&model=${encodeURIComponent(model)}`);
                 const data = await response.json();
                 
-                if (data.results.length > 0) {
-                    dropdownContainer.innerHTML = data.results.map(result => {
-                        const highlightTerm = (text, term) => {
-                            const regex = new RegExp(`(${term})`, 'gi');
-                            return text.replace(regex, '<span class="highlight">$1</span>');
-                        };
-                        return `
-                            <div class="search-result-item" onclick="window.location.href='/product-detail/${encodeURIComponent(result.adi)}-${encodeURIComponent(result.oem)}-${encodeURIComponent(result.brend_kod)}/${result.id}/'">
-                                ${result.sekil_url ? `<img src="${result.sekil_url}" alt="${result.adi}">` : ''}
-                                <div class="search-result-info">
-                                    <h4>${highlightTerm(result.adi, query)}</h4>
-                                    <p>Brend: ${highlightTerm(result.brend, query)} | OEM: ${highlightTerm(result.oem, query)}</p>
-                                    <p>Marka: ${highlightTerm(result.marka, query)} | Brend Kod: ${highlightTerm(result.brend_kod, query)}</p>
-                                </div>
-                                <div class="search-result-price">
-                                    <div class="stock-status ${result.stok === 0 ? 'out-of-stock' : result.stok <= 20 ? 'low-stock' : 'in-stock'}">
-                                        ${result.stok === 0 ? 'Yoxdur' : result.stok <= 20 ? 'Az var' : 'Var'}
-                                    </div>
-                                    ${result.qiymet} AZN
-                                </div>
+                if (data.results && data.results.length > 0) {
+                    dropdownContainer.innerHTML = data.results.map(result => `
+                        <div class="search-result-item" onclick="window.location.href='/product-detail/${result.id}/'">
+                            ${result.sekil_url ? `<img src="${result.sekil_url}" alt="${result.adi}">` : ''}
+                            <div class="search-result-info">
+                                <h4>${highlightSearchTerm(result.adi, query)}</h4>
+                                <p>Brend: ${highlightSearchTerm(result.brend, query)} | OEM: ${highlightSearchTerm(result.oem, query)}</p>
+                                <p>Marka: ${highlightSearchTerm(result.marka, query)} | Brend Kod: ${highlightSearchTerm(result.brend_kod, query)}</p>
                             </div>
-                        `;
-                    }).join('');
+                            <div class="search-result-price">
+                                <div class="stock-status ${result.stok === 0 ? 'out-of-stock' : result.stok <= 20 ? 'low-stock' : 'in-stock'}">
+                                    ${result.stok === 0 ? 'Yoxdur' : result.stok <= 20 ? 'Az var' : 'Var'}
+                                </div>
+                                <span class="price">${result.qiymet} AZN</span>
+                            </div>
+                        </div>
+                    `).join('');
                     dropdownContainer.classList.add('active');
                 } else {
                     dropdownContainer.innerHTML = '<div class="search-result-item">Heç bir nəticə tapılmadı</div>';
@@ -861,8 +859,20 @@
                 }
             } catch (error) {
                 console.error('Axtarış xətası:', error);
+                dropdownContainer.innerHTML = '<div class="search-result-item">Xəta baş verdi</div>';
+                dropdownContainer.classList.add('active');
             }
         }
+        
+        // Search button click handler
+        searchButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            const searchText = searchInput.value.trim();
+            
+            if (searchText.length > 0 || categorySelect.value || brandSelect.value || modelSelect.value) {
+                searchForm.submit();
+            }
+        });
         
         // Input event listener with debounce
         searchInput.addEventListener('input', () => {
@@ -884,8 +894,13 @@
         
         // Form submit handler
         searchForm.addEventListener('submit', (e) => {
-            if (dropdownContainer.classList.contains('active')) {
+            const searchText = searchInput.value.trim();
+            const hasFilters = categorySelect.value || brandSelect.value || modelSelect.value;
+            
+            if (!searchText && !hasFilters) {
                 e.preventDefault();
+                searchInput.focus();
+            } else {
                 dropdownContainer.classList.remove('active');
             }
         });

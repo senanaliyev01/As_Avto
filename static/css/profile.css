@@ -319,56 +319,93 @@ body {
 .form-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-    padding: 0 0.5rem;
+    gap: 1.8rem;
+    padding: 0.5rem;
     max-width: 100%;
     margin: 0 auto;
 }
 
 /* Form Elements */
 .form-group {
-    margin-bottom: 1.2rem;
+    margin-bottom: 1.5rem;
     position: relative;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 1.2rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.form-group:hover {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(100, 255, 218, 0.2);
+    transform: translateY(-2px);
+}
+
+.form-group:focus-within {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: var(--accent-color);
+    box-shadow: 0 4px 20px rgba(100, 255, 218, 0.1);
 }
 
 .form-label {
     display: flex;
     align-items: center;
-    color: var(--accent-color);
+    color: var(--text-secondary);
     font-weight: 500;
-    margin-bottom: 0.5rem;
-    font-size: 0.95rem;
-    letter-spacing: 0.3px;
+    margin-bottom: 0.8rem;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
 .form-label i {
-    width: 20px;
-    margin-right: 8px;
+    width: 24px;
+    margin-right: 10px;
     color: var(--accent-color);
     font-size: 1.1rem;
+    background: rgba(100, 255, 218, 0.1);
+    padding: 6px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.form-group:hover .form-label i {
+    background: rgba(100, 255, 218, 0.15);
+    transform: scale(1.05);
 }
 
 .form-control {
     background-color: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 0.8rem;
-    font-size: 0.95rem;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    padding: 0.9rem 1.2rem;
+    font-size: 1rem;
     color: var(--text-primary);
     transition: all 0.3s ease;
     width: 100%;
     outline: none;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-control:hover {
+    border-color: rgba(100, 255, 218, 0.3);
 }
 
 .form-control:focus {
     border-color: var(--accent-color);
-    box-shadow: 0 0 0 2px rgba(100, 255, 218, 0.1);
+    box-shadow: 0 0 0 3px rgba(100, 255, 218, 0.1),
+                inset 0 2px 4px rgba(0, 0, 0, 0.1);
     background-color: rgba(255, 255, 255, 0.05);
 }
 
 .form-control::placeholder {
     color: var(--text-secondary);
-    opacity: 0.7;
+    opacity: 0.6;
+    font-size: 0.95rem;
 }
 
 /* Buttons */
@@ -411,9 +448,32 @@ body {
 /* Form Actions */
 .form-actions {
     text-align: center;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
+    margin-top: 2.5rem;
+    padding-top: 2rem;
     border-top: 1px solid var(--border-color);
+}
+
+.form-actions .btn {
+    min-width: 200px;
+    position: relative;
+    overflow: hidden;
+}
+
+.form-actions .btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 120%;
+    height: 120%;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translate(-50%, -50%) scale(0);
+    border-radius: 50%;
+    transition: transform 0.5s ease;
+}
+
+.form-actions .btn:hover::after {
+    transform: translate(-50%, -50%) scale(1);
 }
 
 /* Alert Messages */
@@ -483,14 +543,20 @@ body {
 .error-message {
     color: var(--error-color);
     font-size: 0.85rem;
-    margin-top: 0.4rem;
+    margin-top: 0.8rem;
     display: flex;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.6rem;
+    gap: 0.5rem;
+    padding: 0.8rem 1rem;
     background-color: rgba(220, 38, 38, 0.1);
-    border-radius: 6px;
+    border-radius: 8px;
     border: 1px solid rgba(220, 38, 38, 0.2);
+    animation: fadeIn 0.3s ease;
+}
+
+.error-message i {
+    color: var(--error-color);
+    font-size: 1rem;
 }
 
 /* Animations */
@@ -520,8 +586,21 @@ body {
 @media (max-width: 768px) {
     .form-grid {
         grid-template-columns: 1fr;
-        gap: 1rem;
+        gap: 1.2rem;
         padding: 0;
+    }
+    
+    .form-group {
+        padding: 1rem;
+    }
+    
+    .form-control {
+        padding: 0.8rem 1rem;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+        min-width: auto;
     }
     
     .profile-header {
@@ -557,8 +636,18 @@ body {
         border-radius: 12px;
     }
     
+    .form-group {
+        padding: 0.8rem;
+        margin-bottom: 1rem;
+    }
+    
+    .form-label {
+        font-size: 0.85rem;
+    }
+    
     .form-control {
-        padding: 0.7rem;
+        padding: 0.7rem 0.9rem;
+        font-size: 0.95rem;
     }
     
     .btn {

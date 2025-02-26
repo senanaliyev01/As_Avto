@@ -933,4 +933,35 @@
         }
     });
 
+    function addToCartWithQuantity(productId, element) {
+        const quantityInput = element.closest('tr').querySelector('.quantity-input');
+        const quantity = parseInt(quantityInput.value);
+        
+        if (isNaN(quantity) || quantity < 1) {
+            showAnimatedMessage('Xahiş edirik düzgün miqdar daxil edin', true);
+            return;
+        }
+
+        fetch(`/sebet/ekle/${productId}/?quantity=${quantity}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAnimatedMessage('Məhsul səbətə əlavə edildi', false, data.mehsul);
+                updateCartCount();
+            } else {
+                showAnimatedMessage(data.error || 'Xəta baş verdi', true);
+            }
+        })
+        .catch(error => {
+            showAnimatedMessage('Xəta baş verdi', true);
+            console.error('Error:', error);
+        });
+    }
+
 

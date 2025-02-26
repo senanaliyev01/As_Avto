@@ -53,12 +53,6 @@ def sebet_ekle(request, mehsul_id):
                 'error': 'Miqdar 1-dən az ola bilməz'
             }, status=400)
 
-        if quantity > mehsul.stok:
-            return JsonResponse({
-                'success': False,
-                'error': 'Kifayət qədər stok yoxdur'
-            }, status=400)
-
         sebet, created = Sebet.objects.get_or_create(user=request.user, mehsul=mehsul)
         
         if created:

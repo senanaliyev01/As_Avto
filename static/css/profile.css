@@ -532,7 +532,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
+} 
 
 /* Logout Confirm Dialog */
 .logout-confirm-dialog {
@@ -653,63 +653,4 @@ body {
 
 .fa-spinner {
     animation: spin 1s linear infinite;
-}
-
-/* Profile Dropdown Menu Styles */
-.profile-dropdown {
-    position: relative;
-}
-
-.profile-dropdown .dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 0.5rem 0;
-    min-width: 200px;
-    z-index: 1100;
-    box-shadow: var(--shadow-md);
-}
-
-.profile-dropdown.active .dropdown-menu {
-    display: block;
-    animation: fadeIn 0.3s ease-out forwards;
-}
-
-.dropdown-menu a {
-    display: flex;
-    align-items: center;
-    padding: 0.75rem 1.5rem;
-    color: var(--text-primary);
-    text-decoration: none;
-    transition: var(--transition);
-    gap: 0.75rem;
-}
-
-.dropdown-menu a:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--accent-color);
-}
-
-.dropdown-menu i {
-    width: 20px;
-    text-align: center;
-    font-size: 1rem;
-}
-
-.dropdown-divider {
-    height: 1px;
-    background: var(--border-color);
-    margin: 0.5rem 0;
-}
-
-.dropdown-menu .logout-link {
-    color: var(--error-color);
-}
-
-.dropdown-menu .logout-link:hover {
-    background: rgba(220, 38, 38, 0.1);
 } 

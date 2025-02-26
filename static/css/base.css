@@ -598,6 +598,8 @@ html {
 /* Profile Dropdown Styles */
 .profile-dropdown {
     position: relative;
+    display: inline-block;
+    z-index: 1050;
 }
 
 .profile-toggle {
@@ -636,25 +638,26 @@ html {
 
 .dropdown-menu {
     position: absolute;
-    top: calc(100% + 0.5rem);
+    top: 100%;
     right: 0;
-    min-width: 220px;
-    background: var(--primary-color);
-    border: 1px solid rgba(100, 255, 218, 0.2);
-    border-radius: 8px;
-    padding: 0.5rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    min-width: 200px;
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 0.5rem 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color);
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-10px);
-    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    z-index: 1000;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    z-index: 1050;
 }
 
 .profile-dropdown.active .dropdown-menu {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+    z-index: 1050;
 }
 
 .dropdown-menu a {

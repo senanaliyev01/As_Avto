@@ -54,6 +54,8 @@ class Mehsul(models.Model):
     qiymet = models.DecimalField(max_digits=10, decimal_places=2)
     sekil = models.ImageField(upload_to='mehsul_sekilleri/', null=True, blank=True)
     haqqinda = models.TextField(null=True, blank=True)
+    yenidir = models.BooleanField(default=False)
+    elave_edilme_tarixi = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.adi
@@ -71,6 +73,12 @@ class Mehsul(models.Model):
         kodlar = [self.oem]
         kodlar.extend([oem.kod for oem in self.oem_kodlar.all()])
         return kodlar
+
+    @property
+    def is_new(self):
+        from django.utils import timezone
+        from datetime import timedelta
+        return self.yenidir and (timezone.now() - self.elave_edilme_tarixi) < timedelta(days=7)
 
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

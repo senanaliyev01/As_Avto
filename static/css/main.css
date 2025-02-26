@@ -371,3 +371,105 @@ body {
         grid-template-columns: repeat(2, 1fr);
     }
 }
+
+/* New Products Section */
+.new-products-section {
+    padding: 4rem 2rem;
+    background-color: var(--primary-color);
+}
+
+.new-products-slider {
+    width: 100%;
+    padding: 2rem 0;
+}
+
+.product-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: var(--transition);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    margin: 1rem;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+}
+
+.product-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-bottom: 2px solid var(--accent-color);
+}
+
+.product-info {
+    padding: 1.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-info h3 {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.product-info .brand {
+    color: var(--accent-color);
+    margin-bottom: 0.3rem;
+}
+
+.product-info .code {
+    color: var(--text-secondary);
+    font-family: monospace;
+    margin-bottom: 0.3rem;
+}
+
+.product-info .price {
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin: 0.5rem 0;
+}
+
+.details-btn {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    background-color: var(--accent-color);
+    color: var(--primary-color);
+    text-decoration: none;
+    border-radius: 25px;
+    text-align: center;
+    transition: var(--transition);
+    margin-top: auto;
+}
+
+.details-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.no-products {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 2rem;
+}
+
+/* Swiper Navigation Buttons */
+.swiper-button-next,
+.swiper-button-prev {
+    color: var(--accent-color);
+}
+
+.swiper-pagination-bullet {
+    background: var(--accent-color);
+}
+
+.swiper-pagination-bullet-active {
+    background: var(--accent-color);
+}

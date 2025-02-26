@@ -936,24 +936,23 @@
     function handleOrderSubmit(event) {
         event.preventDefault();
         
-        const selectedItems = Array.from(document.querySelectorAll('.select-item:checked')).map(item => item.value);
+        const selectedItems = Array.from(document.querySelectorAll('.select-item:checked')).map(input => input.value);
         
         if (selectedItems.length === 0) {
             alert('Zəhmət olmasa, sifariş etmək istədiyiniz məhsulları seçin.');
             return false;
         }
         
-        if (confirm('Seçilmiş məhsulları sifariş etmək istədiyinizə əminsiniz?')) {
+        if (confirm('Sifarişi təsdiqləmək istədiyinizə əminsiniz?')) {
             const form = event.target;
-            const formData = new FormData(form);
-            formData.append('selected_items', JSON.stringify(selectedItems));
             
             fetch(form.action, {
                 method: 'POST',
                 headers: {
-                    'X-CSRFToken': '{{ csrf_token }}'
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
                 },
-                body: formData
+                body: JSON.stringify({ selected_items: selectedItems })
             })
             .then(response => {
                 if (response.ok) {

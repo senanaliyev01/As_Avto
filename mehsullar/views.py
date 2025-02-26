@@ -260,14 +260,15 @@ def sebetden_sil(request, sebet_id):
 def sifarisi_gonder(request):
     if request.method == "POST":
         try:
-            # Səbətdəki məhsulları yoxla
-            sebet = Sebet.objects.filter(user=request.user)
-            if not sebet.exists():
-                messages.error(request, 'Səbətiniz boşdur')
-                return redirect('view_cart')
+            # JSON formatında seçilmiş məhsulları al
+            data = json.loads(request.body)
+            selected_items = data.get('selected_items', [])
 
-            # Stok yoxlaması
-           
+            # Səbətdəki məhsulları yoxla
+            sebet = Sebet.objects.filter(user=request.user, id__in=selected_items)
+            if not sebet.exists():
+                messages.error(request, 'Seçilmiş məhsullar səbətdə tapılmadı')
+                return redirect('view_cart')
 
             # Yeni sifarişi yarat
             sifaris = Sifaris.objects.create(
@@ -293,7 +294,7 @@ def sifarisi_gonder(request):
             sifaris.status = 'gozleyir'
             sifaris.save()
 
-            # Səbəti təmizlə
+            # Seçilmiş məhsulları səbətdən sil
             sebet.delete()
 
             messages.success(request, 'Sifarişiniz uğurla qeydə alındı')

@@ -15,9 +15,9 @@
     </div>
 
     {% if sebet %}
-    <form id="order-form" action="{% url 'sifarisi_gonder' %}" method="post" onsubmit="return handleOrderSubmit(event)">
-        {% csrf_token %}
-        <div class="cart-container">
+    <div class="cart-container">
+        <form id="order-form" action="{% url 'sifarisi_gonder' %}" method="post" onsubmit="return handleOrderSubmit(event)">
+            {% csrf_token %}
             <table>
                 <thead>
                     <tr>
@@ -112,8 +112,8 @@
                     Sifarişi Təsdiqlə
                 </button>
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
     {% else %}
     <div class="empty-cart">
         <i class="fas fa-shopping-cart"></i>

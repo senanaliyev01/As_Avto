@@ -896,4 +896,31 @@
         return text.replace(regex, '<span class="highlight">$1</span>');
     }
 
+    // Profile Dropdown functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const profileDropdown = document.querySelector('.profile-dropdown');
+        const profileToggle = document.querySelector('.profile-toggle');
+
+        if (profileToggle && profileDropdown) {
+            profileToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                profileDropdown.classList.toggle('active');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!profileDropdown.contains(e.target)) {
+                    profileDropdown.classList.remove('active');
+                }
+            });
+
+            // Close dropdown when pressing Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    profileDropdown.classList.remove('active');
+                }
+            });
+        }
+    });
+
 

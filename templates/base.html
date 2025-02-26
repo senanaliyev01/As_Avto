@@ -65,14 +65,30 @@
             </div>
 
             <div class="header-right">
-                <a href="{% url 'profile' %}"><i class="fas fa-user"></i> {{ user.username }}</a>
+                <div class="profile-dropdown">
+                    <a href="#" class="profile-toggle">
+                        <i class="fas fa-user"></i> {{ user.username }}
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a href="{% url 'profile' %}">
+                            <i class="fas fa-user-circle"></i> Hesabım
+                        </a>
+                        <a href="{% url 'sifaris_izle' %}">
+                            <i class="fas fa-shopping-bag"></i> Sifarişlərim
+                        </a>
+                        <a href="{% url 'hesabatlar' %}">
+                            <i class="fas fa-chart-bar"></i> Hesabatlar
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="{% url 'logout_view' %}" onclick="confirmLogout(event); return false;" class="logout-link">
+                            <i class="fas fa-sign-out-alt"></i> Çıxış
+                        </a>
+                    </div>
+                </div>
                 <a href="{% url 'view_cart' %}" class="cart-link">
                     <i class="fas fa-shopping-cart"></i>
                     <span id="cart-count" class="cart-badge">0</span>
-                </a>
-                {% csrf_token %}
-                <a href="{% url 'logout_view' %}" id="logout-link" onclick="confirmLogout(event); return false;">
-                    <i class="fas fa-sign-out-alt"></i> Çıxış
                 </a>
             </div>
         </div>

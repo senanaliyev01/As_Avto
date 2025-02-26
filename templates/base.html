@@ -20,42 +20,47 @@
             <div class="logo">
                 <img src="{% static '/img/Header_Logo.png' %}" alt="Logo">
             </div>
-
+            
             <!-- Axtarış Forması -->
             <div class="search-container">
                 <div class="search-bar">
                     <form id="search-form" method="GET" action="{% url 'products_list' %}">
-                        <select name="category" id="category">
-                            <option value="">Kateqoriya</option>
-                            {% for category in request.kateqoriyalar %}
-                                <option value="{{ category.adi }}" {% if request.GET.category == category.adi %}selected{% endif %}>
-                                    {{ category.adi }}
-                                </option>
-                            {% endfor %}
-                        </select>
+                        <div class="search-inputs">
+                            <select name="category" id="category">
+                                <option value="">Kateqoriya</option>
+                                {% for category in request.kateqoriyalar %}
+                                    <option value="{{ category.adi }}" {% if request.GET.category == category.adi %}selected{% endif %}>
+                                        {{ category.adi }}
+                                    </option>
+                                {% endfor %}
+                            </select>
 
-                        <select name="brand" id="brand">
-                            <option value="">Firma</option>
-                            {% for brand in request.brendler %}
-                                <option value="{{ brand.adi }}" {% if request.GET.brand == brand.adi %}selected{% endif %}>
-                                    {{ brand.adi }}
-                                </option>
-                            {% endfor %}
-                        </select>
+                            <select name="brand" id="brand">
+                                <option value="">Firma</option>
+                                {% for brand in request.brendler %}
+                                    <option value="{{ brand.adi }}" {% if request.GET.brand == brand.adi %}selected{% endif %}>
+                                        {{ brand.adi }}
+                                    </option>
+                                {% endfor %}
+                            </select>
 
-                        <select name="model" id="model">
-                            <option value="">Avtomobil</option>
-                            {% for marka in request.markalar %}
-                                <option value="{{ marka.adi }}" {% if request.GET.model == marka.adi %}selected{% endif %}>
-                                    {{ marka.adi }}
-                                </option>
-                            {% endfor %}
-                        </select>
+                            <select name="model" id="model">
+                                <option value="">Avtomobil</option>
+                                {% for marka in request.markalar %}
+                                    <option value="{{ marka.adi }}" {% if request.GET.model == marka.adi %}selected{% endif %}>
+                                        {{ marka.adi }}
+                                    </option>
+                                {% endfor %}
+                            </select>
 
-                        <input type="text" name="search_text" placeholder="Axtarış" value="{{ request.GET.search_text }}">
+                            <div class="search-input-wrapper">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" name="search_text" placeholder="Məhsul axtar..." value="{{ request.GET.search_text }}">
+                            </div>
+                        </div>
                         
                         <button type="submit" id="search-button">
-                            <i class="fas fa-search"></i>
+                            Axtar
                             <div id="loading-spinner" class="loading-spinner" style="display: none;">
                                 <div class="spinner"></div>
                             </div>
@@ -76,6 +81,7 @@
                 </a>
             </div>
         </div>
+        
         <div class="working-hours">
             <p>İş vaxtımız: 09:00 - 18:00</p>
             <p class="current-time">Hazırki Saat: <span id="current-time"></span></p>

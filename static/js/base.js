@@ -901,23 +901,40 @@
         const profileDropdown = document.querySelector('.profile-dropdown');
         const profileToggle = document.querySelector('.profile-toggle');
 
-        if (profileToggle && profileDropdown) {
+        if (profileDropdown && profileToggle) {
+            // Toggle dropdown on click
             profileToggle.addEventListener('click', function(e) {
                 e.preventDefault();
                 profileDropdown.classList.toggle('active');
+                
+                // Rotate chevron icon
+                const chevronIcon = this.querySelector('.fa-chevron-down');
+                if (chevronIcon) {
+                    chevronIcon.style.transform = profileDropdown.classList.contains('active') 
+                        ? 'rotate(180deg)' 
+                        : 'rotate(0)';
+                }
             });
 
             // Close dropdown when clicking outside
             document.addEventListener('click', function(e) {
                 if (!profileDropdown.contains(e.target)) {
                     profileDropdown.classList.remove('active');
+                    const chevronIcon = profileToggle.querySelector('.fa-chevron-down');
+                    if (chevronIcon) {
+                        chevronIcon.style.transform = 'rotate(0)';
+                    }
                 }
             });
 
-            // Close dropdown when pressing Escape key
+            // Close dropdown on ESC key press
             document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
+                if (e.key === 'Escape' && profileDropdown.classList.contains('active')) {
                     profileDropdown.classList.remove('active');
+                    const chevronIcon = profileToggle.querySelector('.fa-chevron-down');
+                    if (chevronIcon) {
+                        chevronIcon.style.transform = 'rotate(0)';
+                    }
                 }
             });
         }

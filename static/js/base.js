@@ -896,45 +896,29 @@
         return text.replace(regex, '<span class="highlight">$1</span>');
     }
 
-    // Profile Dropdown functionality
+    // Dropdown menu functionality
     document.addEventListener('DOMContentLoaded', function() {
         const profileDropdown = document.querySelector('.profile-dropdown');
         const profileToggle = document.querySelector('.profile-toggle');
 
-        if (profileDropdown && profileToggle) {
+        if (profileToggle && profileDropdown) {
             // Toggle dropdown on click
             profileToggle.addEventListener('click', function(e) {
                 e.preventDefault();
                 profileDropdown.classList.toggle('active');
-                
-                // Rotate chevron icon
-                const chevronIcon = this.querySelector('.fa-chevron-down');
-                if (chevronIcon) {
-                    chevronIcon.style.transform = profileDropdown.classList.contains('active') 
-                        ? 'rotate(180deg)' 
-                        : 'rotate(0)';
-                }
             });
 
             // Close dropdown when clicking outside
             document.addEventListener('click', function(e) {
                 if (!profileDropdown.contains(e.target)) {
                     profileDropdown.classList.remove('active');
-                    const chevronIcon = profileToggle.querySelector('.fa-chevron-down');
-                    if (chevronIcon) {
-                        chevronIcon.style.transform = 'rotate(0)';
-                    }
                 }
             });
 
             // Close dropdown on ESC key press
             document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && profileDropdown.classList.contains('active')) {
+                if (e.key === 'Escape') {
                     profileDropdown.classList.remove('active');
-                    const chevronIcon = profileToggle.querySelector('.fa-chevron-down');
-                    if (chevronIcon) {
-                        chevronIcon.style.transform = 'rotate(0)';
-                    }
                 }
             });
         }

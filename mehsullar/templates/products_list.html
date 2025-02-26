@@ -10,7 +10,6 @@
 {% block content %}
 
 
-
 <!-- Axtarış Nəticələriii -->
 <div class="search-results">
     {% if mehsullar %}
@@ -92,8 +91,7 @@
                         <td>
                             <a href="#" 
                                onclick="addToCartWithQuantity({{ mehsul.id }}, this); return false;" 
-                               class="cart-icon"
-                               data-product-id="{{ mehsul.id }}">
+                               class="cart-icon">
                                 <i class="fas fa-shopping-cart"></i>
                             </a>
                         </td>

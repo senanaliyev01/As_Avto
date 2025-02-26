@@ -41,33 +41,65 @@ def about(request):
 
 
 
-@csrf_exempt
 @login_required
+@csrf_exempt
 def sebet_ekle(request, mehsul_id):
-    if request.method == 'POST':
+    if request.method != 'POST':
+        return JsonResponse({
+            'success': False,
+            'error': 'Yalnız POST sorğuları qəbul edilir'
+        }, status=405)
+
+    try:
+        mehsul = get_object_or_404(Mehsul, id=mehsul_id)
+        
         try:
-            mehsul = get_object_or_404(Mehsul, id=mehsul_id)
-            data = json.loads(request.body.decode('utf-8'))
-            quantity = int(data.get('quantity', 1))
-
-            if quantity < 1:
-                return JsonResponse({'success': False, 'error': 'Miqdar 1-dən az ola bilməz'}, status=400)
-
-            sebet, created = Sebet.objects.get_or_create(user=request.user, mehsul=mehsul)
-            sebet.miqdar = sebet.miqdar + quantity if not created else quantity
-            sebet.save()
-
+            if request.content_type == 'application/json':
+                data = json.loads(request.body.decode('utf-8'))
+                quantity = int(data.get('quantity', 1))
+            else:
+                quantity = int(request.POST.get('quantity', 1))
+        except (ValueError, TypeError, json.JSONDecodeError):
             return JsonResponse({
-                'success': True,
-                'mehsul': {
-                    'adi': mehsul.adi,
-                    'sekil': mehsul.sekil.url if mehsul.sekil else None,
-                    'oem': mehsul.oem,
-                }
-            })
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)}, status=400)
-    return JsonResponse({'success': False, 'error': 'Yalnız POST metodu dəstəklənir'}, status=405)
+                'success': False,
+                'error': 'Düzgün miqdar daxil edilməyib'
+            }, status=400)
+
+        if quantity < 1:
+            return JsonResponse({
+                'success': False,
+                'error': 'Miqdar 1-dən az ola bilməz'
+            }, status=400)
+
+        sebet, created = Sebet.objects.get_or_create(
+            user=request.user,
+            mehsul=mehsul,
+            defaults={'miqdar': 0}
+        )
+        
+        sebet.miqdar = sebet.miqdar + quantity if not created else quantity
+        sebet.save()
+
+        return JsonResponse({
+            'success': True,
+            'mehsul': {
+                'adi': mehsul.adi,
+                'sekil': mehsul.sekil.url if mehsul.sekil else None,
+                'oem': mehsul.oem,
+            }
+        })
+
+    except Mehsul.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'Məhsul tapılmadı'
+        }, status=404)
+    except Exception as e:
+        print(f"Xəta baş verdi: {str(e)}")  # Server loglarına xətanı yaz
+        return JsonResponse({
+            'success': False,
+            'error': 'Sistemdə xəta baş verdi'
+        }, status=500)
 
 @login_required
 def view_cart(request):

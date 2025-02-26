@@ -336,6 +336,56 @@
         }, 3000);
     }
 
+    // Səbətə məhsul əlavə etmək funksiyası
+    function addToCartWithQuantity(productId, element) {
+        const quantityInput = element.closest('tr').querySelector('.quantity-input');
+        const quantity = parseInt(quantityInput.value);
+
+        if (isNaN(quantity) || quantity < 1) {
+            showAnimatedMessage('Xahiş edirik düzgün miqdar daxil edin', true);
+            return;
+        }
+
+        const originalContent = element.innerHTML;
+        element.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        element.style.pointerEvents = 'none';
+        element.style.opacity = '0.7';
+
+        fetch(`/sebet/ekle/${productId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ quantity: quantity })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            element.innerHTML = originalContent;
+            element.style.pointerEvents = 'auto';
+            element.style.opacity = '1';
+
+            if (data.success) {
+                showAnimatedMessage('Məhsul səbətə əlavə edildi', false, data.mehsul);
+                updateCartCount();
+            } else {
+                showAnimatedMessage(data.error || 'Xəta baş verdi', true);
+            }
+        })
+        .catch(error => {
+            console.error('Xəta:', error);
+            element.innerHTML = originalContent;
+            element.style.pointerEvents = 'auto';
+            element.style.opacity = '1';
+            showAnimatedMessage('Server xətası baş verdi', true);
+        });
+    }
+
     // DOM yükləndikdə
     document.addEventListener('DOMContentLoaded', () => {
         try {
@@ -350,58 +400,12 @@
             // Səbət sayını yenilə
             updateCartCount();
 
-            // Səbətə məhsul əlavə etmək
+            // Səbətə məhsul əlavə etmək üçün bütün linklərə dinləyici əlavə et
             const cartLinks = document.querySelectorAll('.cart-icon');
-
             cartLinks.forEach(link => {
                 link.addEventListener('click', function (event) {
                     event.preventDefault();
-
-                    const originalContent = this.innerHTML;
-                    const url = this.getAttribute('href');
-
-                    // Loading effektini göstər
-                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                    this.style.pointerEvents = 'none';
-                    this.style.opacity = '0.7';
-
-                    // 2 saniyə loading göstər
-                    setTimeout(() => {
-                        fetch(url)
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error('Network response was not ok');
-                                }
-                                return response.json();
-                            })
-                            .then(data => {
-                                // Original ikonu bərpa et
-                                this.innerHTML = originalContent;
-                                this.style.pointerEvents = 'auto';
-                                this.style.opacity = '1';
-
-                                if (data.success) {
-                                    showAnimatedMessage(
-                                        "Məhsul səbətə əlavə olundu!", 
-                                        false, 
-                                        data.mehsul
-                                    );
-                                    updateCartCount();
-                                } else {
-                                    showAnimatedMessage(
-                                        data.error || "Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.", 
-                                        true
-                                    );
-                                }
-                            })
-                            .catch(error => {
-                                console.error("Xəta:", error);
-                                this.innerHTML = originalContent;
-                                this.style.pointerEvents = 'auto';
-                                this.style.opacity = '1';
-                                showAnimatedMessage("Serverdə xəta baş verdi.", true);
-                            });
-                    }, 2000);
+                    addToCartWithQuantity(this.dataset.productId, this);
                 });
             });
 
@@ -937,37 +941,5 @@
             }
         }
     });
-
-    function addToCartWithQuantity(productId, element) {
-        const quantityInput = element.closest('tr').querySelector('.quantity-input');
-        const quantity = parseInt(quantityInput.value);
-        
-        if (isNaN(quantity) || quantity < 1) {
-            showAnimatedMessage('Xahiş edirik düzgün miqdar daxil edin', true);
-            return;
-        }
-
-        fetch(`/sebet/ekle/${productId}/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: JSON.stringify({ quantity: quantity })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showAnimatedMessage('Məhsul səbətə əlavə edildi', false, data.mehsul);
-                updateCartCount();
-            } else {
-                showAnimatedMessage(data.error || 'Xəta baş verdi', true);
-            }
-        })
-        .catch(error => {
-            console.error('Xəta:', error);
-            showAnimatedMessage('Server xətası baş verdi', true);
-        });
-    }
 
 

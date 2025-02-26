@@ -1,3 +1,9 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 /* Professional Dark Blue Theme for Product Details */
 body {
     margin: 0;

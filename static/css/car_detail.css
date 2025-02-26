@@ -18,6 +18,11 @@ body {
     --light-text: #ffffff;
 }
 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 /* Container */
 .car-detail-container {
     margin-top: 20px;

@@ -950,11 +950,10 @@
         fetch(`/sebet/ekle/${productId}/`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
             },
-            body: JSON.stringify({
-                quantity: quantity
-            })
+            body: JSON.stringify({ quantity: quantity })
         })
         .then(response => response.json())
         .then(data => {
@@ -965,7 +964,10 @@
                 showAnimatedMessage(data.error || 'Xəta baş verdi', true);
             }
         })
-      
+        .catch(error => {
+            console.error('Xəta:', error);
+            showAnimatedMessage('Server xətası baş verdi', true);
+        });
     }
 
 

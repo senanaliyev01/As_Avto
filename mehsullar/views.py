@@ -41,51 +41,33 @@ def about(request):
 
 
 
-@login_required
 @csrf_exempt
+@login_required
 def sebet_ekle(request, mehsul_id):
-    try:
-        mehsul = get_object_or_404(Mehsul, id=mehsul_id)
-        quantity = 1
+    if request.method == 'POST':
+        try:
+            mehsul = get_object_or_404(Mehsul, id=mehsul_id)
+            data = json.loads(request.body.decode('utf-8'))
+            quantity = int(data.get('quantity', 1))
 
-        if request.method == 'POST':
-            try:
-                if request.content_type == 'application/json':
-                    data = json.loads(request.body.decode('utf-8'))
-                    quantity = int(data.get('quantity', 1))
-                else:
-                    quantity = int(request.POST.get('quantity', request.GET.get('quantity', 1)))
-            except (ValueError, TypeError, json.JSONDecodeError):
-                quantity = 1
+            if quantity < 1:
+                return JsonResponse({'success': False, 'error': 'Miqdar 1-dən az ola bilməz'}, status=400)
 
-        if quantity < 1:
+            sebet, created = Sebet.objects.get_or_create(user=request.user, mehsul=mehsul)
+            sebet.miqdar = sebet.miqdar + quantity if not created else quantity
+            sebet.save()
+
             return JsonResponse({
-                'success': False,
-                'error': 'Miqdar 1-dən az ola bilməz'
-            }, status=400)
-
-        sebet, created = Sebet.objects.get_or_create(user=request.user, mehsul=mehsul)
-        
-        if created:
-            sebet.miqdar = quantity
-        else:
-            sebet.miqdar += quantity
-        
-        sebet.save()
-
-        return JsonResponse({
-            'success': True,
-            'mehsul': {
-                'adi': mehsul.adi,
-                'sekil': mehsul.sekil.url if mehsul.sekil else None,
-                'oem': mehsul.oem,
-            }
-        })
-    except Exception as e:
-        return JsonResponse({
-            'success': False,
-            'error': str(e)
-        }, status=400)
+                'success': True,
+                'mehsul': {
+                    'adi': mehsul.adi,
+                    'sekil': mehsul.sekil.url if mehsul.sekil else None,
+                    'oem': mehsul.oem,
+                }
+            })
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+    return JsonResponse({'success': False, 'error': 'Yalnız POST metodu dəstəklənir'}, status=405)
 
 @login_required
 def view_cart(request):

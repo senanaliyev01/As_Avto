@@ -52,14 +52,11 @@
                             {% endfor %}
                         </select>
 
-                        <input type="text" name="search_text" placeholder="Axtarış" value="{{ request.GET.search_text }}">
+                        <input type="text" name="search_text" placeholder="Məhsul axtar..." value="{{ request.GET.search_text }}">
                         
                         <button type="submit" id="search-button">
                             <i class="fas fa-search"></i>
                             Axtar
-                            <div id="loading-spinner" class="loading-spinner" style="display: none;">
-                                <div class="spinner"></div>
-                            </div>
                         </button>
                     </form>
                 </div>
@@ -77,10 +74,23 @@
                     <i class="fas fa-sign-out-alt"></i> Çıxış
                 </a>
             </div>
-        </div>
-        <div class="working-hours">
-            <p>İş vaxtımız: 09:00 - 18:00</p>
-            <p class="current-time">Hazırki Saat: <span id="current-time"></span></p>
+
+            <!-- İş Saatları -->
+            <div class="working-hours">
+                <p>
+                    <i class="far fa-clock"></i>
+                    İş vaxtımız: 09:00 - 18:00
+                    <span class="status-badge">
+                        <i class="fas fa-circle"></i>
+                        <span id="work-status">Açıqdır</span>
+                    </span>
+                </p>
+                <p class="current-time">
+                    <i class="fas fa-history"></i>
+                    Hazırki Saat: 
+                    <span id="current-time"></span>
+                </p>
+            </div>
         </div>
     </header>
 

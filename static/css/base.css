@@ -43,7 +43,7 @@ header {
 .search-container {
     grid-column: 2;
     width: 100%;
-    max-width: 600px;
+    max-width: 800px;
     justify-self: center;
     background: transparent;
     padding: 0;
@@ -52,49 +52,66 @@ header {
 
 /* Axtarış Forması Üçün Stil */
 .search-bar {
-    background: rgba(23, 42, 69, 0.8);
-    backdrop-filter: blur(10px);
-    padding: 1rem 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    background: rgba(23, 42, 69, 0.95);
+    backdrop-filter: blur(15px);
+    padding: 1.2rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(100, 255, 218, 0.15);
+    transition: all 0.3s ease;
+}
+
+.search-bar form {
     display: flex;
     gap: 1rem;
-    border: 1px solid rgba(100, 255, 218, 0.1);
-    transition: all 0.3s ease;
+    align-items: center;
 }
 
 .search-bar:hover {
     border-color: rgba(100, 255, 218, 0.3);
-    box-shadow: 0 8px 32px rgba(100, 255, 218, 0.1);
+    box-shadow: 0 12px 40px rgba(100, 255, 218, 0.15);
+    transform: translateY(-2px);
 }
 
 /* Axtarış Forması Elementləri */
 .search-bar select,
 .search-bar input[type="text"] {
-    padding: 0.8rem 1rem;
-    border: 1px solid rgba(100, 255, 218, 0.2);
-    border-radius: 8px;
-    background-color: rgba(10, 25, 47, 0.8);
+    padding: 0.8rem 1.2rem;
+    border: 2px solid rgba(100, 255, 218, 0.2);
+    border-radius: 12px;
+    background-color: rgba(10, 25, 47, 0.9);
     color: var(--text-primary);
-    font-size: 0.95rem;
+    font-size: 1rem;
     transition: all 0.3s ease;
-    min-width: 120px;
+    min-width: 140px;
+    cursor: pointer;
+}
+
+.search-bar select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2364ffda' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: calc(100% - 1rem) center;
+    padding-right: 2.5rem;
 }
 
 .search-bar select:hover,
 .search-bar input[type="text"]:hover {
     border-color: var(--accent-color);
+    background-color: rgba(10, 25, 47, 0.95);
 }
 
 .search-bar select:focus,
 .search-bar input[type="text"]:focus {
     outline: none;
     border-color: var(--accent-color);
-    box-shadow: 0 0 0 2px rgba(100, 255, 218, 0.2);
+    box-shadow: 0 0 0 3px rgba(100, 255, 218, 0.2);
+    background-color: rgba(10, 25, 47, 0.95);
 }
 
 .search-bar input[type="text"] {
     flex: 1;
+    min-width: 200px;
 }
 
 #search-button {
@@ -102,18 +119,25 @@ header {
     background: linear-gradient(135deg, var(--accent-color), #38a7e5);
     color: var(--primary-color);
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     font-weight: 600;
+    font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    min-width: 120px;
+    justify-content: center;
 }
 
 #search-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(100, 255, 218, 0.3);
+    box-shadow: 0 8px 20px rgba(100, 255, 218, 0.3);
+}
+
+#search-button i {
+    font-size: 1.1rem;
 }
 
 .header-right {
@@ -201,18 +225,19 @@ header {
 /* Search Results Dropdown */
 .search-results-dropdown {
     position: absolute;
-    top: calc(100% + 0.5rem);
+    top: calc(100% + 0.8rem);
     left: 0;
     right: 0;
-    background: rgba(10, 25, 47, 0.95);
-    backdrop-filter: blur(10px);
+    background: rgba(10, 25, 47, 0.98);
+    backdrop-filter: blur(20px);
     border: 1px solid rgba(100, 255, 218, 0.2);
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
     z-index: 1000;
-    max-height: 400px;
+    max-height: 500px;
     overflow-y: auto;
     display: none;
+    padding: 0.5rem;
 }
 
 .search-results-dropdown.active {
@@ -232,25 +257,34 @@ header {
 }
 
 .search-result-item {
-    padding: 1rem;
+    padding: 1.2rem;
     border-bottom: 1px solid rgba(100, 255, 218, 0.1);
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 1.2rem;
+    border-radius: 12px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
 }
 
 .search-result-item:hover {
-    background: rgba(23, 42, 69, 0.8);
+    background: rgba(23, 42, 69, 0.95);
     transform: translateX(5px);
 }
 
 .search-result-item img {
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
     object-fit: contain;
-    margin-right: 15px;
-    border-radius: 4px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.5rem;
 }
 
 .search-result-info {
@@ -259,26 +293,83 @@ header {
 
 .search-result-info h4 {
     color: var(--text-primary);
-    margin: 0 0 5px 0;
-    font-size: 1.5rem;
+    margin: 0 0 0.5rem 0;
+    font-size: 1.2rem;
+    font-weight: 600;
 }
 
 .search-result-info p {
-    font-size: large;
-    display: inline-flex;
     color: var(--text-secondary);
     margin: 0;
-    font-size: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
 }
 
 .search-result-price {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 8px;
+    gap: 0.8rem;
+    min-width: 120px;
+}
+
+.search-result-price .price {
+    font-size: 1.2rem;
+    font-weight: 700;
     color: var(--accent-color);
-    font-weight: bold;
-    margin-left: 15px;
+}
+
+/* Working Hours Style */
+.working-hours {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 0.8rem;
+    background: rgba(23, 42, 69, 0.8);
+    border-radius: 12px;
+    margin-top: 1rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(100, 255, 218, 0.1);
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    max-width: 600px;
+    margin: 1rem auto 0;
+}
+
+.working-hours p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.working-hours .current-time {
+    color: var(--accent-color);
+    font-weight: 500;
+}
+
+.time-unit {
+    background: rgba(100, 255, 218, 0.1);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 1rem;
+}
+
+/* Status Badge Style */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    background: rgba(100, 255, 218, 0.1);
+    border: 1px solid rgba(100, 255, 218, 0.2);
+    margin-left: 0.8rem;
 }
 
 .stock-status {

@@ -37,8 +37,8 @@
             {% endfor %}
         </div>
         <div class="swiper-pagination"></div>
-        <div class="swiper-button-next"></div>
         <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
     </div>
     {% else %}
     <p class="no-products">Hal-hazırda yeni məhsul yoxdur</p>
@@ -136,36 +136,5 @@
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-<script>
-    // Yeni məhsullar slider
-    const newProductsSwiper = new Swiper('.new-products-slider', {
-        slidesPerView: 1,
-        spaceBetween: 20,
-        loop: true,
-        autoplay: {
-            delay: 3000,
-            disableOnInteraction: false,
-        },
-        pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
-        },
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-        breakpoints: {
-            640: {
-                slidesPerView: 2,
-            },
-            1024: {
-                slidesPerView: 3,
-            },
-            1280: {
-                slidesPerView: 4,
-            },
-        },
-    });
-</script>
 <script src="{% static 'js/main.js' %}"></script>
 {% endblock %}

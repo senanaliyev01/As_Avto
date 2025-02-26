@@ -54,7 +54,7 @@ class Mehsul(models.Model):
     qiymet = models.DecimalField(max_digits=10, decimal_places=2)
     sekil = models.ImageField(upload_to='mehsul_sekilleri/', null=True, blank=True)
     haqqinda = models.TextField(null=True, blank=True)
-    yenidir = models.BooleanField(default=False)
+    yenidir = models.BooleanField(default=True)
     elave_edilme_tarixi = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -74,11 +74,14 @@ class Mehsul(models.Model):
         kodlar.extend([oem.kod for oem in self.oem_kodlar.all()])
         return kodlar
 
-    @property
-    def is_new(self):
-        from django.utils import timezone
-        from datetime import timedelta
-        return self.yenidir and (timezone.now() - self.elave_edilme_tarixi) < timedelta(days=7)
+    def save(self, *args, **kwargs):
+        # Əgər məhsul 1 həftədən köhnədirsə, yenidir sahəsini False et
+        if self.elave_edilme_tarixi:
+            from django.utils import timezone
+            bir_hefte = timezone.timedelta(days=7)
+            if timezone.now() - self.elave_edilme_tarixi > bir_hefte:
+                self.yenidir = False
+        super().save(*args, **kwargs)
 
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

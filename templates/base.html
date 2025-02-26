@@ -14,48 +14,73 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Axtarış Forması -->
-    <div class="search-container">
-        <div class="search-bar">
-            <form id="search-form" method="GET" action="{% url 'products_list' %}">
-                <select name="category" id="category">
-                    <option value="">Kateqoriya</option>
-                    {% for category in request.kateqoriyalar %}
-                        <option value="{{ category.adi }}" {% if request.GET.category == category.adi %}selected{% endif %}>
-                            {{ category.adi }}
-                        </option>
-                    {% endfor %}
-                </select>
+    <!-- Header -->
+    <header>
+        <div class="top-header">
+            <div class="logo">
+                <img src="{% static '/img/Header_Logo.png' %}" alt="Logo">
+            </div>
 
-                <select name="brand" id="brand">
-                    <option value="">Firma</option>
-                    {% for brand in request.brendler %}
-                        <option value="{{ brand.adi }}" {% if request.GET.brand == brand.adi %}selected{% endif %}>
-                            {{ brand.adi }}
-                        </option>
-                    {% endfor %}
-                </select>
+            <!-- Axtarış Forması -->
+            <div class="search-container">
+                <div class="search-bar">
+                    <form id="search-form" method="GET" action="{% url 'products_list' %}">
+                        <select name="category" id="category">
+                            <option value="">Kateqoriya</option>
+                            {% for category in request.kateqoriyalar %}
+                                <option value="{{ category.adi }}" {% if request.GET.category == category.adi %}selected{% endif %}>
+                                    {{ category.adi }}
+                                </option>
+                            {% endfor %}
+                        </select>
 
-                <select name="model" id="model">
-                    <option value="">Avtomobil</option>
-                    {% for marka in request.markalar %}
-                        <option value="{{ marka.adi }}" {% if request.GET.model == marka.adi %}selected{% endif %}>
-                            {{ marka.adi }}
-                        </option>
-                    {% endfor %}
-                </select>
+                        <select name="brand" id="brand">
+                            <option value="">Firma</option>
+                            {% for brand in request.brendler %}
+                                <option value="{{ brand.adi }}" {% if request.GET.brand == brand.adi %}selected{% endif %}>
+                                    {{ brand.adi }}
+                                </option>
+                            {% endfor %}
+                        </select>
 
-                <input type="text" name="search_text" placeholder="Axtarış" value="{{ request.GET.search_text }}">
-                
-                <button type="submit" id="search-button">
-                    Axtar
-                    <div id="loading-spinner" class="loading-spinner" style="display: none;">
-                        <div class="spinner"></div>
-                    </div>
-                </button>
-            </form>
+                        <select name="model" id="model">
+                            <option value="">Avtomobil</option>
+                            {% for marka in request.markalar %}
+                                <option value="{{ marka.adi }}" {% if request.GET.model == marka.adi %}selected{% endif %}>
+                                    {{ marka.adi }}
+                                </option>
+                            {% endfor %}
+                        </select>
+
+                        <input type="text" name="search_text" placeholder="Axtarış" value="{{ request.GET.search_text }}">
+                        
+                        <button type="submit" id="search-button">
+                            <i class="fas fa-search"></i>
+                            <div id="loading-spinner" class="loading-spinner" style="display: none;">
+                                <div class="spinner"></div>
+                            </div>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <a href="{% url 'profile' %}"><i class="fas fa-user"></i> {{ user.username }}</a>
+                <a href="{% url 'view_cart' %}" class="cart-link">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="cart-count" class="cart-badge">0</span>
+                </a>
+                {% csrf_token %}
+                <a href="{% url 'logout_view' %}" id="logout-link" onclick="confirmLogout(event); return false;">
+                    <i class="fas fa-sign-out-alt"></i> Çıxış
+                </a>
+            </div>
         </div>
-    </div>
+        <div class="working-hours">
+            <p>İş vaxtımız: 09:00 - 18:00</p>
+            <p class="current-time">Hazırki Saat: <span id="current-time"></span></p>
+        </div>
+    </header>
 
     <!-- Navbarr -->
     <div class="nav-bar">
@@ -69,31 +94,6 @@
         <a href="{% url 'car_list' %}"><i class="fas fa-car"></i> Avtomobillər</a>
         <a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> Məlumat</a>
     </div>
-
-    <!-- Header -->
-    <header>
-        <div class="top-header">
-            <div class="logo">
-                <img src="{% static '/img/Header_Logo.png' %}" alt="Logo">
-            </div>
-            <div class="header-right">
-                <a href="{% url 'profile' %}"><i class="fas fa-user"></i> {{ user.username }}</a>
-                <a href="{% url 'view_cart' %}" class="cart-link">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span id="cart-count" class="cart-badge">0</span>
-                    
-                </a>
-                {% csrf_token %}
-                <a href="{% url 'logout_view' %}" id="logout-link" onclick="confirmLogout(event); return false;">
-                    <i class="fas fa-sign-out-alt"></i> Çıxış
-                </a>
-            </div>
-        </div>
-        <div class="working-hours">
-            <p>İş vaxtımız: 09:00 - 18:00</p>
-            <p class="current-time">Hazırki Saat: <span id="current-time"></span></p>
-        </div>
-    </header>
 
     <!-- Main Content -->
     <div class="main-content">

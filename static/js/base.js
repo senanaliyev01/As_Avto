@@ -382,7 +382,7 @@
                             return response.json();
                         })
                         .then(data => {
-                            // Original ikonu bərpa et
+                            // Original ikonu bərpa 3et
                             this.innerHTML = originalContent;
                             this.style.pointerEvents = 'auto';
                             this.style.opacity = '1';

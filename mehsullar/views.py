@@ -48,7 +48,6 @@ def sebet_ekle(request, mehsul_id):
         mehsul = get_object_or_404(Mehsul, id=mehsul_id)
         quantity = 1
 
-        # JSON data-nı parse edirik
         if request.method == 'POST':
             try:
                 if request.content_type == 'application/json':

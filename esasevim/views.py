@@ -6,8 +6,6 @@ from mehsullar.models import Kateqoriya, Brend, Marka, Mehsul, MusteriReyi
 from django.views.decorators.cache import never_cache
 from django.db.models import Count, Avg
 from django.contrib import messages
-from django.utils import timezone
-from datetime import timedelta
 
 @login_required
 def rey_elave_et(request):
@@ -49,7 +47,10 @@ def esasevim(request):
     # Təsdiqlənmiş rəylər
     tesdiqli_reyler = MusteriReyi.objects.filter(tesdiq=True)
     
-    # Ümumi statistikaa
+    # Yeni məhsulları əldə et
+    yeni_mehsullar = Mehsul.objects.filter(yenidir=True)[:5]  # Son 5 yeni məhsul
+    
+    # Ümumi statistika
     rey_statistikasi = MusteriReyi.objects.filter(tesdiq=True).aggregate(
         ortalama=Avg('qiymetlendirme'),
         toplam=Count('id')
@@ -64,22 +65,14 @@ def esasevim(request):
             sayi=Count('id')
         ).order_by('qiymetlendirme')
     
-    # 1 həftədən köhnə məhsulları yenilə
-    bir_hefte_evvel = timezone.now() - timedelta(days=7)
-    Mehsul.objects.filter(yaradilma_tarixi__lt=bir_hefte_evvel, yenidir=True).update(yenidir=False)
-    
-    # Yeni məhsulları əldə et
-    yeni_mehsullar = Mehsul.objects.filter(yenidir=True).order_by('-yaradilma_tarixi')
-    
     context = {
         'reyler': tesdiqli_reyler,
         'rey_statistikasi': rey_statistikasi,
         'ulduz_statistikasi': ulduz_statistikasi,
-        'yeni_mehsullar': yeni_mehsullar
+        'yeni_mehsullar': yeni_mehsullar  # Context-ə yeni məhsulları əlavə et
     }
     
     return render(request, 'main.html', context)
-
 @login_required
 @never_cache
 def get_statistics(request):

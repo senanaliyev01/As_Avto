@@ -14,23 +14,20 @@
 <section class="new-products-section">
     <h2 class="section-title">Yeni Məhsullar</h2>
     
-    {% if yeni_mehsullar %}
     <div class="swiper new-products-slider">
         <div class="swiper-wrapper">
             {% for mehsul in yeni_mehsullar %}
             <div class="swiper-slide">
                 <div class="product-card">
                     {% if mehsul.sekil %}
-                    <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
+                        <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
                     {% else %}
-                    <img src="{% static 'img/no-image.png' %}" alt="Şəkil yoxdur">
+                        <img src="{% static 'img/no-image.png' %}" alt="Şəkil yoxdur">
                     {% endif %}
                     <div class="product-info">
                         <h3>{{ mehsul.adi }}</h3>
                         <p class="brand">{{ mehsul.brend.adi }}</p>
-                        <p class="code">Kod: {{ mehsul.brend_kod }}</p>
                         <p class="price">{{ mehsul.qiymet }} AZN</p>
-                        <a href="{% url 'mehsul_haqqinda' mehsul.id mehsul.adi mehsul.oem mehsul.brend_kod %}" class="details-btn">Ətraflı</a>
                     </div>
                 </div>
             </div>
@@ -40,9 +37,6 @@
         <div class="swiper-button-next"></div>
         <div class="swiper-button-prev"></div>
     </div>
-    {% else %}
-    <p class="no-products">Hal-hazırda yeni məhsul yoxdur.</p>
-    {% endif %}
 </section>
 
 <!-- Müştəri Rəyləri Bölməsi -->
@@ -136,33 +130,5 @@
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-<script>
-    // Yeni məhsullar üçün Swiper inisializasiyası
-    const newProductsSwiper = new Swiper('.new-products-slider', {
-        slidesPerView: 1,
-        spaceBetween: 30,
-        loop: true,
-        autoplay: {
-            delay: 3000,
-            disableOnInteraction: false,
-        },
-        pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
-        },
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-        breakpoints: {
-            640: {
-                slidesPerView: 2,
-            },
-            1024: {
-                slidesPerView: 3,
-            },
-        },
-    });
-</script>
 <script src="{% static 'js/main.js' %}"></script>
 {% endblock %}

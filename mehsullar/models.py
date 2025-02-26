@@ -54,7 +54,7 @@ class Mehsul(models.Model):
     qiymet = models.DecimalField(max_digits=10, decimal_places=2)
     sekil = models.ImageField(upload_to='mehsul_sekilleri/', null=True, blank=True)
     haqqinda = models.TextField(null=True, blank=True)
-    yenidir = models.BooleanField(default=False)
+    yenidir = models.BooleanField(default=False, null=True, blank=True)
 
     def __str__(self):
         return self.adi

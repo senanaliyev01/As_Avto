@@ -414,7 +414,7 @@
                 });
             }
 
-            // İlkin statistikaları yüklə
+            // İlkin statistikaları yüklə1
             updateStatistics();
             setInterval(updateStatistics, 3600000); // 1 saatdan bir yenilə
 

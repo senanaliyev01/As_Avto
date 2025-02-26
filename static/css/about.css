@@ -12,9 +12,9 @@
 
 /* Statistics Section */
 .statistics-section {
-    padding: 2rem 1rem;
+    padding: 2rem;
     background-color: var(--secondary-color);
-    color: var(--text-primary);
+    margin-top: 4rem;
     box-shadow: var(--shadow-md);
 }
 
@@ -54,47 +54,53 @@
 }
 
 .statistics-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
 }
 
 .statistics-card {
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
+    flex: 0 1 200px;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
     text-align: center;
     transition: var(--transition);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
 }
 
 .statistics-card:hover {
-    transform: translateY(-10px);
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.1);
     box-shadow: var(--shadow-md);
-    background: rgba(255, 255, 255, 0.15);
 }
 
 .statistics-card .icon {
-    font-size: 2rem;
+    font-size: 2.5rem;
     color: var(--accent-color);
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
     transition: var(--transition);
 }
 
 .statistics-card:hover .icon {
-    transform: scale(1.2) rotate(10deg);
+    transform: scale(1.1);
 }
 
 .statistics-card h3 {
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
     color: var(--text-primary);
 }
 
 .statistics-card .count {
-    font-size: 1.8rem;
+    font-size: 2rem;
     font-weight: bold;
     color: var(--accent-color);
+    text-shadow: 0 0 10px rgba(100, 255, 218, 0.3);
 }
 
 /* Reviews Section */
@@ -370,6 +376,28 @@ h2::after {
 
     .container {
         padding: 1rem;
+    }
+
+    .statistics-section {
+        padding: 1.5rem;
+        margin-top: 3rem;
+    }
+
+    .statistics-container {
+        gap: 1rem;
+    }
+
+    .statistics-card {
+        flex: 0 1 160px;
+        padding: 1rem;
+    }
+
+    .statistics-card .icon {
+        font-size: 2rem;
+    }
+
+    .statistics-card .count {
+        font-size: 1.75rem;
     }
 }
 

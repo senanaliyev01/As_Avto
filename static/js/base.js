@@ -469,9 +469,52 @@
         }
     });
 
+    document.addEventListener('DOMContentLoaded', function() {
+        // Profile Dropdown functionality
+        const profileDropdown = document.querySelector('.profile-dropdown');
+        const profileToggle = document.querySelector('.profile-toggle');
 
-   
-    
+        if (profileDropdown && profileToggle) {
+            // Toggle dropdown on click
+            profileToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                profileDropdown.classList.toggle('active');
+                
+                // Rotate chevron icon
+                const chevronIcon = this.querySelector('.fa-chevron-down');
+                if (chevronIcon) {
+                    chevronIcon.style.transform = profileDropdown.classList.contains('active') 
+                        ? 'rotate(180deg)' 
+                        : 'rotate(0)';
+                }
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!profileDropdown.contains(e.target)) {
+                    profileDropdown.classList.remove('active');
+                    const chevronIcon = profileToggle.querySelector('.fa-chevron-down');
+                    if (chevronIcon) {
+                        chevronIcon.style.transform = 'rotate(0)';
+                    }
+                }
+            });
+
+            // Close dropdown on ESC key press
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && profileDropdown.classList.contains('active')) {
+                    profileDropdown.classList.remove('active');
+                    const chevronIcon = profileToggle.querySelector('.fa-chevron-down');
+                    if (chevronIcon) {
+                        chevronIcon.style.transform = 'rotate(0)';
+                    }
+                }
+            });
+        }
+
+        // ... existing code ...
+    });
+
     document.getElementById('search-form').addEventListener('submit', function(event) {
         event.preventDefault(); // Formun dərhal göndərilməsini dayandır
     
@@ -895,49 +938,5 @@
         const regex = new RegExp(`(${searchTerm})`, 'gi');
         return text.replace(regex, '<span class="highlight">$1</span>');
     }
-
-    // Profile Dropdown functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        const profileDropdown = document.querySelector('.profile-dropdown');
-        const profileToggle = document.querySelector('.profile-toggle');
-
-        if (profileDropdown && profileToggle) {
-            // Toggle dropdown on click
-            profileToggle.addEventListener('click', function(e) {
-                e.preventDefault();
-                profileDropdown.classList.toggle('active');
-                
-                // Rotate chevron icon
-                const chevronIcon = this.querySelector('.fa-chevron-down');
-                if (chevronIcon) {
-                    chevronIcon.style.transform = profileDropdown.classList.contains('active') 
-                        ? 'rotate(180deg)' 
-                        : 'rotate(0)';
-                }
-            });
-
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!profileDropdown.contains(e.target)) {
-                    profileDropdown.classList.remove('active');
-                    const chevronIcon = profileToggle.querySelector('.fa-chevron-down');
-                    if (chevronIcon) {
-                        chevronIcon.style.transform = 'rotate(0)';
-                    }
-                }
-            });
-
-            // Close dropdown on ESC key press
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && profileDropdown.classList.contains('active')) {
-                    profileDropdown.classList.remove('active');
-                    const chevronIcon = profileToggle.querySelector('.fa-chevron-down');
-                    if (chevronIcon) {
-                        chevronIcon.style.transform = 'rotate(0)';
-                    }
-                }
-            });
-        }
-    });
 
 

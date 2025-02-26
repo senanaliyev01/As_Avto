@@ -405,7 +405,8 @@
             cartLinks.forEach(link => {
                 link.addEventListener('click', function (event) {
                     event.preventDefault();
-                    addToCartWithQuantity(this.dataset.productId, this);
+                    const productId = this.getAttribute('data-product-id');
+                    addToCartWithQuantity(productId, this);
                 });
             });
 

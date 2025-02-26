@@ -933,40 +933,4 @@
         }
     });
 
-    function handleOrderSubmit(event) {
-        event.preventDefault();
-        
-        const selectedItems = Array.from(document.querySelectorAll('.select-item:checked')).map(input => input.value);
-        
-        if (selectedItems.length === 0) {
-            alert('Zəhmət olmasa, sifariş etmək istədiyiniz məhsulları seçin.');
-            return false;
-        }
-        
-        if (confirm('Sifarişi təsdiqləmək istədiyinizə əminsiniz?')) {
-            const form = event.target;
-            
-            fetch(form.action, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ selected_items: selectedItems })
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert('Sifarişiniz uğurla qeydə alındı. Sifarişlərim səhifəsinə yönləndirilirsiniz.');
-                    window.location.href = '{% url "sifaris_izle" %}';
-                } else {
-                    alert('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
-                }
-            })
-            .catch(error => {
-                alert('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
-            });
-        }
-        return false;
-    }
-
 

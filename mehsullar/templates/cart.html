@@ -16,103 +16,99 @@
 
     {% if sebet %}
     <div class="cart-container">
-        <form id="order-form" action="{% url 'sifarisi_gonder' %}" method="post" onsubmit="return handleOrderSubmit(event)">
-            {% csrf_token %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Seç</th>
-                        <th>Məhsul</th>
-                        <th>Kateqoriya</th>
-                        <th>Brend</th>
-                        <th>Model</th>
-                        <th>Brend Kod</th>
-                        <th>OEM</th>
-                        <th>Stok</th>
-                        <th>Qiymət</th>
-                        <th>Miqdar</th>
-                        <th>Cəmi</th>
-                        <th>Sil</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in sebet %}
-                    <tr data-item-id="{{ item.id }}" data-price="{{ item.mehsul.formatted_qiymet }}">
-                        <td>
-                            <input type="checkbox" name="selected_items" value="{{ item.id }}" class="select-item">
-                        </td>
-                        <td>{{ item.mehsul.adi }}</td>
-                        <td>{{ item.mehsul.kateqoriya.adi }}</td>
-                        <td>{{ item.mehsul.brend.adi }}</td>
-                        <td>{{ item.mehsul.marka.adi }}</td>
-                        <td>{{ item.mehsul.brend_kod }}</td>
-                        <td>{{ item.mehsul.oem }}</td>
-                        <td>
-                            {% if item.mehsul.stok == 0 %}
-                                <span class="stock-status out-of-stock">
-                                     Yoxdur
-                                </span>
-                            {% elif item.mehsul.stok <= 20 %}
-                                <span class="stock-status low-stock">
-                                    Az var
-                                </span>
-                            {% else %}
-                                <span class="stock-status in-stock">
-                                   Var
-                                </span>
-                            {% endif %}
-                        </td>
-                        <td class="price">{{ item.mehsul.formatted_qiymet }} AZN</td>
-                        <td>
-                            <div class="quantity-controls">
-                                <button type="button" class="quantity-btn minus" onclick="updateQuantity({{ item.id }}, -1)">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <input type="number" 
-                                       class="quantity-input" 
-                                       value="{{ item.miqdar }}"
-                                       min="1"
-                                       data-item-id="{{ item.id }}"
-                                       onchange="handleQuantityInput(this)"
-                                       onkeyup="if(event.key === 'Enter') handleQuantityInput(this)"
-                                       onblur="handleQuantityInput(this)"
-                                       style="width: 60px; text-align: center;">
-                                <button type="button" class="quantity-btn plus" onclick="updateQuantity({{ item.id }}, 1)">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div>
-                        </td>
-                        <td class="item-total">{{ item.cemi }} AZN</td>
-                        <td>
-                            <form action="{% url 'sebetden_sil' item.id %}" method="post" style="display: inline;">
-                                {% csrf_token %}
-                                <button type="submit" class="delete-btn" title="Sil" onclick="return confirm('Məhsulu silmək istədiyinizə əminsiniz?')">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="12" style="text-align: center; padding: 1.5rem;">
-                            <div style="display: inline-flex; align-items: center; gap: 1rem; background: linear-gradient(145deg, #0a1929, #1a2942); padding: 1rem 2rem; border-radius: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
-                                <strong style="color: #64ffda; font-size: 1.2rem;">Ümumi Cəmi:</strong>
-                                <span id="total-amount" style="color: white; font-size: 1.2rem; font-weight: 600;">{{ cemi_mebleg }} AZN</span>
-                            </div>
-                        </td>
-                    </tr>
-                </tfoot>
-            </table>
+        <table>
+            <thead>
+                <tr>
+                    <th>Məhsul</th>
+                    <th>Kateqoriya</th>
+                    <th>Brend</th>
+                    <th>Model</th>
+                    <th>Brend Kod</th>
+                    <th>OEM</th>
+                    <th>Stok</th>
+                    <th>Qiymət</th>
+                    <th>Miqdar</th>
+                    <th>Cəmi</th>
+                    <th>Sil</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in sebet %}
+                <tr data-item-id="{{ item.id }}" data-price="{{ item.mehsul.formatted_qiymet }}">
+                    <td>{{ item.mehsul.adi }}</td>
+                    <td>{{ item.mehsul.kateqoriya.adi }}</td>
+                    <td>{{ item.mehsul.brend.adi }}</td>
+                    <td>{{ item.mehsul.marka.adi }}</td>
+                    <td>{{ item.mehsul.brend_kod }}</td>
+                    <td>{{ item.mehsul.oem }}</td>
+                    <td>
+                        {% if item.mehsul.stok == 0 %}
+                            <span class="stock-status out-of-stock">
+                                 Yoxdur
+                            </span>
+                        {% elif item.mehsul.stok <= 20 %}
+                            <span class="stock-status low-stock">
+                                Az var
+                            </span>
+                        {% else %}
+                            <span class="stock-status in-stock">
+                               Var
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td class="price">{{ item.mehsul.formatted_qiymet }} AZN</td>
+                    <td>
+                        <div class="quantity-controls">
+                            <button type="button" class="quantity-btn minus" onclick="updateQuantity({{ item.id }}, -1)">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input type="number" 
+                                   class="quantity-input" 
+                                   value="{{ item.miqdar }}"
+                                   min="1"
+                                   data-item-id="{{ item.id }}"
+                                   onchange="handleQuantityInput(this)"
+                                   onkeyup="if(event.key === 'Enter') handleQuantityInput(this)"
+                                   onblur="handleQuantityInput(this)"
+                                   style="width: 60px; text-align: center;">
+                            <button type="button" class="quantity-btn plus" onclick="updateQuantity({{ item.id }}, 1)">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </td>
+                    <td class="item-total">{{ item.cemi }} AZN</td>
+                    <td>
+                        <form action="{% url 'sebetden_sil' item.id %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="delete-btn" title="Sil" onclick="return confirm('Məhsulu silmək istədiyinizə əminsiniz?')">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="11" style="text-align: center; padding: 1.5rem;">
+                        <div style="display: inline-flex; align-items: center; gap: 1rem; background: linear-gradient(145deg, #0a1929, #1a2942); padding: 1rem 2rem; border-radius: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
+                            <strong style="color: #64ffda; font-size: 1.2rem;">Ümumi Cəmi:</strong>
+                            <span id="total-amount" style="color: white; font-size: 1.2rem; font-weight: 600;">{{ cemi_mebleg }} AZN</span>
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
 
-            <div class="cart-actions">
+        <div class="cart-actions">
+            <form action="{% url 'sifarisi_gonder' %}" method="post" style="display: inline;" onsubmit="return handleOrderSubmit(event)">
+                {% csrf_token %}
                 <button type="submit" class="order-btn">
                     <i class="fas fa-shopping-cart"></i>
                     Sifarişi Təsdiqlə
                 </button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
     {% else %}
     <div class="empty-cart">

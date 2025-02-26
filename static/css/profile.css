@@ -381,24 +381,26 @@ body {
 .form-control {
     width: 100%;
     padding: 1rem 1.2rem;
-    font-size: 1.1rem;
-    color: var(--text-primary);
+    font-size: 1.2rem;
+    color: var(--accent-color);
     background: rgba(10, 25, 47, 0.7);
     border: 2px solid var(--border-color);
     border-radius: 10px;
     transition: var(--transition);
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    font-weight: 500;
-    letter-spacing: 0.3px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
     resize: none;
     height: auto;
     line-height: 1.5;
+    text-shadow: 0 0 1px rgba(100, 255, 218, 0.3);
 }
 
 .form-control:hover {
     border-color: var(--accent-color);
     background: rgba(10, 25, 47, 0.8);
+    color: #7dffe1;
 }
 
 .form-control:focus {
@@ -407,13 +409,15 @@ body {
     box-shadow: 0 0 0 3px rgba(100, 255, 218, 0.2),
                 inset 0 2px 4px rgba(0, 0, 0, 0.1);
     background: rgba(10, 25, 47, 0.9);
+    color: #7dffe1;
 }
 
 .form-control::placeholder {
     color: var(--text-secondary);
     opacity: 0.7;
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 400;
+    letter-spacing: normal;
 }
 
 /* Text area specific styles */
@@ -425,7 +429,7 @@ textarea.form-control {
 
 /* Input specific styles */
 input.form-control {
-    height: 50px;
+    height: 55px;
 }
 
 /* Select specific styles */
@@ -453,11 +457,25 @@ select.form-control {
 /* Form group hover effect on form-control */
 .form-group:hover .form-control {
     border-color: rgba(100, 255, 218, 0.3);
+    transform: translateY(-1px);
 }
 
 /* Form group focus effect on form-control */
 .form-group:focus-within .form-control {
     border-color: var(--accent-color);
+    transform: translateY(-1px);
+}
+
+/* Form label when input has value */
+.form-control:not(:placeholder-shown) + .form-label {
+    color: var(--accent-color);
+    font-weight: 700;
+}
+
+/* Add a subtle glow effect to inputs with values */
+.form-control:not(:placeholder-shown) {
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1),
+                0 0 8px rgba(100, 255, 218, 0.1);
 }
 
 /* Buttons */

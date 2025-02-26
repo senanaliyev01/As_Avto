@@ -800,95 +800,189 @@
     `;
     document.head.appendChild(cartStyles);
 
-    // Real-time search functionality
+    // Axtarış funksiyaları
+    const azToEnMapping = {
+        'ə': 'e', 'Ə': 'E',
+        'ı': 'i', 'İ': 'I',
+        'ö': 'o', 'Ö': 'O',
+        'ü': 'u', 'Ü': 'U',
+        'ş': 's', 'Ş': 'S',
+        'ç': 'c', 'Ç': 'C',
+        'ğ': 'g', 'Ğ': 'G'
+    };
+
+    // Mətnin normallaşdırılması funksiyası
+    function normalizeSearchText(text) {
+        if (!text) return { normalized: "", combinations: [] };
+
+        // Mətni kiçik hərflərə çevir
+        text = text.toLowerCase();
+
+        // Azərbaycan hərflərini ingilis hərflərinə çevir
+        for (let [az, en] of Object.entries(azToEnMapping)) {
+            text = text.replace(new RegExp(az, 'g'), en);
+        }
+
+        // Xüsusi simvolları təmizlə
+        const normalized = text.replace(/[^a-zA-Z0-9\s]/g, '')
+                             .replace(/\s+/g, ' ')
+                             .trim();
+
+        // Sözləri ayır və kombinasiyaları yarat
+        const words = normalized.split(' ');
+        const combinations = new Set();
+
+        // Birləşmiş variant
+        combinations.add(words.join(''));
+
+        // Sözlərin bütün mümkün kombinasiyaları
+        if (words.length > 1) {
+            const permutations = getPermutations(words);
+            for (let perm of permutations) {
+                combinations.add(perm.join(''));
+                combinations.add(perm.join(' '));
+            }
+        }
+
+        return {
+            normalized,
+            combinations: Array.from(combinations)
+        };
+    }
+
+    // Permutasiya funksiyası
+    function getPermutations(arr) {
+        if (arr.length <= 1) return [arr];
+        
+        const result = [];
+        for (let i = 0; i < arr.length; i++) {
+            const current = arr[i];
+            const remaining = [...arr.slice(0, i), ...arr.slice(i + 1)];
+            const remainingPerms = getPermutations(remaining);
+            
+            for (let perm of remainingPerms) {
+                result.push([current, ...perm]);
+            }
+        }
+        return result;
+    }
+
+    // Real-time axtarış funksiyası
+    async function performRealTimeSearch(query, category = '', brand = '', model = '') {
+        try {
+            const { normalized, combinations } = normalizeSearchText(query);
+            
+            if (!normalized && !category && !brand && !model) {
+                return { success: false, results: [] };
+            }
+
+            const params = new URLSearchParams({
+                q: query,
+                category: category || '',
+                brand: brand || '',
+                model: model || ''
+            });
+
+            const response = await fetch(`/realtime-search/?${params}`);
+            const data = await response.json();
+
+            if (data.results) {
+                // Nəticələri normallaşdırılmış axtarışa görə filter et
+                return {
+                    success: true,
+                    results: data.results.filter(result => {
+                        const normalizedName = normalizeSearchText(result.adi).normalized;
+                        const normalizedDesc = result.haqqinda ? normalizeSearchText(result.haqqinda).normalized : '';
+                        const normalizedBrendKod = normalizeSearchText(result.brend_kod).normalized;
+                        const normalizedOem = normalizeSearchText(result.oem).normalized;
+
+                        return combinations.some(combo => 
+                            normalizedName.includes(combo) ||
+                            normalizedDesc.includes(combo) ||
+                            normalizedBrendKod.includes(combo) ||
+                            normalizedOem.includes(combo)
+                        );
+                    })
+                };
+            }
+
+            return { success: false, results: [] };
+        } catch (error) {
+            console.error('Axtarış xətası:', error);
+            return { success: false, results: [] };
+        }
+    }
+
+    // Axtarış nəticələrini göstərmək üçün funksiya
+    function displaySearchResults(results, container) {
+        if (!container) return;
+
+        container.innerHTML = results.length ? results.map(result => `
+            <div class="search-result-item" onclick="window.location.href='/product-detail/${encodeURIComponent(result.adi)}-${encodeURIComponent(result.oem)}-${encodeURIComponent(result.brend_kod)}/${result.id}/'">
+                ${result.sekil_url ? `<img src="${result.sekil_url}" alt="${result.adi}">` : ''}
+                <div class="search-result-info">
+                    <h4>${result.adi}</h4>
+                    <p>Brend: ${result.brend} | OEM: ${result.oem}</p>
+                    <p>Marka: ${result.marka} | Brend Kod: ${result.brend_kod}</p>
+                </div>
+                <div class="search-result-price">
+                    <div class="stock-status ${result.stok === 0 ? 'out-of-stock' : result.stok <= 20 ? 'low-stock' : 'in-stock'}">
+                        ${result.stok === 0 ? 'Yoxdur' : result.stok <= 20 ? 'Az var' : 'Var'}
+                    </div>
+                    ${result.qiymet} AZN
+                </div>
+            </div>
+        `).join('') : '<div class="search-result-item">Heç bir nəticə tapılmadı</div>';
+    }
+
+    // Axtarış inputunu dinləmək üçün event listener
     document.addEventListener('DOMContentLoaded', function() {
         const searchForm = document.getElementById('search-form');
-        const searchInput = searchForm.querySelector('input[name="search_text"]');
+        const searchInput = searchForm?.querySelector('input[name="search_text"]');
         const categorySelect = document.getElementById('category');
         const brandSelect = document.getElementById('brand');
         const modelSelect = document.getElementById('model');
-        
-        // Create dropdown container
-        const dropdownContainer = document.createElement('div');
-        dropdownContainer.className = 'search-results-dropdown';
-        searchForm.appendChild(dropdownContainer);
-        
-        let searchTimeout;
-        
-        // Function to perform search
-        async function performSearch() {
-            const query = searchInput.value.trim();
-            const category = categorySelect.value;
-            const brand = brandSelect.value;
-            const model = modelSelect.value;
-            
-            if (query.length < 2 && !category && !brand && !model) {
-                dropdownContainer.classList.remove('active');
-                return;
-            }
-            
-            try {
-                const response = await fetch(`/realtime-search/?q=${encodeURIComponent(query)}&category=${encodeURIComponent(category)}&brand=${encodeURIComponent(brand)}&model=${encodeURIComponent(model)}`);
-                const data = await response.json();
+        const resultsContainer = document.querySelector('.search-results-dropdown');
+
+        if (searchForm && searchInput && resultsContainer) {
+            let searchTimeout;
+
+            const handleSearch = async () => {
+                const query = searchInput.value.trim();
+                const category = categorySelect?.value || '';
+                const brand = brandSelect?.value || '';
+                const model = modelSelect?.value || '';
+
+                const { success, results } = await performRealTimeSearch(query, category, brand, model);
                 
-                if (data.results.length > 0) {
-                    dropdownContainer.innerHTML = data.results.map(result => {
-                        const highlightTerm = (text, term) => {
-                            const regex = new RegExp(`(${term})`, 'gi');
-                            return text.replace(regex, '<span class="highlight">$1</span>');
-                        };
-                        return `
-                            <div class="search-result-item" onclick="window.location.href='/product-detail/${encodeURIComponent(result.adi)}-${encodeURIComponent(result.oem)}-${encodeURIComponent(result.brend_kod)}/${result.id}/'">
-                                ${result.sekil_url ? `<img src="${result.sekil_url}" alt="${result.adi}">` : ''}
-                                <div class="search-result-info">
-                                    <h4>${highlightTerm(result.adi, query)}</h4>
-                                    <p>Brend: ${highlightTerm(result.brend, query)} | OEM: ${highlightTerm(result.oem, query)}</p>
-                                    <p>Marka: ${highlightTerm(result.marka, query)} | Brend Kod: ${highlightTerm(result.brend_kod, query)}</p>
-                                </div>
-                                <div class="search-result-price">
-                                    <div class="stock-status ${result.stok === 0 ? 'out-of-stock' : result.stok <= 20 ? 'low-stock' : 'in-stock'}">
-                                        ${result.stok === 0 ? 'Yoxdur' : result.stok <= 20 ? 'Az var' : 'Var'}
-                                    </div>
-                                    ${result.qiymet} AZN
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-                    dropdownContainer.classList.add('active');
+                if (success) {
+                    resultsContainer.classList.add('active');
+                    displaySearchResults(results, resultsContainer);
                 } else {
-                    dropdownContainer.innerHTML = '<div class="search-result-item">Heç bir nəticə tapılmadı</div>';
-                    dropdownContainer.classList.add('active');
+                    resultsContainer.classList.remove('active');
                 }
-            } catch (error) {
-                console.error('Axtarış xətası:', error);
-            }
+            };
+
+            // Debounce axtarışı
+            searchInput.addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(handleSearch, 300);
+            });
+
+            // Select elementlərinin dəyişməsini dinlə
+            [categorySelect, brandSelect, modelSelect].forEach(select => {
+                if (select) {
+                    select.addEventListener('change', handleSearch);
+                }
+            });
+
+            // Kənar kliklərini dinlə
+            document.addEventListener('click', (e) => {
+                if (!searchForm.contains(e.target)) {
+                    resultsContainer.classList.remove('active');
+                }
+            });
         }
-        
-        // Input event listener with debounce
-        searchInput.addEventListener('input', () => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(performSearch, 300);
-        });
-        
-        // Select elements change listener
-        [categorySelect, brandSelect, modelSelect].forEach(select => {
-            select.addEventListener('change', performSearch);
-        });
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!searchForm.contains(e.target)) {
-                dropdownContainer.classList.remove('active');
-            }
-        });
-        
-        // Form submit handler
-        searchForm.addEventListener('submit', (e) => {
-            if (dropdownContainer.classList.contains('active')) {
-                e.preventDefault();
-                dropdownContainer.classList.remove('active');
-            }
-        });
     });
 
     function highlightSearchTerm(text, searchTerm) {

@@ -55,61 +55,55 @@
             <form method="POST" class="profile-form">
                 {% csrf_token %}
                 <div class="form-grid">
-                    {% for field in user_form %}
-                        <div class="form-group">
-                            <div class="input-wrapper">
-                                {{ field }}
-                                <label class="form-label">
-                                    {% if field.name == 'username' %}
-                                        <i class="fas fa-user"></i>
-                                    {% elif field.name == 'email' %}
-                                        <i class="fas fa-envelope"></i>
-                                    {% else %}
-                                        <i class="fas fa-info"></i>
-                                    {% endif %}
-                                    {{ field.label }}
-                                </label>
-                                <div class="input-focus-effect"></div>
-                            </div>
-                            {% if field.errors %}
-                                <div class="error-message">
-                                    <i class="fas fa-exclamation-circle"></i>
-                                    {{ field.errors|join:", " }}
-                                </div>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                    
-                    {% for field in profile_form %}
-                        {% if field.name != 'sekil' %}
-                            <div class="form-group">
-                                <div class="input-wrapper">
-                                    {{ field }}
-                                    <label class="form-label">
-                                        {% if field.name == 'telefon' %}
-                                            <i class="fas fa-phone"></i>
-                                        {% elif field.name == 'unvan' %}
-                                            <i class="fas fa-map-marker-alt"></i>
-                                        {% elif field.name == 'ad' %}
-                                            <i class="fas fa-user"></i>
-                                        {% elif field.name == 'soyad' %}
-                                            <i class="fas fa-user"></i>
-                                        {% else %}
-                                            <i class="fas fa-info"></i>
-                                        {% endif %}
-                                        {{ field.label }}
-                                    </label>
-                                    <div class="input-focus-effect"></div>
-                                </div>
-                                {% if field.errors %}
-                                    <div class="error-message">
-                                        <i class="fas fa-exclamation-circle"></i>
-                                        {{ field.errors|join:", " }}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                    {% endfor %}
+                    <!-- İstifadəçi Məlumatları -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-user"></i>
+                            İstifadəçi Adı
+                        </label>
+                        <input type="text" name="username" class="form-control" value="{{ user.username }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-envelope"></i>
+                            Email
+                        </label>
+                        <input type="email" name="email" class="form-control" value="{{ user.email }}" required>
+                    </div>
+
+                    <!-- Şəxsi Məlumatlar -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-user"></i>
+                            Ad
+                        </label>
+                        <input type="text" name="ad" class="form-control" value="{{ user.profile.ad }}" placeholder="Adınızı daxil edin">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-user"></i>
+                            Soyad
+                        </label>
+                        <input type="text" name="soyad" class="form-control" value="{{ user.profile.soyad }}" placeholder="Soyadınızı daxil edin">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-phone"></i>
+                            Telefon
+                        </label>
+                        <input type="tel" name="telefon" class="form-control" value="{{ user.profile.telefon }}" placeholder="Telefon nömrənizi daxil edin">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Ünvan
+                        </label>
+                        <textarea name="unvan" class="form-control" placeholder="Ünvanınızı daxil edin">{{ user.profile.unvan }}</textarea>
+                    </div>
                 </div>
                 
                 <div class="form-actions">

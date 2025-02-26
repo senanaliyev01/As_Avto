@@ -898,23 +898,24 @@
 
     // Profile Dropdown functionality
     document.addEventListener('DOMContentLoaded', function() {
-        const profileToggle = document.querySelector('.profile-toggle');
         const profileDropdown = document.querySelector('.profile-dropdown');
+        const profileToggle = document.querySelector('.profile-toggle');
 
         if (profileToggle && profileDropdown) {
             profileToggle.addEventListener('click', function(e) {
                 e.preventDefault();
                 profileDropdown.classList.toggle('active');
+                e.stopPropagation();
             });
 
-            // Dropdown xaricində click olduqda bağlanma
+            // Dropdown xaricində bir yerə kliklədikdə bağlanması
             document.addEventListener('click', function(e) {
                 if (!profileDropdown.contains(e.target)) {
                     profileDropdown.classList.remove('active');
                 }
             });
 
-            // ESC düyməsi ilə bağlanma
+            // ESC düyməsi ilə bağlanması
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     profileDropdown.classList.remove('active');

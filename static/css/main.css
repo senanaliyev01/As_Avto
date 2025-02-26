@@ -13,11 +13,10 @@
     --error-color: #d32f2f;
 }
 
-
 * {
     margin: 0;
     padding: 0;
-    
+    box-sizing: border-box;
 }
 
 

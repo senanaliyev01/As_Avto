@@ -52,17 +52,18 @@ def sebet_ekle(request, mehsul_id):
 
     try:
         mehsul = get_object_or_404(Mehsul, id=mehsul_id)
-        quantity = 1
-
-        # JSON data-nı parse edirik
+        
         try:
             if request.content_type == 'application/json':
                 data = json.loads(request.body.decode('utf-8'))
                 quantity = int(data.get('quantity', 1))
             else:
-                quantity = int(request.POST.get('quantity', request.GET.get('quantity', 1)))
+                quantity = int(request.POST.get('quantity', 1))
         except (ValueError, TypeError, json.JSONDecodeError):
-            quantity = 1
+            return JsonResponse({
+                'success': False,
+                'error': 'Düzgün miqdar daxil edilməyib'
+            }, status=400)
 
         if quantity < 1:
             return JsonResponse({
@@ -70,16 +71,15 @@ def sebet_ekle(request, mehsul_id):
                 'error': 'Miqdar 1-dən az ola bilməz'
             }, status=400)
 
-        sebet, created = Sebet.objects.get_or_create(user=request.user, mehsul=mehsul)
+        sebet, created = Sebet.objects.get_or_create(
+            user=request.user,
+            mehsul=mehsul,
+            defaults={'miqdar': 0}
+        )
         
-        if created:
-            sebet.miqdar = quantity
-        else:
-            sebet.miqdar += quantity
-        
+        sebet.miqdar = sebet.miqdar + quantity if not created else quantity
         sebet.save()
 
-        # Səbətə əlavə etmə uğurlu olduqda
         return JsonResponse({
             'success': True,
             'mehsul': {
@@ -87,7 +87,7 @@ def sebet_ekle(request, mehsul_id):
                 'sekil': mehsul.sekil.url if mehsul.sekil else None,
                 'oem': mehsul.oem,
             }
-        }, status=200)
+        })
 
     except Mehsul.DoesNotExist:
         return JsonResponse({
@@ -95,10 +95,11 @@ def sebet_ekle(request, mehsul_id):
             'error': 'Məhsul tapılmadı'
         }, status=404)
     except Exception as e:
+        print(f"Xəta baş verdi: {str(e)}")  # Server loglarına xətanı yaz
         return JsonResponse({
             'success': False,
-            'error': str(e)
-        }, status=400)
+            'error': 'Sistemdə xəta baş verdi'
+        }, status=500)
 
 @login_required
 def view_cart(request):

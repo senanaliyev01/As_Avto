@@ -367,47 +367,35 @@
 
                     // 2 saniyə loading göstər
                     setTimeout(() => {
-                        fetch(url, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': getCookie('csrftoken')
-                            },
-                            body: JSON.stringify({ quantity: 1 }) // Miqdarı JSON formatında göndərin
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            // Original ikonu bərpa et
-                            this.innerHTML = originalContent;
-                            this.style.pointerEvents = 'auto';
-                            this.style.opacity = '1';
+                        fetch(url)
+                            .then(response => response.json())
+                            .then(data => {
+                                // Original ikonu bərpa et
+                                this.innerHTML = originalContent;
+                                this.style.pointerEvents = 'auto';
+                                this.style.opacity = '1';
 
-                            if (data.success) {
-                                showAnimatedMessage(
-                                    "Məhsul səbətə əlavə olundu!", 
-                                    false, 
-                                    data.mehsul
-                                );
-                                updateCartCount();
-                            } else {
-                                showAnimatedMessage(
-                                    data.error || "Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.", 
-                                    true
-                                );
-                            }
-                        })
-                        .catch(error => {
-                            console.error("Xəta:", error);
-                            this.innerHTML = originalContent;
-                            this.style.pointerEvents = 'auto';
-                            this.style.opacity = '1';
-                            showAnimatedMessage("Serverdə xəta baş verdi.", true);
-                        });
+                                if (data.success) {
+                                    showAnimatedMessage(
+                                        "Məhsul səbətə əlavə olundu!", 
+                                        false, 
+                                        data.mehsul
+                                    );
+                                    updateCartCount();
+                                } else {
+                                    showAnimatedMessage(
+                                        data.error || "Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.", 
+                                        true
+                                    );
+                                }
+                            })
+                            .catch(error => {
+                                console.error("Xəta:", error);
+                                this.innerHTML = originalContent;
+                                this.style.pointerEvents = 'auto';
+                                this.style.opacity = '1';
+                                showAnimatedMessage("Serverdə xəta baş verdi.", true);
+                            });
                     }, 2000);
                 });
             });

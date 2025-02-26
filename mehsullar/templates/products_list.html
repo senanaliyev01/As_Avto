@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block content %}
-
+{% csrf_token %}
 
 <!-- Axtarış Nəticələriii -->
 <div class="search-results">
@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const quantity = parseInt(quantityInput.value);
 
             if (quantity < 1) {
-                alert('Miqdar 1-dən az ola bilməz!');
+                showAnimatedMessage('Miqdar 1-dən az ola bilməz!', true);
                 return;
             }
 
@@ -143,18 +143,15 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Uğurlu əlavə edilmə
-                    showAnimatedMessage('Məhsul səbətə əlavə edildi!', false);
-                    // Səbət sayğacını yeniləmək
+                    showAnimatedMessage(data.message || 'Məhsul səbətə əlavə edildi!', false);
                     updateCartCount();
                 } else {
-                    // Xəta baş verdi
                     showAnimatedMessage(data.message || 'Xəta baş verdi!', true);
                 }
             })
             .catch(error => {
                 console.error('Xəta:', error);
-                showAnimatedMessage('Xəta baş verdi!', true);
+                showAnimatedMessage('Serverdə xəta baş verdi!', true);
             });
         });
     });

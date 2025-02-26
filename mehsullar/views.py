@@ -43,50 +43,60 @@ def about(request):
 
 @login_required
 def sebet_ekle(request, mehsul_id):
-    mehsul = get_object_or_404(Mehsul, id=mehsul_id)
-    
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            miqdar = int(data.get('quantity', 1))
-        except:
-            miqdar = 1
+    try:
+        mehsul = get_object_or_404(Mehsul, id=mehsul_id)
+        
+        if request.method == 'POST':
+            try:
+                data = json.loads(request.body)
+                miqdar = int(data.get('quantity', 1))
+            except (json.JSONDecodeError, ValueError):
+                miqdar = 1
 
-        if miqdar < 1:
-            return JsonResponse({
-                'success': False,
-                'message': 'Miqdar 1-dən az ola bilməz!'
-            })
-
-        if miqdar > mehsul.stok:
-            return JsonResponse({
-                'success': False,
-                'message': f'Stokda yalnız {mehsul.stok} ədəd məhsul var!'
-            })
-
-        # Səbətdə eyni məhsuldan varsa, miqdarını artır
-        sebet_item = Sebet.objects.filter(user=request.user, mehsul=mehsul).first()
-        if sebet_item:
-            yeni_miqdar = sebet_item.miqdar + miqdar
-            if yeni_miqdar > mehsul.stok:
+            if miqdar < 1:
                 return JsonResponse({
                     'success': False,
-                    'message': f'Səbətdə bu məhsuldan {sebet_item.miqdar} ədəd var. Stok limitini keçə bilməzsiniz!'
+                    'message': 'Miqdar 1-dən az ola bilməz!'
                 })
-            sebet_item.miqdar = yeni_miqdar
-            sebet_item.save()
-        else:
-            Sebet.objects.create(user=request.user, mehsul=mehsul, miqdar=miqdar)
+
+            if miqdar > mehsul.stok:
+                return JsonResponse({
+                    'success': False,
+                    'message': f'Stokda yalnız {mehsul.stok} ədəd məhsul var!'
+                })
+
+            # Səbətdə eyni məhsuldan varsa, miqdarını artır
+            sebet_item = Sebet.objects.filter(user=request.user, mehsul=mehsul).first()
+            if sebet_item:
+                yeni_miqdar = sebet_item.miqdar + miqdar
+                if yeni_miqdar > mehsul.stok:
+                    return JsonResponse({
+                        'success': False,
+                        'message': f'Səbətdə bu məhsuldan {sebet_item.miqdar} ədəd var. Stok limitini keçə bilməzsiniz!'
+                    })
+                sebet_item.miqdar = yeni_miqdar
+                sebet_item.save()
+                message = 'Məhsulun miqdarı yeniləndi!'
+            else:
+                Sebet.objects.create(user=request.user, mehsul=mehsul, miqdar=miqdar)
+                message = 'Məhsul səbətə əlavə edildi!'
+
+            return JsonResponse({
+                'success': True,
+                'message': message
+            })
 
         return JsonResponse({
-            'success': True,
-            'message': 'Məhsul səbətə əlavə edildi!'
+            'success': False,
+            'message': 'Yanlış sorğu metodu!'
         })
 
-    return JsonResponse({
-        'success': False,
-        'message': 'Yanlış sorğu metodu!'
-    })
+    except Exception as e:
+        print(f"Xəta baş verdi: {str(e)}")  # Server loglarında xətanı görmək üçün
+        return JsonResponse({
+            'success': False,
+            'message': 'Serverdə xəta baş verdi!'
+        }, status=500)
 
 @login_required
 def view_cart(request):

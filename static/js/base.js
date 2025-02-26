@@ -942,17 +942,10 @@
             return;
         }
 
-        // Loading effektini göstər
-        const cartIcon = element.querySelector('i');
-        const originalIcon = cartIcon.className;
-        cartIcon.className = 'fas fa-spinner fa-spin';
-        element.style.pointerEvents = 'none';
-
         fetch(`/sebet/ekle/${productId}/`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 quantity: quantity
@@ -969,12 +962,7 @@
         })
         .catch(error => {
             console.error('Error:', error);
-            showAnimatedMessage('Xəta baş verdi', true);
-        })
-        .finally(() => {
-            // Loading effektini söndür və original ikonu qaytar
-            cartIcon.className = originalIcon;
-            element.style.pointerEvents = 'auto';
+            showAnimatedMessage('Serverdə xəta baş verdi', true);
         });
     }
 

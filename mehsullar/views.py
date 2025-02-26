@@ -42,15 +42,30 @@ def about(request):
 
 
 @login_required
-def sebet_ekle(request, mehsul_id):
+def sebet_ekle(request, mehsul_id, quantity=1):
     try:
         mehsul = get_object_or_404(Mehsul, id=mehsul_id)
+        
+        # Stok yoxlaması
+        if mehsul.stok < quantity:
+            return JsonResponse({
+                'success': False,
+                'message': f'Kifayət qədər stok yoxdur. Mövcud stok: {mehsul.stok}'
+            }, status=400)
+            
         sebet, created = Sebet.objects.get_or_create(user=request.user, mehsul=mehsul)
-        if not created:
-            sebet.miqdar += 1
-            sebet.save()
+        
+        if created:
+            sebet.miqdar = quantity
+        else:
+            sebet.miqdar += quantity
+            
+        # Yenə stok yoxlaması
+        if sebet.miqdar > mehsul.stok:
+            sebet.miqdar = mehsul.stok
+            
+        sebet.save()
 
-        # Məhsul məlumatlarını JSON formatında qaytarırıq
         return JsonResponse({
             'success': True,
             'mehsul': {
@@ -62,7 +77,7 @@ def sebet_ekle(request, mehsul_id):
     except Exception as e:
         return JsonResponse({
             'success': False,
-            'error': str(e)
+            'message': str(e)
         }, status=400)
 
 @login_required

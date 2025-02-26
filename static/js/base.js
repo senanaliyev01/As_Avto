@@ -896,13 +896,12 @@
         return text.replace(regex, '<span class="highlight">$1</span>');
     }
 
-    // Dropdown menu functionality
+    // Profile Dropdown functionality
     document.addEventListener('DOMContentLoaded', function() {
         const profileDropdown = document.querySelector('.profile-dropdown');
         const profileToggle = document.querySelector('.profile-toggle');
 
         if (profileToggle && profileDropdown) {
-            // Toggle dropdown on click
             profileToggle.addEventListener('click', function(e) {
                 e.preventDefault();
                 profileDropdown.classList.toggle('active');
@@ -915,7 +914,7 @@
                 }
             });
 
-            // Close dropdown on ESC key press
+            // Close dropdown when pressing Escape key
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     profileDropdown.classList.remove('active');

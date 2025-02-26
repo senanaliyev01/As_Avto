@@ -1,4 +1,30 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Dropdown menyu funksionallığı
+    const profileToggle = document.querySelector('.profile-toggle');
+    const profileDropdown = document.querySelector('.profile-dropdown');
+
+    if (profileToggle && profileDropdown) {
+        profileToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            profileDropdown.classList.toggle('active');
+        });
+
+        // Səhifənin başqa yerinə kliklədikdə dropdown-ı bağla
+        document.addEventListener('click', function(e) {
+            if (!profileDropdown.contains(e.target)) {
+                profileDropdown.classList.remove('active');
+            }
+        });
+
+        // ESC düyməsinə basıldıqda dropdown-ı bağla
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                profileDropdown.classList.remove('active');
+            }
+        });
+    }
+
+    // Mövcud profil şəkli funksionallığı
     const imageInput = document.getElementById('imageInput');
     const profileImage = document.getElementById('profileImage');
     const imageContainer = document.querySelector('.profile-image-container');

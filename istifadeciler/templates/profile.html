@@ -57,17 +57,20 @@
                 <div class="form-grid">
                     {% for field in user_form %}
                         <div class="form-group">
-                            <label class="form-label">
-                                {% if field.name == 'username' %}
-                                    <i class="fas fa-user"></i>
-                                {% elif field.name == 'email' %}
-                                    <i class="fas fa-envelope"></i>
-                                {% else %}
-                                    <i class="fas fa-info"></i>
-                                {% endif %}
-                                {{ field.label }}
-                            </label>
-                            {{ field }}
+                            <div class="input-wrapper">
+                                {{ field }}
+                                <label class="form-label">
+                                    {% if field.name == 'username' %}
+                                        <i class="fas fa-user"></i>
+                                    {% elif field.name == 'email' %}
+                                        <i class="fas fa-envelope"></i>
+                                    {% else %}
+                                        <i class="fas fa-info"></i>
+                                    {% endif %}
+                                    {{ field.label }}
+                                </label>
+                                <div class="input-focus-effect"></div>
+                            </div>
                             {% if field.errors %}
                                 <div class="error-message">
                                     <i class="fas fa-exclamation-circle"></i>
@@ -80,21 +83,24 @@
                     {% for field in profile_form %}
                         {% if field.name != 'sekil' %}
                             <div class="form-group">
-                                <label class="form-label">
-                                    {% if field.name == 'telefon' %}
-                                        <i class="fas fa-phone"></i>
-                                    {% elif field.name == 'unvan' %}
-                                        <i class="fas fa-map-marker-alt"></i>
-                                    {% elif field.name == 'ad' %}
-                                        <i class="fas fa-user"></i>
-                                    {% elif field.name == 'soyad' %}
-                                        <i class="fas fa-user"></i>
-                                    {% else %}
-                                        <i class="fas fa-info"></i>
-                                    {% endif %}
-                                    {{ field.label }}
-                                </label>
-                                {{ field }}
+                                <div class="input-wrapper">
+                                    {{ field }}
+                                    <label class="form-label">
+                                        {% if field.name == 'telefon' %}
+                                            <i class="fas fa-phone"></i>
+                                        {% elif field.name == 'unvan' %}
+                                            <i class="fas fa-map-marker-alt"></i>
+                                        {% elif field.name == 'ad' %}
+                                            <i class="fas fa-user"></i>
+                                        {% elif field.name == 'soyad' %}
+                                            <i class="fas fa-user"></i>
+                                        {% else %}
+                                            <i class="fas fa-info"></i>
+                                        {% endif %}
+                                        {{ field.label }}
+                                    </label>
+                                    <div class="input-focus-effect"></div>
+                                </div>
                                 {% if field.errors %}
                                     <div class="error-message">
                                         <i class="fas fa-exclamation-circle"></i>
@@ -116,7 +122,6 @@
         </div>
     </div>
 </div>
-
 
 {% endblock %}
 

@@ -933,49 +933,4 @@
         }
     });
 
-    function addToCartWithQuantity(productId, element) {
-        const quantityInput = element.closest('tr').querySelector('.quantity-input');
-        const quantity = parseInt(quantityInput.value);
-        
-        if (isNaN(quantity) || quantity < 1) {
-            showAnimatedMessage('Xahiş edirik düzgün miqdar daxil edin', true);
-            return;
-        }
-
-        // Loading effektini göstər
-        const cartIcon = element.querySelector('i');
-        const originalIcon = cartIcon.className;
-        cartIcon.className = 'fas fa-spinner fa-spin';
-        element.style.pointerEvents = 'none';
-
-        fetch(`/sebet/ekle/${productId}/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: JSON.stringify({
-                quantity: quantity
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showAnimatedMessage('Məhsul səbətə əlavə edildi', false, data.mehsul);
-                updateCartCount();
-            } else {
-                showAnimatedMessage(data.error || 'Xəta baş verdi', true);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showAnimatedMessage('Xəta baş verdi', true);
-        })
-        .finally(() => {
-            // Loading effektini söndür və original ikonu qaytar
-            cartIcon.className = originalIcon;
-            element.style.pointerEvents = 'auto';
-        });
-    }
-
 

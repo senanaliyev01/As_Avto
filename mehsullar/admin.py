@@ -166,9 +166,15 @@ class SifarisMehsulAdmin(admin.ModelAdmin):
 
 # Məhsul admin paneli
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'oem', 'stok')
-    search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem')
+    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'oem', 'stok', 'get_yenidir_status')
+    search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'yenidir')
+    list_filter = ('yenidir', 'kateqoriya', 'brend', 'marka')
     inlines = [OEMKodInline]
+
+    def get_yenidir_status(self, obj):
+        return '✓' if obj.yenidir else '✗'
+    get_yenidir_status.short_description = 'Yenidir'
+    get_yenidir_status.boolean = True
 
 # Qeydiyyatları düzəltdik
 admin.site.register(SifarisMehsul, SifarisMehsulAdmin)

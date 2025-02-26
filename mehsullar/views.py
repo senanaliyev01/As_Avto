@@ -44,20 +44,25 @@ def about(request):
 @login_required
 @csrf_exempt
 def sebet_ekle(request, mehsul_id):
+    if request.method != 'POST':
+        return JsonResponse({
+            'success': False,
+            'error': 'Yalnız POST sorğuları qəbul edilir'
+        }, status=405)
+
     try:
         mehsul = get_object_or_404(Mehsul, id=mehsul_id)
         quantity = 1
 
         # JSON data-nı parse edirik
-        if request.method == 'POST':
-            try:
-                if request.content_type == 'application/json':
-                    data = json.loads(request.body.decode('utf-8'))
-                    quantity = int(data.get('quantity', 1))
-                else:
-                    quantity = int(request.POST.get('quantity', request.GET.get('quantity', 1)))
-            except (ValueError, TypeError, json.JSONDecodeError):
-                quantity = 1
+        try:
+            if request.content_type == 'application/json':
+                data = json.loads(request.body.decode('utf-8'))
+                quantity = int(data.get('quantity', 1))
+            else:
+                quantity = int(request.POST.get('quantity', request.GET.get('quantity', 1)))
+        except (ValueError, TypeError, json.JSONDecodeError):
+            quantity = 1
 
         if quantity < 1:
             return JsonResponse({
@@ -74,6 +79,7 @@ def sebet_ekle(request, mehsul_id):
         
         sebet.save()
 
+        # Səbətə əlavə etmə uğurlu olduqda
         return JsonResponse({
             'success': True,
             'mehsul': {
@@ -81,7 +87,13 @@ def sebet_ekle(request, mehsul_id):
                 'sekil': mehsul.sekil.url if mehsul.sekil else None,
                 'oem': mehsul.oem,
             }
-        })
+        }, status=200)
+
+    except Mehsul.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'Məhsul tapılmadı'
+        }, status=404)
     except Exception as e:
         return JsonResponse({
             'success': False,

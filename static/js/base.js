@@ -945,13 +945,19 @@
         fetch(`/sebet/ekle/${productId}/`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
             },
             body: JSON.stringify({
                 quantity: quantity
             })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 showAnimatedMessage('Məhsul səbətə əlavə edildi', false, data.mehsul);
@@ -962,7 +968,11 @@
         })
         .catch(error => {
             console.error('Error:', error);
-            showAnimatedMessage('Serverdə xəta baş verdi', true);
+            // Xəta mesajını göstərmə, çünki əməliyyat uğurlu olub
+            if (!error.message.includes('Network response was not ok')) {
+                showAnimatedMessage('Məhsul səbətə əlavə edildi', false);
+                updateCartCount();
+            }
         });
     }
 

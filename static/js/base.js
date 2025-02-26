@@ -902,25 +902,34 @@
         const profileToggle = document.querySelector('.profile-toggle');
 
         if (profileToggle && profileDropdown) {
+            // Click handler for toggle button
             profileToggle.addEventListener('click', function(e) {
                 e.preventDefault();
-                profileDropdown.classList.toggle('active');
                 e.stopPropagation();
+                profileDropdown.classList.toggle('active');
             });
 
-            // Dropdown xaricində bir yerə kliklədikdə bağlanması
+            // Close dropdown when clicking outside
             document.addEventListener('click', function(e) {
                 if (!profileDropdown.contains(e.target)) {
                     profileDropdown.classList.remove('active');
                 }
             });
 
-            // ESC düyməsi ilə bağlanması
+            // Close dropdown with ESC key
             document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
+                if (e.key === 'Escape' && profileDropdown.classList.contains('active')) {
                     profileDropdown.classList.remove('active');
                 }
             });
+
+            // Prevent dropdown from closing when clicking inside
+            const dropdownMenu = profileDropdown.querySelector('.dropdown-menu');
+            if (dropdownMenu) {
+                dropdownMenu.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
         }
     });
 

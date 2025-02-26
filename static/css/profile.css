@@ -16,13 +16,34 @@
 
 /* Override Bootstrap styles that might conflict with base.css */
 .profile-page .dropdown-menu {
-    display: block !important;
-}
-
-.profile-page .profile-dropdown .dropdown-menu {
     position: absolute !important;
     transform: none !important;
     inset: auto !important;
+    margin: 0 !important;
+    padding: 0.5rem !important;
+    float: none !important;
+    min-width: 220px !important;
+    background: var(--primary-color) !important;
+    border: 1px solid var(--accent-color) !important;
+    border-radius: 8px !important;
+    display: block !important;
+}
+
+.profile-page .profile-dropdown {
+    position: relative !important;
+}
+
+.profile-page .dropdown-menu a {
+    color: var(--text-primary) !important;
+    background: transparent !important;
+    padding: 0.8rem 1rem !important;
+    margin: 0 !important;
+    border-radius: 6px !important;
+}
+
+.profile-page .dropdown-menu a:hover {
+    background: rgba(100, 255, 218, 0.1) !important;
+    color: var(--accent-color) !important;
 }
 
 /* Base Styles */

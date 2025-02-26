@@ -637,25 +637,27 @@ html {
 
 .dropdown-menu {
     position: absolute;
-    top: 100%;
+    top: calc(100% + 5px);
     right: 0;
-    min-width: 200px;
-    background: var(--card-bg);
-    border-radius: 12px;
+    min-width: 220px;
+    background: var(--primary-color);
+    border: 1px solid var(--accent-color);
+    border-radius: 8px;
     padding: 0.5rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     opacity: 0;
     visibility: hidden;
-    transform: translateY(10px);
+    transform: translateY(-10px);
     transition: all 0.3s ease;
     z-index: 9999;
-    border: 1px solid var(--border-color);
+    display: block !important;
 }
 
 .profile-dropdown.active .dropdown-menu {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+    display: block !important;
 }
 
 .dropdown-menu a {
@@ -667,6 +669,7 @@ html {
     text-decoration: none;
     border-radius: 6px;
     transition: all 0.2s ease;
+    background: transparent;
 }
 
 .dropdown-menu a:hover {

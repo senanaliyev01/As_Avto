@@ -47,8 +47,8 @@ def esasevim(request):
     # Təsdiqlənmiş rəylər
     tesdiqli_reyler = MusteriReyi.objects.filter(tesdiq=True)
     
-    # Yeni məhsulları əldə et
-    yeni_mehsullar = Mehsul.objects.filter(yenidir=True)[:5]  # Son 5 yeni məhsul
+    # Yeni məhsulları əldə et (limitsiz)
+    yeni_mehsullar = Mehsul.objects.filter(yenidir=True)
     
     # Ümumi statistika
     rey_statistikasi = MusteriReyi.objects.filter(tesdiq=True).aggregate(
@@ -73,6 +73,7 @@ def esasevim(request):
     }
     
     return render(request, 'main.html', context)
+
 @login_required
 @never_cache
 def get_statistics(request):

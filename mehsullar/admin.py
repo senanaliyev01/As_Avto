@@ -168,7 +168,7 @@ class SifarisMehsulAdmin(admin.ModelAdmin):
 class MehsulAdmin(admin.ModelAdmin):
     list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'oem', 'stok', 'yenidir')
     list_filter = ( 'kateqoriya', 'brend', 'marka')
-    search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem')  # Siyahıda birbaşa düzəliş etmək üçün
+    search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'yenidir')  # Siyahıda birbaşa düzəliş etmək üçün
     inlines = [OEMKodInline]
 
 # Qeydiyyatları düzəltdik

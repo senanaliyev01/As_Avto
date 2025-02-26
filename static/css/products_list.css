@@ -360,45 +360,51 @@ body {
     }
 }
 
-.quantity-cart-cell {
-    padding: 5px !important;
-}
-
-.quantity-cart-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
+/* Quantity Input Styles */
 .quantity-input {
-    width: 60px;
-    padding: 4px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    width: 70px;
+    padding: 8px;
+    border: 2px solid #1a4980;
+    border-radius: 8px;
+    background: rgba(16, 33, 62, 0.3);
+    color: #64ffda;
+    font-size: 1rem;
     text-align: center;
-}
-
-.quantity-input:disabled {
-    background-color: #f5f5f5;
-    cursor: not-allowed;
-}
-
-.cart-icon.add-to-cart-btn {
-    padding: 6px 10px;
-    border-radius: 4px;
-    background-color: #4CAF50;
-    color: white;
     transition: all 0.3s ease;
 }
 
-.cart-icon.add-to-cart-btn:hover {
-    background-color: #45a049;
-    transform: scale(1.05);
+.quantity-input:focus {
+    outline: none;
+    border-color: #64ffda;
+    box-shadow: 0 0 0 2px rgba(100, 255, 218, 0.2);
 }
 
-.cart-icon.add-to-cart-btn[disabled] {
-    background-color: #cccccc;
+.quantity-input:disabled {
+    background: rgba(169, 169, 169, 0.3);
+    border-color: #666;
     cursor: not-allowed;
-    pointer-events: none;
+}
+
+/* Disable spinners for number input */
+.quantity-input::-webkit-inner-spin-button,
+.quantity-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.quantity-input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* Add to Cart Button Disabled State */
+.add-to-cart-btn:disabled {
+    background: linear-gradient(135deg, #666, #444);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.add-to-cart-btn:disabled:hover {
+    transform: none;
+    box-shadow: none;
 }
 

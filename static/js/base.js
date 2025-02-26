@@ -464,59 +464,6 @@
                 });
             }
 
-            // Add to cart with quantity functionality
-            document.querySelectorAll('.add-to-cart-btn').forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const productId = this.dataset.productId;
-                    const quantityInput = this.parentElement.querySelector('.quantity-input');
-                    const quantity = parseInt(quantityInput.value);
-
-                    if (quantity < 1) {
-                        showAnimatedMessage('Zəhmət olmasa düzgün miqdar daxil edin', true);
-                        return;
-                    }
-
-                    fetch(`/sebet/ekle/${productId}/${quantity}/`, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRFToken': getCookie('csrftoken'),
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            showAnimatedMessage('Məhsul səbətə əlavə edildi', false, data.mehsul);
-                            updateCartCount();
-                            // Reset quantity input to 1
-                            quantityInput.value = 1;
-                        } else {
-                            showAnimatedMessage(data.message || 'Xəta baş verdi', true);
-                        }
-                    })
-                    .catch(error => {
-                        showAnimatedMessage('Xəta baş verdi', true);
-                        console.error('Error:', error);
-                    });
-                });
-            });
-
-            // Validate quantity input
-            document.querySelectorAll('.quantity-input').forEach(input => {
-                input.addEventListener('change', function() {
-                    const max = parseInt(this.getAttribute('max'));
-                    const value = parseInt(this.value);
-                    
-                    if (value < 1) {
-                        this.value = 1;
-                    } else if (value > max) {
-                        this.value = max;
-                        showAnimatedMessage(`Maksimum ${max} ədəd sifariş edə bilərsiniz`, true);
-                    }
-                });
-            });
-
         } catch (error) {
             console.error('Funksiya xətası:', error);
         }

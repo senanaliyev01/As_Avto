@@ -960,10 +960,7 @@
                 showAnimatedMessage(data.error || 'Xəta baş verdi', true);
             }
         })
-        .catch(error => {
-            console.error('Error:', error);
-            showAnimatedMessage('Serverdə xəta baş verdi', true);
-        });
+      
     }
 
 

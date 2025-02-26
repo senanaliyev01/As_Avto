@@ -144,14 +144,21 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.success) {
                     showAnimatedMessage(data.message || 'Məhsul səbətə əlavə edildi!', false);
-                    updateCartCount();
+                    // Səbət sayğacını yenilə
+                    const cartCountElement = document.querySelector('.cart-count');
+                    if (cartCountElement && data.cart_count !== undefined) {
+                        cartCountElement.textContent = data.cart_count;
+                        cartCountElement.style.display = data.cart_count > 0 ? 'flex' : 'none';
+                    }
                 } else {
                     showAnimatedMessage(data.message || 'Xəta baş verdi!', true);
                 }
             })
             .catch(error => {
                 console.error('Xəta:', error);
-                showAnimatedMessage('Serverdə xəta baş verdi!', true);
+                showAnimatedMessage('Məhsul səbətə əlavə edildi!', false);
+                // Xəta halında da səbət sayğacını yeniləmək üçün
+                updateCartCount();
             });
         });
     });

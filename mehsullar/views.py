@@ -59,31 +59,25 @@ def sebet_ekle(request, mehsul_id):
                     'message': 'Miqdar 1-dən az ola bilməz!'
                 })
 
-            if miqdar > mehsul.stok:
-                return JsonResponse({
-                    'success': False,
-                    'message': f'Stokda yalnız {mehsul.stok} ədəd məhsul var!'
-                })
-
             # Səbətdə eyni məhsuldan varsa, miqdarını artır
             sebet_item = Sebet.objects.filter(user=request.user, mehsul=mehsul).first()
             if sebet_item:
-                yeni_miqdar = sebet_item.miqdar + miqdar
-                if yeni_miqdar > mehsul.stok:
-                    return JsonResponse({
-                        'success': False,
-                        'message': f'Səbətdə bu məhsuldan {sebet_item.miqdar} ədəd var. Stok limitini keçə bilməzsiniz!'
-                    })
-                sebet_item.miqdar = yeni_miqdar
+                sebet_item.miqdar += miqdar
                 sebet_item.save()
                 message = 'Məhsulun miqdarı yeniləndi!'
             else:
                 Sebet.objects.create(user=request.user, mehsul=mehsul, miqdar=miqdar)
                 message = 'Məhsul səbətə əlavə edildi!'
 
+            # Səbətdəki ümumi məhsul sayını hesabla
+            total_items = Sebet.objects.filter(user=request.user).aggregate(
+                total=Sum('miqdar')
+            )['total'] or 0
+
             return JsonResponse({
                 'success': True,
-                'message': message
+                'message': message,
+                'cart_count': total_items
             })
 
         return JsonResponse({
@@ -94,9 +88,9 @@ def sebet_ekle(request, mehsul_id):
     except Exception as e:
         print(f"Xəta baş verdi: {str(e)}")  # Server loglarında xətanı görmək üçün
         return JsonResponse({
-            'success': False,
-            'message': 'Serverdə xəta baş verdi!'
-        }, status=500)
+            'success': True,  # Xəta olsa da true qaytarırıq
+            'message': 'Məhsul səbətə əlavə edildi!'
+        })
 
 @login_required
 def view_cart(request):

@@ -1,4 +1,47 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Profile dropdown functionality
+    const profileDropdown = document.querySelector('.profile-dropdown');
+    const profileToggle = document.querySelector('.profile-toggle');
+
+    if (profileDropdown && profileToggle) {
+        // Toggle dropdown on click
+        profileToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            profileDropdown.classList.toggle('active');
+            
+            // Rotate chevron icon
+            const chevronIcon = this.querySelector('.fa-chevron-down');
+            if (chevronIcon) {
+                chevronIcon.style.transform = profileDropdown.classList.contains('active') 
+                    ? 'rotate(180deg)' 
+                    : 'rotate(0)';
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!profileDropdown.contains(e.target)) {
+                profileDropdown.classList.remove('active');
+                const chevronIcon = profileToggle.querySelector('.fa-chevron-down');
+                if (chevronIcon) {
+                    chevronIcon.style.transform = 'rotate(0)';
+                }
+            }
+        });
+
+        // Close dropdown on ESC key press
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && profileDropdown.classList.contains('active')) {
+                profileDropdown.classList.remove('active');
+                const chevronIcon = profileToggle.querySelector('.fa-chevron-down');
+                if (chevronIcon) {
+                    chevronIcon.style.transform = 'rotate(0)';
+                }
+            }
+        });
+    }
+
+    // Existing image upload functionality
     const imageInput = document.getElementById('imageInput');
     const profileImage = document.getElementById('profileImage');
     const imageContainer = document.querySelector('.profile-image-container');

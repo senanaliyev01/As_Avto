@@ -90,21 +90,15 @@
                     <i class="fas fa-shopping-cart"></i>
                     <span id="cart-count" class="cart-badge">0</span>
                 </a>
-                <!-- Bildirişlər Dropdown -->
                 <div class="notification-dropdown">
                     <a href="#" class="notification-toggle">
                         <i class="fas fa-bell"></i>
-                        <span class="notification-badge">0</span>
+                        <span id="notification-count" class="notification-badge">0</span>
                     </a>
                     <div class="dropdown-menu">
-                        {% for bildiris in user.bildirisler.all %}
-                            <div class="notification-item">
-                                <h4>{{ bildiris.basliq }}</h4>
-                                <p>{{ bildiris.mesaj }}</p>
-                            </div>
-                        {% empty %}
-                            <p>Heç bir bildiriş yoxdur.</p>
-                        {% endfor %}
+                        <div id="notifications-list">
+                            <!-- Bildirişlər burada göstəriləcək -->
+                        </div>
                     </div>
                 </div>
             </div>

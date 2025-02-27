@@ -205,7 +205,4 @@ class MusteriReyiAdmin(admin.ModelAdmin):
         queryset.update(tesdiq=False)
     tesdiq_legv_et.short_description = "Seçilmiş rəylərin təsdiqini ləğv et"
 
-@admin.register(Bildiris)
-class BildirisAdmin(admin.ModelAdmin):
-    list_display = ['basliq']
-    search_fields = ['basliq', 'mesaj']
+admin.site.register(Bildiris)

@@ -19,4 +19,5 @@ urlpatterns = [
     path('products-look-all/', views.umumibaxis, name='umumi_baxis'),
     path('reports/', views.hesabatlar, name='hesabatlar'),
     path('realtime-search/', views.realtime_search, name='realtime_search'),
+    path('get_notifications/', views.get_notifications, name='get_notifications'),
 ]

@@ -73,6 +73,12 @@ class Mehsul(models.Model):
         kodlar.extend([oem.kod for oem in self.oem_kodlar.all()])
         return kodlar
 
+    def save(self, *args, **kwargs):
+        # Yeni məhsul əlavə edildikdə bildiriş yarat
+        if self.pk is None:  # Yalnız yeni məhsul üçün
+            Bildiris.objects.create(mesaj=f"Yeni məhsul əlavə edildi: {self.adi}")
+        super().save(*args, **kwargs)
+
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     mehsul = models.ForeignKey(Mehsul, on_delete=models.CASCADE)
@@ -208,12 +214,11 @@ class MusteriReyi(models.Model):
 
 
 class Bildiris(models.Model):
-    basliq = models.CharField(max_length=255)
     mesaj = models.TextField()
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bildirisler')
+    yaradilma_tarixi = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.basliq
+        return self.mesaj
 
     class Meta:
         verbose_name = 'Bildiriş'

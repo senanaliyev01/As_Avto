@@ -45,9 +45,6 @@ def rey_elave_et(request):
 
 @login_required
 def esasevim(request):
-    # Hero slider məlumatlarını əldə et
-    hero_slides = HeroSlider.objects.filter(aktiv=True).order_by('sira')
-    
     # Təsdiqlənmiş rəylər
     tesdiqli_reyler = MusteriReyi.objects.filter(tesdiq=True)
     
@@ -69,12 +66,15 @@ def esasevim(request):
             sayi=Count('id')
         ).order_by('qiymetlendirme')
     
+    # Hero slider məlumatlarını əldə et
+    hero_slides = HeroSlider.objects.all()
+    
     context = {
         'hero_slides': hero_slides,
         'reyler': tesdiqli_reyler,
         'rey_statistikasi': rey_statistikasi,
         'ulduz_statistikasi': ulduz_statistikasi,
-        'yeni_mehsullar': yeni_mehsullar  # Context-ə yeni məhsulları əlavə et
+        'yeni_mehsullar': yeni_mehsullar
     }
     
     return render(request, 'main.html', context)

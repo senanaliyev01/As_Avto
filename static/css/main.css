@@ -475,20 +475,21 @@ body {
 
 .hero-content p {
     font-size: 1.2rem;
+    margin-bottom: 2rem;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-/* Responsive */
-@media screen and (max-width: 768px) {
-    .hero-slider {
-        height: 400px;
-    }
+/* Hero Slider Navigation */
+.hero-swiper .swiper-button-next,
+.hero-swiper .swiper-button-prev {
+    color: white;
+}
 
-    .hero-content h1 {
-        font-size: 2rem;
-    }
+.hero-swiper .swiper-pagination-bullet {
+    background: white;
+    opacity: 0.8;
+}
 
-    .hero-content p {
-        font-size: 1rem;
-    }
+.hero-swiper .swiper-pagination-bullet-active {
+    background: var(--accent-color);
 }

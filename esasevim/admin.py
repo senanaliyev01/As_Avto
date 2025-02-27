@@ -3,6 +3,5 @@ from .models import HeroSlider
 
 @admin.register(HeroSlider)
 class HeroSliderAdmin(admin.ModelAdmin):
-    list_display = ('basliq', 'aktiv', 'sira')
-    list_editable = ('aktiv', 'sira')
-    search_fields = ('basliq', 'metn')
+    list_display = ('basliq',)
+    search_fields = ['basliq', 'metn']

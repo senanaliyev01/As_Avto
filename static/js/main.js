@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Hero Slider
     const heroSwiper = new Swiper('.hero-swiper', {
         slidesPerView: 1,
-        spaceBetween: 0,
         loop: true,
         effect: 'fade',
         autoplay: {

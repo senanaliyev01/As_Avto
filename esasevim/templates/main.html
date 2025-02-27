@@ -9,10 +9,9 @@
 {% endblock %}
 
 {% block content %}
-
 <!-- Ana Slider -->
-<section class="main-slider-section">
-    <div class="swiper main-slider">
+<section class="main-slider">
+    <div class="swiper main-swiper">
         <div class="swiper-wrapper">
             {% for item in slider_items %}
             <div class="swiper-slide">
@@ -27,8 +26,6 @@
             {% endfor %}
         </div>
         <div class="swiper-pagination"></div>
-        <div class="swiper-button-next"></div>
-        <div class="swiper-button-prev"></div>
     </div>
 </section>
 

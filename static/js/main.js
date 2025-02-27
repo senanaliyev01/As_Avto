@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Main Slider
-    const mainSlider = new Swiper('.main-slider', {
-        slidesPerView: 1,
+    const mainSwiper = new Swiper('.main-swiper', {
+        effect: 'fade',
+        speed: 1000,
         loop: true,
         autoplay: {
             delay: 5000,
@@ -10,10 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
         pagination: {
             el: '.swiper-pagination',
             clickable: true,
-        },
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
         },
     });
 

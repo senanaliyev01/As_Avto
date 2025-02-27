@@ -6,7 +6,7 @@ from mehsullar.models import Kateqoriya, Brend, Marka, Mehsul, MusteriReyi
 from django.views.decorators.cache import never_cache
 from django.db.models import Count, Avg
 from django.contrib import messages
-from .models import HeroSlider
+from .models import slider
 
 @login_required
 def rey_elave_et(request):
@@ -67,10 +67,10 @@ def esasevim(request):
         ).order_by('qiymetlendirme')
     
     # Hero slider məlumatlarını əldə et
-    hero_slides = HeroSlider.objects.all()
+    slides = slider.objects.all()
     
     context = {
-        'hero_slides': hero_slides,
+        'slides': slides,
         'reyler': tesdiqli_reyler,
         'rey_statistikasi': rey_statistikasi,
         'ulduz_statistikasi': ulduz_statistikasi,

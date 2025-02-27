@@ -1,3 +1,15 @@
+*{
+    padding: 0;
+    margin: 0;
+}
+
+body{
+    background-color: #0a192f;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
 .product-container {
     display: flex;
     flex-wrap: wrap;
@@ -6,8 +18,8 @@
 }
 
 .product-card {
-    background-color: #fff;
-    border: 1px solid #ddd;
+    background-color: #1e3a5f; /* Dark blue background */
+    border: 1px solid #0d253f; /* Darker blue border */
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin: 10px;
@@ -28,17 +40,18 @@
 .product-card h3 {
     font-size: 1.5em;
     margin: 10px;
+    color: #ffffff; /* White text for contrast */
 }
 
 .product-card p {
     font-size: 1em;
     margin: 10px;
-    color: #555;
+    color: #d1e7ff; /* Light blue text */
 }
 
 .product-card .price {
     font-size: 1.2em;
     font-weight: bold;
     margin: 10px;
-    color: #e91e63;
+    color: #4fc3f7; /* Light blue price */
 }

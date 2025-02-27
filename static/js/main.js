@@ -1,9 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Main Slider
-    const mainSwiper = new Swiper('.main-swiper', {
+    // Hero Slider
+    const heroSwiper = new Swiper('.hero-swiper', {
         effect: 'fade',
         speed: 1000,
-        loop: true,
         autoplay: {
             delay: 5000,
             disableOnInteraction: false,
@@ -12,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
             el: '.swiper-pagination',
             clickable: true,
         },
+        loop: true,
     });
 
     // Initialize Swiper

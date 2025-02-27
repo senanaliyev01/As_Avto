@@ -430,87 +430,121 @@ body {
     }
 }
 
-/* Main Slider Styles */
-.main-slider {
+/* Hero Slider */
+.hero-slider {
+    position: relative;
     width: 100%;
     height: 80vh;
-    position: relative;
     overflow: hidden;
 }
 
-.main-swiper {
+.hero-swiper {
     width: 100%;
     height: 100%;
 }
 
-.main-swiper .swiper-slide {
+.hero-slide {
     width: 100%;
     height: 100%;
+}
+
+.hero-content {
     position: relative;
-}
-
-.slider-content {
     width: 100%;
     height: 100%;
-    position: relative;
+    display: flex;
+    align-items: center;
+    background: var(--primary-color);
 }
 
-.slider-content img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.slider-text {
+.hero-text {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 4rem;
-    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-    color: #fff;
-}
-
-.slider-text h2 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    font-weight: 700;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-}
-
-.slider-text p {
-    font-size: 1.5rem;
+    left: 10%;
+    z-index: 2;
     max-width: 600px;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    padding: 2rem;
+}
+
+.hero-text h1 {
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    line-height: 1.2;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: slideUp 0.8s forwards;
+}
+
+.hero-text p {
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: slideUp 0.8s 0.3s forwards;
+}
+
+.hero-image {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 60%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
+}
+
+/* Animations */
+@keyframes slideUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Swiper Pagination Customization */
-.main-swiper .swiper-pagination-bullet {
+.hero-slider .swiper-pagination {
+    bottom: 30px;
+}
+
+.hero-slider .swiper-pagination-bullet {
     width: 12px;
     height: 12px;
-    background: rgba(255,255,255,0.9);
-    opacity: 0.5;
-}
-
-.main-swiper .swiper-pagination-bullet-active {
-    opacity: 1;
     background: var(--accent-color);
+    opacity: 0.5;
+    transition: all 0.3s ease;
 }
 
-@media (max-width: 768px) {
-    .main-slider {
+.hero-slider .swiper-pagination-bullet-active {
+    opacity: 1;
+    width: 30px;
+    border-radius: 6px;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+    .hero-slider {
         height: 60vh;
     }
-    
-    .slider-text {
-        padding: 2rem;
+
+    .hero-text {
+        left: 5%;
+        max-width: 90%;
     }
-    
-    .slider-text h2 {
-        font-size: 2rem;
+
+    .hero-text h1 {
+        font-size: 2.5rem;
     }
-    
-    .slider-text p {
-        font-size: 1.1rem;
+
+    .hero-text p {
+        font-size: 1.2rem;
+    }
+
+    .hero-image {
+        width: 100%;
+        clip-path: none;
+        opacity: 0.3;
     }
 }

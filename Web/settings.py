@@ -190,6 +190,7 @@ JAZZMIN_SETTINGS = {
         "mehsullar.Sifaris": "fa-solid fa-bell",
         "rentacar.CarImage": "fa-solid fa-car-side",
         "rentacar.Car": "fa-solid fa-car",
+        "esasevim.HeroSlide": "fa-solid fa-house",
     },
 }
 

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="product-container">
+    {% for mehsul in yeni_mehsullar %}
+    <div class="product-card">
+        <img src="{{ mehsul.image.url }}" alt="{{ mehsul.name }}" class="product-image">
+        <div class="product-info">
+            <h3>{{ mehsul.name }}</h3>
+            <p>{{ mehsul.description }}</p>
+            <p class="product-price">{{ mehsul.price }} AZN</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

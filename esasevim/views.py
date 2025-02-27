@@ -6,6 +6,7 @@ from mehsullar.models import Kateqoriya, Brend, Marka, Mehsul, MusteriReyi
 from django.views.decorators.cache import never_cache
 from django.db.models import Count, Avg
 from django.contrib import messages
+from django.views.decorators.http import require_GET
 
 @login_required
 def rey_elave_et(request):
@@ -114,3 +115,15 @@ def get_statistics(request):
             'car_brands': 0,
             'products': 0
         })
+
+@require_GET
+@login_required
+def yeni_mehsullar(request):
+    # Yeni məhsulları əldə et
+    yeni_mehsullar = Mehsul.objects.filter(yenidir=True)
+    
+    context = {
+        'yeni_mehsullar': yeni_mehsullar
+    }
+    
+    return render(request, 'yeni_mehsullar.html', context)

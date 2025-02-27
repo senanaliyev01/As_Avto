@@ -933,38 +933,4 @@
         }
     });
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const notificationToggle = document.querySelector('.notification-toggle');
-        const notificationsList = document.getElementById('notifications-list');
-        const notificationCount = document.getElementById('notification-count');
-
-        function fetchNotifications() {
-            fetch('/get_notifications/')
-                .then(response => response.json())
-                .then(data => {
-                    notificationsList.innerHTML = '';
-                    data.bildirisler.forEach(bildiris => {
-                        const listItem = document.createElement('div');
-                        listItem.className = 'notification-item';
-                        listItem.textContent = `${bildiris.mesaj} - ${new Date(bildiris.yaradilma_tarixi).toLocaleString()}`;
-                        notificationsList.appendChild(listItem);
-                    });
-                    notificationCount.textContent = data.bildirisler.length;
-                })
-                .catch(error => console.error('Bildirişləri alma xətası:', error));
-        }
-
-        notificationToggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            fetchNotifications();
-            notificationsList.parentElement.classList.toggle('active');
-        });
-
-        document.addEventListener('click', function(e) {
-            if (!notificationToggle.contains(e.target) && !notificationsList.parentElement.contains(e.target)) {
-                notificationsList.parentElement.classList.remove('active');
-            }
-        });
-    });
-
 

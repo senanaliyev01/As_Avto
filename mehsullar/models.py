@@ -73,12 +73,6 @@ class Mehsul(models.Model):
         kodlar.extend([oem.kod for oem in self.oem_kodlar.all()])
         return kodlar
 
-    def save(self, *args, **kwargs):
-        # Yeni məhsul əlavə edildikdə bildiriş yarat
-        if self.pk is None:  # Yalnız yeni məhsul üçün
-            Bildiris.objects.create(mesaj=f"Yeni məhsul əlavə edildi: {self.adi}")
-        super().save(*args, **kwargs)
-
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     mehsul = models.ForeignKey(Mehsul, on_delete=models.CASCADE)
@@ -211,17 +205,5 @@ class MusteriReyi(models.Model):
 
     def __str__(self):
         return f"{self.musteri.get_full_name()} - {self.get_qiymetlendirme_display()}"
-
-
-class Bildiris(models.Model):
-    mesaj = models.TextField()
-    
-
-    def __str__(self):
-        return self.mesaj
-
-    class Meta:
-        verbose_name = 'Bildiriş'
-        verbose_name_plural = 'Bildirişlər'
 
 

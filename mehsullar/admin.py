@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Kateqoriya, Brend, Marka, Mehsul, Sebet, Sifaris, SifarisMehsul, OEMKod, MusteriReyi, MarkaSekil, Bildiris
+from .models import Kateqoriya, Brend, Marka, Mehsul, Sebet, Sifaris, SifarisMehsul, OEMKod, MusteriReyi, MarkaSekil
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils import timezone
@@ -204,5 +204,3 @@ class MusteriReyiAdmin(admin.ModelAdmin):
     def tesdiq_legv_et(self, request, queryset):
         queryset.update(tesdiq=False)
     tesdiq_legv_et.short_description = "Seçilmiş rəylərin təsdiqini ləğv et"
-
-admin.site.register(Bildiris)

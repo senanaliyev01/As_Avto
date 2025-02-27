@@ -114,11 +114,3 @@ def get_statistics(request):
             'car_brands': 0,
             'products': 0
         })
-
-@login_required
-def yeni_mehsullar_view(request):
-    yeni_mehsullar = Mehsul.objects.filter(yenidir=True)
-    context = {
-        'yeni_mehsullar': yeni_mehsullar
-    }
-    return render(request, 'yeni_mehsullar.html', context)

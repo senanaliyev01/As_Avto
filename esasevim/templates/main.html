@@ -15,10 +15,10 @@
         <div class="swiper-wrapper">
             {% for slide in hero_slides %}
             <div class="swiper-slide">
-                <div class="hero-slide" style="background-image: url('{{ HeroSlider.sekil.url }}')">
+                <div class="hero-slide" style="background-image: url('{{ slide.sekil.url }}')">
                     <div class="hero-content">
-                        <h1>{{ HeroSlider.basliq }}</h1>
-                        <p>{{ HeroSlider.metn }}</p>
+                        <h1>{{ slide.basliq }}</h1>
+                        <p>{{ slide.metn }}</p>
                     </div>
                 </div>
             </div>

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404,HttpResponse
 from django.contrib.auth.decorators import login_required
-from .models import Mehsul, Sebet, Kateqoriya, Brend, Marka, Sifaris, SifarisMehsul, OEMKod, SebetItem, Bildiris
+from .models import Mehsul, Sebet, Kateqoriya, Brend, Marka, Sifaris, SifarisMehsul, OEMKod, SebetItem
 from django.db.models import F, Sum, Q
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -721,10 +721,3 @@ def realtime_search(request):
         })
     
     return JsonResponse({'results': results})
-
-@login_required
-def get_notifications(request):
-    bildirisler = Bildiris.objects.filter(mehsul__brend__adi=request.user.username).order_by('-tarix')
-    unread_count = bildirisler.filter(oxundu=False).count()
-    notifications = list(bildirisler.values('mesaj', 'tarix', 'oxundu'))
-    return JsonResponse({'notifications': notifications, 'unread_count': unread_count})

@@ -208,13 +208,14 @@ class MusteriReyi(models.Model):
 
 
 class Bildiris(models.Model):
-    mehsul = models.ForeignKey(Mehsul, on_delete=models.CASCADE, related_name='bildirisler')
+    basliq = models.CharField(max_length=255)
     mesaj = models.TextField()
     tarix = models.DateTimeField(auto_now_add=True)
     oxundu = models.BooleanField(default=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bildirisler')
 
     def __str__(self):
-        return f"Bildiriş: {self.mehsul.adi} - {self.tarix.strftime('%Y-%m-%d %H:%M:%S')}"
+        return self.basliq
 
     class Meta:
         verbose_name = 'Bildiriş'

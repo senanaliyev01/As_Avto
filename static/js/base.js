@@ -935,31 +935,21 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         const notificationToggle = document.querySelector('.notification-toggle');
-        const notificationList = document.getElementById('notification-list');
-        const notificationCount = document.getElementById('notification-count');
+        const notificationDropdown = document.querySelector('.notification-dropdown .dropdown-menu');
 
         notificationToggle.addEventListener('click', function(e) {
             e.preventDefault();
-            fetch('/get_notifications/')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.notifications.length > 0) {
-                        notificationList.innerHTML = data.notifications.map(notification => `
-                            <div class="notification-item ${notification.oxundu ? '' : 'unread'}">
-                                <p>${notification.mesaj}</p>
-                                <small>${notification.tarix}</small>
-                            </div>
-                        `).join('');
-                        notificationCount.textContent = data.unread_count;
-                    } else {
-                        notificationList.innerHTML = '<p>Heç bir bildiriş yoxdur</p>';
-                    }
-                })
-                .catch(error => {
-                    console.error('Bildiriş yükləmə xətası:', error);
-                    notificationList.innerHTML = '<p>Xəta baş verdi</p>';
-                });
+            notificationDropdown.classList.toggle('active');
         });
+
+        // Bildiriş sayını yeniləyin
+        function updateNotificationCount() {
+            const count = document.querySelectorAll('.notification-item.unread').length;
+            const badge = document.querySelector('.notification-badge');
+            badge.textContent = count;
+        }
+
+        updateNotificationCount();
     });
 
 

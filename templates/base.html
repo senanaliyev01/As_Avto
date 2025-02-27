@@ -65,18 +65,6 @@
             </div>
 
             <div class="header-right">
-                <!-- Bildirişlər Dropdown -->
-                <div class="notification-dropdown">
-                    <a href="#" class="notification-toggle">
-                        <i class="fas fa-bell"></i>
-                        <span class="notification-badge" id="notification-count">0</span>
-                    </a>
-                    <div class="dropdown-menu">
-                        <div id="notification-list">
-                            <!-- Bildirişlər burada göstəriləcək -->
-                        </div>
-                    </div>
-                </div>
                 <div class="profile-dropdown">
                     <a href="#" class="profile-toggle">
                         <i class="fas fa-user"></i> {{ user.username }}
@@ -102,6 +90,17 @@
                     <i class="fas fa-shopping-cart"></i>
                     <span id="cart-count" class="cart-badge">0</span>
                 </a>
+                <div class="notification-dropdown">
+                    <a href="#" class="notification-toggle">
+                        <i class="fas fa-bell"></i>
+                        <span id="notification-count" class="notification-badge">0</span>
+                    </a>
+                    <div class="dropdown-menu">
+                        <div id="notification-list">
+                            <p>Bildirişlər yüklənir...</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="working-hours">

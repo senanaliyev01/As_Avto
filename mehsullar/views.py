@@ -724,7 +724,7 @@ def realtime_search(request):
 
 @login_required
 def get_notifications(request):
-    notifications = Bildiris.objects.filter(user=request.user, oxundu=False)
-    unread_count = notifications.count()
-    notifications_data = list(notifications.values('mesaj', 'tarix'))
-    return JsonResponse({'notifications': notifications_data, 'unread_count': unread_count})
+    bildirisler = Bildiris.objects.filter(mehsul__brend__adi=request.user.username).order_by('-tarix')
+    unread_count = bildirisler.filter(oxundu=False).count()
+    notifications = list(bildirisler.values('mesaj', 'tarix', 'oxundu'))
+    return JsonResponse({'notifications': notifications, 'unread_count': unread_count})

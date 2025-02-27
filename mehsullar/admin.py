@@ -207,15 +207,17 @@ class MusteriReyiAdmin(admin.ModelAdmin):
 
 @admin.register(Bildiris)
 class BildirisAdmin(admin.ModelAdmin):
-    list_display = ['mesaj', 'user', 'yeni_mehsul', 'tarix', 'oxundu']
-    list_filter = ['oxundu', 'tarix']
-    search_fields = ['mesaj', 'user__username']
+    list_display = ('mehsul', 'mesaj', 'tarix', 'oxundu')
+    list_filter = ('oxundu', 'tarix')
+    search_fields = ('mehsul__adi', 'mesaj')
     actions = ['mark_as_read', 'mark_as_unread']
 
     def mark_as_read(self, request, queryset):
         queryset.update(oxundu=True)
-    mark_as_read.short_description = "Seçilmiş bildirişləri oxundu kimi işarələ"
+        self.message_user(request, "Seçilmiş bildirişlər oxundu olaraq işarələndi.")
+    mark_as_read.short_description = "Seçilmiş bildirişləri oxundu et"
 
     def mark_as_unread(self, request, queryset):
         queryset.update(oxundu=False)
-    mark_as_unread.short_description = "Seçilmiş bildirişləri oxunmamış kimi işarələ"
+        self.message_user(request, "Seçilmiş bildirişlər oxunmamış olaraq işarələndi.")
+    mark_as_unread.short_description = "Seçilmiş bildirişləri oxunmamış et"

@@ -938,29 +938,27 @@
         const notificationList = document.getElementById('notification-list');
         const notificationCount = document.getElementById('notification-count');
 
-        function loadNotifications() {
+        notificationToggle.addEventListener('click', function(e) {
+            e.preventDefault();
             fetch('/get_notifications/')
                 .then(response => response.json())
                 .then(data => {
-                    notificationList.innerHTML = '';
-                    data.notifications.forEach(notification => {
-                        const item = document.createElement('div');
-                        item.className = 'notification-item';
-                        item.innerHTML = `
-                            <p>${notification.mesaj}</p>
-                            <small>${new Date(notification.tarix).toLocaleString()}</small>
-                        `;
-                        notificationList.appendChild(item);
-                    });
-                    notificationCount.textContent = data.unread_count;
+                    if (data.notifications.length > 0) {
+                        notificationList.innerHTML = data.notifications.map(notification => `
+                            <div class="notification-item ${notification.oxundu ? '' : 'unread'}">
+                                <p>${notification.mesaj}</p>
+                                <small>${notification.tarix}</small>
+                            </div>
+                        `).join('');
+                        notificationCount.textContent = data.unread_count;
+                    } else {
+                        notificationList.innerHTML = '<p>Heç bir bildiriş yoxdur</p>';
+                    }
                 })
-                .catch(error => console.error('Bildirişləri yükləmə xətası:', error));
-        }
-
-        notificationToggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            loadNotifications();
-            notificationList.parentElement.classList.toggle('active');
+                .catch(error => {
+                    console.error('Bildiriş yükləmə xətası:', error);
+                    notificationList.innerHTML = '<p>Xəta baş verdi</p>';
+                });
         });
     });
 

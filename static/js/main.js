@@ -3,13 +3,30 @@ document.addEventListener('DOMContentLoaded', function() {
     const heroSwiper = new Swiper('.hero-slider', {
         slidesPerView: 1,
         loop: true,
+        effect: 'fade',
+        speed: 1000,
         autoplay: {
             delay: 5000,
             disableOnInteraction: false,
         },
-        effect: 'fade',
         fadeEffect: {
             crossFade: true
+        },
+        on: {
+            init: function () {
+                let activeSlide = this.slides[this.activeIndex];
+                activeSlide.classList.add('swiper-slide-animated');
+            },
+            slideChangeTransitionStart: function () {
+                let activeSlide = this.slides[this.activeIndex];
+                activeSlide.classList.add('swiper-slide-animated');
+            },
+            slideChangeTransitionEnd: function () {
+                let prevSlide = this.slides[this.previousIndex];
+                if (prevSlide) {
+                    prevSlide.classList.remove('swiper-slide-animated');
+                }
+            }
         }
     });
 

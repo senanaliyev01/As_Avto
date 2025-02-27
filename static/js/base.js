@@ -934,40 +934,34 @@
     });
 
     document.addEventListener('DOMContentLoaded', function() {
-        const notificationsDropdown = document.querySelector('.notifications-dropdown');
-        const notificationsToggle = document.querySelector('.notifications-toggle');
+        const notificationToggle = document.querySelector('.notification-toggle');
+        const notificationList = document.getElementById('notification-list');
         const notificationCount = document.getElementById('notification-count');
 
-        if (notificationsToggle && notificationsDropdown) {
-            // Click handler for toggle button
-            notificationsToggle.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                notificationsDropdown.classList.toggle('active');
-            });
-
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!notificationsDropdown.contains(e.target)) {
-                    notificationsDropdown.classList.remove('active');
-                }
-            });
-
-            // Close dropdown with ESC key
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && notificationsDropdown.classList.contains('active')) {
-                    notificationsDropdown.classList.remove('active');
-                }
-            });
+        function loadNotifications() {
+            fetch('/get_notifications/')
+                .then(response => response.json())
+                .then(data => {
+                    notificationList.innerHTML = '';
+                    data.notifications.forEach(notification => {
+                        const item = document.createElement('div');
+                        item.className = 'notification-item';
+                        item.innerHTML = `
+                            <p>${notification.mesaj}</p>
+                            <small>${new Date(notification.tarix).toLocaleString()}</small>
+                        `;
+                        notificationList.appendChild(item);
+                    });
+                    notificationCount.textContent = data.unread_count;
+                })
+                .catch(error => console.error('Bildirişləri yükləmə xətası:', error));
         }
 
-        // Update notification count
-        function updateNotificationCount() {
-            const count = document.querySelectorAll('.notification-item').length;
-            notificationCount.textContent = count;
-        }
-
-        updateNotificationCount();
+        notificationToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            loadNotifications();
+            notificationList.parentElement.classList.toggle('active');
+        });
     });
 
 

@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.http import JsonResponse
-from mehsullar.models import Kateqoriya, Brend, Marka, Mehsul, MusteriReyi, Bildiris
+from mehsullar.models import Kateqoriya, Brend, Marka, Mehsul, MusteriReyi
 from django.views.decorators.cache import never_cache
 from django.db.models import Count, Avg
 from django.contrib import messages
@@ -114,8 +114,3 @@ def get_statistics(request):
             'car_brands': 0,
             'products': 0
         })
-
-@login_required
-def base_view(request):
-    bildirisler = Bildiris.objects.all().order_by('-tarix')[:10]  # Son 10 bildirişi alırıq
-    return render(request, 'base.html', {'bildirisler': bildirisler})

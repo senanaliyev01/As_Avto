@@ -73,6 +73,16 @@ class Mehsul(models.Model):
         kodlar.extend([oem.kod for oem in self.oem_kodlar.all()])
         return kodlar
 
+    def save(self, *args, **kwargs):
+        # Yeni məhsul yaradıldıqda və ya yenidir sahəsi True olaraq dəyişdirildikdə
+        if self.pk is None or (self.pk and not Mehsul.objects.get(pk=self.pk).yenidir and self.yenidir):
+            # Bildiriş yaradın
+            Bildiris.objects.create(
+                mesaj=f"Yeni məhsul əlavə edildi: {self.adi}",
+                yeni_mehsul=self
+            )
+        super().save(*args, **kwargs)
+
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     mehsul = models.ForeignKey(Mehsul, on_delete=models.CASCADE)
@@ -208,15 +218,15 @@ class MusteriReyi(models.Model):
 
 
 class Bildiris(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     mesaj = models.TextField()
+    yeni_mehsul = models.ForeignKey(Mehsul, on_delete=models.CASCADE, null=True, blank=True)
     tarix = models.DateTimeField(auto_now_add=True)
-    yeni_mehsul = models.ForeignKey('Mehsul', null=True, blank=True, on_delete=models.CASCADE)
+    oxundu = models.BooleanField(default=False)
 
     def __str__(self):
-        if self.yeni_mehsul:
-            return f"Yeni Məhsul: {self.yeni_mehsul.adi}"
-        return f"Mesaj: {self.mesaj[:50]}..."
-
+        return f"Bildiriş: {self.mesaj[:20]}..."
+    
     class Meta:
         verbose_name = 'Bildiriş'
         verbose_name_plural = 'Bildirişlər'

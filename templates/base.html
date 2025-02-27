@@ -21,28 +21,6 @@
                 <img src="{% static '/img/Header_Logo.png' %}" alt="Logo">
             </div>
             
-            <!-- Bildirişlər Dropdown -->
-            <div class="notifications-dropdown">
-                <a href="#" class="notifications-toggle">
-                    <i class="fas fa-bell"></i>
-                    <span id="notification-count" class="notification-badge">0</span>
-                </a>
-                <div class="dropdown-menu">
-                    {% for bildiris in bildirisler %}
-                        <div class="notification-item">
-                            {% if bildiris.yeni_mehsul %}
-                                <strong>Yeni Məhsul:</strong> {{ bildiris.yeni_mehsul.adi }}
-                            {% else %}
-                                {{ bildiris.mesaj }}
-                            {% endif %}
-                            <span class="notification-date">{{ bildiris.tarix|date:"d-m-Y H:i" }}</span>
-                        </div>
-                    {% empty %}
-                        <div class="notification-item">Bildiriş yoxdur</div>
-                    {% endfor %}
-                </div>
-            </div>
-
             <!-- Search Container -->
             <div class="search-container">
                 <div class="search-bar">
@@ -87,6 +65,18 @@
             </div>
 
             <div class="header-right">
+                <!-- Bildirişlər Dropdown -->
+                <div class="notification-dropdown">
+                    <a href="#" class="notification-toggle">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notification-count">0</span>
+                    </a>
+                    <div class="dropdown-menu">
+                        <div id="notification-list">
+                            <!-- Bildirişlər burada göstəriləcək -->
+                        </div>
+                    </div>
+                </div>
                 <div class="profile-dropdown">
                     <a href="#" class="profile-toggle">
                         <i class="fas fa-user"></i> {{ user.username }}

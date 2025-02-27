@@ -98,10 +98,9 @@
                     </a>
                     <div class="dropdown-menu">
                         {% for bildiris in user.bildirisler.all %}
-                            <div class="notification-item {% if not bildiris.oxundu %}unread{% endif %}">
+                            <div class="notification-item">
                                 <h4>{{ bildiris.basliq }}</h4>
                                 <p>{{ bildiris.mesaj }}</p>
-                                <small>{{ bildiris.tarix|date:"Y-m-d H:i" }}</small>
                             </div>
                         {% empty %}
                             <p>Heç bir bildiriş yoxdur.</p>

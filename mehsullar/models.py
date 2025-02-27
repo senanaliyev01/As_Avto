@@ -210,8 +210,6 @@ class MusteriReyi(models.Model):
 class Bildiris(models.Model):
     basliq = models.CharField(max_length=255)
     mesaj = models.TextField()
-    tarix = models.DateTimeField(auto_now_add=True)
-    oxundu = models.BooleanField(default=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bildirisler')
 
     def __str__(self):

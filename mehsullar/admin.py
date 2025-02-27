@@ -207,15 +207,5 @@ class MusteriReyiAdmin(admin.ModelAdmin):
 
 @admin.register(Bildiris)
 class BildirisAdmin(admin.ModelAdmin):
-    list_display = ['basliq', 'tarix', 'oxundu']
-    list_filter = ['oxundu', 'tarix']
+    list_display = ['basliq']
     search_fields = ['basliq', 'mesaj']
-    actions = ['oxundu_et', 'oxunmamis_et']
-
-    def oxundu_et(self, request, queryset):
-        queryset.update(oxundu=True)
-    oxundu_et.short_description = "Seçilmiş bildirişləri oxundu et"
-
-    def oxunmamis_et(self, request, queryset):
-        queryset.update(oxundu=False)
-    oxunmamis_et.short_description = "Seçilmiş bildirişləri oxunmamış et"

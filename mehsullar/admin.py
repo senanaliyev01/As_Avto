@@ -208,5 +208,5 @@ class MusteriReyiAdmin(admin.ModelAdmin):
 @admin.register(Bildiris)
 class BildirisAdmin(admin.ModelAdmin):
     list_display = ['mesaj', 'tarix', 'yeni_mehsul']
-    search_fields = ['mesaj']
-    list_filter = ['yeni_mehsul']
+    search_fields = ['mesaj', 'yeni_mehsul__adi']
+    list_filter = ['tarix']

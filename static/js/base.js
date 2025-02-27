@@ -933,4 +933,41 @@
         }
     });
 
+    document.addEventListener('DOMContentLoaded', function() {
+        const notificationsDropdown = document.querySelector('.notifications-dropdown');
+        const notificationsToggle = document.querySelector('.notifications-toggle');
+        const notificationCount = document.getElementById('notification-count');
+
+        if (notificationsToggle && notificationsDropdown) {
+            // Click handler for toggle button
+            notificationsToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                notificationsDropdown.classList.toggle('active');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!notificationsDropdown.contains(e.target)) {
+                    notificationsDropdown.classList.remove('active');
+                }
+            });
+
+            // Close dropdown with ESC key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && notificationsDropdown.classList.contains('active')) {
+                    notificationsDropdown.classList.remove('active');
+                }
+            });
+        }
+
+        // Update notification count
+        function updateNotificationCount() {
+            const count = document.querySelectorAll('.notification-item').length;
+            notificationCount.textContent = count;
+        }
+
+        updateNotificationCount();
+    });
+
 

@@ -21,16 +21,21 @@
                 <img src="{% static '/img/Header_Logo.png' %}" alt="Logo">
             </div>
             
-            <!-- Bildirişlər -->
-            <div class="notifications">
-                <a href="#" class="notification-icon">
+            <!-- Bildirişlər Dropdown -->
+            <div class="notifications-dropdown">
+                <a href="#" class="notifications-toggle">
                     <i class="fas fa-bell"></i>
-                    <span class="notification-count">{{ notifications.count }}</span>
+                    <span id="notification-count" class="notification-badge">0</span>
                 </a>
-                <div class="notification-dropdown">
-                    {% for notification in notifications %}
+                <div class="dropdown-menu">
+                    {% for bildiris in bildirisler %}
                         <div class="notification-item">
-                            {{ notification.mesaj }}
+                            {% if bildiris.yeni_mehsul %}
+                                <strong>Yeni Məhsul:</strong> {{ bildiris.yeni_mehsul.adi }}
+                            {% else %}
+                                {{ bildiris.mesaj }}
+                            {% endif %}
+                            <span class="notification-date">{{ bildiris.tarix|date:"d-m-Y H:i" }}</span>
                         </div>
                     {% empty %}
                         <div class="notification-item">Bildiriş yoxdur</div>

@@ -50,9 +50,6 @@ def esasevim(request):
     # Yeni məhsulları əldə et (limitsiz)
     yeni_mehsullar = Mehsul.objects.filter(yenidir=True)
     
-    # Bildirişləri əldə et
-    notifications = Bildiris.objects.all().order_by('-tarix')
-
     # Ümumi statistika
     rey_statistikasi = MusteriReyi.objects.filter(tesdiq=True).aggregate(
         ortalama=Avg('qiymetlendirme'),
@@ -72,8 +69,7 @@ def esasevim(request):
         'reyler': tesdiqli_reyler,
         'rey_statistikasi': rey_statistikasi,
         'ulduz_statistikasi': ulduz_statistikasi,
-        'yeni_mehsullar': yeni_mehsullar,
-        'notifications': notifications  # Context-ə bildirişləri əlavə et
+        'yeni_mehsullar': yeni_mehsullar  # Context-ə yeni məhsulları əlavə et
     }
     
     return render(request, 'main.html', context)
@@ -118,3 +114,8 @@ def get_statistics(request):
             'car_brands': 0,
             'products': 0
         })
+
+@login_required
+def base_view(request):
+    bildirisler = Bildiris.objects.all().order_by('-tarix')[:10]  # Son 10 bildirişi alırıq
+    return render(request, 'base.html', {'bildirisler': bildirisler})

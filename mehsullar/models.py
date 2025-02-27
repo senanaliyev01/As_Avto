@@ -210,10 +210,12 @@ class MusteriReyi(models.Model):
 class Bildiris(models.Model):
     mesaj = models.TextField()
     tarix = models.DateTimeField(auto_now_add=True)
-    yeni_mehsul = models.BooleanField(default=False)
+    yeni_mehsul = models.ForeignKey('Mehsul', null=True, blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"Bildiriş: {self.mesaj[:50]}..."
+        if self.yeni_mehsul:
+            return f"Yeni Məhsul: {self.yeni_mehsul.adi}"
+        return f"Mesaj: {self.mesaj[:50]}..."
 
     class Meta:
         verbose_name = 'Bildiriş'

@@ -1,12 +1,11 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_list_or_404
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from mehsullar.models import Kateqoriya, Brend, Marka, Mehsul, MusteriReyi
 from django.views.decorators.cache import never_cache
 from django.db.models import Count, Avg
 from django.contrib import messages
-from django.views.decorators.http import require_GET
 
 @login_required
 def rey_elave_et(request):
@@ -116,14 +115,10 @@ def get_statistics(request):
             'products': 0
         })
 
-@require_GET
 @login_required
-def yeni_mehsullar(request):
-    # Yeni məhsulları əldə et
-    yeni_mehsullar = Mehsul.objects.filter(yenidir=True)
-    
+def yeni_mehsullar_view(request):
+    yeni_mehsullar = get_list_or_404(Mehsul, yenidir=True)
     context = {
         'yeni_mehsullar': yeni_mehsullar
     }
-    
     return render(request, 'yeni_mehsullar.html', context)

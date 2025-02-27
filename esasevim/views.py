@@ -6,6 +6,7 @@ from mehsullar.models import Kateqoriya, Brend, Marka, Mehsul, MusteriReyi
 from django.views.decorators.cache import never_cache
 from django.db.models import Count, Avg
 from django.contrib import messages
+from .models import HeroSlider
 
 @login_required
 def rey_elave_et(request):
@@ -44,6 +45,9 @@ def rey_elave_et(request):
 
 @login_required
 def esasevim(request):
+    # Hero slider məlumatlarını əldə et
+    hero_slides = HeroSlider.objects.filter(aktiv=True).order_by('sira')
+    
     # Təsdiqlənmiş rəylər
     tesdiqli_reyler = MusteriReyi.objects.filter(tesdiq=True)
     
@@ -66,6 +70,7 @@ def esasevim(request):
         ).order_by('qiymetlendirme')
     
     context = {
+        'hero_slides': hero_slides,
         'reyler': tesdiqli_reyler,
         'rey_statistikasi': rey_statistikasi,
         'ulduz_statistikasi': ulduz_statistikasi,

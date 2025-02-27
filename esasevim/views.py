@@ -6,7 +6,7 @@ from mehsullar.models import Kateqoriya, Brend, Marka, Mehsul, MusteriReyi
 from django.views.decorators.cache import never_cache
 from django.db.models import Count, Avg
 from django.contrib import messages
-from .models import slider
+from .models import Slider
 
 @login_required
 def rey_elave_et(request):
@@ -20,7 +20,7 @@ def rey_elave_et(request):
                     musteri=request.user,
                     qiymetlendirme=qiymetlendirme,
                     rey=rey_metni,
-                    tesdiq=False  # Admin təsdiqləyənə qədər false olacaq
+                    tesdiq=False  # Admin təsdiqlənə qədər false olacaq
                 )
                 return JsonResponse({
                     'success': True,
@@ -66,11 +66,11 @@ def esasevim(request):
             sayi=Count('id')
         ).order_by('qiymetlendirme')
     
-    # Hero slider məlumatlarını əldə et
-    slides = slider.objects.all()
+    # Slider məlumatlarını əlavə et
+    sliders = Slider.objects.all()
     
     context = {
-        'slides': slides,
+        'sliders': sliders,
         'reyler': tesdiqli_reyler,
         'rey_statistikasi': rey_statistikasi,
         'ulduz_statistikasi': ulduz_statistikasi,

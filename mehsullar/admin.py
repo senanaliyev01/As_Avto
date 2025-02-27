@@ -167,9 +167,21 @@ class SifarisMehsulAdmin(admin.ModelAdmin):
 # Məhsul admin paneli
 class MehsulAdmin(admin.ModelAdmin):
     list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'oem', 'stok', 'yenidir')
-    list_filter = ( 'kateqoriya', 'brend', 'marka')
-    search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'yenidir')  # Siyahıda birbaşa düzəliş etmək üçün
+    list_filter = ('kateqoriya', 'brend', 'marka')
+    search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'yenidir')
     inlines = [OEMKodInline]
+    
+    actions = ['yenilikden_sil', 'yenidir_et']  # Yeni hərəkətləri əlavə edirik
+
+    def yenilikden_sil(self, request, queryset):
+        queryset.update(yenidir=False)
+        self.message_user(request, "Seçilmiş məhsullar yenilikdən silindi.")
+    yenilikden_sil.short_description = "Seçilmiş məhsulları yenilikdən sil"
+
+    def yenidir_et(self, request, queryset):
+        queryset.update(yenidir=True)
+        self.message_user(request, "Seçilmiş məhsullar yenidir olaraq işarələndi.")
+    yenidir_et.short_description = "Seçilmiş məhsulları yenidir et"
 
 # Qeydiyyatları düzəltdik
 admin.site.register(SifarisMehsul, SifarisMehsulAdmin)

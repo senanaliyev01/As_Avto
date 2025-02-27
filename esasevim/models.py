@@ -8,7 +8,6 @@ class HeroSlider(models.Model):
     metn = models.TextField(verbose_name='Mətn')
     aktiv = models.BooleanField(default=True, verbose_name='Aktiv')
     sira = models.IntegerField(default=0, verbose_name='Sıra')
-    yaradilma_tarixi = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = 'Hero Slider'

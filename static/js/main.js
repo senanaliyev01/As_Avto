@@ -1,19 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Hero Slider
-    const heroSwiper = new Swiper('.hero-swiper', {
-        effect: 'fade',
-        speed: 1000,
-        autoplay: {
-            delay: 5000,
-            disableOnInteraction: false,
-        },
-        pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
-        },
-        loop: true,
-    });
-
     // Initialize Swiper
     const swiper = new Swiper('.new-products-slider', {
         slidesPerView: 1,

@@ -9,25 +9,6 @@
 {% endblock %}
 
 {% block content %}
-<!-- Hero Slider -->
-<section class="hero-slider">
-    <div class="swiper hero-swiper">
-        <div class="swiper-wrapper">
-            {% for slide in hero_slides %}
-            <div class="swiper-slide hero-slide">
-                <div class="hero-content">
-                    <div class="hero-text">
-                        <h1>{{ slide.basliq }}</h1>
-                        <p>{{ slide.alt_basliq }}</p>
-                    </div>
-                    <div class="hero-image" style="background-image: url('{{ slide.sekil.url }}')"></div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        <div class="swiper-pagination"></div>
-    </div>
-</section>
 
 <!-- Yeni Məhsullar Slider -->
 <section class="new-products-section">

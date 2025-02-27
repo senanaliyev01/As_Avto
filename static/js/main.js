@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const mainSlider = new Swiper('.main-slider', {
         slidesPerView: 1,
         loop: true,
-        effect: 'fade',
         autoplay: {
             delay: 5000,
             disableOnInteraction: false,

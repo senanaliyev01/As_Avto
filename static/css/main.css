@@ -434,7 +434,7 @@ body {
 .main-slider-section {
     width: 100%;
     height: 600px;
-    overflow: hidden;
+    position: relative;
 }
 
 .main-slider {

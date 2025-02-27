@@ -2,10 +2,11 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.http import JsonResponse
-from mehsullar.models import Kateqoriya, Brend, Marka, Mehsul, MusteriReyi, MainSlider
+from mehsullar.models import Kateqoriya, Brend, Marka, Mehsul, MusteriReyi
 from django.views.decorators.cache import never_cache
 from django.db.models import Count, Avg
 from django.contrib import messages
+from .models import MainSlider
 
 @login_required
 def rey_elave_et(request):
@@ -44,9 +45,6 @@ def rey_elave_et(request):
 
 @login_required
 def esasevim(request):
-    # Slider məlumatlarını əldə et
-    slider_items = MainSlider.objects.filter(aktiv=True)
-    
     # Təsdiqlənmiş rəylər
     tesdiqli_reyler = MusteriReyi.objects.filter(tesdiq=True)
     
@@ -68,12 +66,15 @@ def esasevim(request):
             sayi=Count('id')
         ).order_by('qiymetlendirme')
     
+    # Slider məlumatlarını əldə et
+    slider_items = MainSlider.objects.filter(aktiv=True)
+    
     context = {
-        'slider_items': slider_items,
         'reyler': tesdiqli_reyler,
         'rey_statistikasi': rey_statistikasi,
         'ulduz_statistikasi': ulduz_statistikasi,
-        'yeni_mehsullar': yeni_mehsullar
+        'yeni_mehsullar': yeni_mehsullar,
+        'slider_items': slider_items  # Yeni əlavə
     }
     
     return render(request, 'main.html', context)

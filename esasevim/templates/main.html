@@ -9,19 +9,17 @@
 {% endblock %}
 
 {% block content %}
-
 <!-- Ana Slider -->
-<section class="main-slider">
-    <div class="swiper main-swiper">
+<section class="main-slider-section">
+    <div class="swiper main-slider">
         <div class="swiper-wrapper">
-            {% for slider in sliders %}
+            {% for item in slider_items %}
             <div class="swiper-slide">
-                <div class="slider-content" style="background-image: url('{{ slider.sekil.url }}')">
+                <div class="slider-content">
+                    <img src="{{ item.sekil.url }}" alt="{{ item.basliq }}">
                     <div class="slider-text">
-                        <h2>{{ slider.basliq }}</h2>
-                        {% if slider.alt_basliq %}
-                        <p>{{ slider.alt_basliq }}</p>
-                        {% endif %}
+                        <h2>{{ item.basliq }}</h2>
+                        <p>{{ item.alt_basliq }}</p>
                     </div>
                 </div>
             </div>

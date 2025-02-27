@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Ana Slider
-    const mainSwiper = new Swiper('.main-swiper', {
+    // Main Slider
+    const mainSlider = new Swiper('.main-slider', {
         slidesPerView: 1,
         loop: true,
         effect: 'fade',

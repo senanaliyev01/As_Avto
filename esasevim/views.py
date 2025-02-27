@@ -2,11 +2,10 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.http import JsonResponse
-from mehsullar.models import Kateqoriya, Brend, Marka, Mehsul, MusteriReyi
+from mehsullar.models import Kateqoriya, Brend, Marka, Mehsul, MusteriReyi, MainSlider
 from django.views.decorators.cache import never_cache
 from django.db.models import Count, Avg
 from django.contrib import messages
-from .models import Slider
 
 @login_required
 def rey_elave_et(request):
@@ -20,7 +19,7 @@ def rey_elave_et(request):
                     musteri=request.user,
                     qiymetlendirme=qiymetlendirme,
                     rey=rey_metni,
-                    tesdiq=False  # Admin təsdiqlənə qədər false olacaq
+                    tesdiq=False  # Admin təsdiqləyənə qədər false olacaq
                 )
                 return JsonResponse({
                     'success': True,
@@ -45,6 +44,9 @@ def rey_elave_et(request):
 
 @login_required
 def esasevim(request):
+    # Slider məlumatlarını əldə et
+    slider_items = MainSlider.objects.filter(aktiv=True)
+    
     # Təsdiqlənmiş rəylər
     tesdiqli_reyler = MusteriReyi.objects.filter(tesdiq=True)
     
@@ -66,11 +68,8 @@ def esasevim(request):
             sayi=Count('id')
         ).order_by('qiymetlendirme')
     
-    # Slider məlumatlarını əlavə et
-    sliders = Slider.objects.all()
-    
     context = {
-        'sliders': sliders,
+        'slider_items': slider_items,
         'reyler': tesdiqli_reyler,
         'rey_statistikasi': rey_statistikasi,
         'ulduz_statistikasi': ulduz_statistikasi,

@@ -1,7 +1,8 @@
 from django.contrib import admin
-from .models import Slider
+from .models import MainSlider
 
-@admin.register(Slider)
-class SliderAdmin(admin.ModelAdmin):
-    list_display = ('basliq',)
+@admin.register(MainSlider)
+class MainSliderAdmin(admin.ModelAdmin):
+    list_display = ('basliq', 'alt_basliq', 'aktiv', 'yaradilma_tarixi')
+    list_filter = ('aktiv',)
     search_fields = ('basliq', 'alt_basliq')

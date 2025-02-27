@@ -1,13 +1,12 @@
 {% extends 'base.html' %}
-
 {% block content %}
-<div class="mehsul-kartlari">
+<div class="product-container">
     {% for mehsul in yeni_mehsullar %}
-    <div class="mehsul-kart">
-        <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="mehsul-sekil">
+    <div class="product-card">
+        <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
         <h3>{{ mehsul.adi }}</h3>
-        <p>{{ mehsul.formatted_qiymet }} AZN</p>
-        <p>{{ mehsul.haqqinda|truncatewords:20 }}</p>
+        <p>{{ mehsul.haqqinda }}</p>
+        <span class="price">{{ mehsul.formatted_qiymet }} AZN</span>
     </div>
     {% endfor %}
 </div>

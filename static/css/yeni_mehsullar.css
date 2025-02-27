@@ -1,38 +1,44 @@
-.mehsul-kartlari {
+.product-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
+    justify-content: space-around;
     padding: 20px;
 }
 
-.mehsul-kart {
+.product-card {
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
+    margin: 10px;
     width: 300px;
-    text-align: center;
-    transition: transform 0.3s;
+    overflow: hidden;
+    transition: transform 0.2s;
 }
 
-.mehsul-kart:hover {
-    transform: translateY(-10px);
+.product-card:hover {
+    transform: scale(1.05);
 }
 
-.mehsul-sekil {
+.product-card img {
     width: 100%;
-    height: 200px;
-    object-fit: cover;
+    height: auto;
 }
 
-.mehsul-kart h3 {
+.product-card h3 {
     font-size: 1.5em;
-    margin: 10px 0;
+    margin: 10px;
 }
 
-.mehsul-kart p {
+.product-card p {
+    font-size: 1em;
+    margin: 10px;
     color: #555;
-    margin: 0 10px 10px;
+}
+
+.product-card .price {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin: 10px;
+    color: #e91e63;
 }

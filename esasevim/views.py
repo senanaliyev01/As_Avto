@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_list_or_404
+from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from mehsullar.models import Kateqoriya, Brend, Marka, Mehsul, MusteriReyi
@@ -117,7 +117,7 @@ def get_statistics(request):
 
 @login_required
 def yeni_mehsullar_view(request):
-    yeni_mehsullar = get_list_or_404(Mehsul, yenidir=True)
+    yeni_mehsullar = Mehsul.objects.filter(yenidir=True)
     context = {
         'yeni_mehsullar': yeni_mehsullar
     }

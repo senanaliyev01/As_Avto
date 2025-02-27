@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.http import JsonResponse
-from mehsullar.models import Kateqoriya, Brend, Marka, Mehsul, MusteriReyi
+from mehsullar.models import Kateqoriya, Brend, Marka, Mehsul, MusteriReyi, Bildiris
 from django.views.decorators.cache import never_cache
 from django.db.models import Count, Avg
 from django.contrib import messages
@@ -50,6 +50,9 @@ def esasevim(request):
     # Yeni məhsulları əldə et (limitsiz)
     yeni_mehsullar = Mehsul.objects.filter(yenidir=True)
     
+    # Bildirişləri əldə et
+    notifications = Bildiris.objects.all().order_by('-tarix')
+
     # Ümumi statistika
     rey_statistikasi = MusteriReyi.objects.filter(tesdiq=True).aggregate(
         ortalama=Avg('qiymetlendirme'),
@@ -69,7 +72,8 @@ def esasevim(request):
         'reyler': tesdiqli_reyler,
         'rey_statistikasi': rey_statistikasi,
         'ulduz_statistikasi': ulduz_statistikasi,
-        'yeni_mehsullar': yeni_mehsullar  # Context-ə yeni məhsulları əlavə et
+        'yeni_mehsullar': yeni_mehsullar,
+        'notifications': notifications  # Context-ə bildirişləri əlavə et
     }
     
     return render(request, 'main.html', context)

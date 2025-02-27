@@ -21,6 +21,23 @@
                 <img src="{% static '/img/Header_Logo.png' %}" alt="Logo">
             </div>
             
+            <!-- Bildirişlər -->
+            <div class="notifications">
+                <a href="#" class="notification-icon">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-count">{{ notifications.count }}</span>
+                </a>
+                <div class="notification-dropdown">
+                    {% for notification in notifications %}
+                        <div class="notification-item">
+                            {{ notification.mesaj }}
+                        </div>
+                    {% empty %}
+                        <div class="notification-item">Bildiriş yoxdur</div>
+                    {% endfor %}
+                </div>
+            </div>
+
             <!-- Search Container -->
             <div class="search-container">
                 <div class="search-bar">

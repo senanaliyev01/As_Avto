@@ -207,3 +207,16 @@ class MusteriReyi(models.Model):
         return f"{self.musteri.get_full_name()} - {self.get_qiymetlendirme_display()}"
 
 
+class Bildiris(models.Model):
+    mesaj = models.TextField()
+    tarix = models.DateTimeField(auto_now_add=True)
+    yeni_mehsul = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Bildiriş: {self.mesaj[:50]}..."
+
+    class Meta:
+        verbose_name = 'Bildiriş'
+        verbose_name_plural = 'Bildirişlər'
+
+

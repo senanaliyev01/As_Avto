@@ -1,3 +1,8 @@
 from django.contrib import admin
+from .models import HeroSlide
 
-# Register your models here.
+@admin.register(HeroSlide)
+class HeroSlideAdmin(admin.ModelAdmin):
+    list_display = ('basliq', 'alt_basliq', 'yaradilma_tarixi')
+    list_filter = ('yaradilma_tarixi',)
+    search_fields = ('basliq', 'alt_basliq')

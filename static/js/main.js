@@ -1,5 +1,19 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Swiper
+    // Hero Slider
+    const heroSwiper = new Swiper('.hero-slider', {
+        slidesPerView: 1,
+        loop: true,
+        autoplay: {
+            delay: 5000,
+            disableOnInteraction: false,
+        },
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+        },
+    });
+
+    // Initialize Swiper for new products
     const swiper = new Swiper('.new-products-slider', {
         slidesPerView: 1,
         spaceBetween: 30,

@@ -933,59 +933,55 @@
         }
     });
 
-    // Miqdar artırma funksiyası
-    function incrementQuantity(button) {
-        const input = button.parentElement.querySelector('.quantity-value');
-        const currentValue = parseInt(input.value);
-        if (currentValue < 999) {
-            input.value = currentValue + 1;
-        }
-    }
-
-    // Miqdar azaltma funksiyası
-    function decrementQuantity(button) {
-        const input = button.parentElement.querySelector('.quantity-value');
-        const currentValue = parseInt(input.value);
-        if (currentValue > 1) {
-            input.value = currentValue - 1;
-        }
-    }
-
-    // Səbətə əlavə etmə funksiyası (miqdar ilə)
-    function addToCartWithQuantity(event, mehsulId, element) {
+    // Səbətə məhsul əlavə etmə funksiyası
+    async function addToCartWithQuantity(productId, event) {
         event.preventDefault();
         
-        const quantityInput = element.closest('tr').querySelector('.quantity-value');
+        // Miqdar inputunu tap
+        const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
         const quantity = parseInt(quantityInput.value);
-        
-        if (quantity < 1 || quantity > 999) {
-            showAnimatedMessage('Xahiş edirik düzgün miqdar daxil edin (1-999)', true);
+
+        if (quantity < 1) {
+            showAnimatedMessage("Miqdar 1-dən az ola bilməz!", true);
             return;
         }
 
-        const csrftoken = getCookie('csrftoken');
-        
-        fetch(`/sebet/elave/${mehsulId}/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrftoken,
-            },
-            body: JSON.stringify({ quantity: quantity })
-        })
-        .then(response => response.json())
-        .then(data => {
+        try {
+            const response = await fetch(`/sebet/elave/${productId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ quantity: quantity })
+            });
+
+            const data = await response.json();
+
             if (data.success) {
-                showAnimatedMessage(`${data.mehsul.adi} səbətə əlavə edildi`, false, data.mehsul);
+                showAnimatedMessage("Məhsul səbətə əlavə edildi!", false, data.mehsul);
                 updateCartCount();
             } else {
-                showAnimatedMessage(data.error || 'Xəta baş verdi', true);
+                showAnimatedMessage(data.error || "Xəta baş verdi!", true);
             }
-        })
-        .catch(error => {
-            showAnimatedMessage('Xəta baş verdi', true);
+        } catch (error) {
+            showAnimatedMessage("Xəta baş verdi!", true);
             console.error('Error:', error);
-        });
+        }
     }
+
+    // Miqdar inputlarının validasiyası
+    document.addEventListener('DOMContentLoaded', function() {
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        
+        quantityInputs.forEach(input => {
+            input.addEventListener('input', function() {
+                let value = parseInt(this.value);
+                if (isNaN(value) || value < 1) {
+                    this.value = 1;
+                }
+            });
+        });
+    });
 
 

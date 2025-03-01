@@ -90,13 +90,9 @@
                                 <i class="fa-solid fa-manat-sign" style="font-size: 0.9em; margin-left: 2px;"></i>
                             </td>
                             <td>
-                                <div class="quantity-input">
-                                    <button class="quantity-btn minus" onclick="decrementQuantity(this)">-</button>
-                                    <input type="number" class="quantity-value" value="1" min="1" max="999">
-                                    <button class="quantity-btn plus" onclick="incrementQuantity(this)">+</button>
-                                </div>
+                                <input type="number" class="quantity-input" min="1" value="1" data-product-id="{{ mehsul.id }}" style="width: 60px; text-align: center;">
                             </td>
-                            <td><a href="#" class="cart-icon" onclick="addToCartWithQuantity(event, {{ mehsul.id }}, this)"><i class="fas fa-shopping-cart"></i></a></td>
+                            <td><a href="#" class="cart-icon" onclick="addToCartWithQuantity({{ mehsul.id }}, event)"><i class="fas fa-shopping-cart"></i></a></td>
                             <td>
                                 <a href="{% url 'mehsul_haqqinda' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="info-link">
                                     <i class="fas fa-info"></i>

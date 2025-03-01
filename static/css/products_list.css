@@ -432,60 +432,6 @@ body {
 .products-table th:nth-child(11),
 .products-table td:nth-child(11) { width: 5%; }
 
-/* Quantity Input Styles */
-.quantity-input {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-}
-
-.quantity-value {
-    width: 50px;
-    text-align: center;
-    border: 1px solid #64ffda;
-    background: rgba(16, 33, 62, 0.3);
-    color: #fff;
-    padding: 5px;
-    border-radius: 4px;
-    font-size: 14px;
-}
-
-.quantity-btn {
-    width: 25px;
-    height: 25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #1a4980, #0d2b4d);
-    border: 1px solid #64ffda;
-    color: #64ffda;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: all 0.3s ease;
-}
-
-.quantity-btn:hover {
-    background: linear-gradient(135deg, #0d2b4d, #1a4980);
-    transform: translateY(-2px);
-}
-
-.quantity-btn:active {
-    transform: translateY(0);
-}
-
-/* Hide number input arrows */
-.quantity-value::-webkit-inner-spin-button,
-.quantity-value::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-.quantity-value[type=number] {
-    -moz-appearance: textfield;
-}
-
 /* Print Styles */
 @media print {
     .search-bar,

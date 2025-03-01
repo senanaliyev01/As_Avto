@@ -215,7 +215,7 @@
                         ${mehsulData && mehsulData.adi ? `
                             <div class="product-info">
                                 ${mehsulData.sekil ? 
-                                    `<img src="${mehsulData.sekil}" alt="${mehsulData.adi}" class="product-image">` 
+                                    `<img src="${mehsulData.sekil}" alt="${mehsulData.adi}" class="product-image-image-tr">` 
                                     : ''
                                 }
                                 <span class="product-name">${mehsulData.adi}</span>
@@ -303,7 +303,7 @@
                 border-radius: 6px;
             }
             
-            .product-image {
+            .product-image-image-tr {
                 width: 80px;
                 height: auto;
                 object-fit: cover;

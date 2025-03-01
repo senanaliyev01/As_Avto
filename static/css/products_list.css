@@ -210,6 +210,7 @@ body {
 
 /* Products Table */
 .products-table {
+    border: 1px solid #64ffda;
     width: 100%;
     background: rgba(16, 33, 62, 0.3);
     overflow: hidden;

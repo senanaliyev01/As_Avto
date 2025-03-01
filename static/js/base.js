@@ -364,24 +364,16 @@
                     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                     btn.style.pointerEvents = 'none';
                     btn.style.opacity = '0.7';
-
-                    const csrftoken = getCookie('csrftoken');
                     
                     fetch(url, {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': csrftoken,
-                            'Accept': 'application/json'
+                            'Content-Type': 'application/json'
                         },
-                        credentials: 'same-origin',
                         body: JSON.stringify({ quantity: quantity })
                     })
                     .then(response => {
                         if (!response.ok) {
-                            if (response.status === 403) {
-                                throw new Error('CSRF token xətası. Səhifəni yeniləyin.');
-                            }
                             throw new Error('Server xətası');
                         }
                         return response.json();

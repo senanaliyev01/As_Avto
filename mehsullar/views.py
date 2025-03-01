@@ -41,6 +41,7 @@ def about(request):
 
 
 
+@csrf_exempt
 @login_required
 def sebet_ekle(request, mehsul_id):
     if request.method != 'POST':

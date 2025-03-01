@@ -336,40 +336,6 @@
         }, 3000);
     }
 
-    // Məhsulu miqdarı ilə birlikdə səbətə əlavə etmək üçün funksiya
-    function addToCartWithQuantity(productId, event) {
-        event.preventDefault();
-        const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
-        const quantity = parseInt(quantityInput.value);
-
-        if (quantity < 1) {
-            showAnimatedMessage("Miqdar 1-dən az ola bilməz!", true);
-            return;
-        }
-
-        fetch(`/sebet-ekle/${productId}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ quantity: quantity })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showAnimatedMessage(`${quantity} ədəd məhsul səbətə əlavə edildi`, false, data.mehsul);
-                updateCartCount();
-            } else {
-                showAnimatedMessage(data.error || "Xəta baş verdi", true);
-            }
-        })
-        .catch(error => {
-            showAnimatedMessage("Xəta baş verdi", true);
-            console.error('Error:', error);
-        });
-    }
-
     // DOM yükləndikdə
     document.addEventListener('DOMContentLoaded', () => {
         try {

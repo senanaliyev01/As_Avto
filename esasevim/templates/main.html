@@ -44,6 +44,7 @@
                     {% endif %}
                     <div class="product-info">
                         <h3>{{ mehsul.adi }}</h3>
+                        <h4>{{ mehsul.oem }}</h4>
                         <p class="brand">{{ mehsul.brend.adi }}</p>
                         <p class="price">{{ mehsul.formatted_qiymet }} AZN</p>
                         <a href="{% url 'mehsul_haqqinda' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="info-link">

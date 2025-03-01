@@ -933,4 +933,59 @@
         }
     });
 
+    // Miqdar artırma funksiyası
+    function incrementQuantity(button) {
+        const input = button.parentElement.querySelector('.quantity-value');
+        const currentValue = parseInt(input.value);
+        if (currentValue < 999) {
+            input.value = currentValue + 1;
+        }
+    }
+
+    // Miqdar azaltma funksiyası
+    function decrementQuantity(button) {
+        const input = button.parentElement.querySelector('.quantity-value');
+        const currentValue = parseInt(input.value);
+        if (currentValue > 1) {
+            input.value = currentValue - 1;
+        }
+    }
+
+    // Səbətə əlavə etmə funksiyası (miqdar ilə)
+    function addToCartWithQuantity(event, mehsulId, element) {
+        event.preventDefault();
+        
+        const quantityInput = element.closest('tr').querySelector('.quantity-value');
+        const quantity = parseInt(quantityInput.value);
+        
+        if (quantity < 1 || quantity > 999) {
+            showAnimatedMessage('Xahiş edirik düzgün miqdar daxil edin (1-999)', true);
+            return;
+        }
+
+        const csrftoken = getCookie('csrftoken');
+        
+        fetch(`/sebet/elave/${mehsulId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({ quantity: quantity })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAnimatedMessage(`${data.mehsul.adi} səbətə əlavə edildi`, false, data.mehsul);
+                updateCartCount();
+            } else {
+                showAnimatedMessage(data.error || 'Xəta baş verdi', true);
+            }
+        })
+        .catch(error => {
+            showAnimatedMessage('Xəta baş verdi', true);
+            console.error('Error:', error);
+        });
+    }
+
 

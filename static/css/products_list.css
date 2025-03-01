@@ -142,7 +142,6 @@ body {
     background: linear-gradient(135deg, #2196f3, #1976d2);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    min-width: 40px;
 }
 
 .cart-icon i {
@@ -433,6 +432,60 @@ body {
 .products-table th:nth-child(11),
 .products-table td:nth-child(11) { width: 5%; }
 
+/* Quantity Input Styles */
+.quantity-input {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.quantity-value {
+    width: 50px;
+    text-align: center;
+    border: 1px solid #64ffda;
+    background: rgba(16, 33, 62, 0.3);
+    color: #fff;
+    padding: 5px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.quantity-btn {
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1a4980, #0d2b4d);
+    border: 1px solid #64ffda;
+    color: #64ffda;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.quantity-btn:hover {
+    background: linear-gradient(135deg, #0d2b4d, #1a4980);
+    transform: translateY(-2px);
+}
+
+.quantity-btn:active {
+    transform: translateY(0);
+}
+
+/* Hide number input arrows */
+.quantity-value::-webkit-inner-spin-button,
+.quantity-value::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.quantity-value[type=number] {
+    -moz-appearance: textfield;
+}
+
 /* Print Styles */
 @media print {
     .search-bar,
@@ -458,37 +511,5 @@ body {
         transition: none !important;
         animation: none !important;
     }
-}
-
-/* Cart Controls */
-.cart-controls {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    justify-content: center;
-}
-
-.quantity-input {
-    width: 60px;
-    padding: 4px 8px;
-    border: 2px solid #64ffda;
-    border-radius: 6px;
-    background: rgba(16, 33, 62, 0.3);
-    color: #fff;
-    font-size: 14px;
-    text-align: center;
-    outline: none;
-    transition: all 0.3s ease;
-}
-
-.quantity-input:focus {
-    border-color: #2196f3;
-    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
-}
-
-.quantity-input::-webkit-inner-spin-button,
-.quantity-input::-webkit-outer-spin-button {
-    opacity: 1;
-    background: #64ffda;
 }
 

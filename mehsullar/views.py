@@ -44,21 +44,49 @@ def about(request):
 @login_required
 def sebet_ekle(request, mehsul_id):
     try:
+        if request.method != 'POST':
+            return JsonResponse({
+                'success': False,
+                'error': 'Yalnız POST sorğuları qəbul edilir.'
+            }, status=405)
+
         mehsul = get_object_or_404(Mehsul, id=mehsul_id)
-        data = json.loads(request.body) if request.body else {}
-        quantity = int(data.get('quantity', 1))
+        
+        try:
+            data = json.loads(request.body) if request.body else {}
+            quantity = int(data.get('quantity', 1))
+        except (json.JSONDecodeError, ValueError):
+            return JsonResponse({
+                'success': False,
+                'error': 'Yanlış məlumat formatı.'
+            }, status=400)
         
         if quantity < 1:
             quantity = 1
         elif quantity > 99:
             quantity = 99
 
-        sebet, created = Sebet.objects.get_or_create(user=request.user, mehsul=mehsul)
-        if created:
-            sebet.miqdar = quantity
-        else:
-            sebet.miqdar += quantity
-        sebet.save()
+        if quantity > mehsul.stok:
+            return JsonResponse({
+                'success': False,
+                'error': f'Stokda yalnız {mehsul.stok} ədəd məhsul var.'
+            }, status=400)
+
+        sebet, created = Sebet.objects.get_or_create(
+            user=request.user,
+            mehsul=mehsul,
+            defaults={'miqdar': quantity}
+        )
+
+        if not created:
+            yeni_miqdar = sebet.miqdar + quantity
+            if yeni_miqdar > mehsul.stok:
+                return JsonResponse({
+                    'success': False,
+                    'error': f'Səbətinizdə {sebet.miqdar} ədəd var. Stokda yalnız {mehsul.stok} ədəd məhsul var.'
+                }, status=400)
+            sebet.miqdar = yeni_miqdar
+            sebet.save()
 
         return JsonResponse({
             'success': True,
@@ -72,7 +100,7 @@ def sebet_ekle(request, mehsul_id):
         return JsonResponse({
             'success': False,
             'error': str(e)
-        }, status=400)
+        }, status=500)
 
 @login_required
 def view_cart(request):

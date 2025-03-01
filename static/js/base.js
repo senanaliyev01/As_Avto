@@ -365,47 +365,49 @@
                     btn.style.pointerEvents = 'none';
                     btn.style.opacity = '0.7';
 
-                    // 1 saniyə loading göstər
-                    setTimeout(() => {
-                        fetch(url, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': getCookie('csrftoken')
-                            },
-                            body: JSON.stringify({ quantity: quantity })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            // Original ikonu bərpa et
-                            btn.innerHTML = originalContent;
-                            btn.style.pointerEvents = 'auto';
-                            btn.style.opacity = '1';
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: JSON.stringify({ quantity: quantity })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Server xətası');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Original ikonu bərpa et
+                        btn.innerHTML = originalContent;
+                        btn.style.pointerEvents = 'auto';
+                        btn.style.opacity = '1';
 
-                            if (data.success) {
-                                showAnimatedMessage(
-                                    `${quantity} ədəd məhsul səbətə əlavə olundu!`,
-                                    false,
-                                    data.mehsul
-                                );
-                                updateCartCount();
-                                // Miqdarı yenidən 1-ə qaytar
-                                quantityInput.value = 1;
-                            } else {
-                                showAnimatedMessage(
-                                    data.error || "Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.",
-                                    true
-                                );
-                            }
-                        })
-                        .catch(error => {
-                            console.error("Xəta:", error);
-                            btn.innerHTML = originalContent;
-                            btn.style.pointerEvents = 'auto';
-                            btn.style.opacity = '1';
-                            showAnimatedMessage("Serverdə xəta baş verdi.", true);
-                        });
-                    }, 1000);
+                        if (data.success) {
+                            showAnimatedMessage(
+                                `${quantity} ədəd məhsul səbətə əlavə olundu!`,
+                                false,
+                                data.mehsul
+                            );
+                            updateCartCount();
+                            // Miqdarı yenidən 1-ə qaytar
+                            quantityInput.value = 1;
+                        } else {
+                            showAnimatedMessage(
+                                data.error || "Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.",
+                                true
+                            );
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Xəta:", error);
+                        btn.innerHTML = originalContent;
+                        btn.style.pointerEvents = 'auto';
+                        btn.style.opacity = '1';
+                        showAnimatedMessage("Serverdə xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.", true);
+                    });
                 }
             });
 

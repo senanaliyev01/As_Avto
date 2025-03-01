@@ -43,17 +43,23 @@ def about(request):
 
 @login_required
 def sebet_ekle(request, mehsul_id):
-    try:
-        if request.method != 'POST':
-            return JsonResponse({
-                'success': False,
-                'error': 'Yalnız POST sorğuları qəbul edilir.'
-            }, status=405)
+    if request.method != 'POST':
+        return JsonResponse({
+            'success': False,
+            'error': 'Yalnız POST sorğuları qəbul edilir.'
+        }, status=405)
 
+    try:
         mehsul = get_object_or_404(Mehsul, id=mehsul_id)
         
+        if not request.body:
+            return JsonResponse({
+                'success': False,
+                'error': 'Məlumat göndərilməyib.'
+            }, status=400)
+
         try:
-            data = json.loads(request.body) if request.body else {}
+            data = json.loads(request.body)
             quantity = int(data.get('quantity', 1))
         except (json.JSONDecodeError, ValueError):
             return JsonResponse({
@@ -96,10 +102,15 @@ def sebet_ekle(request, mehsul_id):
                 'oem': mehsul.oem,
             }
         })
+    except Mehsul.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'Məhsul tapılmadı.'
+        }, status=404)
     except Exception as e:
         return JsonResponse({
             'success': False,
-            'error': str(e)
+            'error': 'Sistem xətası baş verdi. Zəhmət olmasa yenidən cəhd edin.'
         }, status=500)
 
 @login_required

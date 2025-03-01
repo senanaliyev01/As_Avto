@@ -365,16 +365,23 @@
                     btn.style.pointerEvents = 'none';
                     btn.style.opacity = '0.7';
 
+                    const csrftoken = getCookie('csrftoken');
+                    
                     fetch(url, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRFToken': getCookie('csrftoken')
+                            'X-CSRFToken': csrftoken,
+                            'Accept': 'application/json'
                         },
+                        credentials: 'same-origin',
                         body: JSON.stringify({ quantity: quantity })
                     })
                     .then(response => {
                         if (!response.ok) {
+                            if (response.status === 403) {
+                                throw new Error('CSRF token xətası. Səhifəni yeniləyin.');
+                            }
                             throw new Error('Server xətası');
                         }
                         return response.json();
@@ -406,7 +413,7 @@
                         btn.innerHTML = originalContent;
                         btn.style.pointerEvents = 'auto';
                         btn.style.opacity = '1';
-                        showAnimatedMessage("Serverdə xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.", true);
+                        showAnimatedMessage(error.message || "Serverdə xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.", true);
                     });
                 }
             });

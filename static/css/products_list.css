@@ -459,34 +459,3 @@ body {
     }
 }
 
-/* Quantity Input Styles */
-.quantity-cart-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-}
-
-.quantity-input {
-    padding: 8px;
-    border: 2px solid #64ffda;
-    border-radius: 8px;
-    background: rgba(16, 33, 62, 0.3);
-    color: #fff;
-    font-size: 14px;
-    text-align: center;
-    outline: none;
-    transition: all 0.3s ease;
-}
-
-.quantity-input:focus {
-    border-color: #2196f3;
-    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
-}
-
-.quantity-input::-webkit-inner-spin-button,
-.quantity-input::-webkit-outer-spin-button {
-    opacity: 1;
-    background: transparent;
-}
-

@@ -351,75 +351,53 @@
             updateCartCount();
 
             // Səbətə məhsul əlavə etmək
-            document.body.addEventListener('click', function(e) {
-                if (e.target.closest('.add-to-cart-btn')) {
-                    e.preventDefault();
-                    const btn = e.target.closest('.add-to-cart-btn');
-                    const url = btn.getAttribute('href');
-                    const quantityInput = btn.closest('.quantity-cart-wrapper').querySelector('.quantity-input');
-                    const quantity = parseInt(quantityInput.value) || 1;
+            const cartLinks = document.querySelectorAll('.cart-icon');
+
+            cartLinks.forEach(link => {
+                link.addEventListener('click', function (event) {
+                    event.preventDefault();
+
+                    const originalContent = this.innerHTML;
+                    const url = this.getAttribute('href');
 
                     // Loading effektini göstər
-                    const originalContent = btn.innerHTML;
-                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                    btn.style.pointerEvents = 'none';
-                    btn.style.opacity = '0.7';
-                    
-                    fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ quantity: quantity })
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Server xətası');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        // Original ikonu bərpa et
-                        btn.innerHTML = originalContent;
-                        btn.style.pointerEvents = 'auto';
-                        btn.style.opacity = '1';
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    this.style.pointerEvents = 'none';
+                    this.style.opacity = '0.7';
 
-                        if (data.success) {
-                            showAnimatedMessage(
-                                `${quantity} ədəd məhsul səbətə əlavə olundu!`,
-                                false,
-                                data.mehsul
-                            );
-                            updateCartCount();
-                            // Miqdarı yenidən 1-ə qaytar
-                            quantityInput.value = 1;
-                        } else {
-                            showAnimatedMessage(
-                                data.error || "Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.",
-                                true
-                            );
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Xəta:", error);
-                        btn.innerHTML = originalContent;
-                        btn.style.pointerEvents = 'auto';
-                        btn.style.opacity = '1';
-                        showAnimatedMessage(error.message || "Serverdə xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.", true);
-                    });
-                }
-            });
+                    // 2 saniyə loading göstər
+                    setTimeout(() => {
+                        fetch(url)
+                            .then(response => response.json())
+                            .then(data => {
+                                // Original ikonu bərpa et
+                                this.innerHTML = originalContent;
+                                this.style.pointerEvents = 'auto';
+                                this.style.opacity = '1';
 
-            // Miqdar inputu üçün məhdudiyyətlər
-            document.body.addEventListener('input', function(e) {
-                if (e.target.classList.contains('quantity-input')) {
-                    let value = parseInt(e.target.value);
-                    if (isNaN(value) || value < 1) {
-                        e.target.value = 1;
-                    } else if (value > 99) {
-                        e.target.value = 99;
-                    }
-                }
+                                if (data.success) {
+                                    showAnimatedMessage(
+                                        "Məhsul səbətə əlavə olundu!", 
+                                        false, 
+                                        data.mehsul
+                                    );
+                                    updateCartCount();
+                                } else {
+                                    showAnimatedMessage(
+                                        data.error || "Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.", 
+                                        true
+                                    );
+                                }
+                            })
+                            .catch(error => {
+                                console.error("Xəta:", error);
+                                this.innerHTML = originalContent;
+                                this.style.pointerEvents = 'auto';
+                                this.style.opacity = '1';
+                                showAnimatedMessage("Serverdə xəta baş verdi.", true);
+                            });
+                    }, 2000);
+                });
             });
 
             // Swiper-ləri inicializasiya et

@@ -43,51 +43,27 @@ def about(request):
 
 @login_required
 def sebet_ekle(request, mehsul_id):
-    mehsul = get_object_or_404(Mehsul, id=mehsul_id)
-    
     try:
-        data = json.loads(request.body) if request.body else {}
-        quantity = int(data.get('quantity', 1))
-    except (json.JSONDecodeError, ValueError):
-        quantity = 1
+        mehsul = get_object_or_404(Mehsul, id=mehsul_id)
+        sebet, created = Sebet.objects.get_or_create(user=request.user, mehsul=mehsul)
+        if not created:
+            sebet.miqdar += 1
+            sebet.save()
 
-    if quantity < 1:
+        # Məhsul məlumatlarını JSON formatında qaytarırıq
+        return JsonResponse({
+            'success': True,
+            'mehsul': {
+                'adi': mehsul.adi,
+                'sekil': mehsul.sekil.url if mehsul.sekil else None,
+                'oem': mehsul.oem,
+            }
+        })
+    except Exception as e:
         return JsonResponse({
             'success': False,
-            'error': 'Miqdar 1-dən az ola bilməz!'
-        })
-
-    if quantity > mehsul.stok:
-        return JsonResponse({
-            'success': False,
-            'error': f'Maksimum {mehsul.stok} ədəd əlavə edə bilərsiniz!'
-        })
-
-    # Mövcud səbət elementini tap və ya yenisini yarat
-    sebet_item, created = Sebet.objects.get_or_create(
-        user=request.user,
-        mehsul=mehsul,
-        defaults={'miqdar': quantity}
-    )
-
-    # Əgər mövcud element tapılıbsa, miqdarı yenilə
-    if not created:
-        sebet_item.miqdar += quantity
-        if sebet_item.miqdar > mehsul.stok:
-            return JsonResponse({
-                'success': False,
-                'error': f'Səbətdəki ümumi miqdar {mehsul.stok} ədəddən çox ola bilməz!'
-            })
-        sebet_item.save()
-
-    return JsonResponse({
-        'success': True,
-        'message': 'Məhsul səbətə əlavə edildi!',
-        'mehsul': {
-            'adi': mehsul.adi,
-            'sekil': mehsul.sekil.url if mehsul.sekil else None
-        }
-    })
+            'error': str(e)
+        }, status=400)
 
 @login_required
 def view_cart(request):

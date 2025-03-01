@@ -375,14 +375,14 @@ body {
 
 /* Brand Images */
 .marka-pr-image {
-    width: 120px;
-    height: auto;
+    width: 50px;
+    height: 50px;
     display: block;
     margin: 0 auto;
 }
 
 .marka-image-pr-list {
-    width: 80px;
+    width: 70px;
     height: auto;
     display: inline-block;
     margin: 0 5px;
@@ -390,7 +390,7 @@ body {
 }
 
 .marka-image {
-    width: 120px;
+    width: 90px;
     height: auto;
     display: block;
     margin: 0 auto;

@@ -29,7 +29,6 @@
                         <tr>
                             <th>Təsvir</th>
                             <th>Məhsul</th>
-                            <th>Kateqoriya</th>
                             <th>Firma</th>
                             <th>Avtomobil</th>
                             <th>Brend</th>
@@ -37,7 +36,7 @@
                             <th>Mövcudluğ</th>
                             <th>Qiymət</th>
                             <th>Səbət</th>
-                            <th>Ətraflı</th>
+                            <th><i class="fas fa-info"></i></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -49,7 +48,6 @@
                                 {% endif %}
                             </td>
                             <td>{{ mehsul.adi }}</td>
-                            <td>{{ mehsul.kateqoriya }}</td>
                             <td>
                                 {% if mehsul.brend.sekilyazi %}
                                         <img src="{{ mehsul.brend.sekilyazi.url }}" alt="{{ mehsul.brend.adi }}" class="marka-image">

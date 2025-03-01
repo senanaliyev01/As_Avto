@@ -933,4 +933,37 @@
         }
     });
 
+    function addToCartWithQuantity(event, productId) {
+        event.preventDefault();
+        const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
+        const quantity = parseInt(quantityInput.value);
+        
+        if (quantity < 1) {
+            showAnimatedMessage('Miqdar 1-dən az ola bilməz!', true);
+            return;
+        }
+
+        fetch(`/sebet_ekle/${productId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ quantity: quantity })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showAnimatedMessage(data.message, false, data.mehsul_data);
+                updateCartCount();
+            } else {
+                showAnimatedMessage(data.message, true);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAnimatedMessage('Xəta baş verdi!', true);
+        });
+    }
+
 

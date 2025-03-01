@@ -44,26 +44,61 @@ def about(request):
 @login_required
 def sebet_ekle(request, mehsul_id):
     try:
-        mehsul = get_object_or_404(Mehsul, id=mehsul_id)
-        sebet, created = Sebet.objects.get_or_create(user=request.user, mehsul=mehsul)
-        if not created:
-            sebet.miqdar += 1
-            sebet.save()
+        mehsul = Mehsul.objects.get(id=mehsul_id)
+        
+        # JSON data-dan miqdarı al
+        data = json.loads(request.body) if request.body else {}
+        quantity = int(data.get('quantity', 1))
+        
+        if quantity < 1:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Miqdar 1-dən az ola bilməz!'
+            })
+            
+        if quantity > mehsul.stok:
+            return JsonResponse({
+                'status': 'error',
+                'message': f'Stokda yalnız {mehsul.stok} ədəd məhsul var!'
+            })
 
-        # Məhsul məlumatlarını JSON formatında qaytarırıq
+        # Səbətdə eyni məhsuldan varmı yoxla
+        sebet_item = Sebet.objects.filter(user=request.user, mehsul=mehsul).first()
+        
+        if sebet_item:
+            # Əgər varsa, miqdarı artır
+            sebet_item.miqdar += quantity
+            if sebet_item.miqdar > mehsul.stok:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': f'Stokda yalnız {mehsul.stok} ədəd məhsul var!'
+                })
+            sebet_item.save()
+        else:
+            # Yoxdursa, yeni əlavə et
+            Sebet.objects.create(user=request.user, mehsul=mehsul, miqdar=quantity)
+
+        mehsul_data = {
+            'adi': mehsul.adi,
+            'sekil': mehsul.sekil.url if mehsul.sekil else None
+        }
+
         return JsonResponse({
-            'success': True,
-            'mehsul': {
-                'adi': mehsul.adi,
-                'sekil': mehsul.sekil.url if mehsul.sekil else None,
-                'oem': mehsul.oem,
-            }
+            'status': 'success',
+            'message': f'{mehsul.adi} səbətə əlavə edildi!',
+            'mehsul_data': mehsul_data
+        })
+
+    except Mehsul.DoesNotExist:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Məhsul tapılmadı!'
         })
     except Exception as e:
         return JsonResponse({
-            'success': False,
-            'error': str(e)
-        }, status=400)
+            'status': 'error',
+            'message': 'Xəta baş verdi!'
+        })
 
 @login_required
 def view_cart(request):

@@ -164,6 +164,36 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+.quantity-cart-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.quantity-input {
+    padding: 5px;
+    border: 2px solid #64ffda;
+    border-radius: 5px;
+    background: rgba(16, 33, 62, 0.3);
+    color: #fff;
+    text-align: center;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.quantity-input:focus {
+    outline: none;
+    border-color: #2196f3;
+    box-shadow: 0 0 5px rgba(33, 150, 243, 0.5);
+}
+
+.quantity-input::-webkit-inner-spin-button,
+.quantity-input::-webkit-outer-spin-button {
+    opacity: 1;
+    background: rgba(16, 33, 62, 0.3);
+}
+
 .info-link {
     display: inline-flex;
     align-items: center;

@@ -46,14 +46,14 @@ def sebet_ekle(request, mehsul_id):
     try:
         mehsul = get_object_or_404(Mehsul, id=mehsul_id)
         
-        # POST məlumatlarını al
+        # JSON data-dan miqdarı al
         data = json.loads(request.body) if request.body else {}
         quantity = int(data.get('quantity', 1))
         
         if quantity < 1:
             return JsonResponse({
                 'success': False,
-                'error': 'Miqdar 1-dən az ola bilməz!'
+                'error': 'Miqdar 1-dən az ola bilməz'
             }, status=400)
             
         sebet, created = Sebet.objects.get_or_create(user=request.user, mehsul=mehsul)

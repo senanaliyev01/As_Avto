@@ -336,6 +336,40 @@
         }, 3000);
     }
 
+    // Məhsulu miqdarı ilə birlikdə səbətə əlavə etmək üçün funksiya
+    function addToCartWithQuantity(productId, event) {
+        event.preventDefault();
+        const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
+        const quantity = parseInt(quantityInput.value);
+
+        if (quantity < 1) {
+            showAnimatedMessage("Miqdar 1-dən az ola bilməz!", true);
+            return;
+        }
+
+        fetch(`/sebet-ekle/${productId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ quantity: quantity })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAnimatedMessage(`${quantity} ədəd məhsul səbətə əlavə edildi`, false, data.mehsul);
+                updateCartCount();
+            } else {
+                showAnimatedMessage(data.error || "Xəta baş verdi", true);
+            }
+        })
+        .catch(error => {
+            showAnimatedMessage("Xəta baş verdi", true);
+            console.error('Error:', error);
+        });
+    }
+
     // DOM yükləndikdə
     document.addEventListener('DOMContentLoaded', () => {
         try {
@@ -931,57 +965,6 @@
                 });
             }
         }
-    });
-
-    // Səbətə məhsul əlavə etmə funksiyası
-    async function addToCartWithQuantity(productId, event) {
-        event.preventDefault();
-        
-        // Miqdar inputunu tap
-        const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
-        const quantity = parseInt(quantityInput.value);
-
-        if (quantity < 1) {
-            showAnimatedMessage("Miqdar 1-dən az ola bilməz!", true);
-            return;
-        }
-
-        try {
-            const response = await fetch(`/sebet/elave/${productId}/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': getCookie('csrftoken'),
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ quantity: quantity })
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                showAnimatedMessage("Məhsul səbətə əlavə edildi!", false, data.mehsul);
-                updateCartCount();
-            } else {
-                showAnimatedMessage(data.error || "Xəta baş verdi!", true);
-            }
-        } catch (error) {
-            showAnimatedMessage("Xəta baş verdi!", true);
-            console.error('Error:', error);
-        }
-    }
-
-    // Miqdar inputlarının validasiyası
-    document.addEventListener('DOMContentLoaded', function() {
-        const quantityInputs = document.querySelectorAll('.quantity-input');
-        
-        quantityInputs.forEach(input => {
-            input.addEventListener('input', function() {
-                let value = parseInt(this.value);
-                if (isNaN(value) || value < 1) {
-                    this.value = 1;
-                }
-            });
-        });
     });
 
 

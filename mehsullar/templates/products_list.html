@@ -48,14 +48,16 @@
                                 {% endif %}
                             </td>
                             <td>{{ mehsul.adi }}</td>
-                            <td>
+                            <td>{{ mehsul.brend.adi }}</td>
+                            {% comment %} <td>
                                 {% if mehsul.brend.sekilyazi %}
                                         <img src="{{ mehsul.brend.sekilyazi.url }}" alt="{{ mehsul.brend.adi }}" class="marka-image">
                                 {% else %}
                                     <span>{{ mehsul.brend.adi }}</span>
                                 {% endif %}
-                            </td>
-                            <td >
+                            </td> {% endcomment %}
+                            <td>{{ mehsul.marka.adi }}</td>
+                            {% comment %} <td >
                                 {% if mehsul.marka.sekiller.all %}
                                     {% for sekil in mehsul.marka.sekiller.all %}
                                         <img src="{{ sekil.sekil.url }}" alt="{{ mehsul.marka.adi }}" class="marka-image-pr-list">
@@ -63,7 +65,7 @@
                                 {% else %}
                                     <span>{{ mehsul.marka.adi }}</span>
                                 {% endif %}
-                            </td>
+                            </td> {% endcomment %}
                             <td>{{ mehsul.brend_kod }}</td>
                             <td>{{ mehsul.oem }}
                             <a href="#" title="OEM kodunu axtar" onclick="window.open('https://www.google.com/search?tbm=isch&q={{ mehsul.oem }}', 'googleImages', 'width=600,height=600'); return false;">

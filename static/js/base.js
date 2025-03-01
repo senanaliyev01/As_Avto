@@ -239,7 +239,7 @@
             right: '-400px',
             backgroundColor: isError ? '#dc3545' : '#003366',
             color: '#ffffff',
-            padding: '0.5rem',
+            padding: '15px 25px',
             borderRadius: '8px',
             boxShadow: '0 4px 15px rgba(0, 0, 0, 0.15)',
             zIndex: '2000',
@@ -298,7 +298,7 @@
                 align-items: center;
                 gap: 10px;
                 margin: 10px 0;
-                padding: 0.5rem;
+                padding: 8px;
                 background: #f8f9fa;
                 border-radius: 6px;
             }

@@ -120,6 +120,7 @@ REST_FRAMEWORK = {
 
 # Application definition
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -141,7 +142,76 @@ SITE_ID = 1
 # Sitemap cache müddəti (6 saat = 21600 saniyə)
 SITEMAP_CACHE_TIMEOUT = 21600
 
+# 3. Jazzmin tənzimləmələri
+JAZZMIN_SETTINGS = {
+    # Başlıq
+    "site_title": "AS-AVTO",
+    "site_header": "İdarə Etmə",
+    "site_brand": "Admin",
+    "site_logo": "img/favicon.png",
+    "site_icon": "img/favicon.png",
+     "login_logo": "img/favicon.png",
+    
+    # Admin panelin rəng sxemi
+    "theme": "default",
+    
+    # Sidebar menyu
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    
+    # İstifadəçi interfeysi
+    "user_avatar": None,
+    
+    # Top navbarda axtarış
+    "search_model": ["auth.User", "auth.Group"],
+    
+    # Custom linklər
+    "custom_links": {
+        "books": [{
+            "name": "Statistika", 
+            "url": "make_messages", 
+            "icon": "fas fa-comments",
+        }]
+    },
+    
+    # İkonlar
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "istifadeciler.Profile": "fas fa-user",
+        "mehsullar.Brend": "fas fa-industry icon",
+        "mehsullar.Kateqoriya": "fa-solid fa-list",
+        "mehsullar.Marka": "fa-solid fa-car",
+        "mehsullar.Mehsul": "fa-solid fa-boxes-stacked",
+        "mehsullar.MusteriReyi": "fa-solid fa-comment",
+        "mehsullar.Sebet": "fa-solid fa-cart-shopping",
+        "mehsullar.SifarisMehsul": "fa-solid fa-cart-plus",
+        "mehsullar.Sifaris": "fa-solid fa-bell",
+        "rentacar.CarImage": "fa-solid fa-car-side",
+        "rentacar.Car": "fa-solid fa-car",
+        "esasevim.HeroSlide": "fa-solid fa-house",
+    },
+}
 
+# 4. Admin interfeysi üçün əlavə tənzimləmələr
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "navbar-success",
+    "accent": "accent-primary",
+    "navbar": "navbar-dark",
+    "no_navbar_border": False,
+    "sidebar": "sidebar-dark-primary",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": True,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

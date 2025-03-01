@@ -45,12 +45,30 @@ def about(request):
 def sebet_ekle(request, mehsul_id):
     try:
         mehsul = get_object_or_404(Mehsul, id=mehsul_id)
-        sebet, created = Sebet.objects.get_or_create(user=request.user, mehsul=mehsul)
-        if not created:
-            sebet.miqdar += 1
-            sebet.save()
+        
+        # Get quantity from request body
+        if request.method == 'POST':
+            data = json.loads(request.body)
+            quantity = int(data.get('quantity', 1))
+        else:
+            quantity = 1
 
-        # Məhsul məlumatlarını JSON formatında qaytarırıq
+        # Validate quantity
+        if quantity < 1:
+            return JsonResponse({
+                'success': False,
+                'error': 'Miqdar 1-dən az ola bilməz'
+            }, status=400)
+
+        sebet, created = Sebet.objects.get_or_create(user=request.user, mehsul=mehsul)
+        
+        if created:
+            sebet.miqdar = quantity
+        else:
+            sebet.miqdar += quantity
+        sebet.save()
+
+        # Return product information
         return JsonResponse({
             'success': True,
             'mehsul': {

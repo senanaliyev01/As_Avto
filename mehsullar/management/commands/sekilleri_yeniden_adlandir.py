@@ -37,20 +37,25 @@ class Command(BaseCommand):
                     if os.path.exists(kohne_yol):
                         # Şəkili açırıq
                         img = Image.open(kohne_yol)
+                        # Check if the image is not already in WEBP format
+                        if img.format not in ['WEBP']:
+                            # Convert to WEBP format
+                            img = img.convert('RGB')  # Convert to RGB if it's not already
                         # Yeni ad formatı
                         yeni_ad = f"{self.temizle(yeni_ad_prefix)}.webp"  # Yeni adın uzantısını webp edirik
                         # Şəklin saxlanacağı qovluq
                         upload_folder = 'mehsul_sekilleri' if isinstance(model_instance, Mehsul) else 'brend_sekilleri'
                         yeni_yol = os.path.join(upload_folder, yeni_ad)
                         
-                        # Şəkil uzantısını yoxlayırıq
-                        if not kohne_ad.lower().endswith('.png'):
-                            # Şəkili yeni adla saxla
-                            img.save(yeni_yol, format='webp')  # Şəkili webp formatında saxlayırıq
-                        else:
-                            # Əgər uzantı artıq webp-dirsə, köhnə adı saxlayırıq
-                            img.save(yeni_yol, format='webp')  # Şəkili webp formatında saxlayırıq
+                        # Əgər eyni adda şəkil varsa
+                        counter = 1
+                        while default_storage.exists(yeni_yol):
+                            yeni_ad = f"{self.temizle(yeni_ad_prefix)}_{counter}.webp"
+                            yeni_yol = os.path.join(upload_folder, yeni_ad)
+                            counter += 1
                         
+                        # Şəkili yeni adla saxla
+                        img.save(yeni_yol, format='webp')  # Şəkili webp formatında saxlayırıq
                         setattr(model_instance, field_name, File(open(yeni_yol, 'rb')))  # Modelə yeni şəkil əlavə edirik
                         model_instance.save()
                         

@@ -38,7 +38,7 @@ class Command(BaseCommand):
     def yeniden_adlandir(self, model_instance, field_name, yeni_ad_prefix, tip='mehsul'):
         if hasattr(model_instance, field_name) and getattr(model_instance, field_name):
             sekil = getattr(model_instance, field_name)
-            if sekil:
+            if sekil and sekil.name.endswith(('.jpg', '.png')):  # Yalnız jpg və png formatlarını yoxlayırıq
                 try:
                     # Əgər şəkil artıq yenidən adlandırılıbsa, keç
                     model_id = str(model_instance.id)

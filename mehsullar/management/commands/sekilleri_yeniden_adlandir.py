@@ -4,10 +4,10 @@ import os
 from django.conf import settings
 from django.core.files.storage import default_storage
 from django.core.files import File
-from PIL import Image
 import re
 import json
-import io
+from PIL import Image
+from io import BytesIO
 
 class Command(BaseCommand):
     help = 'Məhsul və brend şəkillərini yenidən adlandırır və WebP formatına çevirir'
@@ -20,7 +20,7 @@ class Command(BaseCommand):
             'mehsul_sekilleri': 0,
             'brend_sekilleri': 0,
             'brend_yazi_sekilleri': 0,
-            'webp_cevirildi': 0
+            'webp_cevrilen': 0
         }
 
     def yaddasi_yukle(self):
@@ -43,35 +43,31 @@ class Command(BaseCommand):
         return temiz.lower()
 
     def sekili_webp_cevir(self, image_path):
-        """Şəkili WebP formatına çevirir və şəffaflığı qoruyur"""
         try:
+            # Şəkili aç
             with Image.open(image_path) as img:
-                # Şəklin orijinal ölçüsünü və formatını saxla
-                original_format = img.format
+                # Şəklin orijinal ölçülərini saxla
+                original_size = img.size
                 
-                # Əgər şəkil artıq WebP formatındadırsa, çevirmə
-                if original_format == 'WEBP':
-                    return None
-                
-                # RGBA moduna keç (şəffaflıq üçün)
+                # RGBA formatına çevir (şəffaflığı qorumaq üçün)
                 if img.mode in ('RGBA', 'LA') or (img.mode == 'P' and 'transparency' in img.info):
                     img = img.convert('RGBA')
                 else:
                     img = img.convert('RGB')
+
+                # BytesIO obyekti yarat
+                webp_io = BytesIO()
                 
-                # Şəkili yaddaşda saxla
-                output = io.BytesIO()
+                # WebP formatında saxla (şəffaflığı qoruyaraq)
+                img.save(webp_io, 'WEBP', quality=90, lossless=True)
+                webp_io.seek(0)
                 
-                # WebP formatına çevir (şəffaflığı qoruyaraq)
-                img.save(output, format='WEBP', quality=90, method=6, lossless=True)
-                output.seek(0)
-                
-                return output
-                
+                return webp_io
+
         except Exception as e:
             self.stdout.write(
                 self.style.ERROR(
-                    f'Şəkil WebP formatına çevrilərkən xəta baş verdi: {str(e)}'
+                    f'WebP çevirmədə xəta: {str(e)}'
                 )
             )
             return None
@@ -95,26 +91,25 @@ class Command(BaseCommand):
                     kohne_ad = os.path.basename(kohne_yol)
                     
                     if os.path.exists(kohne_yol):
-                        # WebP formatına çevir
-                        webp_output = self.sekili_webp_cevir(kohne_yol)
+                        # Yeni ad formatı (WebP uzantısı ilə)
+                        yeni_ad = f"{self.temizle(yeni_ad_prefix)}.webp"
                         
-                        if webp_output:
-                            # Yeni ad formatı (.webp uzantısı ilə)
-                            yeni_ad = f"{self.temizle(yeni_ad_prefix)}.webp"
-                            
-                            # Şəklin saxlanacağı qovluq
-                            upload_folder = 'mehsul_sekilleri' if isinstance(model_instance, Mehsul) else 'brend_sekilleri'
+                        # Şəklin saxlanacağı qovluq
+                        upload_folder = 'mehsul_sekilleri' if isinstance(model_instance, Mehsul) else 'brend_sekilleri'
+                        yeni_yol = os.path.join(upload_folder, yeni_ad)
+                        
+                        # Əgər eyni adda şəkil varsa
+                        counter = 1
+                        while default_storage.exists(yeni_yol):
+                            yeni_ad = f"{self.temizle(yeni_ad_prefix)}_{counter}.webp"
                             yeni_yol = os.path.join(upload_folder, yeni_ad)
-                            
-                            # Əgər eyni adda şəkil varsa
-                            counter = 1
-                            while default_storage.exists(yeni_yol):
-                                yeni_ad = f"{self.temizle(yeni_ad_prefix)}_{counter}.webp"
-                                yeni_yol = os.path.join(upload_folder, yeni_ad)
-                                counter += 1
-                            
-                            # WebP şəklini yeni adla saxla
-                            setattr(model_instance, field_name, File(webp_output, name=yeni_yol))
+                            counter += 1
+                        
+                        # Şəkili WebP formatına çevir
+                        webp_io = self.sekili_webp_cevir(kohne_yol)
+                        if webp_io:
+                            # Yeni WebP şəkili saxla
+                            setattr(model_instance, field_name, File(webp_io, name=yeni_yol))
                             model_instance.save()
                             
                             # Köhnə şəkili sil
@@ -132,20 +127,13 @@ class Command(BaseCommand):
                                 self.statistika['brend_yazi_sekilleri'] += 1
                                 self.yeniden_adlananlar['brend_yazilar'].append(model_id)
                             
-                            self.statistika['webp_cevirildi'] += 1
+                            self.statistika['webp_cevrilen'] += 1
                             
                             self.stdout.write(
                                 self.style.SUCCESS(
                                     f'Şəkil WebP formatına çevrildi və yenidən adlandırıldı: {kohne_ad} -> {yeni_ad}'
                                 )
                             )
-                        else:
-                            self.stdout.write(
-                                self.style.WARNING(
-                                    f'Şəkil artıq WebP formatındadır və ya çevrilə bilmədi: {kohne_ad}'
-                                )
-                            )
-                            
                 except Exception as e:
                     self.stdout.write(
                         self.style.ERROR(
@@ -175,7 +163,7 @@ class Command(BaseCommand):
         self.stdout.write(f"Məhsul şəkilləri: {self.statistika['mehsul_sekilleri']} ədəd")
         self.stdout.write(f"Brend şəkilləri: {self.statistika['brend_sekilleri']} ədəd")
         self.stdout.write(f"Brend yazı şəkilləri: {self.statistika['brend_yazi_sekilleri']} ədəd")
-        self.stdout.write(f"WebP formatına çevrilən şəkillər: {self.statistika['webp_cevirildi']} ədəd")
+        self.stdout.write(f"WebP formatına çevrilən şəkillər: {self.statistika['webp_cevrilen']} ədəd")
         
         if sum(self.statistika.values()) == 0:
             self.stdout.write(
@@ -183,5 +171,5 @@ class Command(BaseCommand):
             )
         else:
             self.stdout.write(
-                self.style.SUCCESS(f"Cəmi {sum(self.statistika.values())} ədəd şəkil emal edildi!")
+                self.style.SUCCESS(f"Cəmi {self.statistika['webp_cevrilen']} ədəd şəkil WebP formatına çevrildi!")
             ) 

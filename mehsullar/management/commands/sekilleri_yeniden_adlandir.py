@@ -76,7 +76,7 @@ class Command(BaseCommand):
                         
                         # Şəkili yeni adla saxla
                         with Image.open(kohne_yol) as img:
-                            img.save(yeni_yol, "WEBP")  # Şəkili webp formatında saxla
+                            img.convert('RGB').save(yeni_yol, "WEBP")  # Şəkili webp formatında saxla
                         
                         # Köhnə şəkili sil
                         if os.path.exists(kohne_yol):

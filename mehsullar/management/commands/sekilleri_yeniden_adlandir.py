@@ -43,10 +43,11 @@ class Command(BaseCommand):
                         return
                     
                     # Şəkil formatını yoxlayırıq
-                    if not (kohne_ad.lower().endswith('.jpg') or kohne_ad.lower().endswith('.png')):
+                    fayl_uzantisi = os.path.splitext(kohne_ad)[1].lower()
+                    if fayl_uzantisi not in ['.jpg', '.jpeg', '.png']:
                         self.stdout.write(
                             self.style.ERROR(
-                                f'Yalnız jpg və png formatları dəstəklənir: {kohne_ad}'
+                                f'Uyğun format deyil: {kohne_ad}. Yalnız jpg və png formatları dəstəklənir.'
                             )
                         )
                         return

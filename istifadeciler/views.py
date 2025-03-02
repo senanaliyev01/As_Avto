@@ -113,17 +113,67 @@ def profile(request):
 @login_required
 def password_change(request):
     if request.method == 'POST':
-        form = PasswordChangeForm(request.user, request.POST)
-        if form.is_valid():
-            user = form.save()
-            update_session_auth_hash(request, user)
+        old_password = request.POST.get('old_password')
+        new_password1 = request.POST.get('new_password1')
+        new_password2 = request.POST.get('new_password2')
+
+        # Boş sahələri yoxla
+        if not all([old_password, new_password1, new_password2]):
+            messages.error(request, 'Bütün sahələr doldurulmalıdır!')
+            return render(request, 'password_change.html')
+
+        # Köhnə şifrəni yoxla
+        if not request.user.check_password(old_password):
+            messages.error(request, 'Köhnə şifrə düzgün deyil!')
+            return render(request, 'password_change.html')
+
+        # Yeni şifrələrin uyğunluğunu yoxla
+        if new_password1 != new_password2:
+            messages.error(request, 'Yeni şifrələr uyğun gəlmir!')
+            return render(request, 'password_change.html')
+
+        # Şifrə tələblərini yoxla
+        if len(new_password1) < 8:
+            messages.error(request, 'Şifrə ən azı 8 simvol olmalıdır!')
+            return render(request, 'password_change.html')
+
+        if not any(char.isupper() for char in new_password1):
+            messages.error(request, 'Şifrədə ən azı 1 böyük hərf olmalıdır!')
+            return render(request, 'password_change.html')
+
+        if not any(char.islower() for char in new_password1):
+            messages.error(request, 'Şifrədə ən azı 1 kiçik hərf olmalıdır!')
+            return render(request, 'password_change.html')
+
+        if not any(char.isdigit() for char in new_password1):
+            messages.error(request, 'Şifrədə ən azı 1 rəqəm olmalıdır!')
+            return render(request, 'password_change.html')
+
+        if not any(char in '!@#$%^&*(),.?":{}|<>' for char in new_password1):
+            messages.error(request, 'Şifrədə ən azı 1 xüsusi simvol olmalıdır!')
+            return render(request, 'password_change.html')
+
+        # Köhnə və yeni şifrənin eyni olmamasını yoxla
+        if old_password == new_password1:
+            messages.error(request, 'Yeni şifrə köhnə şifrə ilə eyni ola bilməz!')
+            return render(request, 'password_change.html')
+
+        try:
+            # Şifrəni yenilə
+            request.user.set_password(new_password1)
+            request.user.save()
+            
+            # Sessiyani yenilə
+            update_session_auth_hash(request, request.user)
+            
             messages.success(request, 'Şifrəniz uğurla dəyişdirildi!')
             return redirect('profile')
-        else:
-            messages.error(request, 'Xəta baş verdi. Zəhmət olmasa məlumatları düzgün daxil edin.')
-    else:
-        form = PasswordChangeForm(request.user)
-    return render(request, 'password_change.html', {'form': form})
+            
+        except Exception as e:
+            messages.error(request, f'Xəta baş verdi: {str(e)}')
+            return render(request, 'password_change.html')
+
+    return render(request, 'password_change.html')
 
 @require_POST
 def logout_view(request):

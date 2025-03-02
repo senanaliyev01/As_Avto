@@ -6,6 +6,7 @@ from django.core.files.storage import default_storage
 from django.core.files import File
 import re
 import json
+from PIL import Image
 
 class Command(BaseCommand):
     help = 'Məhsul və brend şəkillərini yenidən adlandırır'
@@ -59,10 +60,10 @@ class Command(BaseCommand):
                     
                     if os.path.exists(kohne_yol):
                         # Yeni ad formatı
-                        fayl_uzantisi = os.path.splitext(kohne_ad)[1]
+                        fayl_uzantisi = '.webp'  # Yeni uzantı
                         yeni_ad = f"{self.temizle(yeni_ad_prefix)}{fayl_uzantisi}"
                         
-                        # Şəklin saxlanacağı qovluq
+                        # Şəkilin saxlanacağı qovluq
                         upload_folder = 'mehsul_sekilleri' if isinstance(model_instance, Mehsul) else 'brend_sekilleri'
                         yeni_yol = os.path.join(upload_folder, yeni_ad)
                         
@@ -74,10 +75,8 @@ class Command(BaseCommand):
                             counter += 1
                         
                         # Şəkili yeni adla saxla
-                        with open(kohne_yol, 'rb') as f:
-                            setattr(model_instance, field_name, File(f))
-                            getattr(model_instance, field_name).name = yeni_yol
-                            model_instance.save()
+                        with Image.open(kohne_yol) as img:
+                            img.save(yeni_yol, "WEBP")  # Şəkili webp formatında saxla
                         
                         # Köhnə şəkili sil
                         if os.path.exists(kohne_yol):

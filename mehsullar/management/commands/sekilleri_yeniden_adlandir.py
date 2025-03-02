@@ -104,6 +104,10 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         # Məhsul şəkillərini yenidən adlandır
         mehsullar = Mehsul.objects.filter(sekil__isnull=False)
+        if not mehsullar.exists():
+            self.stdout.write(self.style.WARNING('Heç bir məhsul şəkli tapılmadı!'))
+            return
+
         for mehsul in mehsullar:
             yeni_ad = f"{mehsul.adi}_{mehsul.brend.adi}_{mehsul.brend_kod}_{mehsul.oem}"
             self.yeniden_adlandir(mehsul, 'sekil', yeni_ad, 'mehsul')

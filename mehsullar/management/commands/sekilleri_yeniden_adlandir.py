@@ -41,9 +41,7 @@ class Command(BaseCommand):
                         yeni_ad = f"{self.temizle(yeni_ad_prefix)}.webp"  # Yeni adın uzantısını webp edirik
                         
                         # Şəklin saxlanacağı qovluq
-                        upload_folder = os.path.join(settings.MEDIA_ROOT, 'mehsul_sekilleri')
-                        # Qovluğun varlığını yoxlayırıq, yoxdursa yaradırıq
-                        os.makedirs(upload_folder, exist_ok=True)
+                        upload_folder = os.path.join(settings.MEDIA_ROOT, 'mehsul_sekilleri') if isinstance(model_instance, Mehsul) else os.path.join(settings.MEDIA_ROOT, 'brend_sekilleri')
                         yeni_yol = os.path.join(upload_folder, yeni_ad)
                         
                         # Əgər eyni adda şəkil varsa

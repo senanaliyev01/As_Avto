@@ -101,6 +101,7 @@ class Command(BaseCommand):
         # Məhsul şəkillərini yenidən adlandır
         mehsullar = Mehsul.objects.filter(sekil__isnull=False)
         for mehsul in mehsullar:
+            self.stdout.write(f'Mehsul: {mehsul.adi}, Şəkil Yolu: {mehsul.sekil.path}')  # Şəkil yolunu yazdırır
             yeni_ad = f"{mehsul.adi}_{mehsul.brend.adi}_{mehsul.brend_kod}_{mehsul.oem}"
             self.yeniden_adlandir(mehsul, 'sekil', yeni_ad, 'mehsul')
         

@@ -42,6 +42,15 @@ class Command(BaseCommand):
                         )
                         return
                     
+                    # Şəkil formatını yoxlayırıq
+                    if not (kohne_ad.lower().endswith('.jpg') or kohne_ad.lower().endswith('.png')):
+                        self.stdout.write(
+                            self.style.WARNING(
+                                f'Yalnız jpg və png formatlı şəkillər işlənir: {kohne_ad}'
+                            )
+                        )
+                        return
+                    
                     # Şəkili açırıq
                     img = Image.open(kohne_yol)
                     # Yeni ad formatı

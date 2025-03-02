@@ -65,6 +65,9 @@ class Command(BaseCommand):
                         
                         # Şəkilin saxlanacağı qovluq
                         upload_folder = 'mehsul_sekilleri' if isinstance(model_instance, Mehsul) else 'brend_sekilleri'
+                        # Qovluğun mövcudluğunu yoxla, yoxdursa yarat
+                        if not os.path.exists(upload_folder):
+                            os.makedirs(upload_folder)
                         yeni_yol = os.path.join(upload_folder, yeni_ad)
                         
                         # Əgər eyni adda şəkil varsa

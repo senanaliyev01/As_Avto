@@ -40,67 +40,60 @@ class Command(BaseCommand):
             sekil = getattr(model_instance, field_name)
             if sekil and sekil.name.endswith(('.jpg', '.png')):  # Yalnız jpg və png formatlarını yoxlayırıq
                 try:
-                    # Əgər şəkil artıq yenidən adlandırılıbsa, keç
-                    model_id = str(model_instance.id)
-                    if tip == 'mehsul' and model_id in self.yeniden_adlananlar['mehsullar']:
-                        return
-                    elif tip == 'brend' and model_id in self.yeniden_adlananlar['brendler']:
-                        return
-                    elif tip == 'brend_yazi' and model_id in self.yeniden_adlananlar['brend_yazilar']:
-                        return
-
                     # Köhnə şəklin yolunu və adını al
-                    kohne_yol = sekil.path
+                    kohne_yol = sekil.path if sekil else None
+                    if not kohne_yol or not os.path.exists(kohne_yol):
+                        self.stdout.write(self.style.ERROR(f'Köhnə yol tapılmadı: {kohne_yol}'))
+                        return
                     kohne_ad = os.path.basename(kohne_yol)
                     
-                    if os.path.exists(kohne_yol):
+                    # Şəkili açırıq
+                    img = Image.open(kohne_yol)
+                    # Yeni ad formatı
+                    yeni_ad = f"{self.temizle(yeni_ad_prefix)}.webp"  # Yeni adın uzantısını webp edirik
+                    img.save(kohne_yol, format='webp')  # Şəkili webp formatında saxlayırıq
+                    
+                    # Şəklin saxlanacağı qovluq
+                    upload_folder = 'mehsul_sekilleri' if isinstance(model_instance, Mehsul) else 'brend_sekilleri'
+                    yeni_yol = os.path.join(upload_folder, yeni_ad)
+                    
+                    # Əgər eyni adda şəkil varsa
+                    counter = 1
+                    while default_storage.exists(yeni_yol):
+                        yeni_ad = f"{self.temizle(yeni_ad_prefix)}_{counter}.webp"
+                        yeni_yol = os.path.join(upload_folder, yeni_ad)
+                        counter += 1
+                    
+                    # Şəkili yeni adla saxla
+                    with open(kohne_yol, 'rb') as f:
                         # Şəkili açırıq
-                        img = Image.open(kohne_yol)
+                        img = Image.open(f)
                         # Yeni ad formatı
                         yeni_ad = f"{self.temizle(yeni_ad_prefix)}.webp"  # Yeni adın uzantısını webp edirik
-                        img.save(kohne_yol, format='webp')  # Şəkili webp formatında saxlayırıq
-                        
-                        # Şəklin saxlanacağı qovluq
-                        upload_folder = 'mehsul_sekilleri' if isinstance(model_instance, Mehsul) else 'brend_sekilleri'
-                        yeni_yol = os.path.join(upload_folder, yeni_ad)
-                        
-                        # Əgər eyni adda şəkil varsa
-                        counter = 1
-                        while default_storage.exists(yeni_yol):
-                            yeni_ad = f"{self.temizle(yeni_ad_prefix)}_{counter}.webp"
-                            yeni_yol = os.path.join(upload_folder, yeni_ad)
-                            counter += 1
-                        
-                        # Şəkili yeni adla saxla
-                        with open(kohne_yol, 'rb') as f:
-                            # Şəkili açırıq
-                            img = Image.open(f)
-                            # Yeni ad formatı
-                            yeni_ad = f"{self.temizle(yeni_ad_prefix)}.webp"  # Yeni adın uzantısını webp edirik
-                            img.save(yeni_yol, format='webp')  # Şəkili webp formatında saxlayırıq
-                            setattr(model_instance, field_name, File(open(yeni_yol, 'rb')))  # Modelə yeni şəkil əlavə edirik
-                            model_instance.save()
-                        
-                        # Köhnə şəkili sil
-                        if os.path.exists(kohne_yol):
-                            os.remove(kohne_yol)
+                        img.save(yeni_yol, format='webp')  # Şəkili webp formatında saxlayırıq
+                        setattr(model_instance, field_name, File(open(yeni_yol, 'rb')))  # Modelə yeni şəkil əlavə edirik
+                        model_instance.save()
+                    
+                    # Köhnə şəkili sil
+                    if os.path.exists(kohne_yol):
+                        os.remove(kohne_yol)
 
-                        # Statistikanı yenilə
-                        if tip == 'mehsul':
-                            self.statistika['mehsul_sekilleri'] += 1
-                            self.yeniden_adlananlar['mehsullar'].append(model_id)
-                        elif tip == 'brend':
-                            self.statistika['brend_sekilleri'] += 1
-                            self.yeniden_adlananlar['brendler'].append(model_id)
-                        elif tip == 'brend_yazi':
-                            self.statistika['brend_yazi_sekilleri'] += 1
-                            self.yeniden_adlananlar['brend_yazilar'].append(model_id)
-                        
-                        self.stdout.write(
-                            self.style.SUCCESS(
-                                f'Şəkil yenidən adlandırıldı: {kohne_ad} -> {yeni_ad}'
-                            )
+                    # Statistikanı yenilə
+                    if tip == 'mehsul':
+                        self.statistika['mehsul_sekilleri'] += 1
+                        self.yeniden_adlananlar['mehsullar'].append(str(model_instance.id))
+                    elif tip == 'brend':
+                        self.statistika['brend_sekilleri'] += 1
+                        self.yeniden_adlananlar['brendler'].append(str(model_instance.id))
+                    elif tip == 'brend_yazi':
+                        self.statistika['brend_yazi_sekilleri'] += 1
+                        self.yeniden_adlananlar['brend_yazilar'].append(str(model_instance.id))
+                    
+                    self.stdout.write(
+                        self.style.SUCCESS(
+                            f'Şəkil yenidən adlandırıldı: {kohne_ad} -> {yeni_ad}'
                         )
+                    )
                 except Exception as e:
                     self.stdout.write(
                         self.style.ERROR(

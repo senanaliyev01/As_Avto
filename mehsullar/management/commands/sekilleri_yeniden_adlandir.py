@@ -6,7 +6,7 @@ from django.core.files.storage import default_storage
 from django.core.files import File
 import re
 import json
-from PIL import Image
+from PIL import Image  # Pillow kitabxanasını import edirik
 
 class Command(BaseCommand):
     help = 'Məhsul və brend şəkillərini yenidən adlandırır'
@@ -59,27 +59,32 @@ class Command(BaseCommand):
                     kohne_ad = os.path.basename(kohne_yol)
                     
                     if os.path.exists(kohne_yol):
+                        # Şəkili açırıq
+                        img = Image.open(kohne_yol)
                         # Yeni ad formatı
-                        fayl_uzantisi = '.webp'  # Yeni uzantı
-                        yeni_ad = f"{self.temizle(yeni_ad_prefix)}{fayl_uzantisi}"
+                        yeni_ad = f"{self.temizle(yeni_ad_prefix)}.webp"  # Yeni adın uzantısını webp edirik
+                        img.save(kohne_yol, format='webp')  # Şəkili webp formatında saxlayırıq
                         
-                        # Şəkilin saxlanacağı qovluq
+                        # Şəklin saxlanacağı qovluq
                         upload_folder = 'mehsul_sekilleri' if isinstance(model_instance, Mehsul) else 'brend_sekilleri'
-                        # Qovluğun mövcudluğunu yoxla, yoxdursa yarat
-                        if not os.path.exists(upload_folder):
-                            os.makedirs(upload_folder)
                         yeni_yol = os.path.join(upload_folder, yeni_ad)
                         
                         # Əgər eyni adda şəkil varsa
                         counter = 1
                         while default_storage.exists(yeni_yol):
-                            yeni_ad = f"{self.temizle(yeni_ad_prefix)}_{counter}{fayl_uzantisi}"
+                            yeni_ad = f"{self.temizle(yeni_ad_prefix)}_{counter}.webp"
                             yeni_yol = os.path.join(upload_folder, yeni_ad)
                             counter += 1
                         
                         # Şəkili yeni adla saxla
-                        with Image.open(kohne_yol) as img:
-                            img.convert('RGB').save(yeni_yol, "WEBP")  # Şəkili webp formatında saxla
+                        with open(kohne_yol, 'rb') as f:
+                            # Şəkili açırıq
+                            img = Image.open(f)
+                            # Yeni ad formatı
+                            yeni_ad = f"{self.temizle(yeni_ad_prefix)}.webp"  # Yeni adın uzantısını webp edirik
+                            img.save(yeni_yol, format='webp')  # Şəkili webp formatında saxlayırıq
+                            setattr(model_instance, field_name, File(open(yeni_yol, 'rb')))  # Modelə yeni şəkil əlavə edirik
+                            model_instance.save()
                         
                         # Köhnə şəkili sil
                         if os.path.exists(kohne_yol):

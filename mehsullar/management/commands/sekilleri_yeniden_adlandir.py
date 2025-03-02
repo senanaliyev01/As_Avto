@@ -22,13 +22,8 @@ class Command(BaseCommand):
         }
 
     def yaddasi_yukle(self):
-        try:
-            if os.path.exists(self.yaddas_fayli):
-                with open(self.yaddas_fayli, 'r', encoding='utf-8') as f:
-                    return json.load(f)
-            return {'mehsullar': [], 'brendler': [], 'brend_yazilar': []}
-        except:
-            return {'mehsullar': [], 'brendler': [], 'brend_yazilar': []}
+        # Hər dəfə yeni işə salındığında yaddaşı sıfırlayırıq
+        return {'mehsullar': [], 'brendler': [], 'brend_yazilar': []}
 
     def yaddasi_saxla(self):
         with open(self.yaddas_fayli, 'w', encoding='utf-8') as f:

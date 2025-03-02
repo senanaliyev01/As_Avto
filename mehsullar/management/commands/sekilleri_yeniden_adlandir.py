@@ -6,22 +6,36 @@ from django.core.files.storage import default_storage
 from django.core.files import File
 import re
 import json
-from PIL import Image  # Pillow kitabxanasını import edirik
 
 class Command(BaseCommand):
     help = 'Məhsul və brend şəkillərini yenidən adlandırır'
 
     def __init__(self):
         super().__init__()
+        self.yaddas_fayli = 'sekil_yaddasi.json'
+        self.yeniden_adlananlar = self.yaddasi_yukle()
         self.statistika = {
             'mehsul_sekilleri': 0,
             'brend_sekilleri': 0,
             'brend_yazi_sekilleri': 0
         }
 
+    def yaddasi_yukle(self):
+        try:
+            if os.path.exists(self.yaddas_fayli):
+                with open(self.yaddas_fayli, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            return {'mehsullar': [], 'brendler': [], 'brend_yazilar': []}
+        except:
+            return {'mehsullar': [], 'brendler': [], 'brend_yazilar': []}
+
+    def yaddasi_saxla(self):
+        with open(self.yaddas_fayli, 'w', encoding='utf-8') as f:
+            json.dump(self.yeniden_adlananlar, f, ensure_ascii=False, indent=2)
+
     def temizle(self, metin):
         # Xüsusi simvolları və boşluqları təmizləyir
-        temiz = re.sub(r'[^\w\s-]', '', metin)  # Düzgün regex ifadəsi
+        temiz = re.sub(r'[^\w\s-]', '', metin)
         temiz = re.sub(r'\s+', '_', temiz.strip())
         return temiz.lower()
 
@@ -30,19 +44,24 @@ class Command(BaseCommand):
             sekil = getattr(model_instance, field_name)
             if sekil:
                 try:
+                    # Əgər şəkil artıq yenidən adlandırılıbsa, keç
+                    model_id = str(model_instance.id)
+                    if tip == 'mehsul' and model_id in self.yeniden_adlananlar['mehsullar']:
+                        return
+                    elif tip == 'brend' and model_id in self.yeniden_adlananlar['brendler']:
+                        return
+                    elif tip == 'brend_yazi' and model_id in self.yeniden_adlananlar['brend_yazilar']:
+                        return
+
                     # Köhnə şəklin yolunu və adını al
                     kohne_yol = sekil.path
                     kohne_ad = os.path.basename(kohne_yol)
                     
                     if os.path.exists(kohne_yol):
-                        # Şəkili açırıq
-                        img = Image.open(kohne_yol)
-                        # Check if the image is not already in WEBP format
-                        if img.format not in ['WEBP']:
-                            # Convert to WEBP format
-                            img = img.convert('RGB')  # Convert to RGB if it's not already
                         # Yeni ad formatı
-                        yeni_ad = f"{self.temizle(yeni_ad_prefix)}.webp"  # Yeni adın uzantısını webp edirik
+                        fayl_uzantisi = os.path.splitext(kohne_ad)[1]
+                        yeni_ad = f"{self.temizle(yeni_ad_prefix)}{fayl_uzantisi}"
+                        
                         # Şəklin saxlanacağı qovluq
                         upload_folder = 'mehsul_sekilleri' if isinstance(model_instance, Mehsul) else 'brend_sekilleri'
                         yeni_yol = os.path.join(upload_folder, yeni_ad)
@@ -50,14 +69,15 @@ class Command(BaseCommand):
                         # Əgər eyni adda şəkil varsa
                         counter = 1
                         while default_storage.exists(yeni_yol):
-                            yeni_ad = f"{self.temizle(yeni_ad_prefix)}_{counter}.webp"
+                            yeni_ad = f"{self.temizle(yeni_ad_prefix)}_{counter}{fayl_uzantisi}"
                             yeni_yol = os.path.join(upload_folder, yeni_ad)
                             counter += 1
                         
                         # Şəkili yeni adla saxla
-                        img.save(yeni_yol, format='webp')  # Şəkili webp formatında saxlayırıq
-                        setattr(model_instance, field_name, File(open(yeni_yol, 'rb')))  # Modelə yeni şəkil əlavə edirik
-                        model_instance.save()
+                        with open(kohne_yol, 'rb') as f:
+                            setattr(model_instance, field_name, File(f))
+                            getattr(model_instance, field_name).name = yeni_yol
+                            model_instance.save()
                         
                         # Köhnə şəkili sil
                         if os.path.exists(kohne_yol):
@@ -66,10 +86,13 @@ class Command(BaseCommand):
                         # Statistikanı yenilə
                         if tip == 'mehsul':
                             self.statistika['mehsul_sekilleri'] += 1
+                            self.yeniden_adlananlar['mehsullar'].append(model_id)
                         elif tip == 'brend':
                             self.statistika['brend_sekilleri'] += 1
+                            self.yeniden_adlananlar['brendler'].append(model_id)
                         elif tip == 'brend_yazi':
                             self.statistika['brend_yazi_sekilleri'] += 1
+                            self.yeniden_adlananlar['brend_yazilar'].append(model_id)
                         
                         self.stdout.write(
                             self.style.SUCCESS(
@@ -97,6 +120,9 @@ class Command(BaseCommand):
             if brend.sekilyazi:
                 self.yeniden_adlandir(brend, 'sekilyazi', f"{brend.adi}_yazi", 'brend_yazi')
         
+        # Yaddaşı saxla
+        self.yaddasi_saxla()
+
         # Statistikanı göstər
         self.stdout.write("\nStatistika:")
         self.stdout.write(f"Məhsul şəkilləri: {self.statistika['mehsul_sekilleri']} ədəd")

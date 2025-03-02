@@ -44,7 +44,7 @@ class Command(BaseCommand):
                         yeni_yol = os.path.join(upload_folder, yeni_ad)
                         
                         # Şəkil uzantısını yoxlayırıq
-                        if not kohne_ad.lower().endswith('.webp'):
+                        if not kohne_ad.lower().endswith('.png'):
                             # Şəkili yeni adla saxla
                             img.save(yeni_yol, format='webp')  # Şəkili webp formatında saxlayırıq
                         else:

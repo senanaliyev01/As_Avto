@@ -45,7 +45,7 @@ class MarkaSekil(models.Model):
     
     
 class Avtomodel(models.Model):
-    adi = models.CharField(max_length=100)
+    adi = models.CharField(max_length=100 , unique=True)
 
     def __str__(self):
         return self.adi
@@ -55,20 +55,20 @@ class Avtomodel(models.Model):
         verbose_name_plural = 'Avtomobil Modelleri'
     
 class Motor(models.Model):
-    motor = models.CharField(max_length=100)
+    motor = models.CharField(max_length=100 , unique=True)
 
     def __str__(self):
-        return self.adi
+        return self.motor
     
     class Meta:
         verbose_name = 'Avtomobil Motorları'
         verbose_name_plural = 'Avtomobil Motorları'
         
 class Il(models.Model):
-    il = models.CharField(max_length=100)
+    il = models.CharField(max_length=100 , unique=True)
 
     def __str__(self):
-        return self.adi
+        return self.il
     
     class Meta:
         verbose_name = 'Avtomobil İlləri'

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Kateqoriya, Brend, Marka, Mehsul, Sebet, Sifaris, SifarisMehsul, OEMKod, MusteriReyi, MarkaSekil, Model, Avtomodel, Motor, Il
+from .models import Kateqoriya, Brend, Marka, Mehsul, Sebet, Sifaris, SifarisMehsul, OEMKod, MusteriReyi, MarkaSekil, Model, Avtomodel, Motor, Il, Yanacaq
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils import timezone
@@ -169,6 +169,7 @@ admin.site.register(Model)
 admin.site.register(Avtomodel)
 admin.site.register(Motor)
 admin.site.register(Il)
+admin.site.register(Yanacaq)
 class MehsulAdmin(admin.ModelAdmin):
     list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'oem', 'stok', 'model', 'yenidir')
     list_filter = ('kateqoriya', 'brend', 'marka')

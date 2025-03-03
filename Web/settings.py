@@ -191,6 +191,10 @@ JAZZMIN_SETTINGS = {
         "rentacar.CarImage": "fa-solid fa-car-side",
         "rentacar.Car": "fa-solid fa-car",
         "esasevim.HeroSlide": "fa-solid fa-house",
+        "mehsullar.Model": "fa-solid fa-car",
+        "mehsullar.Avtomodel": "fa-solid fa-car-side",
+        "mehsullar.Motor": "fa-solid fa-car-on",
+        "mehsullar.Il": "fa-solid fa-calendar-days",
     },
 }
 

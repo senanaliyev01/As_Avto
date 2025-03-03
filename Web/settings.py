@@ -195,6 +195,7 @@ JAZZMIN_SETTINGS = {
         "mehsullar.Avtomodel": "fa-solid fa-car-side",
         "mehsullar.Motor": "fa-solid fa-car-on",
         "mehsullar.Il": "fa-solid fa-calendar-days",
+        "mehsullar.Yanacaq": "fa-solid fa-gas-pump",
     },
 }
 

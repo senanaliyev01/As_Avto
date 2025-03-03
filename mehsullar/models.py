@@ -80,6 +80,9 @@ class Yanacaq(models.Model):
     def __str__(self):
         return self.yanacaq
     
+    class Meta:
+        verbose_name = 'Yanacaq'
+        verbose_name_plural = 'Yanacaq'
     
 class Model(models.Model):
     avtomobil = models.ForeignKey(Marka, on_delete=models.CASCADE)

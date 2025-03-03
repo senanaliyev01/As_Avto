@@ -101,7 +101,7 @@
     </div>
     {% endif %}
 
-    {% if mehsul.model %}
+    {% if mehsul.model.all %}
     <table>
        <thead>
            <tr>
@@ -111,17 +111,20 @@
                <th>Yanacaq</th>
                <th>İl</th>
            </tr>
-           <tbody>
-               <tr>
-                   <td>{{ mehsul.model.avtomobil.adi }}</td>
-                   <td>{{ mehsul.model.model.adi }}</td>
-                   <td>{{ mehsul.model.motor.motor }}</td>
-                   <td>{{ mehsul.model.yanacaq.yanacaq }}</td>
-                   <td>{{ mehsul.model.il.il }}</td>
-               </tr>
-           </tbody>
-    </table> 
-   {% endif %}
+       </thead>
+       <tbody>
+           {% for model in mehsul.model.all %}
+           <tr>
+               <td>{{ model.avtomobil.adi }}</td>
+               <td>{{ model.model.adi }}</td>
+               <td>{{ model.motor.motor }}</td>
+               <td>{{ model.yanacaq.yanacaq }}</td>
+               <td>{{ model.il.il }}</td>
+           </tr>
+           {% endfor %}
+       </tbody>
+    </table>
+    {% endif %}
 
     {% if mehsul.brend.haqqinda or mehsul.brend.sekil %}
     <div class="brand-info">

@@ -180,6 +180,7 @@ class MehsulAdmin(admin.ModelAdmin):
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
+        form.base_fields['model'].widget.attrs.update({'style': 'width: 300px;height: 300px;'})
         form.base_fields['model'].widget.can_add_related = True  # Yeni model əlavə etməyə imkan verir
         return form
 

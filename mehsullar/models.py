@@ -45,7 +45,7 @@ class MarkaSekil(models.Model):
     
     
 class Avtomodel(models.Model):
-    adi = models.CharField(max_length=100 , unique=True)
+    adi = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.adi

@@ -73,12 +73,19 @@ class Il(models.Model):
     class Meta:
         verbose_name = 'Avtomobil İlləri'
         verbose_name_plural = 'Avtomobil İlləri'
+
+class Yanacaq(models.Model):
+    yanacaq = models.CharField(max_length=100 , unique=True)
+
+    def __str__(self):
+        return self.yanacaq
     
     
 class Model(models.Model):
     avtomobil = models.ForeignKey(Marka, on_delete=models.CASCADE)
     model = models.ForeignKey(Avtomodel, on_delete=models.CASCADE)
     motor = models.ForeignKey(Motor, on_delete=models.CASCADE)
+    yanacaq = models.ForeignKey(Yanacaq, on_delete=models.CASCADE)
     il = models.ForeignKey(Il, on_delete=models.CASCADE)
 
     def __str__(self):

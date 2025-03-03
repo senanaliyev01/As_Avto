@@ -82,7 +82,7 @@ class Model(models.Model):
     il = models.ForeignKey(Il, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.model
+        return str(self.model)
     
     class Meta:
         verbose_name = 'Modeller'

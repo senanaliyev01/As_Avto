@@ -55,7 +55,6 @@ class Mehsul(models.Model):
     sekil = models.ImageField(upload_to='mehsul_sekilleri/', null=True, blank=True)
     haqqinda = models.TextField(null=True, blank=True)
     yenidir = models.BooleanField(default=False, null=True, blank=True)
-    endirim = models.DecimalField(max_digits=5, decimal_places=2, default=0, help_text="Endirim faizi")
 
     def __str__(self):
         return self.adi
@@ -73,12 +72,6 @@ class Mehsul(models.Model):
         kodlar = [self.oem]
         kodlar.extend([oem.kod for oem in self.oem_kodlar.all()])
         return kodlar
-
-    @property
-    def endirimli_qiymet(self):
-        if self.endirim > 0:
-            return self.qiymet * (1 - self.endirim / 100)
-        return self.qiymet
 
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

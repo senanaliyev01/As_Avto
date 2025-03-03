@@ -85,12 +85,7 @@
                                 {% endif %}
                             </td>
                             <td class="price-column">
-                                {% if mehsul.endirim > 0 %}
-                                    <span style="color: red; text-decoration: line-through;">{{ mehsul.formatted_qiymet }}</span>
-                                    <span style="color: green;">{{ mehsul.endirimli_qiymet }}</span>
-                                {% else %}
-                                    {{ mehsul.formatted_qiymet }}
-                                {% endif %}
+                                {{ mehsul.formatted_qiymet }}
                                 <i class="fa-solid fa-manat-sign" style="font-size: 0.9em; margin-left: 2px;"></i>
                             </td>
                             <td><a href="{% url 'sebet_ekle' mehsul.id %}" class="cart-icon"><i class="fas fa-shopping-cart"></i></a></td>

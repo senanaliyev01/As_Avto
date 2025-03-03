@@ -95,10 +95,23 @@
     </div>
 
     {% if mehsul.haqqinda %}
-    <div class="description">
-        <h2>Məhsul Haqqında</h2>
-        <p>{{ mehsul.haqqinda }}</p>
-    </div>
+     <table>
+        <thead>
+            <tr>
+                <th>Avtomobil</th>
+                <th>Model</th>
+                <th>Motor</th>
+                <th>İl</th>
+            </tr>
+            <tbody>
+                <tr>
+                    <td>{{ mehsul.haqqinda.avtomobil }}</td>
+                    <td>{{ mehsul.haqqinda.model }}</td>
+                    <td>{{ mehsul.haqqinda.motor }}</td>
+                    <td>{{ mehsul.haqqinda.il }}</td>
+                </tr>
+            </tbody>
+     </table> 
     {% endif %}
 
     {% if mehsul.brend.haqqinda or mehsul.brend.sekil %}

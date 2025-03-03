@@ -42,6 +42,13 @@ class MarkaSekil(models.Model):
 
     def __str__(self):
         return f"{self.marka.adi} - Şəkil"
+    
+class Haqqinda(models.Model):
+    avtomobil = models.CharField(max_length=100)
+    model = models.CharField(max_length=100)
+    motor = models.CharField(max_length=100)
+    il = models.CharField(max_length=100)
+        
 
 class Mehsul(models.Model):
     adi = models.CharField(max_length=255)
@@ -53,7 +60,7 @@ class Mehsul(models.Model):
     stok = models.IntegerField()
     qiymet = models.DecimalField(max_digits=10, decimal_places=2)
     sekil = models.ImageField(upload_to='mehsul_sekilleri/', null=True, blank=True)
-    haqqinda = models.TextField(null=True, blank=True)
+    haqqinda = models.ForeignKey(Haqqinda, on_delete=models.CASCADE, null=True, blank=True)
     yenidir = models.BooleanField(default=False, null=True, blank=True)
 
     def __str__(self):

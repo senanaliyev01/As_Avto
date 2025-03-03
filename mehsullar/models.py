@@ -43,11 +43,43 @@ class MarkaSekil(models.Model):
     def __str__(self):
         return f"{self.marka.adi} - Şəkil"
     
+    
+class Avtomodel(models.Model):
+    adi = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.adi
+    
+    class Meta:
+        verbose_name = 'Avtomobil Modelleri'
+        verbose_name_plural = 'Avtomobil Modelleri'
+    
+class Motor(models.Model):
+    motor = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.adi
+    
+    class Meta:
+        verbose_name = 'Avtomobil Motorları'
+        verbose_name_plural = 'Avtomobil Motorları'
+        
+class Il(models.Model):
+    il = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.adi
+    
+    class Meta:
+        verbose_name = 'Avtomobil İlləri'
+        verbose_name_plural = 'Avtomobil İlləri'
+    
+    
 class Model(models.Model):
     avtomobil = models.ForeignKey(Marka, on_delete=models.CASCADE)
-    model = models.CharField(max_length=100)
-    motor = models.CharField(max_length=100)
-    il = models.CharField(max_length=100)
+    model = models.ForeignKey(Avtomodel, on_delete=models.CASCADE)
+    motor = models.ForeignKey(Motor, on_delete=models.CASCADE)
+    il = models.ForeignKey(Il, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.model

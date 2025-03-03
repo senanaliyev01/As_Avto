@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Kateqoriya, Brend, Marka, Mehsul, Sebet, Sifaris, SifarisMehsul, OEMKod, MusteriReyi, MarkaSekil
+from .models import Kateqoriya, Brend, Marka, Mehsul, Sebet, Sifaris, SifarisMehsul, OEMKod, MusteriReyi, MarkaSekil, Modeller
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils import timezone
@@ -165,6 +165,7 @@ class SifarisMehsulAdmin(admin.ModelAdmin):
     get_total.short_description = 'Cəmi'
 
 # Məhsul admin paneli
+admin.site.register(Modeller)
 class MehsulAdmin(admin.ModelAdmin):
     list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'oem', 'stok', 'model', 'yenidir')
     list_filter = ('kateqoriya', 'brend', 'marka')

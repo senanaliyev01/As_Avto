@@ -74,6 +74,12 @@ class Mehsul(models.Model):
         kodlar.extend([oem.kod for oem in self.oem_kodlar.all()])
         return kodlar
 
+    @property
+    def endirimli_qiymet(self):
+        if self.endirim > 0:
+            return self.qiymet * (1 - self.endirim / 100)
+        return self.qiymet
+
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     mehsul = models.ForeignKey(Mehsul, on_delete=models.CASCADE)

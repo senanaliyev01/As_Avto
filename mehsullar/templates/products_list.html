@@ -87,7 +87,7 @@
                             <td class="price-column">
                                 {% if mehsul.endirim > 0 %}
                                     <span style="color: red; text-decoration: line-through;">{{ mehsul.formatted_qiymet }}</span>
-                                    <span style="color: green;">{{ mehsul.qiymet * (1 - mehsul.endirim / 100) }}</span>
+                                    <span style="color: green;">{{ mehsul.endirimli_qiymet }}</span>
                                 {% else %}
                                     {{ mehsul.formatted_qiymet }}
                                 {% endif %}

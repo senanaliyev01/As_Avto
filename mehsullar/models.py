@@ -50,7 +50,7 @@ class Modeller(models.Model):
     il = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"{self.model}"
+        return self.model
     
     class Meta:
         verbose_name = 'Modeller'
@@ -61,7 +61,7 @@ class Mehsul(models.Model):
     kateqoriya = models.ForeignKey(Kateqoriya, on_delete=models.CASCADE)
     brend = models.ForeignKey(Brend, on_delete=models.CASCADE)
     marka = models.ForeignKey(Marka, on_delete=models.CASCADE)
-    model = models.ForeignKey(Modeller, on_delete=models.CASCADE)
+    model = models.ForeignKey(Modeller, on_delete=models.CASCADE, null=True, blank=True)
     brend_kod = models.CharField(max_length=50, unique=True)
     oem = models.CharField(max_length=100)
     stok = models.IntegerField()

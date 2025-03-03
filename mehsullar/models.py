@@ -103,7 +103,7 @@ class Mehsul(models.Model):
     kateqoriya = models.ForeignKey(Kateqoriya, on_delete=models.CASCADE)
     brend = models.ForeignKey(Brend, on_delete=models.CASCADE)
     marka = models.ForeignKey(Marka, on_delete=models.CASCADE)
-    model = models.ManyToManyField(Model, null=True, blank=True) 
+    model = models.ManyToManyField(Model,blank=True) 
     brend_kod = models.CharField(max_length=50, unique=True)
     oem = models.CharField(max_length=100)
     stok = models.IntegerField()

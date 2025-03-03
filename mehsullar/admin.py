@@ -171,7 +171,7 @@ admin.site.register(Motor)
 admin.site.register(Il)
 admin.site.register(Yanacaq)
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'oem', 'stok', 'yenidir')
+    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'model', 'qiymet', 'brend_kod', 'oem', 'stok', 'yenidir')
     list_filter = ('kateqoriya', 'brend', 'marka')
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'yenidir')
     inlines = [OEMKodInline]

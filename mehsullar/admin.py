@@ -166,7 +166,7 @@ class SifarisMehsulAdmin(admin.ModelAdmin):
 
 # Məhsul admin paneli
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'oem', 'stok', 'endirim', 'yenidir')
+    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'oem', 'stok',  'yenidir')
     list_filter = ('kateqoriya', 'brend', 'marka')
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'yenidir')
     inlines = [OEMKodInline]

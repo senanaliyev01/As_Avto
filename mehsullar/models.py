@@ -55,6 +55,7 @@ class Mehsul(models.Model):
     sekil = models.ImageField(upload_to='mehsul_sekilleri/', null=True, blank=True)
     haqqinda = models.TextField(null=True, blank=True)
     yenidir = models.BooleanField(default=False, null=True, blank=True)
+    endirim = models.DecimalField(max_digits=5, decimal_places=2, default=0, help_text="Endirim faizi")
 
     def __str__(self):
         return self.adi

@@ -171,12 +171,17 @@ admin.site.register(Motor)
 admin.site.register(Il)
 admin.site.register(Yanacaq)
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'oem', 'stok', 'model', 'yenidir')
+    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'oem', 'stok', 'yenidir')
     list_filter = ('kateqoriya', 'brend', 'marka')
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'yenidir')
     inlines = [OEMKodInline]
     
     actions = ['yenilikden_sil', 'yenidir_et']  # Yeni hərəkətləri əlavə edirik
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        form.base_fields['model'].widget.can_add_related = True  # Yeni model əlavə etməyə imkan verir
+        return form
 
     def yenilikden_sil(self, request, queryset):
         queryset.update(yenidir=False)

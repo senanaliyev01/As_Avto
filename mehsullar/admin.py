@@ -181,6 +181,7 @@ class MehsulAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
         form.base_fields['model'].widget.can_add_related = True  # Yeni model əlavə etməyə imkan verir
+        form.base_fields['model'].queryset = Model.objects.all()  # Model obyektlərini düzgün göstər
         return form
 
     def yenilikden_sil(self, request, queryset):

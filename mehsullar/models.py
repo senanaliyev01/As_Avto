@@ -43,24 +43,31 @@ class MarkaSekil(models.Model):
     def __str__(self):
         return f"{self.marka.adi} - Şəkil"
     
-class Haqqinda(models.Model):
-    avtomobil = models.CharField(max_length=100)
-    model = models.CharField(max_length=100)
-    motor = models.CharField(max_length=100)
-    il = models.CharField(max_length=100)
-        
+class Modeller(models.Model):
+    avtomobil = models.ForeignKey(Marka, on_delete=models.CASCADE)
+    model = models.CharField(max_length=100, null=True, blank=True)
+    motor = models.CharField(max_length=100, null=True, blank=True)
+    il = models.CharField(max_length=100, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.model}"
+    
+    class Meta:
+        verbose_name = 'Modeller'
+        verbose_name_plural = 'Modeller'
 
 class Mehsul(models.Model):
     adi = models.CharField(max_length=255)
     kateqoriya = models.ForeignKey(Kateqoriya, on_delete=models.CASCADE)
     brend = models.ForeignKey(Brend, on_delete=models.CASCADE)
     marka = models.ForeignKey(Marka, on_delete=models.CASCADE)
+    model = models.ForeignKey(Modeller, on_delete=models.CASCADE, null=True, blank=True)
     brend_kod = models.CharField(max_length=50, unique=True)
     oem = models.CharField(max_length=100)
     stok = models.IntegerField()
     qiymet = models.DecimalField(max_digits=10, decimal_places=2)
     sekil = models.ImageField(upload_to='mehsul_sekilleri/', null=True, blank=True)
-    haqqinda = models.ForeignKey(Haqqinda, on_delete=models.CASCADE, null=True, blank=True)
+    haqqinda = models.TextField(null=True, blank=True)
     yenidir = models.BooleanField(default=False, null=True, blank=True)
 
     def __str__(self):

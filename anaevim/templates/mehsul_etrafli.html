@@ -234,6 +234,28 @@
         </div>
     </section>
 
+    {% if mehsul.model %}
+    <table>
+       <thead>
+           <tr>
+               <th>Avtomobil</th>
+               <th>Model</th>
+               <th>Motor</th>
+               <th>Yanacaq</th>
+               <th>İl</th>
+           </tr>
+           <tbody>
+               <tr>
+                   <td>{{ mehsul.model.avtomobil.adi }}</td>
+                   <td>{{ mehsul.model.model.adi }}</td>
+                   <td>{{ mehsul.model.motor.motor }}</td>
+                   <td>{{ mehsul.model.yanacaq.yanacaq }}</td>
+                   <td>{{ mehsul.model.il.il }}</td>
+               </tr>
+           </tbody>
+    </table> 
+   {% endif %}
+
     <!-- Footer -->
     <footer class="footer">
         <div class="footer__top">

@@ -45,9 +45,9 @@ class MarkaSekil(models.Model):
     
 class Modeller(models.Model):
     avtomobil = models.ForeignKey(Marka, on_delete=models.CASCADE)
-    model = models.CharField(max_length=100, null=True, blank=True)
-    motor = models.CharField(max_length=100, null=True, blank=True)
-    il = models.CharField(max_length=100, null=True, blank=True)
+    model = models.CharField(max_length=100)
+    motor = models.CharField(max_length=100)
+    il = models.CharField(max_length=100)
 
     def __str__(self):
         return f"{self.model}"

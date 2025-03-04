@@ -933,44 +933,4 @@
         }
     });
 
-    // Miqdar kontrolları üçün funksiyalar
-    function updateQuantity(mehsulId, change) {
-        const input = document.getElementById(`quantity-${mehsulId}`);
-        let currentValue = parseInt(input.value) || 1;
-        const maxValue = parseInt(input.max);
-        
-        currentValue += change;
-        
-        if (currentValue < 1) currentValue = 1;
-        if (currentValue > maxValue) currentValue = maxValue;
-        
-        input.value = currentValue;
-    }
-
-    async function addToCart(mehsulId) {
-        const quantity = parseInt(document.getElementById(`quantity-${mehsulId}`).value);
-        
-        try {
-            const response = await fetch(`/sebet_ekle/${mehsulId}/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify({ quantity: quantity })
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                showAnimatedMessage('Məhsul səbətə əlavə edildi', false, data.mehsul);
-                updateCartCount();
-            } else {
-                showAnimatedMessage('Xəta baş verdi: ' + data.error, true);
-            }
-        } catch (error) {
-            showAnimatedMessage('Xəta baş verdi: ' + error.message, true);
-        }
-    }
-
 

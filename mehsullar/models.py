@@ -92,7 +92,7 @@ class Model(models.Model):
     il = models.ForeignKey(Il, on_delete=models.CASCADE)
 
     def __str__(self):
-        return str(self.avtomobil - self.model - self.motor - self.yanacaq - self.il)
+        return f"{self.avtomobil} - {self.model} - {self.motor} - {self.yanacaq} - {self.il}"
     
     class Meta:
         verbose_name = 'Modeller'

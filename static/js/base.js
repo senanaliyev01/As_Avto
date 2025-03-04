@@ -704,80 +704,73 @@
         }
     }, 300);
 
-    // Miqdar yeniləmə funksiyası
-    window.updateQuantity = function(itemId, value) {
-        const row = document.querySelector(`tr[data-item-id="${itemId}"]`);
-        const input = row.querySelector('.quantity-input');
-        let newQuantity;
+    // Miqdarı yeniləmək üçün funksiya
+    function updateQuantity(button, change) {
+        const controls = button.parentElement;
+        const input = controls.querySelector('.quantity-input');
+        const currentValue = parseInt(input.value) || 0;
+        const maxValue = parseInt(input.getAttribute('max'));
+        const newValue = currentValue + change;
 
-        if (typeof value === 'number') {
-            newQuantity = parseInt(input.value) + value;
-        } else if (value === 'set') {
-            newQuantity = parseInt(input.value);
-        } else {
-            newQuantity = parseInt(value);
+        if (newValue >= 1 && newValue <= maxValue) {
+            input.value = newValue;
         }
+    }
 
-        if (isNaN(newQuantity) || newQuantity < 1) {
-            newQuantity = 1;
-        }
+    // Səbətə əlavə etmək üçün funksiya
+    async function addToCart(mehsulId, button) {
+        try {
+            const controls = button.closest('tr').querySelector('.quantity-controls');
+            const input = controls.querySelector('.quantity-input');
+            const quantity = parseInt(input.value) || 1;
 
-        // Düyməni deaktiv et və loading göstər
-        const buttons = row.querySelectorAll('.quantity-btn');
-        buttons.forEach(btn => {
-            btn.disabled = true;
-            btn.style.opacity = '0.5';
-        });
-        input.disabled = true;
-
-        // Loading ikonunu göstər
-        const loadingIcon = document.createElement('span');
-        loadingIcon.className = 'loading-icon';
-        loadingIcon.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        input.parentNode.appendChild(loadingIcon);
-
-        fetch(`/update_quantity/${itemId}/${newQuantity}/`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    input.value = data.new_quantity;
-                    const itemTotalElement = row.querySelector('.item-total');
-                    itemTotalElement.textContent = data.item_total.toFixed(2) + ' AZN';
-                    
-                    const totalElement = document.getElementById('total-amount');
-                    if (totalElement) {
-                        totalElement.textContent = data.total_amount.toFixed(2) + ' AZN';
-                        totalElement.classList.add('highlight');
-                        setTimeout(() => totalElement.classList.remove('highlight'), 300);
-                    }
-
-                    row.classList.add('highlight');
-                    setTimeout(() => row.classList.remove('highlight'), 300);
-                } else {
-                    input.value = input.defaultValue;
-                    window.showNotification(data.error || 'Xəta baş verdi', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Xəta:', error);
-                input.value = input.defaultValue;
-                window.showNotification('Xəta baş verdi', 'error');
-            })
-            .finally(() => {
-                // Düymələri və inputu yenidən aktiv et
-                buttons.forEach(btn => {
-                    btn.disabled = false;
-                    btn.style.opacity = '1';
-                });
-                input.disabled = false;
-                
-                // Loading ikonunu sil
-                const loadingIcon = row.querySelector('.loading-icon');
-                if (loadingIcon) {
-                    loadingIcon.remove();
-                }
+            const response = await fetch(`/sebet_ekle/${mehsulId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ quantity: quantity })
             });
-    };
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Səbət sayını yenilə
+                updateCartCount();
+                
+                // Uğurlu əlavə etmə bildirişi
+                showAnimatedMessage(`${data.mehsul.adi} səbətə əlavə edildi`, false, {
+                    adi: data.mehsul.adi,
+                    sekil: data.mehsul.sekil,
+                    oem: data.mehsul.oem
+                });
+
+                // Miqdarı yenidən 1-ə qaytar
+                input.value = 1;
+            } else {
+                showAnimatedMessage('Xəta baş verdi: ' + data.error, true);
+            }
+        } catch (error) {
+            showAnimatedMessage('Xəta baş verdi: ' + error.message, true);
+        }
+    }
+
+    // Səbət sayını yeniləmək üçün funksiya
+    async function updateCartCount() {
+        try {
+            const response = await fetch('/get_cart_count/');
+            const data = await response.json();
+            
+            const cartBadge = document.querySelector('.cart-badge');
+            if (cartBadge) {
+                cartBadge.textContent = data.count;
+                cartBadge.style.display = data.count > 0 ? 'block' : 'none';
+            }
+        } catch (error) {
+            console.error('Səbət sayı yenilənərkən xəta baş verdi:', error);
+        }
+    }
 
     // CSS stilləri
     const cartStyles = document.createElement('style');

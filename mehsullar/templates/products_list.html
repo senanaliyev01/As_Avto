@@ -35,6 +35,7 @@
                             <th>OEM</th>
                             <th>Mövcudluğ</th>
                             <th>Qiymət</th>
+                            <th>Miqdar</th>
                             <th>Səbət</th>
                             <th><i class="fas fa-info"></i></th>
                         </tr>
@@ -88,7 +89,18 @@
                                 {{ mehsul.formatted_qiymet }}
                                 <i class="fa-solid fa-manat-sign" style="font-size: 0.9em; margin-left: 2px;"></i>
                             </td>
-                            <td><a href="{% url 'sebet_ekle' mehsul.id %}" class="cart-icon"><i class="fas fa-shopping-cart"></i></a></td>
+                            <td>
+                                <div class="quantity-controls">
+                                    <button class="quantity-btn minus" onclick="updateQuantity(this, -1)">-</button>
+                                    <input type="number" class="quantity-input" value="1" min="1" max="{{ mehsul.stok }}" data-mehsul-id="{{ mehsul.id }}">
+                                    <button class="quantity-btn plus" onclick="updateQuantity(this, 1)">+</button>
+                                </div>
+                            </td>
+                            <td>
+                                <button class="cart-icon" onclick="addToCart({{ mehsul.id }}, this)">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </button>
+                            </td>
                             <td>
                                 <a href="{% url 'mehsul_haqqinda' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="info-link">
                                     <i class="fas fa-info"></i>

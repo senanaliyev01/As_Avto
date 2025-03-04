@@ -1,1 +1,0 @@
-// Bütün funksionallıq base.js-ə köçürülüb

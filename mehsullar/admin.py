@@ -180,8 +180,10 @@ class MehsulAdmin(admin.ModelAdmin):
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
-        form.base_fields['model'].widget.attrs.update({'style': 'width: 500px; height: 500px;'})
-        form.base_fields['model'].widget.can_add_related = True
+        form.base_fields['model'].widget.attrs.update({
+            'style': 'width: 500px; height: 300px; overflow-y: auto;'  # Genişlik və hündürlük artırılır
+        })
+        form.base_fields['model'].widget.can_add_related = True  # Yeni model əlavə etməyə imkan verir
         return form
 
     def yenilikden_sil(self, request, queryset):

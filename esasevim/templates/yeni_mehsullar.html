@@ -4,10 +4,11 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/products_list.css' %}">
 {% endblock %}
+
 {% block content %}
 <div class="search-results">
     {% if yeni_mehsullar %}
-        <h2>Yeni Məhsullar</h2>
+        <h2 class="search-result-title">Yeni Məhsullar ({{ yeni_mehsullar.count }})</h2>
         <div class="products-table-container">
             <div class="products-table">
                 <table>
@@ -31,6 +32,8 @@
                             <td>
                                 {% if mehsul.sekil %}
                                     <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="marka-pr-image product-image" onclick="openModal(this.src)">
+                                {% else %}
+                                    <img src="{% static 'img/no-image.png' %}" alt="Şəkil yoxdur" class="marka-pr-image product-image">
                                 {% endif %}
                             </td>
                             <td>{{ mehsul.adi }}</td>
@@ -77,7 +80,6 @@
 
 
 {% endblock %}
-
 
 {% block extra_js %}
 <script src="{% static 'js/products_list.js' %}"></script>

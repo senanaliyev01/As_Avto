@@ -126,7 +126,7 @@ def yeni_mehsullar(request):
     yeni_mehsullar = Mehsul.objects.filter(yenidir=True)
     
     context = {
-        'mehsullar': yeni_mehsullar
+        'yeni_mehsullar': yeni_mehsullar
     }
     
     return render(request, 'yeni_mehsullar.html', context)

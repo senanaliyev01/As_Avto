@@ -7,14 +7,112 @@ from django.db import models
 
 class MarkaSekilInline(admin.TabularInline):
     model = MarkaSekil
-    extra = 1  # Yeni şəkil əlavə etmək üçün bir boş forma
+    extra = 1
 
 @admin.register(Marka)
 class MarkaAdmin(admin.ModelAdmin):
     inlines = [MarkaSekilInline]
     list_display = ('adi',)
+    search_fields = ('adi',)
+    ordering = ('adi',)
 
-# Sifarişlərdə məhsul detalını əlavə etmək üçün
+@admin.register(Kateqoriya)
+class KateqoriyaAdmin(admin.ModelAdmin):
+    list_display = ('adi',)
+    search_fields = ('adi',)
+    ordering = ('adi',)
+
+@admin.register(Brend)
+class BrendAdmin(admin.ModelAdmin):
+    list_display = ('adi', 'get_sekil')
+    search_fields = ('adi',)
+    ordering = ('adi',)
+
+    def get_sekil(self, obj):
+        if obj.sekil:
+            return format_html('<img src="{}" width="50" height="50" style="object-fit: contain;" />', obj.sekil.url)
+        return "-"
+    get_sekil.short_description = 'Logo'
+
+@admin.register(Avtomodel)
+class AvtomodelAdmin(admin.ModelAdmin):
+    list_display = ('adi',)
+    search_fields = ('adi',)
+    ordering = ('adi',)
+
+@admin.register(Motor)
+class MotorAdmin(admin.ModelAdmin):
+    list_display = ('motor',)
+    search_fields = ('motor',)
+    ordering = ('motor',)
+
+@admin.register(Il)
+class IlAdmin(admin.ModelAdmin):
+    list_display = ('il',)
+    search_fields = ('il',)
+    ordering = ('il',)
+
+@admin.register(Yanacaq)
+class YanacaqAdmin(admin.ModelAdmin):
+    list_display = ('yanacaq',)
+    search_fields = ('yanacaq',)
+    ordering = ('yanacaq',)
+
+@admin.register(Model)
+class ModelAdmin(admin.ModelAdmin):
+    list_display = ('avtomobil', 'model', 'motor', 'yanacaq', 'il')
+    list_filter = ('avtomobil', 'model', 'motor', 'yanacaq', 'il')
+    search_fields = ('avtomobil__adi', 'model__adi', 'motor__motor', 'yanacaq__yanacaq', 'il__il')
+    ordering = ('avtomobil', 'model', 'motor', 'yanacaq', 'il')
+
+class OEMKodInline(admin.TabularInline):
+    model = OEMKod
+    extra = 0
+    formfield_overrides = {
+        models.TextField: {'widget': admin.widgets.AdminTextareaWidget(
+            attrs={'rows': 5, 'style': 'width: 100%; font-family: monospace;'})},
+    }
+
+@admin.register(Mehsul)
+class MehsulAdmin(admin.ModelAdmin):
+    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'qiymet', 'brend_kod', 'oem', 'stok', 'get_yenidir')
+    list_filter = ('kateqoriya', 'brend', 'marka', 'yenidir')
+    search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem')
+    inlines = [OEMKodInline]
+    actions = ['yenilikden_sil', 'yenidir_et']
+    list_per_page = 25
+
+    def get_yenidir(self, obj):
+        if obj.yenidir:
+            return format_html('<span style="color: green;">✓</span>')
+        return format_html('<span style="color: red;">✗</span>')
+    get_yenidir.short_description = 'Yenidir'
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        form.base_fields['model'].widget.attrs.update({
+            'style': 'width: 500px; height: 300px; overflow-y: auto;'
+        })
+        form.base_fields['model'].widget.can_add_related = True
+        return form
+
+    def yenilikden_sil(self, request, queryset):
+        queryset.update(yenidir=False)
+        self.message_user(request, "Seçilmiş məhsullar yenilikdən silindi.")
+    yenilikden_sil.short_description = "Seçilmiş məhsulları yenilikdən sil"
+
+    def yenidir_et(self, request, queryset):
+        queryset.update(yenidir=True)
+        self.message_user(request, "Seçilmiş məhsullar yenidir olaraq işarələndi.")
+    yenidir_et.short_description = "Seçilmiş məhsulları yenidir et"
+
+@admin.register(Sebet)
+class SebetAdmin(admin.ModelAdmin):
+    list_display = ('user', 'mehsul', 'miqdar')
+    list_filter = ('user', 'mehsul__kateqoriya', 'mehsul__brend')
+    search_fields = ('user__username', 'mehsul__adi', 'mehsul__brend_kod')
+    ordering = ('-id',)
+
 class SifarisMehsulInline(admin.TabularInline):
     model = SifarisMehsul
     extra = 0
@@ -34,29 +132,18 @@ class SifarisMehsulInline(admin.TabularInline):
     get_oem.short_description = 'OEM'
 
     def get_total(self, obj):
-        if obj.id:  # Yalnız mövcud obyektlər üçün
+        if obj.id:
             return format_html('<span style="color: #008000; font-weight: bold;">{} AZN</span>', 
                              obj.miqdar * obj.qiymet)
         return '-'
     get_total.short_description = 'Cəmi'
 
-    # Əlavə sütunları göstərmək üçün
     def get_fields(self, request, obj=None):
         fields = list(super().get_fields(request, obj))
-        if obj:  # Mövcud sifariş üçün
+        if obj:
             fields.extend(['get_brend_adi', 'get_brend_kod', 'get_oem', 'get_total'])
         return fields
 
-# OEMKodInline klassını əvvəldə təyin edirik
-class OEMKodInline(admin.TabularInline):
-    model = OEMKod
-    extra = 0
-    formfield_overrides = {
-        models.TextField: {'widget': admin.widgets.AdminTextareaWidget(
-            attrs={'rows': 5, 'style': 'width: 100%; font-family: monospace;'})},
-    }
-
-# Sifariş admin paneli
 @admin.register(Sifaris)
 class SifarisAdmin(admin.ModelAdmin):
     inlines = [SifarisMehsulInline]
@@ -75,6 +162,7 @@ class SifarisAdmin(admin.ModelAdmin):
     list_filter = ('status', 'tamamlandi')
     fields = ('user', 'cemi_mebleg', 'odenilen_mebleg', 'status', 'tamamlandi')
     readonly_fields = ('borc',)
+    list_per_page = 25
 
     def get_musteri(self, obj):
         return f"{obj.user.first_name} {obj.user.last_name}" if obj.user.first_name else obj.user.username
@@ -102,10 +190,10 @@ class SifarisAdmin(admin.ModelAdmin):
 
     def get_status(self, obj):
         status_classes = {
-            'gozleyir': 'background: #FFA500;',  # Narıncı
-            'hazirlanir': 'background: #FFD700;', # Sarı
-            'yoldadir': 'background: #87CEEB;',   # Mavi
-            'catdirildi': 'background: #90EE90;'  # Yaşıl
+            'gozleyir': 'background: #FFA500;',
+            'hazirlanir': 'background: #FFD700;',
+            'yoldadir': 'background: #87CEEB;',
+            'catdirildi': 'background: #90EE90;'
         }
         status_text = {
             'gozleyir': 'Gözləyir',
@@ -134,11 +222,13 @@ class SifarisAdmin(admin.ModelAdmin):
         )
     pdf_link.short_description = 'PDF'
 
-# Sifariş məhsulları admin paneli
+@admin.register(SifarisMehsul)
 class SifarisMehsulAdmin(admin.ModelAdmin):
     list_display = ('sifaris', 'get_mehsul_adi', 'get_brend_adi', 'get_brend_kod', 'get_oem', 'miqdar', 'qiymet', 'get_total')
     list_filter = ('sifaris', 'mehsul__brend')
     search_fields = ('mehsul__adi', 'mehsul__brend_kod', 'mehsul__oem')
+    ordering = ('-id',)
+    list_per_page = 25
 
     def get_mehsul_adi(self, obj):
         return obj.mehsul.adi
@@ -164,56 +254,36 @@ class SifarisMehsulAdmin(admin.ModelAdmin):
         return f"{obj.miqdar * obj.qiymet} AZN"
     get_total.short_description = 'Cəmi'
 
-# Məhsul admin paneli
-admin.site.register(Model)
-admin.site.register(Avtomodel)
-admin.site.register(Motor)
-admin.site.register(Il)
-admin.site.register(Yanacaq)
-class MehsulAdmin(admin.ModelAdmin):
-    list_display = ('adi', 'kateqoriya', 'brend', 'marka',  'qiymet', 'brend_kod', 'oem', 'stok', 'yenidir')
-    list_filter = ('kateqoriya', 'brend', 'marka')
-    search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'yenidir')
-    inlines = [OEMKodInline]
-    
-    actions = ['yenilikden_sil', 'yenidir_et']  # Yeni hərəkətləri əlavə edirik
-
-    def get_form(self, request, obj=None, **kwargs):
-        form = super().get_form(request, obj, **kwargs)
-        form.base_fields['model'].widget.attrs.update({
-            'style': 'width: 500px; height: 300px; overflow-y: auto;'  # Genişlik və hündürlük artırılır
-        })
-        form.base_fields['model'].widget.can_add_related = True  # Yeni model əlavə etməyə imkan verir
-        return form
-
-    def yenilikden_sil(self, request, queryset):
-        queryset.update(yenidir=False)
-        self.message_user(request, "Seçilmiş məhsullar yenilikdən silindi.")
-    yenilikden_sil.short_description = "Seçilmiş məhsulları yenilikdən sil"
-
-    def yenidir_et(self, request, queryset):
-        queryset.update(yenidir=True)
-        self.message_user(request, "Seçilmiş məhsullar yenidir olaraq işarələndi.")
-    yenidir_et.short_description = "Seçilmiş məhsulları yenidir et"
-
-# Qeydiyyatları düzəltdik
-admin.site.register(SifarisMehsul, SifarisMehsulAdmin)
-admin.site.register(Kateqoriya)
-admin.site.register(Brend)
-admin.site.register(Sebet)
-admin.site.register(Mehsul, MehsulAdmin)
-
 @admin.register(MusteriReyi)
 class MusteriReyiAdmin(admin.ModelAdmin):
-    list_display = ['musteri', 'qiymetlendirme', 'tarix', 'tesdiq']
+    list_display = ['musteri', 'get_qiymetlendirme', 'get_tarix', 'get_tesdiq']
     list_filter = ['tesdiq', 'qiymetlendirme']
     search_fields = ['musteri__username', 'rey']
     actions = ['tesdiqle', 'tesdiq_legv_et']
+    ordering = ('-tarix',)
+    list_per_page = 25
+
+    def get_qiymetlendirme(self, obj):
+        stars = '★' * obj.qiymetlendirme + '☆' * (5 - obj.qiymetlendirme)
+        return format_html('<span style="color: gold;">{}</span>', stars)
+    get_qiymetlendirme.short_description = 'Qiymətləndirmə'
+
+    def get_tarix(self, obj):
+        return obj.tarix.astimezone(timezone.get_current_timezone()).strftime('%d-%m-%Y %H:%M')
+    get_tarix.short_description = 'Tarix'
+
+    def get_tesdiq(self, obj):
+        if obj.tesdiq:
+            return format_html('<span style="color: green;">✓</span>')
+        return format_html('<span style="color: red;">✗</span>')
+    get_tesdiq.short_description = 'Təsdiq'
 
     def tesdiqle(self, request, queryset):
         queryset.update(tesdiq=True)
+        self.message_user(request, "Seçilmiş rəylər təsdiqləndi.")
     tesdiqle.short_description = "Seçilmiş rəyləri təsdiqlə"
 
     def tesdiq_legv_et(self, request, queryset):
         queryset.update(tesdiq=False)
+        self.message_user(request, "Seçilmiş rəylərin təsdiqi ləğv edildi.")
     tesdiq_legv_et.short_description = "Seçilmiş rəylərin təsdiqini ləğv et"

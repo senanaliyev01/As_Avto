@@ -91,15 +91,15 @@
                             </td>
                             <td>
                                 <div class="quantity-controls">
-                                    <button class="quantity-btn minus" onclick="updateQuantity(this, -1)">-</button>
-                                    <input type="number" class="quantity-input" value="1" min="1" max="{{ mehsul.stok }}" data-mehsul-id="{{ mehsul.id }}">
-                                    <button class="quantity-btn plus" onclick="updateQuantity(this, 1)">+</button>
+                                    <button class="quantity-btn minus" onclick="updateQuantity({{ mehsul.id }}, -1)">-</button>
+                                    <input type="number" id="quantity-{{ mehsul.id }}" value="1" min="1" max="{{ mehsul.stok }}" class="quantity-input">
+                                    <button class="quantity-btn plus" onclick="updateQuantity({{ mehsul.id }}, 1)">+</button>
                                 </div>
                             </td>
                             <td>
-                                <button class="cart-icon" onclick="addToCart({{ mehsul.id }}, this)">
+                                <a href="#" onclick="addToCart({{ mehsul.id }})" class="cart-icon">
                                     <i class="fas fa-shopping-cart"></i>
-                                </button>
+                                </a>
                             </td>
                             <td>
                                 <a href="{% url 'mehsul_haqqinda' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="info-link">

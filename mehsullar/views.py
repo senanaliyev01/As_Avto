@@ -46,37 +46,29 @@ def sebet_ekle(request, mehsul_id):
     try:
         mehsul = get_object_or_404(Mehsul, id=mehsul_id)
         
-        # POST sorğusundan miqdarı al
+        # JSON-dan miqdarı al
         if request.method == 'POST':
             data = json.loads(request.body)
             quantity = int(data.get('quantity', 1))
         else:
             quantity = 1
-
+            
         # Stok yoxlaması
         if quantity > mehsul.stok:
             return JsonResponse({
                 'success': False,
-                'error': f'Kifayət qədər stok yoxdur. Maksimum {mehsul.stok} ədəd əlavə edə bilərsiniz.'
-            })
-
-        # Səbəti yarat və ya mövcud olanı tap
+                'error': 'Kifayət qədər stok yoxdur'
+            }, status=400)
+            
         sebet, created = Sebet.objects.get_or_create(user=request.user, mehsul=mehsul)
-        
         if not created:
-            # Mövcud səbətdəki miqdarı yoxla
-            if sebet.miqdar + quantity > mehsul.stok:
-                return JsonResponse({
-                    'success': False,
-                    'error': f'Kifayət qədər stok yoxdur. Maksimum {mehsul.stok} ədəd əlavə edə bilərsiniz.'
-                })
             sebet.miqdar += quantity
             sebet.save()
         else:
             sebet.miqdar = quantity
             sebet.save()
 
-        # Məhsul məlumatlarını JSON formatında qaytar
+        # Məhsul məlumatlarını JSON formatında qaytarırıq
         return JsonResponse({
             'success': True,
             'mehsul': {

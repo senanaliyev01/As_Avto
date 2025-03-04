@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "/rent-a-car/",
                 "/products-look-all/",
                 "/reports/",
+                "/new-products/",
             ],
             baseUrl: "https://as-avto.com"
         },

@@ -78,7 +78,13 @@
     {% endif %}
 </div>
 
-
+<!-- Modal for image preview -->
+<div id="imageModal" class="modal">
+    <span class="close-modal">&times;</span>
+    <div class="modal-content">
+        <img id="modalImage" src="" alt="Böyük şəkil">
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}

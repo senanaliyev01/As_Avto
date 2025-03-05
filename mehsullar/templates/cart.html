@@ -86,7 +86,7 @@
                 </tr>
                 {% endfor %}
             </tbody>
-            <tfoot>
+            {% comment %} <tfoot>
                 <tr>
                     <td colspan="11" style="text-align: center; padding: 1.5rem;">
                         <div style="display: inline-flex; align-items: center; gap: 1rem; background: linear-gradient(145deg, #0a1929, #1a2942); padding: 1rem 2rem; border-radius: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
@@ -95,8 +95,15 @@
                         </div>
                     </td>
                 </tr>
-            </tfoot>
+            </tfoot> {% endcomment %}
         </table>
+
+        <div colspan="11" style="text-align: center; padding: 1.5rem;">
+            <div style="display: inline-flex; align-items: center; gap: 1rem; background: linear-gradient(145deg, #0a1929, #1a2942); padding: 1rem 2rem; border-radius: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
+                <strong style="color: #64ffda; font-size: 1.2rem;">Ümumi Cəmi:</strong>
+            <span id="total-amount" style="color: white; font-size: 1.2rem; font-weight: 600;">{{ cemi_mebleg }} AZN</span>
+        </div>
+
 
         <div class="cart-actions">
             <form action="{% url 'sifarisi_gonder' %}" method="post" style="display: inline;" onsubmit="return handleOrderSubmit(event)">

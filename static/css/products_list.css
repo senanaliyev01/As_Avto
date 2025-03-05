@@ -300,9 +300,9 @@ body {
     opacity: 0;
 }
 
-/* .modal-closing .modal-content {
+.modal-closing .modal-content {
     transform: scale(0.7);
-} */
+}
 
 #modalImage {
     max-width: 100%;

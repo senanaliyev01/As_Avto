@@ -336,15 +336,15 @@ body {
 }
 
 /* Row Hover Effect */
-.products-table tbody tr {
+/* .products-table tbody tr {
     transition: all 0.3s ease;
 }
 
 .products-table tbody tr:hover {
     background: rgba(28, 57, 107, 0.7);
-    
+    transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
+} */
 
 /* Responsive Design */
 @media (max-width: 1200px) {

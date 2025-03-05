@@ -78,6 +78,7 @@ table {
 
 /* Header Styles */
 thead th {
+    width: 5%;
     border: 1px solid #64ffda;
     background-color: var(--primary-color);
     color: var(--text-primary);
@@ -100,6 +101,7 @@ tbody tr:hover {
 
 /* Cell Styles */
 td {
+    width: 5%;
     border: 1px solid #64ffda;
     padding: 1rem;
     color: var(--text-primary);

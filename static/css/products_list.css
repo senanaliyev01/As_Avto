@@ -300,9 +300,9 @@ body {
     opacity: 0;
 }
 
-.modal-closing .modal-content {
+/* .modal-closing .modal-content {
     transform: scale(0.7);
-}
+} */
 
 #modalImage {
     max-width: 100%;
@@ -336,7 +336,7 @@ body {
 }
 
 /* Row Hover Effect */
-/* .products-table tbody tr {
+.products-table tbody tr {
     transition: all 0.3s ease;
 }
 
@@ -344,7 +344,7 @@ body {
     background: rgba(28, 57, 107, 0.7);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-} */
+}
 
 /* Responsive Design */
 @media (max-width: 1200px) {

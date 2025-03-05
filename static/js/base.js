@@ -933,12 +933,4 @@
         }
     });
 
-    function openCartModal() {
-        document.getElementById('cart-modal').style.display = 'block';
-    }
-
-    function closeCartModal() {
-        document.getElementById('cart-modal').style.display = 'none';
-    }
-
 

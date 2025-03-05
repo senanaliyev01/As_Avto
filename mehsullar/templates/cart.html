@@ -130,17 +130,10 @@
 
 <!-- Notification -->
 <div id="notification" class="notification"></div>
+{% endblock %}
 
-<div id="cart-modal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeCartModal()">&times;</span>
-        <h2>Səbətiniz</h2>
-        <div class="cart-details">
-            <!-- Səbət məlumatları burada göstəriləcək -->
-        </div>
-    </div>
-</div>
-
+{% block extra_js %}
+<script src="{% static 'js/cart.js' %}"></script>
 <script>
 function handleOrderSubmit(event) {
     event.preventDefault();
@@ -167,14 +160,6 @@ function handleOrderSubmit(event) {
         });
     }
     return false;
-}
-
-function openCartModal() {
-    document.getElementById('cart-modal').style.display = 'block';
-}
-
-function closeCartModal() {
-    document.getElementById('cart-modal').style.display = 'none';
 }
 </script>
 {% endblock %}

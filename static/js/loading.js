@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "/orders/",
                 "/products/",
                 "/about/",
-                // "/cart/",
+                "/cart/",
                 "/istifadeciler/profile/",
                 "/istifadeciler/password_change/",
                 "/istifadeciler/register/",

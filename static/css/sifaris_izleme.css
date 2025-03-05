@@ -314,7 +314,7 @@ td {
     font-size: 0.95rem;
 }
 
-.text-right { text-align: right; }
+
 .text-center { text-align: center; }
 
 tfoot {
@@ -559,19 +559,3 @@ tfoot td {
     color: var(--error-color);
 }
 
-.order-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 1rem 0;
-    padding: 0.5rem;
-    background-color: rgba(100, 255, 218, 0.1);
-    border-radius: 8px;
-    font-size: 1rem;
-    color: var(--text-primary);
-}
-
-.order-info h4 {
-    font-weight: bold;
-    color: var(--accent-color);
-}

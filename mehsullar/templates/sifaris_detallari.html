@@ -143,14 +143,22 @@
                 </tr>
                 {% endfor %}
             </tbody>
-            <tfoot>
+            {% comment %} <tfoot>
                 <tr>
                     <td colspan="6"></td>
                     <td colspan="2"><strong>Ümumi Cəmi:</strong></td>
                     <td class="text-right"><strong>{{ sifaris.cemi_mebleg|floatformat:2 }} AZN</strong></td>
                 </tr>
-            </tfoot>
+            </tfoot> {% endcomment %}
         </table>
+        <div class="order-info">
+            <span>Ümumi Məbləğ:</span>
+            <h4 class="text-right">{{ sifaris.cemi_mebleg|floatformat:2 }} AZN</h4>
+        </div>
+
+            
+        
+
     </div>
 </div>
 {% endblock %}

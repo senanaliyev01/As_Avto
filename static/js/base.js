@@ -933,4 +933,21 @@
         }
     });
 
+    function openCartModal() {
+        document.getElementById('cart-modal').style.display = 'block';
+    }
+
+    function closeCartModal() {
+        document.getElementById('cart-modal').style.display = 'none';
+    }
+
+    // Səbət linkinə basıldıqda kartı açmaq üçün event listener əlavə edin
+    const cartLink = document.querySelector('.cart-link');
+    if (cartLink) {
+        cartLink.addEventListener('click', function(event) {
+            event.preventDefault(); // Default davranışı dayandır
+            openCartModal(); // Kartı aç
+        });
+    }
+
 

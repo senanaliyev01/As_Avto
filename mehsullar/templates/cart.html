@@ -21,8 +21,8 @@
                 <tr>
                     <th>Məhsul</th>
                     <th>Firma</th>
-                    <th>Model</th>
-                    <th>Brend Kod</th>
+                    <th>Avtomobil</th>
+                    <th>Brend</th>
                     <th>OEM</th>
                     <th>Mövcudluq</th>
                     <th>Qiymət</th>
@@ -130,6 +130,44 @@
 
 <!-- Notification -->
 <div id="notification" class="notification"></div>
+
+<div id="cart-modal" class="cart-modal">
+    <div class="cart-modal-content">
+        <span class="close-btn" onclick="closeCartModal()">&times;</span>
+        <h2>Səbətiniz</h2>
+        <div class="cart-items">
+            <!-- Səbət məhsulları burada göstəriləcək -->
+        </div>
+    </div>
+</div>
+
+<style>
+.cart-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.cart-modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+</style>
 {% endblock %}
 
 {% block extra_js %}

@@ -559,38 +559,3 @@ tfoot td {
 .qaliq-borc-negativ {
     color: var(--error-color);
 }
-
-.products-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-    font-size: 1em;
-    font-family: sans-serif;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-}
-
-.products-table th, .products-table td {
-    padding: 12px 15px;
-    text-align: left;
-}
-
-.products-table th {
-    background-color: #0a192f;
-    color: #ffffff;
-}
-
-.products-table tbody tr {
-    border-bottom: 1px solid #dddddd;
-}
-
-.products-table tbody tr:nth-of-type(even) {
-    background-color: #f3f3f3;
-}
-
-.products-table tbody tr:hover {
-    background-color: #f1f1f1;
-}
-
-.products-table tfoot {
-    font-weight: bold;
-}

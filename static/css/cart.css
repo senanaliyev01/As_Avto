@@ -59,6 +59,7 @@ body {
 
 /* Cart Container */
 .cart-container {
+    border: 1px solid #64ffda;
     background-color: var(--secondary-color);
     border-radius: 1rem;
     box-shadow: var(--shadow-md);
@@ -77,6 +78,7 @@ table {
 
 /* Header Styles */
 thead th {
+    border: 1px solid #64ffda;
     background-color: var(--primary-color);
     color: var(--text-primary);
     padding: 1rem;
@@ -98,6 +100,7 @@ tbody tr:hover {
 
 /* Cell Styles */
 td {
+    border: 1px solid #64ffda;
     padding: 1rem;
     color: var(--text-primary);
     text-align: center;

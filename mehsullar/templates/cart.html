@@ -20,12 +20,11 @@
             <thead>
                 <tr>
                     <th>Məhsul</th>
-                    <th>Kateqoriya</th>
-                    <th>Brend</th>
+                    <th>Firma</th>
                     <th>Model</th>
                     <th>Brend Kod</th>
                     <th>OEM</th>
-                    <th>Stok</th>
+                    <th>Mövcudluq</th>
                     <th>Qiymət</th>
                     <th>Miqdar</th>
                     <th>Cəmi</th>
@@ -36,7 +35,6 @@
                 {% for item in sebet %}
                 <tr data-item-id="{{ item.id }}" data-price="{{ item.mehsul.formatted_qiymet }}">
                     <td>{{ item.mehsul.adi }}</td>
-                    <td>{{ item.mehsul.kateqoriya.adi }}</td>
                     <td>{{ item.mehsul.brend.adi }}</td>
                     <td>{{ item.mehsul.marka.adi }}</td>
                     <td>{{ item.mehsul.brend_kod }}</td>

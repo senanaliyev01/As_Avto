@@ -268,21 +268,25 @@ body {
 
 /* Table Styles */
 .table-container {
-    background: var(--card-bg);
-    border-radius: 16px;
-    padding: 1.5rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    overflow-x: auto;
-    margin-top: 2rem;
+    border: 1px solid #64ffda;
+    background-color: var(--secondary-color);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-md);
+    width: 100%;
+    overflow: hidden;
+    margin-bottom: 2rem;
 }
 
 table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
+    margin: 0;
 }
 
 thead th {
+    width: 5%;
+    border: 1px solid #64ffda;
     background: var(--secondary-color);
     padding: 1rem;
     font-weight: 600;
@@ -299,13 +303,16 @@ tbody tr {
 }
 
 tbody tr:hover {
-    background: rgba(100, 255, 218, 0.05);
-    transform: translateX(5px);
+    background-color: rgba(100, 255, 218, 0.1);
 }
 
 td {
+    width: 5%;
+    border: 1px solid #64ffda;
     padding: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    text-align: center;
+    font-size: 0.95rem;
 }
 
 .text-right { text-align: right; }

@@ -268,13 +268,12 @@ body {
 
 /* Table Styles */
 .table-container {
-    border: 1px solid #64ffda;
-    background-color: var(--secondary-color);
-    border-radius: 1rem;
-    box-shadow: var(--shadow-md);
-    width: 100%;
-    overflow: hidden;
-    margin-bottom: 2rem;
+    display: flex;
+    justify-content: center;
+}
+
+.table-container table {
+    margin: auto;
 }
 
 table {

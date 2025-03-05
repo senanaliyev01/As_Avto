@@ -131,47 +131,16 @@
 <!-- Notification -->
 <div id="notification" class="notification"></div>
 
-<div id="cart-modal" class="cart-modal">
-    <div class="cart-modal-content">
+<div id="cart-modal" class="modal">
+    <div class="modal-content">
         <span class="close-btn" onclick="closeCartModal()">&times;</span>
         <h2>Səbətiniz</h2>
-        <div class="cart-items">
-            <!-- Səbət məhsulları burada göstəriləcək -->
+        <div class="cart-details">
+            <!-- Səbət məlumatları burada göstəriləcək -->
         </div>
     </div>
 </div>
 
-<style>
-.cart-modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-.cart-modal-content {
-    background-color: #fefefe;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    animation: fadeIn 0.5s;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-</style>
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/cart.js' %}"></script>
 <script>
 function handleOrderSubmit(event) {
     event.preventDefault();
@@ -198,6 +167,14 @@ function handleOrderSubmit(event) {
         });
     }
     return false;
+}
+
+function openCartModal() {
+    document.getElementById('cart-modal').style.display = 'block';
+}
+
+function closeCartModal() {
+    document.getElementById('cart-modal').style.display = 'none';
 }
 </script>
 {% endblock %}

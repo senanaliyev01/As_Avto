@@ -493,6 +493,8 @@ tfoot td {
 }
 
 .sifaris-link:hover {
+    text-decoration: none;
+    border-radius: 10px;
     color: var(--text-primary);
     text-decoration: underline;
 }

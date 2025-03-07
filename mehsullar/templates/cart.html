@@ -179,12 +179,15 @@
             const row = checkbox.closest('tr');
             const itemTotalText = row.querySelector('.item-total').textContent;
             const itemTotal = parseFloat(itemTotalText.replace(' AZN', ''));
-            total += itemTotal;
+            if (!isNaN(itemTotal)) {
+                total += itemTotal;
+            }
         });
         
         const formattedTotal = new Intl.NumberFormat('az-AZ', {
             minimumFractionDigits: 2,
-            maximumFractionDigits: 2
+            maximumFractionDigits: 2,
+            useGrouping: false
         }).format(total);
         
         document.getElementById('selected-total-amount').textContent = formattedTotal + ' AZN';

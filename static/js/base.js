@@ -745,11 +745,21 @@
                 if (data.success) {
                     input.value = data.new_quantity;
                     const itemTotalElement = row.querySelector('.item-total');
-                    itemTotalElement.textContent = data.item_total.toFixed(2) + ' AZN';
+                    const formattedItemTotal = new Intl.NumberFormat('az-AZ', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                        useGrouping: false
+                    }).format(data.item_total);
+                    itemTotalElement.textContent = formattedItemTotal + ' AZN';
                     
                     const totalElement = document.getElementById('total-amount');
                     if (totalElement) {
-                        totalElement.textContent = data.total_amount.toFixed(2) + ' AZN';
+                        const formattedTotal = new Intl.NumberFormat('az-AZ', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                            useGrouping: false
+                        }).format(data.total_amount);
+                        totalElement.textContent = formattedTotal + ' AZN';
                         totalElement.classList.add('highlight');
                         setTimeout(() => totalElement.classList.remove('highlight'), 300);
                     }

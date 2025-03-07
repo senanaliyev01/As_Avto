@@ -108,7 +108,7 @@ class Mehsul(models.Model):
     oem = models.CharField(max_length=100)
     stok = models.IntegerField()
     qiymet = models.DecimalField(max_digits=10, decimal_places=2)
-    sekil = models.ImageField(upload_to='mehsul_sekilleri/', null=True, blank=True, default='static/img/noimage.webp')
+    sekil = models.ImageField(upload_to='mehsul_sekilleri/', null=True, blank=True, default='mehsul_sekilleri/noimage.webp')
     haqqinda = models.TextField(null=True, blank=True)
     yenidir = models.BooleanField(default=False, null=True, blank=True)
 

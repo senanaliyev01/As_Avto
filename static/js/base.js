@@ -390,14 +390,11 @@
                                 }
                             })
                             .catch(error => {
+                                console.error("Xəta:", error);
                                 this.innerHTML = originalContent;
                                 this.style.pointerEvents = 'auto';
                                 this.style.opacity = '1';
-                                if (error.name === 'SyntaxError') {
-                                    // If it's a JSON parsing error, the operation was likely successful
-                                    showAnimatedMessage("Məhsul səbətə əlavə olundu!", false);
-                                    updateCartCount();
-                                }
+                                showAnimatedMessage("Serverdə xəta baş verdi.", true);
                             });
                     }, 2000);
                 });
@@ -954,10 +951,16 @@
             method: 'GET',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
                 'X-CSRFToken': getCookie('csrftoken')
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 showAnimatedMessage(`${data.mehsul.adi} səbətə əlavə edildi (${quantity} ədəd)`, false, data.mehsul);
@@ -967,8 +970,8 @@
             }
         })
         .catch(error => {
-            showAnimatedMessage('Xəta baş verdi', true);
             console.error('Error:', error);
+            showAnimatedMessage('Serverdə xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.', true);
         });
     }
 

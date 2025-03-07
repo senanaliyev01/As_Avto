@@ -45,18 +45,42 @@ def about(request):
 def sebet_ekle(request, mehsul_id):
     try:
         mehsul = get_object_or_404(Mehsul, id=mehsul_id)
-        sebet, created = Sebet.objects.get_or_create(user=request.user, mehsul=mehsul)
-        if not created:
-            sebet.miqdar += 1
-            sebet.save()
+        miqdar = int(request.GET.get('miqdar', 1))  # Default olaraq 1
 
-        # Məhsul məlumatlarını JSON formatında qaytarırıq
+        if miqdar <= 0:
+            return JsonResponse({
+                'success': False,
+                'error': 'Miqdar 0-dan böyük olmalıdır'
+            }, status=400)
+
+        if miqdar > mehsul.stok:
+            return JsonResponse({
+                'success': False,
+                'error': 'Kifayət qədər stok yoxdur'
+            }, status=400)
+
+        sebet, created = Sebet.objects.get_or_create(user=request.user, mehsul=mehsul)
+        
+        if created:
+            sebet.miqdar = miqdar
+        else:
+            sebet.miqdar += miqdar
+            
+        if sebet.miqdar > mehsul.stok:
+            return JsonResponse({
+                'success': False,
+                'error': 'Kifayət qədər stok yoxdur'
+            }, status=400)
+            
+        sebet.save()
+
         return JsonResponse({
             'success': True,
             'mehsul': {
                 'adi': mehsul.adi,
                 'sekil': mehsul.sekil.url if mehsul.sekil else None,
                 'oem': mehsul.oem,
+                'miqdar': sebet.miqdar
             }
         })
     except Exception as e:

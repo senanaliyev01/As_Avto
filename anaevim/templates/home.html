@@ -371,6 +371,8 @@
                                     <div class="product-card">
                                         <div class="product-card__image">
                                             <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
+                                            {% else %}
+                                            <img src="{% static 'img/noimage.webp' %}" alt="{{ mehsul.adi }}">
                                         </div>
                                         <div class="product-card__content">
                                             <h3 class="product-card__title">{{ mehsul.adi }}</h3>

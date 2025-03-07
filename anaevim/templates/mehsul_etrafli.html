@@ -189,7 +189,11 @@
         <div class="container">
             <div class="product-detail__grid">
                 <div class="product-detail__image">
+                    {% if mehsul.sekil %}
                     <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
+                    {% else %}
+                    <img src="{% static 'img/noimage.webp' %}" alt="{{ mehsul.adi }}">
+                    {% endif %}
                 </div>
                 <div class="product-detail__content">
                     <h1 class="product-detail__title">{{ mehsul.adi }}</h1>

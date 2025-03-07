@@ -597,6 +597,8 @@ td {
     transition: transform 0.3s ease;
 }
 
+
+
 /* Loading Bar */
 .loading-bar-container {
     position: fixed;
@@ -664,122 +666,5 @@ td {
     to {
         opacity: 1;
     }
-}
-
-/* Custom Checkbox Styles */
-.custom-checkbox {
-    position: relative;
-    display: inline-block;
-}
-
-.custom-checkbox input[type="checkbox"] {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-}
-
-.checkmark {
-    position: relative;
-    display: block;
-    height: 22px;
-    width: 22px;
-    background: var(--primary-color);
-    border: 2px solid var(--accent-color);
-    border-radius: 6px;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.custom-checkbox:hover input ~ .checkmark {
-    transform: scale(1.05);
-    box-shadow: 0 0 10px rgba(100, 255, 218, 0.2);
-}
-
-.custom-checkbox input:checked ~ .checkmark {
-    background: linear-gradient(145deg, #64ffda, #4fd1c5);
-    border-color: transparent;
-}
-
-.checkmark:after {
-    content: '';
-    position: absolute;
-    display: none;
-    left: 6px;
-    top: 2px;
-    width: 6px;
-    height: 12px;
-    border: solid var(--primary-color);
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-    transition: all 0.2s ease;
-}
-
-.custom-checkbox input:checked ~ .checkmark:after {
-    display: block;
-    animation: checkmark 0.2s ease-in-out;
-}
-
-@keyframes checkmark {
-    0% {
-        opacity: 0;
-        transform: rotate(45deg) scale(0);
-    }
-    100% {
-        opacity: 1;
-        transform: rotate(45deg) scale(1);
-    }
-}
-
-/* Select All Checkbox Container */
-.select-all-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-}
-
-.select-all-container .custom-checkbox {
-    margin-right: 8px;
-}
-
-.select-all-label {
-    color: var(--text-primary);
-    font-size: 0.9rem;
-    font-weight: 500;
-    user-select: none;
-    transition: var(--transition);
-}
-
-.select-all-container:hover .select-all-label {
-    color: var(--accent-color);
-}
-
-/* Item Checkbox Container */
-.item-checkbox-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.item-checkbox-container .custom-checkbox {
-    transform: scale(0.9);
-}
-
-/* Checkbox Focus Styles */
-.custom-checkbox input:focus ~ .checkmark {
-    box-shadow: 0 0 0 2px rgba(100, 255, 218, 0.3);
-}
-
-/* Checkbox Disabled Styles */
-.custom-checkbox input:disabled ~ .checkmark {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.custom-checkbox input:disabled ~ .checkmark:hover {
-    transform: none;
-    box-shadow: none;
 }
 

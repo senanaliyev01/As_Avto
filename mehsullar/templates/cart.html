@@ -177,11 +177,21 @@
         
         checkedItems.forEach(checkbox => {
             const row = checkbox.closest('tr');
-            const itemTotal = parseFloat(row.querySelector('.item-total').textContent);
-            total += itemTotal;
+            const itemTotalText = row.querySelector('.item-total').textContent;
+            // "AZN" yazısını silirik və string-i number-ə çeviririk
+            const itemTotal = parseFloat(itemTotalText.replace('AZN', '').trim());
+            if (!isNaN(itemTotal)) {
+                total += itemTotal;
+            }
         });
         
-        document.getElementById('selected-total-amount').textContent = total.toFixed(2) + ' AZN';
+        // Qiyməti 2 rəqəm dəqiqliklə göstəririk
+        const formattedTotal = new Intl.NumberFormat('az-AZ', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(total);
+        
+        document.getElementById('selected-total-amount').textContent = formattedTotal + ' AZN';
         updateOrderButton();
     }
     

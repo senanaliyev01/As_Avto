@@ -129,6 +129,11 @@ class Mehsul(models.Model):
         kodlar.extend([oem.kod for oem in self.oem_kodlar.all()])
         return kodlar
 
+    def save(self, *args, **kwargs):
+        if not self.sekil:
+            self.sekil = 'mehsul_sekilleri/noimage.webp'
+        super().save(*args, **kwargs)
+
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     mehsul = models.ForeignKey(Mehsul, on_delete=models.CASCADE)

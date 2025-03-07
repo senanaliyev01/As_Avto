@@ -105,24 +105,6 @@
     {% endif %}
 </div>
 
-<div class="pagination">
-    <span class="step-links">
-        {% if mehsullar.has_previous %}
-            <a href="?page=1{% if search_text %}&search_text={{ search_text }}{% endif %}">&laquo; İlk</a>
-            <a href="?page={{ mehsullar.previous_page_number }}{% if search_text %}&search_text={{ search_text }}{% endif %}">Öncə</a>
-        {% endif %}
-
-        <span class="current">
-            Səhifə {{ mehsullar.number }} / {{ mehsullar.paginator.num_pages }}.
-        </span>
-
-        {% if mehsullar.has_next %}
-            <a href="?page={{ mehsullar.next_page_number }}{% if search_text %}&search_text={{ search_text }}{% endif %}">Sonraki</a>
-            <a href="?page={{ mehsullar.paginator.num_pages }}{% if search_text %}&search_text={{ search_text }}{% endif %}">Son &raquo;</a>
-        {% endif %}
-    </span>
-</div>
-
 
 {% endblock %}
 

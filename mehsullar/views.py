@@ -21,7 +21,6 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import Image
 from istifadeciler.models import Profile
 from django.contrib import messages
-from django.core.paginator import Paginator
 
 @login_required
 def umumibaxis(request):
@@ -214,22 +213,12 @@ def products_list(request):
             Q(oem_kodlar__kod__icontains=clean_search)  # Əlavə OEM kodlarında axtarış
         ).distinct()
 
-    # Paginator əlavə edirik
-    paginator = Paginator(mehsullar, 10)  # Hər səhifədə 10 məhsul
-    page_number = request.GET.get('page')  # URL-dən səhifə nömrəsini alırıq
-    mehsullar = paginator.get_page(page_number)  # Səhifələnmiş məhsulları alırıq
-
-    # Axtarış parametrlərini saxlayırıq
-    context = {
+    return render(request, 'products_list.html', {
         'mehsullar': mehsullar,
         'kateqoriyalar': kateqoriyalar,
         'brendler': brendler,
-        'markalar': markalar,
-        'paginator': paginator,
-        'search_text': search_text,  # Axtarış mətni
-    }
-
-    return render(request, 'products_list.html', context)
+        'markalar': markalar
+    })
 
 
 @login_required

@@ -937,7 +937,7 @@
         const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
         const quantity = parseInt(quantityInput.value);
 
-        if (isNaN(quantity) || quantity <= 0) {
+        if (isNaN(quantity) || quantity < 1) {
             showAnimatedMessage('Zəhmət olmasa düzgün miqdar daxil edin', true);
             return;
         }
@@ -951,21 +951,25 @@
             method: 'GET',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': getCookie('csrftoken')
+                'Accept': 'application/json'
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.error || 'Xəta baş verdi');
+                });
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
-                showAnimatedMessage(`${data.mehsul.adi} səbətə əlavə edildi (${quantity} ədəd)`, false, data.mehsul);
+                showAnimatedMessage(`${data.mehsul.adi} səbətə əlavə edildi`);
                 updateCartCount();
-            } else {
-                showAnimatedMessage(data.error || 'Xəta baş verdi', true);
             }
         })
         .catch(error => {
-            showAnimatedMessage('Xəta baş verdi', true);
-            console.error('Error:', error);
+            showAnimatedMessage(error.message, true);
         });
     }
 

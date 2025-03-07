@@ -20,7 +20,13 @@
             <thead>
                 <tr>
                     <th>
-                        <input type="checkbox" id="selectAll" onchange="toggleAllItems(this)">
+                        <div class="select-all-container">
+                            <label class="custom-checkbox">
+                                <input type="checkbox" id="selectAll" onchange="toggleAllItems(this)">
+                                <span class="checkmark"></span>
+                            </label>
+                            <span class="select-all-label">Hamısını Seç</span>
+                        </div>
                     </th>
                     <th>Məhsul</th>
                     <th>Firma</th>
@@ -38,7 +44,12 @@
                 {% for item in sebet %}
                 <tr data-item-id="{{ item.id }}" data-price="{{ item.mehsul.formatted_qiymet }}">
                     <td>
-                        <input type="checkbox" class="item-checkbox" data-item-id="{{ item.id }}" onchange="updateTotalAmount()">
+                        <div class="item-checkbox-container">
+                            <label class="custom-checkbox">
+                                <input type="checkbox" class="item-checkbox" data-item-id="{{ item.id }}" onchange="updateTotalAmount()">
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
                     </td>
                     <td>{{ item.mehsul.adi }}</td>
                     <td>{{ item.mehsul.brend.adi }}</td>

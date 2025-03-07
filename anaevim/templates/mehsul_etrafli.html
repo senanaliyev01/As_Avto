@@ -18,7 +18,7 @@
         "@context": "https://schema.org",
         "@type": "Product",
         "name": "{{ mehsul.adi }}",
-        "image": "{% if mehsul.sekil %} https://as-avto.com{{ mehsul.sekil.url }}{% else %} {% static 'img/noimage.webp' %}{% endif %}",
+        "image": "https://as-avto.com{{ mehsul.sekil.url }}",
         "description": "{{ mehsul.adi }} - {{ mehsul.marka.adi }} üçün {{ mehsul.brend.adi }} markalı orijinal ehtiyat hissəsi",
         "brand": {
             "@type": "Brand",
@@ -189,11 +189,7 @@
         <div class="container">
             <div class="product-detail__grid">
                 <div class="product-detail__image">
-                    {% if mehsul.sekil %}
                     <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
-                    {% else %}
-                    <img src="{% static 'img/noimage.webp' %}" alt="{{ mehsul.adi }}">
-                    {% endif %}
                 </div>
                 <div class="product-detail__content">
                     <h1 class="product-detail__title">{{ mehsul.adi }}</h1>

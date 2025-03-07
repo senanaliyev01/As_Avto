@@ -284,14 +284,27 @@ def sebetden_sil(request, sebet_id):
 def sifarisi_gonder(request):
     if request.method == "POST":
         try:
-            # Səbətdəki məhsulları yoxla
-            sebet = Sebet.objects.filter(user=request.user)
-            if not sebet.exists():
-                messages.error(request, 'Səbətiniz boşdur')
-                return redirect('view_cart')
+            # JSON data-nı parse et
+            data = json.loads(request.body)
+            selected_items = data.get('selected_items', [])
+            
+            if not selected_items:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Heç bir məhsul seçilməyib'
+                }, status=400)
 
-            # Stok yoxlaması
-           
+            # Seçilmiş məhsulları əldə et
+            sebet_items = Sebet.objects.filter(
+                user=request.user,
+                id__in=selected_items
+            )
+
+            if not sebet_items.exists():
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Seçilmiş məhsullar tapılmadı'
+                }, status=404)
 
             # Yeni sifarişi yarat
             sifaris = Sifaris.objects.create(
@@ -300,8 +313,8 @@ def sifarisi_gonder(request):
             )
 
             total_amount = 0
-            # Məhsulları sifarişə əlavə et
-            for item in sebet:
+            # Seçilmiş məhsulları sifarişə əlavə et
+            for item in sebet_items:
                 item_total = item.mehsul.qiymet * item.miqdar
                 total_amount += item_total
                 
@@ -317,17 +330,29 @@ def sifarisi_gonder(request):
             sifaris.status = 'gozleyir'
             sifaris.save()
 
-            # Səbəti təmizlə
-            sebet.delete()
+            # Yalnız seçilmiş məhsulları səbətdən sil
+            sebet_items.delete()
 
-            messages.success(request, 'Sifarişiniz uğurla qeydə alındı')
-            return redirect('sifaris_izle')
+            return JsonResponse({
+                'success': True,
+                'message': 'Sifarişiniz uğurla qeydə alındı'
+            })
 
+        except json.JSONDecodeError:
+            return JsonResponse({
+                'success': False,
+                'message': 'Yanlış format'
+            }, status=400)
         except Exception as e:
-            messages.error(request, f'Xəta baş verdi: {str(e)}')
-            return redirect('view_cart')
+            return JsonResponse({
+                'success': False,
+                'message': f'Xəta baş verdi: {str(e)}'
+            }, status=500)
 
-    return redirect('view_cart')
+    return JsonResponse({
+        'success': False,
+        'message': 'Yanlış sorğu metodu'
+    }, status=405)
 
 
 from django.contrib.auth.decorators import login_required

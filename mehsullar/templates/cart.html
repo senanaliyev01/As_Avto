@@ -19,6 +19,9 @@
         <table>
             <thead>
                 <tr>
+                    <th>
+                        <input type="checkbox" id="selectAll" onchange="toggleAllItems(this)">
+                    </th>
                     <th>Məhsul</th>
                     <th>Firma</th>
                     <th>Avtomobil</th>
@@ -34,6 +37,9 @@
             <tbody>
                 {% for item in sebet %}
                 <tr data-item-id="{{ item.id }}" data-price="{{ item.mehsul.formatted_qiymet }}">
+                    <td>
+                        <input type="checkbox" class="item-checkbox" data-item-id="{{ item.id }}" onchange="updateTotalAmount()">
+                    </td>
                     <td>{{ item.mehsul.adi }}</td>
                     <td>{{ item.mehsul.brend.adi }}</td>
                     <td>{{ item.mehsul.marka.adi }}</td>
@@ -101,17 +107,17 @@
 
         <div colspan="11" style="text-align: center; padding: 1.5rem;">
             <div style="display: inline-flex; align-items: center; gap: 1rem; background: linear-gradient(145deg, #0a1929, #1a2942); padding: 1rem 2rem; border-radius: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
-                <strong style="color: #64ffda; font-size: 1.2rem;">Ümumi Cəmi:</strong>
-            <span id="total-amount" style="color: white; font-size: 1.2rem; font-weight: 600;">{{ cemi_mebleg }} AZN</span>
+                <strong style="color: #64ffda; font-size: 1.2rem;">Seçilmiş Məhsulların Cəmi:</strong>
+                <span id="selected-total-amount" style="color: white; font-size: 1.2rem; font-weight: 600;">0 AZN</span>
+            </div>
         </div>
 
-
         <div class="cart-actions">
-            <form action="{% url 'sifarisi_gonder' %}" method="post" style="display: inline;" onsubmit="return handleOrderSubmit(event)">
+            <form id="orderForm" onsubmit="return handleOrderSubmit(event)">
                 {% csrf_token %}
-                <button type="submit" class="order-btn">
+                <button type="submit" class="order-btn" id="orderButton" disabled>
                     <i class="fas fa-shopping-cart"></i>
-                    Sifarişi Təsdiqlə
+                    Seçilmiş Məhsulları Sifariş Et
                 </button>
             </form>
         </div>
@@ -136,17 +142,58 @@
 {% block extra_js %}
 <script src="{% static 'js/cart.js' %}"></script>
 <script>
+function toggleAllItems(checkbox) {
+    const itemCheckboxes = document.querySelectorAll('.item-checkbox');
+    itemCheckboxes.forEach(item => {
+        item.checked = checkbox.checked;
+    });
+    updateTotalAmount();
+    updateOrderButton();
+}
+
+function updateTotalAmount() {
+    let total = 0;
+    const checkedItems = document.querySelectorAll('.item-checkbox:checked');
+    
+    checkedItems.forEach(checkbox => {
+        const row = checkbox.closest('tr');
+        const itemTotal = parseFloat(row.querySelector('.item-total').textContent);
+        total += itemTotal;
+    });
+    
+    document.getElementById('selected-total-amount').textContent = total.toFixed(2) + ' AZN';
+    updateOrderButton();
+}
+
+function updateOrderButton() {
+    const checkedItems = document.querySelectorAll('.item-checkbox:checked');
+    const orderButton = document.getElementById('orderButton');
+    orderButton.disabled = checkedItems.length === 0;
+}
+
 function handleOrderSubmit(event) {
     event.preventDefault();
     
-    if (confirm('Sifarişi təsdiqləmək istədiyinizə əminsiniz?')) {
-        const form = event.target;
+    const checkedItems = document.querySelectorAll('.item-checkbox:checked');
+    if (checkedItems.length === 0) {
+        alert('Zəhmət olmasa ən azı bir məhsul seçin');
+        return false;
+    }
+    
+    if (confirm('Seçilmiş məhsulları sifariş etmək istədiyinizə əminsiniz?')) {
+        const selectedItemIds = Array.from(checkedItems).map(checkbox => 
+            checkbox.getAttribute('data-item-id')
+        );
         
-        fetch(form.action, {
+        fetch('{% url "sifarisi_gonder" %}', {
             method: 'POST',
             headers: {
+                'Content-Type': 'application/json',
                 'X-CSRFToken': '{{ csrf_token }}'
-            }
+            },
+            body: JSON.stringify({
+                selected_items: selectedItemIds
+            })
         })
         .then(response => {
             if (response.ok) {
@@ -162,5 +209,10 @@ function handleOrderSubmit(event) {
     }
     return false;
 }
+
+// Initialize order button state
+document.addEventListener('DOMContentLoaded', function() {
+    updateOrderButton();
+});
 </script>
 {% endblock %}

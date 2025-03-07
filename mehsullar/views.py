@@ -72,7 +72,7 @@ def sebet_ekle(request, mehsul_id):
                 'error': 'Səbətdəki ümumi miqdar 999-dan çox ola bilməz'
             }, status=400)
             
-        sebet.save()
+            sebet.save()
 
         return JsonResponse({
             'success': True,

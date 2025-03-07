@@ -219,13 +219,17 @@ def products_list(request):
     page_number = request.GET.get('page')  # URL-dən səhifə nömrəsini alırıq
     mehsullar = paginator.get_page(page_number)  # Səhifələnmiş məhsulları alırıq
 
-    return render(request, 'products_list.html', {
+    # Axtarış parametrlərini saxlayırıq
+    context = {
         'mehsullar': mehsullar,
         'kateqoriyalar': kateqoriyalar,
         'brendler': brendler,
         'markalar': markalar,
-        'paginator': paginator,  # Paginator-u kontekstə əlavə edirik
-    })
+        'paginator': paginator,
+        'search_text': search_text,  # Axtarış mətni
+    }
+
+    return render(request, 'products_list.html', context)
 
 
 @login_required

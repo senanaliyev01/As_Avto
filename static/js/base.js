@@ -951,13 +951,17 @@
             method: 'GET',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Accept': 'application/json'
             }
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                throw new Error('Şəbəkə xətası');
+            }
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new TypeError('Server JSON cavabı qaytarmadı');
             }
             return response.json();
         })
@@ -970,8 +974,8 @@
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            showAnimatedMessage('Serverdə xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.', true);
+            console.error('Səbətə əlavə xətası:', error);
+            showAnimatedMessage('Səbətə əlavə edilərkən xəta baş verdi', true);
         });
     }
 

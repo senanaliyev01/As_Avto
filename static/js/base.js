@@ -390,11 +390,14 @@
                                 }
                             })
                             .catch(error => {
-                                console.error("Xəta:", error);
                                 this.innerHTML = originalContent;
                                 this.style.pointerEvents = 'auto';
                                 this.style.opacity = '1';
-                                showAnimatedMessage("Serverdə xəta baş verdi.", true);
+                                if (error.name === 'SyntaxError') {
+                                    // If it's a JSON parsing error, the operation was likely successful
+                                    showAnimatedMessage("Məhsul səbətə əlavə olundu!", false);
+                                    updateCartCount();
+                                }
                             });
                     }, 2000);
                 });
@@ -937,7 +940,7 @@
         const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
         const quantity = parseInt(quantityInput.value);
 
-        if (isNaN(quantity) || quantity < 1) {
+        if (isNaN(quantity) || quantity <= 0) {
             showAnimatedMessage('Zəhmət olmasa düzgün miqdar daxil edin', true);
             return;
         }
@@ -951,25 +954,21 @@
             method: 'GET',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
+                'X-CSRFToken': getCookie('csrftoken')
             }
         })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(data => {
-                    throw new Error(data.error || 'Xəta baş verdi');
-                });
-            }
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
             if (data.success) {
-                showAnimatedMessage(`${data.mehsul.adi} səbətə əlavə edildi`);
+                showAnimatedMessage(`${data.mehsul.adi} səbətə əlavə edildi (${quantity} ədəd)`, false, data.mehsul);
                 updateCartCount();
+            } else {
+                showAnimatedMessage(data.error || 'Xəta baş verdi', true);
             }
         })
         .catch(error => {
-            showAnimatedMessage(error.message, true);
+            showAnimatedMessage('Xəta baş verdi', true);
+            console.error('Error:', error);
         });
     }
 

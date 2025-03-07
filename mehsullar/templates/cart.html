@@ -178,14 +178,10 @@
         checkedItems.forEach(checkbox => {
             const row = checkbox.closest('tr');
             const itemTotalText = row.querySelector('.item-total').textContent;
-            // "AZN" yazısını silirik və string-i number-ə çeviririk
-            const itemTotal = parseFloat(itemTotalText.replace('AZN', '').trim());
-            if (!isNaN(itemTotal)) {
-                total += itemTotal;
-            }
+            const itemTotal = parseFloat(itemTotalText.replace(' AZN', ''));
+            total += itemTotal;
         });
         
-        // Qiyməti 2 rəqəm dəqiqliklə göstəririk
         const formattedTotal = new Intl.NumberFormat('az-AZ', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
@@ -201,9 +197,9 @@
         orderButton.disabled = checkedItems.length === 0;
     }
     
-    function handleOrderSubmit(event) {
-        event.preventDefault();
-        
+function handleOrderSubmit(event) {
+    event.preventDefault();
+    
         const checkedItems = document.querySelectorAll('.item-checkbox:checked');
         if (checkedItems.length === 0) {
             alert('Zəhmət olmasa ən azı bir məhsul seçin');
@@ -216,29 +212,29 @@
             );
             
             fetch('{% url "sifarisi_gonder" %}', {
-                method: 'POST',
-                headers: {
+            method: 'POST',
+            headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
+                'X-CSRFToken': '{{ csrf_token }}'
                 },
                 body: JSON.stringify({
                     selected_items: selectedItemIds
                 })
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert('Sifarişiniz uğurla qeydə alındı. Sifarişlərim səhifəsinə yönləndirilirsiniz.');
-                    window.location.href = '{% url "sifaris_izle" %}';
-                } else {
-                    alert('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
-                }
-            })
-            .catch(error => {
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Sifarişiniz uğurla qeydə alındı. Sifarişlərim səhifəsinə yönləndirilirsiniz.');
+                window.location.href = '{% url "sifaris_izle" %}';
+            } else {
                 alert('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
-            });
-        }
-        return false;
+            }
+        })
+        .catch(error => {
+            alert('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+        });
     }
+    return false;
+}
     
     // Initialize order button state
     document.addEventListener('DOMContentLoaded', function() {

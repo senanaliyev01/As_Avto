@@ -113,6 +113,10 @@
         </div>
 
         <div class="cart-actions">
+            <button onclick="recalculateCart()" class="recalculate-btn" id="recalculateBtn">
+                <i class="fas fa-sync-alt"></i>
+                Yenidən Hesabla
+            </button>
             <form id="orderForm" onsubmit="return handleOrderSubmit(event)">
                 {% csrf_token %}
                 <button type="submit" class="order-btn" id="orderButton" disabled>
@@ -133,13 +137,24 @@
     {% endif %}
 </div>
 
-
+<!-- Loading Bar -->
+<div id="loadingBar" class="loading-bar-container" style="display: none;">
+    <div class="loading-bar-overlay">
+        <div class="loading-bar-content">
+            <div class="loading-bar-progress">
+                <div class="loading-bar-fill"></div>
+            </div>
+            <div class="loading-bar-text">Yenidən hesablanır... <span class="loading-bar-percentage">0%</span></div>
+        </div>
+    </div>
+</div>
 
 <!-- Notification -->
 <div id="notification" class="notification"></div>
 {% endblock %}
 
 {% block extra_js %}
+{{ block.super }}
 <script src="{% static 'js/cart.js' %}"></script>
 <script>
 function toggleAllItems(checkbox) {
@@ -214,5 +229,40 @@ function handleOrderSubmit(event) {
 document.addEventListener('DOMContentLoaded', function() {
     updateOrderButton();
 });
+
+function recalculateCart() {
+    const loadingBar = document.getElementById('loadingBar');
+    const progressBar = loadingBar.querySelector('.loading-bar-fill');
+    const percentageText = loadingBar.querySelector('.loading-bar-percentage');
+    const recalculateBtn = document.getElementById('recalculateBtn');
+    
+    // Düyməni deaktiv et
+    recalculateBtn.disabled = true;
+    recalculateBtn.style.opacity = '0.7';
+    
+    // Loading bar-ı göstər
+    loadingBar.style.display = 'block';
+    
+    let progress = 0;
+    const duration = 3000; // 3 saniyə
+    const interval = 30; // Hər 30ms-də yenilənir
+    const increment = (100 * interval) / duration;
+    
+    const updateProgress = setInterval(() => {
+        progress += increment;
+        if (progress >= 100) {
+            progress = 100;
+            clearInterval(updateProgress);
+            
+            // 3 saniyə sonra səhifəni yenilə
+            setTimeout(() => {
+                window.location.reload();
+            }, 100);
+        }
+        
+        progressBar.style.width = `${progress}%`;
+        percentageText.textContent = `${Math.round(progress)}%`;
+    }, interval);
+}
 </script>
 {% endblock %}

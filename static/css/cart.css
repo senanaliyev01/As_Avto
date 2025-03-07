@@ -231,10 +231,11 @@ td {
 
 /* Cart Actions */
 .cart-actions {
-    padding: 1.5rem;
     display: flex;
+    align-items: center;
     justify-content: flex-end;
-    border-top: 1px solid var(--secondary-color);
+    gap: 1rem;
+    padding: 1.5rem;
 }
 
 .order-btn {
@@ -563,6 +564,110 @@ td {
     .modal-content {
         width: 95%;
         padding: 1.5rem;
+    }
+}
+
+/* Recalculate Button */
+.recalculate-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(145deg, #64ffda, #4fd1c5);
+    color: var(--primary-color);
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-right: 1rem;
+}
+
+.recalculate-btn:hover {
+    transform: scale(1.05) rotate(360deg);
+    box-shadow: 0 4px 15px rgba(100, 255, 218, 0.3);
+}
+
+.recalculate-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.recalculate-btn i {
+    transition: transform 0.3s ease;
+}
+
+.recalculate-btn:hover i {
+    transform: rotate(180deg);
+}
+
+/* Loading Bar */
+.loading-bar-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 25, 47, 0.9);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.loading-bar-overlay {
+    background: linear-gradient(145deg, #0a1929, #1a2942);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(100, 255, 218, 0.1);
+    width: 90%;
+    max-width: 500px;
+}
+
+.loading-bar-content {
+    text-align: center;
+}
+
+.loading-bar-progress {
+    height: 8px;
+    background: rgba(100, 255, 218, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 1rem 0;
+    position: relative;
+}
+
+.loading-bar-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #64ffda, #4fd1c5);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.loading-bar-text {
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    margin-top: 1rem;
+}
+
+.loading-bar-percentage {
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
     }
 }
 

@@ -18,7 +18,7 @@
         "@context": "https://schema.org",
         "@type": "Product",
         "name": "{{ mehsul.adi }}",
-        "image": "{% if mehsul.sekil %}{{ mehsul.sekil.url }}{% else %}{% static 'img/noimage.webp' %}{% endif %}",
+        "image": "{% if mehsul.sekil %} https://as-avto.com{{ mehsul.sekil.url }}{% else %} https://as-avto.com{% static 'img/noimage.webp' %}{% endif %}",
         "description": "{{ mehsul.adi }} - {{ mehsul.marka.adi }} üçün {{ mehsul.brend.adi }} markalı orijinal ehtiyat hissəsi",
         "brand": {
             "@type": "Brand",

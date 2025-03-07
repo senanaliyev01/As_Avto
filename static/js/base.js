@@ -972,4 +972,118 @@
         });
     }
 
-    // ... existing code ...
+    // Miqdar kontrolu üçün funksiyalar
+    function updateProductQuantity(productId, change) {
+        const input = document.querySelector(`input[data-product-id="${productId}"]`);
+        let newValue = parseInt(input.value) + change;
+        
+        // Minimum və maximum dəyərləri yoxla
+        if (newValue < 1) newValue = 1;
+        if (newValue > 999) newValue = 999;
+        
+        input.value = newValue;
+        
+        // Animasiya effekti
+        input.classList.add('quantity-changed');
+        setTimeout(() => input.classList.remove('quantity-changed'), 300);
+    }
+
+    function validateQuantity(input) {
+        let value = parseInt(input.value);
+        
+        if (isNaN(value) || value < 1) {
+            value = 1;
+        } else if (value > 999) {
+            value = 999;
+        }
+        
+        input.value = value;
+    }
+
+    // Miqdar kontrolu üçün CSS
+    const quantityStyles = document.createElement('style');
+    quantityStyles.textContent = `
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 2px;
+            width: fit-content;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .quantity-btn {
+            background: #003366;
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .quantity-btn:hover {
+            background: #004080;
+            transform: scale(1.05);
+        }
+
+        .quantity-btn:active {
+            transform: scale(0.95);
+        }
+
+        .quantity-btn.minus {
+            margin-right: 4px;
+        }
+
+        .quantity-btn.plus {
+            margin-left: 4px;
+        }
+
+        .quantity-input {
+            width: 50px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 4px;
+            font-size: 14px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .quantity-input:focus {
+            outline: none;
+            border-color: #003366;
+            box-shadow: 0 0 0 2px rgba(0,51,102,0.1);
+        }
+
+        .quantity-input::-webkit-inner-spin-button,
+        .quantity-input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .quantity-changed {
+            animation: quantityPulse 0.3s ease;
+        }
+
+        @keyframes quantityPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .quantity-btn i {
+            font-size: 12px;
+        }
+
+        .quantity-control:hover {
+            border-color: #003366;
+        }
+    `;
+    document.head.appendChild(quantityStyles);

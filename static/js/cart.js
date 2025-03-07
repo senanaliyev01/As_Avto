@@ -32,7 +32,7 @@ function handleOrderSubmit(event) {
     
     const checkedItems = document.querySelectorAll('.item-checkbox:checked');
     if (checkedItems.length === 0) {
-        alert('Zəhmət olmasa ən azı bir məhsul seçin');
+        showAnimatedMessage('Zəhmət olmasa ən azı bir məhsul seçin', true);
         return false;
     }
     
@@ -41,26 +41,56 @@ function handleOrderSubmit(event) {
             checkbox.getAttribute('data-item-id')
         );
         
-        fetch('{% url "sifarisi_gonder" %}', {
+        const form = document.getElementById('orderForm');
+        const submitUrl = form.getAttribute('data-submit-url');
+        
+        fetch(submitUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
+                'X-CSRFToken': getCsrfToken()
             },
             body: JSON.stringify({
                 selected_items: selectedItemIds
             })
         })
-        .then(response => {
-            if (response.ok) {
-                alert('Sifarişiniz uğurla qeydə alındı. Sifarişlərim səhifəsinə yönləndirilirsiniz.');
-                window.location.href = '{% url "sifaris_izle" %}';
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAnimatedMessage('Sifarişiniz uğurla qeydə alındı!', false);
+                
+                // Loading bar göstər
+                const loadingBar = document.getElementById('loadingBar');
+                const progressBar = loadingBar.querySelector('.loading-bar-fill');
+                const percentageText = loadingBar.querySelector('.loading-bar-percentage');
+                
+                loadingBar.style.display = 'block';
+                
+                let progress = 0;
+                const duration = 3000; // 3 saniyə
+                const interval = 30;
+                const increment = (100 * interval) / duration;
+                
+                const updateProgress = setInterval(() => {
+                    progress += increment;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(updateProgress);
+                        
+                        // Sifarişlər səhifəsinə yönləndir
+                        window.location.href = '/sifaris_izle/';
+                    }
+                    
+                    progressBar.style.width = `${progress}%`;
+                    percentageText.textContent = `${Math.round(progress)}%`;
+                }, interval);
             } else {
-                alert('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+                showAnimatedMessage(data.message || 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.', true);
             }
         })
         .catch(error => {
-            alert('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+            console.error('Xəta:', error);
+            showAnimatedMessage('Server xətası baş verdi. Zəhmət olmasa yenidən cəhd edin.', true);
         });
     }
     return false;

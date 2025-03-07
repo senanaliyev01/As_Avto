@@ -128,7 +128,7 @@
                 <i class="fas fa-sync-alt"></i>
                 Yenidən Hesabla
             </button>
-            <form id="orderForm" onsubmit="return handleOrderSubmit(event)">
+            <form id="orderForm" onsubmit="return handleOrderSubmit(event)" data-submit-url="{% url 'sifarisi_gonder' %}">
                 {% csrf_token %}
                 <button type="submit" class="order-btn" id="orderButton" disabled>
                     <i class="fas fa-shopping-cart"></i>
@@ -166,5 +166,11 @@
 
 {% block extra_js %}
 {{ block.super }}
+<script>
+    // CSRF token funksiyası
+    function getCsrfToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
+</script>
 <script src="{% static 'js/cart.js' %}"></script>
 {% endblock %}

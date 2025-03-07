@@ -368,7 +368,12 @@
                     // 2 saniyə loading göstər
                     setTimeout(() => {
                         fetch(url)
-                            .then(response => response.json())
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Network response was not ok');
+                                }
+                                return response.json();
+                            })
                             .then(data => {
                                 // Original ikonu bərpa et
                                 this.innerHTML = originalContent;
@@ -390,11 +395,9 @@
                                 }
                             })
                             .catch(error => {
-                                console.error("Xəta:", error);
                                 this.innerHTML = originalContent;
                                 this.style.pointerEvents = 'auto';
                                 this.style.opacity = '1';
-                                showAnimatedMessage("Serverdə xəta baş verdi.", true);
                             });
                     }, 2000);
                 });
@@ -951,20 +954,10 @@
             method: 'GET',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': getCookie('csrftoken'),
-                'Accept': 'application/json'
+                'X-CSRFToken': getCookie('csrftoken')
             }
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Şəbəkə xətası');
-            }
-            const contentType = response.headers.get('content-type');
-            if (!contentType || !contentType.includes('application/json')) {
-                throw new TypeError('Server JSON cavabı qaytarmadı');
-            }
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
             if (data.success) {
                 showAnimatedMessage(`${data.mehsul.adi} səbətə əlavə edildi (${quantity} ədəd)`, false, data.mehsul);
@@ -974,8 +967,8 @@
             }
         })
         .catch(error => {
-            console.error('Səbətə əlavə xətası:', error);
-            showAnimatedMessage('Səbətə əlavə edilərkən xəta baş verdi', true);
+            showAnimatedMessage('Xəta baş verdi', true);
+            console.error('Error:', error);
         });
     }
 

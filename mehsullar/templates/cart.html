@@ -177,14 +177,11 @@
         
         checkedItems.forEach(checkbox => {
             const row = checkbox.closest('tr');
-            const itemTotalText = row.querySelector('.item-total').textContent;
-            const itemTotal = parseFloat(itemTotalText.replace(' AZN', ''));
-            if (!isNaN(itemTotal)) {
-                total += itemTotal;
-            }
+            const itemTotal = parseFloat(row.querySelector('.item-total').textContent);
+            total += itemTotal;
         });
         
-        document.getElementById('selected-total-amount').textContent = total.toFixed(2) + ' AZN';
+        document.getElementById('selected-total-amount').textContent = total.toFixed(4) + ' AZN';
         updateOrderButton();
     }
     

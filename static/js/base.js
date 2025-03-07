@@ -576,76 +576,47 @@
     }
 
     // Səbət funksiyaları
-    function updateQuantity(itemId, value) {
+    function updateQuantity(itemId, change) {
         const row = document.querySelector(`tr[data-item-id="${itemId}"]`);
         const input = row.querySelector('.quantity-input');
-        let newQuantity;
-
-        if (typeof value === 'number') {
-            newQuantity = parseInt(input.value) + value;
-        } else if (value === 'set') {
-            newQuantity = parseInt(input.value);
+        const currentValue = parseInt(input.value);
+        
+        let newValue;
+        if (typeof change === 'number') {
+            newValue = currentValue + change;
         } else {
-            newQuantity = parseInt(value);
+            newValue = parseInt(change);
         }
 
-        if (isNaN(newQuantity) || newQuantity < 1) {
-            newQuantity = 1;
-        }
+        if (newValue < 1) newValue = 1;
 
-        // Düyməni deaktiv et və loading göstər
-        const buttons = row.querySelectorAll('.quantity-btn');
-        buttons.forEach(btn => {
-            btn.disabled = true;
-            btn.style.opacity = '0.5';
+        const price = parseFloat(row.getAttribute('data-price'));
+        
+        fetch(`/update_cart/${itemId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                quantity: newValue
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                input.value = newValue;
+                row.querySelector('.item-total').textContent = `${(price * newValue).toFixed(2)} AZN`;
+                document.getElementById('total-amount').textContent = `${data.total} AZN`;
+                updateCartCount();
+            } else {
+                showAnimatedMessage(data.error || "Miqdar yeniləmə xətası", true);
+            }
+        })
+        .catch(error => {
+            console.error('Xəta:', error);
+            showAnimatedMessage("Server xətası baş verdi", true);
         });
-        input.disabled = true;
-
-        // Loading ikonunu göstər
-        const loadingIcon = document.createElement('span');
-        loadingIcon.className = 'loading-icon';
-        loadingIcon.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        input.parentNode.appendChild(loadingIcon);
-
-        fetch(`/update_quantity/${itemId}/${newQuantity}/`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    input.value = data.new_quantity;
-                    const itemTotalElement = row.querySelector('.item-total');
-                    itemTotalElement.textContent = data.item_total.toFixed(2) + ' AZN';
-                    
-                    // Seçilmiş məhsulların cəmini yenilə
-                    if (row.querySelector('.item-checkbox').checked) {
-                        updateTotalAmount();
-                    }
-
-                    row.classList.add('highlight');
-                    setTimeout(() => row.classList.remove('highlight'), 300);
-                } else {
-                    input.value = input.defaultValue;
-                    window.showNotification(data.error || 'Xəta baş verdi', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Xəta:', error);
-                input.value = input.defaultValue;
-                window.showNotification('Xəta baş verdi', 'error');
-            })
-            .finally(() => {
-                // Düymələri və inputu yenidən aktiv et
-                buttons.forEach(btn => {
-                    btn.disabled = false;
-                    btn.style.opacity = '1';
-                });
-                input.disabled = false;
-                
-                // Loading ikonunu sil
-                const loadingIcon = row.querySelector('.loading-icon');
-                if (loadingIcon) {
-                    loadingIcon.remove();
-                }
-            });
     }
 
     function removeItem(itemId) {
@@ -776,9 +747,11 @@
                     const itemTotalElement = row.querySelector('.item-total');
                     itemTotalElement.textContent = data.item_total.toFixed(2) + ' AZN';
                     
-                    // Seçilmiş məhsulların cəmini yenilə
-                    if (row.querySelector('.item-checkbox').checked) {
-                        updateTotalAmount();
+                    const totalElement = document.getElementById('total-amount');
+                    if (totalElement) {
+                        totalElement.textContent = data.total_amount.toFixed(2) + ' AZN';
+                        totalElement.classList.add('highlight');
+                        setTimeout(() => totalElement.classList.remove('highlight'), 300);
                     }
 
                     row.classList.add('highlight');

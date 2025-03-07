@@ -54,7 +54,6 @@
                             </span>
                         {% endif %}
                     </td>
-                    <td class="price">{{ item.mehsul.formatted_qiymet }} AZN</td>
                     <td>
                         <div class="quantity-controls">
                             {% comment %} <button type="button" class="quantity-btn minus" onclick="updateQuantity({{ item.id }}, -1)">
@@ -75,6 +74,7 @@
                             </button> {% endcomment %}
                         </div>
                     </td>
+                    <td class="price">{{ item.mehsul.formatted_qiymet }} AZN</td>
                     <td class="item-total">{{ item.cemi }} AZN</td>
                     <td>
                         <form action="{% url 'sebetden_sil' item.id %}" method="post" style="display: inline;">

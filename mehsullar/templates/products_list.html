@@ -91,7 +91,7 @@
                             </td>
                             <td>
                                 <div class="quantity-container">
-                                    <button class="quantity-btn" onclick="decrementQuantity({{ mehsul.id }})">-</button>
+                                    {% comment %} <button class="quantity-btn" onclick="decrementQuantity({{ mehsul.id }})">-</button> {% endcomment %}
                                     <input type="number" 
                                            class="quantity-input" 
                                            value="1" 
@@ -99,7 +99,7 @@
                                            max="999"
                                            data-product-id="{{ mehsul.id }}"
                                            onchange="validateQuantity(this)">
-                                    <button class="quantity-btn" onclick="incrementQuantity({{ mehsul.id }})">+</button>
+                                    {% comment %} <button class="quantity-btn" onclick="incrementQuantity({{ mehsul.id }})">+</button> {% endcomment %}
                                     <div class="quantity-error"></div>
                                 </div>
                             </td>

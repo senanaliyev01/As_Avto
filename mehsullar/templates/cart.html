@@ -57,9 +57,9 @@
                     <td class="price">{{ item.mehsul.formatted_qiymet }} AZN</td>
                     <td>
                         <div class="quantity-controls">
-                            <button type="button" class="quantity-btn minus" onclick="updateQuantity({{ item.id }}, -1)">
+                            {% comment %} <button type="button" class="quantity-btn minus" onclick="updateQuantity({{ item.id }}, -1)">
                                 <i class="fas fa-minus"></i>
-                            </button>
+                            </button> {% endcomment %}
                             <input type="number" 
                                    class="quantity-input" 
                                    value="{{ item.miqdar }}"
@@ -70,9 +70,9 @@
                                    onkeyup="if(event.key === 'Enter') validateCartQuantity(this)"
                                    onblur="validateCartQuantity(this)"
                                    style="width: 60px; text-align: center;">
-                            <button type="button" class="quantity-btn plus" onclick="updateQuantity({{ item.id }}, 1)">
+                            {% comment %} <button type="button" class="quantity-btn plus" onclick="updateQuantity({{ item.id }}, 1)">
                                 <i class="fas fa-plus"></i>
-                            </button>
+                            </button> {% endcomment %}
                         </div>
                     </td>
                     <td class="item-total">{{ item.cemi }} AZN</td>

@@ -45,9 +45,7 @@
                             <td>
                                 {% if mehsul.sekil %}
                                     <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="marka-pr-image product-image" onclick="openModal(this.src)">
-                                    {% else %}
-                                    <img src="{% static 'img/noimage.webp' %}" alt="No Image" class="marka-pr-image product-image" onclick="openModal(this.src)">
-                                    {% endif %}
+                                {% endif %}
                             </td>
                             <td>{{ mehsul.adi }}</td>
                             <td>{{ mehsul.brend.adi }}</td>

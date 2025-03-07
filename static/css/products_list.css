@@ -459,3 +459,129 @@ body {
     }
 }
 
+/* Quantity Input Styles */
+.quantity-input {
+    width: 80px !important;
+    height: 40px;
+    padding: 8px;
+    border: 2px solid #64ffda;
+    border-radius: 8px;
+    background: rgba(16, 33, 62, 0.8);
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.3s ease;
+    -moz-appearance: textfield;
+    appearance: textfield;
+    box-shadow: 0 2px 8px rgba(100, 255, 218, 0.1);
+}
+
+.quantity-input::-webkit-outer-spin-button,
+.quantity-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.quantity-input:hover {
+    border-color: #64ffda;
+    box-shadow: 0 4px 12px rgba(100, 255, 218, 0.2);
+    transform: translateY(-1px);
+}
+
+.quantity-input:focus {
+    outline: none;
+    border-color: #64ffda;
+    background: rgba(16, 33, 62, 0.95);
+    box-shadow: 0 0 0 3px rgba(100, 255, 218, 0.3);
+    transform: translateY(-1px);
+}
+
+/* Quantity Input Container */
+.quantity-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Quantity Buttons */
+.quantity-btn {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1a4980, #0d2b4d);
+    border: 1px solid #64ffda;
+    border-radius: 6px;
+    color: #64ffda;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+}
+
+.quantity-btn:hover {
+    background: linear-gradient(135deg, #0d2b4d, #1a4980);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(100, 255, 218, 0.15);
+}
+
+.quantity-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(100, 255, 218, 0.1);
+}
+
+.quantity-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Invalid Input State */
+.quantity-input:invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
+}
+
+/* Loading State */
+.quantity-input:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Input Placeholder */
+.quantity-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Focus Within Container */
+.quantity-container:focus-within {
+    transform: translateY(-1px);
+}
+
+/* Quantity Label */
+.quantity-label {
+    font-size: 14px;
+    color: #64ffda;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Error Message */
+.quantity-error {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 4px;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.quantity-error.show {
+    opacity: 1;
+}
+

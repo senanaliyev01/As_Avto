@@ -90,10 +90,8 @@
                                 <i class="fa-solid fa-manat-sign" style="font-size: 0.9em; margin-left: 2px;"></i>
                             </td>
                             <td>
-                                <div class="quantity-control">
-                                    <button type="button" class="quantity-btn minus" onclick="updateProductQuantity({{ mehsul.id }}, -1)">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
+                                <div class="quantity-container">
+                                    <button class="quantity-btn" onclick="decrementQuantity({{ mehsul.id }})">-</button>
                                     <input type="number" 
                                            class="quantity-input" 
                                            value="1" 
@@ -101,9 +99,8 @@
                                            max="999"
                                            data-product-id="{{ mehsul.id }}"
                                            onchange="validateQuantity(this)">
-                                    <button type="button" class="quantity-btn plus" onclick="updateProductQuantity({{ mehsul.id }}, 1)">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
+                                    <button class="quantity-btn" onclick="incrementQuantity({{ mehsul.id }})">+</button>
+                                    <div class="quantity-error"></div>
                                 </div>
                             </td>
                             <td>

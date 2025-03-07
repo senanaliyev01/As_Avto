@@ -942,6 +942,11 @@
             return;
         }
 
+        if (quantity > 999) {
+            showAnimatedMessage('Maksimum 999 ədəd sifariş edə bilərsiniz', true);
+            return;
+        }
+
         fetch(`/sebet/ekle/${productId}/?miqdar=${quantity}`, {
             method: 'GET',
             headers: {
@@ -964,4 +969,4 @@
         });
     }
 
-
+    // ... existing code ...

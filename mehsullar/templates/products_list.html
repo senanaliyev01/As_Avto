@@ -94,14 +94,13 @@
                                        class="quantity-input" 
                                        value="1" 
                                        min="1" 
-                                       max="{{ mehsul.stok }}"
+                                       max="999"
                                        data-product-id="{{ mehsul.id }}"
                                        style="width: 60px; text-align: center;">
                             </td>
                             <td>
                                 <button onclick="addToCartWithQuantity({{ mehsul.id }})" 
-                                        class="cart-icon" 
-                                        {% if mehsul.stok == 0 %}disabled{% endif %}>
+                                        class="cart-icon">
                                     <i class="fas fa-shopping-cart"></i>
                                 </button>
                             </td>

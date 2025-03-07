@@ -53,10 +53,10 @@ def sebet_ekle(request, mehsul_id):
                 'error': 'Miqdar 0-dan böyük olmalıdır'
             }, status=400)
 
-        if miqdar > mehsul.stok:
+        if miqdar > 999:
             return JsonResponse({
                 'success': False,
-                'error': 'Kifayət qədər stok yoxdur'
+                'error': 'Maksimum 999 ədəd sifariş edə bilərsiniz'
             }, status=400)
 
         sebet, created = Sebet.objects.get_or_create(user=request.user, mehsul=mehsul)
@@ -66,10 +66,10 @@ def sebet_ekle(request, mehsul_id):
         else:
             sebet.miqdar += miqdar
             
-        if sebet.miqdar > mehsul.stok:
+        if sebet.miqdar > 999:
             return JsonResponse({
                 'success': False,
-                'error': 'Kifayət qədər stok yoxdur'
+                'error': 'Səbətdəki ümumi miqdar 999-dan çox ola bilməz'
             }, status=400)
             
         sebet.save()

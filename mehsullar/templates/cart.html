@@ -171,7 +171,7 @@
         updateOrderButton();
     }
     
-    function updateTotalAmount() {
+    {% comment %} function updateTotalAmount() {
         let total = 0;
         const checkedItems = document.querySelectorAll('.item-checkbox:checked');
         
@@ -181,7 +181,7 @@
             total += itemTotal;
         });
         
-        document.getElementById('selected-total-amount').textContent = total.toFixed(4) + ' AZN';
+        document.getElementById('selected-total-amount').textContent = total.toFixed(2) + ' AZN';
         updateOrderButton();
     }
     
@@ -189,7 +189,7 @@
         const checkedItems = document.querySelectorAll('.item-checkbox:checked');
         const orderButton = document.getElementById('orderButton');
         orderButton.disabled = checkedItems.length === 0;
-    }
+    } {% endcomment %}
     
 function handleOrderSubmit(event) {
     event.preventDefault();

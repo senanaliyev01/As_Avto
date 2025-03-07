@@ -597,8 +597,6 @@ td {
     transition: transform 0.3s ease;
 }
 
-
-
 /* Loading Bar */
 .loading-bar-container {
     position: fixed;
@@ -666,5 +664,109 @@ td {
     to {
         opacity: 1;
     }
+}
+
+/* Custom Checkbox Styles */
+.custom-checkbox {
+    position: relative;
+    display: inline-block;
+}
+
+input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--accent-color);
+    border-radius: 6px;
+    background-color: transparent;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+    margin: 0;
+}
+
+input[type="checkbox"]:hover {
+    border-color: #4fd1c5;
+    box-shadow: 0 0 10px rgba(100, 255, 218, 0.2);
+}
+
+input[type="checkbox"]:checked {
+    background: linear-gradient(145deg, #64ffda, #4fd1c5);
+    border-color: transparent;
+}
+
+input[type="checkbox"]:checked::before {
+    content: '\f00c';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--primary-color);
+    font-size: 12px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+input[type="checkbox"]:focus {
+    outline: none;
+    border-color: #4fd1c5;
+    box-shadow: 0 0 0 3px rgba(100, 255, 218, 0.3);
+}
+
+/* Select All Checkbox */
+#selectAll {
+    width: 24px;
+    height: 24px;
+}
+
+#selectAll:checked::before {
+    font-size: 14px;
+}
+
+/* Checkbox Container Animation */
+.custom-checkbox {
+    animation: checkboxAppear 0.3s ease-out;
+}
+
+@keyframes checkboxAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Checkbox Check Animation */
+input[type="checkbox"]:checked {
+    animation: checkmark 0.2s ease-in-out;
+}
+
+@keyframes checkmark {
+    0% {
+        transform: scale(0.8);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Disabled State */
+input[type="checkbox"]:disabled {
+    border-color: var(--text-secondary);
+    background-color: rgba(136, 146, 176, 0.1);
+    cursor: not-allowed;
+}
+
+input[type="checkbox"]:disabled:checked {
+    background: var(--text-secondary);
 }
 

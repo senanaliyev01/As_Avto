@@ -66,9 +66,9 @@
                                    min="1"
                                    max="999"
                                    data-item-id="{{ item.id }}"
-                                   onchange="handleQuantityInput(this)"
-                                   onkeyup="if(event.key === 'Enter') handleQuantityInput(this)"
-                                   onblur="handleQuantityInput(this)"
+                                   onchange="validateCartQuantity(this)"
+                                   onkeyup="if(event.key === 'Enter') validateCartQuantity(this)"
+                                   onblur="validateCartQuantity(this)"
                                    style="width: 60px; text-align: center;">
                             <button type="button" class="quantity-btn plus" onclick="updateQuantity({{ item.id }}, 1)">
                                 <i class="fas fa-plus"></i>

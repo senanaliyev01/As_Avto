@@ -1007,4 +1007,20 @@
         }
     }
 
+    function validateCartQuantity(input) {
+        const value = parseInt(input.value);
+        
+        if (isNaN(value) || value < 1) {
+            input.value = 1;
+            showAnimatedMessage('Minimum miqdar 1 olmalıdır', true);
+            handleQuantityInput(input);
+        } else if (value > 999) {
+            input.value = 999;
+            showAnimatedMessage('Maksimum miqdar 999 olmalıdır', true);
+            handleQuantityInput(input);
+        } else {
+            handleQuantityInput(input);
+        }
+    }
+
     // ... existing code ...

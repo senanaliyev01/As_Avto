@@ -386,6 +386,12 @@ def update_quantity(request, item_id, new_quantity):
             new_quantity = int(new_quantity)
             if new_quantity < 1:
                 new_quantity = 1
+            elif new_quantity > 999:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Maksimum 999 ədəd sifariş edə bilərsiniz'
+                }, status=400)
+                
         except ValueError:
             return JsonResponse({
                 'success': False,
@@ -410,7 +416,6 @@ def update_quantity(request, item_id, new_quantity):
             'item_total': round(item_total, 2),
             'total_amount': round(cart_total, 2)
         })
-            
     except Exception as e:
         return JsonResponse({
             'success': False,

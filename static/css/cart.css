@@ -585,7 +585,6 @@ td {
 }
 
 .recalculate-btn:hover {
-    transform: scale(1.05) rotate(360deg);
     box-shadow: 0 4px 15px rgba(100, 255, 218, 0.3);
 }
 
@@ -598,9 +597,7 @@ td {
     transition: transform 0.3s ease;
 }
 
-.recalculate-btn:hover i {
-    transform: rotate(180deg);
-}
+
 
 /* Loading Bar */
 .loading-bar-container {

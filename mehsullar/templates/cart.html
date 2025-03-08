@@ -178,73 +178,16 @@
         checkedItems.forEach(checkbox => {
             const row = checkbox.closest('tr');
             const itemTotalText = row.querySelector('.item-total').textContent;
-            // Mətn formatından rəqəmə çevirmək (məsələn, "1168,70 AZN" -> 1168.70)
-            const itemTotal = parseFloat(itemTotalText.replace(/[^\d,.-]/g, '').replace(',', '.'));
+            // AZN-i kənarlaşdırıb, vergülü nöqtə ilə əvəz edirik
+            const itemTotal = parseFloat(itemTotalText.replace('AZN', '').replace(',', '.').trim());
             if (!isNaN(itemTotal)) {
                 total += itemTotal;
             }
         });
         
-        // Tam dəqiq rəqəmi göstərmək üçün toFixed(2) istifadə edirik
+        // Onluq kəsrləri qoruyaraq formatlaşdırırıq
         document.getElementById('selected-total-amount').textContent = total.toFixed(2) + ' AZN';
-        
-        // Animasiya əlavə et
-        const totalElement = document.getElementById('selected-total-amount');
-        totalElement.classList.add('highlight');
-        setTimeout(() => totalElement.classList.remove('highlight'), 300);
-        
         updateOrderButton();
-    }
-    
-    // Miqdar dəyişdikdə cəmi yeniləmək üçün
-    function validateCartQuantity(input) {
-        const value = parseInt(input.value);
-        
-        if (isNaN(value) || value < 1) {
-            input.value = 1;
-            showAnimatedMessage('Minimum miqdar 1 olmalıdır', true);
-            updateItemTotal(input);
-        } else if (value > 999) {
-            input.value = 999;
-            showAnimatedMessage('Maksimum miqdar 999 olmalıdır', true);
-            updateItemTotal(input);
-        } else {
-            updateItemTotal(input);
-        }
-    }
-    
-    // Məhsulun cəmini yeniləmək
-    function updateItemTotal(input) {
-        const itemId = input.getAttribute('data-item-id');
-        const quantity = parseInt(input.value);
-        const row = input.closest('tr');
-        const priceText = row.querySelector('.price').textContent;
-        const price = parseFloat(priceText.replace(/[^\d,.-]/g, '').replace(',', '.'));
-        
-        if (!isNaN(price) && !isNaN(quantity)) {
-            const newTotal = (price * quantity).toFixed(2);
-            row.querySelector('.item-total').textContent = newTotal + ' AZN';
-            
-            // Server-ə məlumat göndər
-            fetch(`/update_quantity/${itemId}/${quantity}/`, {
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Uğurlu olduqda seçilmiş məhsulların cəmini yenilə
-                    updateTotalAmount();
-                } else {
-                    showAnimatedMessage(data.error || 'Xəta baş verdi', true);
-                }
-            })
-            .catch(error => {
-                console.error('Xəta:', error);
-            });
-        }
     }
     
     function updateOrderButton() {
@@ -253,9 +196,9 @@
         orderButton.disabled = checkedItems.length === 0;
     }
     
-    function handleOrderSubmit(event) {
-        event.preventDefault();
-        
+function handleOrderSubmit(event) {
+    event.preventDefault();
+    
         const checkedItems = document.querySelectorAll('.item-checkbox:checked');
         if (checkedItems.length === 0) {
             alert('Zəhmət olmasa ən azı bir məhsul seçin');
@@ -292,23 +235,36 @@
     return false;
 }
     
-    // Initialize order button state and total amount
+    // Initialize order button state
     document.addEventListener('DOMContentLoaded', function() {
         updateOrderButton();
         
-        // Səhifə yükləndikdə checkbox-ları yoxla və cəmi hesabla
-        const checkboxes = document.querySelectorAll('.item-checkbox');
-        if (checkboxes.length > 0) {
-            updateTotalAmount();
-        }
-        
-        // Miqdar inputlarına event listener əlavə et
-        const quantityInputs = document.querySelectorAll('.quantity-input');
-        quantityInputs.forEach(input => {
-            input.addEventListener('change', function() {
-                validateCartQuantity(this);
+        // Checkbox-ların dəyişməsini izlə
+        document.querySelectorAll('.item-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateTotalAmount();
+                
+                // Checkbox seçildikdə animasiya
+                const row = this.closest('tr');
+                if (this.checked) {
+                    row.classList.add('highlight');
+                    setTimeout(() => row.classList.remove('highlight'), 300);
+                }
             });
         });
+        
+        // Miqdar inputlarına event listener əlavə et
+        document.querySelectorAll('.quantity-input').forEach(input => {
+            input.addEventListener('change', function() {
+                // Miqdar dəyişdikdə cəmi yenilə
+                setTimeout(() => {
+                    updateTotalAmount();
+                }, 500); // Serverdən cavab gəldikdən sonra yenilə
+            });
+        });
+        
+        // İlkin cəmi hesabla
+        updateTotalAmount();
     });
     
     function recalculateCart() {
@@ -345,24 +301,135 @@
             percentageText.textContent = `${Math.round(progress)}%`;
         }, interval);
     }
+
+    function validateCartQuantity(input) {
+        const value = parseInt(input.value);
+        const itemId = input.getAttribute('data-item-id');
+        
+        if (isNaN(value) || value < 1) {
+            input.value = 1;
+            showNotification('Minimum miqdar 1 olmalıdır', 'error');
+            updateCartItem(itemId, 1);
+        } else if (value > 999) {
+            input.value = 999;
+            showNotification('Maksimum miqdar 999 olmalıdır', 'error');
+            updateCartItem(itemId, 999);
+        } else {
+            updateCartItem(itemId, value);
+        }
+    }
     
-    // Bildiriş göstərmə funksiyası
-    function showAnimatedMessage(message, isError = false) {
+    function updateCartItem(itemId, quantity) {
+        const row = document.querySelector(`tr[data-item-id="${itemId}"]`);
+        const priceText = row.querySelector('.price').textContent;
+        const price = parseFloat(priceText.replace('AZN', '').replace(',', '.').trim());
+        
+        // Loading göstər
+        const input = row.querySelector('.quantity-input');
+        input.disabled = true;
+        
+        const loadingIcon = document.createElement('span');
+        loadingIcon.className = 'loading-icon';
+        loadingIcon.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        input.parentNode.appendChild(loadingIcon);
+        
+        fetch(`/update_quantity/${itemId}/${quantity}/`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Sətir cəmini yenilə
+                const itemTotal = data.item_total;
+                row.querySelector('.item-total').textContent = itemTotal.toFixed(2) + ' AZN';
+                
+                // Seçilmiş məhsulların cəmini yenilə
+                updateTotalAmount();
+                
+                // Sətri vurğula
+                row.classList.add('highlight');
+                setTimeout(() => row.classList.remove('highlight'), 300);
+            } else {
+                showNotification(data.error || 'Xəta baş verdi', 'error');
+                input.value = input.defaultValue;
+            }
+        })
+        .catch(error => {
+            console.error('Xəta:', error);
+            showNotification('Server xətası baş verdi', 'error');
+            input.value = input.defaultValue;
+        })
+        .finally(() => {
+            // Loading-i təmizlə
+            input.disabled = false;
+            const loadingIcon = row.querySelector('.loading-icon');
+            if (loadingIcon) {
+                loadingIcon.remove();
+            }
+        });
+    }
+    
+    function showNotification(message, type = 'success') {
         const notification = document.getElementById('notification');
         notification.textContent = message;
-        notification.className = `notification ${isError ? 'error' : 'success'}`;
-        notification.style.display = 'block';
-        
-        setTimeout(() => {
-            notification.classList.add('show');
-        }, 10);
+        notification.className = `notification ${type} show`;
         
         setTimeout(() => {
             notification.classList.remove('show');
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 300);
         }, 3000);
     }
+    
+    // CSS stilləri
+    const cartStyles = document.createElement('style');
+    cartStyles.textContent = `
+        .highlight {
+            animation: highlight 0.3s ease;
+        }
+
+        @keyframes highlight {
+            0% {
+                background-color: transparent;
+            }
+            50% {
+                background-color: rgba(100, 255, 218, 0.2);
+            }
+            100% {
+                background-color: transparent;
+            }
+        }
+        
+        .loading-icon {
+            position: absolute;
+            right: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-color);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: -400px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            background-color: var(--success-color);
+            color: white;
+            z-index: 1000;
+            transition: right 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .notification.error {
+            background-color: var(--danger-color);
+        }
+        
+        .notification.show {
+            right: 20px;
+        }
+    `;
+    document.head.appendChild(cartStyles);
 </script>
 {% endblock %}

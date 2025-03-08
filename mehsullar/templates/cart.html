@@ -177,11 +177,32 @@
         
         checkedItems.forEach(checkbox => {
             const row = checkbox.closest('tr');
-            const itemTotal = parseFloat(row.querySelector('.item-total').textContent);
-            total += itemTotal;
+            const itemTotalText = row.querySelector('.item-total').textContent.trim();
+            
+            // Vergül və nöqtə işarələrini düzgün emal et
+            // "1168,70 AZN" formatını "1168.70" formatına çevir
+            const numericValue = itemTotalText
+                .replace(' AZN', '')  // "AZN" yazısını sil
+                .replace(',', '.')    // vergülü nöqtə ilə əvəz et
+                .trim();              // əlavə boşluqları sil
+            
+            const itemTotal = parseFloat(numericValue);
+            
+            if (!isNaN(itemTotal)) {
+                total += itemTotal;
+            } else {
+                console.error('Xətalı məbləğ formatı:', itemTotalText);
+            }
         });
         
-        document.getElementById('selected-total-amount').textContent = total.toFixed(2) + ' AZN';
+        // Məbləği formatla: nöqtəni vergüllə əvəz et və AZN əlavə et
+        const formattedTotal = total.toFixed(2).replace('.', ',') + ' AZN';
+        document.getElementById('selected-total-amount').textContent = formattedTotal;
+        
+        // Debug məlumatı
+        console.log('Hesablanmış cəmi:', total.toFixed(2));
+        console.log('Formatlanmış cəmi:', formattedTotal);
+        
         updateOrderButton();
     }
     
@@ -233,12 +254,28 @@ function handleOrderSubmit(event) {
     // Initialize order button state
     document.addEventListener('DOMContentLoaded', function() {
         updateOrderButton();
+        
+        // Səhifə yüklənərkən cəmi hesabla
+        updateTotalAmount();
+        
+        // Miqdar dəyişdikdə cəmi yenilə
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        quantityInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                // Miqdar dəyişdikdə cəmi yenilə
+                setTimeout(updateTotalAmount, 500);
+            });
+        });
+        
+        // Debug məlumatı
+        console.log('Səhifə yükləndi, cəmi hesablandı');
     });
     
     function recalculateCart() {
         const loadingBar = document.getElementById('loadingBar');
         const progressBar = loadingBar.querySelector('.loading-bar-fill');
         const percentageText = loadingBar.querySelector('.loading-bar-percentage');
+        const loadingText = loadingBar.querySelector('.loading-bar-text');
         const recalculateBtn = document.getElementById('recalculateBtn');
         
         // Düyməni deaktiv et
@@ -248,25 +285,45 @@ function handleOrderSubmit(event) {
         // Loading bar-ı göstər
         loadingBar.style.display = 'block';
         
+        // Əvvəlcə cəmi yenidən hesabla
+        updateTotalAmount();
+        
+        // Hesablama mərhələlərini göstər
+        const steps = [
+            "Məlumatlar yüklənir...",
+            "Məbləğlər yoxlanılır...",
+            "Vergül və nöqtələr düzəldilir...",
+            "Cəmi hesablanır...",
+            "Tamamlanır..."
+        ];
+        
         let progress = 0;
         const duration = 3000; // 3 saniyə
         const interval = 30; // Hər 30ms-də yenilənir
         const increment = (100 * interval) / duration;
+        const stepSize = 100 / steps.length;
         
         const updateProgress = setInterval(() => {
             progress += increment;
+            
+            // Cari mərhələni göstər
+            const currentStep = Math.min(Math.floor(progress / stepSize), steps.length - 1);
+            loadingText.innerHTML = `${steps[currentStep]} <span class="loading-bar-percentage">${Math.round(progress)}%</span>`;
+            
             if (progress >= 100) {
                 progress = 100;
                 clearInterval(updateProgress);
                 
-                // 3 saniyə sonra səhifəni yenilə
+                // Tamamlandı mesajını göstər
+                loadingText.innerHTML = `Tamamlandı! <span class="loading-bar-percentage">100%</span>`;
+                
+                // 1 saniyə sonra səhifəni yenilə
                 setTimeout(() => {
                     window.location.reload();
-                }, 100);
+                }, 1000);
             }
             
             progressBar.style.width = `${progress}%`;
-            percentageText.textContent = `${Math.round(progress)}%`;
         }, interval);
     }
 </script>

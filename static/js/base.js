@@ -1023,4 +1023,120 @@
         }
     }
 
-    // ... existing code ...
+    // Cart Functions
+    function toggleAllItems(checkbox) {
+        const itemCheckboxes = document.querySelectorAll('.item-checkbox');
+        itemCheckboxes.forEach(item => {
+            item.checked = checkbox.checked;
+        });
+        updateTotalAmount();
+        updateOrderButton();
+    }
+
+    function updateTotalAmount() {
+        let total = 0;
+        const checkedItems = document.querySelectorAll('.item-checkbox:checked');
+        
+        checkedItems.forEach(checkbox => {
+            const row = checkbox.closest('tr');
+            const itemTotalText = row.querySelector('.item-total').textContent;
+            // AZN yazısını silirik və string-i float-a çeviririk
+            const itemTotal = parseFloat(itemTotalText.replace(' AZN', ''));
+            total += itemTotal;
+        });
+        
+        // toFixed(2) istifadə edərək 2 ondalıq rəqəmə qədər yuvarlaqlaşdırırıq
+        document.getElementById('selected-total-amount').textContent = total.toFixed(2) + ' AZN';
+        updateOrderButton();
+    }
+
+    function updateOrderButton() {
+        const checkedItems = document.querySelectorAll('.item-checkbox:checked');
+        const orderButton = document.getElementById('orderButton');
+        orderButton.disabled = checkedItems.length === 0;
+    }
+
+    function handleOrderSubmit(event) {
+        event.preventDefault();
+        
+        const checkedItems = document.querySelectorAll('.item-checkbox:checked');
+        if (checkedItems.length === 0) {
+            showAnimatedMessage('Zəhmət olmasa ən azı bir məhsul seçin', true);
+            return false;
+        }
+        
+        if (confirm('Seçilmiş məhsulları sifariş etmək istədiyinizə əminsiniz?')) {
+            const selectedItemIds = Array.from(checkedItems).map(checkbox => 
+                checkbox.getAttribute('data-item-id')
+            );
+            
+            fetch('/sifarisi_gonder/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    selected_items: selectedItemIds
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    showAnimatedMessage('Sifarişiniz uğurla qeydə alındı. Sifarişlərim səhifəsinə yönləndirilirsiniz.', false);
+                    setTimeout(() => {
+                        window.location.href = '/sifaris_izle/';
+                    }, 2000);
+                } else {
+                    showAnimatedMessage('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.', true);
+                }
+            })
+            .catch(error => {
+                showAnimatedMessage('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.', true);
+                console.error('Error:', error);
+            });
+        }
+        return false;
+    }
+
+    function recalculateCart() {
+        const loadingBar = document.getElementById('loadingBar');
+        const progressBar = loadingBar.querySelector('.loading-bar-fill');
+        const percentageText = loadingBar.querySelector('.loading-bar-percentage');
+        const recalculateBtn = document.getElementById('recalculateBtn');
+        
+        // Düyməni deaktiv et
+        recalculateBtn.disabled = true;
+        recalculateBtn.style.opacity = '0.7';
+        
+        // Loading bar-ı göstər
+        loadingBar.style.display = 'block';
+        
+        let progress = 0;
+        const duration = 3000; // 3 saniyə
+        const interval = 30; // Hər 30ms-də yenilənir
+        const increment = (100 * interval) / duration;
+        
+        const updateProgress = setInterval(() => {
+            progress += increment;
+            if (progress >= 100) {
+                progress = 100;
+                clearInterval(updateProgress);
+                
+                // 3 saniyə sonra səhifəni yenilə
+                setTimeout(() => {
+                    window.location.reload();
+                }, 100);
+            }
+            
+            progressBar.style.width = `${progress}%`;
+            percentageText.textContent = `${Math.round(progress)}%`;
+        }, interval);
+    }
+
+    // Cart initialization
+    document.addEventListener('DOMContentLoaded', function() {
+        const cartPage = document.querySelector('.cart-container');
+        if (cartPage) {
+            updateOrderButton();
+        }
+    });

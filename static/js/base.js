@@ -589,34 +589,60 @@
         }
 
         if (newValue < 1) newValue = 1;
+        if (newValue > 999) newValue = 999;
 
         const price = parseFloat(row.getAttribute('data-price'));
         
-        fetch(`/update_cart/${itemId}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                quantity: newValue
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                input.value = newValue;
-                row.querySelector('.item-total').textContent = `${(price * newValue).toFixed(2)} AZN`;
-                document.getElementById('total-amount').textContent = `${data.total} AZN`;
-                updateCartCount();
-            } else {
-                showAnimatedMessage(data.error || "Miqdar yeniləmə xətası", true);
-            }
-        })
-        .catch(error => {
-            console.error('Xəta:', error);
-            showAnimatedMessage("Server xətası baş verdi", true);
+        // Düyməni deaktiv et və loading göstər
+        const buttons = row.querySelectorAll('.quantity-btn');
+        buttons.forEach(btn => {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
         });
+        input.disabled = true;
+
+        // Loading ikonunu göstər
+        const loadingIcon = document.createElement('span');
+        loadingIcon.className = 'loading-icon';
+        loadingIcon.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        input.parentNode.appendChild(loadingIcon);
+
+        fetch(`/update_quantity/${itemId}/${newValue}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    input.value = data.new_quantity;
+                    const itemTotalElement = row.querySelector('.item-total');
+                    const itemTotal = (price * data.new_quantity).toFixed(2);
+                    itemTotalElement.textContent = itemTotal + ' AZN';
+                    
+                    updateTotalAmount(); // Seçilmiş məhsulların cəmini yenilə
+                    row.classList.add('highlight');
+                    setTimeout(() => row.classList.remove('highlight'), 300);
+                } else {
+                    input.value = input.defaultValue;
+                    showAnimatedMessage(data.error || 'Xəta baş verdi', true);
+                }
+            })
+            .catch(error => {
+                console.error('Xəta:', error);
+                input.value = input.defaultValue;
+                showAnimatedMessage('Xəta baş verdi', true);
+            })
+            .finally(() => {
+                // Düymələri və inputu yenidən aktiv et
+                buttons.forEach(btn => {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                });
+                input.disabled = false;
+                
+                // Loading ikonunu sil
+                const loadingIcon = row.querySelector('.loading-icon');
+                if (loadingIcon) {
+                    loadingIcon.remove();
+                }
+            });
     }
 
     function removeItem(itemId) {
@@ -695,317 +721,17 @@
     }
 
     // Miqdar dəyişikliyi
-    window.handleQuantityInput = debounce(function(input) {
+    const handleQuantityInput = debounce(function(input) {
         const value = parseInt(input.value);
         const itemId = input.dataset.itemId;
         
         if (!isNaN(value) && value > 0) {
-            updateQuantity(itemId, 'set', value);
+            updateQuantity(itemId, value);
         } else {
             input.value = 1;
-            updateQuantity(itemId, 'set', 1);
+            updateQuantity(itemId, 1);
         }
     }, 300);
-
-    // Miqdar yeniləmə funksiyası
-    window.updateQuantity = function(itemId, value) {
-        const row = document.querySelector(`tr[data-item-id="${itemId}"]`);
-        const input = row.querySelector('.quantity-input');
-        let newQuantity;
-
-        if (typeof value === 'number') {
-            newQuantity = parseInt(input.value) + value;
-        } else if (value === 'set') {
-            newQuantity = parseInt(input.value);
-        } else {
-            newQuantity = parseInt(value);
-        }
-
-        if (isNaN(newQuantity) || newQuantity < 1) {
-            newQuantity = 1;
-        }
-
-        // Düyməni deaktiv et və loading göstər
-        const buttons = row.querySelectorAll('.quantity-btn');
-        buttons.forEach(btn => {
-            btn.disabled = true;
-            btn.style.opacity = '0.5';
-        });
-        input.disabled = true;
-
-        // Loading ikonunu göstər
-        const loadingIcon = document.createElement('span');
-        loadingIcon.className = 'loading-icon';
-        loadingIcon.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        input.parentNode.appendChild(loadingIcon);
-
-        fetch(`/update_quantity/${itemId}/${newQuantity}/`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    input.value = data.new_quantity;
-                    const itemTotalElement = row.querySelector('.item-total');
-                    itemTotalElement.textContent = data.item_total.toFixed(2) + ' AZN';
-                    
-                    const totalElement = document.getElementById('total-amount');
-                    if (totalElement) {
-                        totalElement.textContent = data.total_amount.toFixed(2) + ' AZN';
-                        totalElement.classList.add('highlight');
-                        setTimeout(() => totalElement.classList.remove('highlight'), 300);
-                    }
-
-                    row.classList.add('highlight');
-                    setTimeout(() => row.classList.remove('highlight'), 300);
-                } else {
-                    input.value = input.defaultValue;
-                    window.showNotification(data.error || 'Xəta baş verdi', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Xəta:', error);
-                input.value = input.defaultValue;
-                window.showNotification('Xəta baş verdi', 'error');
-            })
-            .finally(() => {
-                // Düymələri və inputu yenidən aktiv et
-                buttons.forEach(btn => {
-                    btn.disabled = false;
-                    btn.style.opacity = '1';
-                });
-                input.disabled = false;
-                
-                // Loading ikonunu sil
-                const loadingIcon = row.querySelector('.loading-icon');
-                if (loadingIcon) {
-                    loadingIcon.remove();
-                }
-            });
-    };
-
-    // CSS stilləri
-    const cartStyles = document.createElement('style');
-    cartStyles.textContent = `
-        .highlight {
-            animation: highlight 0.3s ease;
-        }
-
-        @keyframes highlight {
-            0% {
-                background-color: transparent;
-            }
-            50% {
-                background-color: rgba(100, 255, 218, 0.2);
-            }
-            100% {
-                background-color: transparent;
-            }
-        }
-    `;
-    document.head.appendChild(cartStyles);
-
-    // Real-time search functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchForm = document.getElementById('search-form');
-        const searchInput = searchForm.querySelector('input[name="search_text"]');
-        const categorySelect = document.getElementById('category');
-        const brandSelect = document.getElementById('brand');
-        const modelSelect = document.getElementById('model');
-        
-        // Create dropdown container
-        const dropdownContainer = document.createElement('div');
-        dropdownContainer.className = 'search-results-dropdown';
-        searchForm.appendChild(dropdownContainer);
-        
-        let searchTimeout;
-        
-        // Function to perform search
-        async function performSearch() {
-            const query = searchInput.value.trim();
-            const category = categorySelect.value;
-            const brand = brandSelect.value;
-            const model = modelSelect.value;
-            
-            if (query.length < 2 && !category && !brand && !model) {
-                dropdownContainer.classList.remove('active');
-                return;
-            }
-            
-            try {
-                const response = await fetch(`/realtime-search/?q=${encodeURIComponent(query)}&category=${encodeURIComponent(category)}&brand=${encodeURIComponent(brand)}&model=${encodeURIComponent(model)}`);
-                const data = await response.json();
-                
-                if (data.results.length > 0) {
-                    dropdownContainer.innerHTML = data.results.map(result => {
-                        const highlightTerm = (text, term) => {
-                            const regex = new RegExp(`(${term})`, 'gi');
-                            return text.replace(regex, '<span class="highlight">$1</span>');
-                        };
-                        return `
-                            <div class="search-result-item" onclick="window.location.href='/product-detail/${encodeURIComponent(result.adi)}-${encodeURIComponent(result.oem)}-${encodeURIComponent(result.brend_kod)}/${result.id}/'">
-                                ${result.sekil_url ? `<img src="${result.sekil_url}" alt="${result.adi}">` : ''}
-                                <div class="search-result-info">
-                                    <h4>${highlightTerm(result.adi, query)}</h4>
-                                    <p>Brend: ${highlightTerm(result.brend, query)} | OEM: ${highlightTerm(result.oem, query)}</p>
-                                    <p>Marka: ${highlightTerm(result.marka, query)} | Brend Kod: ${highlightTerm(result.brend_kod, query)}</p>
-                                </div>
-                                <div class="search-result-price">
-                                    <div class="stock-status ${result.stok === 0 ? 'out-of-stock' : result.stok <= 20 ? 'low-stock' : 'in-stock'}">
-                                        ${result.stok === 0 ? 'Yoxdur' : result.stok <= 20 ? 'Az var' : 'Var'}
-                                    </div>
-                                    ${result.qiymet} AZN
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-                    dropdownContainer.classList.add('active');
-                } else {
-                    dropdownContainer.innerHTML = '<div class="search-result-item">Heç bir nəticə tapılmadı</div>';
-                    dropdownContainer.classList.add('active');
-                }
-            } catch (error) {
-                console.error('Axtarış xətası:', error);
-            }
-        }
-        
-        // Input event listener with debounce
-        searchInput.addEventListener('input', () => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(performSearch, 300);
-        });
-        
-        // Select elements change listener
-        [categorySelect, brandSelect, modelSelect].forEach(select => {
-            select.addEventListener('change', performSearch);
-        });
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!searchForm.contains(e.target)) {
-                dropdownContainer.classList.remove('active');
-            }
-        });
-        
-        // Form submit handler
-        searchForm.addEventListener('submit', (e) => {
-            if (dropdownContainer.classList.contains('active')) {
-                e.preventDefault();
-                dropdownContainer.classList.remove('active');
-            }
-        });
-    });
-
-    function highlightSearchTerm(text, searchTerm) {
-        const regex = new RegExp(`(${searchTerm})`, 'gi');
-        return text.replace(regex, '<span class="highlight">$1</span>');
-    }
-
-    // Profile Dropdown functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        const profileDropdown = document.querySelector('.profile-dropdown');
-        const profileToggle = document.querySelector('.profile-toggle');
-
-        if (profileToggle && profileDropdown) {
-            // Click handler for toggle button
-            profileToggle.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                profileDropdown.classList.toggle('active');
-            });
-
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!profileDropdown.contains(e.target)) {
-                    profileDropdown.classList.remove('active');
-                }
-            });
-
-            // Close dropdown with ESC key
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && profileDropdown.classList.contains('active')) {
-                    profileDropdown.classList.remove('active');
-                }
-            });
-
-            // Prevent dropdown from closing when clicking inside
-            const dropdownMenu = profileDropdown.querySelector('.dropdown-menu');
-            if (dropdownMenu) {
-                dropdownMenu.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                });
-            }
-        }
-    });
-
-    function addToCartWithQuantity(productId) {
-        const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
-        const quantity = parseInt(quantityInput.value);
-
-        if (isNaN(quantity) || quantity <= 0) {
-            showAnimatedMessage('Zəhmət olmasa düzgün miqdar daxil edin', true);
-            return;
-        }
-
-        if (quantity > 999) {
-            showAnimatedMessage('Maksimum 999 ədəd sifariş edə bilərsiniz', true);
-            return;
-        }
-
-        fetch(`/sebet/ekle/${productId}/?miqdar=${quantity}`, {
-            method: 'GET',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': getCookie('csrftoken')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showAnimatedMessage(`${data.mehsul.adi} səbətə əlavə edildi (${quantity} ədəd)`, false, data.mehsul);
-                updateCartCount();
-            } else {
-                showAnimatedMessage(data.error || 'Xəta baş verdi', true);
-            }
-        })
-        .catch(error => {
-            showAnimatedMessage('Xəta baş verdi', true);
-            console.error('Error:', error);
-        });
-    }
-
-    function validateQuantity(input) {
-        const value = parseInt(input.value);
-        const errorDiv = input.parentElement.querySelector('.quantity-error');
-        
-        if (isNaN(value) || value < 1) {
-            input.value = 1;
-            errorDiv.textContent = 'Minimum miqdar 1 olmalıdır';
-            errorDiv.classList.add('show');
-            setTimeout(() => errorDiv.classList.remove('show'), 3000);
-        } else if (value > 999) {
-            input.value = 999;
-            errorDiv.textContent = 'Maksimum miqdar 999 olmalıdır';
-            errorDiv.classList.add('show');
-            setTimeout(() => errorDiv.classList.remove('show'), 3000);
-        }
-    }
-
-    function incrementQuantity(productId) {
-        const input = document.querySelector(`input[data-product-id="${productId}"]`);
-        const currentValue = parseInt(input.value);
-        if (currentValue < 999) {
-            input.value = currentValue + 1;
-            validateQuantity(input);
-        }
-    }
-
-    function decrementQuantity(productId) {
-        const input = document.querySelector(`input[data-product-id="${productId}"]`);
-        const currentValue = parseInt(input.value);
-        if (currentValue > 1) {
-            input.value = currentValue - 1;
-            validateQuantity(input);
-        }
-    }
 
     function validateCartQuantity(input) {
         const value = parseInt(input.value);
@@ -1013,14 +739,12 @@
         if (isNaN(value) || value < 1) {
             input.value = 1;
             showAnimatedMessage('Minimum miqdar 1 olmalıdır', true);
-            handleQuantityInput(input);
         } else if (value > 999) {
             input.value = 999;
             showAnimatedMessage('Maksimum miqdar 999 olmalıdır', true);
-            handleQuantityInput(input);
-        } else {
-            handleQuantityInput(input);
         }
+        
+        handleQuantityInput(input);
     }
 
     // Cart Functions
@@ -1040,12 +764,12 @@
         checkedItems.forEach(checkbox => {
             const row = checkbox.closest('tr');
             const itemTotalText = row.querySelector('.item-total').textContent;
-            // AZN yazısını silirik və string-i float-a çeviririk
             const itemTotal = parseFloat(itemTotalText.replace(' AZN', ''));
-            total += itemTotal;
+            if (!isNaN(itemTotal)) {
+                total += itemTotal;
+            }
         });
         
-        // toFixed(2) istifadə edərək 2 ondalıq rəqəmə qədər yuvarlaqlaşdırırıq
         document.getElementById('selected-total-amount').textContent = total.toFixed(2) + ' AZN';
         updateOrderButton();
     }

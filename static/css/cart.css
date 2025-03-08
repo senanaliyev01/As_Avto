@@ -684,7 +684,7 @@ td {
     position: relative;
     cursor: pointer;
     padding-left: 28px;
-    display: inline-block;
+    display: inline;
     color: var(--text-primary);
 }
 

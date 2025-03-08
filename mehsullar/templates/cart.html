@@ -238,8 +238,8 @@ function handleOrderSubmit(event) {
         })
         .then(response => {
             if (response.ok) {
-                alert('Sifarişiniz uğurla qeydə alındı. Sifarişlərim səhifəsinə yönləndirilirsiniz.');
-                window.location.href = '{% url "sifaris_izle" %}';
+                alert('Sifarişiniz uğurla qeydə alındı.');
+                window.location.href = '{% url "view_cart" %}';
             } else {
                 alert('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
             }

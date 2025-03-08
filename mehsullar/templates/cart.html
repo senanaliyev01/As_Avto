@@ -111,10 +111,10 @@
             </tfoot> {% endcomment %}
         </table>
 
-        <div style="text-align: center; padding: 1.5rem;">
-            <div class="total-amount-container" id="totalAmountContainer">
+        <div colspan="11" style="text-align: center; padding: 1.5rem;">
+            <div style="display: inline-flex; align-items: center; gap: 1rem; background: linear-gradient(145deg, #0a1929, #1a2942); padding: 1rem 2rem; border-radius: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
                 <strong style="color: #64ffda; font-size: 1.2rem;">Seçilmiş Məhsulların Cəmi:</strong>
-                <span id="selected-total-amount" style="color: white; font-size: 1.2rem; font-weight: 600;">0.00 AZN</span>
+                <span id="selected-total-amount" style="color: white; font-size: 1.2rem; font-weight: 600;">0 AZN</span>
             </div>
         </div>
 
@@ -166,53 +166,85 @@
         const itemCheckboxes = document.querySelectorAll('.item-checkbox');
         itemCheckboxes.forEach(item => {
             item.checked = checkbox.checked;
-            highlightSelectedRow(item);
         });
-        updateTotalAmount(true);
+        updateTotalAmount();
         updateOrderButton();
     }
     
-    function highlightSelectedRow(checkbox) {
-        const row = checkbox.closest('tr');
-        if (checkbox.checked) {
-            row.classList.add('selected');
-        } else {
-            row.classList.remove('selected');
-        }
-    }
-    
-    function updateTotalAmount(animate = false) {
+    function updateTotalAmount() {
         let total = 0;
         const checkedItems = document.querySelectorAll('.item-checkbox:checked');
-        const totalContainer = document.getElementById('totalAmountContainer');
-        const totalElement = document.getElementById('selected-total-amount');
         
         checkedItems.forEach(checkbox => {
             const row = checkbox.closest('tr');
             const itemTotalText = row.querySelector('.item-total').textContent;
-            // AZN-i kənarlaşdırıb, vergülü nöqtə ilə əvəz edirik
-            const cleanedText = itemTotalText.replace('AZN', '').replace(',', '.').trim();
-            const itemTotal = parseFloat(cleanedText);
-            
+            // Mətn formatından rəqəmə çevirmək (məsələn, "1168,70 AZN" -> 1168.70)
+            const itemTotal = parseFloat(itemTotalText.replace(/[^\d,.-]/g, '').replace(',', '.'));
             if (!isNaN(itemTotal)) {
                 total += itemTotal;
             }
         });
         
-        // Animasiya əlavə et
-        if (animate) {
-            totalElement.classList.add('updating');
-            totalContainer.classList.add('updating');
-            
-            setTimeout(() => {
-                totalElement.classList.remove('updating');
-                totalContainer.classList.remove('updating');
-            }, 500);
-        }
-        
         // Tam dəqiq rəqəmi göstərmək üçün toFixed(2) istifadə edirik
-        totalElement.textContent = total.toFixed(2) + ' AZN';
+        document.getElementById('selected-total-amount').textContent = total.toFixed(2) + ' AZN';
+        
+        // Animasiya əlavə et
+        const totalElement = document.getElementById('selected-total-amount');
+        totalElement.classList.add('highlight');
+        setTimeout(() => totalElement.classList.remove('highlight'), 300);
+        
         updateOrderButton();
+    }
+    
+    // Miqdar dəyişdikdə cəmi yeniləmək üçün
+    function validateCartQuantity(input) {
+        const value = parseInt(input.value);
+        
+        if (isNaN(value) || value < 1) {
+            input.value = 1;
+            showAnimatedMessage('Minimum miqdar 1 olmalıdır', true);
+            updateItemTotal(input);
+        } else if (value > 999) {
+            input.value = 999;
+            showAnimatedMessage('Maksimum miqdar 999 olmalıdır', true);
+            updateItemTotal(input);
+        } else {
+            updateItemTotal(input);
+        }
+    }
+    
+    // Məhsulun cəmini yeniləmək
+    function updateItemTotal(input) {
+        const itemId = input.getAttribute('data-item-id');
+        const quantity = parseInt(input.value);
+        const row = input.closest('tr');
+        const priceText = row.querySelector('.price').textContent;
+        const price = parseFloat(priceText.replace(/[^\d,.-]/g, '').replace(',', '.'));
+        
+        if (!isNaN(price) && !isNaN(quantity)) {
+            const newTotal = (price * quantity).toFixed(2);
+            row.querySelector('.item-total').textContent = newTotal + ' AZN';
+            
+            // Server-ə məlumat göndər
+            fetch(`/update_quantity/${itemId}/${quantity}/`, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Uğurlu olduqda seçilmiş məhsulların cəmini yenilə
+                    updateTotalAmount();
+                } else {
+                    showAnimatedMessage(data.error || 'Xəta baş verdi', true);
+                }
+            })
+            .catch(error => {
+                console.error('Xəta:', error);
+            });
+        }
     }
     
     function updateOrderButton() {
@@ -257,20 +289,26 @@
             alert('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
         });
     }
+    return false;
+}
     
-    // Checkbox dəyişikliyi üçün event listener əlavə et
+    // Initialize order button state and total amount
     document.addEventListener('DOMContentLoaded', function() {
-        const itemCheckboxes = document.querySelectorAll('.item-checkbox');
-        itemCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                highlightSelectedRow(this);
-                updateTotalAmount(true);
+        updateOrderButton();
+        
+        // Səhifə yükləndikdə checkbox-ları yoxla və cəmi hesabla
+        const checkboxes = document.querySelectorAll('.item-checkbox');
+        if (checkboxes.length > 0) {
+            updateTotalAmount();
+        }
+        
+        // Miqdar inputlarına event listener əlavə et
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        quantityInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                validateCartQuantity(this);
             });
         });
-        
-        // İlkin vəziyyəti yüklə
-        updateTotalAmount();
-        updateOrderButton();
     });
     
     function recalculateCart() {
@@ -306,6 +344,25 @@
             progressBar.style.width = `${progress}%`;
             percentageText.textContent = `${Math.round(progress)}%`;
         }, interval);
+    }
+    
+    // Bildiriş göstərmə funksiyası
+    function showAnimatedMessage(message, isError = false) {
+        const notification = document.getElementById('notification');
+        notification.textContent = message;
+        notification.className = `notification ${isError ? 'error' : 'success'}`;
+        notification.style.display = 'block';
+        
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 10);
+        
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 300);
+        }, 3000);
     }
 </script>
 {% endblock %}

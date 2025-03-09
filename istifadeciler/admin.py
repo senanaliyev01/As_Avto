@@ -1,9 +1,8 @@
 from django.contrib import admin
-from .models import Profile
 from django.contrib.auth.models import User
 from django.utils.html import format_html
 from django.urls import reverse
-from istifadeciler.models import Profile, Message  # Modelinizi düzgün import edin
+from .models import Profile, Message
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
@@ -11,12 +10,6 @@ class ProfileAdmin(admin.ModelAdmin):
     list_filter = ('is_approved',)
     search_fields = ('user__username', 'ad', 'soyad', 'telefon')
     list_editable = ('is_approved',)
-
-
-from django.contrib import admin
-from django.contrib.auth.models import User
-from django.utils.html import format_html
-from istifadeciler.models import Profile, Message  # Modelinizi düzgün import edin
 
 class CustomUserAdmin(admin.ModelAdmin):
     def user_avatar(self, obj):

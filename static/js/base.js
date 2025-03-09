@@ -1112,7 +1112,12 @@
         }
 
         // WebSocket bağlantısını yarat
-        connectWebSocket();
+        try {
+            connectWebSocket();
+        } catch (error) {
+            console.error('WebSocket bağlantısı yaradılarkən xəta:', error);
+            console.log('WebSocket bağlantısı yaradıla bilmədi, HTTP sorğularından istifadə ediləcək');
+        }
 
         // Chat ikonuna klik
         chatIcon.addEventListener('click', () => {
@@ -1146,12 +1151,23 @@
         });
 
         // İstifadəçiləri və mesajları yenilə
-        setInterval(loadChatUsers, 3000);
         setInterval(() => {
-            if (currentReceiverId) {
-                loadMessages(currentReceiverId);
+            try {
+                loadChatUsers();
+            } catch (error) {
+                console.error('İstifadəçilər yüklənərkən xəta:', error);
             }
-        }, 1000);
+        }, 5000);
+        
+        setInterval(() => {
+            try {
+                if (currentReceiverId) {
+                    loadMessages(currentReceiverId);
+                }
+            } catch (error) {
+                console.error('Mesajlar yüklənərkən xəta:', error);
+            }
+        }, 2000);
 
         // Axtarış funksiyasını əlavə et
         const searchInput = document.getElementById('user-search');
@@ -1177,10 +1193,20 @@
             }
             
             try {
+                // WebSocket bağlantısını sınayırıq, lakin xəta baş verdikdə HTTP sorğularından istifadə edirik
                 chatSocket = new WebSocket(wsUrl);
+                
+                // WebSocket bağlantısı üçün 3 saniyə gözləyirik
+                let wsConnectTimeout = setTimeout(() => {
+                    console.log('WebSocket bağlantısı vaxtı bitdi, HTTP sorğularından istifadə ediləcək');
+                    if (chatSocket && chatSocket.readyState !== WebSocket.OPEN) {
+                        chatSocket.close();
+                    }
+                }, 3000);
                 
                 chatSocket.onopen = function(e) {
                     console.log('WebSocket bağlantısı açıldı');
+                    clearTimeout(wsConnectTimeout);
                 };
                 
                 chatSocket.onmessage = function(e) {
@@ -1212,24 +1238,27 @@
                 
                 chatSocket.onclose = function(e) {
                     console.log('WebSocket bağlantısı bağlandı', e.code, e.reason);
+                    clearTimeout(wsConnectTimeout);
                     
                     // WebSocket bağlantısı uğursuz olduqda HTTP sorğularından istifadə et
                     if (e.code !== 1000) {
-                        console.log('WebSocket bağlantısı qırıldı, yenidən qoşulmağa çalışılır...');
-                        // 10 saniyə sonra yenidən bağlanmağa çalış
-                        setTimeout(connectWebSocket, 10000);
+                        console.log('WebSocket bağlantısı qırıldı, HTTP sorğularından istifadə ediləcək');
                     }
                 };
                 
                 chatSocket.onerror = function(e) {
                     console.error('WebSocket xətası:', e);
-                    // Xəta baş verdikdə bağlantını bağla
+                    clearTimeout(wsConnectTimeout);
+                    
+                    // Xəta baş verdikdə bağlantını bağla və HTTP sorğularından istifadə et
                     if (chatSocket) {
                         chatSocket.close();
                     }
+                    console.log('WebSocket xətası baş verdi, HTTP sorğularından istifadə ediləcək');
                 };
             } catch (error) {
                 console.error('WebSocket bağlantısı yaradılarkən xəta:', error);
+                console.log('WebSocket bağlantısı yaradıla bilmədi, HTTP sorğularından istifadə ediləcək');
             }
         } catch (error) {
             console.error('WebSocket bağlantısı yaradılarkən xəta:', error);

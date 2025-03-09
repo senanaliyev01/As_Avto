@@ -1024,6 +1024,8 @@
     }
 
     // Chat funksiyaları
+    let messageUpdateInterval;
+
     function initChat() {
         const chatIcon = document.createElement('div');
         chatIcon.className = 'chat-icon';
@@ -1050,11 +1052,17 @@
             chatBox.classList.toggle('active');
             if (chatBox.classList.contains('active')) {
                 loadMessages();
+                // Chat açıq olduqda mesajları yenilə
+                messageUpdateInterval = setInterval(loadMessages, 1000);
+            } else {
+                // Chat bağlı olduqda interval-ı dayandır
+                clearInterval(messageUpdateInterval);
             }
         });
 
         chatBox.querySelector('.close-chat').addEventListener('click', () => {
             chatBox.classList.remove('active');
+            clearInterval(messageUpdateInterval);
         });
 
         const input = chatBox.querySelector('input');
@@ -1065,6 +1073,9 @@
             if (message) {
                 const formData = new FormData();
                 formData.append('message', message);
+                
+                input.disabled = true;
+                sendButton.disabled = true;
 
                 fetch('/chat/send/', {
                     method: 'POST',
@@ -1078,7 +1089,18 @@
                     if (data.status === 'success') {
                         input.value = '';
                         loadMessages();
+                    } else {
+                        showAnimatedMessage('Mesaj göndərilə bilmədi', true);
                     }
+                })
+                .catch(error => {
+                    console.error('Mesaj göndərmə xətası:', error);
+                    showAnimatedMessage('Mesaj göndərilə bilmədi', true);
+                })
+                .finally(() => {
+                    input.disabled = false;
+                    sendButton.disabled = false;
+                    input.focus();
                 });
             }
         }
@@ -1091,23 +1113,32 @@
         });
     }
 
+    let lastMessageCount = 0;
+
     function loadMessages() {
         const messagesContainer = document.querySelector('.chat-messages');
+        if (!messagesContainer) return;
         
         fetch('/chat/messages/')
             .then(response => response.json())
             .then(data => {
-                messagesContainer.innerHTML = data.messages.reverse().map(msg => `
-                    <div class="message ${msg.is_admin ? 'admin-message' : ''} ${msg.is_own ? 'own-message' : ''}">
-                        <div class="message-info">
-                            <span class="username">${msg.username}</span>
-                            <span class="timestamp">${msg.timestamp}</span>
+                if (data.messages.length !== lastMessageCount) {
+                    messagesContainer.innerHTML = data.messages.reverse().map(msg => `
+                        <div class="message ${msg.is_admin ? 'admin-message' : ''} ${msg.is_own ? 'own-message' : ''}">
+                            <div class="message-info">
+                                <span class="username">${msg.username}</span>
+                                <span class="timestamp">${msg.timestamp}</span>
+                            </div>
+                            <div class="message-content">${msg.message}</div>
                         </div>
-                        <div class="message-content">${msg.message}</div>
-                    </div>
-                `).join('');
-                
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    `).join('');
+                    
+                    lastMessageCount = data.messages.length;
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+            })
+            .catch(error => {
+                console.error('Mesajları yükləmə xətası:', error);
             });
     }
 
@@ -1144,18 +1175,31 @@
             position: fixed;
             bottom: 90px;
             right: 20px;
-            width: 300px;
-            height: 400px;
+            width: 350px;
+            height: 500px;
             background-color: white;
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             display: none;
             flex-direction: column;
             z-index: 1000;
+            transition: all 0.3s ease;
         }
 
         .chat-box.active {
             display: flex;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .chat-header {
@@ -1178,29 +1222,50 @@
             border: none;
             color: white;
             cursor: pointer;
+            padding: 5px;
+            transition: transform 0.3s;
+        }
+
+        .close-chat:hover {
+            transform: scale(1.1);
         }
 
         .chat-messages {
             flex: 1;
             padding: 15px;
             overflow-y: auto;
+            background-color: #f8f9fa;
         }
 
         .message {
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             max-width: 80%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .message-info {
             font-size: 12px;
             margin-bottom: 4px;
+            color: #666;
         }
 
         .message-content {
-            background-color: #f0f0f0;
-            padding: 8px 12px;
+            background-color: #e9ecef;
+            padding: 10px 15px;
             border-radius: 15px;
             display: inline-block;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         .own-message {
@@ -1222,14 +1287,20 @@
             border-top: 1px solid #eee;
             display: flex;
             gap: 10px;
+            background-color: white;
         }
 
         .chat-input input {
             flex: 1;
-            padding: 8px 12px;
+            padding: 10px 15px;
             border: 1px solid #ddd;
             border-radius: 20px;
             outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .chat-input input:focus {
+            border-color: #003366;
         }
 
         .chat-input button {
@@ -1243,11 +1314,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background-color 0.3s;
+            transition: all 0.3s;
         }
 
         .chat-input button:hover {
             background-color: #002244;
+            transform: scale(1.1);
+        }
+
+        .chat-input button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
         }
     `;
 
@@ -1256,8 +1334,4 @@
     // DOM yükləndikdə chat-i başlat
     document.addEventListener('DOMContentLoaded', () => {
         initChat();
-        // Hər 10 saniyədə bir mesajları yenilə
-        if (document.querySelector('.chat-box.active')) {
-            setInterval(loadMessages, 10000);
-        }
     });

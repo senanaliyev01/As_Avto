@@ -15,6 +15,7 @@ from django.core.exceptions import ValidationError
 import re
 from esasevim.views import esasevim
 from django.utils import timezone
+from django.db import models
 
 def login_view(request):
     # Əgər istifadəçi artıq daxil olubsa
@@ -302,23 +303,36 @@ def send_message(request):
                 user=request.user,
                 message=message
             )
+            
             return JsonResponse({
                 'status': 'success',
                 'message': message,
                 'timestamp': chat_message.created_at.strftime('%H:%M'),
-                'username': request.user.username
+                'username': request.user.username,
+                'is_admin': request.user.is_staff,
+                'is_own': True
             })
     return JsonResponse({'status': 'error'})
 
 @login_required
 def get_messages(request):
-    messages = ChatMessage.objects.all().order_by('-created_at')[:50]  # Son 50 mesaj
+    if request.user.is_staff:
+        # Admin bütün mesajları görür
+        messages = ChatMessage.objects.all()
+    else:
+        # İstifadəçi yalnız öz mesajlarını və admin mesajlarını görür
+        messages = ChatMessage.objects.filter(
+            models.Q(user=request.user) | models.Q(user__is_staff=True)
+        )
+    
+    messages = messages.order_by('-created_at')[:50]  # Son 50 mesaj
+    
     return JsonResponse({
         'messages': [{
             'message': msg.message,
             'username': msg.user.username,
             'timestamp': msg.created_at.strftime('%H:%M'),
-            'is_admin': msg.is_admin_message,
+            'is_admin': msg.user.is_staff,
             'is_own': msg.user == request.user
         } for msg in messages]
     })

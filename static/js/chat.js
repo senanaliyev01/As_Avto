@@ -4,6 +4,7 @@ let currentReceiverName = null;
 let lastMessageCount = 0;
 let lastMessageId = 0;
 let chatSocket = null;
+let usingWebSocket = false; // WebSocket istifadə edilib-edilmədiyini izləmək üçün
 
 // CSRF token funksiyası
 function getCookie(name) {
@@ -137,9 +138,8 @@ function connectWebSocket() {
     console.log('WebSocket bağlantısı yaradılır...'); // Debug üçün
     
     try {
-        // WebSocket bağlantısını yarat
-        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${wsProtocol}//${window.location.host}/ws/chat/`;
+        // WebSocket bağlantısını yarat - HTTPS sayt üçün həmişə WSS istifadə et
+        const wsUrl = 'wss://' + window.location.host + '/ws/chat/';
         
         console.log('WebSocket URL:', wsUrl); // Debug üçün
         
@@ -151,6 +151,7 @@ function connectWebSocket() {
         try {
             // WebSocket bağlantısını sınayırıq, lakin xəta baş verdikdə HTTP sorğularından istifadə edirik
             chatSocket = new WebSocket(wsUrl);
+            usingWebSocket = false; // Əvvəlcə false təyin edirik, bağlantı açıldıqda true olacaq
             
             // WebSocket bağlantısı üçün 3 saniyə gözləyirik
             let wsConnectTimeout = setTimeout(() => {
@@ -163,6 +164,12 @@ function connectWebSocket() {
             chatSocket.onopen = function(e) {
                 console.log('WebSocket bağlantısı açıldı');
                 clearTimeout(wsConnectTimeout);
+                usingWebSocket = true; // Bağlantı uğurlu olduqda true təyin edirik
+                
+                // İstifadəçiyə bildiriş göstər
+                if (typeof showAnimatedMessage === 'function') {
+                    showAnimatedMessage('Chat serveri ilə bağlantı quruldu!', false);
+                }
             };
             
             chatSocket.onmessage = function(e) {
@@ -211,6 +218,11 @@ function connectWebSocket() {
                     chatSocket.close();
                 }
                 console.log('WebSocket xətası baş verdi, HTTP sorğularından istifadə ediləcək');
+                
+                // İstifadəçiyə bildiriş göstər
+                if (typeof showAnimatedMessage === 'function') {
+                    showAnimatedMessage('Chat serveri ilə bağlantı qurmaq mümkün olmadı. Mesajlar HTTP ilə göndəriləcək.', false);
+                }
             };
         } catch (error) {
             console.error('WebSocket bağlantısı yaradılarkən xəta:', error);
@@ -454,7 +466,7 @@ function sendMessage() {
 
     // WebSocket ilə mesaj göndərməyə çalış
     let websocketSent = false;
-    if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+    if (usingWebSocket && chatSocket && chatSocket.readyState === WebSocket.OPEN) {
         try {
             chatSocket.send(JSON.stringify({
                 'message': content,
@@ -501,12 +513,20 @@ function sendMessage() {
             input.focus();
         } else {
             console.error('Mesaj göndərilə bilmədi:', data.message);
-            alert('Mesaj göndərilə bilmədi: ' + data.message);
+            if (typeof showAnimatedMessage === 'function') {
+                showAnimatedMessage('Mesaj göndərilə bilmədi: ' + data.message, true);
+            } else {
+                alert('Mesaj göndərilə bilmədi: ' + data.message);
+            }
         }
     })
     .catch(error => {
         console.error('Mesaj göndərilərkən xəta:', error);
-        alert('Mesaj göndərilərkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+        if (typeof showAnimatedMessage === 'function') {
+            showAnimatedMessage('Mesaj göndərilərkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.', true);
+        } else {
+            alert('Mesaj göndərilərkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+        }
     });
 }
 

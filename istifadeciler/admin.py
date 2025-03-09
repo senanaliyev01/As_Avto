@@ -1,5 +1,9 @@
 from django.contrib import admin
 from .models import Profile
+from django.contrib.auth.models import User
+from django.utils.html import format_html
+from django.urls import reverse
+from istifadeciler.models import Profile, Message  # Modelinizi düzgün import edin
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):

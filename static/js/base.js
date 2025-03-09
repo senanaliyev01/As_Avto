@@ -359,20 +359,20 @@
             // Swiper-ləri inicializasiya et
             if (document.querySelector('.brandsSwiper')) {
                 try {
-                    new Swiper('.brandsSwiper', swiperConfig);
+                new Swiper('.brandsSwiper', swiperConfig);
                 } catch (error) {
                     console.error('Swiper inicializasiya xətası:', error);
                 }
             }
             if (document.querySelector('.carBrandsSwiper')) {
                 try {
-                    new Swiper('.carBrandsSwiper', {
-                        ...swiperConfig,
-                        autoplay: {
-                            ...swiperConfig.autoplay,
-                            delay: 3500
-                        }
-                    });
+                new Swiper('.carBrandsSwiper', {
+                    ...swiperConfig,
+                    autoplay: {
+                        ...swiperConfig.autoplay,
+                        delay: 3500
+                    }
+                });
                 } catch (error) {
                     console.error('Swiper inicializasiya xətası:', error);
                 }
@@ -380,8 +380,8 @@
 
             // İlkin statistikaları yüklə
             if (document.querySelector('.statistics-card')) {
-                updateStatistics();
-                setInterval(updateStatistics, 3600000); // 1 saatdan bir yenilə
+            updateStatistics();
+            setInterval(updateStatistics, 3600000); // 1 saatdan bir yenilə
             }
 
             // Chat-i inicializasiya et
@@ -503,33 +503,33 @@
             const searchForm = document.getElementById('search-form');
             if (searchForm) {
                 searchForm.addEventListener('submit', function(event) {
-                    event.preventDefault(); // Formun dərhal göndərilməsini dayandır
-                
-                    let searchButton = document.getElementById('search-button');
-                    let spinner = document.getElementById('loading-spinner');
+        event.preventDefault(); // Formun dərhal göndərilməsini dayandır
+    
+        let searchButton = document.getElementById('search-button');
+        let spinner = document.getElementById('loading-spinner');
                 
                     if (!searchButton || !spinner) return;
-                
-                    // Butonun ölçüsünü qorumaq üçün enini və hündürlüyünü sabit saxla
-                    searchButton.style.width = `${searchButton.offsetWidth}px`;
-                    searchButton.style.height = `${searchButton.offsetHeight}px`;
-                    
-                    // Axtarış yazısını gizlət, amma spinneri saxla
+    
+        // Butonun ölçüsünü qorumaq üçün enini və hündürlüyünü sabit saxla
+        searchButton.style.width = `${searchButton.offsetWidth}px`;
+        searchButton.style.height = `${searchButton.offsetHeight}px`;
+        
+        // Axtarış yazısını gizlət, amma spinneri saxla
                     if (searchButton.childNodes[0] && searchButton.childNodes[0].nodeValue) {
-                        searchButton.childNodes[0].nodeValue = ''; // Axtar sözünü sil
+        searchButton.childNodes[0].nodeValue = ''; // Axtar sözünü sil
                     }
-                    spinner.style.display = 'inline-block'; // Spinneri göstər
-                
-                    // Butonu deaktiv et ki, yenidən klik olunmasın
-                    searchButton.disabled = true; 
-                
-                    // 2 saniyə sonra formu göndər
-                    setTimeout(() => {
-                        this.submit(); // Formu göndər
-                    }, 2000);
-                });
+        spinner.style.display = 'inline-block'; // Spinneri göstər
+    
+        // Butonu deaktiv et ki, yenidən klik olunmasın
+        searchButton.disabled = true; 
+    
+        // 2 saniyə sonra formu göndər
+        setTimeout(() => {
+            this.submit(); // Formu göndər
+        }, 2000);
+    });
             }
-
+    
         } catch (error) {
             console.error('Funksiya xətası:', error);
         }
@@ -1166,7 +1166,6 @@
         
         try {
             // WebSocket bağlantısını yarat
-            // Əgər WebSocket bağlantısı uğursuz olursa, HTTP sorğularından istifadə et
             const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             const wsUrl = `${wsProtocol}//${window.location.host}/ws/chat/`;
             
@@ -1215,16 +1214,22 @@
                     console.log('WebSocket bağlantısı bağlandı', e.code, e.reason);
                     
                     // WebSocket bağlantısı uğursuz olduqda HTTP sorğularından istifadə et
-                    console.log('WebSocket bağlantısı uğursuz oldu, HTTP sorğularından istifadə ediləcək');
+                    if (e.code !== 1000) {
+                        console.log('WebSocket bağlantısı qırıldı, yenidən qoşulmağa çalışılır...');
+                        // 10 saniyə sonra yenidən bağlanmağa çalış
+                        setTimeout(connectWebSocket, 10000);
+                    }
                 };
                 
                 chatSocket.onerror = function(e) {
                     console.error('WebSocket xətası:', e);
-                    console.log('WebSocket bağlantısı uğursuz oldu, HTTP sorğularından istifadə ediləcək');
+                    // Xəta baş verdikdə bağlantını bağla
+                    if (chatSocket) {
+                        chatSocket.close();
+                    }
                 };
             } catch (error) {
                 console.error('WebSocket bağlantısı yaradılarkən xəta:', error);
-                console.log('WebSocket bağlantısı uğursuz oldu, HTTP sorğularından istifadə ediləcək');
             }
         } catch (error) {
             console.error('WebSocket bağlantısı yaradılarkən xəta:', error);
@@ -1476,6 +1481,8 @@
             } catch (error) {
                 console.error('WebSocket ilə mesaj göndərilərkən xəta:', error);
             }
+        } else {
+            console.log('WebSocket bağlantısı açıq deyil, HTTP sorğusu ilə mesaj göndərilir');
         }
 
         // HTTP sorğusu ilə mesaj göndər (WebSocket uğursuz olduqda və ya hər halda)
@@ -1502,16 +1509,19 @@
             if (data.status === 'success') {
                 input.value = '';
                 
-                // Əgər WebSocket ilə göndərilməyibsə, mesajları yenilə
-                if (!websocketSent) {
-                    loadMessages(currentReceiverId);
-                }
+                // Mesajları yenilə
+                loadMessages(currentReceiverId);
+                
+                // Mesaj göndərildikdən sonra mesaj sahəsini fokusla
+                input.focus();
             } else {
                 console.error('Mesaj göndərilə bilmədi:', data.message);
+                alert('Mesaj göndərilə bilmədi: ' + data.message);
             }
         })
         .catch(error => {
             console.error('Mesaj göndərilərkən xəta:', error);
+            alert('Mesaj göndərilərkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
         });
     }
 

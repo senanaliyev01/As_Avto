@@ -4,7 +4,7 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from .forms import UserUpdateForm, ProfileUpdateForm
-from .models import Profile, Message
+from .models import Profile
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
 from django.db.models import Q
@@ -14,7 +14,6 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 import re
 from esasevim.views import esasevim
-import json
 
 def login_view(request):
     # Əgər istifadəçi artıq daxil olubsa
@@ -292,63 +291,4 @@ def register(request):
             })
 
     return render(request, 'register.html')
-
-@login_required
-def chat_box(request):
-    users = User.objects.filter(is_active=True).exclude(id=request.user.id)
-    return render(request, 'chat/chat_box.html', {'users': users})
-
-@login_required
-def get_messages(request, user_id):
-    other_user = User.objects.get(id=user_id)
-    messages = Message.objects.filter(
-        Q(sender=request.user, receiver=other_user) |
-        Q(sender=other_user, receiver=request.user)
-    ).order_by('timestamp')
-    
-    # Mesajları oxunmuş olaraq işarələ
-    unread_messages = messages.filter(receiver=request.user, is_read=False)
-    unread_messages.update(is_read=True)
-    
-    message_list = []
-    for message in messages:
-        message_list.append({
-            'id': message.id,
-            'content': message.content,
-            'sender': message.sender.username,
-            'timestamp': message.timestamp.strftime('%H:%M'),
-            'is_mine': message.sender == request.user
-        })
-    
-    return JsonResponse({'messages': message_list})
-
-@login_required
-def send_message(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        receiver = User.objects.get(id=data['receiver_id'])
-        content = data['content']
-        
-        message = Message.objects.create(
-            sender=request.user,
-            receiver=receiver,
-            content=content
-        )
-        
-        return JsonResponse({
-            'status': 'success',
-            'message': {
-                'id': message.id,
-                'content': message.content,
-                'sender': message.sender.username,
-                'timestamp': message.timestamp.strftime('%H:%M'),
-                'is_mine': True
-            }
-        })
-    return JsonResponse({'status': 'error'}, status=400)
-
-@login_required
-def get_unread_count(request):
-    count = Message.objects.filter(receiver=request.user, is_read=False).count()
-    return JsonResponse({'count': count})
 

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Profile, Message
+from .models import Profile
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
@@ -8,12 +8,6 @@ class ProfileAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'ad', 'soyad', 'telefon')
     list_editable = ('is_approved',)
 
-@admin.register(Message)
-class MessageAdmin(admin.ModelAdmin):
-    list_display = ('sender', 'receiver', 'content', 'timestamp', 'is_read')
-    list_filter = ('is_read', 'timestamp')
-    search_fields = ('sender__username', 'receiver__username', 'content')
-    readonly_fields = ('timestamp',)
 
 from django.contrib import admin
 from django.contrib.auth.models import User

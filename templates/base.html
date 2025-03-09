@@ -12,48 +12,6 @@
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
 
     {% block extra_css %}{% endblock %}
-    <style>
-        .chat-widget {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-        }
-
-        .chat-toggle {
-            width: 60px;
-            height: 60px;
-            background-color: #003366;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            transition: transform 0.3s ease;
-        }
-
-        .chat-toggle:hover {
-            transform: scale(1.1);
-        }
-
-        .chat-toggle i {
-            color: white;
-            font-size: 24px;
-        }
-
-        .unread-count {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: #ff4444;
-            color: white;
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 12px;
-            display: none;
-        }
-    </style>
 </head>
 <body>
     <!-- Header -->
@@ -172,37 +130,9 @@
         </div>
     </footer>
 
-    {% if user.is_authenticated %}
-    <div class="chat-widget">
-        <div class="chat-toggle" onclick="window.location.href='{% url 'chat_box' %}'">
-            <i class="fas fa-comments"></i>
-            <span class="unread-count" id="unreadCount"></span>
-        </div>
-    </div>
-
-    <script>
-        // Oxunmamış mesajları yoxla
-        function checkUnreadMessages() {
-            fetch('/istifadeciler/chat/unread/')
-                .then(response => response.json())
-                .then(data => {
-                    const unreadCount = document.getElementById('unreadCount');
-                    if (data.count > 0) {
-                        unreadCount.textContent = data.count;
-                        unreadCount.style.display = 'block';
-                    } else {
-                        unreadCount.style.display = 'none';
-                    }
-                });
-        }
-
-        // Hər 10 saniyədə bir yeni mesajları yoxla
-        setInterval(checkUnreadMessages, 10000);
-        checkUnreadMessages();
-    </script>
-    {% endif %}
-
     <!-- Common Scripts -->
+
+
     <script src="{% static 'js/loading.js' %}"></script>
     <script src="{% static 'js/base.js' %}"></script>
     {% block extra_js %}{% endblock %}

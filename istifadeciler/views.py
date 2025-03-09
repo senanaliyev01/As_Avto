@@ -4,17 +4,16 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from .forms import UserUpdateForm, ProfileUpdateForm
-from .models import Profile, Message
+from .models import Profile
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
-from django.db.models import Q, Count
+from django.db.models import Q
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 import re
 from esasevim.views import esasevim
-import json
 
 def login_view(request):
     # Əgər istifadəçi artıq daxil olubsa
@@ -292,109 +291,4 @@ def register(request):
             })
 
     return render(request, 'register.html')
-
-@login_required
-def get_unread_count(request):
-    unread_count = Message.objects.filter(receiver=request.user, is_read=False).count()
-    return JsonResponse({'unread_count': unread_count})
-
-@login_required
-def get_messages(request):
-    user = request.user
-    other_user_id = request.GET.get('user_id')
-    
-    try:
-        other_user = User.objects.get(id=other_user_id)
-        
-        # Mesajları oxunmuş kimi işarələ
-        Message.objects.filter(sender=other_user, receiver=user, is_read=False).update(is_read=True)
-        
-        # İki istifadəçi arasındakı bütün mesajları əldə et
-        messages = Message.objects.filter(
-            (Q(sender=user) & Q(receiver=other_user)) |
-            (Q(sender=other_user) & Q(receiver=user))
-        ).order_by('timestamp')
-        
-        message_list = []
-        for msg in messages:
-            message_list.append({
-                'id': msg.id,
-                'content': msg.content,
-                'sender': msg.sender.username,
-                'timestamp': msg.timestamp.strftime('%H:%M'),
-                'is_mine': msg.sender == user
-            })
-        
-        return JsonResponse({'messages': message_list})
-        
-    except User.DoesNotExist:
-        return JsonResponse({'error': 'İstifadəçi tapılmadı'}, status=404)
-
-@login_required
-def send_message(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            receiver_id = data.get('receiver_id')
-            content = data.get('content')
-            
-            if not content:
-                return JsonResponse({'error': 'Mesaj boş ola bilməz'}, status=400)
-                
-            try:
-                receiver = User.objects.get(id=receiver_id)
-                
-                # Əgər göndərən admin deyilsə və qəbul edən də admin deyilsə, mesaj göndərilə bilməz
-                if not request.user.is_staff and not receiver.is_staff:
-                    return JsonResponse({
-                        'error': 'Yalnız adminlərlə mesajlaşa bilərsiniz'
-                    }, status=403)
-                
-                message = Message.objects.create(
-                    sender=request.user,
-                    receiver=receiver,
-                    content=content
-                )
-                
-                return JsonResponse({
-                    'id': message.id,
-                    'content': message.content,
-                    'sender': message.sender.username,
-                    'timestamp': message.timestamp.strftime('%H:%M'),
-                    'is_mine': True
-                })
-                
-            except User.DoesNotExist:
-                return JsonResponse({'error': 'İstifadəçi tapılmadı'}, status=404)
-                
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'Yanlış format'}, status=400)
-            
-    return JsonResponse({'error': 'Yanlış sorğu metodu'}, status=405)
-
-@login_required
-def get_chat_users(request):
-    user = request.user
-    
-    if user.is_staff:
-        # Admin bütün istifadəçiləri görə bilər
-        chat_users = User.objects.exclude(id=user.id).annotate(
-            unread_count=Count('sent_messages', filter=Q(sent_messages__receiver=user, sent_messages__is_read=False))
-        )
-    else:
-        # Adi istifadəçi yalnız adminləri görə bilər
-        chat_users = User.objects.filter(is_staff=True).exclude(id=user.id).annotate(
-            unread_count=Count('sent_messages', filter=Q(sent_messages__receiver=user, sent_messages__is_read=False))
-        )
-    
-    users_list = []
-    for chat_user in chat_users:
-        users_list.append({
-            'id': chat_user.id,
-            'username': chat_user.username,
-            'unread_count': chat_user.unread_count,
-            'is_online': True  # Burada online statusu əlavə edə bilərsiniz
-        })
-    
-    return JsonResponse({'users': users_list})
 

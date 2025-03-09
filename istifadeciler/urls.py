@@ -7,10 +7,4 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('password_change/', views.password_change, name='password_change'),
     path('logout/', views.logout_view, name='logout_view'),
-    
-    # Chat URLs
-    path('chat/unread-count/', views.get_unread_count, name='get_unread_count'),
-    path('chat/messages/', views.get_messages, name='get_messages'),
-    path('chat/send/', views.send_message, name='send_message'),
-    path('chat/users/', views.get_chat_users, name='get_chat_users'),
 ]

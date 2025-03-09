@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Profile, Message
+from .models import Profile
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
@@ -8,21 +8,6 @@ class ProfileAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'ad', 'soyad', 'telefon')
     list_editable = ('is_approved',)
 
-@admin.register(Message)
-class MessageAdmin(admin.ModelAdmin):
-    list_display = ('sender', 'receiver', 'content', 'timestamp', 'is_read')
-    list_filter = ('is_read', 'timestamp', 'sender', 'receiver')
-    search_fields = ('content', 'sender__username', 'receiver__username')
-    ordering = ('-timestamp',)
-    actions = ['mark_as_read', 'mark_as_unread']
-
-    def mark_as_read(self, request, queryset):
-        queryset.update(is_read=True)
-    mark_as_read.short_description = "Seçilmiş mesajları oxunmuş kimi işarələ"
-
-    def mark_as_unread(self, request, queryset):
-        queryset.update(is_read=False)
-    mark_as_unread.short_description = "Seçilmiş mesajları oxunmamış kimi işarələ"
 
 from django.contrib import admin
 from django.contrib.auth.models import User

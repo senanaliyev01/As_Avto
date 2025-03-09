@@ -83,6 +83,11 @@ CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     'https://as-avto.com',
     'https://www.as-avto.com',
+    'wss://as-avto.com',
+]
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r'^(https?|wss?)://as-avto\.com$',
+    r'^(https?|wss?)://www\.as-avto\.com$',
 ]
 CORS_ALLOW_METHODS = [
     'GET',
@@ -102,6 +107,10 @@ CORS_ALLOW_HEADERS = [
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
+    'sec-websocket-protocol',
+    'sec-websocket-extensions',
+    'sec-websocket-key',
+    'sec-websocket-version',
 ]
 CORS_EXPOSE_HEADERS = ['content-type', 'x-csrftoken']
 CORS_ALLOW_CREDENTIALS = True

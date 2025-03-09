@@ -8,3 +8,4 @@ reportlab==4.2.5
 channels==4.0.0
 daphne==4.1.0
 channels-redis==4.2.0
+requests==2.32.3

@@ -1,4 +1,5 @@
 import json
+import traceback
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth.models import User
@@ -13,18 +14,48 @@ class ChatConsumer(AsyncWebsocketConsumer):
         logger.info("WebSocket bağlantısı qurulur...")
         print("WebSocket bağlantısı qurulur...")
         
+        # Otaq adını al (varsa)
+        self.room_name = self.scope.get('url_route', {}).get('kwargs', {}).get('room_name', 'default')
+        self.room_group_name = f'chat_{self.room_name}'
+        
+        logger.info(f"Otaq adı: {self.room_name}, Qrup adı: {self.room_group_name}")
+        print(f"Otaq adı: {self.room_name}, Qrup adı: {self.room_group_name}")
+        
         try:
+            # Qrupa qoşul
+            await self.channel_layer.group_add(
+                self.room_group_name,
+                self.channel_name
+            )
+            
+            # Bağlantını qəbul et
             await self.accept()
             logger.info("WebSocket bağlantısı qəbul edildi")
             print("WebSocket bağlantısı qəbul edildi")
+            
+            # Bağlantı uğurlu olduğunu bildir
+            await self.send(text_data=json.dumps({
+                'status': 'connected',
+                'message': 'WebSocket bağlantısı uğurla quruldu'
+            }))
         except Exception as e:
             logger.error(f"WebSocket bağlantısı qurularkən xəta: {str(e)}")
             print(f"WebSocket bağlantısı qurularkən xəta: {str(e)}")
+            traceback.print_exc()
 
     async def disconnect(self, close_code):
         logger.info(f"WebSocket bağlantısı bağlandı: {close_code}")
         print(f"WebSocket bağlantısı bağlandı: {close_code}")
-        pass
+        
+        try:
+            # Qrupdan çıx
+            await self.channel_layer.group_discard(
+                self.room_group_name,
+                self.channel_name
+            )
+        except Exception as e:
+            logger.error(f"Qrupdan çıxarkən xəta: {str(e)}")
+            print(f"Qrupdan çıxarkən xəta: {str(e)}")
 
     async def receive(self, text_data):
         logger.info(f"WebSocket mesajı alındı: {text_data}")
@@ -42,13 +73,29 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 # Mesajı verilənlər bazasına yaz
                 message_obj = await self.save_message(sender_id, receiver_id, message)
                 
+                # Mesajı qrupa göndər
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        'type': 'chat_message',
+                        'message': {
+                            'id': message_obj.id,
+                            'content': message_obj.content,
+                            'sender': message_obj.sender.username,
+                            'is_mine': False,
+                            'is_read': False,
+                            'is_delivered': True
+                        }
+                    }
+                )
+                
                 # Mesajı göndərən və qəbul edən istifadəçilərə göndər
                 await self.send(text_data=json.dumps({
                     'message': {
                         'id': message_obj.id,
                         'content': message_obj.content,
                         'sender': message_obj.sender.username,
-                        'is_mine': False,
+                        'is_mine': True,
                         'is_read': False,
                         'is_delivered': True
                     }
@@ -60,10 +107,23 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'error': 'Mesaj məlumatları tam deyil'
                 }))
         except Exception as e:
+            logger.error(f"WebSocket mesajı işlənərkən xəta: {str(e)}")
             print(f"WebSocket mesajı işlənərkən xəta: {str(e)}")
+            traceback.print_exc()
             await self.send(text_data=json.dumps({
                 'error': f'Xəta: {str(e)}'
             }))
+    
+    async def chat_message(self, event):
+        """
+        Qrupdan mesaj alındıqda bu funksiya çağırılır
+        """
+        message = event['message']
+        
+        # Mesajı müştəriyə göndər
+        await self.send(text_data=json.dumps({
+            'message': message
+        }))
 
     @database_sync_to_async
     def save_message(self, sender_id, receiver_id, content):
@@ -84,4 +144,5 @@ class ChatConsumer(AsyncWebsocketConsumer):
             raise
         except Exception as e:
             print(f"Mesaj yadda saxlanarkən xəta: {str(e)}")
+            traceback.print_exc()
             raise 

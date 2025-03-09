@@ -131,10 +131,14 @@
     </footer>
 
     <!-- Common Scripts -->
-
-
     <script src="{% static 'js/loading.js' %}"></script>
     <script src="{% static 'js/base.js' %}"></script>
+    
+    <!-- Chatbot Script -->
+    {% if user.is_authenticated %}
+    <script src="{% static 'js/chatbot.js' %}"></script>
+    {% endif %}
+    
     {% block extra_js %}{% endblock %}
 </body>
 </html>

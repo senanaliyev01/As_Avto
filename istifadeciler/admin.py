@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Profile
+from .models import Profile, Message
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
@@ -7,6 +7,27 @@ class ProfileAdmin(admin.ModelAdmin):
     list_filter = ('is_approved',)
     search_fields = ('user__username', 'ad', 'soyad', 'telefon')
     list_editable = ('is_approved',)
+
+@admin.register(Message)
+class MessageAdmin(admin.ModelAdmin):
+    list_display = ('sender', 'receiver', 'short_content', 'timestamp', 'is_read')
+    list_filter = ('is_read', 'timestamp')
+    search_fields = ('sender__username', 'receiver__username', 'content')
+    actions = ['mark_as_read', 'mark_as_unread']
+    
+    def short_content(self, obj):
+        return obj.content[:50] + '...' if len(obj.content) > 50 else obj.content
+    short_content.short_description = 'Mesaj'
+    
+    def mark_as_read(self, request, queryset):
+        queryset.update(is_read=True)
+        self.message_user(request, f"{queryset.count()} mesaj oxunmuş kimi işarələndi.")
+    mark_as_read.short_description = "Seçilmiş mesajları oxunmuş kimi işarələ"
+    
+    def mark_as_unread(self, request, queryset):
+        queryset.update(is_read=False)
+        self.message_user(request, f"{queryset.count()} mesaj oxunmamış kimi işarələndi.")
+    mark_as_unread.short_description = "Seçilmiş mesajları oxunmamış kimi işarələ"
 
 
 from django.contrib import admin

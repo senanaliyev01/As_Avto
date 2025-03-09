@@ -1,19 +1,21 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, update_session_auth_hash, logout
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from .forms import UserUpdateForm, ProfileUpdateForm
-from .models import Profile
+from .models import Profile, Message
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 import re
 from esasevim.views import esasevim
+import json
+from django.utils import timezone
 
 def login_view(request):
     # Əgər istifadəçi artıq daxil olubsa
@@ -291,4 +293,153 @@ def register(request):
             })
 
     return render(request, 'register.html')
+
+@login_required
+def get_unread_message_count(request):
+    """İstifadəçinin oxunmamış mesajlarının sayını qaytarır"""
+    count = Message.objects.filter(receiver=request.user, is_read=False).count()
+    return JsonResponse({'count': count})
+
+@login_required
+def get_chat_list(request):
+    """İstifadəçinin söhbət siyahısını qaytarır"""
+    user = request.user
+    
+    # Admin istifadəçilər üçün bütün istifadəçiləri göstər
+    if user.is_staff:
+        # Mesaj göndərmiş və ya qəbul etmiş bütün istifadəçiləri əldə et
+        users = User.objects.exclude(id=user.id).annotate(
+            unread_count=Count('sent_messages', filter=Q(sent_messages__receiver=user, sent_messages__is_read=False))
+        ).order_by('-unread_count')
+    else:
+        # Yalnız admin istifadəçiləri göstər
+        users = User.objects.filter(is_staff=True).annotate(
+            unread_count=Count('sent_messages', filter=Q(sent_messages__receiver=user, sent_messages__is_read=False))
+        ).order_by('-unread_count')
+    
+    chat_list = []
+    for chat_user in users:
+        # Son mesajı əldə et
+        last_message = Message.objects.filter(
+            (Q(sender=user) & Q(receiver=chat_user)) | 
+            (Q(sender=chat_user) & Q(receiver=user))
+        ).order_by('-timestamp').first()
+        
+        # Oxunmamış mesajların sayını əldə et
+        unread_count = Message.objects.filter(
+            sender=chat_user, receiver=user, is_read=False
+        ).count()
+        
+        if last_message:
+            chat_list.append({
+                'id': chat_user.id,
+                'username': chat_user.username,
+                'full_name': f"{chat_user.profile.ad or ''} {chat_user.profile.soyad or ''}".strip() or chat_user.username,
+                'avatar': chat_user.profile.sekil.url if hasattr(chat_user, 'profile') and chat_user.profile.sekil else None,
+                'last_message': last_message.content[:30] + '...' if len(last_message.content) > 30 else last_message.content,
+                'timestamp': last_message.timestamp.strftime('%H:%M'),
+                'unread_count': unread_count,
+                'is_online': True  # Burada online statusu əlavə edə bilərsiniz
+            })
+    
+    return JsonResponse({'chat_list': chat_list})
+
+@login_required
+def get_messages(request, user_id):
+    """İki istifadəçi arasındakı mesajları qaytarır"""
+    other_user = get_object_or_404(User, id=user_id)
+    user = request.user
+    
+    # İstifadəçi admin deyilsə və digər istifadəçi də admin deyilsə, xəta qaytarın
+    if not user.is_staff and not other_user.is_staff:
+        return JsonResponse({'error': 'İcazə yoxdur'}, status=403)
+    
+    # Mesajları əldə et
+    messages_query = Message.objects.filter(
+        (Q(sender=user) & Q(receiver=other_user)) | 
+        (Q(sender=other_user) & Q(receiver=user))
+    ).order_by('timestamp')
+    
+    # Oxunmamış mesajları oxunmuş kimi işarələ
+    Message.objects.filter(sender=other_user, receiver=user, is_read=False).update(is_read=True)
+    
+    messages_list = []
+    for msg in messages_query:
+        messages_list.append({
+            'id': msg.id,
+            'content': msg.content,
+            'timestamp': msg.timestamp.strftime('%H:%M'),
+            'is_sender': msg.sender == user,
+            'is_read': msg.is_read
+        })
+    
+    return JsonResponse({
+        'messages': messages_list,
+        'user': {
+            'id': other_user.id,
+            'username': other_user.username,
+            'full_name': f"{other_user.profile.ad or ''} {other_user.profile.soyad or ''}".strip() or other_user.username,
+            'avatar': other_user.profile.sekil.url if hasattr(other_user, 'profile') and other_user.profile.sekil else None,
+            'is_online': True  # Burada online statusu əlavə edə bilərsiniz
+        }
+    })
+
+@login_required
+@require_POST
+def send_message(request):
+    """Yeni mesaj göndərir"""
+    data = json.loads(request.body)
+    receiver_id = data.get('receiver_id')
+    content = data.get('content')
+    
+    if not content or not receiver_id:
+        return JsonResponse({'error': 'Mesaj və alıcı tələb olunur'}, status=400)
+    
+    receiver = get_object_or_404(User, id=receiver_id)
+    user = request.user
+    
+    # İstifadəçi admin deyilsə və digər istifadəçi də admin deyilsə, xəta qaytarın
+    if not user.is_staff and not receiver.is_staff:
+        return JsonResponse({'error': 'İcazə yoxdur'}, status=403)
+    
+    # Mesajı yarat
+    message = Message.objects.create(
+        sender=user,
+        receiver=receiver,
+        content=content
+    )
+    
+    return JsonResponse({
+        'id': message.id,
+        'content': message.content,
+        'timestamp': message.timestamp.strftime('%H:%M'),
+        'is_sender': True,
+        'is_read': False
+    })
+
+@login_required
+@require_POST
+def mark_as_read(request, message_id):
+    """Mesajı oxunmuş kimi işarələyir"""
+    message = get_object_or_404(Message, id=message_id, receiver=request.user)
+    message.is_read = True
+    message.save()
+    return JsonResponse({'success': True})
+
+@login_required
+@require_POST
+def delete_message(request, message_id):
+    """Mesajı silir"""
+    # Yalnız admin istifadəçilər mesajları silə bilər
+    if not request.user.is_staff:
+        return JsonResponse({'error': 'İcazə yoxdur'}, status=403)
+    
+    message = get_object_or_404(Message, id=message_id)
+    message.delete()
+    return JsonResponse({'success': True})
+
+@login_required
+def chat_view(request):
+    """Mesajlaşma səhifəsini göstərir"""
+    return render(request, 'chat.html')
 

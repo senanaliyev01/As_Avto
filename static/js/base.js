@@ -1025,6 +1025,7 @@
 
     // Chat funksiyaları
     let messageUpdateInterval;
+    let selectedUserId = null;
 
     function initChat() {
         const chatIcon = document.createElement('div');
@@ -1039,10 +1040,15 @@
                 <h3>Canlı Dəstək</h3>
                 <button class="close-chat"><i class="fas fa-times"></i></button>
             </div>
-            <div class="chat-messages"></div>
-            <div class="chat-input">
-                <input type="text" placeholder="Mesajınızı yazın...">
-                <button class="send-message"><i class="fas fa-paper-plane"></i></button>
+            <div class="chat-container">
+                <div class="users-list"></div>
+                <div class="chat-content">
+                    <div class="chat-messages"></div>
+                    <div class="chat-input">
+                        <input type="text" placeholder="Mesajınızı yazın...">
+                        <button class="send-message"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
             </div>
         `;
         document.body.appendChild(chatBox);
@@ -1052,10 +1058,11 @@
             chatBox.classList.toggle('active');
             if (chatBox.classList.contains('active')) {
                 loadMessages();
-                // Chat açıq olduqda mesajları yenilə
+                if (isAdmin) {
+                    loadUsers();
+                }
                 messageUpdateInterval = setInterval(loadMessages, 1000);
             } else {
-                // Chat bağlı olduqda interval-ı dayandır
                 clearInterval(messageUpdateInterval);
             }
         });
@@ -1077,7 +1084,7 @@
                 input.disabled = true;
                 sendButton.disabled = true;
 
-                fetch('/chat/send/', {
+                fetch('/istifadeciler/chat/send/', {
                     method: 'POST',
                     body: formData,
                     headers: {
@@ -1113,13 +1120,48 @@
         });
     }
 
+    function loadUsers() {
+        fetch('/istifadeciler/chat/users/')
+            .then(response => response.json())
+            .then(data => {
+                const usersList = document.querySelector('.users-list');
+                usersList.innerHTML = data.users.map(user => `
+                    <div class="user-item ${selectedUserId === user.id ? 'active' : ''}" data-user-id="${user.id}">
+                        <div class="user-avatar">
+                            <img src="${user.avatar || '/static/img/default-avatar.png'}" alt="${user.username}">
+                            <span class="status-dot ${user.is_online ? 'online' : ''}"></span>
+                        </div>
+                        <div class="user-info">
+                            <div class="user-name">${user.full_name || user.username}</div>
+                            <div class="user-status">${user.is_staff ? 'Admin' : 'İstifadəçi'}</div>
+                        </div>
+                    </div>
+                `).join('');
+
+                // İstifadəçi seçimi
+                usersList.querySelectorAll('.user-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        selectedUserId = parseInt(item.dataset.userId);
+                        document.querySelectorAll('.user-item').forEach(i => i.classList.remove('active'));
+                        item.classList.add('active');
+                        loadMessages();
+                    });
+                });
+            });
+    }
+
     let lastMessageCount = 0;
 
     function loadMessages() {
         const messagesContainer = document.querySelector('.chat-messages');
         if (!messagesContainer) return;
         
-        fetch('/chat/messages/')
+        let url = '/istifadeciler/chat/messages/';
+        if (selectedUserId) {
+            url += `?user_id=${selectedUserId}`;
+        }
+        
+        fetch(url)
             .then(response => response.json())
             .then(data => {
                 if (data.messages.length !== lastMessageCount) {
@@ -1175,8 +1217,8 @@
             position: fixed;
             bottom: 90px;
             right: 20px;
-            width: 350px;
-            height: 500px;
+            width: 800px;
+            height: 600px;
             background-color: white;
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
@@ -1189,6 +1231,83 @@
         .chat-box.active {
             display: flex;
             animation: slideIn 0.3s ease;
+        }
+
+        .chat-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .users-list {
+            width: 250px;
+            border-right: 1px solid #eee;
+            overflow-y: auto;
+            background-color: #f8f9fa;
+        }
+
+        .user-item {
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-bottom: 1px solid #eee;
+        }
+
+        .user-item:hover {
+            background-color: #e9ecef;
+        }
+
+        .user-item.active {
+            background-color: #e3f2fd;
+        }
+
+        .user-avatar {
+            position: relative;
+            margin-right: 10px;
+        }
+
+        .user-avatar img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .status-dot {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #ccc;
+            border: 2px solid white;
+        }
+
+        .status-dot.online {
+            background-color: #4CAF50;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .user-status {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .chat-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         @keyframes slideIn {
@@ -1326,6 +1445,20 @@
             background-color: #ccc;
             cursor: not-allowed;
             transform: none;
+        }
+
+        @media (max-width: 850px) {
+            .chat-box {
+                width: 90%;
+                right: 5%;
+                left: 5%;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .users-list {
+                width: 200px;
+            }
         }
     `;
 

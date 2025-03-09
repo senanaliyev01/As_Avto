@@ -315,22 +315,51 @@ def send_message(request):
     return JsonResponse({'status': 'error'})
 
 @login_required
+def get_chat_users(request):
+    if not request.user.is_staff:
+        return JsonResponse({'status': 'error', 'message': 'İcazə yoxdur'})
+    
+    users = User.objects.exclude(id=request.user.id).select_related('profile')
+    
+    return JsonResponse({
+        'users': [{
+            'id': user.id,
+            'username': user.username,
+            'full_name': f"{user.profile.ad or ''} {user.profile.soyad or ''}".strip(),
+            'is_online': user.is_authenticated,
+            'is_staff': user.is_staff,
+            'avatar': user.profile.sekil.url if user.profile.sekil else None
+        } for user in users]
+    })
+
+@login_required
 def get_messages(request):
-    if request.user.is_staff:
+    user_id = request.GET.get('user_id')
+    
+    if request.user.is_staff and user_id:
+        # Admin seçilmiş istifadəçi ilə yazışmanı görür
+        messages = ChatMessage.objects.filter(
+            models.Q(user_id=user_id) | 
+            models.Q(user=request.user)
+        )
+    elif request.user.is_staff:
         # Admin bütün mesajları görür
         messages = ChatMessage.objects.all()
     else:
         # İstifadəçi yalnız öz mesajlarını və admin mesajlarını görür
         messages = ChatMessage.objects.filter(
-            models.Q(user=request.user) | models.Q(user__is_staff=True)
+            models.Q(user=request.user) | 
+            models.Q(user__is_staff=True)
         )
     
     messages = messages.order_by('-created_at')[:50]  # Son 50 mesaj
     
     return JsonResponse({
         'messages': [{
+            'id': msg.id,
             'message': msg.message,
             'username': msg.user.username,
+            'user_id': msg.user.id,
             'timestamp': msg.created_at.strftime('%H:%M'),
             'is_admin': msg.user.is_staff,
             'is_own': msg.user == request.user

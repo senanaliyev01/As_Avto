@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Kateqoriya, Brend, Marka, Mehsul, Sebet, Sifaris, SifarisMehsul, OEMKod, MusteriReyi, MarkaSekil, Model, Avtomodel, Motor, Il, Yanacaq
+from .models import Kateqoriya, Brend, Marka, Mehsul, Sebet, Sifaris, SifarisMehsul, OEMKod, MusteriReyi, MarkaSekil, Model, Avtomodel, Motor, Il, Yanacaq, AxtarisSozleri
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils import timezone
@@ -50,6 +50,15 @@ class SifarisMehsulInline(admin.TabularInline):
 # OEMKodInline klassını əvvəldə təyin edirik
 class OEMKodInline(admin.TabularInline):
     model = OEMKod
+    extra = 0
+    formfield_overrides = {
+        models.TextField: {'widget': admin.widgets.AdminTextareaWidget(
+            attrs={'rows': 5, 'style': 'width: 100%; font-family: monospace;'})},
+    }
+
+# AxtarisSozleri inline klassını əlavə edirik
+class AxtarisSozleriInline(admin.TabularInline):
+    model = AxtarisSozleri
     extra = 0
     formfield_overrides = {
         models.TextField: {'widget': admin.widgets.AdminTextareaWidget(
@@ -174,7 +183,7 @@ class MehsulAdmin(admin.ModelAdmin):
     list_display = ('adi', 'kateqoriya', 'brend', 'marka',  'qiymet', 'brend_kod', 'oem', 'stok', 'yenidir')
     list_filter = ('kateqoriya', 'brend', 'marka')
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'yenidir')
-    inlines = [OEMKodInline]
+    inlines = [OEMKodInline, AxtarisSozleriInline]
     
     actions = ['yenilikden_sil', 'yenidir_et']  # Yeni hərəkətləri əlavə edirik
 

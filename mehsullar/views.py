@@ -209,6 +209,12 @@ def products_list(request):
                 normalized_haqqinda, haqqinda_combinations = normalize_search_text(mehsul.haqqinda)
             else:
                 normalized_haqqinda, haqqinda_combinations = "", []
+                
+            # Axtarış sözlərini normalize et (əgər varsa)
+            axtaris_sozleri_combinations = []
+            for soz in mehsul.butun_axtaris_sozleri:
+                normalized_soz, soz_combinations = normalize_search_text(soz)
+                axtaris_sozleri_combinations.extend(soz_combinations)
             
             # Bütün kombinasiyaları yoxla
             found = False
@@ -216,7 +222,9 @@ def products_list(request):
                 if (search_variant in mehsul_adi_combinations or 
                     any(search_variant in combo for combo in mehsul_adi_combinations) or
                     search_variant in haqqinda_combinations or
-                    any(search_variant in combo for combo in haqqinda_combinations)):
+                    any(search_variant in combo for combo in haqqinda_combinations) or
+                    search_variant in axtaris_sozleri_combinations or
+                    any(search_variant in combo for combo in axtaris_sozleri_combinations)):
                     mehsul_ids.add(mehsul.id)
                     found = True
                     break
@@ -234,7 +242,8 @@ def products_list(request):
             Q(id__in=list(mehsul_ids)) |  # Normalize edilmiş ad və haqqında axtarışı
             Q(brend_kod__icontains=clean_search) |  # Brend kodunda axtarış
             Q(oem__icontains=clean_search) |  # OEM kodunda axtarış
-            Q(oem_kodlar__kod__icontains=clean_search)  # Əlavə OEM kodlarında axtarış
+            Q(oem_kodlar__kod__icontains=clean_search) |  # Əlavə OEM kodlarında axtarış
+            Q(axtaris_sozleri__sozler__icontains=clean_search)  # Axtarış sözlərində axtarış
         ).distinct()
 
     return render(request, 'products_list.html', {
@@ -468,6 +477,12 @@ def mehsul_axtaris(request):
                 normalized_haqqinda, haqqinda_combinations = normalize_search_text(mehsul.haqqinda)
             else:
                 normalized_haqqinda, haqqinda_combinations = "", []
+                
+            # Axtarış sözlərini normalize et (əgər varsa)
+            axtaris_sozleri_combinations = []
+            for soz in mehsul.butun_axtaris_sozleri:
+                normalized_soz, soz_combinations = normalize_search_text(soz)
+                axtaris_sozleri_combinations.extend(soz_combinations)
             
             # Bütün kombinasiyaları yoxla
             found = False
@@ -475,7 +490,9 @@ def mehsul_axtaris(request):
                 if (search_variant in mehsul_adi_combinations or 
                     any(search_variant in combo for combo in mehsul_adi_combinations) or
                     search_variant in haqqinda_combinations or
-                    any(search_variant in combo for combo in haqqinda_combinations)):
+                    any(search_variant in combo for combo in haqqinda_combinations) or
+                    search_variant in axtaris_sozleri_combinations or
+                    any(search_variant in combo for combo in axtaris_sozleri_combinations)):
                     mehsul_ids.add(mehsul.id)
                     found = True
                     break
@@ -493,7 +510,8 @@ def mehsul_axtaris(request):
             Q(id__in=list(mehsul_ids)) |
             Q(brend_kod__icontains=clean_query) |
             Q(oem__icontains=clean_query) |
-            Q(oem_kodlar__kod__icontains=clean_query)
+            Q(oem_kodlar__kod__icontains=clean_query) |
+            Q(axtaris_sozleri__sozler__icontains=clean_query)
             ).distinct()
         
         # Nəticələri qaytarırıq
@@ -732,6 +750,12 @@ def realtime_search(request):
                 normalized_haqqinda, haqqinda_combinations = normalize_search_text(mehsul.haqqinda)
             else:
                 normalized_haqqinda, haqqinda_combinations = "", []
+                
+            # Axtarış sözlərini normalize et (əgər varsa)
+            axtaris_sozleri_combinations = []
+            for soz in mehsul.butun_axtaris_sozleri:
+                normalized_soz, soz_combinations = normalize_search_text(soz)
+                axtaris_sozleri_combinations.extend(soz_combinations)
             
             # Bütün kombinasiyaları yoxla
             found = False
@@ -739,7 +763,9 @@ def realtime_search(request):
                 if (search_variant in mehsul_adi_combinations or 
                     any(search_variant in combo for combo in mehsul_adi_combinations) or
                     search_variant in haqqinda_combinations or
-                    any(search_variant in combo for combo in haqqinda_combinations)):
+                    any(search_variant in combo for combo in haqqinda_combinations) or
+                    search_variant in axtaris_sozleri_combinations or
+                    any(search_variant in combo for combo in axtaris_sozleri_combinations)):
                     mehsul_ids.add(mehsul.id)
                     found = True
                     break
@@ -756,7 +782,8 @@ def realtime_search(request):
             Q(id__in=list(mehsul_ids)) |
             Q(brend_kod__icontains=clean_query) |
             Q(oem__icontains=clean_query) |
-            Q(oem_kodlar__kod__icontains=clean_query)
+            Q(oem_kodlar__kod__icontains=clean_query) |
+            Q(axtaris_sozleri__sozler__icontains=clean_query)
         ).distinct()
     
     results = []
@@ -772,6 +799,7 @@ def realtime_search(request):
             'stok': mehsul.stok,
             'sekil_url': mehsul.sekil.url if mehsul.sekil else None,
             'haqqinda': mehsul.haqqinda if mehsul.haqqinda else None,
+            'axtaris_sozleri': mehsul.butun_axtaris_sozleri,
         })
     
     return JsonResponse({'results': results})

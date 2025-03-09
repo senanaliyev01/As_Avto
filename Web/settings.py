@@ -130,11 +130,13 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'django.contrib.sites',
     'rest_framework',
+    'channels',
     'anaevim',
     'istifadeciler',
     'mehsullar',
     'esasevim',
     'rentacar',
+    'sohbet_otagi',
 ]
 
 SITE_ID = 1
@@ -512,3 +514,11 @@ AUTH_USER_MODEL = 'auth.User'
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+# Channels konfiqurasiyası
+ASGI_APPLICATION = 'Web.asgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}

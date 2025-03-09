@@ -339,6 +339,8 @@
     // DOM yükləndikdə
     document.addEventListener('DOMContentLoaded', function() {
         try {
+            console.log('DOM yükləndi, funksiyalar başladılır...'); // Debug üçün
+            
             // Saatı başlat
             updateCurrentTime();
             setInterval(updateCurrentTime, 1000);
@@ -372,8 +374,10 @@
 
             // Chat-i inicializasiya et
             if (document.getElementById('chat-widget')) {
-                console.log('DOM loaded, initializing chat...'); // Debug üçün
+                console.log('Chat widget tapıldı, inicializasiya edilir...'); // Debug üçün
                 initChat();
+            } else {
+                console.log('Chat widget tapılmadı!'); // Debug üçün
             }
 
             // Rəy formu
@@ -1044,6 +1048,7 @@
     let currentReceiverName = null;
     let lastMessageCount = 0;
     let lastMessageId = 0;
+    let chatSocket = null;
 
     // Yeni mesaj bildirişi səsi
     function playNewMessageSound() {
@@ -1068,6 +1073,8 @@
     }
 
     function initChat() {
+        console.log('Chat funksiyası başladılır...'); // Debug üçün
+        
         const chatIcon = document.getElementById('chat-icon');
         const chatWindow = document.getElementById('chat-window');
         const closeChat = document.getElementById('close-chat');
@@ -1077,7 +1084,13 @@
         const chatMain = document.querySelector('.chat-main');
         const chatSidebar = document.querySelector('.chat-sidebar');
 
-        if (!chatIcon || !chatWindow) return;
+        if (!chatIcon || !chatWindow) {
+            console.log('Chat elementləri tapılmadı!'); // Debug üçün
+            return;
+        }
+
+        // WebSocket bağlantısını yarat
+        connectWebSocket();
 
         // Chat ikonuna klik
         chatIcon.addEventListener('click', () => {
@@ -1125,12 +1138,100 @@
         }
     }
 
+    // WebSocket bağlantısını yarat
+    function connectWebSocket() {
+        console.log('WebSocket bağlantısı yaradılır...'); // Debug üçün
+        
+        // WebSocket bağlantısını yarat
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${wsProtocol}//${window.location.host}/ws/chat/`;
+        
+        try {
+            chatSocket = new WebSocket(wsUrl);
+            
+            chatSocket.onopen = function(e) {
+                console.log('WebSocket bağlantısı açıldı');
+            };
+            
+            chatSocket.onmessage = function(e) {
+                const data = JSON.parse(e.data);
+                console.log('WebSocket mesajı alındı:', data);
+                
+                if (data.message) {
+                    // Əgər hazırda həmin istifadəçi ilə söhbət edirsinizsə, mesajı göstər
+                    if (currentReceiverId && (data.message.sender === currentReceiverName || data.message.is_mine)) {
+                        appendMessage(data.message);
+                        
+                        // Əgər mesaj bizim deyilsə, səs çal
+                        if (!data.message.is_mine) {
+                            playChatMessageSound();
+                        }
+                    } else {
+                        // Əks halda bildiriş səsini çal
+                        playNewMessageSound();
+                        
+                        // İstifadəçi siyahısını yenilə
+                        loadChatUsers();
+                    }
+                }
+            };
+            
+            chatSocket.onclose = function(e) {
+                console.log('WebSocket bağlantısı bağlandı');
+                // 5 saniyə sonra yenidən bağlanmağa çalış
+                setTimeout(connectWebSocket, 5000);
+            };
+            
+            chatSocket.onerror = function(e) {
+                console.error('WebSocket xətası:', e);
+            };
+        } catch (error) {
+            console.error('WebSocket bağlantısı yaradılarkən xəta:', error);
+        }
+    }
+
+    // Mesajı əlavə et
+    function appendMessage(message) {
+        const chatMessages = document.getElementById('chat-messages');
+        if (!chatMessages) return;
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${message.is_mine ? 'mine' : 'theirs'}`;
+        
+        messageDiv.innerHTML = `
+            ${!message.is_mine ? `<div class="message-sender">${message.sender}</div>` : ''}
+            <div class="message-content">${message.content}</div>
+            ${message.is_mine ? `
+                <div class="message-status ${getMessageStatus(message)}">
+                    ${getStatusIcons(message)}
+                </div>
+            ` : ''}
+        `;
+        
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
     // Chat istifadəçilərini yükləmə funksiyası
     function loadChatUsers() {
+        console.log('İstifadəçilər yüklənir...'); // Debug üçün
+        
         fetch('/istifadeciler/api/chat/users/')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('İstifadəçi məlumatları alındı:', data); // Debug üçün
+                
                 const usersList = document.getElementById('users-list');
+                if (!usersList) {
+                    console.error('users-list elementi tapılmadı!');
+                    return;
+                }
+                
                 let totalUnread = 0;
                 
                 usersList.innerHTML = '';
@@ -1159,6 +1260,9 @@
 
                 lastMessageCount = totalUnread;
                 updateUnreadCount(totalUnread);
+            })
+            .catch(error => {
+                console.error('İstifadəçilər yüklənərkən xəta:', error);
             });
     }
 
@@ -1181,6 +1285,8 @@
         const totalUnreadElement = document.getElementById('total-unread');
         const chatIcon = document.getElementById('chat-icon');
         
+        if (!totalUnreadElement || !chatIcon) return;
+        
         if (totalUnread > 0) {
             totalUnreadElement.textContent = totalUnread;
             totalUnreadElement.style.display = 'block';
@@ -1192,12 +1298,19 @@
     }
 
     function selectUser(userId, username) {
+        console.log(`İstifadəçi seçildi: ${username} (ID: ${userId})`); // Debug üçün
+        
         currentReceiverId = userId;
         currentReceiverName = username;
         
         const chatMain = document.querySelector('.chat-main');
         const chatSidebar = document.querySelector('.chat-sidebar');
         const selectedUsername = document.getElementById('selected-username');
+        
+        if (!chatMain || !chatSidebar || !selectedUsername) {
+            console.error('Chat elementləri tapılmadı!');
+            return;
+        }
         
         chatSidebar.style.display = 'none';
         chatMain.style.display = 'flex';
@@ -1208,13 +1321,26 @@
 
     // Mesaj yükləmə funksiyası
     function loadMessages(receiverId) {
+        console.log(`${receiverId} ID-li istifadəçi ilə mesajlar yüklənir...`); // Debug üçün
+        
         fetch(`/istifadeciler/api/chat/messages/${receiverId}/`)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(messages => {
+                console.log(`${messages.length} mesaj alındı`); // Debug üçün
+                
                 const chatMessages = document.getElementById('chat-messages');
+                if (!chatMessages) {
+                    console.error('chat-messages elementi tapılmadı!');
+                    return;
+                }
                 
                 // Son mesajın ID-sini al
-                const lastMessage = messages[messages.length - 1];
+                const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
                 
                 // HTML-i yenilə
                 chatMessages.innerHTML = messages.map(msg => `
@@ -1241,6 +1367,9 @@
                 
                 // Mesajları aşağı sürüşdür
                 chatMessages.scrollTop = chatMessages.scrollHeight;
+            })
+            .catch(error => {
+                console.error('Mesajlar yüklənərkən xəta:', error);
             });
     }
 
@@ -1264,10 +1393,24 @@
 
     function sendMessage() {
         const input = document.getElementById('message-input');
+        if (!input) return;
+        
         const content = input.value.trim();
         
         if (!content || !currentReceiverId) return;
 
+        console.log(`Mesaj göndərilir: ${content} (Alıcı ID: ${currentReceiverId})`); // Debug üçün
+
+        // WebSocket ilə mesaj göndər
+        if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+            chatSocket.send(JSON.stringify({
+                'message': content,
+                'sender': currentUserId,
+                'receiver': currentReceiverId
+            }));
+        }
+
+        // Eyni zamanda API ilə də göndər (verilənlər bazasına yazmaq üçün)
         const formData = new FormData();
         formData.append('receiver_id', currentReceiverId);
         formData.append('content', content);
@@ -1279,14 +1422,25 @@
                 'X-CSRFToken': getCookie('csrftoken')
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log('Mesaj göndərildi:', data); // Debug üçün
+            
             if (data.status === 'success') {
                 input.value = '';
                 loadMessages(currentReceiverId);
+            } else {
+                console.error('Mesaj göndərilə bilmədi:', data.message);
             }
         })
-        .catch(error => console.error('Error sending message:', error));
+        .catch(error => {
+            console.error('Mesaj göndərilərkən xəta:', error);
+        });
     }
 
     function filterUsers() {

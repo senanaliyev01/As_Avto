@@ -1,3 +1,19 @@
+// WebSocket xətalarını gizlətmək üçün window.onerror hadisəsi
+window.onerror = function(message, source, lineno, colno, error) {
+    // WebSocket ilə bağlı xətaları gizlət
+    if (source && source.includes('chat.js') && message && (
+        message.includes('WebSocket') || 
+        message.includes('ws://') || 
+        message.includes('wss://')
+    )) {
+        // Xətanı gizlət
+        return true;
+    }
+    
+    // Digər xətaları normal emal et
+    return false;
+};
+
 // Chat funksionallığı
 let currentReceiverId = null;
 let currentReceiverName = null;
@@ -6,6 +22,7 @@ let lastMessageId = 0;
 let chatSocket = null;
 let usingWebSocket = false; // WebSocket istifadə edilib-edilmədiyini izləmək üçün
 let suppressWebSocketErrors = true; // WebSocket xətalarını gizlətmək üçün
+let useOnlyHTTP = true; // Yalnız HTTP istifadə et, WebSocket-i tamamilə söndür
 
 // CSRF token funksiyası
 function getCookie(name) {
@@ -75,13 +92,15 @@ function initChat() {
         return;
     }
 
-    // WebSocket bağlantısını yarat
-    try {
-        connectWebSocket();
-    } catch (error) {
-        if (!suppressWebSocketErrors) {
-            console.error('WebSocket bağlantısı yaradılarkən xəta:', error);
-            console.log('WebSocket bağlantısı yaradıla bilmədi, HTTP sorğularından istifadə ediləcək');
+    // WebSocket bağlantısını yarat (yalnız HTTP istifadə edilmirsə)
+    if (!useOnlyHTTP) {
+        try {
+            connectWebSocket();
+        } catch (error) {
+            if (!suppressWebSocketErrors) {
+                console.error('WebSocket bağlantısı yaradılarkən xəta:', error);
+                console.log('WebSocket bağlantısı yaradıla bilmədi, HTTP sorğularından istifadə ediləcək');
+            }
         }
     }
 
@@ -125,7 +144,7 @@ function initChat() {
                 console.error('İstifadəçilər yüklənərkən xəta:', error);
             }
         }
-    }, 5000);
+    }, 3000);
     
     setInterval(() => {
         try {
@@ -137,7 +156,7 @@ function initChat() {
                 console.error('Mesajlar yüklənərkən xəta:', error);
             }
         }
-    }, 2000);
+    }, 1000);
 
     // Axtarış funksiyasını əlavə et
     const searchInput = document.getElementById('user-search');
@@ -148,6 +167,11 @@ function initChat() {
 
 // WebSocket bağlantısını yarat
 function connectWebSocket() {
+    // Əgər yalnız HTTP istifadə ediləcəksə, WebSocket bağlantısını yaratma
+    if (useOnlyHTTP) {
+        return;
+    }
+    
     if (suppressWebSocketErrors) {
         console.log('WebSocket bağlantısı yaradılır (səssiz rejim)...');
     } else {
@@ -410,92 +434,98 @@ function appendMessage(message) {
 
 // Chat istifadəçilərini yükləmə funksiyası
 function loadChatUsers() {
-    if (!suppressWebSocketErrors) {
-        console.log('İstifadəçilər yüklənir...');
-    }
-    
-    // Əgər istifadəçi daxil olmayıbsa, funksiyadan çıx
-    if (!currentUserId) {
+    try {
         if (!suppressWebSocketErrors) {
-            console.log('İstifadəçi daxil olmayıb, istifadəçilər yüklənmir');
-        }
-        return;
-    }
-    
-    fetch('/istifadeciler/api/chat/users/', {
-        method: 'GET',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        credentials: 'same-origin'
-    })
-    .then(response => {
-        if (!response.ok) {
-            if (response.status === 500) {
-                if (!suppressWebSocketErrors) {
-                    console.error('Server xətası (500): İstifadəçilər yüklənə bilmədi');
-                }
-            } else if (response.status === 403) {
-                if (!suppressWebSocketErrors) {
-                    console.error('Giriş icazəsi yoxdur (403): İstifadəçi daxil olmayıb və ya sessiyanın vaxtı bitib');
-                }
-            } else {
-                if (!suppressWebSocketErrors) {
-                    console.error(`HTTP xətası: ${response.status}`);
-                }
-            }
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (!suppressWebSocketErrors) {
-            console.log('İstifadəçi məlumatları alındı:', data);
+            console.log('İstifadəçilər yüklənir...');
         }
         
-        const usersList = document.getElementById('users-list');
-        if (!usersList) {
+        // Əgər istifadəçi daxil olmayıbsa, funksiyadan çıx
+        if (!currentUserId) {
             if (!suppressWebSocketErrors) {
-                console.error('users-list elementi tapılmadı!');
+                console.log('İstifadəçi daxil olmayıb, istifadəçilər yüklənmir');
             }
             return;
         }
         
-        let totalUnread = 0;
-        
-        usersList.innerHTML = '';
-        
-        // Adminləri və istifadəçiləri əlavə et
-        if (data.admins && data.admins.length > 0) {
-            usersList.innerHTML += '<div class="user-group-title">Adminlər</div>';
-            data.admins.forEach(user => {
-                totalUnread += user.unread_count;
-                usersList.innerHTML += createUserItem(user);
-            });
-        }
-        
-        if (data.users && data.users.length > 0) {
-            usersList.innerHTML += '<div class="user-group-title">İstifadəçilər</div>';
-            data.users.forEach(user => {
-                totalUnread += user.unread_count;
-                usersList.innerHTML += createUserItem(user);
-            });
-        }
+        fetch('/istifadeciler/api/chat/users/', {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 500) {
+                    if (!suppressWebSocketErrors) {
+                        console.error('Server xətası (500): İstifadəçilər yüklənə bilmədi');
+                    }
+                } else if (response.status === 403) {
+                    if (!suppressWebSocketErrors) {
+                        console.error('Giriş icazəsi yoxdur (403): İstifadəçi daxil olmayıb və ya sessiyanın vaxtı bitib');
+                    }
+                } else {
+                    if (!suppressWebSocketErrors) {
+                        console.error(`HTTP xətası: ${response.status}`);
+                    }
+                }
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (!suppressWebSocketErrors) {
+                console.log('İstifadəçi məlumatları alındı:', data);
+            }
+            
+            const usersList = document.getElementById('users-list');
+            if (!usersList) {
+                if (!suppressWebSocketErrors) {
+                    console.error('users-list elementi tapılmadı!');
+                }
+                return;
+            }
+            
+            let totalUnread = 0;
+            
+            usersList.innerHTML = '';
+            
+            // Adminləri və istifadəçiləri əlavə et
+            if (data.admins && data.admins.length > 0) {
+                usersList.innerHTML += '<div class="user-group-title">Adminlər</div>';
+                data.admins.forEach(user => {
+                    totalUnread += user.unread_count;
+                    usersList.innerHTML += createUserItem(user);
+                });
+            }
+            
+            if (data.users && data.users.length > 0) {
+                usersList.innerHTML += '<div class="user-group-title">İstifadəçilər</div>';
+                data.users.forEach(user => {
+                    totalUnread += user.unread_count;
+                    usersList.innerHTML += createUserItem(user);
+                });
+            }
 
-        // Yeni mesaj varsa bildiriş səsini çal
-        if (totalUnread > lastMessageCount) {
-            playNewMessageSound();
-        }
+            // Yeni mesaj varsa bildiriş səsini çal
+            if (totalUnread > lastMessageCount) {
+                playNewMessageSound();
+            }
 
-        lastMessageCount = totalUnread;
-        updateUnreadCount(totalUnread);
-    })
-    .catch(error => {
+            lastMessageCount = totalUnread;
+            updateUnreadCount(totalUnread);
+        })
+        .catch(error => {
+            if (!suppressWebSocketErrors) {
+                console.error('İstifadəçilər yüklənərkən xəta:', error);
+            }
+        });
+    } catch (error) {
         if (!suppressWebSocketErrors) {
-            console.error('İstifadəçilər yüklənərkən xəta:', error);
+            console.error('İstifadəçilər yüklənərkən ümumi xəta:', error);
         }
-    });
+    }
 }
 
 function createUserItem(user) {
@@ -557,64 +587,78 @@ function selectUser(userId, username) {
 
 // Mesaj yükləmə funksiyası
 function loadMessages(receiverId) {
-    if (!suppressWebSocketErrors) {
-        console.log(`${receiverId} ID-li istifadəçi ilə mesajlar yüklənir...`);
-    }
-    
-    fetch(`/istifadeciler/api/chat/messages/${receiverId}/`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(messages => {
-            if (!suppressWebSocketErrors) {
-                console.log(`${messages.length} mesaj alındı`);
-            }
-            
-            const chatMessages = document.getElementById('chat-messages');
-            if (!chatMessages) {
-                if (!suppressWebSocketErrors) {
-                    console.error('chat-messages elementi tapılmadı!');
+    try {
+        if (!suppressWebSocketErrors) {
+            console.log(`${receiverId} ID-li istifadəçi ilə mesajlar yüklənir...`);
+        }
+        
+        fetch(`/istifadeciler/api/chat/messages/${receiverId}/`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-                return;
-            }
-            
-            // Son mesajın ID-sini al
-            const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
-            
-            // HTML-i yenilə
-            chatMessages.innerHTML = messages.map(msg => `
-                <div class="message ${msg.is_mine ? 'mine' : 'theirs'}">
-                    ${!msg.is_mine ? `<div class="message-sender">${msg.sender}</div>` : ''}
-                    <div class="message-content">${msg.content}</div>
-                    ${msg.is_mine ? `
-                        <div class="message-status ${getMessageStatus(msg)}">
-                            ${getStatusIcons(msg)}
-                        </div>
-                    ` : ''}
-                </div>
-            `).join('');
+                return response.json();
+            })
+            .then(messages => {
+                if (!suppressWebSocketErrors) {
+                    console.log(`${messages.length} mesaj alındı`);
+                }
+                
+                const chatMessages = document.getElementById('chat-messages');
+                if (!chatMessages) {
+                    if (!suppressWebSocketErrors) {
+                        console.error('chat-messages elementi tapılmadı!');
+                    }
+                    return;
+                }
+                
+                // Son mesajın ID-sini al
+                const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
+                
+                // Müvəqqəti mesajları saxla
+                const tempMessages = Array.from(chatMessages.querySelectorAll('.message[id^="temp_"]'));
+                
+                // HTML-i yenilə
+                chatMessages.innerHTML = messages.map(msg => `
+                    <div class="message ${msg.is_mine ? 'mine' : 'theirs'}">
+                        ${!msg.is_mine ? `<div class="message-sender">${msg.sender}</div>` : ''}
+                        <div class="message-content">${msg.content}</div>
+                        ${msg.is_mine ? `
+                            <div class="message-status ${getMessageStatus(msg)}">
+                                ${getStatusIcons(msg)}
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+                
+                // Müvəqqəti mesajları əlavə et
+                tempMessages.forEach(tempMsg => {
+                    chatMessages.appendChild(tempMsg);
+                });
 
-            // Yeni mesaj gəlibsə və bu mesaj bizim deyilsə səs çal
-            if (lastMessage && lastMessage.id > lastMessageId && !lastMessage.is_mine) {
-                playChatMessageSound();
-            }
+                // Yeni mesaj gəlibsə və bu mesaj bizim deyilsə səs çal
+                if (lastMessage && lastMessage.id > lastMessageId && !lastMessage.is_mine) {
+                    playChatMessageSound();
+                }
 
-            // Son mesaj ID-sini yadda saxla
-            if (lastMessage) {
-                lastMessageId = lastMessage.id;
-            }
-            
-            // Mesajları aşağı sürüşdür
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        })
-        .catch(error => {
-            if (!suppressWebSocketErrors) {
-                console.error('Mesajlar yüklənərkən xəta:', error);
-            }
-        });
+                // Son mesaj ID-sini yadda saxla
+                if (lastMessage) {
+                    lastMessageId = lastMessage.id;
+                }
+                
+                // Mesajları aşağı sürüşdür
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            })
+            .catch(error => {
+                if (!suppressWebSocketErrors) {
+                    console.error('Mesajlar yüklənərkən xəta:', error);
+                }
+            });
+    } catch (error) {
+        if (!suppressWebSocketErrors) {
+            console.error('Mesajlar yüklənərkən ümumi xəta:', error);
+        }
+    }
 }
 
 // Mesaj statusunu müəyyən et
@@ -647,9 +691,32 @@ function sendMessage() {
         console.log(`Mesaj göndərilir: ${content} (Alıcı ID: ${currentReceiverId})`);
     }
 
-    // WebSocket ilə mesaj göndərməyə çalış
+    // Mesajı əvvəlcədən göstər (daha yaxşı istifadəçi təcrübəsi üçün)
+    const tempMessageId = 'temp_' + Date.now();
+    const chatMessages = document.getElementById('chat-messages');
+    if (chatMessages) {
+        const tempMessageDiv = document.createElement('div');
+        tempMessageDiv.className = 'message mine';
+        tempMessageDiv.id = tempMessageId;
+        tempMessageDiv.innerHTML = `
+            <div class="message-content">${content}</div>
+            <div class="message-status">
+                <i class="fas fa-check"></i>
+            </div>
+        `;
+        chatMessages.appendChild(tempMessageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    // İnput sahəsini təmizlə
+    input.value = '';
+    
+    // Mesaj sahəsini fokusla
+    input.focus();
+
+    // WebSocket ilə mesaj göndərməyə çalış (yalnız HTTP istifadə edilmirsə)
     let websocketSent = false;
-    if (usingWebSocket && chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+    if (!useOnlyHTTP && usingWebSocket && chatSocket && chatSocket.readyState === WebSocket.OPEN) {
         try {
             chatSocket.send(JSON.stringify({
                 'message': content,
@@ -671,7 +738,7 @@ function sendMessage() {
         }
     }
 
-    // HTTP sorğusu ilə mesaj göndər (WebSocket uğursuz olduqda və ya hər halda)
+    // HTTP sorğusu ilə mesaj göndər
     const formData = new FormData();
     formData.append('receiver_id', currentReceiverId);
     formData.append('content', content);
@@ -695,14 +762,21 @@ function sendMessage() {
         }
         
         if (data.status === 'success') {
-            input.value = '';
+            // Müvəqqəti mesajı yenisi ilə əvəz et
+            if (chatMessages && document.getElementById(tempMessageId)) {
+                const tempMessage = document.getElementById(tempMessageId);
+                tempMessage.querySelector('.message-status').className = 'message-status read';
+                tempMessage.querySelector('.message-status').innerHTML = '<i class="fas fa-check"></i><i class="fas fa-check"></i>';
+            }
             
             // Mesajları yenilə
             loadMessages(currentReceiverId);
-            
-            // Mesaj göndərildikdən sonra mesaj sahəsini fokusla
-            input.focus();
         } else {
+            // Müvəqqəti mesajı sil
+            if (chatMessages && document.getElementById(tempMessageId)) {
+                document.getElementById(tempMessageId).remove();
+            }
+            
             if (!suppressWebSocketErrors) {
                 console.error('Mesaj göndərilə bilmədi:', data.message);
             }
@@ -714,6 +788,11 @@ function sendMessage() {
         }
     })
     .catch(error => {
+        // Müvəqqəti mesajı sil
+        if (chatMessages && document.getElementById(tempMessageId)) {
+            document.getElementById(tempMessageId).remove();
+        }
+        
         if (!suppressWebSocketErrors) {
             console.error('Mesaj göndərilərkən xəta:', error);
         }
@@ -792,23 +871,30 @@ function initAudio() {
 
 // DOM yükləndikdə chat funksiyasını başlat
 document.addEventListener('DOMContentLoaded', function() {
-    if (!suppressWebSocketErrors) {
-        console.log('DOM yükləndi, chat funksiyası başladılır...');
-    }
-    
-    // Global funksiyaları window obyektinə əlavə et
-    window.selectUser = selectUser;
-    
-    // Chat widget-i inicializasiya et
-    const chatWidget = document.getElementById('chat-widget');
-    if (chatWidget) {
+    try {
         if (!suppressWebSocketErrors) {
-            console.log('Chat widget tapıldı, inicializasiya edilir...');
+            console.log('DOM yükləndi, chat funksiyası başladılır...');
         }
-        initChat();
-    } else {
+        
+        // Global funksiyaları window obyektinə əlavə et
+        window.selectUser = selectUser;
+        
+        // Chat widget-i inicializasiya et
+        const chatWidget = document.getElementById('chat-widget');
+        if (chatWidget) {
+            if (!suppressWebSocketErrors) {
+                console.log('Chat widget tapıldı, inicializasiya edilir...');
+            }
+            initChat();
+        } else {
+            if (!suppressWebSocketErrors) {
+                console.log('Chat widget tapılmadı!');
+            }
+        }
+    } catch (error) {
+        // Xətaları gizlət
         if (!suppressWebSocketErrors) {
-            console.log('Chat widget tapılmadı!');
+            console.error('Chat inicializasiya edilərkən xəta:', error);
         }
     }
 }); 

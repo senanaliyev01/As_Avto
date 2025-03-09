@@ -577,14 +577,17 @@ function initAudio() {
 
 // DOM yükləndikdə chat funksiyasını başlat
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM yükləndi, chat funksiyası başladılır...');
+    
     // Global funksiyaları window obyektinə əlavə et
     window.selectUser = selectUser;
     
-    // Chat-i inicializasiya et
-    if (document.getElementById('chat-widget')) {
-        console.log('Chat widget tapıldı, inicializasiya edilir...'); // Debug üçün
+    // Chat widget-i inicializasiya et
+    const chatWidget = document.getElementById('chat-widget');
+    if (chatWidget) {
+        console.log('Chat widget tapıldı, inicializasiya edilir...');
         initChat();
     } else {
-        console.log('Chat widget tapılmadı!'); // Debug üçün
+        console.log('Chat widget tapılmadı!');
     }
 }); 

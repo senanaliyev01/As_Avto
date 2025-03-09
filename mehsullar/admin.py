@@ -186,7 +186,7 @@ class MehsulAdmin(admin.ModelAdmin):
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'yenidir', 'axtaris_sozleri__adi', 'axtaris_sozleri__sozler')
     inlines = [OEMKodInline]
     
-    actions = ['yenilikden_sil', 'yenidir_et']  # Yeni hərəkətləri əlavə edirik
+    actions = ['yenilikden_sil', 'yenidir_et', 'assign_axtaris_sozleri', 'assign_models']  # Yeni hərəkətləri əlavə edirik
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -205,6 +205,93 @@ class MehsulAdmin(admin.ModelAdmin):
         queryset.update(yenidir=True)
         self.message_user(request, "Seçilmiş məhsullar yenidir olaraq işarələndi.")
     yenidir_et.short_description = "Seçilmiş məhsulları yenidir et"
+    
+    def assign_axtaris_sozleri(self, request, queryset):
+        """Seçilmiş məhsullara axtarış sözləri təyin etmək üçün action"""
+        from django.shortcuts import render
+        from django import forms
+        
+        class AxtarisSozleriForm(forms.Form):
+            axtaris_sozleri = forms.ModelChoiceField(
+                queryset=AxtarisSozleri.objects.all(),
+                label="Axtarış Sözləri",
+                required=True
+            )
+        
+        # Əgər form təqdim edilibsə
+        if 'apply' in request.POST:
+            form = AxtarisSozleriForm(request.POST)
+            
+            if form.is_valid():
+                axtaris_sozleri = form.cleaned_data['axtaris_sozleri']
+                count = 0
+                
+                for mehsul in queryset:
+                    mehsul.axtaris_sozleri = axtaris_sozleri
+                    mehsul.save()
+                    count += 1
+                    
+                self.message_user(request, f"{count} məhsula '{axtaris_sozleri}' axtarış sözləri təyin edildi.")
+                return None
+        else:
+            form = AxtarisSozleriForm()
+        
+        return render(
+            request,
+            'admin/assign_axtaris_sozleri.html',
+            context={
+                'title': 'Axtarış Sözləri Təyin Et',
+                'queryset': queryset,
+                'form': form,
+                'action_checkbox_name': admin.helpers.ACTION_CHECKBOX_NAME,
+            }
+        )
+    assign_axtaris_sozleri.short_description = "Seçilmiş məhsullara axtarış sözləri təyin et"
+    
+    def assign_models(self, request, queryset):
+        """Seçilmiş məhsullara modellər təyin etmək üçün action"""
+        from django.shortcuts import render
+        from django import forms
+        
+        class ModelForm(forms.Form):
+            models = forms.ModelMultipleChoiceField(
+                queryset=Model.objects.all(),
+                label="Modellər",
+                required=True,
+                widget=forms.SelectMultiple(attrs={'size': '10', 'style': 'width: 500px; height: 300px;'})
+            )
+        
+        # Əgər form təqdim edilibsə
+        if 'apply' in request.POST:
+            form = ModelForm(request.POST)
+            
+            if form.is_valid():
+                models = form.cleaned_data['models']
+                count = 0
+                
+                for mehsul in queryset:
+                    # Əvvəlki modelləri təmizləmədən yeni modelləri əlavə edirik
+                    for model in models:
+                        mehsul.model.add(model)
+                    mehsul.save()
+                    count += 1
+                    
+                self.message_user(request, f"{count} məhsula seçilmiş modellər əlavə edildi.")
+                return None
+        else:
+            form = ModelForm()
+        
+        return render(
+            request,
+            'admin/assign_models.html',
+            context={
+                'title': 'Modellər Təyin Et',
+                'queryset': queryset,
+                'form': form,
+                'action_checkbox_name': admin.helpers.ACTION_CHECKBOX_NAME,
+            }
+        )
+    assign_models.short_description = "Seçilmiş məhsullara modellər təyin et"
 
 # Qeydiyyatları düzəltdik
 admin.site.register(SifarisMehsul, SifarisMehsulAdmin)

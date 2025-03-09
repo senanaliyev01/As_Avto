@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404,HttpResponse
 from django.contrib.auth.decorators import login_required
-from .models import Mehsul, Sebet, Kateqoriya, Brend, Marka, Sifaris, SifarisMehsul, OEMKod, SebetItem
+from .models import Mehsul, Sebet, Kateqoriya, Brend, Marka, Sifaris, SifarisMehsul, OEMKod, SebetItem, AxtarisSozleri
 from django.db.models import F, Sum, Q
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -176,11 +176,13 @@ def products_list(request):
     kateqoriyalar = Kateqoriya.objects.all()
     brendler = Brend.objects.all()
     markalar = Marka.objects.all()
+    axtaris_sozleri = AxtarisSozleri.objects.all()
 
     # Axtarış parametrlərini alırıq
     category = request.GET.get('category')
     brand = request.GET.get('brand')
     model = request.GET.get('model')
+    axtaris = request.GET.get('axtaris')
     search_text = request.GET.get('search_text')
 
     # Brend, kateqoriya və marka üçün dəqiq filtrasiya
@@ -192,6 +194,9 @@ def products_list(request):
     
     if model:
         mehsullar = mehsullar.filter(marka__adi=model)
+        
+    if axtaris:
+        mehsullar = mehsullar.filter(axtaris_sozleri__adi=axtaris)
 
     # Axtarış mətni varsa
     if search_text:
@@ -212,9 +217,9 @@ def products_list(request):
                 
             # Axtarış sözlərini normalize et (əgər varsa)
             axtaris_sozleri_combinations = []
-            for soz in mehsul.butun_axtaris_sozleri:
-                normalized_soz, soz_combinations = normalize_search_text(soz)
-                axtaris_sozleri_combinations.extend(soz_combinations)
+            if mehsul.axtaris_sozleri:
+                normalized_axtaris, axtaris_combinations = normalize_search_text(mehsul.axtaris_sozleri.sozler)
+                axtaris_sozleri_combinations.extend(axtaris_combinations)
             
             # Bütün kombinasiyaları yoxla
             found = False
@@ -250,7 +255,8 @@ def products_list(request):
         'mehsullar': mehsullar,
         'kateqoriyalar': kateqoriyalar,
         'brendler': brendler,
-        'markalar': markalar
+        'markalar': markalar,
+        'axtaris_sozleri': axtaris_sozleri
     })
 
 
@@ -480,9 +486,9 @@ def mehsul_axtaris(request):
                 
             # Axtarış sözlərini normalize et (əgər varsa)
             axtaris_sozleri_combinations = []
-            for soz in mehsul.butun_axtaris_sozleri:
-                normalized_soz, soz_combinations = normalize_search_text(soz)
-                axtaris_sozleri_combinations.extend(soz_combinations)
+            if mehsul.axtaris_sozleri:
+                normalized_axtaris, axtaris_combinations = normalize_search_text(mehsul.axtaris_sozleri.sozler)
+                axtaris_sozleri_combinations.extend(axtaris_combinations)
             
             # Bütün kombinasiyaları yoxla
             found = False
@@ -526,7 +532,8 @@ def mehsul_axtaris(request):
                 'brend_kod', 
                 'qiymet',
                 'stok',
-                'haqqinda'
+                'haqqinda',
+                'axtaris_sozleri__adi'
             ))
         })
     
@@ -725,6 +732,7 @@ def realtime_search(request):
     category = request.GET.get('category', '')
     brand = request.GET.get('brand', '')
     model = request.GET.get('model', '')
+    axtaris = request.GET.get('axtaris', '')
     
     mehsullar = Mehsul.objects.all()
     
@@ -734,6 +742,8 @@ def realtime_search(request):
         mehsullar = mehsullar.filter(brend__adi=brand)
     if model:
         mehsullar = mehsullar.filter(marka__adi=model)
+    if axtaris:
+        mehsullar = mehsullar.filter(axtaris_sozleri__adi=axtaris)
     
     if query:
         # Məhsul adı və haqqında üçün normalize edilmiş axtarış
@@ -753,9 +763,9 @@ def realtime_search(request):
                 
             # Axtarış sözlərini normalize et (əgər varsa)
             axtaris_sozleri_combinations = []
-            for soz in mehsul.butun_axtaris_sozleri:
-                normalized_soz, soz_combinations = normalize_search_text(soz)
-                axtaris_sozleri_combinations.extend(soz_combinations)
+            if mehsul.axtaris_sozleri:
+                normalized_axtaris, axtaris_combinations = normalize_search_text(mehsul.axtaris_sozleri.sozler)
+                axtaris_sozleri_combinations.extend(axtaris_combinations)
             
             # Bütün kombinasiyaları yoxla
             found = False
@@ -799,7 +809,7 @@ def realtime_search(request):
             'stok': mehsul.stok,
             'sekil_url': mehsul.sekil.url if mehsul.sekil else None,
             'haqqinda': mehsul.haqqinda if mehsul.haqqinda else None,
-            'axtaris_sozleri': mehsul.butun_axtaris_sozleri,
+            'axtaris_sozleri': mehsul.axtaris_sozleri.adi if mehsul.axtaris_sozleri else None,
         })
     
     return JsonResponse({'results': results})

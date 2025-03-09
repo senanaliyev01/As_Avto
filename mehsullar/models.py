@@ -99,33 +99,15 @@ class Model(models.Model):
         verbose_name_plural = 'Modeller'
 
 class AxtarisSozleri(models.Model):
+    adi = models.CharField(max_length=100, unique=True)
     sozler = models.TextField(help_text="Axtarış sözlərini boşluqla ayırın. Məsələn: 'sirga sirgalar'")
-    mehsul = models.ForeignKey('Mehsul', on_delete=models.CASCADE, related_name='axtaris_sozleri')
 
     def __str__(self):
-        return self.sozler
+        return self.adi
 
     class Meta:
         verbose_name = 'Axtarış Sözləri'
         verbose_name_plural = 'Axtarış Sözləri'
-
-    def save(self, *args, **kwargs):
-        # Əgər yeni yaradılırsa və ya sözlər dəyişdirilibsə
-        if self.pk is None or self._state.adding:
-            # Boşluqla ayrılmış sözləri ayırıb hər birini ayrı-ayrı yaradaq
-            sozler = self.sozler.split()
-            if sozler:
-                # İlk sözü bu obyektdə saxlayaq
-                self.sozler = sozler[0]
-                super().save(*args, **kwargs)
-                # Qalan sözlər üçün yeni AxtarisSozleri obyektləri yaradaq
-                for soz in sozler[1:]:
-                    AxtarisSozleri.objects.create(
-                        sozler=soz,
-                        mehsul=self.mehsul
-                    )
-            return
-        super().save(*args, **kwargs)
 
 class Mehsul(models.Model):
     adi = models.CharField(max_length=255)
@@ -133,6 +115,7 @@ class Mehsul(models.Model):
     brend = models.ForeignKey(Brend, on_delete=models.CASCADE)
     marka = models.ForeignKey(Marka, on_delete=models.CASCADE)
     model = models.ManyToManyField(Model,blank=True)  
+    axtaris_sozleri = models.ForeignKey(AxtarisSozleri, on_delete=models.SET_NULL, null=True, blank=True, related_name='mehsullar')
     brend_kod = models.CharField(max_length=50, unique=True)
     oem = models.CharField(max_length=100)
     stok = models.IntegerField()
@@ -160,7 +143,9 @@ class Mehsul(models.Model):
         
     @property
     def butun_axtaris_sozleri(self):
-        return [soz.sozler for soz in self.axtaris_sozleri.all()]
+        if self.axtaris_sozleri:
+            return self.axtaris_sozleri.sozler.split()
+        return []
 
     def save(self, *args, **kwargs):
         if not self.sekil:

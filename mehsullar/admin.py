@@ -56,10 +56,11 @@ class OEMKodInline(admin.TabularInline):
             attrs={'rows': 5, 'style': 'width: 100%; font-family: monospace;'})},
     }
 
-# AxtarisSozleri inline klassını əlavə edirik
-class AxtarisSozleriInline(admin.TabularInline):
-    model = AxtarisSozleri
-    extra = 0
+# AxtarisSozleri admin paneli
+@admin.register(AxtarisSozleri)
+class AxtarisSozleriAdmin(admin.ModelAdmin):
+    list_display = ('adi', 'sozler')
+    search_fields = ('adi', 'sozler')
     formfield_overrides = {
         models.TextField: {'widget': admin.widgets.AdminTextareaWidget(
             attrs={'rows': 5, 'style': 'width: 100%; font-family: monospace;'})},
@@ -180,10 +181,10 @@ admin.site.register(Motor)
 admin.site.register(Il)
 admin.site.register(Yanacaq)
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ('adi', 'kateqoriya', 'brend', 'marka',  'qiymet', 'brend_kod', 'oem', 'stok', 'yenidir')
-    list_filter = ('kateqoriya', 'brend', 'marka')
-    search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'yenidir')
-    inlines = [OEMKodInline, AxtarisSozleriInline]
+    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'axtaris_sozleri', 'qiymet', 'brend_kod', 'oem', 'stok', 'yenidir')
+    list_filter = ('kateqoriya', 'brend', 'marka', 'axtaris_sozleri')
+    search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'yenidir', 'axtaris_sozleri__adi', 'axtaris_sozleri__sozler')
+    inlines = [OEMKodInline]
     
     actions = ['yenilikden_sil', 'yenidir_et']  # Yeni hərəkətləri əlavə edirik
 

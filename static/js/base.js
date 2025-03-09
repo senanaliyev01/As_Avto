@@ -1166,6 +1166,7 @@
         
         try {
             // WebSocket bağlantısını yarat
+            // Əgər WebSocket bağlantısı uğursuz olursa, HTTP sorğularından istifadə et
             const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             const wsUrl = `${wsProtocol}//${window.location.host}/ws/chat/`;
             
@@ -1176,57 +1177,57 @@
                 chatSocket.close();
             }
             
-            chatSocket = new WebSocket(wsUrl);
-            
-            chatSocket.onopen = function(e) {
-                console.log('WebSocket bağlantısı açıldı');
-            };
-            
-            chatSocket.onmessage = function(e) {
-                try {
-                    const data = JSON.parse(e.data);
-                    console.log('WebSocket mesajı alındı:', data);
-                    
-                    if (data.message) {
-                        // Əgər hazırda həmin istifadəçi ilə söhbət edirsinizsə, mesajı göstər
-                        if (currentReceiverId && (data.message.sender === currentReceiverName || data.message.is_mine)) {
-                            appendMessage(data.message);
-                            
-                            // Əgər mesaj bizim deyilsə, səs çal
-                            if (!data.message.is_mine) {
-                                playChatMessageSound();
-                            }
-                        } else {
-                            // Əks halda bildiriş səsini çal
-                            playNewMessageSound();
-                            
-                            // İstifadəçi siyahısını yenilə
-                            loadChatUsers();
-                        }
-                    }
-                } catch (error) {
-                    console.error('WebSocket mesajı işlənərkən xəta:', error);
-                }
-            };
-            
-            chatSocket.onclose = function(e) {
-                console.log('WebSocket bağlantısı bağlandı', e.code, e.reason);
+            try {
+                chatSocket = new WebSocket(wsUrl);
                 
-                // Əgər bağlantı normal bağlanmayıbsa, yenidən qoşulmağa çalış
-                if (e.code !== 1000) {
-                    console.log('WebSocket bağlantısı qırıldı, yenidən qoşulmağa çalışılır...');
-                    // 5 saniyə sonra yenidən bağlanmağa çalış
-                    setTimeout(connectWebSocket, 5000);
-                }
-            };
-            
-            chatSocket.onerror = function(e) {
-                console.error('WebSocket xətası:', e);
-            };
+                chatSocket.onopen = function(e) {
+                    console.log('WebSocket bağlantısı açıldı');
+                };
+                
+                chatSocket.onmessage = function(e) {
+                    try {
+                        const data = JSON.parse(e.data);
+                        console.log('WebSocket mesajı alındı:', data);
+                        
+                        if (data.message) {
+                            // Əgər hazırda həmin istifadəçi ilə söhbət edirsinizsə, mesajı göstər
+                            if (currentReceiverId && (data.message.sender === currentReceiverName || data.message.is_mine)) {
+                                appendMessage(data.message);
+                                
+                                // Əgər mesaj bizim deyilsə, səs çal
+                                if (!data.message.is_mine) {
+                                    playChatMessageSound();
+                                }
+                            } else {
+                                // Əks halda bildiriş səsini çal
+                                playNewMessageSound();
+                                
+                                // İstifadəçi siyahısını yenilə
+                                loadChatUsers();
+                            }
+                        }
+                    } catch (error) {
+                        console.error('WebSocket mesajı işlənərkən xəta:', error);
+                    }
+                };
+                
+                chatSocket.onclose = function(e) {
+                    console.log('WebSocket bağlantısı bağlandı', e.code, e.reason);
+                    
+                    // WebSocket bağlantısı uğursuz olduqda HTTP sorğularından istifadə et
+                    console.log('WebSocket bağlantısı uğursuz oldu, HTTP sorğularından istifadə ediləcək');
+                };
+                
+                chatSocket.onerror = function(e) {
+                    console.error('WebSocket xətası:', e);
+                    console.log('WebSocket bağlantısı uğursuz oldu, HTTP sorğularından istifadə ediləcək');
+                };
+            } catch (error) {
+                console.error('WebSocket bağlantısı yaradılarkən xəta:', error);
+                console.log('WebSocket bağlantısı uğursuz oldu, HTTP sorğularından istifadə ediləcək');
+            }
         } catch (error) {
             console.error('WebSocket bağlantısı yaradılarkən xəta:', error);
-            // 5 saniyə sonra yenidən bağlanmağa çalış
-            setTimeout(connectWebSocket, 5000);
         }
     }
 
@@ -1461,16 +1462,23 @@
 
         console.log(`Mesaj göndərilir: ${content} (Alıcı ID: ${currentReceiverId})`); // Debug üçün
 
-        // WebSocket ilə mesaj göndər
+        // WebSocket ilə mesaj göndərməyə çalış
+        let websocketSent = false;
         if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
-            chatSocket.send(JSON.stringify({
-                'message': content,
-                'sender': currentUserId,
-                'receiver': currentReceiverId
-            }));
+            try {
+                chatSocket.send(JSON.stringify({
+                    'message': content,
+                    'sender': currentUserId,
+                    'receiver': currentReceiverId
+                }));
+                websocketSent = true;
+                console.log('Mesaj WebSocket ilə göndərildi');
+            } catch (error) {
+                console.error('WebSocket ilə mesaj göndərilərkən xəta:', error);
+            }
         }
 
-        // Eyni zamanda API ilə də göndər (verilənlər bazasına yazmaq üçün)
+        // HTTP sorğusu ilə mesaj göndər (WebSocket uğursuz olduqda və ya hər halda)
         const formData = new FormData();
         formData.append('receiver_id', currentReceiverId);
         formData.append('content', content);
@@ -1493,7 +1501,11 @@
             
             if (data.status === 'success') {
                 input.value = '';
-                loadMessages(currentReceiverId);
+                
+                // Əgər WebSocket ilə göndərilməyibsə, mesajları yenilə
+                if (!websocketSent) {
+                    loadMessages(currentReceiverId);
+                }
             } else {
                 console.error('Mesaj göndərilə bilmədi:', data.message);
             }

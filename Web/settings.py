@@ -79,10 +79,12 @@ USE_X_FORWARDED_PORT = True
 SECURE_SSL_HOST = 'as-avto.com'  # SSL sertifikatının domain adı
 
 # CORS Tənzimləmələri
-CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
     'https://as-avto.com',
     'https://www.as-avto.com',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
 ]
 CORS_ALLOW_METHODS = [
     'GET',

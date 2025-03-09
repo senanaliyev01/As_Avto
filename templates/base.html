@@ -8,12 +8,19 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="icon" type="image/png" sizes="128x128" href="{% static 'img/favicon.png' %}">
-    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
 
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    {% if user.is_authenticated %}
+    <script>
+        const currentUserId = {{ user.id }};
+        const isAdmin = {% if user.is_staff %}true{% else %}false{% endif %};
+    </script>
+    {% endif %}
+    
     <!-- Header r-->
     <header>
         <div class="top-header">
@@ -81,9 +88,9 @@
                             <i class="fas fa-chart-bar"></i> Hesabatlar
                         </a>
                         <div class="dropdown-divider"></div>
-                        {% comment %} <a href="{% url 'logout_view' %}" onclick="confirmLogout(event); return false;" class="logout-link">
+                        <a href="{% url 'logout_view' %}" onclick="confirmLogout(event); return false;" class="logout-link">
                             <i class="fas fa-sign-out-alt"></i> Çıxış
-                        </a> {% endcomment %}
+                        </a>
                     </div>
                 </div>
                 <a href="{% url 'view_cart' %}" class="cart-link">
@@ -130,9 +137,59 @@
         </div>
     </footer>
 
+    {% if user.is_authenticated %}
+    <!-- Bildiriş səsləri -->
+    <audio id="new-message-sound" preload="auto">
+        <source src="{% static 'audio/notification.mp3' %}" type="audio/mpeg">
+    </audio>
+    <audio id="chat-message-sound" preload="auto">
+        <source src="{% static 'audio/chat-message.mp3' %}" type="audio/mpeg">
+    </audio>
+
+    <!-- Chat widget -->
+    <div id="chat-widget" class="chat-widget">
+        <div id="chat-icon" class="chat-icon">
+            <i class="fas fa-comments"></i>
+            <span id="total-unread" class="unread-count" style="display: none;">0</span>
+        </div>
+        
+        <div id="chat-window" class="chat-window" style="display: none;">
+            <div class="chat-header">
+                <div class="chat-title">Mesajlar</div>
+                <button id="close-chat" class="close-button">&times;</button>
+            </div>
+            
+            <div class="chat-container">
+                <!-- İstifadəçilər siyahısı -->
+                <div class="chat-sidebar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="user-search" placeholder="İstifadəçi axtar...">
+                    </div>
+                    <div id="users-list" class="users-list"></div>
+                </div>
+                
+                <!-- Mesajlaşma bölməsi -->
+                <div class="chat-main" style="display: none;">
+                    <div class="selected-user">
+                        <i class="fas fa-arrow-left" id="back-to-users"></i>
+                        <span id="selected-username"></span>
+                    </div>
+                    <div class="chat-messages" id="chat-messages"></div>
+                    <div class="chat-input">
+                        <input type="text" id="message-input" placeholder="Mesajınızı yazın...">
+                        <button id="send-message" type="button">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Common Scripts -->
-
-
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="{% static 'js/loading.js' %}"></script>
     <script src="{% static 'js/base.js' %}"></script>
     {% block extra_js %}{% endblock %}

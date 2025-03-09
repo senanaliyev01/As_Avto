@@ -292,3 +292,113 @@ def register(request):
 
     return render(request, 'register.html')
 
+
+
+@login_required
+def get_messages(request, receiver_id):
+    try:
+        receiver = User.objects.get(id=receiver_id)
+        messages = Message.objects.filter(
+            Q(sender=request.user, receiver=receiver) |
+            Q(sender=receiver, receiver=request.user)
+        ).order_by('created_at')
+        
+        # Oxunmamış mesajları oxunmuş et
+        messages.filter(receiver=request.user, is_read=False).update(is_read=True)
+        
+        return JsonResponse([{
+            'id': msg.id,
+            'content': msg.content,
+            'sender': msg.sender.username,
+            'is_mine': msg.sender == request.user,
+            'is_read': msg.is_read,
+            'is_delivered': msg.is_delivered
+        } for msg in messages], safe=False)
+        
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'İstifadəçi tapılmadı'}, status=404)
+
+@login_required
+@csrf_exempt
+def send_message(request):
+    if request.method == 'POST':
+        receiver_id = request.POST.get('receiver_id')
+        content = request.POST.get('content')
+        
+        if not content:
+            return JsonResponse({'status': 'error', 'message': 'Mesaj boş ola bilməz'})
+            
+        try:
+            receiver = User.objects.get(id=receiver_id)
+            message = Message.objects.create(
+                sender=request.user,
+                receiver=receiver,
+                content=content,
+                is_delivered=True  # Avtomatik çatdırıldı kimi qeyd et
+            )
+            
+            return JsonResponse({
+                'status': 'success',
+                'message': {
+                    'id': message.id,
+                    'content': message.content,
+                    'sender': message.sender.username,
+                    'is_mine': True,
+                    'is_delivered': True,
+                    'is_read': False
+                }
+            })
+            
+        except User.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'İstifadəçi tapılmadı'})
+            
+    return JsonResponse({'status': 'error', 'message': 'Yanlış sorğu metodu'})
+
+@login_required
+def get_chat_users(request):
+    print("get_chat_users called") # Debug üçün
+    
+    # Admin və normal istifadəçiləri əldə et
+    admin_users = User.objects.filter(is_staff=True).exclude(id=request.user.id)
+    normal_users = User.objects.filter(is_staff=False).exclude(id=request.user.id)
+    
+    print(f"Found {admin_users.count()} admins and {normal_users.count()} users") # Debug üçün
+    
+    # Admin və normal istifadəçilər üçün məlumatları hazırla
+    admins = []
+    users = []
+    
+    for user in admin_users:
+        unread_count = Message.objects.filter(
+            sender=user,
+            receiver=request.user,
+            is_read=False
+        ).count()
+        
+        admins.append({
+            'id': user.id,
+            'username': user.username,
+            'unread_count': unread_count,
+            'is_admin': True
+        })
+    
+    for user in normal_users:
+        unread_count = Message.objects.filter(
+            sender=user,
+            receiver=request.user,
+            is_read=False
+        ).count()
+        
+        users.append({
+            'id': user.id,
+            'username': user.username,
+            'unread_count': unread_count,
+            'is_admin': False
+        })
+    
+    response_data = {
+        'admins': admins,
+        'users': users
+    }
+    print("Sending response:", response_data) # Debug üçün
+    return JsonResponse(response_data)

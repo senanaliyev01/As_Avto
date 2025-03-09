@@ -337,7 +337,7 @@
     }
 
     // DOM yükləndikdə
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', function() {
         try {
             // Saatı başlat
             updateCurrentTime();
@@ -349,59 +349,6 @@
 
             // Səbət sayını yenilə
             updateCartCount();
-
-            // Səbətə məhsul əlavə etmək
-            const cartLinks = document.querySelectorAll('.cart-icon');
-
-            cartLinks.forEach(link => {
-                link.addEventListener('click', function (event) {
-                    event.preventDefault();
-
-                    const originalContent = this.innerHTML;
-                    const url = this.getAttribute('href');
-
-                    // Loading effektini göstər
-                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                    this.style.pointerEvents = 'none';
-                    this.style.opacity = '0.7';
-
-                    // 2 saniyə loading göstər
-                    setTimeout(() => {
-                        fetch(url)
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error('Network response was not ok');
-                                }
-                                return response.json();
-                            })
-                            .then(data => {
-                                // Original ikonu bərpa et
-                                this.innerHTML = originalContent;
-                                this.style.pointerEvents = 'auto';
-                                this.style.opacity = '1';
-
-                                if (data.success) {
-                                    showAnimatedMessage(
-                                        "Məhsul səbətə əlavə olundu!", 
-                                        false, 
-                                        data.mehsul
-                                    );
-                                    updateCartCount();
-                                } else {
-                                    showAnimatedMessage(
-                                        data.error || "Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.", 
-                                        true
-                                    );
-                                }
-                            })
-                            .catch(error => {
-                                this.innerHTML = originalContent;
-                                this.style.pointerEvents = 'auto';
-                                this.style.opacity = '1';
-                            });
-                    }, 2000);
-                });
-            });
 
             // Swiper-ləri inicializasiya et
             if (document.querySelector('.brandsSwiper')) {
@@ -417,9 +364,17 @@
                 });
             }
 
-            // İlkin statistikaları yüklə1
-            updateStatistics();
-            setInterval(updateStatistics, 3600000); // 1 saatdan bir yenilə
+            // İlkin statistikaları yüklə
+            if (document.querySelector('.statistics-card')) {
+                updateStatistics();
+                setInterval(updateStatistics, 3600000); // 1 saatdan bir yenilə
+            }
+
+            // Chat-i inicializasiya et
+            if (document.getElementById('chat-widget')) {
+                console.log('DOM loaded, initializing chat...'); // Debug üçün
+                initChat();
+            }
 
             // Rəy formu
             const reviewForm = document.querySelector('.review-form form');
@@ -429,13 +384,13 @@
                     
                     const rating = reviewForm.querySelector('input[name="qiymetlendirme"]:checked');
                     if (!rating) {
-                        showAnimatedMessage('Zəhmət olmasa, qiymətləndirmə üçün ulduz seçin', true);
+                        showReviewNotification('error', 'Zəhmət olmasa, qiymətləndirmə üçün ulduz seçin');
                         return;
                     }
 
                     const review = reviewForm.querySelector('textarea[name="rey"]').value.trim();
                     if (!review) {
-                        showAnimatedMessage('Zəhmət olmasa, rəyinizi yazın', true);
+                        showReviewNotification('error', 'Zəhmət olmasa, rəyinizi yazın');
                         return;
                     }
 
@@ -451,19 +406,107 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            showAnimatedMessage('Rəyiniz uğurla göndərildi. Təsdiqlənməsi gözlənilir', false);
+                            showReviewNotification('success', 'Rəyiniz uğurla göndərildi. Təsdiqlənməsi gözlənilir');
                             reviewForm.reset();
                             setTimeout(() => {
                                 window.location.reload();
                             }, 3000);
                         } else {
-                            showAnimatedMessage(data.message || 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin', true);
+                            showReviewNotification('error', data.message || 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin');
                         }
                     })
                     .catch(error => {
                         console.error('Xəta:', error);
-                        showAnimatedMessage('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin', true);
+                        showReviewNotification('error', 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin');
                     });
+                });
+            }
+
+            // Çıxış funksiyası
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.logout-link')) {
+                    confirmLogout(e);
+                }
+            });
+
+            // Səbətə məhsul əlavə etmək
+            const cartLinks = document.querySelectorAll('.cart-icon');
+            if (cartLinks.length > 0) {
+                cartLinks.forEach(link => {
+                    link.addEventListener('click', function (event) {
+                        event.preventDefault();
+
+                        const originalContent = this.innerHTML;
+                        const url = this.getAttribute('href');
+
+                        // Loading effektini göstər
+                        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                        this.style.pointerEvents = 'none';
+                        this.style.opacity = '0.7';
+
+                        // 2 saniyə loading göstər
+                        setTimeout(() => {
+                            fetch(url)
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error('Network response was not ok');
+                                    }
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    // Original ikonu bərpa et
+                                    this.innerHTML = originalContent;
+                                    this.style.pointerEvents = 'auto';
+                                    this.style.opacity = '1';
+
+                                    if (data.success) {
+                                        showAnimatedMessage(
+                                            "Məhsul səbətə əlavə olundu!", 
+                                            false, 
+                                            data.mehsul
+                                        );
+                                        updateCartCount();
+                                    } else {
+                                        showAnimatedMessage(
+                                            data.error || "Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.", 
+                                            true
+                                        );
+                                    }
+                                })
+                                .catch(error => {
+                                    this.innerHTML = originalContent;
+                                    this.style.pointerEvents = 'auto';
+                                    this.style.opacity = '1';
+                                });
+                        }, 2000);
+                    });
+                });
+            }
+
+            // Axtarış formu
+            const searchForm = document.getElementById('search-form');
+            if (searchForm) {
+                searchForm.addEventListener('submit', function(event) {
+                    event.preventDefault(); // Formun dərhal göndərilməsini dayandır
+                
+                    let searchButton = document.getElementById('search-button');
+                    let spinner = document.getElementById('loading-spinner');
+                
+                    // Butonun ölçüsünü qorumaq üçün enini və hündürlüyünü sabit saxla
+                    searchButton.style.width = `${searchButton.offsetWidth}px`;
+                    searchButton.style.height = `${searchButton.offsetHeight}px`;
+                    
+                    // Axtarış yazısını gizlət, amma spinneri saxla
+                    searchButton.childNodes[0].nodeValue = ''; // Axtar sözünü sil
+                    spinner.style.display = 'inline-block'; // Spinneri göstər
+                
+                    // Butonu deaktiv et ki, yenidən klik olunmasın
+                    searchButton.disabled = true; 
+                
+                    // 2 saniyə sonra formu göndər
+                    setTimeout(() => {
+                        this.submit(); // Formu göndər
+                    }, 2000);
                 });
             }
 
@@ -471,33 +514,6 @@
             console.error('Funksiya xətası:', error);
         }
     });
-
-
-   
-    
-    document.getElementById('search-form').addEventListener('submit', function(event) {
-        event.preventDefault(); // Formun dərhal göndərilməsini dayandır
-    
-        let searchButton = document.getElementById('search-button');
-        let spinner = document.getElementById('loading-spinner');
-    
-        // Butonun ölçüsünü qorumaq üçün enini və hündürlüyünü sabit saxla
-        searchButton.style.width = `${searchButton.offsetWidth}px`;
-        searchButton.style.height = `${searchButton.offsetHeight}px`;
-        
-        // Axtarış yazısını gizlət, amma spinneri saxla
-        searchButton.childNodes[0].nodeValue = ''; // Axtar sözünü sil
-        spinner.style.display = 'inline-block'; // Spinneri göstər
-    
-        // Butonu deaktiv et ki, yenidən klik olunmasın
-        searchButton.disabled = true; 
-    
-        // 2 saniyə sonra formu göndər
-        setTimeout(() => {
-            this.submit(); // Formu göndər
-        }, 2000);
-    });
-    
 
     function confirmLogout(event) {
         event.preventDefault();  // Default davranışı dayandırır
@@ -1023,4 +1039,601 @@
         }
     }
 
-    // ... existing code ...
+    // Chat funksionallığı
+    let currentReceiverId = null;
+    let currentReceiverName = null;
+    let lastMessageCount = 0;
+    let lastMessageId = 0;
+
+    // Yeni mesaj bildirişi səsi
+    function playNewMessageSound() {
+        const audio = document.getElementById('new-message-sound');
+        if (audio) {
+            audio.currentTime = 0;
+            audio.play().catch(error => {
+                console.log('Səs oxutma xətası:', error);
+            });
+        }
+    }
+
+    // Chat mesajı bildirişi səsi
+    function playChatMessageSound() {
+        const audio = document.getElementById('chat-message-sound');
+        if (audio) {
+            audio.currentTime = 0;
+            audio.play().catch(error => {
+                console.log('Səs oxutma xətası:', error);
+            });
+        }
+    }
+
+    function initChat() {
+        const chatIcon = document.getElementById('chat-icon');
+        const chatWindow = document.getElementById('chat-window');
+        const closeChat = document.getElementById('close-chat');
+        const backButton = document.getElementById('back-to-users');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-message');
+        const chatMain = document.querySelector('.chat-main');
+        const chatSidebar = document.querySelector('.chat-sidebar');
+
+        if (!chatIcon || !chatWindow) return;
+
+        // Chat ikonuna klik
+        chatIcon.addEventListener('click', () => {
+            chatWindow.style.display = chatWindow.style.display === 'none' ? 'flex' : 'none';
+            if (chatWindow.style.display === 'flex') {
+                loadChatUsers();
+                chatMain.style.display = 'none';
+                chatSidebar.style.display = 'block';
+            }
+        });
+
+        // Chat pəncərəsini bağla
+        closeChat.addEventListener('click', () => {
+            chatWindow.style.display = 'none';
+        });
+
+        // İstifadəçilər siyahısına qayıt
+        backButton.addEventListener('click', () => {
+            chatMain.style.display = 'none';
+            chatSidebar.style.display = 'block';
+            currentReceiverId = null;
+            currentReceiverName = null;
+        });
+
+        // Mesaj göndər
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // İstifadəçiləri və mesajları yenilə
+        setInterval(loadChatUsers, 3000);
+        setInterval(() => {
+            if (currentReceiverId) {
+                loadMessages(currentReceiverId);
+            }
+        }, 1000);
+
+        // Axtarış funksiyasını əlavə et
+        const searchInput = document.getElementById('user-search');
+        if (searchInput) {
+            searchInput.addEventListener('input', filterUsers);
+        }
+    }
+
+    // Chat istifadəçilərini yükləmə funksiyası
+    function loadChatUsers() {
+        fetch('/istifadeciler/api/chat/users/')
+            .then(response => response.json())
+            .then(data => {
+                const usersList = document.getElementById('users-list');
+                let totalUnread = 0;
+                
+                usersList.innerHTML = '';
+                
+                // Adminləri və istifadəçiləri əlavə et
+                if (data.admins && data.admins.length > 0) {
+                    usersList.innerHTML += '<div class="user-group-title">Adminlər</div>';
+                    data.admins.forEach(user => {
+                        totalUnread += user.unread_count;
+                        usersList.innerHTML += createUserItem(user);
+                    });
+                }
+                
+                if (data.users && data.users.length > 0) {
+                    usersList.innerHTML += '<div class="user-group-title">İstifadəçilər</div>';
+                    data.users.forEach(user => {
+                        totalUnread += user.unread_count;
+                        usersList.innerHTML += createUserItem(user);
+                    });
+                }
+
+                // Yeni mesaj varsa bildiriş səsini çal
+                if (totalUnread > lastMessageCount) {
+                    playNewMessageSound();
+                }
+
+                lastMessageCount = totalUnread;
+                updateUnreadCount(totalUnread);
+            });
+    }
+
+    function createUserItem(user) {
+        return `
+            <div class="user-item ${user.unread_count > 0 ? 'has-unread' : ''}" 
+                 onclick="selectUser(${user.id}, '${user.username}')">
+                <div class="user-info">
+                    <i class="fas ${user.is_admin ? 'fa-user-shield admin-icon' : 'fa-user'}"></i>
+                    <span>${user.username}</span>
+                </div>
+                ${user.unread_count > 0 ? 
+                    `<span class="unread-count">${user.unread_count}</span>` : 
+                    ''}
+            </div>
+        `;
+    }
+
+    function updateUnreadCount(totalUnread) {
+        const totalUnreadElement = document.getElementById('total-unread');
+        const chatIcon = document.getElementById('chat-icon');
+        
+        if (totalUnread > 0) {
+            totalUnreadElement.textContent = totalUnread;
+            totalUnreadElement.style.display = 'block';
+            chatIcon.classList.add('has-notification');
+        } else {
+            totalUnreadElement.style.display = 'none';
+            chatIcon.classList.remove('has-notification');
+        }
+    }
+
+    function selectUser(userId, username) {
+        currentReceiverId = userId;
+        currentReceiverName = username;
+        
+        const chatMain = document.querySelector('.chat-main');
+        const chatSidebar = document.querySelector('.chat-sidebar');
+        const selectedUsername = document.getElementById('selected-username');
+        
+        chatSidebar.style.display = 'none';
+        chatMain.style.display = 'flex';
+        selectedUsername.textContent = username;
+        
+        loadMessages(userId);
+    }
+
+    // Mesaj yükləmə funksiyası
+    function loadMessages(receiverId) {
+        fetch(`/istifadeciler/api/chat/messages/${receiverId}/`)
+            .then(response => response.json())
+            .then(messages => {
+                const chatMessages = document.getElementById('chat-messages');
+                
+                // Son mesajın ID-sini al
+                const lastMessage = messages[messages.length - 1];
+                
+                // HTML-i yenilə
+                chatMessages.innerHTML = messages.map(msg => `
+                    <div class="message ${msg.is_mine ? 'mine' : 'theirs'}">
+                        ${!msg.is_mine ? `<div class="message-sender">${msg.sender}</div>` : ''}
+                        <div class="message-content">${msg.content}</div>
+                        ${msg.is_mine ? `
+                            <div class="message-status ${getMessageStatus(msg)}">
+                                ${getStatusIcons(msg)}
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+
+                // Yeni mesaj gəlibsə və bu mesaj bizim deyilsə səs çal
+                if (lastMessage && lastMessage.id > lastMessageId && !lastMessage.is_mine) {
+                    playChatMessageSound();
+                }
+
+                // Son mesaj ID-sini yadda saxla
+                if (lastMessage) {
+                    lastMessageId = lastMessage.id;
+                }
+                
+                // Mesajları aşağı sürüşdür
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            });
+    }
+
+    // Mesaj statusunu müəyyən et
+    function getMessageStatus(msg) {
+        if (msg.is_read) return 'read';
+        if (msg.is_delivered) return 'delivered';
+        return 'sent';
+    }
+
+    // Status ikonlarını qaytarır
+    function getStatusIcons(msg) {
+        if (msg.is_read) {
+            return '<i class="fas fa-check"></i><i class="fas fa-check"></i>';
+        } else if (msg.is_delivered) {
+            return '<i class="fas fa-check"></i><i class="fas fa-check"></i>';
+        } else {
+            return '<i class="fas fa-check"></i>';
+        }
+    }
+
+    function sendMessage() {
+        const input = document.getElementById('message-input');
+        const content = input.value.trim();
+        
+        if (!content || !currentReceiverId) return;
+
+        const formData = new FormData();
+        formData.append('receiver_id', currentReceiverId);
+        formData.append('content', content);
+
+        fetch('/istifadeciler/api/chat/send/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                input.value = '';
+                loadMessages(currentReceiverId);
+            }
+        })
+        .catch(error => console.error('Error sending message:', error));
+    }
+
+    function filterUsers() {
+        const searchTerm = document.getElementById('user-search').value.toLowerCase();
+        const userItems = document.querySelectorAll('.user-item');
+        const userGroupTitles = document.querySelectorAll('.user-group-title');
+        
+        // Əgər axtarış boşdursa hər şeyi göstər
+        if (!searchTerm) {
+            userGroupTitles.forEach(title => {
+                title.style.display = 'block';
+            });
+            userItems.forEach(item => {
+                item.style.display = 'flex';
+            });
+            return;
+        }
+
+        // Əvvəlcə bütün başlıqları və istifadəçiləri gizlət
+        userGroupTitles.forEach(title => {
+            title.style.display = 'none';
+        });
+        userItems.forEach(item => {
+            item.style.display = 'none';
+        });
+
+        // Axtarış sözünə uyğun istifadəçiləri göstər
+        let adminFound = false;
+        let userFound = false;
+
+        userItems.forEach(item => {
+            const username = item.querySelector('.user-info span').textContent.toLowerCase();
+            if (username.includes(searchTerm)) {
+                item.style.display = 'flex';
+                // İstifadəçinin admin olub-olmadığını yoxla
+                const isAdmin = item.querySelector('.admin-icon') !== null;
+                if (isAdmin) {
+                    adminFound = true;
+                    document.querySelector('.user-group-title:first-of-type').style.display = 'block';
+                } else {
+                    userFound = true;
+                    document.querySelector('.user-group-title:last-of-type').style.display = 'block';
+                }
+            }
+        });
+    }
+
+    // Səhifə yükləndikdə istifadəçi qarşılıqlı əlaqəsini gözlə
+    document.addEventListener('click', function initAudioOnUserInteraction() {
+        initAudio();
+        document.removeEventListener('click', initAudioOnUserInteraction);
+    }, { once: true });
+
+    // Audio elementlərini inicializasiya et
+    function initAudio() {
+        const newMessageSound = document.getElementById('new-message-sound');
+        const chatMessageSound = document.getElementById('chat-message-sound');
+        
+        if (newMessageSound) {
+            newMessageSound.load();
+        }
+        
+        if (chatMessageSound) {
+            chatMessageSound.load();
+        }
+    }
+
+    // CSS stilləri əlavə et
+    const chatStyles = document.createElement('style');
+    chatStyles.textContent = `
+        /* Chat Widget Stilləri */
+        .chat-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .chat-icon {
+            width: 60px;
+            height: 60px;
+            background-color: #003366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .chat-icon i {
+            color: white;
+            font-size: 24px;
+        }
+
+        .chat-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .chat-icon.has-notification {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 51, 102, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 51, 102, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 51, 102, 0); }
+        }
+
+        .unread-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #ff5252;
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .chat-window {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .chat-header {
+            background-color: #003366;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-title {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .close-button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .chat-sidebar {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #eee;
+        }
+
+        .search-box {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-box i {
+            color: #999;
+            margin-right: 10px;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            width: 100%;
+            padding: 5px;
+        }
+
+        .users-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .user-group-title {
+            padding: 10px;
+            background-color: #f5f5f5;
+            font-weight: bold;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .user-item {
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+        }
+
+        .user-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .user-item.has-unread {
+            background-color: rgba(0, 51, 102, 0.05);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-info i {
+            margin-right: 10px;
+            color: #003366;
+        }
+
+        .admin-icon {
+            color: #ff9800 !important;
+        }
+
+        .chat-main {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .selected-user {
+            padding: 12px 15px;
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        .selected-user i {
+            margin-right: 15px;
+            cursor: pointer;
+            color: #003366;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            max-width: 80%;
+            position: relative;
+        }
+
+        .message.mine {
+            margin-left: auto;
+            background-color: #e1f5fe;
+            border-radius: 15px 15px 0 15px;
+            padding: 10px 15px;
+        }
+
+        .message.theirs {
+            margin-right: auto;
+            background-color: white;
+            border-radius: 15px 15px 15px 0;
+            padding: 10px 15px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-sender {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .message-content {
+            word-break: break-word;
+        }
+
+        .message-status {
+            font-size: 10px;
+            color: #999;
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        .message-status.read {
+            color: #4caf50;
+        }
+
+        .chat-input {
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            border-top: 1px solid #eee;
+        }
+
+        .chat-input input {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 8px 15px;
+            outline: none;
+        }
+
+        .chat-input button {
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            margin-left: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .chat-input button:hover {
+            background-color: #002244;
+        }
+    `;
+
+    document.head.appendChild(chatStyles);
+
+    // Global funksiyaları window obyektinə əlavə et
+    window.selectUser = selectUser;
+    window.confirmLogout = confirmLogout;

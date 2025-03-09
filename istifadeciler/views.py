@@ -4,7 +4,7 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from .forms import UserUpdateForm, ProfileUpdateForm
-from .models import Profile, ChatMessage
+from .models import Profile, Message
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
 from django.db.models import Q
@@ -14,8 +14,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 import re
 from esasevim.views import esasevim
-from django.utils import timezone
-from django.db import models
+import json
 
 def login_view(request):
     # Əgər istifadəçi artıq daxil olubsa
@@ -295,74 +294,61 @@ def register(request):
     return render(request, 'register.html')
 
 @login_required
+def chat_box(request):
+    users = User.objects.filter(is_active=True).exclude(id=request.user.id)
+    return render(request, 'chat/chat_box.html', {'users': users})
+
+@login_required
+def get_messages(request, user_id):
+    other_user = User.objects.get(id=user_id)
+    messages = Message.objects.filter(
+        Q(sender=request.user, receiver=other_user) |
+        Q(sender=other_user, receiver=request.user)
+    ).order_by('timestamp')
+    
+    # Mesajları oxunmuş olaraq işarələ
+    unread_messages = messages.filter(receiver=request.user, is_read=False)
+    unread_messages.update(is_read=True)
+    
+    message_list = []
+    for message in messages:
+        message_list.append({
+            'id': message.id,
+            'content': message.content,
+            'sender': message.sender.username,
+            'timestamp': message.timestamp.strftime('%H:%M'),
+            'is_mine': message.sender == request.user
+        })
+    
+    return JsonResponse({'messages': message_list})
+
+@login_required
 def send_message(request):
     if request.method == 'POST':
-        message = request.POST.get('message')
-        if message:
-            chat_message = ChatMessage.objects.create(
-                user=request.user,
-                message=message
-            )
-            
-            return JsonResponse({
-                'status': 'success',
-                'message': message,
-                'timestamp': chat_message.created_at.strftime('%H:%M'),
-                'username': request.user.username,
-                'is_admin': request.user.is_staff,
-                'is_own': True
-            })
-    return JsonResponse({'status': 'error'})
+        data = json.loads(request.body)
+        receiver = User.objects.get(id=data['receiver_id'])
+        content = data['content']
+        
+        message = Message.objects.create(
+            sender=request.user,
+            receiver=receiver,
+            content=content
+        )
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': {
+                'id': message.id,
+                'content': message.content,
+                'sender': message.sender.username,
+                'timestamp': message.timestamp.strftime('%H:%M'),
+                'is_mine': True
+            }
+        })
+    return JsonResponse({'status': 'error'}, status=400)
 
 @login_required
-def get_chat_users(request):
-    if not request.user.is_staff:
-        return JsonResponse({'status': 'error', 'message': 'İcazə yoxdur'})
-    
-    users = User.objects.exclude(id=request.user.id).select_related('profile')
-    
-    return JsonResponse({
-        'users': [{
-            'id': user.id,
-            'username': user.username,
-            'full_name': f"{user.profile.ad or ''} {user.profile.soyad or ''}".strip(),
-            'is_online': user.is_authenticated,
-            'is_staff': user.is_staff,
-            'avatar': user.profile.sekil.url if user.profile.sekil else None
-        } for user in users]
-    })
-
-@login_required
-def get_messages(request):
-    user_id = request.GET.get('user_id')
-    
-    if request.user.is_staff and user_id:
-        # Admin seçilmiş istifadəçi ilə yazışmanı görür
-        messages = ChatMessage.objects.filter(
-            models.Q(user_id=user_id) | 
-            models.Q(user=request.user)
-        )
-    elif request.user.is_staff:
-        # Admin bütün mesajları görür
-        messages = ChatMessage.objects.all()
-    else:
-        # İstifadəçi yalnız öz mesajlarını və admin mesajlarını görür
-        messages = ChatMessage.objects.filter(
-            models.Q(user=request.user) | 
-            models.Q(user__is_staff=True)
-        )
-    
-    messages = messages.order_by('-created_at')[:50]  # Son 50 mesaj
-    
-    return JsonResponse({
-        'messages': [{
-            'id': msg.id,
-            'message': msg.message,
-            'username': msg.user.username,
-            'user_id': msg.user.id,
-            'timestamp': msg.created_at.strftime('%H:%M'),
-            'is_admin': msg.user.is_staff,
-            'is_own': msg.user == request.user
-        } for msg in messages]
-    })
+def get_unread_count(request):
+    count = Message.objects.filter(receiver=request.user, is_read=False).count()
+    return JsonResponse({'count': count})
 

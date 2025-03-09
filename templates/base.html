@@ -130,6 +130,15 @@
         </div>
     </footer>
 
+    {% if user.is_authenticated %}
+    <div class="chat-widget" id="chatWidget">
+        <div class="chat-toggle" onclick="toggleChat()">
+            <i class="fas fa-comments"></i>
+            <span class="unread-count" id="unreadCount"></span>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Common Scripts -->
 
 

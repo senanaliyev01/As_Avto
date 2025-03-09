@@ -31,17 +31,18 @@ def save_user_profile(sender, instance, **kwargs):
     except Profile.DoesNotExist:
         Profile.objects.create(user=instance)
 
-class ChatMessage(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    message = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_admin_message = models.BooleanField(default=False)
+class Message(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ['created_at']
-        verbose_name = 'Chat Mesajları'
-        verbose_name_plural = 'Chat Mesajları'
+        ordering = ['timestamp']
+        verbose_name = 'Mesaj'
+        verbose_name_plural = 'Mesajlar'
 
     def __str__(self):
-        return f'{self.user.username} - {self.created_at}'
+        return f'{self.sender} -> {self.receiver}: {self.content[:50]}'
 

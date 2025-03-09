@@ -203,48 +203,30 @@ def products_list(request):
         # Axtarış mətnini normalize et
         normalized_search, search_combinations = normalize_search_text(search_text)
         
-        # Məhsul adlarını və haqqında məlumatlarını normalize edib axtarış
+        # Axtarış sözlərini normalize edib axtarış
         mehsul_ids = set()
         for mehsul in mehsullar:
-            # Məhsul adını normalize et
-            normalized_mehsul_adi, mehsul_adi_combinations = normalize_search_text(mehsul.adi)
-            
-            # Məhsul haqqında məlumatını normalize et (əgər varsa)
-            if mehsul.haqqinda:
-                normalized_haqqinda, haqqinda_combinations = normalize_search_text(mehsul.haqqinda)
-            else:
-                normalized_haqqinda, haqqinda_combinations = "", []
-                
-            # Axtarış sözlərini normalize et (əgər varsa)
+            # Yalnız axtarış sözlərini normalize et (əgər varsa)
             axtaris_sozleri_combinations = []
             if mehsul.axtaris_sozleri:
                 normalized_axtaris, axtaris_combinations = normalize_search_text(mehsul.axtaris_sozleri.sozler)
                 axtaris_sozleri_combinations.extend(axtaris_combinations)
             
-            # Bütün kombinasiyaları yoxla
+            # Axtarış sözlərində axtarış
             found = False
             for search_variant in search_combinations:
-                if (search_variant in mehsul_adi_combinations or 
-                    any(search_variant in combo for combo in mehsul_adi_combinations) or
-                    search_variant in haqqinda_combinations or
-                    any(search_variant in combo for combo in haqqinda_combinations) or
-                    search_variant in axtaris_sozleri_combinations or
+                if (search_variant in axtaris_sozleri_combinations or
                     any(search_variant in combo for combo in axtaris_sozleri_combinations)):
                     mehsul_ids.add(mehsul.id)
                     found = True
                     break
-            
-            # Əgər normalized versiyada tapılıbsa
-            if not found and (normalized_search in normalized_mehsul_adi or 
-                            normalized_search in normalized_haqqinda):
-                mehsul_ids.add(mehsul.id)
         
         # Xüsusi simvolları təmizlə (brend kodu və OEM üçün)
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_text)
         
         # Axtarış sorğusunu yarat
         mehsullar = mehsullar.filter(
-            Q(id__in=list(mehsul_ids)) |  # Normalize edilmiş ad və haqqında axtarışı
+            Q(id__in=list(mehsul_ids)) |  # Axtarış sözlərində axtarış
             Q(brend_kod__icontains=clean_search) |  # Brend kodunda axtarış
             Q(oem__icontains=clean_search) |  # OEM kodunda axtarış
             Q(oem_kodlar__kod__icontains=clean_search) |  # Əlavə OEM kodlarında axtarış
@@ -472,41 +454,23 @@ def mehsul_axtaris(request):
         # Axtarış mətnini normalize et və kombinasiyaları al
         normalized_query, query_combinations = normalize_search_text(query)
         
-        # Məhsul adlarını və haqqında məlumatlarını normalize edib axtarış
+        # Axtarış sözlərini normalize edib axtarış
         mehsul_ids = set()
         for mehsul in mehsullar:
-            # Məhsul adını normalize et
-            normalized_mehsul_adi, mehsul_adi_combinations = normalize_search_text(mehsul.adi)
-            
-            # Məhsul haqqında məlumatını normalize et (əgər varsa)
-            if mehsul.haqqinda:
-                normalized_haqqinda, haqqinda_combinations = normalize_search_text(mehsul.haqqinda)
-            else:
-                normalized_haqqinda, haqqinda_combinations = "", []
-                
-            # Axtarış sözlərini normalize et (əgər varsa)
+            # Yalnız axtarış sözlərini normalize et (əgər varsa)
             axtaris_sozleri_combinations = []
             if mehsul.axtaris_sozleri:
                 normalized_axtaris, axtaris_combinations = normalize_search_text(mehsul.axtaris_sozleri.sozler)
                 axtaris_sozleri_combinations.extend(axtaris_combinations)
             
-            # Bütün kombinasiyaları yoxla
+            # Axtarış sözlərində axtarış
             found = False
             for search_variant in query_combinations:
-                if (search_variant in mehsul_adi_combinations or 
-                    any(search_variant in combo for combo in mehsul_adi_combinations) or
-                    search_variant in haqqinda_combinations or
-                    any(search_variant in combo for combo in haqqinda_combinations) or
-                    search_variant in axtaris_sozleri_combinations or
+                if (search_variant in axtaris_sozleri_combinations or
                     any(search_variant in combo for combo in axtaris_sozleri_combinations)):
                     mehsul_ids.add(mehsul.id)
                     found = True
                     break
-            
-            # Əgər normalized versiyada tapılıbsa
-            if not found and (normalized_query in normalized_mehsul_adi or 
-                            normalized_query in normalized_haqqinda):
-                mehsul_ids.add(mehsul.id)
         
         # Xüsusi simvolları təmizlə (brend kodu və OEM üçün)
         clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
@@ -746,44 +710,26 @@ def realtime_search(request):
         mehsullar = mehsullar.filter(axtaris_sozleri__adi=axtaris)
     
     if query:
-        # Məhsul adı və haqqında üçün normalize edilmiş axtarış
+        # Axtarış mətnini normalize et
         normalized_query, query_combinations = normalize_search_text(query)
         
-        # Məhsul adlarını və haqqında məlumatlarını normalize edib axtarış
+        # Axtarış sözlərini normalize edib axtarış
         mehsul_ids = set()
         for mehsul in mehsullar:
-            # Məhsul adını normalize et
-            normalized_mehsul_adi, mehsul_adi_combinations = normalize_search_text(mehsul.adi)
-            
-            # Məhsul haqqında məlumatını normalize et (əgər varsa)
-            if mehsul.haqqinda:
-                normalized_haqqinda, haqqinda_combinations = normalize_search_text(mehsul.haqqinda)
-            else:
-                normalized_haqqinda, haqqinda_combinations = "", []
-                
-            # Axtarış sözlərini normalize et (əgər varsa)
+            # Yalnız axtarış sözlərini normalize et (əgər varsa)
             axtaris_sozleri_combinations = []
             if mehsul.axtaris_sozleri:
                 normalized_axtaris, axtaris_combinations = normalize_search_text(mehsul.axtaris_sozleri.sozler)
                 axtaris_sozleri_combinations.extend(axtaris_combinations)
             
-            # Bütün kombinasiyaları yoxla
+            # Axtarış sözlərində axtarış
             found = False
             for search_variant in query_combinations:
-                if (search_variant in mehsul_adi_combinations or 
-                    any(search_variant in combo for combo in mehsul_adi_combinations) or
-                    search_variant in haqqinda_combinations or
-                    any(search_variant in combo for combo in haqqinda_combinations) or
-                    search_variant in axtaris_sozleri_combinations or
+                if (search_variant in axtaris_sozleri_combinations or
                     any(search_variant in combo for combo in axtaris_sozleri_combinations)):
                     mehsul_ids.add(mehsul.id)
                     found = True
                     break
-            
-            # Əgər normalized versiyada tapılıbsa
-            if not found and (normalized_query in normalized_mehsul_adi or 
-                            normalized_query in normalized_haqqinda):
-                mehsul_ids.add(mehsul.id)
         
         # Brend kodu və OEM üçün təmizlənmiş axtarış
         clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)

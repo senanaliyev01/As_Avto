@@ -1023,4 +1023,241 @@
         }
     }
 
-    // ... existing code ...
+    // Chat funksiyaları
+    function initChat() {
+        const chatIcon = document.createElement('div');
+        chatIcon.className = 'chat-icon';
+        chatIcon.innerHTML = '<i class="fas fa-comments"></i>';
+        document.body.appendChild(chatIcon);
+
+        const chatBox = document.createElement('div');
+        chatBox.className = 'chat-box';
+        chatBox.innerHTML = `
+            <div class="chat-header">
+                <h3>Canlı Dəstək</h3>
+                <button class="close-chat"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="chat-messages"></div>
+            <div class="chat-input">
+                <input type="text" placeholder="Mesajınızı yazın...">
+                <button class="send-message"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        `;
+        document.body.appendChild(chatBox);
+
+        // Event listeners
+        chatIcon.addEventListener('click', () => {
+            chatBox.classList.toggle('active');
+            if (chatBox.classList.contains('active')) {
+                loadMessages();
+            }
+        });
+
+        chatBox.querySelector('.close-chat').addEventListener('click', () => {
+            chatBox.classList.remove('active');
+        });
+
+        const input = chatBox.querySelector('input');
+        const sendButton = chatBox.querySelector('.send-message');
+
+        function sendMessage() {
+            const message = input.value.trim();
+            if (message) {
+                const formData = new FormData();
+                formData.append('message', message);
+
+                fetch('/chat/send/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        input.value = '';
+                        loadMessages();
+                    }
+                });
+            }
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    }
+
+    function loadMessages() {
+        const messagesContainer = document.querySelector('.chat-messages');
+        
+        fetch('/chat/messages/')
+            .then(response => response.json())
+            .then(data => {
+                messagesContainer.innerHTML = data.messages.reverse().map(msg => `
+                    <div class="message ${msg.is_admin ? 'admin-message' : ''} ${msg.is_own ? 'own-message' : ''}">
+                        <div class="message-info">
+                            <span class="username">${msg.username}</span>
+                            <span class="timestamp">${msg.timestamp}</span>
+                        </div>
+                        <div class="message-content">${msg.message}</div>
+                    </div>
+                `).join('');
+                
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            });
+    }
+
+    // Chat stilləri
+    const chatStyles = document.createElement('style');
+    chatStyles.textContent = `
+        .chat-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: #003366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: transform 0.3s;
+        }
+
+        .chat-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .chat-icon i {
+            color: white;
+            font-size: 24px;
+        }
+
+        .chat-box {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 300px;
+            height: 400px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .chat-box.active {
+            display: flex;
+        }
+
+        .chat-header {
+            padding: 15px;
+            background-color: #003366;
+            color: white;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .close-chat {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            max-width: 80%;
+        }
+
+        .message-info {
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .message-content {
+            background-color: #f0f0f0;
+            padding: 8px 12px;
+            border-radius: 15px;
+            display: inline-block;
+        }
+
+        .own-message {
+            margin-left: auto;
+        }
+
+        .own-message .message-content {
+            background-color: #003366;
+            color: white;
+        }
+
+        .admin-message .message-content {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .chat-input {
+            padding: 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+
+        .chat-input button {
+            background-color: #003366;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+
+        .chat-input button:hover {
+            background-color: #002244;
+        }
+    `;
+
+    document.head.appendChild(chatStyles);
+
+    // DOM yükləndikdə chat-i başlat
+    document.addEventListener('DOMContentLoaded', () => {
+        initChat();
+        // Hər 10 saniyədə bir mesajları yenilə
+        if (document.querySelector('.chat-box.active')) {
+            setInterval(loadMessages, 10000);
+        }
+    });

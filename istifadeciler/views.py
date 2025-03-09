@@ -4,7 +4,7 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from .forms import UserUpdateForm, ProfileUpdateForm
-from .models import Profile
+from .models import Profile, ChatMessage
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
 from django.db.models import Q
@@ -14,6 +14,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 import re
 from esasevim.views import esasevim
+from django.utils import timezone
 
 def login_view(request):
     # Əgər istifadəçi artıq daxil olubsa
@@ -291,4 +292,34 @@ def register(request):
             })
 
     return render(request, 'register.html')
+
+@login_required
+def send_message(request):
+    if request.method == 'POST':
+        message = request.POST.get('message')
+        if message:
+            chat_message = ChatMessage.objects.create(
+                user=request.user,
+                message=message
+            )
+            return JsonResponse({
+                'status': 'success',
+                'message': message,
+                'timestamp': chat_message.created_at.strftime('%H:%M'),
+                'username': request.user.username
+            })
+    return JsonResponse({'status': 'error'})
+
+@login_required
+def get_messages(request):
+    messages = ChatMessage.objects.all().order_by('-created_at')[:50]  # Son 50 mesaj
+    return JsonResponse({
+        'messages': [{
+            'message': msg.message,
+            'username': msg.user.username,
+            'timestamp': msg.created_at.strftime('%H:%M'),
+            'is_admin': msg.is_admin_message,
+            'is_own': msg.user == request.user
+        } for msg in messages]
+    })
 

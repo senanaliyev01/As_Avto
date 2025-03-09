@@ -4,6 +4,9 @@ from django.urls import reverse
 from django.utils.html import format_html
 from django.utils import timezone
 from django.db import models
+from django.contrib import messages
+from django import forms
+from django.http import HttpResponseRedirect
 
 class MarkaSekilInline(admin.TabularInline):
     model = MarkaSekil
@@ -180,13 +183,14 @@ admin.site.register(Avtomodel)
 admin.site.register(Motor)
 admin.site.register(Il)
 admin.site.register(Yanacaq)
+
 class MehsulAdmin(admin.ModelAdmin):
     list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'axtaris_sozleri', 'qiymet', 'brend_kod', 'oem', 'stok', 'yenidir')
     list_filter = ('kateqoriya', 'brend', 'marka', 'axtaris_sozleri')
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'yenidir', 'axtaris_sozleri__adi', 'axtaris_sozleri__sozler')
     inlines = [OEMKodInline]
     
-    actions = ['yenilikden_sil', 'yenidir_et']  # Yeni hərəkətləri əlavə edirik
+    actions = ['yenilikden_sil', 'yenidir_et', 'axtaris_sozleri_teyin_et']  # Yeni action əlavə edirik
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -205,6 +209,62 @@ class MehsulAdmin(admin.ModelAdmin):
         queryset.update(yenidir=True)
         self.message_user(request, "Seçilmiş məhsullar yenidir olaraq işarələndi.")
     yenidir_et.short_description = "Seçilmiş məhsulları yenidir et"
+    
+    def axtaris_sozleri_teyin_et(self, request, queryset):
+        # Əgər bu bir POST sorğusudursa və axtarış sözü seçilibsə
+        if 'axtaris_sozleri_id' in request.POST:
+            axtaris_sozleri_id = request.POST.get('axtaris_sozleri_id')
+            if axtaris_sozleri_id:
+                try:
+                    axtaris_sozleri = AxtarisSozleri.objects.get(id=axtaris_sozleri_id)
+                    # Seçilmiş məhsullara axtarış sözlərini təyin edirik
+                    queryset.update(axtaris_sozleri=axtaris_sozleri)
+                    self.message_user(request, f"{queryset.count()} məhsula '{axtaris_sozleri.adi}' axtarış sözləri təyin edildi.")
+                    return None
+                except AxtarisSozleri.DoesNotExist:
+                    self.message_user(request, "Seçilmiş axtarış sözü tapılmadı.", level=messages.ERROR)
+            else:
+                self.message_user(request, "Axtarış sözü seçilmədi.", level=messages.WARNING)
+                
+        # Bütün axtarış sözlərini əldə edirik
+        axtaris_sozleri = AxtarisSozleri.objects.all()
+        
+        # Əgər heç bir axtarış sözü yoxdursa, xəbərdarlıq edirik
+        if not axtaris_sozleri.exists():
+            self.message_user(request, "Heç bir axtarış sözü tapılmadı. Əvvəlcə axtarış sözləri yaradın.", level=messages.WARNING)
+            return None
+        
+        # Axtarış sözlərini seçmək üçün HTML formu yaradırıq
+        select_options = ''.join([f'<option value="{axtaris.id}">{axtaris.adi} - {axtaris.sozler}</option>' for axtaris in axtaris_sozleri])
+        
+        # Seçilmiş məhsulların ID-lərini formda göndərmək üçün hidden inputlar yaradırıq
+        hidden_inputs = ''.join([f'<input type="hidden" name="_selected_action" value="{obj.pk}">' for obj in queryset])
+        
+        # Formu göstəririk
+        from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
+        
+        html = f"""
+        <h2>Axtarış sözlərini təyin et</h2>
+        <p>Seçilmiş {queryset.count()} məhsula axtarış sözlərini təyin edin:</p>
+        <form action="" method="post">
+            <input type="hidden" name="action" value="axtaris_sozleri_teyin_et">
+            {hidden_inputs}
+            <div style="margin-bottom: 10px;">
+                <label for="axtaris_sozleri_id">Axtarış Sözləri:</label>
+                <select name="axtaris_sozleri_id" id="axtaris_sozleri_id" style="width: 300px;">
+                    <option value="">---------</option>
+                    {select_options}
+                </select>
+            </div>
+            <input type="submit" name="apply" value="Təyin et">
+        </form>
+        """
+        
+        # Formu göstəririk
+        from django.http import HttpResponse
+        return HttpResponse(html)
+    
+    axtaris_sozleri_teyin_et.short_description = "Seçilmiş məhsullara axtarış sözlərini təyin et"
 
 # Qeydiyyatları düzəltdik
 admin.site.register(SifarisMehsul, SifarisMehsulAdmin)

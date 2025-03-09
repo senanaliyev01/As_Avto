@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import timezone
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -20,19 +21,19 @@ class Profile(models.Model):
         verbose_name_plural = 'Profillər'
 
 class Message(models.Model):
-    sender = models.ForeignKey(User, related_name='sent_messages', on_delete=models.CASCADE)
-    receiver = models.ForeignKey(User, related_name='received_messages', on_delete=models.CASCADE)
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
     content = models.TextField()
-    timestamp = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField(default=timezone.now)
     is_read = models.BooleanField(default=False)
     
-    def __str__(self):
-        return f'Mesaj: {self.sender.username} -> {self.receiver.username}'
-    
     class Meta:
+        ordering = ['timestamp']
         verbose_name = 'Mesaj'
         verbose_name_plural = 'Mesajlar'
-        ordering = ['-timestamp']
+    
+    def __str__(self):
+        return f'{self.sender} -> {self.receiver}: {self.content[:50]}'
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

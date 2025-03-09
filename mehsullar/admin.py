@@ -7,6 +7,7 @@ from django.db import models
 from django.contrib import messages
 from django import forms
 from django.http import HttpResponseRedirect
+from django.middleware.csrf import get_token
 
 class MarkaSekilInline(admin.TabularInline):
     model = MarkaSekil
@@ -240,24 +241,87 @@ class MehsulAdmin(admin.ModelAdmin):
         # Seçilmiş məhsulların ID-lərini formda göndərmək üçün hidden inputlar yaradırıq
         hidden_inputs = ''.join([f'<input type="hidden" name="_selected_action" value="{obj.pk}">' for obj in queryset])
         
+        # CSRF token əldə edirik
+        csrf_token = get_token(request)
+        
         # Formu göstəririk
         from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
         
         html = f"""
-        <h2>Axtarış sözlərini təyin et</h2>
-        <p>Seçilmiş {queryset.count()} məhsula axtarış sözlərini təyin edin:</p>
-        <form action="" method="post">
-            <input type="hidden" name="action" value="axtaris_sozleri_teyin_et">
-            {hidden_inputs}
-            <div style="margin-bottom: 10px;">
-                <label for="axtaris_sozleri_id">Axtarış Sözləri:</label>
-                <select name="axtaris_sozleri_id" id="axtaris_sozleri_id" style="width: 300px;">
-                    <option value="">---------</option>
-                    {select_options}
-                </select>
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Axtarış sözlərini təyin et</title>
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                    margin: 20px;
+                    background-color: #f8f8f8;
+                }}
+                h2 {{
+                    color: #333;
+                    border-bottom: 1px solid #ddd;
+                    padding-bottom: 10px;
+                }}
+                .container {{
+                    background-color: white;
+                    padding: 20px;
+                    border-radius: 5px;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                    max-width: 600px;
+                    margin: 0 auto;
+                }}
+                label {{
+                    display: block;
+                    margin-bottom: 5px;
+                    font-weight: bold;
+                }}
+                select {{
+                    width: 100%;
+                    padding: 8px;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    margin-bottom: 15px;
+                    font-size: 14px;
+                }}
+                .btn {{
+                    background-color: #417690;
+                    color: white;
+                    border: none;
+                    padding: 10px 15px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 14px;
+                }}
+                .btn:hover {{
+                    background-color: #2b5070;
+                }}
+                .count {{
+                    font-weight: bold;
+                    color: #417690;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h2>Axtarış sözlərini təyin et</h2>
+                <p>Seçilmiş <span class="count">{queryset.count()}</span> məhsula axtarış sözlərini təyin edin:</p>
+                <form action="" method="post">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}">
+                    <input type="hidden" name="action" value="axtaris_sozleri_teyin_et">
+                    {hidden_inputs}
+                    <div>
+                        <label for="axtaris_sozleri_id">Axtarış Sözləri:</label>
+                        <select name="axtaris_sozleri_id" id="axtaris_sozleri_id">
+                            <option value="">---------</option>
+                            {select_options}
+                        </select>
+                    </div>
+                    <input type="submit" name="apply" value="Təyin et" class="btn">
+                </form>
             </div>
-            <input type="submit" name="apply" value="Təyin et">
-        </form>
+        </body>
+        </html>
         """
         
         # Formu göstəririk

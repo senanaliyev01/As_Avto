@@ -191,7 +191,7 @@ class MehsulAdmin(admin.ModelAdmin):
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'yenidir', 'axtaris_sozleri__adi', 'axtaris_sozleri__sozler')
     inlines = [OEMKodInline]
     
-    actions = ['yenilikden_sil', 'yenidir_et', 'axtaris_sozleri_teyin_et']  # Yeni action əlavə edirik
+    actions = ['yenilikden_sil', 'yenidir_et', 'axtaris_sozleri_teyin_et', 'axtaris_sozleri_sil']  # Yeni action əlavə edirik
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -211,6 +211,21 @@ class MehsulAdmin(admin.ModelAdmin):
         self.message_user(request, "Seçilmiş məhsullar yenidir olaraq işarələndi.")
     yenidir_et.short_description = "Seçilmiş məhsulları yenidir et"
     
+    def axtaris_sozleri_sil(self, request, queryset):
+        # Axtarış sözləri olan məhsulları sayırıq
+        mehsullar_with_axtaris = queryset.exclude(axtaris_sozleri=None).count()
+        
+        # Axtarış sözlərini silirik (None olaraq təyin edirik)
+        queryset.update(axtaris_sozleri=None)
+        
+        # İstifadəçiyə bildiriş göndəririk
+        if mehsullar_with_axtaris > 0:
+            self.message_user(request, f"{mehsullar_with_axtaris} məhsuldan axtarış sözləri silindi.")
+        else:
+            self.message_user(request, "Seçilmiş məhsulların heç birində axtarış sözü yox idi.", level=messages.INFO)
+    
+    axtaris_sozleri_sil.short_description = "Seçilmiş məhsullardan axtarış sözlərini sil"
+    
     def axtaris_sozleri_teyin_et(self, request, queryset):
         # Əgər bu bir POST sorğusudursa və axtarış sözü seçilibsə
         if 'axtaris_sozleri_id' in request.POST:
@@ -220,7 +235,7 @@ class MehsulAdmin(admin.ModelAdmin):
                     axtaris_sozleri = AxtarisSozleri.objects.get(id=axtaris_sozleri_id)
                     # Seçilmiş məhsullara axtarış sözlərini təyin edirik
                     queryset.update(axtaris_sozleri=axtaris_sozleri)
-                    self.message_user(request, f"{queryset.count()} məhsula '{axtaris_sozleri.adi}' axtarış sözləri təyin edildi.")
+                    self.message_user(request, f"{queryset.count()} məhsula '{axtaris_sozleri.adi}' axtarış sözlərini təyin edildi.")
                     return None
                 except AxtarisSozleri.DoesNotExist:
                     self.message_user(request, "Seçilmiş axtarış sözü tapılmadı.", level=messages.ERROR)

@@ -142,6 +142,8 @@ function connectWebSocket() {
         const wsUrl = 'wss://' + window.location.host + '/ws/chat/';
         
         console.log('WebSocket URL:', wsUrl); // Debug üçün
+        console.log('Cari host:', window.location.host);
+        console.log('Cari protokol:', window.location.protocol);
         
         // Əvvəlki bağlantını bağla
         if (chatSocket && chatSocket.readyState !== WebSocket.CLOSED) {
@@ -150,6 +152,7 @@ function connectWebSocket() {
         
         try {
             // WebSocket bağlantısını sınayırıq, lakin xəta baş verdikdə HTTP sorğularından istifadə edirik
+            console.log('WebSocket obyekti yaradılır...');
             chatSocket = new WebSocket(wsUrl);
             usingWebSocket = false; // Əvvəlcə false təyin edirik, bağlantı açıldıqda true olacaq
             

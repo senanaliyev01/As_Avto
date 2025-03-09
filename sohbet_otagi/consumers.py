@@ -3,19 +3,33 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth.models import User
 from istifadeciler.models import Message
+import logging
+
+# Logging konfiqurasiyası
+logger = logging.getLogger(__name__)
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        logger.info("WebSocket bağlantısı qurulur...")
         print("WebSocket bağlantısı qurulur...")
-        await self.accept()
-        print("WebSocket bağlantısı qəbul edildi")
+        
+        try:
+            await self.accept()
+            logger.info("WebSocket bağlantısı qəbul edildi")
+            print("WebSocket bağlantısı qəbul edildi")
+        except Exception as e:
+            logger.error(f"WebSocket bağlantısı qurularkən xəta: {str(e)}")
+            print(f"WebSocket bağlantısı qurularkən xəta: {str(e)}")
 
     async def disconnect(self, close_code):
+        logger.info(f"WebSocket bağlantısı bağlandı: {close_code}")
         print(f"WebSocket bağlantısı bağlandı: {close_code}")
         pass
 
     async def receive(self, text_data):
+        logger.info(f"WebSocket mesajı alındı: {text_data}")
         print(f"WebSocket mesajı alındı: {text_data}")
+        
         try:
             text_data_json = json.loads(text_data)
             message = text_data_json.get('message')

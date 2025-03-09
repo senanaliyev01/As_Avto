@@ -139,11 +139,15 @@
 
     {% if user.is_authenticated %}
     <!-- Bildiriş səsləri -->
-    <audio id="new-message-sound" preload="auto">
+    <audio id="new-message-sound" preload="auto" muted>
         <source src="{% static 'audio/notification.mp3' %}" type="audio/mpeg">
+        <source src="{% static 'audio/notification.wav' %}" type="audio/wav">
+        Səs dəstəklənmir
     </audio>
-    <audio id="chat-message-sound" preload="auto">
+    <audio id="chat-message-sound" preload="auto" muted>
         <source src="{% static 'audio/chat-message.mp3' %}" type="audio/mpeg">
+        <source src="{% static 'audio/chat-message.wav' %}" type="audio/wav">
+        Səs dəstəklənmir
     </audio>
 
     <!-- Chat widget -->

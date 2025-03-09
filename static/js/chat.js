@@ -42,23 +42,87 @@ function getCookie(name) {
 
 // Yeni mesaj bildirişi səsi
 function playNewMessageSound() {
-    const audio = document.getElementById('new-message-sound');
-    if (audio) {
-        audio.currentTime = 0;
-        audio.play().catch(error => {
-            console.log('Səs oxutma xətası:', error);
-        });
+    try {
+        const audio = document.getElementById('new-message-sound');
+        if (audio) {
+            // Səsi yüklə və hazırla
+            audio.load();
+            // Səsi 0-dan başlat
+            audio.currentTime = 0;
+            // Səsi unmute et
+            audio.muted = false;
+            // Səs səviyyəsini təyin et
+            audio.volume = 1.0;
+            // Səsi çal
+            const playPromise = audio.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    // Səs uğurla çalındı
+                    if (!suppressWebSocketErrors) {
+                        console.log('Bildiriş səsi uğurla çalındı');
+                    }
+                }).catch(error => {
+                    // Səs çalınarkən xəta baş verdi
+                    if (!suppressWebSocketErrors) {
+                        console.error('Səs oxutma xətası:', error);
+                    }
+                    // İstifadəçi qarşılıqlı əlaqəsini gözlə
+                    initAudio();
+                });
+            }
+        } else {
+            if (!suppressWebSocketErrors) {
+                console.error('new-message-sound elementi tapılmadı!');
+            }
+        }
+    } catch (error) {
+        if (!suppressWebSocketErrors) {
+            console.error('Bildiriş səsi çalınarkən xəta:', error);
+        }
     }
 }
 
 // Chat mesajı bildirişi səsi
 function playChatMessageSound() {
-    const audio = document.getElementById('chat-message-sound');
-    if (audio) {
-        audio.currentTime = 0;
-        audio.play().catch(error => {
-            console.log('Səs oxutma xətası:', error);
-        });
+    try {
+        const audio = document.getElementById('chat-message-sound');
+        if (audio) {
+            // Səsi yüklə və hazırla
+            audio.load();
+            // Səsi 0-dan başlat
+            audio.currentTime = 0;
+            // Səsi unmute et
+            audio.muted = false;
+            // Səs səviyyəsini təyin et
+            audio.volume = 1.0;
+            // Səsi çal
+            const playPromise = audio.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    // Səs uğurla çalındı
+                    if (!suppressWebSocketErrors) {
+                        console.log('Chat mesajı səsi uğurla çalındı');
+                    }
+                }).catch(error => {
+                    // Səs çalınarkən xəta baş verdi
+                    if (!suppressWebSocketErrors) {
+                        console.error('Səs oxutma xətası:', error);
+                    }
+                    // İstifadəçi qarşılıqlı əlaqəsini gözlə
+                    initAudio();
+                });
+            }
+        } else {
+            if (!suppressWebSocketErrors) {
+                console.error('chat-message-sound elementi tapılmadı!');
+            }
+        }
+    } catch (error) {
+        if (!suppressWebSocketErrors) {
+            console.error('Chat mesajı səsi çalınarkən xəta:', error);
+        }
     }
 }
 
@@ -618,9 +682,16 @@ function loadMessages(receiverId) {
                 // Müvəqqəti mesajları saxla
                 const tempMessages = Array.from(chatMessages.querySelectorAll('.message[id^="temp_"]'));
                 
+                // Mesajları tarixə görə sırala (köhnədən yeniyə)
+                messages.sort((a, b) => {
+                    const dateA = new Date(a.created_at || 0);
+                    const dateB = new Date(b.created_at || 0);
+                    return dateA - dateB;
+                });
+                
                 // HTML-i yenilə
                 chatMessages.innerHTML = messages.map(msg => `
-                    <div class="message ${msg.is_mine ? 'mine' : 'theirs'}">
+                    <div class="message ${msg.is_mine ? 'mine' : 'theirs'}" data-id="${msg.id}">
                         ${!msg.is_mine ? `<div class="message-sender">${msg.sender}</div>` : ''}
                         <div class="message-content">${msg.content}</div>
                         ${msg.is_mine ? `
@@ -631,9 +702,19 @@ function loadMessages(receiverId) {
                     </div>
                 `).join('');
                 
-                // Müvəqqəti mesajları əlavə et
+                // Müvəqqəti mesajları əlavə et (əgər serverdən gələn mesajlarda yoxdursa)
                 tempMessages.forEach(tempMsg => {
-                    chatMessages.appendChild(tempMsg);
+                    const tempId = tempMsg.id;
+                    const tempContent = tempMsg.querySelector('.message-content').textContent;
+                    
+                    // Eyni məzmunlu mesaj serverdən gəlibsə, müvəqqəti mesajı əlavə etmə
+                    const isDuplicate = messages.some(msg => 
+                        msg.content === tempContent && msg.is_mine
+                    );
+                    
+                    if (!isDuplicate) {
+                        chatMessages.appendChild(tempMsg);
+                    }
                 });
 
                 // Yeni mesaj gəlibsə və bu mesaj bizim deyilsə səs çal
@@ -857,15 +938,76 @@ document.addEventListener('click', function initAudioOnUserInteraction() {
 
 // Audio elementlərini inicializasiya et
 function initAudio() {
-    const newMessageSound = document.getElementById('new-message-sound');
-    const chatMessageSound = document.getElementById('chat-message-sound');
-    
-    if (newMessageSound) {
-        newMessageSound.load();
-    }
-    
-    if (chatMessageSound) {
-        chatMessageSound.load();
+    try {
+        const newMessageSound = document.getElementById('new-message-sound');
+        const chatMessageSound = document.getElementById('chat-message-sound');
+        
+        if (newMessageSound) {
+            // Səsi yüklə
+            newMessageSound.load();
+            
+            // Səsi unmute et (istifadəçi qarşılıqlı əlaqəsindən sonra)
+            document.addEventListener('click', function unmuteSounds() {
+                newMessageSound.muted = false;
+                if (chatMessageSound) {
+                    chatMessageSound.muted = false;
+                }
+                document.removeEventListener('click', unmuteSounds);
+                
+                if (!suppressWebSocketErrors) {
+                    console.log('Səslər unmute edildi');
+                }
+            }, { once: true });
+            
+            // Səsi səssiz çal və dayandır (istifadəçi qarşılıqlı əlaqəsini təmin etmək üçün)
+            newMessageSound.volume = 0;
+            const playPromise = newMessageSound.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    // Səs uğurla çalındı, dayandır və səsi normal səviyyəyə qaytar
+                    newMessageSound.pause();
+                    newMessageSound.currentTime = 0;
+                    newMessageSound.volume = 1;
+                    if (!suppressWebSocketErrors) {
+                        console.log('Bildiriş səsi inicializasiya edildi');
+                    }
+                }).catch(error => {
+                    if (!suppressWebSocketErrors) {
+                        console.error('Bildiriş səsi inicializasiya edilərkən xəta:', error);
+                    }
+                });
+            }
+        }
+        
+        if (chatMessageSound) {
+            // Səsi yüklə
+            chatMessageSound.load();
+            
+            // Səsi səssiz çal və dayandır (istifadəçi qarşılıqlı əlaqəsini təmin etmək üçün)
+            chatMessageSound.volume = 0;
+            const playPromise = chatMessageSound.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    // Səs uğurla çalındı, dayandır və səsi normal səviyyəyə qaytar
+                    chatMessageSound.pause();
+                    chatMessageSound.currentTime = 0;
+                    chatMessageSound.volume = 1;
+                    if (!suppressWebSocketErrors) {
+                        console.log('Chat mesajı səsi inicializasiya edildi');
+                    }
+                }).catch(error => {
+                    if (!suppressWebSocketErrors) {
+                        console.error('Chat mesajı səsi inicializasiya edilərkən xəta:', error);
+                    }
+                });
+            }
+        }
+    } catch (error) {
+        if (!suppressWebSocketErrors) {
+            console.error('Audio inicializasiya edilərkən xəta:', error);
+        }
     }
 }
 
@@ -878,6 +1020,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Global funksiyaları window obyektinə əlavə et
         window.selectUser = selectUser;
+        
+        // Audio elementlərini inicializasiya et
+        initAudio();
         
         // Chat widget-i inicializasiya et
         const chatWidget = document.getElementById('chat-widget');

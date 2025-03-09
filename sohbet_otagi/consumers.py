@@ -6,43 +6,68 @@ from istifadeciler.models import Message
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        print("WebSocket bağlantısı qurulur...")
         await self.accept()
+        print("WebSocket bağlantısı qəbul edildi")
 
     async def disconnect(self, close_code):
+        print(f"WebSocket bağlantısı bağlandı: {close_code}")
         pass
 
     async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json.get('message')
-        sender_id = text_data_json.get('sender')
-        receiver_id = text_data_json.get('receiver')
+        print(f"WebSocket mesajı alındı: {text_data}")
+        try:
+            text_data_json = json.loads(text_data)
+            message = text_data_json.get('message')
+            sender_id = text_data_json.get('sender')
+            receiver_id = text_data_json.get('receiver')
 
-        if message and sender_id and receiver_id:
-            # Mesajı verilənlər bazasına yaz
-            message_obj = await self.save_message(sender_id, receiver_id, message)
-            
-            # Mesajı göndərən və qəbul edən istifadəçilərə göndər
+            print(f"Mesaj məlumatları: sender_id={sender_id}, receiver_id={receiver_id}, message={message}")
+
+            if message and sender_id and receiver_id:
+                # Mesajı verilənlər bazasına yaz
+                message_obj = await self.save_message(sender_id, receiver_id, message)
+                
+                # Mesajı göndərən və qəbul edən istifadəçilərə göndər
+                await self.send(text_data=json.dumps({
+                    'message': {
+                        'id': message_obj.id,
+                        'content': message_obj.content,
+                        'sender': message_obj.sender.username,
+                        'is_mine': False,
+                        'is_read': False,
+                        'is_delivered': True
+                    }
+                }))
+                print("Mesaj uğurla göndərildi")
+            else:
+                print("Mesaj məlumatları tam deyil")
+                await self.send(text_data=json.dumps({
+                    'error': 'Mesaj məlumatları tam deyil'
+                }))
+        except Exception as e:
+            print(f"WebSocket mesajı işlənərkən xəta: {str(e)}")
             await self.send(text_data=json.dumps({
-                'message': {
-                    'id': message_obj.id,
-                    'content': message_obj.content,
-                    'sender': message_obj.sender.username,
-                    'is_mine': False,
-                    'is_read': False,
-                    'is_delivered': True
-                }
+                'error': f'Xəta: {str(e)}'
             }))
 
     @database_sync_to_async
     def save_message(self, sender_id, receiver_id, content):
-        sender = User.objects.get(id=sender_id)
-        receiver = User.objects.get(id=receiver_id)
-        
-        message = Message.objects.create(
-            sender=sender,
-            receiver=receiver,
-            content=content,
-            is_delivered=True
-        )
-        
-        return message 
+        try:
+            sender = User.objects.get(id=sender_id)
+            receiver = User.objects.get(id=receiver_id)
+            
+            message = Message.objects.create(
+                sender=sender,
+                receiver=receiver,
+                content=content,
+                is_delivered=True
+            )
+            
+            return message
+        except User.DoesNotExist:
+            print(f"İstifadəçi tapılmadı: sender_id={sender_id}, receiver_id={receiver_id}")
+            raise
+        except Exception as e:
+            print(f"Mesaj yadda saxlanarkən xəta: {str(e)}")
+            raise 

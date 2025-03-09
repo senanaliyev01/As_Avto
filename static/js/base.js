@@ -341,6 +341,10 @@
         try {
             console.log('DOM yükləndi, funksiyalar başladılır...'); // Debug üçün
             
+            // Global funksiyaları window obyektinə əlavə et
+            window.selectUser = selectUser;
+            window.confirmLogout = confirmLogout;
+            
             // Saatı başlat
             updateCurrentTime();
             setInterval(updateCurrentTime, 1000);
@@ -354,16 +358,24 @@
 
             // Swiper-ləri inicializasiya et
             if (document.querySelector('.brandsSwiper')) {
-                new Swiper('.brandsSwiper', swiperConfig);
+                try {
+                    new Swiper('.brandsSwiper', swiperConfig);
+                } catch (error) {
+                    console.error('Swiper inicializasiya xətası:', error);
+                }
             }
             if (document.querySelector('.carBrandsSwiper')) {
-                new Swiper('.carBrandsSwiper', {
-                    ...swiperConfig,
-                    autoplay: {
-                        ...swiperConfig.autoplay,
-                        delay: 3500
-                    }
-                });
+                try {
+                    new Swiper('.carBrandsSwiper', {
+                        ...swiperConfig,
+                        autoplay: {
+                            ...swiperConfig.autoplay,
+                            delay: 3500
+                        }
+                    });
+                } catch (error) {
+                    console.error('Swiper inicializasiya xətası:', error);
+                }
             }
 
             // İlkin statistikaları yüklə
@@ -496,12 +508,16 @@
                     let searchButton = document.getElementById('search-button');
                     let spinner = document.getElementById('loading-spinner');
                 
+                    if (!searchButton || !spinner) return;
+                
                     // Butonun ölçüsünü qorumaq üçün enini və hündürlüyünü sabit saxla
                     searchButton.style.width = `${searchButton.offsetWidth}px`;
                     searchButton.style.height = `${searchButton.offsetHeight}px`;
                     
                     // Axtarış yazısını gizlət, amma spinneri saxla
-                    searchButton.childNodes[0].nodeValue = ''; // Axtar sözünü sil
+                    if (searchButton.childNodes[0] && searchButton.childNodes[0].nodeValue) {
+                        searchButton.childNodes[0].nodeValue = ''; // Axtar sözünü sil
+                    }
                     spinner.style.display = 'inline-block'; // Spinneri göstər
                 
                     // Butonu deaktiv et ki, yenidən klik olunmasın
@@ -1075,6 +1091,12 @@
     function initChat() {
         console.log('Chat funksiyası başladılır...'); // Debug üçün
         
+        // İstifadəçi daxil olmayıbsa, funksiyadan çıx
+        if (typeof currentUserId === 'undefined' || !currentUserId) {
+            console.log('İstifadəçi daxil olmayıb, chat funksiyası başladılmır');
+            return;
+        }
+        
         const chatIcon = document.getElementById('chat-icon');
         const chatWindow = document.getElementById('chat-window');
         const closeChat = document.getElementById('close-chat');
@@ -1142,11 +1164,18 @@
     function connectWebSocket() {
         console.log('WebSocket bağlantısı yaradılır...'); // Debug üçün
         
-        // WebSocket bağlantısını yarat
-        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${wsProtocol}//${window.location.host}/ws/chat/`;
-        
         try {
+            // WebSocket bağlantısını yarat
+            const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${wsProtocol}//${window.location.host}/ws/chat/`;
+            
+            console.log('WebSocket URL:', wsUrl); // Debug üçün
+            
+            // Əvvəlki bağlantını bağla
+            if (chatSocket && chatSocket.readyState !== WebSocket.CLOSED) {
+                chatSocket.close();
+            }
+            
             chatSocket = new WebSocket(wsUrl);
             
             chatSocket.onopen = function(e) {
@@ -1154,32 +1183,41 @@
             };
             
             chatSocket.onmessage = function(e) {
-                const data = JSON.parse(e.data);
-                console.log('WebSocket mesajı alındı:', data);
-                
-                if (data.message) {
-                    // Əgər hazırda həmin istifadəçi ilə söhbət edirsinizsə, mesajı göstər
-                    if (currentReceiverId && (data.message.sender === currentReceiverName || data.message.is_mine)) {
-                        appendMessage(data.message);
-                        
-                        // Əgər mesaj bizim deyilsə, səs çal
-                        if (!data.message.is_mine) {
-                            playChatMessageSound();
+                try {
+                    const data = JSON.parse(e.data);
+                    console.log('WebSocket mesajı alındı:', data);
+                    
+                    if (data.message) {
+                        // Əgər hazırda həmin istifadəçi ilə söhbət edirsinizsə, mesajı göstər
+                        if (currentReceiverId && (data.message.sender === currentReceiverName || data.message.is_mine)) {
+                            appendMessage(data.message);
+                            
+                            // Əgər mesaj bizim deyilsə, səs çal
+                            if (!data.message.is_mine) {
+                                playChatMessageSound();
+                            }
+                        } else {
+                            // Əks halda bildiriş səsini çal
+                            playNewMessageSound();
+                            
+                            // İstifadəçi siyahısını yenilə
+                            loadChatUsers();
                         }
-                    } else {
-                        // Əks halda bildiriş səsini çal
-                        playNewMessageSound();
-                        
-                        // İstifadəçi siyahısını yenilə
-                        loadChatUsers();
                     }
+                } catch (error) {
+                    console.error('WebSocket mesajı işlənərkən xəta:', error);
                 }
             };
             
             chatSocket.onclose = function(e) {
-                console.log('WebSocket bağlantısı bağlandı');
-                // 5 saniyə sonra yenidən bağlanmağa çalış
-                setTimeout(connectWebSocket, 5000);
+                console.log('WebSocket bağlantısı bağlandı', e.code, e.reason);
+                
+                // Əgər bağlantı normal bağlanmayıbsa, yenidən qoşulmağa çalış
+                if (e.code !== 1000) {
+                    console.log('WebSocket bağlantısı qırıldı, yenidən qoşulmağa çalışılır...');
+                    // 5 saniyə sonra yenidən bağlanmağa çalış
+                    setTimeout(connectWebSocket, 5000);
+                }
             };
             
             chatSocket.onerror = function(e) {
@@ -1187,6 +1225,8 @@
             };
         } catch (error) {
             console.error('WebSocket bağlantısı yaradılarkən xəta:', error);
+            // 5 saniyə sonra yenidən bağlanmağa çalış
+            setTimeout(connectWebSocket, 5000);
         }
     }
 
@@ -1216,54 +1256,74 @@
     function loadChatUsers() {
         console.log('İstifadəçilər yüklənir...'); // Debug üçün
         
-        fetch('/istifadeciler/api/chat/users/')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+        // Əgər istifadəçi daxil olmayıbsa, funksiyadan çıx
+        if (!currentUserId) {
+            console.log('İstifadəçi daxil olmayıb, istifadəçilər yüklənmir');
+            return;
+        }
+        
+        fetch('/istifadeciler/api/chat/users/', {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 500) {
+                    console.error('Server xətası (500): İstifadəçilər yüklənə bilmədi');
+                } else if (response.status === 403) {
+                    console.error('Giriş icazəsi yoxdur (403): İstifadəçi daxil olmayıb və ya sessiyanın vaxtı bitib');
+                } else {
+                    console.error(`HTTP xətası: ${response.status}`);
                 }
-                return response.json();
-            })
-            .then(data => {
-                console.log('İstifadəçi məlumatları alındı:', data); // Debug üçün
-                
-                const usersList = document.getElementById('users-list');
-                if (!usersList) {
-                    console.error('users-list elementi tapılmadı!');
-                    return;
-                }
-                
-                let totalUnread = 0;
-                
-                usersList.innerHTML = '';
-                
-                // Adminləri və istifadəçiləri əlavə et
-                if (data.admins && data.admins.length > 0) {
-                    usersList.innerHTML += '<div class="user-group-title">Adminlər</div>';
-                    data.admins.forEach(user => {
-                        totalUnread += user.unread_count;
-                        usersList.innerHTML += createUserItem(user);
-                    });
-                }
-                
-                if (data.users && data.users.length > 0) {
-                    usersList.innerHTML += '<div class="user-group-title">İstifadəçilər</div>';
-                    data.users.forEach(user => {
-                        totalUnread += user.unread_count;
-                        usersList.innerHTML += createUserItem(user);
-                    });
-                }
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('İstifadəçi məlumatları alındı:', data); // Debug üçün
+            
+            const usersList = document.getElementById('users-list');
+            if (!usersList) {
+                console.error('users-list elementi tapılmadı!');
+                return;
+            }
+            
+            let totalUnread = 0;
+            
+            usersList.innerHTML = '';
+            
+            // Adminləri və istifadəçiləri əlavə et
+            if (data.admins && data.admins.length > 0) {
+                usersList.innerHTML += '<div class="user-group-title">Adminlər</div>';
+                data.admins.forEach(user => {
+                    totalUnread += user.unread_count;
+                    usersList.innerHTML += createUserItem(user);
+                });
+            }
+            
+            if (data.users && data.users.length > 0) {
+                usersList.innerHTML += '<div class="user-group-title">İstifadəçilər</div>';
+                data.users.forEach(user => {
+                    totalUnread += user.unread_count;
+                    usersList.innerHTML += createUserItem(user);
+                });
+            }
 
-                // Yeni mesaj varsa bildiriş səsini çal
-                if (totalUnread > lastMessageCount) {
-                    playNewMessageSound();
-                }
+            // Yeni mesaj varsa bildiriş səsini çal
+            if (totalUnread > lastMessageCount) {
+                playNewMessageSound();
+            }
 
-                lastMessageCount = totalUnread;
-                updateUnreadCount(totalUnread);
-            })
-            .catch(error => {
-                console.error('İstifadəçilər yüklənərkən xəta:', error);
-            });
+            lastMessageCount = totalUnread;
+            updateUnreadCount(totalUnread);
+        })
+        .catch(error => {
+            console.error('İstifadəçilər yüklənərkən xəta:', error);
+        });
     }
 
     function createUserItem(user) {
@@ -1787,7 +1847,3 @@
     `;
 
     document.head.appendChild(chatStyles);
-
-    // Global funksiyaları window obyektinə əlavə et
-    window.selectUser = selectUser;
-    window.confirmLogout = confirmLogout;

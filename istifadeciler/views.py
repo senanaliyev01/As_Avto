@@ -4,7 +4,7 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from .forms import UserUpdateForm, ProfileUpdateForm
-from .models import Profile
+from .models import Profile, Message
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
 from django.db.models import Q
@@ -12,6 +12,7 @@ from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from django.urls import reverse
 import re
 from esasevim.views import esasevim
 
@@ -297,38 +298,50 @@ def register(request):
 @login_required
 def get_messages(request, receiver_id):
     try:
+        print(f"get_messages called: receiver_id={receiver_id}") # Debug üçün
+        
         receiver = User.objects.get(id=receiver_id)
         messages = Message.objects.filter(
             Q(sender=request.user, receiver=receiver) |
             Q(sender=receiver, receiver=request.user)
         ).order_by('created_at')
         
+        print(f"Found {messages.count()} messages") # Debug üçün
+        
         # Oxunmamış mesajları oxunmuş et
         messages.filter(receiver=request.user, is_read=False).update(is_read=True)
         
-        return JsonResponse([{
+        response_data = [{
             'id': msg.id,
             'content': msg.content,
             'sender': msg.sender.username,
             'is_mine': msg.sender == request.user,
             'is_read': msg.is_read,
             'is_delivered': msg.is_delivered
-        } for msg in messages], safe=False)
+        } for msg in messages]
+        
+        return JsonResponse(response_data, safe=False)
         
     except User.DoesNotExist:
+        print(f"İstifadəçi tapılmadı: receiver_id={receiver_id}")
         return JsonResponse({'error': 'İstifadəçi tapılmadı'}, status=404)
+    except Exception as e:
+        print(f"get_messages funksiyasında xəta: {str(e)}")
+        return JsonResponse({'error': str(e)}, status=500)
 
 @login_required
 @csrf_exempt
 def send_message(request):
     if request.method == 'POST':
-        receiver_id = request.POST.get('receiver_id')
-        content = request.POST.get('content')
-        
-        if not content:
-            return JsonResponse({'status': 'error', 'message': 'Mesaj boş ola bilməz'})
-            
         try:
+            receiver_id = request.POST.get('receiver_id')
+            content = request.POST.get('content')
+            
+            print(f"send_message called: receiver_id={receiver_id}, content={content}") # Debug üçün
+            
+            if not content:
+                return JsonResponse({'status': 'error', 'message': 'Mesaj boş ola bilməz'})
+                
             receiver = User.objects.get(id=receiver_id)
             message = Message.objects.create(
                 sender=request.user,
@@ -336,6 +349,8 @@ def send_message(request):
                 content=content,
                 is_delivered=True  # Avtomatik çatdırıldı kimi qeyd et
             )
+            
+            print(f"Mesaj yaradıldı: id={message.id}") # Debug üçün
             
             return JsonResponse({
                 'status': 'success',
@@ -350,7 +365,11 @@ def send_message(request):
             })
             
         except User.DoesNotExist:
+            print(f"İstifadəçi tapılmadı: receiver_id={receiver_id}")
             return JsonResponse({'status': 'error', 'message': 'İstifadəçi tapılmadı'})
+        except Exception as e:
+            print(f"send_message funksiyasında xəta: {str(e)}")
+            return JsonResponse({'status': 'error', 'message': str(e)})
             
     return JsonResponse({'status': 'error', 'message': 'Yanlış sorğu metodu'})
 
@@ -358,47 +377,57 @@ def send_message(request):
 def get_chat_users(request):
     print("get_chat_users called") # Debug üçün
     
-    # Admin və normal istifadəçiləri əldə et
-    admin_users = User.objects.filter(is_staff=True).exclude(id=request.user.id)
-    normal_users = User.objects.filter(is_staff=False).exclude(id=request.user.id)
-    
-    print(f"Found {admin_users.count()} admins and {normal_users.count()} users") # Debug üçün
-    
-    # Admin və normal istifadəçilər üçün məlumatları hazırla
-    admins = []
-    users = []
-    
-    for user in admin_users:
-        unread_count = Message.objects.filter(
-            sender=user,
-            receiver=request.user,
-            is_read=False
-        ).count()
+    try:
+        # Admin və normal istifadəçiləri əldə et
+        admin_users = User.objects.filter(is_staff=True).exclude(id=request.user.id)
+        normal_users = User.objects.filter(is_staff=False).exclude(id=request.user.id)
         
-        admins.append({
-            'id': user.id,
-            'username': user.username,
-            'unread_count': unread_count,
-            'is_admin': True
-        })
-    
-    for user in normal_users:
-        unread_count = Message.objects.filter(
-            sender=user,
-            receiver=request.user,
-            is_read=False
-        ).count()
+        print(f"Found {admin_users.count()} admins and {normal_users.count()} users") # Debug üçün
         
-        users.append({
-            'id': user.id,
-            'username': user.username,
-            'unread_count': unread_count,
-            'is_admin': False
-        })
-    
-    response_data = {
-        'admins': admins,
-        'users': users
-    }
-    print("Sending response:", response_data) # Debug üçün
-    return JsonResponse(response_data)
+        # Admin və normal istifadəçilər üçün məlumatları hazırla
+        admins = []
+        users = []
+        
+        for user in admin_users:
+            try:
+                unread_count = Message.objects.filter(
+                    sender=user,
+                    receiver=request.user,
+                    is_read=False
+                ).count()
+                
+                admins.append({
+                    'id': user.id,
+                    'username': user.username,
+                    'unread_count': unread_count,
+                    'is_admin': True
+                })
+            except Exception as e:
+                print(f"Admin istifadəçi məlumatları hazırlanarkən xəta: {str(e)}")
+        
+        for user in normal_users:
+            try:
+                unread_count = Message.objects.filter(
+                    sender=user,
+                    receiver=request.user,
+                    is_read=False
+                ).count()
+                
+                users.append({
+                    'id': user.id,
+                    'username': user.username,
+                    'unread_count': unread_count,
+                    'is_admin': False
+                })
+            except Exception as e:
+                print(f"Normal istifadəçi məlumatları hazırlanarkən xəta: {str(e)}")
+        
+        response_data = {
+            'admins': admins,
+            'users': users
+        }
+        print("Sending response:", response_data) # Debug üçün
+        return JsonResponse(response_data)
+    except Exception as e:
+        print(f"get_chat_users funksiyasında xəta: {str(e)}")
+        return JsonResponse({'error': str(e)}, status=500)

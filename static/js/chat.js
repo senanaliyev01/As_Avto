@@ -28,68 +28,6 @@ let chatSocket = null;
 let usingWebSocket = false; // WebSocket istifadə edilib-edilmədiyini izləmək üçün
 let suppressWebSocketErrors = true; // WebSocket xətalarını gizlətmək üçün
 let useOnlyHTTP = true; // Yalnız HTTP istifadə et, WebSocket-i tamamilə söndür
-let disableNotificationSounds = true; // Bildiriş səslərini söndür/aç
-
-// Chat widget CSS-ni əlavə et
-(function addChatStyles() {
-    const style = document.createElement('style');
-    style.textContent = `
-        #chat-icon {
-            position: relative;
-        }
-        
-        #total-unread {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background-color: red;
-            color: white;
-            border-radius: 50%;
-            min-width: 18px;
-            height: 18px;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2px;
-            font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            animation: pulse 1.5s infinite;
-        }
-        
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.1);
-            }
-            100% {
-                transform: scale(1);
-            }
-        }
-        
-        .has-notification {
-            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-        }
-        
-        @keyframes shake {
-            10%, 90% {
-                transform: translate3d(-1px, 0, 0);
-            }
-            20%, 80% {
-                transform: translate3d(2px, 0, 0);
-            }
-            30%, 50%, 70% {
-                transform: translate3d(-2px, 0, 0);
-            }
-            40%, 60% {
-                transform: translate3d(2px, 0, 0);
-            }
-        }
-    `;
-    document.head.appendChild(style);
-})();
 
 // CSRF token funksiyası
 function getCookie(name) {
@@ -106,6 +44,8 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
+
 
 // Chat funksiyasını başlat
 function initChat() {
@@ -156,11 +96,6 @@ function initChat() {
             loadChatUsers();
             chatMain.style.display = 'none';
             chatSidebar.style.display = 'block';
-            
-            // Chat pəncərəsi açıldıqda başlığı əvvəlki vəziyyətinə qaytar
-            if (window.originalTitle) {
-                document.title = window.originalTitle;
-            }
         }
     });
 
@@ -662,24 +597,9 @@ function updateUnreadCount(totalUnread) {
         totalUnreadElement.textContent = totalUnread;
         totalUnreadElement.style.display = 'block';
         chatIcon.classList.add('has-notification');
-        
-        // Əgər chat pəncərəsi açıq deyilsə, səhifə başlığında bildiriş göstər
-        if (document.getElementById('chat-window').style.display === 'none') {
-            // Orijinal başlığı saxla
-            if (!window.originalTitle) {
-                window.originalTitle = document.title;
-            }
-            // Başlıqda oxunmamış mesaj sayını göstər
-            document.title = `(${totalUnread}) ${window.originalTitle}`;
-        }
     } else {
         totalUnreadElement.style.display = 'none';
         chatIcon.classList.remove('has-notification');
-        
-        // Başlığı əvvəlki vəziyyətinə qaytar
-        if (window.originalTitle) {
-            document.title = window.originalTitle;
-        }
     }
 }
 
@@ -706,58 +626,7 @@ function selectUser(userId, username) {
     chatMain.style.display = 'flex';
     selectedUsername.textContent = username;
     
-    // Mesajları yüklə
     loadMessages(userId);
-    
-    // Mesajları oxunmuş kimi işarələ
-    markMessagesAsRead(userId);
-    
-    // Başlığı əvvəlki vəziyyətinə qaytar
-    if (window.originalTitle) {
-        document.title = window.originalTitle;
-    }
-}
-
-// Mesajları oxunmuş kimi işarələ
-function markMessagesAsRead(userId) {
-    try {
-        if (!suppressWebSocketErrors) {
-            console.log(`${userId} ID-li istifadəçinin mesajları oxunmuş kimi işarələnir...`);
-        }
-        
-        fetch(`/istifadeciler/api/chat/mark-read/${userId}/`, {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': getCookie('csrftoken'),
-                'Content-Type': 'application/json'
-            },
-            credentials: 'same-origin'
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (!suppressWebSocketErrors) {
-                console.log('Mesajlar oxunmuş kimi işarələndi:', data);
-            }
-            
-            // İstifadəçi siyahısını yenilə
-            loadChatUsers();
-        })
-        .catch(error => {
-            if (!suppressWebSocketErrors) {
-                console.error('Mesajlar oxunmuş kimi işarələnərkən xəta:', error);
-            }
-        });
-    } catch (error) {
-        if (!suppressWebSocketErrors) {
-            console.error('Mesajlar oxunmuş kimi işarələnərkən ümumi xəta:', error);
-        }
-    }
 }
 
 // Mesaj yükləmə funksiyası

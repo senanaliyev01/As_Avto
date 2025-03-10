@@ -1210,7 +1210,7 @@ html {
 }
 
 .unread-count {
-    /* position: absolute; */
+    position: absolute;
     top: -5px;
     right: -5px;
     background-color: var(--error-color);

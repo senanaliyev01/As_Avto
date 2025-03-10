@@ -19,18 +19,10 @@ class LoginCodeAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at',)
     ordering = ('-created_at',)  # Ən son kodlar əvvəldə
     
-    class Media:
-        js = ('js/auto_refresh.js',)
-    
-    def changelist_view(self, request, extra_context=None):
-        extra_context = extra_context or {}
-        extra_context['title'] = 'Təhlükəsizlik Kodları (Avtomatik yenilənir)'
-        return super().changelist_view(request, extra_context=extra_context)
-    
     def is_valid_status(self, obj):
         is_valid = obj.is_valid()
         return mark_safe(
-            '<span style="color: {}; font-weight: bold;" class="status-badge">{}</span>'.format(
+            '<span style="color: {}; font-weight: bold;">{}</span>'.format(
                 'green' if is_valid else 'red',
                 'AKTİV' if is_valid else 'BİTİB'
             )
@@ -47,8 +39,7 @@ class LoginCodeAdmin(admin.ModelAdmin):
                 minutes = seconds // 60
                 seconds = seconds % 60
                 return mark_safe(
-                    '<span style="color: blue;" class="countdown" data-created="{}">{:02d}:{:02d}</span>'.format(
-                        obj.created_at.isoformat(),
+                    '<span style="color: blue;">{:02d}:{:02d}</span>'.format(
                         minutes, seconds
                     )
                 )
@@ -56,10 +47,10 @@ class LoginCodeAdmin(admin.ModelAdmin):
     remaining_time.short_description = 'Qalan vaxt'
 
     def has_add_permission(self, request):
-        return False
+        return False  # Əl ilə kod əlavə etməyə icazə vermə
 
     def has_change_permission(self, request, obj=None):
-        return False
+        return False  # Kodları dəyişməyə icazə vermə
 
 class CustomUserAdmin(admin.ModelAdmin):
     def user_avatar(self, obj):

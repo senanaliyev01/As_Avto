@@ -9,18 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
-    <style>
-        .countdown {
-            font-size: 14px;
-            color: #666;
-            margin-top: 5px;
-            text-align: center;
-        }
-        .countdown.warning {
-            color: #f44336;
-            font-weight: bold;
-        }
-    </style>
 </head>
 <body>
     <!-- Animasyonlu Arka Plan -->
@@ -74,9 +62,7 @@
                         <input type="text" name="code" required maxlength="6" pattern="[A-Z0-9]{6}" style="text-transform: uppercase;">
                         <label>Təhlükəsizlik Kodu</label>
                     </div>
-                    <div id="countdown" class="countdown">
-                        Qalan vaxt: <span id="timer">03:00</span>
-                    </div>
+                    <small class="help-text">Kod 3 dəqiqə ərzində etibarlıdır.</small>
                 </div>
                 {% else %}
                 <!-- İstifadəçi Adı -->
@@ -108,7 +94,7 @@
                 {% endif %}
 
                 <!-- Giriş Düyməsi -->
-                <button type="submit" class="login-btn" {% if show_code_input %}id="submitBtn"{% endif %}>
+                <button type="submit" class="login-btn">
                     <span class="btn-text">{% if show_code_input %}Təsdiqlə{% else %}Daxil Ol{% endif %}</span>
                     <div class="btn-loader"></div>
                 </button>
@@ -134,45 +120,5 @@
 
     <script src="{% static 'js/login.js' %}"></script>
     <script src="{% static 'js/loading.js' %}"></script>
-    {% if show_code_input %}
-    <script>
-        // Geri sayım funksiyası
-        function startCountdown() {
-            const timerDisplay = document.getElementById('timer');
-            const countdownDiv = document.getElementById('countdown');
-            const submitBtn = document.getElementById('submitBtn');
-            let timeLeft = 180; // 3 dəqiqə = 180 saniyə
-
-            function updateTimer() {
-                const minutes = Math.floor(timeLeft / 60);
-                const seconds = timeLeft % 60;
-                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                
-                // Son 30 saniyədə qırmızı rəng
-                if (timeLeft <= 30) {
-                    countdownDiv.classList.add('warning');
-                }
-
-                if (timeLeft <= 0) {
-                    clearInterval(interval);
-                    timerDisplay.textContent = "00:00";
-                    countdownDiv.innerHTML = "Kodun müddəti bitdi! Yenidən cəhd edin.";
-                    submitBtn.disabled = true;
-                    setTimeout(() => {
-                        window.location.href = "{% url 'login' %}";
-                    }, 2000);
-                }
-                timeLeft--;
-            }
-
-            // Hər saniyədə yenilə
-            updateTimer();
-            const interval = setInterval(updateTimer, 1000);
-        }
-
-        // Səhifə yükləndikdə geri sayımı başlat
-        document.addEventListener('DOMContentLoaded', startCountdown);
-    </script>
-    {% endif %}
 </body>
 </html>

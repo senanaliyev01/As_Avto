@@ -55,6 +55,7 @@ let disableNotificationSounds = false; // Bildiriş səslərini söndür/aç
             font-weight: bold;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             animation: pulse 1.5s infinite;
+            z-index: 1001; /* Yüksək z-index dəyəri */
         }
         
         @keyframes pulse {
@@ -129,12 +130,18 @@ function initChat() {
     const sendButton = document.getElementById('send-message');
     const chatMain = document.querySelector('.chat-main');
     const chatSidebar = document.querySelector('.chat-sidebar');
+    const totalUnreadElement = document.getElementById('total-unread');
 
     if (!chatIcon || !chatWindow) {
         if (!suppressWebSocketErrors) {
             console.log('Chat elementləri tapılmadı!');
         }
         return;
+    }
+    
+    // Oxunmamış mesaj sayını göstərmək üçün əmin ol ki, element düzgün görünür
+    if (totalUnreadElement) {
+        totalUnreadElement.style.display = 'none'; // Əvvəlcə gizlət, sonra loadChatUsers funksiyası göstərəcək
     }
 
     // WebSocket bağlantısını yarat (yalnız HTTP istifadə edilmirsə)
@@ -148,6 +155,9 @@ function initChat() {
             }
         }
     }
+
+    // Səhifə yükləndikdə istifadəçiləri və oxunmamış mesaj sayını yüklə
+    loadChatUsers();
 
     // Chat ikonuna klik
     chatIcon.addEventListener('click', () => {
@@ -591,14 +601,30 @@ function loadChatUsers() {
                 });
             }
 
-            // Yeni mesaj varsa bildiriş səsini çal
+            // İstifadəçi siyahısını yenilə
+            loadChatUsers();
+
+            // Yeni mesaj varsa bildiriş səsini çal və oxunmamış mesaj sayını göstər
             if (totalUnread > lastMessageCount && !disableNotificationSounds) {
                 playNewMessageSound();
             }
 
+            // Oxunmamış mesaj sayını yenilə
             lastMessageCount = totalUnread;
-            updateUnreadCount(totalUnread);
-            
+
+            // Oxunmamış mesaj sayını göstər
+            if (totalUnread > 0) {
+                updateUnreadCount(totalUnread);
+                if (!suppressWebSocketErrors) {
+                    console.log(`Toplam oxunmamış mesaj sayı: ${totalUnread}`);
+                }
+            } else {
+                updateUnreadCount(0);
+                if (!suppressWebSocketErrors) {
+                    console.log('Oxunmamış mesaj yoxdur');
+                }
+            }
+
             // Uğurlu sorğudan sonra xəta sayğacını sıfırla
             window.chatUserLoadErrors = 0;
         })
@@ -656,11 +682,17 @@ function updateUnreadCount(totalUnread) {
     const totalUnreadElement = document.getElementById('total-unread');
     const chatIcon = document.getElementById('chat-icon');
     
-    if (!totalUnreadElement || !chatIcon) return;
+    if (!totalUnreadElement || !chatIcon) {
+        if (!suppressWebSocketErrors) {
+            console.error('total-unread və ya chat-icon elementləri tapılmadı!');
+        }
+        return;
+    }
     
     if (totalUnread > 0) {
+        // Oxunmamış mesaj sayını göstər
         totalUnreadElement.textContent = totalUnread;
-        totalUnreadElement.style.display = 'block';
+        totalUnreadElement.style.display = 'flex'; // 'none' əvəzinə 'flex' istifadə et
         chatIcon.classList.add('has-notification');
         
         // Əgər chat pəncərəsi açıq deyilsə, səhifə başlığında bildiriş göstər
@@ -671,6 +703,10 @@ function updateUnreadCount(totalUnread) {
             }
             // Başlıqda oxunmamış mesaj sayını göstər
             document.title = `(${totalUnread}) ${window.originalTitle}`;
+        }
+        
+        if (!suppressWebSocketErrors) {
+            console.log(`Oxunmamış mesaj sayı yeniləndi: ${totalUnread}`);
         }
     } else {
         totalUnreadElement.style.display = 'none';
@@ -1249,7 +1285,35 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!suppressWebSocketErrors) {
                 console.log('Chat widget tapıldı, inicializasiya edilir...');
             }
+            
+            // Chat ikonunu və oxunmamış mesaj sayını yoxla
+            const chatIcon = document.getElementById('chat-icon');
+            const totalUnreadElement = document.getElementById('total-unread');
+            
+            if (chatIcon && totalUnreadElement) {
+                if (!suppressWebSocketErrors) {
+                    console.log('Chat ikonu və oxunmamış mesaj sayı elementi tapıldı');
+                }
+                
+                // Əmin ol ki, oxunmamış mesaj sayı elementi düzgün görünür
+                if (totalUnreadElement.style.display === 'none') {
+                    if (!suppressWebSocketErrors) {
+                        console.log('Oxunmamış mesaj sayı elementi gizlidir, yenilənəcək');
+                    }
+                }
+            } else {
+                if (!suppressWebSocketErrors) {
+                    console.error('Chat ikonu və ya oxunmamış mesaj sayı elementi tapılmadı!');
+                }
+            }
+            
+            // Chat funksiyasını başlat
             initChat();
+            
+            // Əlavə olaraq, 1 saniyə sonra oxunmamış mesaj sayını yenilə
+            setTimeout(function() {
+                loadChatUsers();
+            }, 1000);
         } else {
             if (!suppressWebSocketErrors) {
                 console.log('Chat widget tapılmadı!');

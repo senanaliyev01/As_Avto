@@ -302,11 +302,11 @@
             justify-content: space-between;
             cursor: pointer;
             border-bottom: 1px solid #f0f0f0;
-            transition: background-color 0.2s;
+            transition: all 0.3s ease;
         }
 
         .user-item:hover {
-            background-color: #f9f9f9;
+            background-color: rgba(0, 51, 102, 0.1);
         }
 
         .user-item.has-unread {
@@ -367,7 +367,7 @@
         .notification-dot {
             width: 8px;
             height: 8px;
-            background-color: #ff5252;
+            background-color: #003366;
             border-radius: 50%;
             margin-top: 5px;
             animation: blink 1s infinite;
@@ -380,7 +380,7 @@
         }
 
         .admin-icon {
-            color: #ff9800 !important;
+            color: #003366 !important;
         }
 
         .chat-main {
@@ -391,16 +391,17 @@
 
         .selected-user {
             padding: 12px 15px;
-            background-color: #f5f5f5;
+            background-color: #003366;
+            color: white;
             display: flex;
             align-items: center;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #002244;
         }
 
         .selected-user i {
             margin-right: 15px;
             cursor: pointer;
-            color: #003366;
+            color: white;
         }
 
         .chat-messages {
@@ -418,23 +419,29 @@
 
         .message.mine {
             margin-left: auto;
-            background-color: #e1f5fe;
+            background-color: #003366;
+            color: white;
             border-radius: 15px 15px 0 15px;
             padding: 10px 15px;
         }
 
         .message.theirs {
             margin-right: auto;
-            background-color: white;
+            background-color: #f0f2f5;
+            color: #333;
             border-radius: 15px 15px 15px 0;
             padding: 10px 15px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
 
         .message-sender {
             font-size: 12px;
             color: #666;
             margin-bottom: 5px;
+        }
+
+        .message.mine .message-sender,
+        .message.mine .message-status {
+            color: rgba(255, 255, 255, 0.7);
         }
 
         .message-content {
@@ -457,14 +464,20 @@
             display: flex;
             align-items: center;
             border-top: 1px solid #eee;
+            background-color: white;
         }
 
         .chat-input input {
             flex: 1;
-            border: 1px solid #ddd;
+            border: 1px solid #003366;
             border-radius: 20px;
             padding: 8px 15px;
             outline: none;
+        }
+
+        .chat-input input:focus {
+            border-color: #004080;
+            box-shadow: 0 0 0 2px rgba(0, 51, 102, 0.2);
         }
 
         .chat-input button {
@@ -479,11 +492,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background-color 0.2s;
+            transition: all 0.3s ease;
         }
 
         .chat-input button:hover {
-            background-color: #002244;
+            background-color: #004080;
+            transform: scale(1.1);
         }
     </style>
 

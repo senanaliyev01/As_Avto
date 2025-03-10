@@ -518,8 +518,8 @@ function loadChatUsers() {
 }
 
 function createUserItem(user) {
-    // Profil şəkli URL-i
-    const profileImageUrl = user.profile_image ? user.profile_image : '{% static "img/default-profile.png" %}';
+    // Profil şəkli URL-i - profile.sekil sahəsindən götür
+    const profileImageUrl = user.profile && user.profile.sekil ? user.profile.sekil : '/static/img/default-profile.png';
     
     return `
         <div class="user-item ${user.unread_count > 0 ? 'has-unread' : ''}" 

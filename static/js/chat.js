@@ -10,6 +10,11 @@ window.onerror = function(message, source, lineno, colno, error) {
         return true;
     }
     
+    // Cloudflare RUM xətasını gizlət
+    if (message && message.includes('cdn-cgi/rum')) {
+        return true;
+    }
+    
     // Digər xətaları normal emal et
     return false;
 };

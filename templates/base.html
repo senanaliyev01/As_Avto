@@ -144,42 +144,51 @@
     <div id="chat-widget" class="chat-widget">
         <div id="chat-icon" class="chat-icon">
             <i class="fas fa-comments"></i>
-            <span id="total-unread" class="unread-count" style="display: none;">0</span>
+            <span id="total-unread" class="total-unread">0</span>
         </div>
-        
         <div id="chat-window" class="chat-window" style="display: none;">
             <div class="chat-header">
                 <div class="chat-title">Mesajlar</div>
-                <button id="close-chat" class="close-button">&times;</button>
+                <div id="close-chat" class="close-chat"><i class="fas fa-times"></i></div>
             </div>
-            
-            <div class="chat-container">
-                <!-- İstifadəçilər siyahısı -->
-                <div class="chat-sidebar">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="user-search" placeholder="İstifadəçi axtar...">
-                    </div>
-                    <div id="users-list" class="users-list"></div>
+            <div class="chat-sidebar">
+                <div class="search-container">
+                    <input type="text" id="user-search" placeholder="İstifadəçi axtar...">
+                    <i class="fas fa-search"></i>
                 </div>
-                
-                <!-- Mesajlaşma bölməsi -->
-                <div class="chat-main" style="display: none;">
-                    <div class="selected-user">
-                        <i class="fas fa-arrow-left" id="back-to-users"></i>
-                        <span id="selected-username"></span>
-                    </div>
-                    <div class="chat-messages" id="chat-messages"></div>
-                    <div class="chat-input">
-                        <input type="text" id="message-input" placeholder="Mesajınızı yazın...">
-                        <button id="send-message" type="button">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
+                <div id="users-list" class="users-list">
+                    <!-- İstifadəçilər burada göstəriləcək -->
+                </div>
+            </div>
+            <div class="chat-main" style="display: none;">
+                <div class="chat-header-inner">
+                    <div id="back-to-users" class="back-button"><i class="fas fa-arrow-left"></i></div>
+                    <div id="selected-username" class="selected-username"></div>
+                </div>
+                <div id="chat-messages" class="chat-messages">
+                    <!-- Mesajlar burada göstəriləcək -->
+                </div>
+                <div class="chat-input">
+                    <textarea id="message-input" placeholder="Mesajınızı yazın..."></textarea>
+                    <div class="chat-actions">
+                        <button id="attach-file" class="attach-file"><i class="fas fa-paperclip"></i></button>
+                        <input type="file" id="file-input" style="display: none;">
+                        <button id="send-message" class="send-message"><i class="fas fa-paper-plane"></i></button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Bildiriş səsləri -->
+    <audio id="new-message-sound" preload="auto" muted>
+        <source src="{% static 'sounds/notification.mp3' %}" type="audio/mpeg">
+        <source src="{% static 'sounds/notification.wav' %}" type="audio/wav">
+    </audio>
+    <audio id="chat-message-sound" preload="auto" muted>
+        <source src="{% static 'sounds/chat-message.mp3' %}" type="audio/mpeg">
+        <source src="{% static 'sounds/chat-message.wav' %}" type="audio/wav">
+    </audio>
     {% endif %}
 
     <!-- Common Scripts -->

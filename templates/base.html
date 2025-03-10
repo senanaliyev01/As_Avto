@@ -88,9 +88,9 @@
                             <i class="fas fa-chart-bar"></i> Hesabatlar
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a href="{% url 'logout_view' %}" onclick="confirmLogout(event); return false;" class="logout-link">
+                        {% comment %} <a href="{% url 'logout_view' %}" onclick="confirmLogout(event); return false;" class="logout-link">
                             <i class="fas fa-sign-out-alt"></i> Çıxış
-                        </a>
+                        </a> {% endcomment %}
                     </div>
                 </div>
                 <a href="{% url 'view_cart' %}" class="cart-link">

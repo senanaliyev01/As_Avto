@@ -1211,9 +1211,9 @@ html {
 
 .unread-count {
     position: absolute;
-    top: -5px;
-    right: -5px;
-    background-color: var(--error-color);
+    top: -1px;
+    right: -1px;
+    background-color: #0b9911;
     color: var(--text-primary);
     border-radius: 50%;
     width: 22px;

@@ -4,6 +4,7 @@ from django.utils.html import format_html
 from django.urls import reverse
 from .models import Profile, Message, LoginCode
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
@@ -20,10 +21,11 @@ class LoginCodeAdmin(admin.ModelAdmin):
     
     def is_valid_status(self, obj):
         is_valid = obj.is_valid()
-        return format_html(
-            '<span style="color: {}; font-weight: bold;">{}</span>',
-            'green' if is_valid else 'red',
-            'AKTİV' if is_valid else 'BİTİB'
+        return mark_safe(
+            '<span style="color: {}; font-weight: bold;">{}</span>'.format(
+                'green' if is_valid else 'red',
+                'AKTİV' if is_valid else 'BİTİB'
+            )
         )
     is_valid_status.short_description = 'Status'
 
@@ -36,11 +38,12 @@ class LoginCodeAdmin(admin.ModelAdmin):
                 seconds = int(remaining.total_seconds())
                 minutes = seconds // 60
                 seconds = seconds % 60
-                return format_html(
-                    '<span style="color: blue;">{:02d}:{:02d}</span>',
-                    minutes, seconds
+                return mark_safe(
+                    '<span style="color: blue;">{:02d}:{:02d}</span>'.format(
+                        minutes, seconds
+                    )
                 )
-        return format_html('<span style="color: red;">Vaxt bitib</span>')
+        return mark_safe('<span style="color: red;">Vaxt bitib</span>')
     remaining_time.short_description = 'Qalan vaxt'
 
     def has_add_permission(self, request):
@@ -54,8 +57,8 @@ class CustomUserAdmin(admin.ModelAdmin):
         # İstifadəçinin profil şəkili varsa, onu göstər, əks halda default şəkil
         profile = Profile.objects.filter(user=obj).first()
         if profile and profile.sekil:
-            return format_html('<img src="{}" width="30" class="img-circle elevation-2" />', profile.sekil.url)
-        return format_html('<img src="/static/vendor/adminlte/img/user2-160x160.jpg" width="30" class="img-circle elevation-2" />')
+            return mark_safe('<img src="{}" width="30" class="img-circle elevation-2" />'.format(profile.sekil.url))
+        return mark_safe('<img src="/static/vendor/adminlte/img/user2-160x160.jpg" width="30" class="img-circle elevation-2" />')
 
     list_display = ("username", "email", "user_avatar")  # Admin paneldə avatar göstərmək üçün
 
@@ -85,10 +88,9 @@ class MessageAdmin(admin.ModelAdmin):
 
     def delete_button(self, obj):
         delete_url = reverse('admin:istifadeciler_message_delete', args=[obj.id])
-        return format_html(
+        return mark_safe(
             '<a class="deletelink" href="{}" onclick="return confirm(\'Bu mesajı silmək istədiyinizə əminsiniz?\');">'
-            'Sil</a>',
-            delete_url
+            'Sil</a>'.format(delete_url)
         )
     delete_button.short_description = 'Əməliyyatlar'
     delete_button.allow_tags = True

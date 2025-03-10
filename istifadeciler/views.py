@@ -32,7 +32,7 @@ def login_view(request):
             
             if not user_id:
                 messages.error(request, 'Sessiya müddəti bitib. Zəhmət olmasa yenidən cəhd edin.')
-                return render(request, 'login.html')
+                return render(request, 'login.html', {'show_code_input': False})
             
             try:
                 user = User.objects.get(id=user_id)
@@ -46,26 +46,28 @@ def login_view(request):
                     
                     remember_me = request.session.get('temp_remember_me', False)
                     if remember_me:
-                        request.session.set_expiry(31536000)
+                        request.session.set_expiry(31536000)  # 365 gün
                         request.session['remember_me'] = True
                     else:
                         request.session.set_expiry(0)
                         request.session['remember_me'] = False
                     
                     # Təmizlə
-                    del request.session['temp_user_id']
-                    if 'temp_remember_me' in request.session:
-                        del request.session['temp_remember_me']
+                    request.session.pop('temp_user_id', None)
+                    request.session.pop('temp_remember_me', None)
                     
-                    next_url = request.session.get('next')
+                    next_url = request.session.pop('next', None)
                     if next_url:
-                        del request.session['next']
                         return redirect(next_url)
                     return redirect('esasevim:main')
                 else:
                     messages.error(request, 'Kod etibarsızdır və ya müddəti bitib.')
-            except (User.DoesNotExist, LoginCode.DoesNotExist):
+            except User.DoesNotExist:
+                messages.error(request, 'İstifadəçi tapılmadı.')
+            except LoginCode.DoesNotExist:
                 messages.error(request, 'Yanlış və ya etibarsız kod.')
+            except Exception as e:
+                messages.error(request, f'Xəta baş verdi: {str(e)}')
             
             return render(request, 'login.html', {'show_code_input': True})
         else:
@@ -77,21 +79,26 @@ def login_view(request):
             user = authenticate(request, username=username, password=password)
             
             if user is not None:
-                # Təhlükəsizlik kodu yarat və saxla
-                code = LoginCode.generate_code()
-                LoginCode.objects.create(user=user, code=code)
-                
-                # Müvəqqəti məlumatları sessiyada saxla
-                request.session['temp_user_id'] = user.id
-                request.session['temp_remember_me'] = remember_me
-                if 'next' in request.GET:
-                    request.session['next'] = request.GET['next']
-                
-                # Admin üçün kodu console-a çap et (real layihədə email/SMS ilə göndəriləcək)
-                print(f"Təhlükəsizlik kodu: {code}")
-                
-                messages.info(request, 'Zəhmət olmasa sizə verilən təhlükəsizlik kodunu daxil edin.')
-                return render(request, 'login.html', {'show_code_input': True})
+                try:
+                    # Təhlükəsizlik kodu yarat və saxla
+                    code = LoginCode.generate_code()
+                    LoginCode.objects.create(user=user, code=code)
+                    
+                    # Müvəqqəti məlumatları sessiyada saxla
+                    request.session['temp_user_id'] = user.id
+                    request.session['temp_remember_me'] = remember_me
+                    
+                    if request.GET.get('next'):
+                        request.session['next'] = request.GET['next']
+                    
+                    # Admin üçün kodu console-a çap et (real layihədə email/SMS ilə göndəriləcək)
+                    print(f"Təhlükəsizlik kodu: {code}")
+                    
+                    messages.info(request, 'Zəhmət olmasa sizə verilən təhlükəsizlik kodunu daxil edin.')
+                    return render(request, 'login.html', {'show_code_input': True})
+                except Exception as e:
+                    messages.error(request, f'Təhlükəsizlik kodu yaradılarkən xəta baş verdi: {str(e)}')
+                    return render(request, 'login.html', {'show_code_input': False})
             else:
                 messages.error(request, 'İstifadəçi adı və ya şifrə yanlışdır!')
     

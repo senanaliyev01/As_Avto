@@ -59,10 +59,21 @@
                 <div class="form-group">
                     <div class="input-wrap">
                         <i class="fas fa-shield-alt icon"></i>
-                        <input type="text" name="code" required maxlength="6" pattern="[A-Z0-9]{6}" style="text-transform: uppercase;">
+                        <input type="text" 
+                               name="code" 
+                               id="securityCode"
+                               required 
+                               maxlength="6" 
+                               pattern="[A-Z0-9]{6}" 
+                               style="text-transform: uppercase;"
+                               autocomplete="off"
+                               oninput="formatSecurityCode(this)">
                         <label>Təhlükəsizlik Kodu</label>
                     </div>
                     <small class="help-text" style="color: red;">Kod 3 dəqiqə ərzində etibarlıdır.</small>
+                    <small class="format-help" style="color: #666; display: block; margin-top: 5px;">
+                        Format: 6 rəqəm və ya böyük hərf (məsələn: ABC123)
+                    </small>
                 </div>
                 {% else %}
                 <!-- İstifadəçi Adı -->
@@ -120,5 +131,52 @@
 
     <script src="{% static 'js/login.js' %}"></script>
     <script src="{% static 'js/loading.js' %}"></script>
+    <script>
+    function formatSecurityCode(input) {
+        // Daxil edilən mətni böyük hərflərə çevir
+        let value = input.value.toUpperCase();
+        
+        // Yalnız hərflər və rəqəmlərə icazə ver
+        value = value.replace(/[^A-Z0-9]/g, '');
+        
+        // Maksimum 6 simvol
+        value = value.substring(0, 6);
+        
+        // Yenilənmiş dəyəri input-a mənimsət
+        input.value = value;
+        
+        // Pattern-ə uyğunluğu yoxla
+        const isValid = /^[A-Z0-9]{6}$/.test(value);
+        
+        // Vizual əks-əlaqə
+        if (value.length === 6) {
+            if (isValid) {
+                input.style.borderColor = '#28a745';
+                input.style.boxShadow = '0 0 0 0.2rem rgba(40, 167, 69, 0.25)';
+            } else {
+                input.style.borderColor = '#dc3545';
+                input.style.boxShadow = '0 0 0 0.2rem rgba(220, 53, 69, 0.25)';
+            }
+        } else {
+            input.style.borderColor = '';
+            input.style.boxShadow = '';
+        }
+    }
+
+    // Səhifə yükləndikdə input-u fokusla
+    document.addEventListener('DOMContentLoaded', function() {
+        const codeInput = document.getElementById('securityCode');
+        if (codeInput) {
+            codeInput.focus();
+            
+            // Enter düyməsinə basıldıqda formanı göndər
+            codeInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && this.value.length === 6) {
+                    this.form.submit();
+                }
+            });
+        }
+    });
+    </script>
 </body>
 </html>

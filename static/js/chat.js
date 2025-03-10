@@ -518,15 +518,15 @@ function loadChatUsers() {
 }
 
 function createUserItem(user) {
-    // Profil şəkli URL-i
-    const profileImageUrl = user.profile_image ? user.profile_image : '{% static "img/default-profile.png" %}';
+    // Profil şəkli URL-i - Profile modelindəki sekil sahəsindən götürürük
+    const profileImageUrl = user.profile_image || user.sekil || '/static/img/default-profile.png';
     
     return `
         <div class="user-item ${user.unread_count > 0 ? 'has-unread' : ''}" 
-             onclick="selectUser(${user.id}, '${user.username}')">
+             onclick="selectUser(${user.id}, '${user.username}', '${profileImageUrl}')">
             <div class="user-info">
                 <div class="user-avatar">
-                    <img src="${profileImageUrl}" alt="${user.username}" onerror="this.src='/static/img/default-profile.png'">
+                    <img src="${profileImageUrl}" alt="${user.username}" onerror="this.src='/static/profile_pics/default.png'">
                     ${user.is_online ? '<span class="online-indicator"></span>' : ''}
                 </div>
                 <div class="user-details">
@@ -575,7 +575,7 @@ function updateUnreadCount(totalUnread) {
     }
 }
 
-function selectUser(userId, username) {
+function selectUser(userId, username, profileImage) {
     if (!suppressWebSocketErrors) {
         console.log(`İstifadəçi seçildi: ${username} (ID: ${userId})`);
     }
@@ -586,6 +586,7 @@ function selectUser(userId, username) {
     const chatMain = document.querySelector('.chat-main');
     const chatSidebar = document.querySelector('.chat-sidebar');
     const selectedUsername = document.getElementById('selected-username');
+    const selectedUserAvatar = document.getElementById('selected-user-avatar');
     
     if (!chatMain || !chatSidebar || !selectedUsername) {
         if (!suppressWebSocketErrors) {
@@ -597,6 +598,15 @@ function selectUser(userId, username) {
     chatSidebar.style.display = 'none';
     chatMain.style.display = 'flex';
     selectedUsername.textContent = username;
+    
+    // Profil şəklini göstər
+    if (selectedUserAvatar && profileImage) {
+        selectedUserAvatar.src = profileImage;
+        selectedUserAvatar.style.display = 'block';
+    } else if (selectedUserAvatar) {
+        selectedUserAvatar.src = '/static/profile_pics/default.png';
+        selectedUserAvatar.style.display = 'block';
+    }
     
     loadMessages(userId);
 }

@@ -86,32 +86,11 @@ function initChat() {
 
     // Chat ikonuna klik
     chatIcon.addEventListener('click', () => {
-        // Chat pəncərəsini aç/bağla
         chatWindow.style.display = chatWindow.style.display === 'none' ? 'flex' : 'none';
-        
         if (chatWindow.style.display === 'flex') {
-            // İstifadəçiləri yüklə
             loadChatUsers();
-            
-            // Chat əsas pəncərəsini gizlət, istifadəçilər siyahısını göstər
             chatMain.style.display = 'none';
             chatSidebar.style.display = 'block';
-            
-            // Bildiriş göstər
-            if (typeof showAnimatedMessage === 'function') {
-                // Oxunmamış mesaj sayını al
-                const totalUnreadElement = document.getElementById('total-unread');
-                const unreadCount = totalUnreadElement ? parseInt(totalUnreadElement.textContent) || 0 : 0;
-                
-                if (unreadCount > 0) {
-                    showAnimatedMessage(`${unreadCount} oxunmamış mesajınız var!`, false);
-                } else {
-                    showAnimatedMessage('Mesajlarınız yoxdur', false);
-                }
-            }
-            
-            // Chat ikonundan bildiriş animasiyasını sil
-            chatIcon.classList.remove('pulse-animation');
         }
     });
 
@@ -255,12 +234,14 @@ function connectWebSocket() {
                             appendMessage(data.message);
                             
                             // Əgər mesaj bizim deyilsə, səs çal
-                            if (!data.message.is_mine) {
+                            if (!data.message.is_mine && !disableNotificationSounds) {
                                 playChatMessageSound();
                             }
                         } else {
                             // Əks halda bildiriş səsini çal
-                            playNewMessageSound();
+                            if (!disableNotificationSounds) {
+                                playNewMessageSound();
+                            }
                             
                             // İstifadəçi siyahısını yenilə
                             loadChatUsers();
@@ -384,12 +365,14 @@ function tryAlternativeWebSocket() {
                                 appendMessage(data.message);
                                 
                                 // Əgər mesaj bizim deyilsə, səs çal
-                                if (!data.message.is_mine) {
+                                if (!data.message.is_mine && !disableNotificationSounds) {
                                     playChatMessageSound();
                                 }
                             } else {
                                 // Əks halda bildiriş səsini çal
-                                playNewMessageSound();
+                                if (!disableNotificationSounds) {
+                                    playNewMessageSound();
+                                }
                                 
                                 // İstifadəçi siyahısını yenilə
                                 loadChatUsers();
@@ -495,20 +478,20 @@ function loadChatUsers() {
             // Cari istifadəçinin admin olub-olmadığını yoxla
             const isCurrentUserAdmin = typeof isAdmin !== 'undefined' && isAdmin;
             
-            // Adminləri əlavə et (yalnız istifadəçilər üçün və ya adminlər üçün bütün adminlər)
+            // Adminləri əlavə et (bütün istifadəçilər adminləri görə bilər)
             if (data.admins && data.admins.length > 0) {
                 usersList.innerHTML += '<div class="user-group-title">Adminlər</div>';
                 data.admins.forEach(user => {
-                    // Əgər cari istifadəçi admindisə və ya admin deyilsə, bütün adminləri göstər
-                    if (isCurrentUserAdmin || !isCurrentUserAdmin) {
+                    // Özünü göstərmə
+                    if (user.id !== currentUserId) {
                         totalUnread += user.unread_count;
                         usersList.innerHTML += createUserItem(user);
                     }
                 });
             }
             
-            // İstifadəçiləri əlavə et (yalnız adminlər üçün)
-            if (data.users && data.users.length > 0 && isCurrentUserAdmin) {
+            // İstifadəçiləri əlavə et (yalnız adminlər bütün istifadəçiləri görə bilər)
+            if (isCurrentUserAdmin && data.users && data.users.length > 0) {
                 usersList.innerHTML += '<div class="user-group-title">İstifadəçilər</div>';
                 data.users.forEach(user => {
                     totalUnread += user.unread_count;
@@ -517,7 +500,7 @@ function loadChatUsers() {
             }
 
             // Yeni mesaj varsa bildiriş səsini çal
-            if (totalUnread > lastMessageCount) {
+            if (totalUnread > lastMessageCount && !disableNotificationSounds) {
                 playNewMessageSound();
             }
 
@@ -558,29 +541,12 @@ function updateUnreadCount(totalUnread) {
     if (!totalUnreadElement || !chatIcon) return;
     
     if (totalUnread > 0) {
-        // Bildiriş sayını göstər
         totalUnreadElement.textContent = totalUnread;
         totalUnreadElement.style.display = 'block';
-        
-        // Chat ikonuna bildiriş sinfi əlavə et
         chatIcon.classList.add('has-notification');
-        
-        // Chat ikonunu animasiya et
-        chatIcon.classList.add('pulse-animation');
-        
-        // Bildiriş səsini çal (əgər söndürülməyibsə)
-        if (!disableNotificationSounds) {
-            playNewMessageSound();
-        }
     } else {
-        // Bildiriş sayını gizlət
         totalUnreadElement.style.display = 'none';
-        
-        // Chat ikonundan bildiriş sinfini sil
         chatIcon.classList.remove('has-notification');
-        
-        // Chat ikonundan animasiyanı sil
-        chatIcon.classList.remove('pulse-animation');
     }
 }
 
@@ -603,26 +569,11 @@ function selectUser(userId, username) {
         return;
     }
     
-    // İstifadəçilər siyahısını gizlət, mesajlaşma pəncərəsini göstər
     chatSidebar.style.display = 'none';
     chatMain.style.display = 'flex';
-    
-    // Seçilmiş istifadəçinin adını göstər
     selectedUsername.textContent = username;
     
-    // Bildiriş göstər
-    if (typeof showAnimatedMessage === 'function') {
-        showAnimatedMessage(`${username} ilə söhbət başladıldı`, false);
-    }
-    
-    // Mesajları yüklə
     loadMessages(userId);
-    
-    // Mesaj sahəsini fokusla
-    const messageInput = document.getElementById('message-input');
-    if (messageInput) {
-        messageInput.focus();
-    }
 }
 
 // Mesaj yükləmə funksiyası
@@ -694,7 +645,7 @@ function loadMessages(receiverId) {
                 });
 
                 // Yeni mesaj gəlibsə və bu mesaj bizim deyilsə səs çal
-                if (lastMessage && lastMessage.id > lastMessageId && !lastMessage.is_mine) {
+                if (lastMessage && lastMessage.id > lastMessageId && !lastMessage.is_mine && !disableNotificationSounds) {
                     playChatMessageSound();
                 }
 
@@ -866,22 +817,13 @@ function filterUsers() {
     const userItems = document.querySelectorAll('.user-item');
     const userGroupTitles = document.querySelectorAll('.user-group-title');
     
-    // Cari istifadəçinin admin olub-olmadığını yoxla
-    const isCurrentUserAdmin = typeof isAdmin !== 'undefined' && isAdmin;
-    
     // Əgər axtarış boşdursa hər şeyi göstər
     if (!searchTerm) {
         userGroupTitles.forEach(title => {
             title.style.display = 'block';
         });
         userItems.forEach(item => {
-            // Admin olmayan istifadəçilər üçün yalnız adminləri göstər
-            const isAdmin = item.querySelector('.admin-icon') !== null;
-            if (isCurrentUserAdmin || (!isCurrentUserAdmin && isAdmin)) {
-                item.style.display = 'flex';
-            } else {
-                item.style.display = 'none';
-            }
+            item.style.display = 'flex';
         });
         return;
     }
@@ -900,23 +842,16 @@ function filterUsers() {
 
     userItems.forEach(item => {
         const username = item.querySelector('.user-info span').textContent.toLowerCase();
-        const isItemAdmin = item.querySelector('.admin-icon') !== null;
-        
         if (username.includes(searchTerm)) {
-            // Admin olmayan istifadəçilər üçün yalnız adminləri göstər
-            if (isCurrentUserAdmin || (!isCurrentUserAdmin && isItemAdmin)) {
-                item.style.display = 'flex';
-                
-                // İstifadəçinin admin olub-olmadığını yoxla
-                if (isItemAdmin) {
-                    adminFound = true;
-                    const adminTitle = document.querySelector('.user-group-title:first-of-type');
-                    if (adminTitle) adminTitle.style.display = 'block';
-                } else {
-                    userFound = true;
-                    const userTitle = document.querySelector('.user-group-title:last-of-type');
-                    if (userTitle) userTitle.style.display = 'block';
-                }
+            item.style.display = 'flex';
+            // İstifadəçinin admin olub-olmadığını yoxla
+            const isAdmin = item.querySelector('.admin-icon') !== null;
+            if (isAdmin) {
+                adminFound = true;
+                document.querySelector('.user-group-title:first-of-type').style.display = 'block';
+            } else {
+                userFound = true;
+                document.querySelector('.user-group-title:last-of-type').style.display = 'block';
             }
         }
     });
@@ -1010,9 +945,6 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM yükləndi, chat funksiyası başladılır...');
         }
         
-        // Chat üçün əlavə CSS stilləri əlavə et
-        addChatStyles();
-        
         // Global funksiyaları window obyektinə əlavə et
         window.selectUser = selectUser;
         
@@ -1037,55 +969,4 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Chat inicializasiya edilərkən xəta:', error);
         }
     }
-});
-
-// Chat üçün əlavə CSS stilləri əlavə et
-function addChatStyles() {
-    const style = document.createElement('style');
-    style.textContent = `
-        /* Chat ikonuna animasiya */
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(0, 51, 102, 0.7);
-            }
-            70% {
-                transform: scale(1.1);
-                box-shadow: 0 0 0 10px rgba(0, 51, 102, 0);
-            }
-            100% {
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(0, 51, 102, 0);
-            }
-        }
-        
-        .pulse-animation {
-            animation: pulse 1.5s infinite;
-        }
-        
-        /* Bildiriş sayı üçün stil */
-        .unread-count {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: #ff5252;
-            color: white;
-            border-radius: 50%;
-            width: 22px;
-            height: 22px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-        
-        /* Chat ikonuna hover effekti */
-        .chat-icon:hover {
-            transform: scale(1.1);
-            transition: transform 0.3s ease;
-        }
-    `;
-    document.head.appendChild(style);
-} 
+}); 

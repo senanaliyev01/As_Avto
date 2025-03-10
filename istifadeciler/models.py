@@ -46,3 +46,7 @@ class Message(models.Model):
 
     def __str__(self):
         return f'Message from {self.sender.username} to {self.receiver.username}'
+    
+    class Meta:
+        verbose_name = 'Mesajlar'
+        verbose_name_plural = 'Mesajlar'

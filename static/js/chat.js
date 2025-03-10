@@ -23,8 +23,6 @@ let chatSocket = null;
 let usingWebSocket = false; // WebSocket istifadə edilib-edilmədiyini izləmək üçün
 let suppressWebSocketErrors = true; // WebSocket xətalarını gizlətmək üçün
 let useOnlyHTTP = true; // Yalnız HTTP istifadə et, WebSocket-i tamamilə söndür
-let disableNotificationSounds = true; // Bildiriş səslərini söndür
-let userIsAdmin = false; // İstifadəçinin admin olub-olmadığını saxlayır
 
 // CSRF token funksiyası
 function getCookie(name) {
@@ -42,6 +40,8 @@ function getCookie(name) {
     return cookieValue;
 }
 
+
+
 // Chat funksiyasını başlat
 function initChat() {
     if (!suppressWebSocketErrors) {
@@ -54,14 +54,6 @@ function initChat() {
             console.log('İstifadəçi daxil olmayıb, chat funksiyası başladılmır');
         }
         return;
-    }
-    
-    // İstifadəçinin admin olub-olmadığını təyin et
-    if (typeof isAdmin !== 'undefined') {
-        userIsAdmin = isAdmin;
-        if (!suppressWebSocketErrors) {
-            console.log('İstifadəçi admin statusu:', userIsAdmin);
-        }
     }
     
     const chatIcon = document.getElementById('chat-icon');
@@ -99,6 +91,14 @@ function initChat() {
             loadChatUsers();
             chatMain.style.display = 'none';
             chatSidebar.style.display = 'block';
+            
+            // İstifadəçiyə bildiriş göstər
+            if (typeof showAnimatedMessage === 'function') {
+                showAnimatedMessage('Mesajlarınız yüklənir...', false);
+            }
+            
+            // Bildiriş animasiyasını dayandır
+            chatIcon.classList.remove('pulse-animation');
         }
     });
 
@@ -479,7 +479,7 @@ function loadChatUsers() {
             
             usersList.innerHTML = '';
             
-            // Adminləri və istifadəçiləri əlavə et
+            // Adminləri əlavə et - həm adminlər, həm də istifadəçilər üçün göstər
             if (data.admins && data.admins.length > 0) {
                 usersList.innerHTML += '<div class="user-group-title">Adminlər</div>';
                 data.admins.forEach(user => {
@@ -488,8 +488,8 @@ function loadChatUsers() {
                 });
             }
             
-            // Əgər istifadəçi admindisə, bütün istifadəçiləri göstər
-            if (userIsAdmin && data.users && data.users.length > 0) {
+            // İstifadəçiləri əlavə et - yalnız adminlər üçün göstər
+            if (isAdmin && data.users && data.users.length > 0) {
                 usersList.innerHTML += '<div class="user-group-title">İstifadəçilər</div>';
                 data.users.forEach(user => {
                     totalUnread += user.unread_count;
@@ -498,7 +498,7 @@ function loadChatUsers() {
             }
 
             // Yeni mesaj varsa bildiriş səsini çal
-            if (totalUnread > lastMessageCount) {
+            if (totalUnread > lastMessageCount && !disableNotificationSounds) {
                 playNewMessageSound();
             }
 
@@ -518,27 +518,15 @@ function loadChatUsers() {
 }
 
 function createUserItem(user) {
-    // Profil şəkli URL-i - Profile modelindəki sekil sahəsindən götürürük
-    const profileImageUrl = user.profile_image || user.sekil || '/static/img/default.png';
-    
     return `
         <div class="user-item ${user.unread_count > 0 ? 'has-unread' : ''}" 
-             onclick="selectUser(${user.id}, '${user.username}', '${profileImageUrl}')">
+             onclick="selectUser(${user.id}, '${user.username}')">
             <div class="user-info">
-                <div class="user-avatar">
-                    <img src="${profileImageUrl}" alt="${user.username}" onerror="this.src='/static/img/default.png'">
-                    ${user.is_online ? '<span class="online-indicator"></span>' : ''}
-                </div>
-                <div class="user-details">
-                    <span class="username">${user.username}</span>
-                    <span class="user-status">${user.is_admin ? 'Admin' : 'İstifadəçi'}</span>
-                </div>
+                <i class="fas ${user.is_admin ? 'fa-user-shield admin-icon' : 'fa-user'}"></i>
+                <span>${user.username}</span>
             </div>
             ${user.unread_count > 0 ? 
-                `<div class="notification-badge">
-                    <span class="unread-count">${user.unread_count}</span>
-                    <span class="notification-dot"></span>
-                </div>` : 
+                `<span class="unread-count">${user.unread_count}</span>` : 
                 ''}
         </div>
     `;
@@ -551,31 +539,26 @@ function updateUnreadCount(totalUnread) {
     if (!totalUnreadElement || !chatIcon) return;
     
     if (totalUnread > 0) {
+        // Bildiriş sayını göstər
         totalUnreadElement.textContent = totalUnread;
-        totalUnreadElement.style.display = 'flex';
+        totalUnreadElement.style.display = 'block';
+        
+        // Chat ikonuna bildiriş sinfi əlavə et
         chatIcon.classList.add('has-notification');
         
         // Bildiriş animasiyası əlavə et
         chatIcon.classList.add('pulse-animation');
-        
-        // Bildiriş başlığını yenilə
-        if (document.title.indexOf('(') !== 0) {
-            document.title = `(${totalUnread}) ${document.title}`;
-        } else {
-            // Əgər artıq bildiriş varsa, sadəcə sayı yenilə
-            document.title = document.title.replace(/\(\d+\)/, `(${totalUnread})`);
-        }
     } else {
+        // Bildiriş sayını gizlət
         totalUnreadElement.style.display = 'none';
+        
+        // Chat ikonundan bildiriş siniflərini sil
         chatIcon.classList.remove('has-notification');
         chatIcon.classList.remove('pulse-animation');
-        
-        // Bildiriş başlığını təmizlə
-        document.title = document.title.replace(/^\(\d+\) /, '');
     }
 }
 
-function selectUser(userId, username, profileImage) {
+function selectUser(userId, username) {
     if (!suppressWebSocketErrors) {
         console.log(`İstifadəçi seçildi: ${username} (ID: ${userId})`);
     }
@@ -586,7 +569,6 @@ function selectUser(userId, username, profileImage) {
     const chatMain = document.querySelector('.chat-main');
     const chatSidebar = document.querySelector('.chat-sidebar');
     const selectedUsername = document.getElementById('selected-username');
-    const selectedUserAvatar = document.getElementById('selected-user-avatar');
     
     if (!chatMain || !chatSidebar || !selectedUsername) {
         if (!suppressWebSocketErrors) {
@@ -598,15 +580,6 @@ function selectUser(userId, username, profileImage) {
     chatSidebar.style.display = 'none';
     chatMain.style.display = 'flex';
     selectedUsername.textContent = username;
-    
-    // Profil şəklini göstər
-    if (selectedUserAvatar && profileImage) {
-        selectedUserAvatar.src = profileImage;
-        selectedUserAvatar.style.display = 'block';
-    } else if (selectedUserAvatar) {
-        selectedUserAvatar.src = '/static/profile_pics/default.png';
-        selectedUserAvatar.style.display = 'block';
-    }
     
     loadMessages(userId);
 }
@@ -979,6 +952,40 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!suppressWebSocketErrors) {
             console.log('DOM yükləndi, chat funksiyası başladılır...');
         }
+        
+        // CSS stilləri əlavə et
+        const chatStyles = document.createElement('style');
+        chatStyles.textContent = `
+            /* Bildiriş animasiyası */
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+                100% { transform: scale(1); }
+            }
+            
+            .pulse-animation {
+                animation: pulse 1s infinite;
+            }
+            
+            /* Bildiriş sayı stili */
+            .unread-count {
+                position: absolute;
+                top: -5px;
+                right: -5px;
+                background-color: #ff5252;
+                color: white;
+                border-radius: 50%;
+                width: 22px;
+                height: 22px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                font-weight: bold;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            }
+        `;
+        document.head.appendChild(chatStyles);
         
         // Global funksiyaları window obyektinə əlavə et
         window.selectUser = selectUser;

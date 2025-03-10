@@ -375,72 +375,59 @@ def send_message(request):
 
 @login_required
 def get_chat_users(request):
-    """
-    Chat üçün istifadəçiləri qaytarır
-    """
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        # Admin istifadəçilər
-        admins = User.objects.filter(is_staff=True).exclude(id=request.user.id)
-        admin_data = []
+    print("get_chat_users called") # Debug üçün
+    
+    try:
+        # Admin və normal istifadəçiləri əldə et
+        admin_users = User.objects.filter(is_staff=True).exclude(id=request.user.id)
+        normal_users = User.objects.filter(is_staff=False).exclude(id=request.user.id)
         
-        for admin in admins:
-            # Oxunmamış mesajların sayını hesabla
-            unread_count = Message.objects.filter(
-                sender=admin,
-                receiver=request.user,
-                is_read=False
-            ).count()
-            
-            # Profil şəklini əldə et
-            profile_image = None
+        print(f"Found {admin_users.count()} admins and {normal_users.count()} users") # Debug üçün
+        
+        # Admin və normal istifadəçilər üçün məlumatları hazırla
+        admins = []
+        users = []
+        
+        for user in admin_users:
             try:
-                if hasattr(admin, 'profile') and admin.profile.sekil:
-                    profile_image = admin.profile.sekil.url
-            except:
-                pass
-            
-            admin_data.append({
-                'id': admin.id,
-                'username': admin.username,
-                'is_admin': True,
-                'unread_count': unread_count,
-                'is_online': True,  # Burada online statusu əlavə edə bilərsiniz
-                'sekil': profile_image
-            })
-        
-        # Normal istifadəçilər (yalnız adminlər üçün)
-        users_data = []
-        if request.user.is_staff:
-            users = User.objects.filter(is_staff=False)
-            
-            for user in users:
-                # Oxunmamış mesajların sayını hesabla
                 unread_count = Message.objects.filter(
                     sender=user,
                     receiver=request.user,
                     is_read=False
                 ).count()
                 
-                # Profil şəklini əldə et
-                profile_image = None
-                try:
-                    if hasattr(user, 'profile') and user.profile.sekil:
-                        profile_image = user.profile.sekil.url
-                except:
-                    pass
-                
-                users_data.append({
+                admins.append({
                     'id': user.id,
                     'username': user.username,
-                    'is_admin': False,
                     'unread_count': unread_count,
-                    'is_online': False,  # Burada online statusu əlavə edə bilərsiniz
-                    'sekil': profile_image
+                    'is_admin': True
                 })
+            except Exception as e:
+                print(f"Admin istifadəçi məlumatları hazırlanarkən xəta: {str(e)}")
         
-        return JsonResponse({
-            'admins': admin_data,
-            'users': users_data
-        })
-    
-    return JsonResponse({'error': 'Invalid request'}, status=400)
+        for user in normal_users:
+            try:
+                unread_count = Message.objects.filter(
+                    sender=user,
+                    receiver=request.user,
+                    is_read=False
+                ).count()
+                
+                users.append({
+                    'id': user.id,
+                    'username': user.username,
+                    'unread_count': unread_count,
+                    'is_admin': False
+                })
+            except Exception as e:
+                print(f"Normal istifadəçi məlumatları hazırlanarkən xəta: {str(e)}")
+        
+        response_data = {
+            'admins': admins,
+            'users': users
+        }
+        print("Sending response:", response_data) # Debug üçün
+        return JsonResponse(response_data)
+    except Exception as e:
+        print(f"get_chat_users funksiyasında xəta: {str(e)}")
+        return JsonResponse({'error': str(e)}, status=500)

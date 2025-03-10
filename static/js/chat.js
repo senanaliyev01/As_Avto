@@ -436,20 +436,42 @@ function loadChatUsers() {
             return;
         }
         
+        // Sorğu göndərmədən əvvəl yoxla ki, əvvəlki sorğu hələ davam edirmi
+        if (window.loadingChatUsers) {
+            if (!suppressWebSocketErrors) {
+                console.log('İstifadəçilər artıq yüklənir, gözlənilir...');
+            }
+            return;
+        }
+        
+        window.loadingChatUsers = true;
+        
         fetch('/istifadeciler/api/chat/users/', {
             method: 'GET',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': getCookie('csrftoken')
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
             },
-            credentials: 'same-origin'
+            credentials: 'same-origin',
+            timeout: 10000 // 10 saniyə timeout
         })
         .then(response => {
+            window.loadingChatUsers = false;
+            
             if (!response.ok) {
                 if (response.status === 500) {
                     if (!suppressWebSocketErrors) {
                         console.error('Server xətası (500): İstifadəçilər yüklənə bilmədi');
                     }
+                } else if (response.status === 502) {
+                    if (!suppressWebSocketErrors) {
+                        console.error('Bad Gateway xətası (502): Server cavab vermir');
+                    }
+                    // 502 xətası üçün 5 saniyə sonra yenidən cəhd et
+                    setTimeout(loadChatUsers, 5000);
                 } else if (response.status === 403) {
                     if (!suppressWebSocketErrors) {
                         console.error('Giriş icazəsi yoxdur (403): İstifadəçi daxil olmayıb və ya sessiyanın vaxtı bitib');
@@ -511,13 +533,39 @@ function loadChatUsers() {
 
             lastMessageCount = totalUnread;
             updateUnreadCount(totalUnread);
+            
+            // Uğurlu sorğudan sonra xəta sayğacını sıfırla
+            window.chatUserLoadErrors = 0;
         })
         .catch(error => {
+            window.loadingChatUsers = false;
+            
+            // Xəta sayğacını artır
+            window.chatUserLoadErrors = (window.chatUserLoadErrors || 0) + 1;
+            
             if (!suppressWebSocketErrors) {
                 console.error('İstifadəçilər yüklənərkən xəta:', error);
             }
+            
+            // Əgər 3-dən az xəta varsa, yenidən cəhd et
+            if (window.chatUserLoadErrors < 3) {
+                if (!suppressWebSocketErrors) {
+                    console.log(`İstifadəçilər yüklənərkən xəta baş verdi, ${window.chatUserLoadErrors} cəhd. 5 saniyə sonra yenidən cəhd ediləcək...`);
+                }
+                setTimeout(loadChatUsers, 5000);
+            } else {
+                if (!suppressWebSocketErrors) {
+                    console.error('İstifadəçilər yüklənərkən çoxlu xəta baş verdi, yenidən cəhd edilmir.');
+                }
+                // 1 dəqiqə sonra xəta sayğacını sıfırla
+                setTimeout(() => {
+                    window.chatUserLoadErrors = 0;
+                }, 60000);
+            }
         });
     } catch (error) {
+        window.loadingChatUsers = false;
+        
         if (!suppressWebSocketErrors) {
             console.error('İstifadəçilər yüklənərkən ümumi xəta:', error);
         }
@@ -588,9 +636,39 @@ function loadMessages(receiverId) {
             console.log(`${receiverId} ID-li istifadəçi ilə mesajlar yüklənir...`);
         }
         
-        fetch(`/istifadeciler/api/chat/messages/${receiverId}/`)
+        // Sorğu göndərmədən əvvəl yoxla ki, əvvəlki sorğu hələ davam edirmi
+        if (window.loadingMessages) {
+            if (!suppressWebSocketErrors) {
+                console.log('Mesajlar artıq yüklənir, gözlənilir...');
+            }
+            return;
+        }
+        
+        window.loadingMessages = true;
+        
+        fetch(`/istifadeciler/api/chat/messages/${receiverId}/`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            },
+            credentials: 'same-origin',
+            timeout: 10000 // 10 saniyə timeout
+        })
             .then(response => {
+                window.loadingMessages = false;
+                
                 if (!response.ok) {
+                    if (response.status === 502) {
+                        if (!suppressWebSocketErrors) {
+                            console.error('Bad Gateway xətası (502): Server cavab vermir');
+                        }
+                        // 502 xətası üçün 5 saniyə sonra yenidən cəhd et
+                        setTimeout(() => loadMessages(receiverId), 5000);
+                    }
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
                 return response.json();
@@ -661,13 +739,39 @@ function loadMessages(receiverId) {
                 
                 // Mesajları aşağı sürüşdür
                 chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // Uğurlu sorğudan sonra xəta sayğacını sıfırla
+                window.chatMessageLoadErrors = 0;
             })
             .catch(error => {
+                window.loadingMessages = false;
+                
+                // Xəta sayğacını artır
+                window.chatMessageLoadErrors = (window.chatMessageLoadErrors || 0) + 1;
+                
                 if (!suppressWebSocketErrors) {
                     console.error('Mesajlar yüklənərkən xəta:', error);
                 }
+                
+                // Əgər 3-dən az xəta varsa, yenidən cəhd et
+                if (window.chatMessageLoadErrors < 3) {
+                    if (!suppressWebSocketErrors) {
+                        console.log(`Mesajlar yüklənərkən xəta baş verdi, ${window.chatMessageLoadErrors} cəhd. 5 saniyə sonra yenidən cəhd ediləcək...`);
+                    }
+                    setTimeout(() => loadMessages(receiverId), 5000);
+                } else {
+                    if (!suppressWebSocketErrors) {
+                        console.error('Mesajlar yüklənərkən çoxlu xəta baş verdi, yenidən cəhd edilmir.');
+                    }
+                    // 1 dəqiqə sonra xəta sayğacını sıfırla
+                    setTimeout(() => {
+                        window.chatMessageLoadErrors = 0;
+                    }, 60000);
+                }
             });
     } catch (error) {
+        window.loadingMessages = false;
+        
         if (!suppressWebSocketErrors) {
             console.error('Mesajlar yüklənərkən ümumi xəta:', error);
         }
@@ -751,6 +855,16 @@ function sendMessage() {
         }
     }
 
+    // Əgər mesaj göndərilməkdədirsə, yeni sorğu göndərmə
+    if (window.sendingMessage) {
+        if (!suppressWebSocketErrors) {
+            console.log('Mesaj artıq göndərilir, gözlənilir...');
+        }
+        return;
+    }
+    
+    window.sendingMessage = true;
+
     // HTTP sorğusu ilə mesaj göndər
     const formData = new FormData();
     formData.append('receiver_id', currentReceiverId);
@@ -760,11 +874,21 @@ function sendMessage() {
         method: 'POST',
         body: formData,
         headers: {
-            'X-CSRFToken': getCookie('csrftoken')
-        }
+            'X-CSRFToken': getCookie('csrftoken'),
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        timeout: 10000 // 10 saniyə timeout
     })
     .then(response => {
+        window.sendingMessage = false;
+        
         if (!response.ok) {
+            if (response.status === 502) {
+                if (!suppressWebSocketErrors) {
+                    console.error('Bad Gateway xətası (502): Server cavab vermir');
+                }
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
         return response.json();
@@ -784,6 +908,9 @@ function sendMessage() {
             
             // Mesajları yenilə
             loadMessages(currentReceiverId);
+            
+            // Uğurlu sorğudan sonra xəta sayğacını sıfırla
+            window.sendMessageErrors = 0;
         } else {
             // Müvəqqəti mesajı sil
             if (chatMessages && document.getElementById(tempMessageId)) {
@@ -801,6 +928,11 @@ function sendMessage() {
         }
     })
     .catch(error => {
+        window.sendingMessage = false;
+        
+        // Xəta sayğacını artır
+        window.sendMessageErrors = (window.sendMessageErrors || 0) + 1;
+        
         // Müvəqqəti mesajı sil
         if (chatMessages && document.getElementById(tempMessageId)) {
             document.getElementById(tempMessageId).remove();
@@ -809,10 +941,34 @@ function sendMessage() {
         if (!suppressWebSocketErrors) {
             console.error('Mesaj göndərilərkən xəta:', error);
         }
-        if (typeof showAnimatedMessage === 'function') {
-            showAnimatedMessage('Mesaj göndərilərkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.', true);
+        
+        // Əgər 3-dən az xəta varsa və 502 xətasıdırsa, yenidən cəhd et
+        if (window.sendMessageErrors < 3 && error.message && error.message.includes('502')) {
+            if (!suppressWebSocketErrors) {
+                console.log(`Mesaj göndərilərkən server xətası baş verdi, ${window.sendMessageErrors} cəhd. 5 saniyə sonra yenidən cəhd ediləcək...`);
+            }
+            
+            // Mesajı yenidən göndərmək üçün input-a qaytar
+            input.value = content;
+            
+            // 5 saniyə sonra yenidən cəhd et
+            setTimeout(() => {
+                if (typeof showAnimatedMessage === 'function') {
+                    showAnimatedMessage('Mesaj göndərilməyə yenidən cəhd edilir...', false);
+                }
+                sendMessage();
+            }, 5000);
         } else {
-            alert('Mesaj göndərilərkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+            if (typeof showAnimatedMessage === 'function') {
+                showAnimatedMessage('Mesaj göndərilərkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.', true);
+            } else {
+                alert('Mesaj göndərilərkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+            }
+            
+            // 1 dəqiqə sonra xəta sayğacını sıfırla
+            setTimeout(() => {
+                window.sendMessageErrors = 0;
+            }, 60000);
         }
     });
 }

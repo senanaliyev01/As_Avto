@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.utils.html import format_html
 from django.urls import reverse
 from .models import Profile, Message, LoginCode
+from django.utils import timezone
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
@@ -11,19 +12,42 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(LoginCode)
 class LoginCodeAdmin(admin.ModelAdmin):
-    list_display = ('user', 'code', 'created_at', 'is_used', 'is_valid_status')
+    list_display = ('user', 'code', 'created_at', 'is_used', 'is_valid_status', 'remaining_time')
     list_filter = ('is_used', 'created_at')
     search_fields = ('user__username', 'code')
     readonly_fields = ('created_at',)
+    ordering = ('-created_at',)  # Ən son kodlar əvvəldə
     
     def is_valid_status(self, obj):
         is_valid = obj.is_valid()
         return format_html(
-            '<span style="color: {};">{}</span>',
+            '<span style="color: {}; font-weight: bold;">{}</span>',
             'green' if is_valid else 'red',
-            'Aktiv' if is_valid else 'Bitib'
+            'AKTİV' if is_valid else 'BİTİB'
         )
     is_valid_status.short_description = 'Status'
+
+    def remaining_time(self, obj):
+        if not obj.is_used:
+            now = timezone.now()
+            expiration_time = obj.created_at + timezone.timedelta(minutes=3)
+            if now <= expiration_time:
+                remaining = expiration_time - now
+                seconds = int(remaining.total_seconds())
+                minutes = seconds // 60
+                seconds = seconds % 60
+                return format_html(
+                    '<span style="color: blue;">{:02d}:{:02d}</span>',
+                    minutes, seconds
+                )
+        return format_html('<span style="color: red;">Vaxt bitib</span>')
+    remaining_time.short_description = 'Qalan vaxt'
+
+    def has_add_permission(self, request):
+        return False  # Əl ilə kod əlavə etməyə icazə vermə
+
+    def has_change_permission(self, request, obj=None):
+        return False  # Kodları dəyişməyə icazə vermə
 
 class CustomUserAdmin(admin.ModelAdmin):
     def user_avatar(self, obj):

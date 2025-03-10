@@ -82,7 +82,7 @@ def login_view(request):
                 try:
                     # Təhlükəsizlik kodu yarat və saxla
                     code = LoginCode.generate_code()
-                    LoginCode.objects.create(user=user, code=code)
+                    login_code = LoginCode.objects.create(user=user, code=code)
                     
                     # Müvəqqəti məlumatları sessiyada saxla
                     request.session['temp_user_id'] = user.id
@@ -91,10 +91,7 @@ def login_view(request):
                     if request.GET.get('next'):
                         request.session['next'] = request.GET['next']
                     
-                    # Admin üçün kodu console-a çap et (real layihədə email/SMS ilə göndəriləcək)
-                    print(f"Təhlükəsizlik kodu: {code}")
-                    
-                    messages.info(request, 'Zəhmət olmasa sizə verilən təhlükəsizlik kodunu daxil edin.')
+                    messages.info(request, 'Təhlükəsizlik kodu admin panelinə göndərildi. Zəhmət olmasa administratorla əlaqə saxlayın.')
                     return render(request, 'login.html', {'show_code_input': True})
                 except Exception as e:
                     messages.error(request, f'Təhlükəsizlik kodu yaradılarkən xəta baş verdi: {str(e)}')

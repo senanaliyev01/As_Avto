@@ -4,7 +4,7 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from .forms import UserUpdateForm, ProfileUpdateForm
-from .models import Profile, Message
+from .models import Profile, Message, LoginCode
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
 from django.db.models import Q
@@ -17,50 +17,85 @@ import re
 from esasevim.views import esasevim
 
 def login_view(request):
-    # Əgər istifadəçi artıq daxil olubsa
     if request.user.is_authenticated:
-        # Remember me seçilməyibsə və session müddəti bitibsə
         if not request.session.get('remember_me', False) and request.session.get_expiry_age() <= 0:
             logout(request)
             messages.info(request, 'Sessiya müddəti bitdi. Zəhmət olmasa yenidən daxil olun.')
             return redirect('login')
-        # Remember me seçilibsə və ya session aktiv isə ana səhifəyə yönləndir
         return redirect('esasevim:main')
 
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        remember_me = request.POST.get('remember_me') == 'on'
-        
-        user = authenticate(request, username=username, password=password)
-        
-        if user is not None:
-            # İstifadəçinin təsdiq statusunu yoxla
-            if not user.profile.is_approved:
-                messages.error(request, 'Giriş üçün icazəniz yoxdur.')
+        if 'code' in request.POST:
+            # Təhlükəsizlik kodunun yoxlanması
+            code = request.POST.get('code')
+            user_id = request.session.get('temp_user_id')
+            
+            if not user_id:
+                messages.error(request, 'Sessiya müddəti bitib. Zəhmət olmasa yenidən cəhd edin.')
                 return render(request, 'login.html')
+            
+            try:
+                user = User.objects.get(id=user_id)
+                login_code = LoginCode.objects.filter(user=user, code=code, is_used=False).latest('created_at')
                 
-            login(request, user)
+                if login_code.is_valid():
+                    login_code.is_used = True
+                    login_code.save()
+                    
+                    login(request, user)
+                    
+                    remember_me = request.session.get('temp_remember_me', False)
+                    if remember_me:
+                        request.session.set_expiry(31536000)
+                        request.session['remember_me'] = True
+                    else:
+                        request.session.set_expiry(0)
+                        request.session['remember_me'] = False
+                    
+                    # Təmizlə
+                    del request.session['temp_user_id']
+                    if 'temp_remember_me' in request.session:
+                        del request.session['temp_remember_me']
+                    
+                    next_url = request.session.get('next')
+                    if next_url:
+                        del request.session['next']
+                        return redirect(next_url)
+                    return redirect('esasevim:main')
+                else:
+                    messages.error(request, 'Kod etibarsızdır və ya müddəti bitib.')
+            except (User.DoesNotExist, LoginCode.DoesNotExist):
+                messages.error(request, 'Yanlış və ya etibarsız kod.')
             
-            # Remember Me yoxlaması
-            if remember_me:
-                # 1 illik session
-                request.session.set_expiry(31536000)  # 365 gün
-                request.session['remember_me'] = True
-            else:
-                # Browser bağlandıqda session silinəcək
-                request.session.set_expiry(0)
-                request.session['remember_me'] = False
-            
-            # Əgər istifadəçi admin panelə giriş etməyə çalışırdısa
-            next_url = request.GET.get('next')
-            if next_url:
-                return redirect(next_url)
-            return redirect('esasevim:main')
+            return render(request, 'login.html', {'show_code_input': True})
         else:
-            messages.error(request, 'İstifadəçi adı və ya şifrə yanlışdır!')
+            # İlkin giriş məlumatlarının yoxlanması
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+            remember_me = request.POST.get('remember_me') == 'on'
+            
+            user = authenticate(request, username=username, password=password)
+            
+            if user is not None:
+                # Təhlükəsizlik kodu yarat və saxla
+                code = LoginCode.generate_code()
+                LoginCode.objects.create(user=user, code=code)
+                
+                # Müvəqqəti məlumatları sessiyada saxla
+                request.session['temp_user_id'] = user.id
+                request.session['temp_remember_me'] = remember_me
+                if 'next' in request.GET:
+                    request.session['next'] = request.GET['next']
+                
+                # Admin üçün kodu console-a çap et (real layihədə email/SMS ilə göndəriləcək)
+                print(f"Təhlükəsizlik kodu: {code}")
+                
+                messages.info(request, 'Zəhmət olmasa sizə verilən təhlükəsizlik kodunu daxil edin.')
+                return render(request, 'login.html', {'show_code_input': True})
+            else:
+                messages.error(request, 'İstifadəçi adı və ya şifrə yanlışdır!')
     
-    return render(request, 'login.html')
+    return render(request, 'login.html', {'show_code_input': False})
 
 @login_required
 def profile(request):

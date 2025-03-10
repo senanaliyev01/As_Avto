@@ -43,13 +43,28 @@
             <!-- Başlık -->
             <div class="title-wrap">
                 <h1>B4B Giriş</h1>
+                {% if show_code_input %}
+                <p>Zəhmət olmasa təhlükəsizlik kodunu daxil edin.</p>
+                {% else %}
                 <p>Xoş gəlmisiniz! Zəhmət olmasa məlumatlarınızı daxil edin.</p>
+                {% endif %}
             </div>
 
             <!-- Form -->
             <form method="post" action="{% url 'login' %}" class="login-form">
                 {% csrf_token %}
                 
+                {% if show_code_input %}
+                <!-- Təhlükəsizlik Kodu -->
+                <div class="form-group">
+                    <div class="input-wrap">
+                        <i class="fas fa-shield-alt icon"></i>
+                        <input type="text" name="code" required maxlength="6" pattern="[A-Z0-9]{6}" style="text-transform: uppercase;">
+                        <label>Təhlükəsizlik Kodu</label>
+                    </div>
+                    <small class="help-text">Kod 3 dəqiqə ərzində etibarlıdır.</small>
+                </div>
+                {% else %}
                 <!-- İstifadəçi Adı -->
                 <div class="form-group">
                     <div class="input-wrap">
@@ -76,10 +91,11 @@
                     <input type="checkbox" name="remember_me" id="remember_me">
                     <label for="remember_me">Məni yadda saxla</label>
                 </div>
+                {% endif %}
 
                 <!-- Giriş Düyməsi -->
                 <button type="submit" class="login-btn">
-                    <span class="btn-text">Daxil Ol</span>
+                    <span class="btn-text">{% if show_code_input %}Təsdiqlə{% else %}Daxil Ol{% endif %}</span>
                     <div class="btn-loader"></div>
                 </button>
 
@@ -90,12 +106,14 @@
                         <span>Ana Səhifəyə Qayıt</span>
                     </a>
                 </div>
+                {% if not show_code_input %}
                 <div class="home-link">
                     <a href="{% url 'register' %}">
                         <i class="fa-solid fa-user-pen"></i>
                         <span>Hesabınız Yoxdur? Qeydiyyatdan Keçin</span>
                     </a>
                 </div>
+                {% endif %}
             </form>
         </div>
     </div>

@@ -2,14 +2,28 @@ from django.contrib import admin
 from django.contrib.auth.models import User
 from django.utils.html import format_html
 from django.urls import reverse
-from .models import Profile, Message
+from .models import Profile, Message, LoginCode
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'ad', 'soyad', 'telefon', 'is_approved')
-    list_filter = ('is_approved',)
+    list_display = ('user', 'ad', 'soyad', 'telefon')
     search_fields = ('user__username', 'ad', 'soyad', 'telefon')
-    list_editable = ('is_approved',)
+
+@admin.register(LoginCode)
+class LoginCodeAdmin(admin.ModelAdmin):
+    list_display = ('user', 'code', 'created_at', 'is_used', 'is_valid_status')
+    list_filter = ('is_used', 'created_at')
+    search_fields = ('user__username', 'code')
+    readonly_fields = ('created_at',)
+    
+    def is_valid_status(self, obj):
+        is_valid = obj.is_valid()
+        return format_html(
+            '<span style="color: {};">{}</span>',
+            'green' if is_valid else 'red',
+            'Aktiv' if is_valid else 'Bitib'
+        )
+    is_valid_status.short_description = 'Status'
 
 class CustomUserAdmin(admin.ModelAdmin):
     def user_avatar(self, obj):

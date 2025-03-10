@@ -208,6 +208,7 @@ JAZZMIN_SETTINGS = {
         "mehsullar.Il": "fa-solid fa-calendar-days",
         "mehsullar.Yanacaq": "fa-solid fa-gas-pump",
         "mehsullar.AxtarisSozleri": "fa-solid fa-search",
+        "istifadeciler.Message": "fa-solid fa-message",
     },
 }
 

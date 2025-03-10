@@ -518,15 +518,15 @@ function loadChatUsers() {
 }
 
 function createUserItem(user) {
-    // Profil şəkli URL-i - istifadəçinin profil şəklini istifadə et
-    const profileImageUrl = user.profile_image || '/media/profile_pics/default.png';
+    // Profil şəkli URL-i
+    const profileImageUrl = user.profile_image ? user.profile_image : '{% static "img/default-profile.png" %}';
     
     return `
         <div class="user-item ${user.unread_count > 0 ? 'has-unread' : ''}" 
              onclick="selectUser(${user.id}, '${user.username}')">
             <div class="user-info">
                 <div class="user-avatar">
-                    <img src="${profileImageUrl}" alt="${user.username}" onerror="this.src='/media/profile_pics/default.png'">
+                    <img src="${profileImageUrl}" alt="${user.username}" onerror="this.src='/static/img/default-profile.png'">
                     ${user.is_online ? '<span class="online-indicator"></span>' : ''}
                 </div>
                 <div class="user-details">

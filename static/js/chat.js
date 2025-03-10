@@ -23,6 +23,8 @@ let chatSocket = null;
 let usingWebSocket = false; // WebSocket istifadə edilib-edilmədiyini izləmək üçün
 let suppressWebSocketErrors = true; // WebSocket xətalarını gizlətmək üçün
 let useOnlyHTTP = true; // Yalnız HTTP istifadə et, WebSocket-i tamamilə söndür
+let disableNotificationSounds = true; // Bildiriş səslərini söndür
+let userIsAdmin = false; // İstifadəçinin admin olub-olmadığını saxlayır
 
 // CSRF token funksiyası
 function getCookie(name) {
@@ -40,8 +42,6 @@ function getCookie(name) {
     return cookieValue;
 }
 
-
-
 // Chat funksiyasını başlat
 function initChat() {
     if (!suppressWebSocketErrors) {
@@ -54,6 +54,14 @@ function initChat() {
             console.log('İstifadəçi daxil olmayıb, chat funksiyası başladılmır');
         }
         return;
+    }
+    
+    // İstifadəçinin admin olub-olmadığını təyin et
+    if (typeof isAdmin !== 'undefined') {
+        userIsAdmin = isAdmin;
+        if (!suppressWebSocketErrors) {
+            console.log('İstifadəçi admin statusu:', userIsAdmin);
+        }
     }
     
     const chatIcon = document.getElementById('chat-icon');
@@ -480,7 +488,8 @@ function loadChatUsers() {
                 });
             }
             
-            if (data.users && data.users.length > 0) {
+            // Əgər istifadəçi admindisə, bütün istifadəçiləri göstər
+            if (userIsAdmin && data.users && data.users.length > 0) {
                 usersList.innerHTML += '<div class="user-group-title">İstifadəçilər</div>';
                 data.users.forEach(user => {
                     totalUnread += user.unread_count;
@@ -509,15 +518,27 @@ function loadChatUsers() {
 }
 
 function createUserItem(user) {
+    // Profil şəkli URL-i
+    const profileImageUrl = user.profile_image ? user.profile_image : '{% static "img/default-profile.png" %}';
+    
     return `
         <div class="user-item ${user.unread_count > 0 ? 'has-unread' : ''}" 
              onclick="selectUser(${user.id}, '${user.username}')">
             <div class="user-info">
-                <i class="fas ${user.is_admin ? 'fa-user-shield admin-icon' : 'fa-user'}"></i>
-                <span>${user.username}</span>
+                <div class="user-avatar">
+                    <img src="${profileImageUrl}" alt="${user.username}" onerror="this.src='/static/img/default-profile.png'">
+                    ${user.is_online ? '<span class="online-indicator"></span>' : ''}
+                </div>
+                <div class="user-details">
+                    <span class="username">${user.username}</span>
+                    <span class="user-status">${user.is_admin ? 'Admin' : 'İstifadəçi'}</span>
+                </div>
             </div>
             ${user.unread_count > 0 ? 
-                `<span class="unread-count">${user.unread_count}</span>` : 
+                `<div class="notification-badge">
+                    <span class="unread-count">${user.unread_count}</span>
+                    <span class="notification-dot"></span>
+                </div>` : 
                 ''}
         </div>
     `;
@@ -531,11 +552,26 @@ function updateUnreadCount(totalUnread) {
     
     if (totalUnread > 0) {
         totalUnreadElement.textContent = totalUnread;
-        totalUnreadElement.style.display = 'block';
+        totalUnreadElement.style.display = 'flex';
         chatIcon.classList.add('has-notification');
+        
+        // Bildiriş animasiyası əlavə et
+        chatIcon.classList.add('pulse-animation');
+        
+        // Bildiriş başlığını yenilə
+        if (document.title.indexOf('(') !== 0) {
+            document.title = `(${totalUnread}) ${document.title}`;
+        } else {
+            // Əgər artıq bildiriş varsa, sadəcə sayı yenilə
+            document.title = document.title.replace(/\(\d+\)/, `(${totalUnread})`);
+        }
     } else {
         totalUnreadElement.style.display = 'none';
         chatIcon.classList.remove('has-notification');
+        chatIcon.classList.remove('pulse-animation');
+        
+        // Bildiriş başlığını təmizlə
+        document.title = document.title.replace(/^\(\d+\) /, '');
     }
 }
 

@@ -210,6 +210,7 @@ JAZZMIN_SETTINGS = {
         "mehsullar.AxtarisSozleri": "fa-solid fa-search",
         "istifadeciler.Message": "fa-solid fa-message",
         "sites": "fa-solid fa-globe",
+        "istifadeciler.LoginCode": "fa-solid fa-key",
     },
 }
 

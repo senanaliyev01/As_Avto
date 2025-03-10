@@ -209,6 +209,7 @@ JAZZMIN_SETTINGS = {
         "mehsullar.Yanacaq": "fa-solid fa-gas-pump",
         "mehsullar.AxtarisSozleri": "fa-solid fa-search",
         "istifadeciler.Message": "fa-solid fa-message",
+        "sites": "fa-solid fa-globe",
     },
 }
 

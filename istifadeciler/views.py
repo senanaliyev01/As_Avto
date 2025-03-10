@@ -91,7 +91,7 @@ def login_view(request):
                     if request.GET.get('next'):
                         request.session['next'] = request.GET['next']
                     
-                    messages.info(request, 'Təhlükəsizlik kodu admin panelinə göndərildi. Zəhmət olmasa administratorla əlaqə saxlayın.')
+                    messages.info(request, 'Təhlükəsizlik kodu göndərildi. Zəhmət olmasa administratorla əlaqə saxlayın.')
                     return render(request, 'login.html', {'show_code_input': True})
                 except Exception as e:
                     messages.error(request, f'Təhlükəsizlik kodu yaradılarkən xəta baş verdi: {str(e)}')

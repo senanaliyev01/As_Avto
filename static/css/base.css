@@ -1161,7 +1161,7 @@ html {
     100% { transform: scale(1) }
 }
 
-.product-info {
+/* .product-info {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -1181,7 +1181,7 @@ html {
     font-size: 0.9em;
     font-weight: 500;
     color: #495057;
-}
+} */
 
 /* Mobil uyğunlaşma */
 @media (max-width: 576px) {

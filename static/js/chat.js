@@ -519,14 +519,14 @@ function loadChatUsers() {
 
 function createUserItem(user) {
     // Profil şəkli URL-i - Profile modelindəki sekil sahəsindən götürürük
-    const profileImageUrl = user.profile_image || user.sekil || '/static/img/default-profile.png';
+    const profileImageUrl = user.profile_image || user.sekil || '/static/img/default.png';
     
     return `
         <div class="user-item ${user.unread_count > 0 ? 'has-unread' : ''}" 
              onclick="selectUser(${user.id}, '${user.username}', '${profileImageUrl}')">
             <div class="user-info">
                 <div class="user-avatar">
-                    <img src="${profileImageUrl}" alt="${user.username}" onerror="this.src='/static/profile_pics/default.png'">
+                    <img src="${profileImageUrl}" alt="${user.username}" onerror="this.src='/static/img/default.png'">
                     ${user.is_online ? '<span class="online-indicator"></span>' : ''}
                 </div>
                 <div class="user-details">

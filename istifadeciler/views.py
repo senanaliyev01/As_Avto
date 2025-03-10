@@ -13,11 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.urls import reverse
-from django.conf import settings
 import re
-import os
-import uuid
-from datetime import datetime
 from esasevim.views import esasevim
 
 def login_view(request):
@@ -321,9 +317,7 @@ def get_messages(request, receiver_id):
             'sender': msg.sender.username,
             'is_mine': msg.sender == request.user,
             'is_read': msg.is_read,
-            'is_delivered': msg.is_delivered,
-            'is_file': msg.is_file,
-            'created_at': msg.created_at.isoformat()
+            'is_delivered': msg.is_delivered
         } for msg in messages]
         
         return JsonResponse(response_data, safe=False)
@@ -337,85 +331,13 @@ def get_messages(request, receiver_id):
 
 @login_required
 @csrf_exempt
-def upload_file(request):
-    if request.method == 'POST':
-        try:
-            receiver_id = request.POST.get('receiver_id')
-            file = request.FILES.get('file')
-            
-            if not file:
-                return JsonResponse({'status': 'error', 'message': 'Fayl seçilməyib'})
-                
-            if not receiver_id:
-                return JsonResponse({'status': 'error', 'message': 'Alıcı ID-si təyin edilməyib'})
-                
-            # Fayl tipini yoxla
-            allowed_file_types = [
-                'image/jpeg', 'image/png', 'image/gif', 
-                'application/pdf', 
-                'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                'text/plain',
-                'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            ]
-            
-            if file.content_type not in allowed_file_types:
-                return JsonResponse({'status': 'error', 'message': 'Bu fayl formatı dəstəklənmir'})
-                
-            # Fayl ölçüsünü yoxla (5MB)
-            if file.size > 5 * 1024 * 1024:
-                return JsonResponse({'status': 'error', 'message': 'Fayl ölçüsü çox böyükdür (maksimum 5MB)'})
-                
-            # Fayl adını təhlükəsiz et
-            original_filename = file.name
-            file_extension = os.path.splitext(original_filename)[1].lower()
-            safe_filename = f"{uuid.uuid4()}{file_extension}"
-            
-            # Fayl yüklənəcək qovluğu təyin et
-            upload_dir = os.path.join(settings.MEDIA_ROOT, 'chat_files')
-            
-            # Qovluq yoxdursa yarat
-            if not os.path.exists(upload_dir):
-                os.makedirs(upload_dir)
-                
-            # Tarix əsasında alt qovluq yarat
-            today = datetime.now().strftime('%Y%m%d')
-            upload_subdir = os.path.join(upload_dir, today)
-            
-            if not os.path.exists(upload_subdir):
-                os.makedirs(upload_subdir)
-                
-            # Faylı yüklə
-            file_path = os.path.join(upload_subdir, safe_filename)
-            
-            with open(file_path, 'wb+') as destination:
-                for chunk in file.chunks():
-                    destination.write(chunk)
-                    
-            # Fayl URL-ini yarat
-            file_url = f"{settings.MEDIA_URL}chat_files/{today}/{safe_filename}"
-            
-            return JsonResponse({
-                'status': 'success',
-                'file_url': file_url,
-                'original_filename': original_filename
-            })
-            
-        except Exception as e:
-            print(f"Fayl yüklənərkən xəta: {str(e)}")
-            return JsonResponse({'status': 'error', 'message': str(e)})
-            
-    return JsonResponse({'status': 'error', 'message': 'Yanlış sorğu metodu'})
-
-@login_required
-@csrf_exempt
 def send_message(request):
     if request.method == 'POST':
         try:
             receiver_id = request.POST.get('receiver_id')
             content = request.POST.get('content')
-            is_file = request.POST.get('is_file') == 'true'
             
-            print(f"send_message called: receiver_id={receiver_id}, content={content}, is_file={is_file}") # Debug üçün
+            print(f"send_message called: receiver_id={receiver_id}, content={content}") # Debug üçün
             
             if not content:
                 return JsonResponse({'status': 'error', 'message': 'Mesaj boş ola bilməz'})
@@ -425,8 +347,7 @@ def send_message(request):
                 sender=request.user,
                 receiver=receiver,
                 content=content,
-                is_delivered=True,  # Avtomatik çatdırıldı kimi qeyd et
-                is_file=is_file  # Fayl mesajı olub-olmadığını qeyd et
+                is_delivered=True  # Avtomatik çatdırıldı kimi qeyd et
             )
             
             print(f"Mesaj yaradıldı: id={message.id}") # Debug üçün
@@ -439,8 +360,7 @@ def send_message(request):
                     'sender': message.sender.username,
                     'is_mine': True,
                     'is_delivered': True,
-                    'is_read': False,
-                    'is_file': is_file
+                    'is_read': False
                 }
             })
             

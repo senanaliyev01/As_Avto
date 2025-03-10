@@ -28,9 +28,6 @@ let chatSocket = null;
 let usingWebSocket = false; // WebSocket istifadə edilib-edilmədiyini izləmək üçün
 let suppressWebSocketErrors = true; // WebSocket xətalarını gizlətmək üçün
 let useOnlyHTTP = true; // Yalnız HTTP istifadə et, WebSocket-i tamamilə söndür
-let disableNotificationSounds = false; // Bildiriş səslərini söndür
-let allowedFileTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']; // İcazə verilən fayl tipləri
-let maxFileSize = 5 * 1024 * 1024; // 5MB maksimum fayl ölçüsü
 
 // CSRF token funksiyası
 function getCookie(name) {
@@ -47,6 +44,8 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
+
 
 // Chat funksiyasını başlat
 function initChat() {
@@ -70,8 +69,6 @@ function initChat() {
     const sendButton = document.getElementById('send-message');
     const chatMain = document.querySelector('.chat-main');
     const chatSidebar = document.querySelector('.chat-sidebar');
-    const fileInput = document.getElementById('file-input');
-    const attachButton = document.getElementById('attach-file');
 
     if (!chatIcon || !chatWindow) {
         if (!suppressWebSocketErrors) {
@@ -118,23 +115,10 @@ function initChat() {
     // Mesaj göndər
     sendButton.addEventListener('click', sendMessage);
     messageInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
+        if (e.key === 'Enter') {
             sendMessage();
         }
     });
-    
-    // Fayl əlavə et
-    if (attachButton && fileInput) {
-        attachButton.addEventListener('click', () => {
-            fileInput.click();
-        });
-        
-        fileInput.addEventListener('change', handleFileUpload);
-    }
-    
-    // Link tanıma
-    messageInput.addEventListener('input', detectLinks);
 
     // İstifadəçiləri və mesajları yenilə
     setInterval(() => {
@@ -423,12 +407,9 @@ function appendMessage(message) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${message.is_mine ? 'mine' : 'theirs'}`;
     
-    // Mesaj məzmununu formatla
-    const formattedContent = formatMessageContent(message.content);
-    
     messageDiv.innerHTML = `
         ${!message.is_mine ? `<div class="message-sender">${message.sender}</div>` : ''}
-        <div class="message-content">${formattedContent}</div>
+        <div class="message-content">${message.content}</div>
         ${message.is_mine ? `
             <div class="message-status ${getMessageStatus(message)}">
                 ${getStatusIcons(message)}
@@ -719,22 +700,17 @@ function loadMessages(receiverId) {
                 });
                 
                 // HTML-i yenilə
-                chatMessages.innerHTML = messages.map(msg => {
-                    // Mesaj məzmununu formatla
-                    const formattedContent = formatMessageContent(msg.content);
-                    
-                    return `
-                        <div class="message ${msg.is_mine ? 'mine' : 'theirs'}" data-id="${msg.id}">
-                            ${!msg.is_mine ? `<div class="message-sender">${msg.sender}</div>` : ''}
-                            <div class="message-content">${formattedContent}</div>
-                            ${msg.is_mine ? `
-                                <div class="message-status ${getMessageStatus(msg)}">
-                                    ${getStatusIcons(msg)}
-                                </div>
-                            ` : ''}
-                        </div>
-                    `;
-                }).join('');
+                chatMessages.innerHTML = messages.map(msg => `
+                    <div class="message ${msg.is_mine ? 'mine' : 'theirs'}" data-id="${msg.id}">
+                        ${!msg.is_mine ? `<div class="message-sender">${msg.sender}</div>` : ''}
+                        <div class="message-content">${msg.content}</div>
+                        ${msg.is_mine ? `
+                            <div class="message-status ${getMessageStatus(msg)}">
+                                ${getStatusIcons(msg)}
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
                 
                 // Müvəqqəti mesajları əlavə et (əgər serverdən gələn mesajlarda yoxdursa)
                 tempMessages.forEach(tempMsg => {
@@ -820,7 +796,7 @@ function getStatusIcons(msg) {
     }
 }
 
-function sendMessage(isFileMessage = false) {
+function sendMessage() {
     const input = document.getElementById('message-input');
     if (!input) return;
     
@@ -839,12 +815,8 @@ function sendMessage(isFileMessage = false) {
         const tempMessageDiv = document.createElement('div');
         tempMessageDiv.className = 'message mine';
         tempMessageDiv.id = tempMessageId;
-        
-        // Mesaj məzmununu formatla
-        const formattedContent = formatMessageContent(content);
-        
         tempMessageDiv.innerHTML = `
-            <div class="message-content">${formattedContent}</div>
+            <div class="message-content">${content}</div>
             <div class="message-status">
                 <i class="fas fa-check"></i>
             </div>
@@ -866,8 +838,7 @@ function sendMessage(isFileMessage = false) {
             chatSocket.send(JSON.stringify({
                 'message': content,
                 'sender': currentUserId,
-                'receiver': currentReceiverId,
-                'is_file': isFileMessage
+                'receiver': currentReceiverId
             }));
             websocketSent = true;
             if (!suppressWebSocketErrors) {
@@ -898,7 +869,6 @@ function sendMessage(isFileMessage = false) {
     const formData = new FormData();
     formData.append('receiver_id', currentReceiverId);
     formData.append('content', content);
-    formData.append('is_file', isFileMessage);
 
     fetch('/istifadeciler/api/chat/send/', {
         method: 'POST',
@@ -986,7 +956,7 @@ function sendMessage(isFileMessage = false) {
                 if (typeof showAnimatedMessage === 'function') {
                     showAnimatedMessage('Mesaj göndərilməyə yenidən cəhd edilir...', false);
                 }
-                sendMessage(isFileMessage);
+                sendMessage();
             }, 5000);
         } else {
             if (typeof showAnimatedMessage === 'function') {
@@ -1127,145 +1097,6 @@ function initAudio() {
             console.error('Audio inicializasiya edilərkən xəta:', error);
         }
     }
-}
-
-// Fayl yükləmə funksiyası
-function handleFileUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    // Fayl tipini və ölçüsünü yoxla
-    if (!allowedFileTypes.includes(file.type)) {
-        if (typeof showAnimatedMessage === 'function') {
-            showAnimatedMessage('Bu fayl formatı dəstəklənmir. Zəhmət olmasa başqa format seçin.', true);
-        } else {
-            alert('Bu fayl formatı dəstəklənmir. Zəhmət olmasa başqa format seçin.');
-        }
-        return;
-    }
-    
-    if (file.size > maxFileSize) {
-        if (typeof showAnimatedMessage === 'function') {
-            showAnimatedMessage('Fayl ölçüsü çox böyükdür. Maksimum 5MB ola bilər.', true);
-        } else {
-            alert('Fayl ölçüsü çox böyükdür. Maksimum 5MB ola bilər.');
-        }
-        return;
-    }
-    
-    // Fayl yüklənir bildirişi
-    if (typeof showAnimatedMessage === 'function') {
-        showAnimatedMessage('Fayl yüklənir...', false);
-    }
-    
-    // FormData yaradıb faylı əlavə et
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('receiver_id', currentReceiverId);
-    
-    // Faylı serverə göndər
-    fetch('/istifadeciler/api/chat/upload/', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRFToken': getCookie('csrftoken')
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.status === 'success') {
-            // Fayl mesajını göndər
-            const messageInput = document.getElementById('message-input');
-            messageInput.value = data.file_url;
-            sendMessage(true);
-            
-            // Bildiriş göstər
-            if (typeof showAnimatedMessage === 'function') {
-                showAnimatedMessage('Fayl uğurla yükləndi!', false);
-            }
-        } else {
-            if (typeof showAnimatedMessage === 'function') {
-                showAnimatedMessage('Fayl yüklənərkən xəta: ' + data.message, true);
-            } else {
-                alert('Fayl yüklənərkən xəta: ' + data.message);
-            }
-        }
-    })
-    .catch(error => {
-        if (!suppressWebSocketErrors) {
-            console.error('Fayl yüklənərkən xəta:', error);
-        }
-        if (typeof showAnimatedMessage === 'function') {
-            showAnimatedMessage('Fayl yüklənərkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.', true);
-        } else {
-            alert('Fayl yüklənərkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
-        }
-    })
-    .finally(() => {
-        // Fayl inputunu təmizlə
-        event.target.value = '';
-    });
-}
-
-// Link tanıma funksiyası
-function detectLinks() {
-    const messageInput = document.getElementById('message-input');
-    if (!messageInput) return;
-    
-    const text = messageInput.value;
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    
-    if (urlRegex.test(text)) {
-        // Link tapıldı, göndərmə düyməsini vurğula
-        const sendButton = document.getElementById('send-message');
-        if (sendButton) {
-            sendButton.classList.add('has-link');
-        }
-    } else {
-        // Link tapılmadı, vurğunu sil
-        const sendButton = document.getElementById('send-message');
-        if (sendButton) {
-            sendButton.classList.remove('has-link');
-        }
-    }
-}
-
-// Mesaj məzmununda linkləri və fayl URL-lərini formatla
-function formatMessageContent(content) {
-    // URL-ləri link et
-    let formattedContent = content.replace(/(https?:\/\/[^\s]+)/g, function(url) {
-        // Fayl URL-i olub-olmadığını yoxla
-        if (url.match(/\.(jpeg|jpg|gif|png|pdf|doc|docx|xls|xlsx|txt)$/i)) {
-            // Şəkil URL-i olub-olmadığını yoxla
-            if (url.match(/\.(jpeg|jpg|gif|png)$/i)) {
-                return `<div class="message-image"><img src="${url}" alt="Şəkil" onclick="window.open('${url}', '_blank')"></div>`;
-            }
-            // PDF URL-i olub-olmadığını yoxla
-            else if (url.match(/\.(pdf)$/i)) {
-                return `<div class="message-file pdf-file"><i class="fas fa-file-pdf"></i> <a href="${url}" target="_blank">PDF Faylı</a></div>`;
-            }
-            // Word URL-i olub-olmadığını yoxla
-            else if (url.match(/\.(doc|docx)$/i)) {
-                return `<div class="message-file word-file"><i class="fas fa-file-word"></i> <a href="${url}" target="_blank">Word Faylı</a></div>`;
-            }
-            // Excel URL-i olub-olmadığını yoxla
-            else if (url.match(/\.(xls|xlsx)$/i)) {
-                return `<div class="message-file excel-file"><i class="fas fa-file-excel"></i> <a href="${url}" target="_blank">Excel Faylı</a></div>`;
-            }
-            // Text URL-i olub-olmadığını yoxla
-            else if (url.match(/\.(txt)$/i)) {
-                return `<div class="message-file text-file"><i class="fas fa-file-alt"></i> <a href="${url}" target="_blank">Mətn Faylı</a></div>`;
-            }
-        }
-        return `<a href="${url}" target="_blank">${url}</a>`;
-    });
-    
-    return formattedContent;
 }
 
 // DOM yükləndikdə chat funksiyasını başlat

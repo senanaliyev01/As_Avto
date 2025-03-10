@@ -40,12 +40,13 @@ class Message(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
     is_delivered = models.BooleanField(default=False)
-    is_file = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['created_at']
-        verbose_name = 'Mesajlar'
-        verbose_name_plural = 'Mesajlar'
 
     def __str__(self):
         return f'Message from {self.sender.username} to {self.receiver.username}'
+    
+    class Meta:
+        verbose_name = 'Mesajlar'
+        verbose_name_plural = 'Mesajlar'

@@ -384,43 +384,43 @@
         window.selectUser = selectUser;
         window.confirmLogout = confirmLogout;
         
-        // Saatı başlat
-        updateCurrentTime();
-        setInterval(updateCurrentTime, 1000);
+            // Saatı başlat
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
 
-        // İş saatlarını yoxla
-        checkWorkingHours();
-        setInterval(checkWorkingHours, 60000); // Hər dəqiqə yoxla
+            // İş saatlarını yoxla
+            checkWorkingHours();
+            setInterval(checkWorkingHours, 60000); // Hər dəqiqə yoxla
 
-        // Səbət sayını yenilə
-        updateCartCount();
+            // Səbət sayını yenilə
+            updateCartCount();
 
-        // Swiper-ləri inicializasiya et
-        if (document.querySelector('.brandsSwiper')) {
+            // Swiper-ləri inicializasiya et
+            if (document.querySelector('.brandsSwiper')) {
             try {
-            new Swiper('.brandsSwiper', swiperConfig);
+                new Swiper('.brandsSwiper', swiperConfig);
             } catch (error) {
                 console.error('Swiper inicializasiya xətası:', error);
             }
-        }
-        if (document.querySelector('.carBrandsSwiper')) {
+            }
+            if (document.querySelector('.carBrandsSwiper')) {
             try {
-            new Swiper('.carBrandsSwiper', {
-                ...swiperConfig,
-                autoplay: {
-                    ...swiperConfig.autoplay,
-                    delay: 3500
-                }
-            });
+                new Swiper('.carBrandsSwiper', {
+                    ...swiperConfig,
+                    autoplay: {
+                        ...swiperConfig.autoplay,
+                        delay: 3500
+                    }
+                });
             } catch (error) {
                 console.error('Swiper inicializasiya xətası:', error);
             }
-        }
+            }
 
         // İlkin statistikaları yüklə
         if (document.querySelector('.statistics-card')) {
-        updateStatistics();
-        setInterval(updateStatistics, 3600000); // 1 saatdan bir yenilə
+            updateStatistics();
+            setInterval(updateStatistics, 3600000); // 1 saatdan bir yenilə
         }
 
         // Chat widget-i inicializasiya et
@@ -430,51 +430,51 @@
             // Chat.js faylında inicializasiya edilir
         }
 
-        // Rəy formu
-        const reviewForm = document.querySelector('.review-form form');
-        if (reviewForm) {
-            reviewForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const rating = reviewForm.querySelector('input[name="qiymetlendirme"]:checked');
-                if (!rating) {
+            // Rəy formu
+            const reviewForm = document.querySelector('.review-form form');
+            if (reviewForm) {
+                reviewForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const rating = reviewForm.querySelector('input[name="qiymetlendirme"]:checked');
+                    if (!rating) {
                     showReviewNotification('error', 'Zəhmət olmasa, qiymətləndirmə üçün ulduz seçin');
-                    return;
-                }
+                        return;
+                    }
 
-                const review = reviewForm.querySelector('textarea[name="rey"]').value.trim();
-                if (!review) {
+                    const review = reviewForm.querySelector('textarea[name="rey"]').value.trim();
+                    if (!review) {
                     showReviewNotification('error', 'Zəhmət olmasa, rəyinizi yazın');
-                    return;
-                }
+                        return;
+                    }
 
-                const formData = new FormData(reviewForm);
-                
-                fetch(reviewForm.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken')
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
+                    const formData = new FormData(reviewForm);
+                    
+                    fetch(reviewForm.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken')
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
                         showReviewNotification('success', 'Rəyiniz uğurla göndərildi. Təsdiqlənməsi gözlənilir');
-                        reviewForm.reset();
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 3000);
-                    } else {
+                            reviewForm.reset();
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 3000);
+                        } else {
                         showReviewNotification('error', data.message || 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin');
-                    }
-                })
-                .catch(error => {
-                    console.error('Xəta:', error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Xəta:', error);
                     showReviewNotification('error', 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin');
+                    });
                 });
-            });
-        }
+            }
 
         // Çıxış funksiyası
         document.addEventListener('click', function(e) {
@@ -541,31 +541,31 @@
         const searchForm = document.getElementById('search-form');
         if (searchForm) {
             searchForm.addEventListener('submit', function(event) {
-    event.preventDefault(); // Formun dərhal göndərilməsini dayandır
-
-    let searchButton = document.getElementById('search-button');
-    let spinner = document.getElementById('loading-spinner');
+        event.preventDefault(); // Formun dərhal göndərilməsini dayandır
+    
+        let searchButton = document.getElementById('search-button');
+        let spinner = document.getElementById('loading-spinner');
             
                 if (!searchButton || !spinner) return;
-
-    // Butonun ölçüsünü qorumaq üçün enini və hündürlüyünü sabit saxla
-    searchButton.style.width = `${searchButton.offsetWidth}px`;
-    searchButton.style.height = `${searchButton.offsetHeight}px`;
     
-    // Axtarış yazısını gizlət, amma spinneri saxla
+        // Butonun ölçüsünü qorumaq üçün enini və hündürlüyünü sabit saxla
+        searchButton.style.width = `${searchButton.offsetWidth}px`;
+        searchButton.style.height = `${searchButton.offsetHeight}px`;
+        
+        // Axtarış yazısını gizlət, amma spinneri saxla
                 if (searchButton.childNodes[0] && searchButton.childNodes[0].nodeValue) {
-    searchButton.childNodes[0].nodeValue = ''; // Axtar sözünü sil
+        searchButton.childNodes[0].nodeValue = ''; // Axtar sözünü sil
                 }
-    spinner.style.display = 'inline-block'; // Spinneri göstər
-
-    // Butonu deaktiv et ki, yenidən klik olunmasın
-    searchButton.disabled = true; 
-
-    // 2 saniyə sonra formu göndər
-    setTimeout(() => {
-        this.submit(); // Formu göndər
-    }, 2000);
-});
+        spinner.style.display = 'inline-block'; // Spinneri göstər
+    
+        // Butonu deaktiv et ki, yenidən klik olunmasın
+        searchButton.disabled = true; 
+    
+        // 2 saniyə sonra formu göndər
+        setTimeout(() => {
+            this.submit(); // Formu göndər
+        }, 2000);
+    });
         }
 
     });

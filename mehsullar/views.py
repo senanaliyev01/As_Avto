@@ -389,15 +389,33 @@ def sifaris_izle(request):
 
 @login_required
 def get_cart_count(request):
-    try:
-        count = Sebet.objects.filter(user=request.user).aggregate(
-            total_items=Sum('miqdar')
-        )['total_items'] or 0
-        return JsonResponse({'count': count})
-    except:
-        return JsonResponse({'count': 0})
+    sebet = Sebet.objects.filter(user=request.user)
+    count = sebet.count()
+    return JsonResponse({'count': count})
 
-
+@login_required
+def get_cart_items(request):
+    sebet = Sebet.objects.filter(user=request.user)
+    cemi_mebleg = sebet.aggregate(total=Sum(F('miqdar') * F('mehsul__qiymet')))['total'] or 0
+    
+    items = []
+    for item in sebet:
+        items.append({
+            'id': item.id,
+            'name': item.mehsul.adi,
+            'brand': item.mehsul.brend.adi if item.mehsul.brend else '',
+            'model': item.mehsul.marka.adi if item.mehsul.marka else '',
+            'oem': item.mehsul.oem,
+            'price': item.mehsul.qiymet,
+            'quantity': item.miqdar,
+            'image': item.mehsul.sekil.url if item.mehsul.sekil else None,
+            'total': item.mehsul.qiymet * item.miqdar
+        })
+    
+    return JsonResponse({
+        'items': items,
+        'total': cemi_mebleg
+    })
 
 @login_required
 def update_quantity(request, item_id, new_quantity):

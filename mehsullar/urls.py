@@ -9,6 +9,7 @@ urlpatterns = [
     path('sifaris/gonder/', views.sifarisi_gonder, name='sifarisi_gonder'),
     path('orders/', views.sifaris_izle, name='sifaris_izle'),
     path('get_cart_count/', views.get_cart_count, name='get_cart_count'),
+    path('get_cart_items/', views.get_cart_items, name='get_cart_items'),
     path('orders_detail/<int:sifaris_id>/', views.sifaris_detallari, name='sifaris_detallari'),
     path('product-detail/<str:mehsul_adi>-<str:mehsul_oem>-<str:mehsul_brend_kod>/<int:mehsul_id>/', 
          views.mehsul_haqqinda, 

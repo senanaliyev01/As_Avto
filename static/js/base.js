@@ -1117,10 +1117,10 @@
                                     <span>Miqdar: ${item.quantity}</span>
                                 </div>
                             </div>
-                            <div class="cart-item-actions">
-                                <div class="cart-item-price">${item.price} ₼</div>
-                                <button class="delete-cart-item" onclick="deleteCartItem(${item.id})">
-                                    <i class="fas fa-trash"></i>
+                            <div class="cart-item-price">
+                                ${item.price} ₼
+                                <button class="cart-item-delete" onclick="deleteCartItem(${item.id})">
+                                    <i class="fas fa-trash-alt"></i>
                                 </button>
                             </div>
                         </div>
@@ -1198,30 +1198,61 @@
     // Səbətdən məhsulu silmək üçün funksiya
     function deleteCartItem(itemId) {
         if (confirm('Məhsulu səbətdən silmək istədiyinizə əminsiniz?')) {
+            const cartItem = document.querySelector(`.cart-item[data-item-id="${itemId}"]`);
+            
+            if (cartItem) {
+                // Loading effektini göstər
+                cartItem.style.opacity = '0.5';
+                cartItem.style.pointerEvents = 'none';
+            }
+
             fetch(`/sebet/sil/${itemId}/`, {
                 method: 'POST',
                 headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRFToken': getCookie('csrftoken')
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Səbəti yeniləyək
-                    loadCartItems();
-                    // Səbət sayını yeniləyək
+                    if (cartItem) {
+                        cartItem.remove();
+                    }
+                    
+                    // Səbət cəmini yenilə
+                    document.getElementById('cart-modal-total').textContent = `${data.total} ₼`;
+                    
+                    // Səbət ikonunun altındakı cəmi də yeniləyək
+                    const cartTotalBadge = document.getElementById('cart-total-badge');
+                    if (cartTotalBadge) {
+                        cartTotalBadge.textContent = `${data.total} ₼`;
+                    }
+                    
+                    // Səbət sayını yenilə
                     updateCartCount();
-                    // Uğurlu mesaj göstərək
+                    
+                    // Səbət boşdursa modalı yenidən yüklə
+                    if (data.is_empty) {
+                        loadCartItems();
+                    }
+                    
                     showAnimatedMessage('Məhsul səbətdən silindi', false);
                 } else {
-                    // Xəta mesajı göstərək
-                    showAnimatedMessage('Məhsul silinərkən xəta baş verdi', true);
+                    if (cartItem) {
+                        cartItem.style.opacity = '1';
+                        cartItem.style.pointerEvents = 'auto';
+                    }
+                    showAnimatedMessage(data.message || 'Silmə xətası baş verdi', true);
                 }
             })
             .catch(error => {
-                console.error('Səbətdən silmə xətası:', error);
-                showAnimatedMessage('Məhsul silinərkən xəta baş verdi', true);
+                console.error('Xəta:', error);
+                if (cartItem) {
+                    cartItem.style.opacity = '1';
+                    cartItem.style.pointerEvents = 'auto';
+                }
+                showAnimatedMessage('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.', true);
             });
         }
     }

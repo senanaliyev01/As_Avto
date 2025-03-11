@@ -418,34 +418,6 @@ footer {
     .search-bar {
         margin: 0 1rem;
     }
-
-    .cart-modal-content {
-        width: 95%;
-        max-height: 90vh;
-    }
-    
-    .cart-item {
-        grid-template-columns: 60px 1fr auto;
-    }
-    
-    .cart-item-actions {
-        flex-direction: row;
-        align-items: center;
-        grid-column: 2 / span 2;
-        justify-content: space-between;
-        margin-top: 10px;
-    }
-    
-    .cart-modal-footer {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .cart-total {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-    }
 }
 
 @media (max-width: 576px) {
@@ -1441,37 +1413,6 @@ html {
     color: var(--text-primary);
 }
 
-.cart-item-actions {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 10px;
-}
-
-.cart-item-remove {
-    background: rgba(255, 82, 82, 0.1);
-    color: #ff5252;
-    border: 1px solid rgba(255, 82, 82, 0.3);
-    border-radius: 4px;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.cart-item-remove:hover {
-    background: rgba(255, 82, 82, 0.2);
-    transform: scale(1.1);
-}
-
-.cart-item-remove i {
-    font-size: 0.9rem;
-}
-
 .cart-modal-footer {
     padding: 15px 20px;
     background: rgba(0, 0, 0, 0.2);
@@ -1541,7 +1482,7 @@ html {
     }
     
     .cart-item {
-        grid-template-columns: 60px 1fr auto;
+        grid-template-columns: 60px 1fr;
     }
     
     .cart-item-price {
@@ -1559,4 +1500,47 @@ html {
         display: flex;
         justify-content: space-between;
     }
+}
+
+.cart-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-left: auto;
+}
+
+.delete-cart-item {
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    padding: 5px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+}
+
+.delete-cart-item:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+    transform: scale(1.1);
+}
+
+.delete-cart-item i {
+    font-size: 16px;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    transition: opacity 0.3s ease;
+}
+
+.cart-item:last-child {
+    border-bottom: none;
 }

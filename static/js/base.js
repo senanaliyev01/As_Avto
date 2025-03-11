@@ -1110,17 +1110,17 @@
                                 <div class="cart-item-info">
                                     <span>${item.brand}</span>
                                     <span>${item.model}</span>
-                                    <span>OEM: ${item.oem}</span>
-                                    <span>Brend Kod: ${item.brend_kod || '-'}</span>
+                                    <span>${item.oem}</span>
+                                    <span>${item.brend_kod || '-'}</span>
                                 </div>
                                 <div class="cart-item-quantity">
                                     <span>Miqdar: ${item.quantity}</span>
                                 </div>
                             </div>
                             <div class="cart-item-actions">
-                                <div class="cart-item-price">${item.price} AZN</div>
-                                <button class="cart-item-remove" onclick="removeCartItem(${item.id}, event)">
-                                    <i class="fas fa-trash-alt"></i>
+                                <div class="cart-item-price">${item.price} ₼</div>
+                                <button class="delete-cart-item" onclick="deleteCartItem(${item.id})">
+                                    <i class="fas fa-trash"></i>
                                 </button>
                             </div>
                         </div>
@@ -1163,6 +1163,61 @@
         });
     }
 
+    // Səbətdən məhsul silmə funksiyası
+    function deleteCartItem(itemId) {
+        if (confirm('Bu məhsulu səbətdən silmək istədiyinizə əminsiniz?')) {
+            const cartItem = document.querySelector(`.cart-item[data-item-id="${itemId}"]`);
+            if (cartItem) {
+                // Loading effektini göstər
+                cartItem.style.opacity = '0.5';
+                cartItem.style.pointerEvents = 'none';
+            }
+
+            fetch(`/remove_from_cart/${itemId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (cartItem) {
+                        cartItem.remove();
+                    }
+                    
+                    // Səbət cəmini yenilə
+                    document.getElementById('cart-modal-total').textContent = `${data.total} ₼`;
+                    
+                    // Səbət sayını yenilə
+                    updateCartCount();
+                    
+                    // Səbət boşdursa modalı yenidən yüklə
+                    if (data.is_empty) {
+                        loadCartItems();
+                    }
+                    
+                    showAnimatedMessage('Məhsul səbətdən silindi', false);
+                } else {
+                    if (cartItem) {
+                        cartItem.style.opacity = '1';
+                        cartItem.style.pointerEvents = 'auto';
+                    }
+                    showAnimatedMessage(data.error || 'Silmə xətası baş verdi', true);
+                }
+            })
+            .catch(error => {
+                console.error('Xəta:', error);
+                if (cartItem) {
+                    cartItem.style.opacity = '1';
+                    cartItem.style.pointerEvents = 'auto';
+                }
+                showAnimatedMessage('Server xətası baş verdi', true);
+            });
+        }
+    }
+
     // Səbət modalını bağlamaq üçün
     document.addEventListener('DOMContentLoaded', function() {
         const cartModal = document.getElementById('cart-modal');
@@ -1194,86 +1249,3 @@
         // Səhifə yükləndikdə səbət sayını və cəmini yeniləyək
         updateCartCount();
     });
-    
-    // Səbətdən məhsul silmək üçün funksiya
-    function removeCartItem(itemId, event) {
-        event.preventDefault();
-        event.stopPropagation();
-        
-        if (confirm('Bu məhsulu səbətdən silmək istədiyinizə əminsiniz?')) {
-            // Silmə əməliyyatını göstərmək üçün animasiya
-            const cartItem = document.querySelector(`.cart-item[data-item-id="${itemId}"]`);
-            if (cartItem) {
-                cartItem.style.opacity = '0.5';
-                cartItem.style.transform = 'translateX(20px)';
-                cartItem.style.transition = 'all 0.3s ease';
-            }
-            
-            // Form yaradaq və POST sorğusu göndərək
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = `/sebet/sil/${itemId}/`;
-            form.style.display = 'none';
-            
-            // CSRF token əlavə edək
-            const csrfToken = document.createElement('input');
-            csrfToken.type = 'hidden';
-            csrfToken.name = 'csrfmiddlewaretoken';
-            csrfToken.value = getCookie('csrftoken');
-            form.appendChild(csrfToken);
-            
-            // Formu səhifəyə əlavə edək və göndərək
-            document.body.appendChild(form);
-            
-            // FormData istifadə edərək POST sorğusu göndərək
-            const formData = new FormData(form);
-            
-            fetch(form.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Uğurlu silmə
-                    if (cartItem) {
-                        cartItem.style.height = '0';
-                        cartItem.style.margin = '0';
-                        cartItem.style.padding = '0';
-                        cartItem.style.overflow = 'hidden';
-                        
-                        setTimeout(() => {
-                            // Səbət məlumatlarını yenilə
-                            loadCartItems();
-                            updateCartCount();
-                            
-                            // Bildiriş göstər
-                            showAnimatedMessage('Məhsul səbətdən silindi', false);
-                        }, 300);
-                    }
-                } else {
-                    // Xəta baş verdi
-                    if (cartItem) {
-                        cartItem.style.opacity = '1';
-                        cartItem.style.transform = 'translateX(0)';
-                    }
-                    showAnimatedMessage('Məhsul silinərkən xəta baş verdi', true);
-                }
-            })
-            .catch(error => {
-                console.error('Səbətdən silmə xətası:', error);
-                if (cartItem) {
-                    cartItem.style.opacity = '1';
-                    cartItem.style.transform = 'translateX(0)';
-                }
-                showAnimatedMessage('Məhsul silinərkən xəta baş verdi', true);
-            })
-            .finally(() => {
-                // Formu təmizləyək
-                document.body.removeChild(form);
-            });
-        }
-    }

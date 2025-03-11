@@ -391,7 +391,12 @@ def sifaris_izle(request):
 def get_cart_count(request):
     sebet = Sebet.objects.filter(user=request.user)
     count = sebet.count()
-    return JsonResponse({'count': count})
+    cemi_mebleg = sebet.aggregate(total=Sum(F('miqdar') * F('mehsul__qiymet')))['total'] or 0
+    
+    return JsonResponse({
+        'count': count,
+        'total': cemi_mebleg
+    })
 
 @login_required
 def get_cart_items(request):

@@ -84,6 +84,22 @@ header {
     border: 2px solid var(--primary-color);
 }
 
+.cart-total-badge {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #0a1929, #132f4c);
+    color: #64ffda;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    border: 1px solid var(--accent-color);
+    white-space: nowrap;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
 .working-hours {
     background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
     color: var(--text-secondary);
@@ -1298,6 +1314,26 @@ html {
     padding: 20px;
     overflow-y: auto;
     max-height: calc(80vh - 140px);
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-color) rgba(0, 0, 0, 0.2);
+}
+
+.cart-modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.cart-modal-body::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.cart-modal-body::-webkit-scrollbar-thumb {
+    background-color: var(--accent-color);
+    border-radius: 4px;
+}
+
+.cart-modal-body::-webkit-scrollbar-thumb:hover {
+    background-color: #38a7e5;
 }
 
 .cart-item {

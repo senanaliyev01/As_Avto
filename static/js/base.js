@@ -193,6 +193,14 @@
                 if (cartCount) {
                     cartCount.textContent = data.count;
                 }
+                
+                // Səbət cəmini də yeniləyək
+                if (data.total !== undefined) {
+                    const cartTotalBadge = document.getElementById('cart-total-badge');
+                    if (cartTotalBadge) {
+                        cartTotalBadge.textContent = data.total + ' AZN';
+                    }
+                }
             })
             .catch(error => console.error('Error:', error));
     }
@@ -1115,6 +1123,12 @@
                 
                 cartItemsContainer.innerHTML = cartHTML;
                 document.getElementById('cart-modal-total').textContent = data.total + ' AZN';
+                
+                // Səbət ikonunun altındakı cəmi də yeniləyək
+                const cartTotalBadge = document.getElementById('cart-total-badge');
+                if (cartTotalBadge) {
+                    cartTotalBadge.textContent = data.total + ' AZN';
+                }
             } else {
                 // Səbət boşdursa
                 cartItemsContainer.innerHTML = `
@@ -1124,6 +1138,12 @@
                     </div>
                 `;
                 document.getElementById('cart-modal-total').textContent = '0 AZN';
+                
+                // Səbət ikonunun altındakı cəmi də sıfırlayaq
+                const cartTotalBadge = document.getElementById('cart-total-badge');
+                if (cartTotalBadge) {
+                    cartTotalBadge.textContent = '0 AZN';
+                }
             }
         })
         .catch(error => {
@@ -1164,4 +1184,7 @@
                 document.body.style.overflow = '';
             }
         });
+        
+        // Səhifə yükləndikdə səbət sayını və cəmini yeniləyək
+        updateCartCount();
     });

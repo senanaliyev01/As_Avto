@@ -1104,13 +1104,14 @@
                 data.items.forEach(item => {
                     cartHTML += `
                         <div class="cart-item" data-item-id="${item.id}">
-                            <img src="${item.image || '/static/img/noimage.webp'}" alt="${item.name}" class="cart-item-image">
+                            <img src="${item.image || '/static/img/no-image.png'}" alt="${item.name}" class="cart-item-image">
                             <div class="cart-item-details">
                                 <div class="cart-item-name">${item.name}</div>
                                 <div class="cart-item-info">
                                     <span>${item.brand}</span>
                                     <span>${item.model}</span>
                                     <span>${item.oem}</span>
+                                    <span>${item.brend_kod || '-'}</span>
                                 </div>
                                 <div class="cart-item-quantity">
                                     <span>Miqdar: ${item.quantity}</span>

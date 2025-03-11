@@ -411,6 +411,7 @@ def get_cart_items(request):
             'brand': item.mehsul.brend.adi if item.mehsul.brend else '',
             'model': item.mehsul.marka.adi if item.mehsul.marka else '',
             'oem': item.mehsul.oem,
+            'brend_kod': item.mehsul.brend_kod,
             'price': item.mehsul.qiymet,
             'quantity': item.miqdar,
             'image': item.mehsul.sekil.url if item.mehsul.sekil else None,

@@ -70,9 +70,11 @@
                                oninput="formatSecurityCode(this)">
                         <label>Təhlükəsizlik Kodu</label>
                     </div>
-                    <small class="help-text" style="color: red;">
-                        Kod <span id="countdown">03:00</span> ərzində etibarlıdır.
-                    </small>
+                    <div class="timer-container" style="margin-top: 10px; text-align: center;">
+                        <small class="help-text" style="color: red;">
+                            Kodun müddəti: <span id="timer" style="font-weight: bold;">03:00</span>
+                        </small>
+                    </div>
                     <small class="format-help" style="color: #666; display: block; margin-top: 5px;">
                         Format: 6 rəqəm və ya böyük hərf (məsələn: ABC123)
                     </small>
@@ -134,23 +136,74 @@
     <script src="{% static 'js/login.js' %}"></script>
     <script src="{% static 'js/loading.js' %}"></script>
     <script>
+    let timerInterval;
+    let isExpired = false;
+
+    function startTimer(initialSeconds) {
+        const timerDisplay = document.getElementById('timer');
+        let timeLeft = initialSeconds;
+
+        function updateTimer() {
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                handleExpiration();
+                return;
+            }
+
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            timeLeft--;
+        }
+
+        updateTimer();
+        timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function handleExpiration() {
+        if (isExpired) return;
+        isExpired = true;
+        
+        // İstifadəçiyə mesaj göstər
+        const messages = document.querySelector('.messages');
+        if (messages) {
+            messages.innerHTML = `
+                <div class="alert error">
+                    <i class="fas fa-times-circle"></i>
+                    <span>Təhlükəsizlik kodunun müddəti bitib. Yenidən cəhd edin.</span>
+                </div>
+            `;
+        }
+        
+        // 2 saniyə gözlə və səhifəni yenilə
+        setTimeout(() => {
+            window.location.href = "{% url 'login' %}";
+        }, 2000);
+    }
+
+    function checkCodeExpiration() {
+        fetch("{% url 'check_code_expiration' %}")
+            .then(response => response.json())
+            .then(data => {
+                if (data.expired) {
+                    handleExpiration();
+                } else if (data.remaining_seconds > 0) {
+                    startTimer(data.remaining_seconds);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
     function formatSecurityCode(input) {
-        // Daxil edilən mətni böyük hərflərə çevir
+        if (isExpired) return;
+        
         let value = input.value.toUpperCase();
-        
-        // Yalnız hərflər və rəqəmlərə icazə ver
         value = value.replace(/[^A-Z0-9]/g, '');
-        
-        // Maksimum 6 simvol
         value = value.substring(0, 6);
-        
-        // Yenilənmiş dəyəri input-a mənimsət
         input.value = value;
         
-        // Pattern-ə uyğunluğu yoxla
         const isValid = /^[A-Z0-9]{6}$/.test(value);
         
-        // Vizual əks-əlaqə
         if (value.length === 6) {
             if (isValid) {
                 input.style.borderColor = '#28a745';
@@ -165,59 +218,24 @@
         }
     }
 
-    // Geri sayım funksiyası
-    function startCountdown() {
-        const countdownElement = document.getElementById('countdown');
-        if (!countdownElement) return;
-
-        let timeLeft = 180; // 3 dəqiqə = 180 saniyə
-        
-        function updateCountdown() {
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            
-            // Vaxtı formatla
-            countdownElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-            
-            if (timeLeft <= 0) {
-                // Vaxt bitdikdə
-                clearInterval(timer);
-                alert('Təhlükəsizlik kodunun müddəti bitdi. Yenidən cəhd edin.');
-                window.location.href = "{% url 'login' %}";
-            } else {
-                timeLeft--;
-                
-                // Son 30 saniyədə qırmızı rənglə xəbərdarlıq
-                if (timeLeft <= 30) {
-                    countdownElement.style.color = '#dc3545';
-                    countdownElement.style.fontWeight = 'bold';
-                }
-            }
-        }
-
-        // İlk dəfə çağır
-        updateCountdown();
-        
-        // Hər saniyədə yenilə
-        const timer = setInterval(updateCountdown, 1000);
-    }
-
-    // Səhifə yükləndikdə
     document.addEventListener('DOMContentLoaded', function() {
         const codeInput = document.getElementById('securityCode');
         if (codeInput) {
-            // Input-u fokusla
             codeInput.focus();
             
-            // Geri sayımı başlat
-            startCountdown();
-            
-            // Enter düyməsinə basıldıqda formanı göndər
             codeInput.addEventListener('keypress', function(e) {
+                if (isExpired) {
+                    e.preventDefault();
+                    return;
+                }
+                
                 if (e.key === 'Enter' && this.value.length === 6) {
                     this.form.submit();
                 }
             });
+            
+            // Serverdən vaxt məlumatını al və timer-i başlat
+            checkCodeExpiration();
         }
     });
     </script>

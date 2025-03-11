@@ -13,8 +13,46 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.urls import reverse
+from django.utils import timezone
 import re
 from esasevim.views import esasevim
+
+def check_code_expiration(request):
+    """Təhlükəsizlik kodunun müddətini yoxlayır"""
+    if request.method == 'GET':
+        user_id = request.session.get('temp_user_id')
+        if not user_id:
+            return JsonResponse({'expired': True})
+        
+        try:
+            user = User.objects.get(id=user_id)
+            login_code = LoginCode.objects.filter(
+                user=user,
+                is_used=False
+            ).latest('created_at')
+            
+            now = timezone.now()
+            expiration_time = login_code.created_at + timezone.timedelta(minutes=3)
+            remaining_seconds = int((expiration_time - now).total_seconds())
+            
+            if remaining_seconds <= 0:
+                # Sessiyanı təmizlə
+                request.session.pop('temp_user_id', None)
+                request.session.pop('temp_remember_me', None)
+                return JsonResponse({
+                    'expired': True,
+                    'message': 'Təhlükəsizlik kodunun müddəti bitib.'
+                })
+            
+            return JsonResponse({
+                'expired': False,
+                'remaining_seconds': remaining_seconds
+            })
+            
+        except (User.DoesNotExist, LoginCode.DoesNotExist):
+            return JsonResponse({'expired': True})
+    
+    return JsonResponse({'error': 'Invalid request method'})
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -91,8 +129,11 @@ def login_view(request):
                     if request.GET.get('next'):
                         request.session['next'] = request.GET['next']
                     
-                    messages.info(request, 'Təhlükəsizlik kodu göndərildi. Zəhmət olmasa administratorla əlaqə saxlayın.')
-                    return render(request, 'login.html', {'show_code_input': True})
+                    messages.info(request, 'Təhlükəsizlik kodu admin panelinə göndərildi. Zəhmət olmasa administratorla əlaqə saxlayın.')
+                    return render(request, 'login.html', {
+                        'show_code_input': True,
+                        'code_created_at': login_code.created_at.isoformat()
+                    })
                 except Exception as e:
                     messages.error(request, f'Təhlükəsizlik kodu yaradılarkən xəta baş verdi: {str(e)}')
                     return render(request, 'login.html', {'show_code_input': False})

@@ -1110,14 +1110,19 @@
                                 <div class="cart-item-info">
                                     <span>${item.brand}</span>
                                     <span>${item.model}</span>
-                                    <span>${item.oem}</span>
-                                    <span>${item.brend_kod || '-'}</span>
+                                    <span>OEM: ${item.oem}</span>
+                                    <span>Brend Kod: ${item.brend_kod || '-'}</span>
                                 </div>
                                 <div class="cart-item-quantity">
                                     <span>Miqdar: ${item.quantity}</span>
                                 </div>
                             </div>
-                            <div class="cart-item-price">${item.price} ₼</div>
+                            <div class="cart-item-actions">
+                                <div class="cart-item-price">${item.price} AZN</div>
+                                <button class="cart-item-remove" onclick="removeCartItem(${item.id}, event)">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
                         </div>
                     `;
                 });
@@ -1189,3 +1194,64 @@
         // Səhifə yükləndikdə səbət sayını və cəmini yeniləyək
         updateCartCount();
     });
+    
+    // Səbətdən məhsul silmək üçün funksiya
+    function removeCartItem(itemId, event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        if (confirm('Bu məhsulu səbətdən silmək istədiyinizə əminsiniz?')) {
+            // Silmə əməliyyatını göstərmək üçün animasiya
+            const cartItem = document.querySelector(`.cart-item[data-item-id="${itemId}"]`);
+            if (cartItem) {
+                cartItem.style.opacity = '0.5';
+                cartItem.style.transform = 'translateX(20px)';
+                cartItem.style.transition = 'all 0.3s ease';
+            }
+            
+            // Serverdən məhsulu sil
+            fetch(`/sebet/sil/${itemId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Uğurlu silmə
+                    if (cartItem) {
+                        cartItem.style.height = '0';
+                        cartItem.style.margin = '0';
+                        cartItem.style.padding = '0';
+                        cartItem.style.overflow = 'hidden';
+                        
+                        setTimeout(() => {
+                            // Səbət məlumatlarını yenilə
+                            loadCartItems();
+                            updateCartCount();
+                            
+                            // Bildiriş göstər
+                            showAnimatedMessage('Məhsul səbətdən silindi', false);
+                        }, 300);
+                    }
+                } else {
+                    // Xəta baş verdi
+                    if (cartItem) {
+                        cartItem.style.opacity = '1';
+                        cartItem.style.transform = 'translateX(0)';
+                    }
+                    showAnimatedMessage('Məhsul silinərkən xəta baş verdi', true);
+                }
+            })
+            .catch(error => {
+                console.error('Səbətdən silmə xətası:', error);
+                if (cartItem) {
+                    cartItem.style.opacity = '1';
+                    cartItem.style.transform = 'translateX(0)';
+                }
+                showAnimatedMessage('Məhsul silinərkən xəta baş verdi', true);
+            });
+        }
+    }

@@ -1117,7 +1117,7 @@
                                     <span>Miqdar: ${item.quantity}</span>
                                 </div>
                             </div>
-                            <div class="cart-item-price">${item.price} AZN</div>
+                            <div class="cart-item-price">${item.price} ₼</div>
                         </div>
                     `;
                 });
@@ -1128,7 +1128,7 @@
                 // Səbət ikonunun altındakı cəmi də yeniləyək
                 const cartTotalBadge = document.getElementById('cart-total-badge');
                 if (cartTotalBadge) {
-                    cartTotalBadge.textContent = data.total + ' AZN';
+                    cartTotalBadge.textContent = data.total + ' ₼';
                 }
             } else {
                 // Səbət boşdursa
@@ -1138,12 +1138,12 @@
                         <p>Səbətiniz boşdur</p>
                     </div>
                 `;
-                document.getElementById('cart-modal-total').textContent = '0 AZN';
+                document.getElementById('cart-modal-total').textContent = '0 ₼';
                 
                 // Səbət ikonunun altındakı cəmi də sıfırlayaq
                 const cartTotalBadge = document.getElementById('cart-total-badge');
                 if (cartTotalBadge) {
-                    cartTotalBadge.textContent = '0 AZN';
+                    cartTotalBadge.textContent = '0 ₼';
                 }
             }
         })

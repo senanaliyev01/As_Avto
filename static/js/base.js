@@ -198,7 +198,7 @@
                 if (data.total !== undefined) {
                     const cartTotalBadge = document.getElementById('cart-total-badge');
                     if (cartTotalBadge) {
-                        cartTotalBadge.textContent = data.total + ' AZN';
+                        cartTotalBadge.textContent = data.total + ' ₼';
                     }
                 }
             })
@@ -663,8 +663,8 @@
         .then(data => {
             if (data.success) {
                 input.value = newValue;
-                row.querySelector('.item-total').textContent = `${(price * newValue).toFixed(2)} AZN`;
-                document.getElementById('total-amount').textContent = `${data.total} AZN`;
+                row.querySelector('.item-total').textContent = `${(price * newValue).toFixed(2)} ₼`;
+                document.getElementById('total-amount').textContent = `${data.total} ₼`;
                 updateCartCount();
             } else {
                 showAnimatedMessage(data.error || "Miqdar yeniləmə xətası", true);
@@ -689,7 +689,7 @@
                 if (data.success) {
                     const row = document.querySelector(`tr[data-item-id="${itemId}"]`);
                     row.remove();
-                    document.getElementById('total-amount').textContent = `${data.total} AZN`;
+                    document.getElementById('total-amount').textContent = `${data.total} ₼`;
                     updateCartCount();
                     
                     // Səbət boşdursa, boş səbət mesajını göstər
@@ -802,11 +802,11 @@
                 if (data.success) {
                     input.value = data.new_quantity;
                     const itemTotalElement = row.querySelector('.item-total');
-                    itemTotalElement.textContent = data.item_total.toFixed(2) + ' AZN';
+                    itemTotalElement.textContent = data.item_total.toFixed(2) + ' ₼';
                     
                     const totalElement = document.getElementById('total-amount');
                     if (totalElement) {
-                        totalElement.textContent = data.total_amount.toFixed(2) + ' AZN';
+                        totalElement.textContent = data.total_amount.toFixed(2) + ' ₼';
                         totalElement.classList.add('highlight');
                         setTimeout(() => totalElement.classList.remove('highlight'), 300);
                     }
@@ -909,7 +909,7 @@
                                     <div class="stock-status ${result.stok === 0 ? 'out-of-stock' : result.stok <= 20 ? 'low-stock' : 'in-stock'}">
                                         ${result.stok === 0 ? 'Yoxdur' : result.stok <= 20 ? 'Az var' : 'Var'}
                                     </div>
-                                    ${result.qiymet} AZN
+                                    ${result.qiymet} ₼
                                 </div>
                             </div>
                         `;
@@ -1123,7 +1123,7 @@
                 });
                 
                 cartItemsContainer.innerHTML = cartHTML;
-                document.getElementById('cart-modal-total').textContent = data.total + ' AZN';
+                document.getElementById('cart-modal-total').textContent = data.total + ' ₼';
                 
                 // Səbət ikonunun altındakı cəmi də yeniləyək
                 const cartTotalBadge = document.getElementById('cart-total-badge');

@@ -186,15 +186,7 @@ admin.site.register(Il)
 admin.site.register(Yanacaq)
 
 class MehsulAdmin(admin.ModelAdmin):
-    def toplam_maya_deyer(self, obj):
-        return f"{obj.maya_qiymet * obj.stok} AZN"
-    toplam_maya_deyer.short_description = "Toplam Maya Dəyəri"
-
-    def toplam_satis_deyer(self, obj):
-        return f"{obj.qiymet * obj.stok} AZN"
-    toplam_satis_deyer.short_description = "Toplam Satış Dəyəri"
-
-    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'axtaris_sozleri', 'qiymet', 'brend_kod', 'oem', 'stok', 'yenidir', 'toplam_maya_deyer', 'toplam_satis_deyer')
+    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'axtaris_sozleri', 'qiymet', 'brend_kod', 'oem', 'stok', 'yenidir')
     list_filter = ('kateqoriya', 'brend', 'marka', 'axtaris_sozleri')
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'yenidir', 'axtaris_sozleri__adi', 'axtaris_sozleri__sozler')
     inlines = [OEMKodInline]

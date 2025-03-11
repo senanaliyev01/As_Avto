@@ -230,8 +230,10 @@ class OEMKod(models.Model):
     def save(self, *args, **kwargs):
         # Əgər yeni yaradılırsa və ya kod dəyişdirilibsə
         if self.pk is None or self._state.adding:
+            # Əvvəlcə "-" işarələrini silək
+            temiz_kod = self.kod.replace('-', '')
             # Boşluqla ayrılmış kodları ayırıb hər birini ayrı-ayrı yaradaqq
-            kodlar = self.kod.split()
+            kodlar = temiz_kod.split()
             if kodlar:
                 # İlk kodu bu obyektdə saxlayaq
                 self.kod = kodlar[0]
@@ -243,6 +245,9 @@ class OEMKod(models.Model):
                         mehsul=self.mehsul
                     )
             return
+        else:
+            # Mövcud kod yenilənərkən də "-" işarələrini silək
+            self.kod = self.kod.replace('-', '')
         super().save(*args, **kwargs)
 
     class Meta:

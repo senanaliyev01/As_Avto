@@ -1119,7 +1119,7 @@
                             </div>
                             <div class="cart-item-actions">
                                 <div class="cart-item-price">${item.price} AZN</div>
-                                <button class="cart-item-remove" onclick="removeCartItem(${item.id}, event)">
+                                <button type="button" class="cart-item-remove" onclick="removeCartItem(${item.id}, event)" title="Sil">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </div>
@@ -1209,17 +1209,40 @@
                 cartItem.style.transition = 'all 0.3s ease';
             }
             
-            // Serverdən məhsulu sil
-            fetch(`/sebet/sil/${itemId}/`, {
+            // Form yaradaq və göndərək
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/sebet/sil/${itemId}/`;
+            form.style.display = 'none';
+            
+            // CSRF token əlavə et
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = 'csrfmiddlewaretoken';
+            csrfToken.value = getCookie('csrftoken');
+            form.appendChild(csrfToken);
+            
+            // Formu səhifəyə əlavə et və göndər
+            document.body.appendChild(form);
+            
+            // FormData istifadə edərək göndər
+            const formData = new FormData(form);
+            
+            fetch(form.action, {
                 method: 'POST',
+                body: formData,
                 headers: {
-                    'X-CSRFToken': getCookie('csrftoken'),
-                    'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             })
             .then(response => {
                 if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Məhsul silinərkən xəta baş verdi');
+            })
+            .then(data => {
+                if (data.success) {
                     // Uğurlu silmə
                     if (cartItem) {
                         cartItem.style.height = '0';
@@ -1252,6 +1275,10 @@
                     cartItem.style.transform = 'translateX(0)';
                 }
                 showAnimatedMessage('Məhsul silinərkən xəta baş verdi', true);
+            })
+            .finally(() => {
+                // Formu təmizlə
+                document.body.removeChild(form);
             });
         }
     }

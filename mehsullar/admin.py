@@ -186,36 +186,65 @@ admin.site.register(Il)
 admin.site.register(Yanacaq)
 
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'axtaris_sozleri', 'qiymet', 'brend_kod', 'oem', 'stok', 'yenidir')
+    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'axtaris_sozleri', 'qiymet', 'maya_qiymet', 'get_toplam_maya', 'get_toplam_satis', 'get_qazanc', 'brend_kod', 'oem', 'stok', 'yenidir')
     list_filter = ('kateqoriya', 'brend', 'marka', 'axtaris_sozleri')
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'yenidir', 'axtaris_sozleri__adi', 'axtaris_sozleri__sozler')
     inlines = [OEMKodInline]
     
-    actions = ['yenilikden_sil', 'yenidir_et', 'axtaris_sozleri_teyin_et', 'axtaris_sozleri_sil']  # Hesablama action-ını silirik
+    actions = ['yenilikden_sil', 'yenidir_et', 'axtaris_sozleri_teyin_et', 'axtaris_sozleri_sil']
+
+    def get_toplam_maya(self, obj):
+        return format_html('<span style="color: #1a73e8;">{:.2f} AZN</span>', obj.maya_qiymet * obj.stok)
+    get_toplam_maya.short_description = 'Toplam Maya'
+    get_toplam_maya.admin_order_field = 'maya_qiymet'
+
+    def get_toplam_satis(self, obj):
+        return format_html('<span style="color: #34a853;">{:.2f} AZN</span>', obj.qiymet * obj.stok)
+    get_toplam_satis.short_description = 'Toplam Satış'
+    get_toplam_satis.admin_order_field = 'qiymet'
+
+    def get_qazanc(self, obj):
+        qazanc = (obj.qiymet * obj.stok) - (obj.maya_qiymet * obj.stok)
+        return format_html('<span style="color: #ea4335;">{:.2f} AZN</span>', qazanc)
+    get_qazanc.short_description = 'Qazanc'
 
     def changelist_view(self, request, extra_context=None):
         # Bütün məhsulların toplam maya qiyməti və satış qiymətini hesablayırıq
         butun_mehsullar = Mehsul.objects.all()
-        toplam_maya_qiymet = 0
-        toplam_satis_qiymet = 0
-        
-        for mehsul in butun_mehsullar:
-            # Hər məhsul üçün stok miqdarını nəzərə alaraq hesablama
-            toplam_maya_qiymet += mehsul.maya_qiymet * mehsul.stok
-            toplam_satis_qiymet += mehsul.qiymet * mehsul.stok
-        
-        # Qazanc hesablanır
-        qazanc = toplam_satis_qiymet - toplam_maya_qiymet
-        
-        # Mesajı göstəririk
-        self.message_user(
-            request, 
-            f"Bütün məhsullar üçün hesablama: Toplam Maya Qiyməti: {toplam_maya_qiymet:.2f} AZN | "
-            f"Toplam Satış Qiyməti: {toplam_satis_qiymet:.2f} AZN | "
-            f"Potensial Qazanc: {qazanc:.2f} AZN",
-            level=messages.SUCCESS
-        )
-        
+        toplam_maya_qiymet = sum(mehsul.maya_qiymet * mehsul.stok for mehsul in butun_mehsullar)
+        toplam_satis_qiymet = sum(mehsul.qiymet * mehsul.stok for mehsul in butun_mehsullar)
+        umumi_qazanc = toplam_satis_qiymet - toplam_maya_qiymet
+
+        # Admin panelinin yuxarı hissəsində göstərmək üçün stil əlavə edirik
+        style = """
+            <style>
+                #toplam-info {
+                    background: #fff;
+                    padding: 10px;
+                    margin: 10px 0;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    font-size: 14px;
+                }
+                #toplam-info span {
+                    margin-right: 20px;
+                }
+                .maya { color: #1a73e8; }
+                .satis { color: #34a853; }
+                .qazanc { color: #ea4335; }
+            </style>
+            <div id="toplam-info">
+                <span class="maya">Ümumi Maya: {:.2f} AZN</span>
+                <span class="satis">Ümumi Satış: {:.2f} AZN</span>
+                <span class="qazanc">Ümumi Qazanc: {:.2f} AZN</span>
+            </div>
+        """.format(toplam_maya_qiymet, toplam_satis_qiymet, umumi_qazanc)
+
+        # Admin panelinin yuxarı hissəsinə əlavə edirik
+        if extra_context is None:
+            extra_context = {}
+        extra_context['additional_content'] = style
+
         return super().changelist_view(request, extra_context)
 
     def get_form(self, request, obj=None, **kwargs):

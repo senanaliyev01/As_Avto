@@ -191,7 +191,7 @@ class MehsulAdmin(admin.ModelAdmin):
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'yenidir', 'axtaris_sozleri__adi', 'axtaris_sozleri__sozler')
     inlines = [OEMKodInline]
     
-    actions = ['yenilikden_sil', 'yenidir_et', 'axtaris_sozleri_teyin_et', 'axtaris_sozleri_sil']  # Yeni action əlavə edirik
+    actions = ['yenilikden_sil', 'yenidir_et', 'axtaris_sozleri_teyin_et', 'axtaris_sozleri_sil', 'hesabla_toplam_qiymet']  # Yeni action əlavə edirik
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -210,6 +210,30 @@ class MehsulAdmin(admin.ModelAdmin):
         queryset.update(yenidir=True)
         self.message_user(request, "Seçilmiş məhsullar yenidir olaraq işarələndi.")
     yenidir_et.short_description = "Seçilmiş məhsulları yenidir et"
+    
+    def hesabla_toplam_qiymet(self, request, queryset):
+        # Toplam maya qiyməti və satış qiymətini hesablayırıq
+        toplam_maya_qiymet = 0
+        toplam_satis_qiymet = 0
+        
+        for mehsul in queryset:
+            # Hər məhsul üçün stok miqdarını nəzərə alaraq hesablama
+            toplam_maya_qiymet += mehsul.maya_qiymet * mehsul.stok
+            toplam_satis_qiymet += mehsul.qiymet * mehsul.stok
+        
+        # Qazanc hesablanır
+        qazanc = toplam_satis_qiymet - toplam_maya_qiymet
+        
+        # İstifadəçiyə bildiriş göndəririk
+        self.message_user(
+            request, 
+            f"Seçilmiş məhsullar üçün hesablama: \n"
+            f"Toplam Maya Qiyməti: {toplam_maya_qiymet:.2f} AZN \n"
+            f"Toplam Satış Qiyməti: {toplam_satis_qiymet:.2f} AZN \n"
+            f"Potensial Qazanc: {qazanc:.2f} AZN"
+        )
+    
+    hesabla_toplam_qiymet.short_description = "Seçilmiş məhsulların toplam qiymətini hesabla"
     
     def axtaris_sozleri_sil(self, request, queryset):
         # Axtarış sözləri olan məhsulları sayırıq

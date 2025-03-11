@@ -191,111 +191,29 @@ class MehsulAdmin(admin.ModelAdmin):
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'yenidir', 'axtaris_sozleri__adi', 'axtaris_sozleri__sozler')
     inlines = [OEMKodInline]
     
-    actions = ['yenilikden_sil', 'yenidir_et', 'axtaris_sozleri_teyin_et', 'axtaris_sozleri_sil', 'hesabla_umumi_deyer']  # Yeni action əlavə edirik
-
-    def hesabla_umumi_deyer(self, request, queryset):
-        # Seçilmiş məhsulların ümumi maya dəyərini və satış dəyərini hesablayaq
-        toplam_maya = sum(mehsul.maya_qiymet * mehsul.stok for mehsul in queryset)
-        toplam_satis = sum(mehsul.qiymet * mehsul.stok for mehsul in queryset)
-        mehsul_sayi = queryset.count()
-        
-        # HTML formatında nəticəni göstərək
-        html = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Ümumi Dəyər Hesablaması</title>
-            <style>
-                body {{
-                    font-family: Arial, sans-serif;
-                    margin: 20px;
-                    background-color: #f8f8f8;
-                }}
-                .container {{
-                    background-color: white;
-                    padding: 20px;
-                    border-radius: 5px;
-                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-                    max-width: 600px;
-                    margin: 0 auto;
-                }}
-                h2 {{
-                    color: #333;
-                    border-bottom: 1px solid #ddd;
-                    padding-bottom: 10px;
-                }}
-                .info-row {{
-                    display: flex;
-                    justify-content: space-between;
-                    padding: 10px 0;
-                    border-bottom: 1px solid #eee;
-                }}
-                .label {{
-                    font-weight: bold;
-                }}
-                .value {{
-                    font-weight: bold;
-                }}
-                .maya {{
-                    color: #FF5733;
-                }}
-                .satis {{
-                    color: #008000;
-                }}
-                .qazanc {{
-                    color: #0066cc;
-                }}
-                .btn {{
-                    background-color: #417690;
-                    color: white;
-                    border: none;
-                    padding: 10px 15px;
-                    border-radius: 4px;
-                    cursor: pointer;
-                    font-size: 14px;
-                    margin-top: 20px;
-                    text-decoration: none;
-                    display: inline-block;
-                }}
-                .btn:hover {{
-                    background-color: #2b5070;
-                }}
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h2>Ümumi Dəyər Hesablaması</h2>
-                
-                <div class="info-row">
-                    <span class="label">Məhsul sayı:</span>
-                    <span class="value">{mehsul_sayi} ədəd</span>
-                </div>
-                
-                <div class="info-row">
-                    <span class="label">Toplam Maya Dəyəri:</span>
-                    <span class="value maya">{toplam_maya:.2f} AZN</span>
-                </div>
-                
-                <div class="info-row">
-                    <span class="label">Toplam Satış Dəyəri:</span>
-                    <span class="value satis">{toplam_satis:.2f} AZN</span>
-                </div>
-                
-                <div class="info-row">
-                    <span class="label">Potensial Qazanc:</span>
-                    <span class="value qazanc">{toplam_satis - toplam_maya:.2f} AZN</span>
-                </div>
-                
-                <a href="{reverse('admin:mehsullar_mehsul_changelist')}" class="btn">Geri Qayıt</a>
-            </div>
-        </body>
-        </html>
-        """
-        
-        return HttpResponse(html)
+    actions = ['yenilikden_sil', 'yenidir_et', 'axtaris_sozleri_teyin_et', 'axtaris_sozleri_sil']
     
-    hesabla_umumi_deyer.short_description = "Seçilmiş məhsulların ümumi dəyərini hesabla"
-
+    def changelist_view(self, request, extra_context=None):
+        # Əsas görünüşü əldə edək
+        response = super().changelist_view(request, extra_context)
+        
+        try:
+            # Bütün məhsulların ümumi dəyərini hesablayaq
+            butun_mehsullar = Mehsul.objects.all()
+            toplam_maya = sum(mehsul.maya_qiymet * mehsul.stok for mehsul in butun_mehsullar)
+            toplam_satis = sum(mehsul.qiymet * mehsul.stok for mehsul in butun_mehsullar)
+            mehsul_sayi = butun_mehsullar.count()
+            
+            # Əgər response-da context varsa
+            if hasattr(response, 'context_data'):
+                # Mesaj əlavə edək
+                messages.info(request, f"Məhsul sayı: {mehsul_sayi} ədəd | Toplam Maya: {toplam_maya:.2f} AZN | Toplam Satış: {toplam_satis:.2f} AZN | Potensial Qazanc: {toplam_satis - toplam_maya:.2f} AZN")
+        except:
+            # Xəta baş verərsə, heç nə etmə
+            pass
+            
+        return response
+    
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
         form.base_fields['model'].widget.attrs.update({

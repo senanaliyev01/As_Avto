@@ -1205,14 +1205,19 @@
                 cartItem.style.pointerEvents = 'none';
             }
 
-            fetch(`/sebetden_sil/${itemId}/`, {
+            fetch(`/sebet/sil/${itemId}/`, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': getCookie('csrftoken'),
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     if (cartItem) {

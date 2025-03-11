@@ -186,37 +186,20 @@ admin.site.register(Il)
 admin.site.register(Yanacaq)
 
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'axtaris_sozleri', 'qiymet', 'brend_kod', 'oem', 'stok', 'yenidir')
+    def toplam_maya_deyer(self, obj):
+        return f"{obj.maya_qiymet * obj.stok} AZN"
+    toplam_maya_deyer.short_description = "Toplam Maya Dəyəri"
+
+    def toplam_satis_deyer(self, obj):
+        return f"{obj.qiymet * obj.stok} AZN"
+    toplam_satis_deyer.short_description = "Toplam Satış Dəyəri"
+
+    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'axtaris_sozleri', 'qiymet', 'brend_kod', 'oem', 'stok', 'yenidir', 'toplam_maya_deyer', 'toplam_satis_deyer')
     list_filter = ('kateqoriya', 'brend', 'marka', 'axtaris_sozleri')
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'yenidir', 'axtaris_sozleri__adi', 'axtaris_sozleri__sozler')
     inlines = [OEMKodInline]
     
-    actions = ['yenilikden_sil', 'yenidir_et', 'axtaris_sozleri_teyin_et', 'axtaris_sozleri_sil']  # Hesablama action-ını silirik
-
-    def changelist_view(self, request, extra_context=None):
-        # Bütün məhsulların toplam maya qiyməti və satış qiymətini hesablayırıq
-        butun_mehsullar = Mehsul.objects.all()
-        toplam_maya_qiymet = 0
-        toplam_satis_qiymet = 0
-        
-        for mehsul in butun_mehsullar:
-            # Hər məhsul üçün stok miqdarını nəzərə alaraq hesablama
-            toplam_maya_qiymet += mehsul.maya_qiymet * mehsul.stok
-            toplam_satis_qiymet += mehsul.qiymet * mehsul.stok
-        
-        # Qazanc hesablanır
-        qazanc = toplam_satis_qiymet - toplam_maya_qiymet
-        
-        # Mesajı göstəririk
-        self.message_user(
-            request, 
-            f"Bütün məhsullar üçün hesablama: Toplam Maya Qiyməti: {toplam_maya_qiymet:.2f} AZN | "
-            f"Toplam Satış Qiyməti: {toplam_satis_qiymet:.2f} AZN | "
-            f"Potensial Qazanc: {qazanc:.2f} AZN",
-            level=messages.SUCCESS
-        )
-        
-        return super().changelist_view(request, extra_context)
+    actions = ['yenilikden_sil', 'yenidir_et', 'axtaris_sozleri_teyin_et', 'axtaris_sozleri_sil']  # Yeni action əlavə edirik
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)

@@ -1119,7 +1119,7 @@
                             </div>
                             <div class="cart-item-actions">
                                 <div class="cart-item-price">${item.price} AZN</div>
-                                <button type="button" class="cart-item-remove" onclick="removeCartItem(${item.id}, event)" title="Sil">
+                                <button class="cart-item-remove" onclick="removeCartItem(${item.id}, event)">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </div>
@@ -1209,23 +1209,23 @@
                 cartItem.style.transition = 'all 0.3s ease';
             }
             
-            // Form yaradaq və göndərək
+            // Form yaradaq və POST sorğusu göndərək
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = `/sebet/sil/${itemId}/`;
             form.style.display = 'none';
             
-            // CSRF token əlavə et
+            // CSRF token əlavə edək
             const csrfToken = document.createElement('input');
             csrfToken.type = 'hidden';
             csrfToken.name = 'csrfmiddlewaretoken';
             csrfToken.value = getCookie('csrftoken');
             form.appendChild(csrfToken);
             
-            // Formu səhifəyə əlavə et və göndər
+            // Formu səhifəyə əlavə edək və göndərək
             document.body.appendChild(form);
             
-            // FormData istifadə edərək göndər
+            // FormData istifadə edərək POST sorğusu göndərək
             const formData = new FormData(form);
             
             fetch(form.action, {
@@ -1235,12 +1235,7 @@
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error('Məhsul silinərkən xəta baş verdi');
-            })
+            .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     // Uğurlu silmə
@@ -1277,7 +1272,7 @@
                 showAnimatedMessage('Məhsul silinərkən xəta baş verdi', true);
             })
             .finally(() => {
-                // Formu təmizlə
+                // Formu təmizləyək
                 document.body.removeChild(form);
             });
         }

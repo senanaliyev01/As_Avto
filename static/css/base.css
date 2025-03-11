@@ -1398,37 +1398,6 @@ html {
     text-align: right;
 }
 
-.cart-item-actions {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 10px;
-}
-
-.delete-cart-item {
-    background: rgba(255, 82, 82, 0.1);
-    color: #ff5252;
-    border: 1px solid rgba(255, 82, 82, 0.3);
-    border-radius: 4px;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.delete-cart-item:hover {
-    background: rgba(255, 82, 82, 0.2);
-    transform: scale(1.05);
-}
-
-.delete-cart-item:active {
-    transform: scale(0.95);
-}
-
 .cart-item-quantity {
     display: flex;
     align-items: center;
@@ -1531,4 +1500,36 @@ html {
         display: flex;
         justify-content: space-between;
     }
+}
+
+.cart-item-actions {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.delete-cart-item {
+    background: rgba(255, 82, 82, 0.1);
+    border: 1px solid rgba(255, 82, 82, 0.3);
+    color: #ff5252;
+    border-radius: 4px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.delete-cart-item:hover {
+    background: rgba(255, 82, 82, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.delete-cart-item i {
+    font-size: 0.9rem;
 }

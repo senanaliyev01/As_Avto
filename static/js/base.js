@@ -1178,7 +1178,7 @@
             }
         });
         
-        // ESC düyməsi ilə bağlanması
+        // ESC2 düyməsi ilə bağlanması
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape' && cartModal.classList.contains('active')) {
                 cartModal.classList.remove('active');

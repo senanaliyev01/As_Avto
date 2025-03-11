@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.db import models
 from django.contrib import messages
 from django import forms
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
 
 class MarkaSekilInline(admin.TabularInline):
@@ -186,12 +186,115 @@ admin.site.register(Il)
 admin.site.register(Yanacaq)
 
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'axtaris_sozleri', 'qiymet', 'brend_kod', 'oem', 'stok', 'yenidir')
+    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'axtaris_sozleri', 'maya_qiymet', 'qiymet', 'brend_kod', 'oem', 'stok', 'yenidir')
     list_filter = ('kateqoriya', 'brend', 'marka', 'axtaris_sozleri')
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'yenidir', 'axtaris_sozleri__adi', 'axtaris_sozleri__sozler')
     inlines = [OEMKodInline]
     
-    actions = ['yenilikden_sil', 'yenidir_et', 'axtaris_sozleri_teyin_et', 'axtaris_sozleri_sil']  # Yeni action əlavə edirik
+    actions = ['yenilikden_sil', 'yenidir_et', 'axtaris_sozleri_teyin_et', 'axtaris_sozleri_sil', 'hesabla_umumi_deyer']  # Yeni action əlavə edirik
+
+    def hesabla_umumi_deyer(self, request, queryset):
+        # Seçilmiş məhsulların ümumi maya dəyərini və satış dəyərini hesablayaq
+        toplam_maya = sum(mehsul.maya_qiymet * mehsul.stok for mehsul in queryset)
+        toplam_satis = sum(mehsul.qiymet * mehsul.stok for mehsul in queryset)
+        mehsul_sayi = queryset.count()
+        
+        # HTML formatında nəticəni göstərək
+        html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Ümumi Dəyər Hesablaması</title>
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                    margin: 20px;
+                    background-color: #f8f8f8;
+                }}
+                .container {{
+                    background-color: white;
+                    padding: 20px;
+                    border-radius: 5px;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                    max-width: 600px;
+                    margin: 0 auto;
+                }}
+                h2 {{
+                    color: #333;
+                    border-bottom: 1px solid #ddd;
+                    padding-bottom: 10px;
+                }}
+                .info-row {{
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 10px 0;
+                    border-bottom: 1px solid #eee;
+                }}
+                .label {{
+                    font-weight: bold;
+                }}
+                .value {{
+                    font-weight: bold;
+                }}
+                .maya {{
+                    color: #FF5733;
+                }}
+                .satis {{
+                    color: #008000;
+                }}
+                .qazanc {{
+                    color: #0066cc;
+                }}
+                .btn {{
+                    background-color: #417690;
+                    color: white;
+                    border: none;
+                    padding: 10px 15px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    margin-top: 20px;
+                    text-decoration: none;
+                    display: inline-block;
+                }}
+                .btn:hover {{
+                    background-color: #2b5070;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h2>Ümumi Dəyər Hesablaması</h2>
+                
+                <div class="info-row">
+                    <span class="label">Məhsul sayı:</span>
+                    <span class="value">{mehsul_sayi} ədəd</span>
+                </div>
+                
+                <div class="info-row">
+                    <span class="label">Toplam Maya Dəyəri:</span>
+                    <span class="value maya">{toplam_maya:.2f} AZN</span>
+                </div>
+                
+                <div class="info-row">
+                    <span class="label">Toplam Satış Dəyəri:</span>
+                    <span class="value satis">{toplam_satis:.2f} AZN</span>
+                </div>
+                
+                <div class="info-row">
+                    <span class="label">Potensial Qazanc:</span>
+                    <span class="value qazanc">{toplam_satis - toplam_maya:.2f} AZN</span>
+                </div>
+                
+                <a href="{reverse('admin:mehsullar_mehsul_changelist')}" class="btn">Geri Qayıt</a>
+            </div>
+        </body>
+        </html>
+        """
+        
+        return HttpResponse(html)
+    
+    hesabla_umumi_deyer.short_description = "Seçilmiş məhsulların ümumi dəyərini hesabla"
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -340,7 +443,6 @@ class MehsulAdmin(admin.ModelAdmin):
         """
         
         # Formu göstəririk
-        from django.http import HttpResponse
         return HttpResponse(html)
     
     axtaris_sozleri_teyin_et.short_description = "Seçilmiş məhsullara axtarış sözlərini təyin et"

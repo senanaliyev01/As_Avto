@@ -129,7 +129,7 @@ def login_view(request):
                     if request.GET.get('next'):
                         request.session['next'] = request.GET['next']
                     
-                    messages.info(request, 'Təhlükəsizlik kodu admin panelinə göndərildi. Zəhmət olmasa administratorla əlaqə saxlayın.')
+                    messages.info(request, 'Təhlükəsizlik kodu göndərildi. Zəhmət olmasa administratorla əlaqə saxlayın.')
                     return render(request, 'login.html', {
                         'show_code_input': True,
                         'code_created_at': login_code.created_at.isoformat()

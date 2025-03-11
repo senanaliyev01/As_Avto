@@ -1110,7 +1110,8 @@
                                 <div class="cart-item-info">
                                     <span>${item.brand}</span>
                                     <span>${item.model}</span>
-                                    <span>OEM: ${item.oem}</span>
+                                    <span>${item.brend_kod}</span>
+                                    <span>${item.oem}</span>
                                 </div>
                                 <div class="cart-item-quantity">
                                     <span>Miqdar: ${item.quantity}</span>

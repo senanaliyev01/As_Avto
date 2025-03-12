@@ -72,8 +72,8 @@
             </div>
 
             <div class="header-right">
-                <a href="{% url 'profile' %}" class="profile-link">
-                    <img src="{{ user.profile.sekil.url }}" alt="{{ user.username }}" class="profile-image">
+                <a href="{% url 'profile' %}" class="header-profile-link">
+                    <img src="{{ user.profile.sekil.url }}" alt="{{ user.username }}" class="header-profile-image">
                     {{ user.username }}
                 </a>
                 <a href="#" class="cart-link" id="cart-toggle" onclick="toggleCartModal(event)">

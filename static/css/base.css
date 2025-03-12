@@ -672,7 +672,7 @@ html {
 }
 
 /* Profile Link Styles */
-.profile-link {
+.header-profile-link {
     color: var(--text-primary);
     text-decoration: none;
     font-size: 0.95rem;
@@ -686,13 +686,13 @@ html {
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.profile-link:hover {
+.header-profile-link:hover {
     background: rgba(100, 255, 218, 0.1);
     border-color: var(--accent-color);
     transform: translateY(-2px);
 }
 
-.profile-image {
+.header-profile-image {
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -701,7 +701,7 @@ html {
     transition: all 0.3s ease;
 }
 
-.profile-link:hover .profile-image {
+.header-profile-link:hover .header-profile-image {
     transform: scale(1.1);
     border-color: var(--text-primary);
 }

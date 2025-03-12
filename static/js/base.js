@@ -148,26 +148,6 @@
         }
     };
 
-    // Saat elementlərini əldə et
-    const currentTimeElement = document.getElementById('current-time');
-
-    // Təkmilləşdirilmiş saat funksiyası
-    function updateCurrentTime() {
-        if (currentTimeElement) {
-            const now = new Date();
-            const hours = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const seconds = now.getSeconds().toString().padStart(2, '0');
-            
-            // Animasiyalı rəqəm dəyişməsi
-            currentTimeElement.innerHTML = `
-                <span class="time-unit">${hours}</span>:
-                <span class="time-unit">${minutes}</span>:
-                <span class="time-unit">${seconds}</span>
-            `;
-        }
-    }
-
     // İş saatlarını yoxla və bildiriş göstər
     function checkWorkingHours() {
         const now = new Date();
@@ -391,39 +371,32 @@
         // Global funksiyaları window obyektinə əlavə et
         window.selectUser = selectUser;
         window.confirmLogout = confirmLogout;
-        
-            // Saatı başlat
-            updateCurrentTime();
-            setInterval(updateCurrentTime, 1000);
 
-            // İş saatlarını yoxla
-            checkWorkingHours();
-            setInterval(checkWorkingHours, 60000); // Hər dəqiqə yoxla
+        // Səbət sayını yenilə
+        updateCartCount();
+        setInterval(updateCartCount, 30000); // Hər 30 saniyədə bir yenilə
 
-            // Səbət sayını yenilə
-            updateCartCount();
-
-            // Swiper-ləri inicializasiya et
-            if (document.querySelector('.brandsSwiper')) {
-            try {
-                new Swiper('.brandsSwiper', swiperConfig);
-            } catch (error) {
-                console.error('Swiper inicializasiya xətası:', error);
-            }
-            }
-            if (document.querySelector('.carBrandsSwiper')) {
-            try {
-                new Swiper('.carBrandsSwiper', {
-                    ...swiperConfig,
-                    autoplay: {
-                        ...swiperConfig.autoplay,
-                        delay: 3500
-                    }
-                });
-            } catch (error) {
-                console.error('Swiper inicializasiya xətası:', error);
-            }
-            }
+        // Swiper-ləri inicializasiya et
+        if (document.querySelector('.brandsSwiper')) {
+        try {
+            new Swiper('.brandsSwiper', swiperConfig);
+        } catch (error) {
+            console.error('Swiper inicializasiya xətası:', error);
+        }
+        }
+        if (document.querySelector('.carBrandsSwiper')) {
+        try {
+            new Swiper('.carBrandsSwiper', {
+                ...swiperConfig,
+                autoplay: {
+                    ...swiperConfig.autoplay,
+                    delay: 3500
+                }
+            });
+        } catch (error) {
+            console.error('Swiper inicializasiya xətası:', error);
+        }
+        }
 
         // İlkin statistikaları yüklə
         if (document.querySelector('.statistics-card')) {
@@ -438,51 +411,51 @@
             // Chat.js faylında inicializasiya edilir
         }
 
-            // Rəy formu
-            const reviewForm = document.querySelector('.review-form form');
-            if (reviewForm) {
-                reviewForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    const rating = reviewForm.querySelector('input[name="qiymetlendirme"]:checked');
-                    if (!rating) {
-                    showReviewNotification('error', 'Zəhmət olmasa, qiymətləndirmə üçün ulduz seçin');
-                        return;
-                    }
+        // Rəy formu
+        const reviewForm = document.querySelector('.review-form form');
+        if (reviewForm) {
+            reviewForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const rating = reviewForm.querySelector('input[name="qiymetlendirme"]:checked');
+                if (!rating) {
+                showReviewNotification('error', 'Zəhmət olmasa, qiymətləndirmə üçün ulduz seçin');
+                    return;
+                }
 
-                    const review = reviewForm.querySelector('textarea[name="rey"]').value.trim();
-                    if (!review) {
-                    showReviewNotification('error', 'Zəhmət olmasa, rəyinizi yazın');
-                        return;
-                    }
+                const review = reviewForm.querySelector('textarea[name="rey"]').value.trim();
+                if (!review) {
+                showReviewNotification('error', 'Zəhmət olmasa, rəyinizi yazın');
+                    return;
+                }
 
-                    const formData = new FormData(reviewForm);
-                    
-                    fetch(reviewForm.action, {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-CSRFToken': getCookie('csrftoken')
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                        showReviewNotification('success', 'Rəyiniz uğurla göndərildi. Təsdiqlənməsi gözlənilir');
-                            reviewForm.reset();
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 3000);
-                        } else {
-                        showReviewNotification('error', data.message || 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Xəta:', error);
-                    showReviewNotification('error', 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin');
-                    });
+                const formData = new FormData(reviewForm);
+                
+                fetch(reviewForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                    showReviewNotification('success', 'Rəyiniz uğurla göndərildi. Təsdiqlənməsi gözlənilir');
+                        reviewForm.reset();
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 3000);
+                    } else {
+                    showReviewNotification('error', data.message || 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin');
+                    }
+                })
+                .catch(error => {
+                    console.error('Xəta:', error);
+                showReviewNotification('error', 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin');
                 });
-            }
+            });
+        }
 
         // Çıxış funksiyası
         document.addEventListener('click', function(e) {
@@ -1198,7 +1171,7 @@
         const navOverlay = document.querySelector('.nav-overlay');
         const body = document.body;
 
-        navToggle.addEventListener('click', function() {
+        navToggle.addEventListener('click', () => {
             navBar.classList.add('active');
             navOverlay.classList.add('active');
             body.style.overflow = 'hidden';

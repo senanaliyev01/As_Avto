@@ -101,12 +101,7 @@ header {
 }
 
 .working-hours {
-    background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
-    color: var(--text-secondary);
-    text-align: center;
-    padding: 0.5rem;
-    font-size: 0.9rem;
-    border-top: 1px solid rgba(100, 255, 218, 0.1);
+    display: none;
 }
 
 /* Navbar Styles */
@@ -499,11 +494,6 @@ footer {
     .header-right a {
         width: 100%;
         justify-content: center;
-    }
-
-    .working-hours {
-        flex-direction: column;
-        gap: 0.5rem;
     }
 }
 
@@ -1106,22 +1096,15 @@ html {
 
 /* Saat stilləri */
 .time-unit {
-    display: inline-block;
-    background-color: rgba(100, 255, 218, 0.1);
-    padding: 2px 5px;
-    border-radius: 4px;
-    transition: all 0.3s ease;
+    display: none;
 }
 
 .current-time {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: none;
 }
 
 #current-time {
-    margin-left: 5px;
-    font-weight: bold;
+    display: none;
 }
 
 .status-badge {

@@ -1196,27 +1196,25 @@
         const navBar = document.querySelector('.nav-bar');
         const navClose = document.querySelector('.nav-close');
         const navOverlay = document.querySelector('.nav-overlay');
+        const body = document.body;
 
-        // Navbarı aç
         navToggle.addEventListener('click', function() {
             navBar.classList.add('active');
             navOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
+            body.style.overflow = 'hidden';
         });
 
-        // Navbarı bağla
         function closeNav() {
             navBar.classList.remove('active');
             navOverlay.classList.remove('active');
-            document.body.style.overflow = '';
+            body.style.overflow = '';
         }
 
         navClose.addEventListener('click', closeNav);
         navOverlay.addEventListener('click', closeNav);
 
-        // ESC düyməsi ilə bağlanma
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape' && navBar.classList.contains('active')) {
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && navBar.classList.contains('active')) {
                 closeNav();
             }
         });

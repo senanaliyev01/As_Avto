@@ -9,7 +9,6 @@
 
 {% block content %}
 
-
 <!-- Axtarış Nəticələriii -->
 <div class="search-results">
     <!-- Modal for product image -->
@@ -21,8 +20,8 @@
     </div>
     
     {% if mehsullar %}
-        <h2 class="search-result-title">{{ mehsullar.count }} Nəticə tapıldı</h2>
         <div class="products-table-container">
+            <h2 class="search-result-title">{{ mehsullar.count }} Nəticə tapıldı</h2>
             <div class="products-table">
                 <table>
                     <thead>
@@ -50,23 +49,7 @@
                             </td>
                             <td>{{ mehsul.adi }}</td>
                             <td>{{ mehsul.brend.adi }}</td>
-                            {% comment %} <td>
-                                {% if mehsul.brend.sekilyazi %}
-                                        <img src="{{ mehsul.brend.sekilyazi.url }}" alt="{{ mehsul.brend.adi }}" class="marka-image">
-                                {% else %}
-                                    <span>{{ mehsul.brend.adi }}</span>
-                                {% endif %}
-                            </td> {% endcomment %}
                             <td>{{ mehsul.marka.adi }}</td>
-                            {% comment %} <td >
-                                {% if mehsul.marka.sekiller.all %}
-                                    {% for sekil in mehsul.marka.sekiller.all %}
-                                        <img src="{{ sekil.sekil.url }}" alt="{{ mehsul.marka.adi }}" class="marka-image-pr-list">
-                                    {% endfor %}
-                                {% else %}
-                                    <span>{{ mehsul.marka.adi }}</span>
-                                {% endif %}
-                            </td> {% endcomment %}
                             <td>{{ mehsul.brend_kod }}</td>
                             <td>{{ mehsul.oem }}
                             <a href="#" title="OEM kodunu axtar" onclick="window.open('https://www.google.com/search?tbm=isch&q={{ mehsul.oem }}', 'googleImages', 'width=600,height=600'); return false;">
@@ -91,7 +74,6 @@
                             </td>
                             <td>
                                 <div class="quantity-container">
-                                    {% comment %} <button class="quantity-btn" onclick="decrementQuantity({{ mehsul.id }})">-</button> {% endcomment %}
                                     <input type="number" 
                                            class="quantity-input" 
                                            value="1" 
@@ -99,7 +81,6 @@
                                            max="999"
                                            data-product-id="{{ mehsul.id }}"
                                            onchange="validateQuantity(this)">
-                                    {% comment %} <button class="quantity-btn" onclick="incrementQuantity({{ mehsul.id }})">+</button> {% endcomment %}
                                     <div class="quantity-error"></div>
                                 </div>
                             </td>
@@ -124,7 +105,6 @@
         <h2 class="no-results" style="color: red">Heç bir nəticə tapılmadı. Zəhmət olmasa axtarış parametrlərini yoxlayın.</h2>
     {% endif %}
 </div>
-
 
 {% endblock %}
 

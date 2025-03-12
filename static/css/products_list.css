@@ -39,13 +39,40 @@ body {
 
 .search-result-title {
     text-align: center;
-    margin-bottom: 1.5rem;
+    margin: 0 0 1.5rem 0;
+    padding: 1rem;
     font-size: 1.8rem;
-    color: var(--success-color) !important;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-    background: rgba(6, 85, 138, 0.9);
-    border-radius: 20px;
+    color: var(--text-primary) !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+    border-radius: 12px;
     box-shadow: var(--shadow-sm);
+    border: 1px solid var(--accent-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.search-result-title::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(100, 255, 218, 0.1), transparent);
+    animation: shine 2s infinite;
+}
+
+@keyframes shine {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 .no-results {

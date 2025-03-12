@@ -124,6 +124,7 @@ class Mehsul(models.Model):
     sekil = models.ImageField(upload_to='mehsul_sekilleri/', null=True, blank=True, default='mehsul_sekilleri/noimage.webp')
     haqqinda = models.TextField(null=True, blank=True)
     yenidir = models.BooleanField(default=False, null=True, blank=True)
+    eyni_mehsullar = models.ManyToManyField('self', blank=True, verbose_name='Eyni Məhsullar', help_text='Bu məhsulla eyni olan digər məhsulları seçin', symmetrical=True)
 
     def __str__(self):
         return self.adi

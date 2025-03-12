@@ -230,7 +230,10 @@ def products_list(request):
             Q(brend_kod__icontains=clean_search) |  # Brend kodunda axtarış
             Q(oem__icontains=clean_search) |  # OEM kodunda axtarış
             Q(oem_kodlar__kod__icontains=clean_search) |  # Əlavə OEM kodlarında axtarış
-            Q(axtaris_sozleri__sozler__icontains=clean_search)  # Axtarış sözlərində axtarış
+            Q(axtaris_sozleri__sozler__icontains=clean_search) |  # Axtarış sözlərində axtarış
+            Q(eyni_mehsullar__brend_kod__icontains=clean_search) |  # Eyni məhsulların brend kodunda axtarış
+            Q(eyni_mehsullar__oem__icontains=clean_search) |  # Eyni məhsulların OEM kodunda axtarış
+            Q(eyni_mehsullar__oem_kodlar__kod__icontains=clean_search)  # Eyni məhsulların əlavə OEM kodlarında axtarış
         ).distinct()
 
     return render(request, 'products_list.html', {
@@ -505,7 +508,10 @@ def mehsul_axtaris(request):
             Q(brend_kod__icontains=clean_query) |
             Q(oem__icontains=clean_query) |
             Q(oem_kodlar__kod__icontains=clean_query) |
-            Q(axtaris_sozleri__sozler__icontains=clean_query)
+            Q(axtaris_sozleri__sozler__icontains=clean_query) |
+            Q(eyni_mehsullar__brend_kod__icontains=clean_query) |
+            Q(eyni_mehsullar__oem__icontains=clean_query) |
+            Q(eyni_mehsullar__oem_kodlar__kod__icontains=clean_query)
             ).distinct()
         
         # Nəticələri qaytarırıq
@@ -763,7 +769,10 @@ def realtime_search(request):
             Q(brend_kod__icontains=clean_query) |
             Q(oem__icontains=clean_query) |
             Q(oem_kodlar__kod__icontains=clean_query) |
-            Q(axtaris_sozleri__sozler__icontains=clean_query)
+            Q(axtaris_sozleri__sozler__icontains=clean_query) |
+            Q(eyni_mehsullar__brend_kod__icontains=clean_query) |
+            Q(eyni_mehsullar__oem__icontains=clean_query) |
+            Q(eyni_mehsullar__oem_kodlar__kod__icontains=clean_query)
         ).distinct()
     
     results = []

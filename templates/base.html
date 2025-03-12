@@ -72,27 +72,15 @@
             </div>
 
             <div class="header-right">
-                <div class="profile-dropdown">
-                    <a href="#" class="profile-toggle">
-                        <i class="fas fa-user"></i> {{ user.username }}
-                        <i class="fas fa-chevron-down"></i>
-                    </a>
-                    <div class="dropdown-menu">
-                        <a href="{% url 'profile' %}">
-                            <i class="fas fa-user-circle"></i> Hesabım
-                        </a>
-                        <a href="{% url 'sifaris_izle' %}">
-                            <i class="fas fa-shopping-bag"></i> Sifarişlərim
-                        </a>
-                        <a href="{% url 'hesabatlar' %}">
-                            <i class="fas fa-chart-bar"></i> Hesabatlar
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        {% comment %} <a href="{% url 'logout_view' %}" onclick="confirmLogout(event); return false;" class="logout-link">
-                            <i class="fas fa-sign-out-alt"></i> Çıxış
-                        </a> {% endcomment %}
-                    </div>
-                </div>
+                <a href="{% url 'profile' %}" class="profile-link">
+                    {% if user.profile.sekil %}
+                        <img src="{{ user.profile.sekil.url }}" alt="{{ user.username }}" class="profile-image">
+                    {% else %}
+                        <div class="profile-image-placeholder">
+                            {{ user.username|make_list|first|upper }}
+                        </div>
+                    {% endif %}
+                </a>
                 <a href="#" class="cart-link" id="cart-toggle" onclick="toggleCartModal(event)">
                     <i class="fas fa-shopping-cart"></i>
                     <span id="cart-count" class="cart-badge">0</span>
@@ -119,10 +107,13 @@
             </button>
         </div>
         <div class="nav-links">
-            <a href="{% url 'esasevim:main' %}"><i class="fa-solid fa-house"></i> Ana Səhifə</a>
-            <a href="{% url 'esasevim:yeni_mehsullar' %}"><i class="fa-solid fa-bell"></i> Yeni Məhsullar</a>
+            <a href="{% url 'profile' %}"><i class="fas fa-user-circle"></i> Hesabım</a>
+            <a href="{% url 'esasevim:main' %}"><i class="fa-solid fa-house"></i> Əsas Səhifə</a>
             <a href="{% url 'products_list' %}"><i class="fa-solid fa-box"></i> Məhsullar</a>
             <a href="{% url 'umumi_baxis' %}"><i class="fas fa-box-open"></i> Məhsullara Baxış</a>
+            <a href="{% url 'esasevim:yeni_mehsullar' %}"><i class="fa-solid fa-bell"></i> Yeni Məhsullar</a>
+            <a href="{% url 'sifaris_izle' %}"><i class="fas fa-shopping-bag"></i> Sifarişlərim</a>
+            <a href="{% url 'hesabatlar' %}"><i class="fas fa-chart-bar"></i> Hesabatlar</a>
             {% comment %} <a href="{% url 'car_list' %}"><i class="fas fa-car"></i> Avtomobillər</a> {% endcomment %}
             <a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> Məlumat</a>
         </div>

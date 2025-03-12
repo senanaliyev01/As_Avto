@@ -73,12 +73,8 @@
 
             <div class="header-right">
                 <a href="{% url 'profile' %}" class="profile-link">
-                    {% if user.profil.sekil %}
-                        <img src="{{ user.profil.sekil.url }}" alt="{{ user.username }}" class="profile-image">
-                    {% else %}
-                        <i class="fas fa-user"></i>
-                    {% endif %}
-                    <span>{{ user.username }}</span>
+                    <img src="{{ user.profile.sekil.url }}" alt="{{ user.username }}" class="profile-image">
+                    {{ user.username }}
                 </a>
                 <a href="#" class="cart-link" id="cart-toggle" onclick="toggleCartModal(event)">
                     <i class="fas fa-shopping-cart"></i>

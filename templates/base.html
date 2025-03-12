@@ -72,14 +72,17 @@
             </div>
 
             <div class="header-right">
-                <a href="{% url 'profile' %}" class="profile-link">
-                    {% if user.profile.sekil %}
-                        <img src="{{ user.profile.sekil.url }}" alt="{{ user.username }}" class="profile-image">
-                    {% else %}
-                        <div class="profile-image-placeholder">
-                            {{ user.username|make_list|first|upper }}
-                        </div>
-                    {% endif %}
+                <a href="{% url 'profile' %}" class="user-profile-link">
+                    <div class="user-avatar">
+                        {% if profile.sekil %}
+                            <img src="{{ profile.sekil.url }}" alt="{{ profile.ad }}">
+                        {% else %}
+                            <img src="{% static 'img/default-avatar.png' %}" alt="Default Avatar">
+                        {% endif %}
+                    </div>
+                    <div class="user-info">
+                        <span class="user-fullname">{{ profile.ad }} {{ profile.soyad }}</span>
+                    </div>
                 </a>
                 <a href="#" class="cart-link" id="cart-toggle" onclick="toggleCartModal(event)">
                     <i class="fas fa-shopping-cart"></i>

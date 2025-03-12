@@ -126,7 +126,7 @@ class Mehsul(models.Model):
     yenidir = models.BooleanField(default=False, null=True, blank=True)
 
     def __str__(self):
-        return self.adi
+        return f"{self.adi} - {self.brend_kod} - {self.oem}"
     
     class Meta:
         verbose_name = 'Məhsullar'

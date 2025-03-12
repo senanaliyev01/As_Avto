@@ -187,10 +187,10 @@ admin.site.register(Yanacaq)
 
 class MehsulAdmin(admin.ModelAdmin):
     list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'axtaris_sozleri', 'maya_qiymet', 'qiymet', 'brend_kod', 'oem', 'stok', 'yenidir')
-    list_filter = ('kateqoriya', 'brend', 'marka', 'axtaris_sozleri', 'eyni_mehsullar')
-    search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'oem_kodlar__kod', 'yenidir', 'axtaris_sozleri__adi', 'axtaris_sozleri__sozler', 'eyni_mehsullar__adi', 'eyni_mehsullar__brend_kod', 'eyni_mehsullar__oem')
+    list_filter = ('kateqoriya', 'brend', 'marka', 'axtaris_sozleri')
+    search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'oem_kodlar__kod', 'yenidir', 'axtaris_sozleri__adi', 'axtaris_sozleri__sozler')
     inlines = [OEMKodInline]
-    filter_horizontal = ('model', 'eyni_mehsullar')
+    filter_horizontal = ('eynidir',)
     
     actions = ['yenilikden_sil', 'yenidir_et', 'axtaris_sozleri_teyin_et', 'axtaris_sozleri_sil']
     

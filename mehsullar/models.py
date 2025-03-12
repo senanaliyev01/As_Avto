@@ -116,6 +116,7 @@ class Mehsul(models.Model):
     marka = models.ForeignKey(Marka, on_delete=models.CASCADE)
     model = models.ManyToManyField(Model,blank=True)  
     axtaris_sozleri = models.ForeignKey(AxtarisSozleri, on_delete=models.SET_NULL, null=True, blank=True, related_name='mehsullar')
+    eynidir = models.ManyToManyField('self', blank=True, symmetrical=True, related_name='eyni_mehsullar')
     brend_kod = models.CharField(max_length=50, unique=True)
     oem = models.CharField(max_length=100)
     stok = models.IntegerField()
@@ -124,10 +125,9 @@ class Mehsul(models.Model):
     sekil = models.ImageField(upload_to='mehsul_sekilleri/', null=True, blank=True, default='mehsul_sekilleri/noimage.webp')
     haqqinda = models.TextField(null=True, blank=True)
     yenidir = models.BooleanField(default=False, null=True, blank=True)
-    eyni_mehsullar = models.ManyToManyField('self', blank=True, verbose_name='Eyni Məhsullar', help_text='Bu məhsulla eyni olan digər məhsulları seçin', symmetrical=True)
 
     def __str__(self):
-        return f"{self.adi} - {self.brend_kod} - {self.oem}"
+        return self.adi
     
     class Meta:
         verbose_name = 'Məhsullar'

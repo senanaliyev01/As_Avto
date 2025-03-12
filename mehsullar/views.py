@@ -230,11 +230,19 @@ def products_list(request):
             Q(brend_kod__icontains=clean_search) |  # Brend kodunda axtarış
             Q(oem__icontains=clean_search) |  # OEM kodunda axtarış
             Q(oem_kodlar__kod__icontains=clean_search) |  # Əlavə OEM kodlarında axtarış
-            Q(axtaris_sozleri__sozler__icontains=clean_search) |  # Axtarış sözlərində axtarış
-            Q(eyni_mehsullar__brend_kod__icontains=clean_search) |  # Eyni məhsulların brend kodunda axtarış
-            Q(eyni_mehsullar__oem__icontains=clean_search) |  # Eyni məhsulların OEM kodunda axtarış
-            Q(eyni_mehsullar__oem_kodlar__kod__icontains=clean_search)  # Eyni məhsulların əlavə OEM kodlarında axtarış
+            Q(axtaris_sozleri__sozler__icontains=clean_search)  # Axtarış sözlərində axtarış
         ).distinct()
+        
+        # Eyni məhsulları da əlavə edək
+        eyni_mehsullar_ids = []
+        for mehsul in mehsullar:
+            eyni_mehsullar_ids.extend([m.id for m in mehsul.eynidir.all()])
+        
+        # Əgər eyni məhsullar varsa, onları da əlavə edək
+        if eyni_mehsullar_ids:
+            eyni_mehsullar = Mehsul.objects.filter(id__in=eyni_mehsullar_ids)
+            # Birləşdirmə əməliyyatı
+            mehsullar = (mehsullar | eyni_mehsullar).distinct()
 
     return render(request, 'products_list.html', {
         'mehsullar': mehsullar,
@@ -508,11 +516,19 @@ def mehsul_axtaris(request):
             Q(brend_kod__icontains=clean_query) |
             Q(oem__icontains=clean_query) |
             Q(oem_kodlar__kod__icontains=clean_query) |
-            Q(axtaris_sozleri__sozler__icontains=clean_query) |
-            Q(eyni_mehsullar__brend_kod__icontains=clean_query) |
-            Q(eyni_mehsullar__oem__icontains=clean_query) |
-            Q(eyni_mehsullar__oem_kodlar__kod__icontains=clean_query)
+            Q(axtaris_sozleri__sozler__icontains=clean_query)
             ).distinct()
+        
+        # Eyni məhsulları da əlavə edək
+        eyni_mehsullar_ids = []
+        for mehsul in mehsullar:
+            eyni_mehsullar_ids.extend([m.id for m in mehsul.eynidir.all()])
+        
+        # Əgər eyni məhsullar varsa, onları da əlavə edək
+        if eyni_mehsullar_ids:
+            eyni_mehsullar = Mehsul.objects.filter(id__in=eyni_mehsullar_ids)
+            # Birləşdirmə əməliyyatı
+            mehsullar = (mehsullar | eyni_mehsullar).distinct()
         
         # Nəticələri qaytarırıq
         return JsonResponse({
@@ -769,11 +785,19 @@ def realtime_search(request):
             Q(brend_kod__icontains=clean_query) |
             Q(oem__icontains=clean_query) |
             Q(oem_kodlar__kod__icontains=clean_query) |
-            Q(axtaris_sozleri__sozler__icontains=clean_query) |
-            Q(eyni_mehsullar__brend_kod__icontains=clean_query) |
-            Q(eyni_mehsullar__oem__icontains=clean_query) |
-            Q(eyni_mehsullar__oem_kodlar__kod__icontains=clean_query)
+            Q(axtaris_sozleri__sozler__icontains=clean_query)
         ).distinct()
+        
+        # Eyni məhsulları da əlavə edək
+        eyni_mehsullar_ids = []
+        for mehsul in mehsullar:
+            eyni_mehsullar_ids.extend([m.id for m in mehsul.eynidir.all()])
+        
+        # Əgər eyni məhsullar varsa, onları da əlavə edək
+        if eyni_mehsullar_ids:
+            eyni_mehsullar = Mehsul.objects.filter(id__in=eyni_mehsullar_ids)
+            # Birləşdirmə əməliyyatı
+            mehsullar = (mehsullar | eyni_mehsullar).distinct()
     
     results = []
     for mehsul in mehsullar:

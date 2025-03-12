@@ -1091,12 +1091,6 @@
                                 </div>
                             </div>
                             <div class="cart-item-price">${item.price} ₼</div>
-                             <form action="{% url 'sebetden_sil' item.id %}" method="post" style="display: inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="delete-btn" title="Sil" onclick="return confirm('Məhsulu silmək istədiyinizə əminsiniz?')">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </form>
                         </div>
                     `;
                 });

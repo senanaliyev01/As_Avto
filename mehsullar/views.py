@@ -212,23 +212,29 @@ def products_list(request):
                 normalized_axtaris, axtaris_combinations = normalize_search_text(mehsul.axtaris_sozleri.sozler)
                 axtaris_sozleri_combinations.extend(axtaris_combinations)
             
-            # Axtarış sözlərində axtarış
+            # Məhsul haqqında məlumatı normalize et (əgər varsa)
+            haqqinda_combinations = []
+            if mehsul.haqqinda:
+                normalized_haqqinda, haqqinda_combinations = normalize_search_text(mehsul.haqqinda)
+                haqqinda_combinations.extend(haqqinda_combinations)
+            
+            # Axtarış sözlərində və haqqında məlumatda axtarış
             found = False
             for search_variant in search_combinations:
                 if (search_variant in axtaris_sozleri_combinations or
-                    any(search_variant in combo for combo in axtaris_sozleri_combinations)):
+                    any(search_variant in combo for combo in axtaris_sozleri_combinations) or
+                    search_variant in haqqinda_combinations or
+                    any(search_variant in combo for combo in haqqinda_combinations)):
                     mehsul_ids.add(mehsul.id)
                     found = True
                     break
         
-        # Xüsusi simvolları təmizlə (brend kodu və OEM üçün)
+        # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_text)
         
         # Axtarış sorğusunu yarat
         mehsullar = mehsullar.filter(
-            Q(id__in=list(mehsul_ids)) |  # Axtarış sözlərində axtarış
-            Q(brend_kod__icontains=clean_search) |  # Brend kodunda axtarış
-            Q(oem__icontains=clean_search) |  # OEM kodunda axtarış
+            Q(id__in=list(mehsul_ids)) |  # Axtarış sözlərində və haqqında məlumatda axtarış
             Q(oem_kodlar__kod__icontains=clean_search) |  # Əlavə OEM kodlarında axtarış
             Q(axtaris_sozleri__sozler__icontains=clean_search)  # Axtarış sözlərində axtarış
         ).distinct()
@@ -487,23 +493,29 @@ def mehsul_axtaris(request):
                 normalized_axtaris, axtaris_combinations = normalize_search_text(mehsul.axtaris_sozleri.sozler)
                 axtaris_sozleri_combinations.extend(axtaris_combinations)
             
-            # Axtarış sözlərində axtarış
+            # Məhsul haqqında məlumatı normalize et (əgər varsa)
+            haqqinda_combinations = []
+            if mehsul.haqqinda:
+                normalized_haqqinda, haqqinda_combinations = normalize_search_text(mehsul.haqqinda)
+                haqqinda_combinations.extend(haqqinda_combinations)
+            
+            # Axtarış sözlərində və haqqında məlumatda axtarış
             found = False
             for search_variant in query_combinations:
                 if (search_variant in axtaris_sozleri_combinations or
-                    any(search_variant in combo for combo in axtaris_sozleri_combinations)):
+                    any(search_variant in combo for combo in axtaris_sozleri_combinations) or
+                    search_variant in haqqinda_combinations or
+                    any(search_variant in combo for combo in haqqinda_combinations)):
                     mehsul_ids.add(mehsul.id)
                     found = True
                     break
         
-        # Xüsusi simvolları təmizlə (brend kodu və OEM üçün)
+        # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
         clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
         
         # Axtarış sorğusunu yarat
         mehsullar = mehsullar.filter(
             Q(id__in=list(mehsul_ids)) |
-            Q(brend_kod__icontains=clean_query) |
-            Q(oem__icontains=clean_query) |
             Q(oem_kodlar__kod__icontains=clean_query) |
             Q(axtaris_sozleri__sozler__icontains=clean_query)
             ).distinct()
@@ -746,22 +758,28 @@ def realtime_search(request):
                 normalized_axtaris, axtaris_combinations = normalize_search_text(mehsul.axtaris_sozleri.sozler)
                 axtaris_sozleri_combinations.extend(axtaris_combinations)
             
-            # Axtarış sözlərində axtarış
+            # Məhsul haqqında məlumatı normalize et (əgər varsa)
+            haqqinda_combinations = []
+            if mehsul.haqqinda:
+                normalized_haqqinda, haqqinda_combinations = normalize_search_text(mehsul.haqqinda)
+                haqqinda_combinations.extend(haqqinda_combinations)
+            
+            # Axtarış sözlərində və haqqında məlumatda axtarış
             found = False
             for search_variant in query_combinations:
                 if (search_variant in axtaris_sozleri_combinations or
-                    any(search_variant in combo for combo in axtaris_sozleri_combinations)):
+                    any(search_variant in combo for combo in axtaris_sozleri_combinations) or
+                    search_variant in haqqinda_combinations or
+                    any(search_variant in combo for combo in haqqinda_combinations)):
                     mehsul_ids.add(mehsul.id)
                     found = True
                     break
         
-        # Brend kodu və OEM üçün təmizlənmiş axtarış
+        # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
         clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
         
         mehsullar = mehsullar.filter(
             Q(id__in=list(mehsul_ids)) |
-            Q(brend_kod__icontains=clean_query) |
-            Q(oem__icontains=clean_query) |
             Q(oem_kodlar__kod__icontains=clean_query) |
             Q(axtaris_sozleri__sozler__icontains=clean_query)
         ).distinct()

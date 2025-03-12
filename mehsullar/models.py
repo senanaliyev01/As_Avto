@@ -127,7 +127,7 @@ class Mehsul(models.Model):
     eyni_mehsullar = models.ManyToManyField('self', blank=True, verbose_name='Eyni Məhsullar', help_text='Bu məhsulla eyni olan digər məhsulları seçin', symmetrical=True)
 
     def __str__(self):
-        return self.adi ,self.brend_kod,self.oem
+        return f"{self.adi} - {self.brend_kod} - {self.oem}"
     
     class Meta:
         verbose_name = 'Məhsullar'

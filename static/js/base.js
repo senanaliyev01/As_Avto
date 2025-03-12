@@ -1189,3 +1189,35 @@
         // Səhifə yükləndikdə səbət sayını və cəmini yeniləyək
         updateCartCount();
     });
+
+    // Navbar funksiyaları
+    document.addEventListener('DOMContentLoaded', function() {
+        const navToggle = document.querySelector('.nav-toggle');
+        const navBar = document.querySelector('.nav-bar');
+        const navClose = document.querySelector('.nav-close');
+        const navOverlay = document.querySelector('.nav-overlay');
+
+        // Navbarı aç
+        navToggle.addEventListener('click', function() {
+            navBar.classList.add('active');
+            navOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        // Navbarı bağla
+        function closeNav() {
+            navBar.classList.remove('active');
+            navOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        navClose.addEventListener('click', closeNav);
+        navOverlay.addEventListener('click', closeNav);
+
+        // ESC düyməsi ilə bağlanma
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && navBar.classList.contains('active')) {
+                closeNav();
+            }
+        });
+    });

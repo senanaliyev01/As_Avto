@@ -107,14 +107,28 @@
     </header>
 
     <!-- Navbar -->
+    <div class="nav-toggle">
+        <i class="fas fa-bars"></i>
+    </div>
+
     <nav class="nav-bar">
-        <a href="{% url 'esasevim:main' %}"><i class="fa-solid fa-house"></i> Ana Səhifə</a>
-        <a href="{% url 'esasevim:yeni_mehsullar' %}"><i class="fa-solid fa-bell"></i> Yeni Məhsullar</a>
-        <a href="{% url 'products_list' %}"><i class="fa-solid fa-box"></i> Məhsullar</a>
-        <a href="{% url 'umumi_baxis' %}"><i class="fas fa-box-open"></i> Məhsullara Baxış</a>
-        {% comment %} <a href="{% url 'car_list' %}"><i class="fas fa-car"></i> Avtomobillər</a> {% endcomment %}
-        <a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> Məlumat</a>
+        <div class="nav-header">
+            <h3>Menyu</h3>
+            <button class="nav-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="nav-links">
+            <a href="{% url 'esasevim:main' %}"><i class="fa-solid fa-house"></i> Ana Səhifə</a>
+            <a href="{% url 'esasevim:yeni_mehsullar' %}"><i class="fa-solid fa-bell"></i> Yeni Məhsullar</a>
+            <a href="{% url 'products_list' %}"><i class="fa-solid fa-box"></i> Məhsullar</a>
+            <a href="{% url 'umumi_baxis' %}"><i class="fas fa-box-open"></i> Məhsullara Baxış</a>
+            {% comment %} <a href="{% url 'car_list' %}"><i class="fas fa-car"></i> Avtomobillər</a> {% endcomment %}
+            <a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> Məlumat</a>
+        </div>
     </nav>
+
+    <div class="nav-overlay"></div>
 
     <!-- Main Content -->
     <div class="main-content">

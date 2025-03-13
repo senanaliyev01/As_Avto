@@ -458,6 +458,7 @@ footer::before {
 }
 
 .social-links a {
+    text-decoration: none;
     color: var(--text-secondary);
     font-size: 1.2rem;
     width: 40px;

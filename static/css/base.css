@@ -107,25 +107,36 @@ header {
 /* Navbar Styles */
 .nav-toggle {
     position: fixed;
-    top: 20px;
-    left: 20px;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
     z-index: 1001;
     background: var(--primary-color);
     color: var(--text-primary);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+    width: 30px;
+    height: 50px;
+    border-radius: 0 5px 5px 0;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     border: 1px solid var(--border-color);
+    border-left: none;
     transition: all 0.3s ease;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
 }
 
 .nav-toggle:hover {
     background: var(--highlight-color);
-    transform: scale(1.1);
+    width: 35px;
+}
+
+.nav-toggle i {
+    transition: transform 0.3s ease;
+}
+
+.nav-bar.active + .nav-overlay + .nav-toggle i {
+    transform: rotate(180deg);
 }
 
 .nav-bar {

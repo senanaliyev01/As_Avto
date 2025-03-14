@@ -1172,9 +1172,13 @@
         const body = document.body;
 
         navToggle.addEventListener('click', () => {
-            navBar.classList.add('active');
-            navOverlay.classList.add('active');
-            body.style.overflow = 'hidden';
+            if (navBar.classList.contains('active')) {
+                closeNav();
+            } else {
+                navBar.classList.add('active');
+                navOverlay.classList.add('active');
+                body.style.overflow = 'hidden';
+            }
         });
 
         function closeNav() {

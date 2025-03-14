@@ -586,10 +586,7 @@ footer::before {
     padding: 0;
 }
 
-/* Add padding only for non-table content */
-.main-content > *:not(.table-container):not(.table-responsive) {
-    padding: 2rem;
-}
+
 
 /* Responsive Design */
 @media (max-width: 1400px) {

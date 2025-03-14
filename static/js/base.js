@@ -1172,21 +1172,14 @@
         const body = document.body;
 
         navToggle.addEventListener('click', () => {
-            navBar.classList.toggle('active');
-            navOverlay.classList.toggle('active');
-            navToggle.classList.toggle('active');
-            
-            if (navBar.classList.contains('active')) {
-                body.style.overflow = 'hidden';
-            } else {
-                body.style.overflow = '';
-            }
+            navBar.classList.add('active');
+            navOverlay.classList.add('active');
+            body.style.overflow = 'hidden';
         });
 
         function closeNav() {
             navBar.classList.remove('active');
             navOverlay.classList.remove('active');
-            navToggle.classList.remove('active');
             body.style.overflow = '';
         }
 

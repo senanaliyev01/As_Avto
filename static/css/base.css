@@ -107,38 +107,25 @@ header {
 /* Navbar Styles */
 .nav-toggle {
     position: fixed;
-    top: 50%;
-    left: 0;
-    transform: translateY(-50%);
+    top: 20px;
+    left: 20px;
     z-index: 1001;
     background: var(--primary-color);
     color: var(--text-primary);
-    width: 30px;
-    height: 50px;
-    border-radius: 0 5px 5px 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     border: 1px solid var(--border-color);
-    border-left: none;
     transition: all 0.3s ease;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
 }
 
 .nav-toggle:hover {
     background: var(--highlight-color);
-    width: 35px;
-    color: var(--accent-color);
-}
-
-.nav-toggle i {
-    transition: transform 0.3s ease;
-    font-size: 16px;
-}
-
-.nav-toggle.active i {
-    transform: rotate(180deg);
+    transform: scale(1.1);
 }
 
 .nav-bar {
@@ -156,17 +143,6 @@ header {
 
 .nav-bar.active {
     left: 0;
-    animation: slideIn 0.3s forwards;
-}
-
-@keyframes slideIn {
-    from { left: -300px; }
-    to { left: 0; }
-}
-
-@keyframes slideOut {
-    from { left: 0; }
-    to { left: -300px; }
 }
 
 .nav-header {

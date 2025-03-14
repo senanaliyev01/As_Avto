@@ -1172,35 +1172,49 @@
         const body = document.body;
         const navLinks = document.querySelectorAll('.nav-links a');
         
+        // Navbarın vəziyyəti
+        let isNavbarOpen = false;
+        let isAnimating = false;
+        
         // Səhifə yükləndikdə navbarı hazırla
         initNavbar();
         
         function initNavbar() {
-            // Navbardakı linkləri hazırla
+            // Navbardakı linkləri hazırla - bunu DOM-a əlavə etmədən əvvəl edirik
             navLinks.forEach(link => {
                 link.style.opacity = '0';
                 link.style.transform = 'translateX(-20px)';
                 link.style.transition = 'none';
             });
             
-            // Navbarın başlanğıc vəziyyətini təyin et
-            navBar.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-            navToggle.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-            
             // Navbarın vəziyyətini yoxla (səhifə yenilənəndə)
             if (localStorage.getItem('navbarOpen') === 'true') {
-                openNav(false); // animasiyasız aç
+                // Animasiyasız açılma
+                navBar.classList.add('active');
+                navOverlay.classList.add('active');
+                navToggle.classList.add('active');
+                isNavbarOpen = true;
+                
+                // Linkləri göstər
+                requestAnimationFrame(() => {
+                    navLinks.forEach(link => {
+                        link.style.opacity = '1';
+                        link.style.transform = 'translateX(0)';
+                    });
+                });
             }
         }
 
         // Navbar açılıb-bağlanması
-        navToggle.addEventListener('click', () => {
+        navToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (isAnimating) return; // Animasiya davam edirsə, yeni klikləri blokla
             toggleNavbar();
         });
 
         // Navbar açılıb-bağlanması funksiyası
         function toggleNavbar() {
-            if (navBar.classList.contains('active')) {
+            if (isNavbarOpen) {
                 closeNav();
             } else {
                 openNav();
@@ -1208,69 +1222,82 @@
         }
         
         // Navbarı açma funksiyası
-        function openNav(animate = true) {
-            navBar.classList.add('active');
+        function openNav() {
+            if (isAnimating) return;
+            isAnimating = true;
+            
+            // Əvvəlcə overlay-i göstər
             navOverlay.classList.add('active');
-            navToggle.classList.add('active');
-            body.style.overflow = 'hidden';
             
-            // Local storage-də vəziyyəti saxla
-            localStorage.setItem('navbarOpen', 'true');
-            
-            // Navbardakı linkləri animasiya ilə göstər
-            if (animate) {
+            // Sonra navbarı aç - requestAnimationFrame ilə
+            requestAnimationFrame(() => {
+                navBar.classList.add('active');
+                navToggle.classList.add('active');
+                body.style.overflow = 'hidden';
+                isNavbarOpen = true;
+                
+                // Local storage-də vəziyyəti saxla
+                localStorage.setItem('navbarOpen', 'true');
+                
+                // Navbardakı linkləri animasiya ilə göstər
                 navLinks.forEach((link, index) => {
-                    link.style.opacity = '0';
-                    link.style.transform = 'translateX(-20px)';
                     setTimeout(() => {
-                        link.style.transition = 'all 0.3s ease';
+                        link.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
                         link.style.opacity = '1';
                         link.style.transform = 'translateX(0)';
-                    }, 100 + (index * 50));
+                    }, 50 + (index * 30)); // Daha qısa gecikmələr
                 });
                 
-                // Navbarın açılma animasiyası
-                navBar.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-                navToggle.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-            } else {
-                // Animasiyasız açılma (səhifə yenilənəndə)
-                navLinks.forEach(link => {
-                    link.style.opacity = '1';
-                    link.style.transform = 'translateX(0)';
-                });
-            }
+                // Animasiya bitdikdə isAnimating bayrağını sıfırla
+                setTimeout(() => {
+                    isAnimating = false;
+                }, 300); // Ən uzun animasiya müddətindən bir az çox
+            });
         }
 
         // Navbarı bağlama funksiyası
         function closeNav() {
-            navBar.classList.remove('active');
-            navOverlay.classList.remove('active');
-            navToggle.classList.remove('active');
-            body.style.overflow = '';
+            if (isAnimating) return;
+            isAnimating = true;
             
-            // Local storage-də vəziyyəti saxla
-            localStorage.setItem('navbarOpen', 'false');
-            
-            // Navbardakı linkləri gizlət
+            // Navbardakı linkləri gizlət - daha sürətli
             navLinks.forEach(link => {
                 link.style.opacity = '0';
                 link.style.transform = 'translateX(-20px)';
             });
             
-            // Navbarın bağlanma animasiyası
-            navBar.style.transition = 'all 0.4s cubic-bezier(0.6, -0.28, 0.735, 0.045)';
-            navToggle.style.transition = 'all 0.4s cubic-bezier(0.6, -0.28, 0.735, 0.045)';
+            // Qısa gecikmədən sonra navbarı bağla
+            setTimeout(() => {
+                navBar.classList.remove('active');
+                navToggle.classList.remove('active');
+                
+                // Overlay-i gizlət
+                navOverlay.classList.remove('active');
+                body.style.overflow = '';
+                isNavbarOpen = false;
+                
+                // Local storage-də vəziyyəti saxla
+                localStorage.setItem('navbarOpen', 'false');
+                
+                // Animasiya bitdikdə isAnimating bayrağını sıfırla
+                setTimeout(() => {
+                    isAnimating = false;
+                }, 200);
+            }, 100);
         }
 
         // Bağlama düyməsinə klik
-        navClose.addEventListener('click', closeNav);
+        navClose.addEventListener('click', function(e) {
+            e.preventDefault();
+            closeNav();
+        });
         
         // Overlay-ə klik
         navOverlay.addEventListener('click', closeNav);
 
         // ESC düyməsi ilə bağlama
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && navBar.classList.contains('active')) {
+            if (e.key === 'Escape' && isNavbarOpen) {
                 closeNav();
             }
         });
@@ -1278,16 +1305,20 @@
         // Navbardakı linklərə klik edildikdə mobil cihazlarda navbarı bağla
         navLinks.forEach(link => {
             link.addEventListener('click', function() {
-                if (window.innerWidth <= 768) {
+                if (window.innerWidth <= 768 && isNavbarOpen) {
                     closeNav();
                 }
             });
         });
         
         // Pəncərə ölçüsü dəyişdikdə navbarı bağla
+        let resizeTimer;
         window.addEventListener('resize', function() {
-            if (window.innerWidth > 768 && navBar.classList.contains('active')) {
-                closeNav();
-            }
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function() {
+                if (window.innerWidth > 768 && isNavbarOpen) {
+                    closeNav();
+                }
+            }, 100);
         });
     });

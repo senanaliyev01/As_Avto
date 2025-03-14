@@ -8,6 +8,8 @@
     --border-color: #1e3a5f;
     --error-color: #d32f2f;
     --success-color: #388e3c;
+    --nav-transition-duration: 0.2s;
+    --nav-transition-timing: cubic-bezier(0.215, 0.61, 0.355, 1);
 }
 
 /* Header Styles */
@@ -122,26 +124,16 @@ header {
     cursor: pointer;
     border: 1px solid var(--border-color);
     border-left: none;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: transform var(--nav-transition-duration) var(--nav-transition-timing);
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
-    animation: pulse-toggle 2s infinite;
-}
-
-@keyframes pulse-toggle {
-    0% {
-        box-shadow: 0 0 0 0 rgba(45, 109, 163, 0.7);
-    }
-    70% {
-        box-shadow: 0 0 0 10px rgba(45, 109, 163, 0);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(45, 109, 163, 0);
-    }
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
 }
 
 .nav-toggle.active {
-    animation: none;
-    left: 300px;
+    transform: translateY(-50%) translateX(300px);
 }
 
 .nav-toggle::before {
@@ -154,7 +146,7 @@ header {
     background: linear-gradient(to right, var(--highlight-color), var(--accent-color));
     border-radius: 0 8px 8px 0;
     opacity: 0;
-    transition: opacity 0.4s ease;
+    transition: opacity var(--nav-transition-duration) ease;
     z-index: -1;
 }
 
@@ -167,7 +159,7 @@ header {
     height: calc(100% + 10px);
     background: var(--accent-color);
     opacity: 0;
-    transition: opacity 0.4s ease;
+    transition: opacity var(--nav-transition-duration) ease;
 }
 
 .nav-toggle.active::after {
@@ -184,9 +176,10 @@ header {
 }
 
 .nav-toggle i {
-    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    transition: transform var(--nav-transition-duration) var(--nav-transition-timing);
     font-size: 1.2rem;
     text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    will-change: transform;
 }
 
 .nav-toggle.active i {
@@ -196,19 +189,24 @@ header {
 .nav-bar {
     position: fixed;
     top: 0;
-    left: -300px;
+    left: 0;
     width: 300px;
     height: 100vh;
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     z-index: 1002;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: transform var(--nav-transition-duration) var(--nav-transition-timing);
     box-shadow: 2px 0 15px rgba(0, 0, 0, 0.4);
     overflow-y: auto;
     border-right: 1px solid var(--border-color);
+    will-change: transform;
+    transform: translateX(-100%);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
 }
 
 .nav-bar.active {
-    left: 0;
+    transform: translateX(0);
 }
 
 .nav-header {
@@ -265,7 +263,8 @@ header {
     margin: 5px 0;
     opacity: 0;
     transform: translateX(-20px);
-    transition: opacity 0.3s ease, transform 0.3s ease, background 0.3s ease, border-left-color 0.3s ease, padding-left 0.3s ease;
+    transition: opacity 0.15s ease, transform 0.15s ease, background 0.15s ease, border-left-color 0.15s ease, padding-left 0.15s ease;
+    will-change: opacity, transform;
 }
 
 .nav-links a:hover {
@@ -299,12 +298,15 @@ header {
     z-index: 1001;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s ease;
+    transition: opacity var(--nav-transition-duration) ease, visibility var(--nav-transition-duration) ease;
+    will-change: opacity, visibility;
+    pointer-events: none;
 }
 
 .nav-overlay.active {
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
 }
 
 /* Search Container */
@@ -779,45 +781,20 @@ footer::before {
 
     .nav-bar {
         width: 280px;
-        left: -280px;
-    }
-
-    .nav-bar a {
-        flex: 0 0 calc(33.333% - 1rem);
-        padding: 0.8rem;
-        min-width: 120px;
-    }
-
-    .search-bar {
-        margin: 0 1rem;
-    }
-
-    .nav-toggle {
-        height: 50px;
     }
     
     .nav-toggle.active {
-        left: 280px;
+        transform: translateY(-50%) translateX(280px);
     }
 }
 
 @media (max-width: 576px) {
     .nav-bar {
         width: 260px;
-        left: -260px;
-    }
-    
-    .nav-toggle {
-        height: 45px;
-        width: 25px;
-    }
-    
-    .nav-toggle:hover {
-        width: 30px;
     }
     
     .nav-toggle.active {
-        left: 260px;
+        transform: translateY(-50%) translateX(260px);
     }
 
     .header-right {

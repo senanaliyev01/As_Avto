@@ -1,96 +1,164 @@
 /* Novruz Bayramı CSS */
-:root {
-    --grass-height: 40px;
-    --fire-size: 80px;
-    --wood-height: 30px;
-}
 
 /* Otluq (Grass) */
-.novruz-grass {
+.grass-container {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: var(--grass-height);
-    background-image: url('../img/novruz/grass.png');
-    background-repeat: repeat-x;
-    background-size: auto var(--grass-height);
+    height: 30px;
+    overflow: hidden;
     z-index: 10;
-    pointer-events: none;
 }
 
-/* Taxta (Wood) */
-.novruz-wood {
+.grass {
     position: absolute;
     bottom: 0;
-    right: 20%;
-    width: 120px;
-    height: var(--wood-height);
-    background-image: url('../img/novruz/wood.png');
-    background-repeat: no-repeat;
+    width: 100%;
+    height: 30px;
+    background: url('/static/img/novruz/grass.png') repeat-x;
     background-size: contain;
-    z-index: 11;
-    pointer-events: none;
+    animation: grassWave 10s linear infinite;
+}
+
+@keyframes grassWave {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 100% 0;
+    }
 }
 
 /* Alov (Fire) */
-.novruz-fire {
+.fire-container {
     position: absolute;
-    bottom: calc(var(--wood-height) - 10px);
-    right: calc(20% + 30px);
-    width: var(--fire-size);
-    height: var(--fire-size);
-    background-image: url('../img/novruz/fire.gif');
-    background-repeat: no-repeat;
-    background-size: contain;
-    z-index: 12;
-    pointer-events: none;
-    filter: drop-shadow(0 0 10px rgba(255, 165, 0, 0.7));
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 80px;
+    height: 100px;
+    z-index: 5;
 }
 
-/* Header-in pozisiyasını tənzimləmək */
-header {
-    position: relative;
-    margin-bottom: var(--grass-height);
+.fire {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
-/* Responsive dizayn */
+/* Taxta (Wood) */
+.wood-container {
+    position: absolute;
+    right: 20px;
+    bottom: 0;
+    width: 120px;
+    height: 40px;
+    z-index: 4;
+}
+
+.wood {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Novruz Bayramı Yazısı */
+.novruz-title {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    color: #FF6D00;
+    text-shadow: 0 0 5px rgba(255, 109, 0, 0.7);
+    z-index: 10;
+    animation: novruztitle 2s ease-in-out infinite;
+}
+
+@keyframes novruztitle {
+    0%, 100% {
+        transform: translateX(-50%) scale(1);
+    }
+    50% {
+        transform: translateX(-50%) scale(1.1);
+    }
+}
+
+/* Semeni */
+.semeni-container {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 60px;
+    height: 80px;
+    z-index: 5;
+}
+
+.semeni {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Responsive */
 @media screen and (max-width: 768px) {
-    :root {
-        --grass-height: 30px;
-        --fire-size: 60px;
-        --wood-height: 20px;
+    .fire-container {
+        width: 50px;
+        height: 70px;
+        right: 10px;
     }
     
-    .novruz-wood {
-        right: 10%;
+    .wood-container {
+        width: 80px;
+        height: 30px;
+        right: 10px;
     }
     
-    .novruz-fire {
-        right: calc(10% + 20px);
+    .semeni-container {
+        width: 40px;
+        height: 60px;
+        left: 10px;
+    }
+    
+    .novruz-title {
+        font-size: 14px;
     }
 }
 
-/* Novruz bayramı üçün əlavə animasiyalar */
-@keyframes flicker {
-    0% { opacity: 1; }
-    25% { opacity: 0.9; }
-    50% { opacity: 1; }
-    75% { opacity: 0.8; }
-    100% { opacity: 1; }
+/* Novruz Toggle Button */
+.novruz-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #FF6D00;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
 }
 
-.novruz-fire {
-    animation: flicker 2s infinite;
+.novruz-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
 }
 
-/* Otluq animasiyası */
-@keyframes sway {
-    0% { transform: translateX(-5px); }
-    50% { transform: translateX(5px); }
-    100% { transform: translateX(-5px); }
+.novruz-toggle i {
+    transition: transform 0.3s ease;
 }
 
-.novruz-grass {
-    animation: sway 8s ease-in-out infinite;
+.novruz-toggle:hover i {
+    transform: rotate(15deg);
 } 

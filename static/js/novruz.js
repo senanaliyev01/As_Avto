@@ -1,117 +1,171 @@
-/**
- * Novruz Bayramı JavaScript
- * Bu fayl Novruz bayramı elementlərini dinamik olaraq əlavə etmək və ləğv etmək üçün istifadə olunur.
- */
+// Novruz Bayramı JavaScript
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Novruz elementlərini əlavə et
-    addNovruzElements();
+    // Novruz elementlərinin aktivləşdirilməsi
+    initNovruz();
     
-    // Novruz elementlərini ləğv etmək üçün düymə əlavə et
-    addToggleButton();
+    // Toggle düyməsinin işləməsi
+    setupNovruzToggle();
+    
+    // Local Storage-dən vəziyyəti yoxla
+    checkNovruzState();
 });
 
-/**
- * Header-ə Novruz bayramı elementlərini əlavə edir
- */
-function addNovruzElements() {
+// Novruz elementlərini yaratmaq
+function initNovruz() {
     const header = document.querySelector('header');
     
     if (!header) return;
     
-    // Əgər elementlər artıq mövcuddursa, əlavə etmə
-    if (document.querySelector('.novruz-grass')) return;
+    // Header-in position-unu relative et
+    header.style.position = 'relative';
     
-    // Otluq elementi
+    // Novruz başlığı
+    const novruzTitle = document.createElement('div');
+    novruzTitle.className = 'novruz-title';
+    novruzTitle.textContent = 'Novruz Bayramınız Mübarək!';
+    novruzTitle.id = 'novruz-title';
+    
+    // Otluq
+    const grassContainer = document.createElement('div');
+    grassContainer.className = 'grass-container';
+    grassContainer.id = 'grass-container';
+    
     const grass = document.createElement('div');
-    grass.className = 'novruz-grass';
+    grass.className = 'grass';
+    grassContainer.appendChild(grass);
     
-    // Taxta elementi
-    const wood = document.createElement('div');
-    wood.className = 'novruz-wood';
+    // Alov
+    const fireContainer = document.createElement('div');
+    fireContainer.className = 'fire-container';
+    fireContainer.id = 'fire-container';
     
-    // Alov elementi
-    const fire = document.createElement('div');
-    fire.className = 'novruz-fire';
+    const fire = document.createElement('img');
+    fire.className = 'fire';
+    fire.src = '/static/img/novruz/fire.gif';
+    fire.alt = 'Alov';
+    fireContainer.appendChild(fire);
     
-    // Elementləri header-ə əlavə et
-    header.appendChild(grass);
-    header.appendChild(wood);
-    header.appendChild(fire);
+    // Taxta
+    const woodContainer = document.createElement('div');
+    woodContainer.className = 'wood-container';
+    woodContainer.id = 'wood-container';
     
-    // Novruz elementlərinin aktiv olduğunu localStorage-də saxla
-    localStorage.setItem('novruzActive', 'true');
+    const wood = document.createElement('img');
+    wood.className = 'wood';
+    wood.src = '/static/img/novruz/wood.png';
+    wood.alt = 'Taxta';
+    woodContainer.appendChild(wood);
+    
+    // Səməni
+    const semeniContainer = document.createElement('div');
+    semeniContainer.className = 'semeni-container';
+    semeniContainer.id = 'semeni-container';
+    
+    const semeni = document.createElement('img');
+    semeni.className = 'semeni';
+    semeni.src = '/static/img/novruz/semeni.png';
+    semeni.alt = 'Səməni';
+    semeniContainer.appendChild(semeni);
+    
+    // Toggle düyməsi
+    const toggleButton = document.createElement('button');
+    toggleButton.className = 'novruz-toggle';
+    toggleButton.id = 'novruz-toggle';
+    toggleButton.innerHTML = '<i class="fas fa-fire"></i>';
+    toggleButton.title = 'Novruz effektlərini aç/bağla';
+    
+    // Elementləri əlavə et
+    header.appendChild(novruzTitle);
+    header.appendChild(grassContainer);
+    header.appendChild(fireContainer);
+    header.appendChild(woodContainer);
+    header.appendChild(semeniContainer);
+    document.body.appendChild(toggleButton);
 }
 
-/**
- * Novruz bayramı elementlərini silir
- */
-function removeNovruzElements() {
-    const elements = document.querySelectorAll('.novruz-grass, .novruz-wood, .novruz-fire');
+// Toggle düyməsinin işləməsi
+function setupNovruzToggle() {
+    const toggleButton = document.getElementById('novruz-toggle');
     
-    elements.forEach(element => {
-        element.remove();
-    });
+    if (!toggleButton) return;
     
-    // Novruz elementlərinin deaktiv olduğunu localStorage-də saxla
-    localStorage.setItem('novruzActive', 'false');
-}
-
-/**
- * Novruz elementlərini göstərmək/gizlətmək üçün düymə əlavə edir
- */
-function addToggleButton() {
-    // Əgər düymə artıq mövcuddursa, əlavə etmə
-    if (document.querySelector('#novruz-toggle')) return;
-    
-    const header = document.querySelector('header .header-right');
-    
-    if (!header) return;
-    
-    // Düymə yarat
-    const button = document.createElement('a');
-    button.id = 'novruz-toggle';
-    button.href = '#';
-    button.className = 'novruz-toggle-button';
-    button.innerHTML = '<i class="fas fa-fire"></i> Novruz';
-    
-    // Düyməyə klik hadisəsi əlavə et
-    button.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        // Novruz elementlərinin aktiv olub-olmadığını yoxla
+    toggleButton.addEventListener('click', function() {
         const isActive = localStorage.getItem('novruzActive') === 'true';
         
         if (isActive) {
-            removeNovruzElements();
-            button.innerHTML = '<i class="fas fa-fire"></i> Novruz (Deaktiv)';
+            // Deaktiv et
+            hideNovruzElements();
+            localStorage.setItem('novruzActive', 'false');
         } else {
-            addNovruzElements();
-            button.innerHTML = '<i class="fas fa-fire"></i> Novruz (Aktiv)';
+            // Aktiv et
+            showNovruzElements();
+            localStorage.setItem('novruzActive', 'true');
         }
     });
+}
+
+// Local Storage-dən vəziyyəti yoxla
+function checkNovruzState() {
+    const isActive = localStorage.getItem('novruzActive');
     
-    // Düyməni header-ə əlavə et
-    header.appendChild(button);
-    
-    // Düymənin mətnini tənzimlə
-    const isActive = localStorage.getItem('novruzActive') === 'true';
-    button.innerHTML = isActive ? 
-        '<i class="fas fa-fire"></i> Novruz (Aktiv)' : 
-        '<i class="fas fa-fire"></i> Novruz (Deaktiv)';
-    
-    // Əgər localStorage-də məlumat yoxdursa və ya aktivdirsə, elementləri əlavə et
-    if (isActive || localStorage.getItem('novruzActive') === null) {
-        addNovruzElements();
+    // İlk dəfə açılanda aktiv et
+    if (isActive === null) {
+        localStorage.setItem('novruzActive', 'true');
+        showNovruzElements();
+    } else if (isActive === 'false') {
+        hideNovruzElements();
+    } else {
+        showNovruzElements();
     }
 }
 
-// Səhifə yüklənəndə Novruz elementlərinin vəziyyətini yoxla
-window.addEventListener('load', function() {
-    const isActive = localStorage.getItem('novruzActive');
+// Novruz elementlərini göstər
+function showNovruzElements() {
+    const elements = [
+        'novruz-title',
+        'grass-container',
+        'fire-container',
+        'wood-container',
+        'semeni-container'
+    ];
     
-    // Əgər localStorage-də məlumat yoxdursa və ya aktivdirsə, elementləri əlavə et
-    if (isActive === 'true' || isActive === null) {
-        addNovruzElements();
+    elements.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.style.display = 'block';
+        }
+    });
+    
+    // Toggle düyməsini yenilə
+    const toggleButton = document.getElementById('novruz-toggle');
+    if (toggleButton) {
+        toggleButton.innerHTML = '<i class="fas fa-fire"></i>';
+        toggleButton.style.backgroundColor = '#FF6D00';
     }
-}); 
+}
+
+// Novruz elementlərini gizlət
+function hideNovruzElements() {
+    const elements = [
+        'novruz-title',
+        'grass-container',
+        'fire-container',
+        'wood-container',
+        'semeni-container'
+    ];
+    
+    elements.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.style.display = 'none';
+        }
+    });
+    
+    // Toggle düyməsini yenilə
+    const toggleButton = document.getElementById('novruz-toggle');
+    if (toggleButton) {
+        toggleButton.innerHTML = '<i class="fas fa-fire-alt"></i>';
+        toggleButton.style.backgroundColor = '#555';
+    }
+} 

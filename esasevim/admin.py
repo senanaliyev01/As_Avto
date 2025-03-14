@@ -3,6 +3,6 @@ from .models import HeroSlide
 
 @admin.register(HeroSlide)
 class HeroSlideAdmin(admin.ModelAdmin):
-    list_display = ('basliq', 'alt_basliq', 'yaradilma_tarixi')
-    list_filter = ('yaradilma_tarixi',)
+    list_display = ('basliq', 'alt_basliq', 'aktiv', 'yaradilma_tarixi')
+    list_filter = ('aktiv', 'yaradilma_tarixi')
     search_fields = ('basliq', 'alt_basliq')

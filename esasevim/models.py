@@ -6,6 +6,7 @@ class HeroSlide(models.Model):
     sekil = models.ImageField(upload_to='hero_slides/', verbose_name='Şəkil')
     basliq = models.CharField(max_length=200, verbose_name='Başlıq', null=True, blank=True)
     alt_basliq = models.CharField(max_length=300, verbose_name='Alt Başlıq', null=True, blank=True)
+    aktiv = models.BooleanField(default=True, verbose_name='Aktiv')
     yaradilma_tarixi = models.DateTimeField(auto_now_add=True)
     
     class Meta:

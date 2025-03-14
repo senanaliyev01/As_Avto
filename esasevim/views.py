@@ -45,8 +45,8 @@ def rey_elave_et(request):
 
 @login_required
 def esasevim(request):
-    # Hero slides
-    hero_slides = HeroSlide.objects.all()
+    # Hero slides - yalnız aktiv olanlar
+    hero_slides = HeroSlide.objects.filter(aktiv=True)
     
     # Təsdiqlənmiş rəylər
     tesdiqli_reyler = MusteriReyi.objects.filter(tesdiq=True)

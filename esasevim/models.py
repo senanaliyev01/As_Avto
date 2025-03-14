@@ -14,4 +14,4 @@ class HeroSlide(models.Model):
         ordering = ['-yaradilma_tarixi']
     
     def __str__(self):
-        return self.basliq
+        return f"{self.basliq}"

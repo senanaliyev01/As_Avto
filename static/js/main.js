@@ -14,6 +14,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 fadeEffect: {
                     crossFade: true
                 },
+                pagination: {
+                    el: '.hero-pagination',
+                    clickable: true,
+                    renderBullet: function (index, className) {
+                        return '<span class="' + className + '"></span>';
+                    },
+                },
+                navigation: {
+                    nextEl: '.hero-button-next',
+                    prevEl: '.hero-button-prev',
+                },
                 on: {
                     init: function () {
                         let activeSlide = this.slides[this.activeIndex];

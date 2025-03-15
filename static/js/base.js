@@ -1192,32 +1192,3 @@
             }
         });
     });
-
-    // Reklam banneri üçün animasiya
-    document.addEventListener('DOMContentLoaded', function() {
-        const announcementBanner = document.getElementById('announcement-banner');
-        
-        if (announcementBanner) {
-            // Banneri vurğulamaq üçün funksiya
-            function highlightBanner() {
-                announcementBanner.classList.add('highlight-banner');
-                
-                setTimeout(() => {
-                    announcementBanner.classList.remove('highlight-banner');
-                }, 1000);
-            }
-            
-            // Səhifə yükləndikdə banneri vurğula
-            setTimeout(highlightBanner, 1500);
-            
-            // Hər 30 saniyədən bir banneri vurğula
-            setInterval(highlightBanner, 30000);
-            
-            // Bannerin üzərinə gəldikdə də vurğula
-            announcementBanner.addEventListener('mouseenter', function() {
-                if (!announcementBanner.classList.contains('highlight-banner')) {
-                    highlightBanner();
-                }
-            });
-        }
-    });

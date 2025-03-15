@@ -14,7 +14,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 
 DEBUG = os.environ.get('DEBUG')
 
-ALLOWED_HOSTS = ['localhost','127.0.0.1','0.0.0.0', 'as-avto.com', 'www.as-avto.com','188.245.112.154']
+ALLOWED_HOSTS = ['localhost','127.0.0.1','0.0.0.0', 'as-avto.com', 'www.as-avto.com']
 
 CSRF_TRUSTED_ORIGINS = [
     'https://as-avto.com',
@@ -146,7 +146,6 @@ INSTALLED_APPS = [
     'esasevim',
     'rentacar',
     'sohbet_otagi',
-    'django_elasticsearch_dsl',
 ]
 
 SITE_ID = 1
@@ -535,13 +534,3 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',
     },
 }
-
-# Elasticsearch konfiqurasiyası
-ELASTICSEARCH_DSL = {
-    'default': {
-        'hosts': 'http://188.245.112.154:9200'
-    },
-}
-
-# Elasticsearch keşləmə müddəti (saniyələrlə)
-ELASTICSEARCH_CACHE_TIMEOUT = 60 * 15  # 15 dəqiqə

@@ -21,15 +21,6 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import Image
 from istifadeciler.models import Profile
 from django.contrib import messages
-from django.core.cache import cache
-import hashlib
-from elasticsearch_dsl import Q as ESQ
-from .documents import MehsulDocument
-from elasticsearch.exceptions import NotFoundError, ConnectionError
-import logging
-
-# Logging konfiqurasiyası
-logger = logging.getLogger(__name__)
 
 @login_required
 def umumibaxis(request):
@@ -186,104 +177,10 @@ def normalize_search_text(text):
     # Təkrarları silmək üçün set istifadə edirik
     return normalized, list(set(word_combinations))
 
-def search_with_elasticsearch(search_text, category=None, brand=None, model=None, axtaris=None):
-    """
-    Elasticsearch ilə axtarış edən funksiya
-    """
-    try:
-        # Keş açarını yaradırıq
-        cache_params = f"{search_text}_{category}_{brand}_{model}_{axtaris}"
-        cache_key = f"es_search_{hashlib.md5(cache_params.encode()).hexdigest()}"
-        
-        # Keşdən nəticələri yoxlayırıq
-        cached_results = cache.get(cache_key)
-        if cached_results is not None:
-            logger.info(f"Keşdən nəticələr əldə edildi: {cache_key}")
-            return cached_results
-        
-        # Elasticsearch sorğusunu yaradırıq
-        search = MehsulDocument.search()
-        
-        # Filtrləri əlavə edirik
-        if category:
-            search = search.filter('term', kateqoriya__adi__raw=category)
-        if brand:
-            search = search.filter('term', brend__adi__raw=brand)
-        if model:
-            search = search.filter('term', marka__adi__raw=model)
-        if axtaris:
-            search = search.filter('term', axtaris_sozleri_text=axtaris)
-        
-        # Axtarış mətni varsa
-        if search_text:
-            # Axtarış mətnini normalize et
-            normalized_search, search_combinations = normalize_search_text(search_text)
-            
-            # Multi-match sorğusu yaradırıq
-            should_queries = [
-                # Dəqiq uyğunluq üçün
-                ESQ('match_phrase', adi=search_text),
-                ESQ('match_phrase', haqqinda=search_text),
-                ESQ('match_phrase', axtaris_sozleri_text=search_text),
-                
-                # Fuzzy axtarış üçün
-                ESQ('match', adi={'query': search_text, 'fuzziness': 'AUTO'}),
-                ESQ('match', haqqinda={'query': search_text, 'fuzziness': 'AUTO'}),
-                ESQ('match', axtaris_sozleri_text={'query': search_text, 'fuzziness': 'AUTO'}),
-                
-                # OEM kodları üçün
-                ESQ('match', oem=search_text),
-                ESQ('match', oem_kodlar=search_text),
-                ESQ('match', brend_kod=search_text),
-            ]
-            
-            # Hər bir axtarış kombinasiyası üçün sorğu əlavə et
-            for combo in search_combinations[:5]:
-                should_queries.extend([
-                    ESQ('match', adi={'query': combo, 'fuzziness': 'AUTO'}),
-                    ESQ('match', haqqinda={'query': combo, 'fuzziness': 'AUTO'}),
-                    ESQ('match', axtaris_sozleri_text={'query': combo, 'fuzziness': 'AUTO'}),
-                ])
-            
-            # Sorğunu əlavə edirik
-            search = search.query('bool', should=should_queries, minimum_should_match=1)
-            
-            # Nəticələri sıralayırıq
-            search = search.sort('_score')
-        
-        # Timeout əlavə edirik
-        search = search.params(request_timeout=30)
-        
-        # Nəticələri əldə edirik
-        response = search.execute()
-        
-        if not hasattr(response, 'hits') or len(response.hits) == 0:
-            logger.info(f"Elasticsearch sorğusu nəticə qaytarmadı: {search_text}")
-            return None
-        
-        # Nəticələri Django modellərinə çeviririk
-        mehsul_ids = [hit.id for hit in response]
-        mehsullar = list(Mehsul.objects.filter(id__in=mehsul_ids))
-        
-        # Nəticələri keşə yazırıq
-        from django.conf import settings
-        cache_timeout = getattr(settings, 'ELASTICSEARCH_CACHE_TIMEOUT', 60 * 15)  # Default 15 dəqiqə
-        cache.set(cache_key, mehsullar, cache_timeout)
-        
-        logger.info(f"Elasticsearch sorğusu uğurla tamamlandı: {search_text}, {len(mehsullar)} nəticə")
-        return mehsullar
-    
-    except (ConnectionError, NotFoundError) as e:
-        logger.error(f"Elasticsearch bağlantı xətası: {str(e)}")
-        # Elasticsearch xətası halında standart axtarışa qayıdırıq
-        return None
-    except Exception as e:
-        logger.error(f"Elasticsearch sorğusu zamanı gözlənilməz xəta: {str(e)}")
-        return None
-
 @login_required
 def products_list(request):
     # Başlanğıc olaraq bütün məhsulları götürürük
+    mehsullar = Mehsul.objects.all()
     kateqoriyalar = Kateqoriya.objects.all()
     brendler = Brend.objects.all()
     markalar = Marka.objects.all()
@@ -295,55 +192,48 @@ def products_list(request):
     model = request.GET.get('model')
     axtaris = request.GET.get('axtaris')
     search_text = request.GET.get('search_text')
-    
-    # Elasticsearch ilə axtarış edirik
-    mehsullar = search_with_elasticsearch(search_text, category, brand, model, axtaris)
-    
-    # Əgər Elasticsearch ilə axtarış uğursuz olubsa, standart axtarışa qayıdırıq
-    if mehsullar is None:
-        mehsullar = Mehsul.objects.all()
-        
-        # Brend, kateqoriya və marka üçün dəqiq filtrasiya
-        if category:
-            mehsullar = mehsullar.filter(kateqoriya__adi=category)
-        
-        if brand:
-            mehsullar = mehsullar.filter(brend__adi=brand)
-        
-        if model:
-            mehsullar = mehsullar.filter(marka__adi=model)
-            
-        if axtaris:
-            mehsullar = mehsullar.filter(axtaris_sozleri__adi=axtaris)
 
-        # Axtarış mətni varsa
-        if search_text:
-            # Axtarış mətnini normalize et
-            normalized_search, search_combinations = normalize_search_text(search_text)
-            
-            # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
-            clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_text)
-            
-            # Axtarış sorğusunu yarat - daha effektiv sorğu
-            query = Q()
-            
-            # OEM kodlarında axtarış
-            query |= Q(oem_kodlar__kod__icontains=clean_search)
-            
-            # Axtarış sözlərində axtarış
-            query |= Q(axtaris_sozleri__sozler__icontains=clean_search)
-            
-            # Haqqında məlumatlarında axtarış
-            query |= Q(haqqinda__icontains=search_text)
-            
-            # Hər bir axtarış kombinasiyası üçün sorğu əlavə et
-            # Amma çox böyük sorğular yaratmamaq üçün maksimum 5 kombinasiya istifadə et
-            for combo in search_combinations[:5]:
-                query |= Q(axtaris_sozleri__sozler__icontains=combo)
-                query |= Q(haqqinda__icontains=combo)
-            
-            # Sorğunu tətbiq et
-            mehsullar = mehsullar.filter(query).distinct()
+    # Brend, kateqoriya və marka üçün dəqiq filtrasiya
+    if category:
+        mehsullar = mehsullar.filter(kateqoriya__adi=category)
+    
+    if brand:
+        mehsullar = mehsullar.filter(brend__adi=brand)
+    
+    if model:
+        mehsullar = mehsullar.filter(marka__adi=model)
+        
+    if axtaris:
+        mehsullar = mehsullar.filter(axtaris_sozleri__adi=axtaris)
+
+    # Axtarış mətni varsa
+    if search_text:
+        # Axtarış mətnini normalize et
+        normalized_search, search_combinations = normalize_search_text(search_text)
+        
+        # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
+        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_text)
+        
+        # Axtarış sorğusunu yarat - daha effektiv sorğu
+        query = Q()
+        
+        # OEM kodlarında axtarış
+        query |= Q(oem_kodlar__kod__icontains=clean_search)
+        
+        # Axtarış sözlərində axtarış
+        query |= Q(axtaris_sozleri__sozler__icontains=clean_search)
+        
+        # Haqqında məlumatlarında axtarış
+        query |= Q(haqqinda__icontains=search_text)
+        
+        # Hər bir axtarış kombinasiyası üçün sorğu əlavə et
+        # Amma çox böyük sorğular yaratmamaq üçün maksimum 5 kombinasiya istifadə et
+        for combo in search_combinations[:5]:
+            query |= Q(axtaris_sozleri__sozler__icontains=combo)
+            query |= Q(haqqinda__icontains=combo)
+        
+        # Sorğunu tətbiq et
+        mehsullar = mehsullar.filter(query).distinct()
 
     return render(request, 'products_list.html', {
         'mehsullar': mehsullar,
@@ -584,40 +474,35 @@ def update_quantity(request, item_id, new_quantity):
 def mehsul_axtaris(request):
     query = request.GET.get('q')
     if query:
-        # Elasticsearch ilə axtarış edirik
-        mehsullar = search_with_elasticsearch(query)
+        # Başlanğıc sorğunu yaradırıq
+        mehsullar = Mehsul.objects.all()
         
-        # Əgər Elasticsearch ilə axtarış uğursuz olubsa, standart axtarışa qayıdırıq
-        if mehsullar is None:
-            # Başlanğıc sorğunu yaradırıq
-            mehsullar = Mehsul.objects.all()
-            
-            # Axtarış mətnini normalize et və kombinasiyaları al
-            normalized_query, query_combinations = normalize_search_text(query)
-            
-            # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
-            clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
-            
-            # Axtarış sorğusunu yarat - daha effektiv sorğu
-            search_query = Q()
-            
-            # OEM kodlarında axtarış
-            search_query |= Q(oem_kodlar__kod__icontains=clean_query)
-            
-            # Axtarış sözlərində axtarış
-            search_query |= Q(axtaris_sozleri__sozler__icontains=clean_query)
-            
-            # Haqqında məlumatlarında axtarış
-            search_query |= Q(haqqinda__icontains=query)
-            
-            # Hər bir axtarış kombinasiyası üçün sorğu əlavə et
-            # Amma çox böyük sorğular yaratmamaq üçün maksimum 5 kombinasiya istifadə et
-            for combo in query_combinations[:5]:
-                search_query |= Q(axtaris_sozleri__sozler__icontains=combo)
-                search_query |= Q(haqqinda__icontains=combo)
-            
-            # Sorğunu tətbiq et
-            mehsullar = mehsullar.filter(search_query).distinct()
+        # Axtarış mətnini normalize et və kombinasiyaları al
+        normalized_query, query_combinations = normalize_search_text(query)
+        
+        # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
+        clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
+        
+        # Axtarış sorğusunu yarat - daha effektiv sorğu
+        search_query = Q()
+        
+        # OEM kodlarında axtarış
+        search_query |= Q(oem_kodlar__kod__icontains=clean_query)
+        
+        # Axtarış sözlərində axtarış
+        search_query |= Q(axtaris_sozleri__sozler__icontains=clean_query)
+        
+        # Haqqında məlumatlarında axtarış
+        search_query |= Q(haqqinda__icontains=query)
+        
+        # Hər bir axtarış kombinasiyası üçün sorğu əlavə et
+        # Amma çox böyük sorğular yaratmamaq üçün maksimum 5 kombinasiya istifadə et
+        for combo in query_combinations[:5]:
+            search_query |= Q(axtaris_sozleri__sozler__icontains=combo)
+            search_query |= Q(haqqinda__icontains=combo)
+        
+        # Sorğunu tətbiq et
+        mehsullar = mehsullar.filter(search_query).distinct()
         
         # Nəticələri qaytarırıq
         return JsonResponse({
@@ -833,49 +718,44 @@ def realtime_search(request):
     model = request.GET.get('model', '')
     axtaris = request.GET.get('axtaris', '')
     
-    # Elasticsearch ilə axtarış edirik
-    mehsullar = search_with_elasticsearch(query, category, brand, model, axtaris)
+    mehsullar = Mehsul.objects.all()
     
-    # Əgər Elasticsearch ilə axtarış uğursuz olubsa, standart axtarışa qayıdırıq
-    if mehsullar is None:
-        mehsullar = Mehsul.objects.all()
+    if category:
+        mehsullar = mehsullar.filter(kateqoriya__adi=category)
+    if brand:
+        mehsullar = mehsullar.filter(brend__adi=brand)
+    if model:
+        mehsullar = mehsullar.filter(marka__adi=model)
+    if axtaris:
+        mehsullar = mehsullar.filter(axtaris_sozleri__adi=axtaris)
+    
+    if query:
+        # Axtarış mətnini normalize et
+        normalized_query, query_combinations = normalize_search_text(query)
         
-        if category:
-            mehsullar = mehsullar.filter(kateqoriya__adi=category)
-        if brand:
-            mehsullar = mehsullar.filter(brend__adi=brand)
-        if model:
-            mehsullar = mehsullar.filter(marka__adi=model)
-        if axtaris:
-            mehsullar = mehsullar.filter(axtaris_sozleri__adi=axtaris)
+        # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
+        clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
         
-        if query:
-            # Axtarış mətnini normalize et
-            normalized_query, query_combinations = normalize_search_text(query)
-            
-            # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
-            clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
-            
-            # Axtarış sorğusunu yarat - daha effektiv sorğu
-            search_query = Q()
-            
-            # OEM kodlarında axtarış
-            search_query |= Q(oem_kodlar__kod__icontains=clean_query)
-            
-            # Axtarış sözlərində axtarış
-            search_query |= Q(axtaris_sozleri__sozler__icontains=clean_query)
-            
-            # Haqqında məlumatlarında axtarış
-            search_query |= Q(haqqinda__icontains=query)
-            
-            # Hər bir axtarış kombinasiyası üçün sorğu əlavə et
-            # Amma çox böyük sorğular yaratmamaq üçün maksimum 5 kombinasiya istifadə et
-            for combo in query_combinations[:5]:
-                search_query |= Q(axtaris_sozleri__sozler__icontains=combo)
-                search_query |= Q(haqqinda__icontains=combo)
-            
-            # Sorğunu tətbiq et
-            mehsullar = mehsullar.filter(search_query).distinct()
+        # Axtarış sorğusunu yarat - daha effektiv sorğu
+        search_query = Q()
+        
+        # OEM kodlarında axtarış
+        search_query |= Q(oem_kodlar__kod__icontains=clean_query)
+        
+        # Axtarış sözlərində axtarış
+        search_query |= Q(axtaris_sozleri__sozler__icontains=clean_query)
+        
+        # Haqqında məlumatlarında axtarış
+        search_query |= Q(haqqinda__icontains=query)
+        
+        # Hər bir axtarış kombinasiyası üçün sorğu əlavə et
+        # Amma çox böyük sorğular yaratmamaq üçün maksimum 5 kombinasiya istifadə et
+        for combo in query_combinations[:5]:
+            search_query |= Q(axtaris_sozleri__sozler__icontains=combo)
+            search_query |= Q(haqqinda__icontains=combo)
+        
+        # Sorğunu tətbiq et
+        mehsullar = mehsullar.filter(search_query).distinct()
     
     results = []
     for mehsul in mehsullar:

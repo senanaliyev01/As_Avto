@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
             baseUrl: "https://as-avto.com"
         },
         loading: {
-            duration: 1500,
+            duration: 1000,
             containerStyle: {
                 background: "rgba(10, 20, 50, 0.95)",
                 zIndex: 9999

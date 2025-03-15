@@ -67,7 +67,7 @@
                         // Animasiyanı təmizlə
                         setTimeout(() => {
                             card.classList.remove('updating');
-                        }, 1000);
+                        }, 8000);
                     }
                 }
             });
@@ -111,7 +111,7 @@
             setTimeout(() => {
                 notification.remove();
             }, 500);
-        }, 1000);
+        }, 3000);
     }
 
     // Swiper konfiqurasiyası
@@ -121,7 +121,7 @@
         centeredSlides: true,
         loop: true,
         autoplay: {
-            delay: 1000,
+            delay: 3000,
             disableOnInteraction: false
         },
         pagination: {
@@ -321,7 +321,7 @@
             setTimeout(() => {
                 document.body.removeChild(messageDiv);
             }, 500);
-        }, 1000);
+        }, 3000);
     }
 
     // Çıxış etməni təsdiqləmə funksiyası
@@ -479,7 +479,7 @@
                     this.style.pointerEvents = 'none';
                     this.style.opacity = '0.7';
 
-                    // 1 saniyə loading göstər
+                    // 2 saniyə loading göstər
                     setTimeout(() => {
                         fetch(url)
                             .then(response => {
@@ -513,7 +513,7 @@
                                 this.style.pointerEvents = 'auto';
                                 this.style.opacity = '1';
                             });
-                    }, 1000);
+                    }, 2000);
                 });
             });
         }
@@ -542,7 +542,7 @@
         // Butonu deaktiv et ki, yenidən klik olunmasın
         searchButton.disabled = true; 
     
-        // 1 saniyə sonra formu göndər
+        // 2 saniyə sonra formu göndər
         setTimeout(() => {
             this.submit(); // Formu göndər
         }, 1000);
@@ -587,10 +587,10 @@
                 const successModal = document.getElementById('successModal');
                 successModal.style.display = 'flex';
                 
-                // 1 saniyə sonra yönləndir
+                // 3 saniyə sonra yönləndir
                 setTimeout(() => {
                     window.location.href = '/sifaris_izle/';
-                }, 1000);
+                }, 3000);
             } else {
                 showAnimatedMessage(data.error || "Sifariş zamanı xəta baş verdi", true);
                 submitButton.innerHTML = originalContent;
@@ -900,7 +900,7 @@
         // Input event listener with debounce
         searchInput.addEventListener('input', () => {
             clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(performSearch, 100);
+            searchTimeout = setTimeout(performSearch, 300);
         });
         
         // Select elements change listener
@@ -1010,12 +1010,12 @@
             input.value = 1;
             errorDiv.textContent = 'Minimum miqdar 1 olmalıdır';
             errorDiv.classList.add('show');
-            setTimeout(() => errorDiv.classList.remove('show'), 1000);
+            setTimeout(() => errorDiv.classList.remove('show'), 3000);
         } else if (value > 999) {
             input.value = 999;
             errorDiv.textContent = 'Maksimum miqdar 999 olmalıdır';
             errorDiv.classList.add('show');
-            setTimeout(() => errorDiv.classList.remove('show'), 1000);
+            setTimeout(() => errorDiv.classList.remove('show'), 3000);
         }
     }
 

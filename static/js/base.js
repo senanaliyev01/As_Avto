@@ -545,7 +545,7 @@
         // 2 saniyə sonra formu göndər
         setTimeout(() => {
             this.submit(); // Formu göndər
-        }, 2000);
+        }, 1000);
     });
         }
 

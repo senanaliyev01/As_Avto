@@ -479,7 +479,7 @@
                     this.style.pointerEvents = 'none';
                     this.style.opacity = '0.7';
 
-                    // 2 saniyə loading göstər
+                    // 1 saniyə loading göstər
                     setTimeout(() => {
                         fetch(url)
                             .then(response => {
@@ -513,7 +513,7 @@
                                 this.style.pointerEvents = 'auto';
                                 this.style.opacity = '1';
                             });
-                    }, 2000);
+                    }, 1000);
                 });
             });
         }
@@ -587,10 +587,10 @@
                 const successModal = document.getElementById('successModal');
                 successModal.style.display = 'flex';
                 
-                // 3 saniyə sonra yönləndir
+                // 1 saniyə sonra yönləndir
                 setTimeout(() => {
                     window.location.href = '/sifaris_izle/';
-                }, 3000);
+                }, 1000);
             } else {
                 showAnimatedMessage(data.error || "Sifariş zamanı xəta baş verdi", true);
                 submitButton.innerHTML = originalContent;

@@ -146,6 +146,7 @@ INSTALLED_APPS = [
     'esasevim',
     'rentacar',
     'sohbet_otagi',
+    'django_elasticsearch_dsl',
 ]
 
 SITE_ID = 1
@@ -534,3 +535,13 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',
     },
 }
+
+# Elasticsearch konfiqurasiyası
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': 'localhost:9200'
+    },
+}
+
+# Elasticsearch keşləmə müddəti (saniyələrlə)
+ELASTICSEARCH_CACHE_TIMEOUT = 60 * 15  # 15 dəqiqə

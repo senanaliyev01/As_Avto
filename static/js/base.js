@@ -1193,26 +1193,31 @@
         });
     });
 
-    // Bildiriş bağlama funksiyası
+    // Reklam banneri üçün animasiya
     document.addEventListener('DOMContentLoaded', function() {
-        const announcementClose = document.querySelector('.announcement-close');
-        const specialAnnouncement = document.querySelector('.special-announcement');
+        const announcementBanner = document.getElementById('announcement-banner');
         
-        if (announcementClose && specialAnnouncement) {
-            // Əvvəlki vəziyyəti yoxla
-            const isAnnouncementClosed = localStorage.getItem('announcementClosed') === 'true';
-            
-            if (isAnnouncementClosed) {
-                specialAnnouncement.style.display = 'none';
+        if (announcementBanner) {
+            // Banneri vurğulamaq üçün funksiya
+            function highlightBanner() {
+                announcementBanner.classList.add('highlight-banner');
+                
+                setTimeout(() => {
+                    announcementBanner.classList.remove('highlight-banner');
+                }, 1000);
             }
             
-            announcementClose.addEventListener('click', function() {
-                specialAnnouncement.style.opacity = '0';
-                setTimeout(() => {
-                    specialAnnouncement.style.display = 'none';
-                    // Vəziyyəti yadda saxla
-                    localStorage.setItem('announcementClosed', 'true');
-                }, 300);
+            // Səhifə yükləndikdə banneri vurğula
+            setTimeout(highlightBanner, 1500);
+            
+            // Hər 30 saniyədən bir banneri vurğula
+            setInterval(highlightBanner, 30000);
+            
+            // Bannerin üzərinə gəldikdə də vurğula
+            announcementBanner.addEventListener('mouseenter', function() {
+                if (!announcementBanner.classList.contains('highlight-banner')) {
+                    highlightBanner();
+                }
             });
         }
     });

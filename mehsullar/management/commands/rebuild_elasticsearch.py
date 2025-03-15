@@ -51,7 +51,19 @@ class Command(BaseCommand):
                 for doc in document_models:
                     if doc()._index._name == index_name:
                         self.stdout.write(f"Model indekslənir: {doc.Django.model.__name__}")
-                        doc().update()
+                        # Bütün model obyektlərini əldə edirik
+                        model_objects = doc.Django.model.objects.all()
+                        self.stdout.write(f"Cəmi {len(model_objects)} obyekt indekslənəcək")
+                        
+                        # Hər bir obyekti indeksləyirik
+                        for obj in model_objects:
+                            try:
+                                registry.update(obj)
+                                self.stdout.write(f"Obyekt indeksləndi: {obj.id}")
+                            except Exception as obj_error:
+                                self.stdout.write(self.style.ERROR(f"Obyekt indekslənərkən xəta: {str(obj_error)}"))
+                                logger.error(f"Obyekt indekslənərkən xəta: {str(obj_error)}")
+                        
                         self.stdout.write(self.style.SUCCESS(f"Model indeksləndi: {doc.Django.model.__name__}"))
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f"Sənədlər indekslənərkən xəta baş verdi: {str(e)}"))

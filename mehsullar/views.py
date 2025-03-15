@@ -198,6 +198,7 @@ def search_with_elasticsearch(search_text, category=None, brand=None, model=None
         # Keşdən nəticələri yoxlayırıq
         cached_results = cache.get(cache_key)
         if cached_results is not None:
+            logger.info(f"Keşdən nəticələr əldə edildi: {cache_key}")
             return cached_results
         
         # Elasticsearch sorğusunu yaradırıq
@@ -250,8 +251,15 @@ def search_with_elasticsearch(search_text, category=None, brand=None, model=None
             # Nəticələri sıralayırıq
             search = search.sort('_score')
         
+        # Timeout əlavə edirik
+        search = search.params(request_timeout=30)
+        
         # Nəticələri əldə edirik
         response = search.execute()
+        
+        if not hasattr(response, 'hits') or len(response.hits) == 0:
+            logger.info(f"Elasticsearch sorğusu nəticə qaytarmadı: {search_text}")
+            return None
         
         # Nəticələri Django modellərinə çeviririk
         mehsul_ids = [hit.id for hit in response]
@@ -262,14 +270,15 @@ def search_with_elasticsearch(search_text, category=None, brand=None, model=None
         cache_timeout = getattr(settings, 'ELASTICSEARCH_CACHE_TIMEOUT', 60 * 15)  # Default 15 dəqiqə
         cache.set(cache_key, mehsullar, cache_timeout)
         
+        logger.info(f"Elasticsearch sorğusu uğurla tamamlandı: {search_text}, {len(mehsullar)} nəticə")
         return mehsullar
     
     except (ConnectionError, NotFoundError) as e:
-        logger.error(f"Elasticsearch xətası: {str(e)}")
+        logger.error(f"Elasticsearch bağlantı xətası: {str(e)}")
         # Elasticsearch xətası halında standart axtarışa qayıdırıq
         return None
     except Exception as e:
-        logger.error(f"Gözlənilməz xəta: {str(e)}")
+        logger.error(f"Elasticsearch sorğusu zamanı gözlənilməz xəta: {str(e)}")
         return None
 
 @login_required

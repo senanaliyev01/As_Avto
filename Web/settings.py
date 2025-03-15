@@ -539,7 +539,7 @@ CHANNEL_LAYERS = {
 # Elasticsearch konfiqurasiyası
 ELASTICSEARCH_DSL = {
     'default': {
-        'hosts': 'https://188.245.112.154:8000'
+        'hosts': 'http://188.245.112.154:9200'
     },
 }
 

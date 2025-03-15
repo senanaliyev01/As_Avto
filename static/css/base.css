@@ -104,125 +104,6 @@ header {
     display: none;
 }
 
-/* Axtarış Sistemləri Bölməsi */
-.search-systems {
-    background-color: var(--secondary-color);
-    padding: 1rem 0;
-    border-bottom: 1px solid var(--border-color);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-.search-systems .container {
-    max-width: 1600px;
-    margin: 0 auto;
-    padding: 0 2rem;
-}
-
-.search-systems-content {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.search-systems-title {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    color: var(--text-primary);
-}
-
-.search-systems-title i {
-    font-size: 1.5rem;
-    color: var(--accent-color);
-}
-
-.search-systems-title h3 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin: 0;
-}
-
-.search-systems-items {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
-    justify-content: flex-start;
-}
-
-.search-system-item {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    background-color: rgba(255, 255, 255, 0.05);
-    padding: 0.75rem 1.25rem;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    border: 1px solid var(--border-color);
-    max-width: 450px;
-    flex: 1;
-}
-
-.search-system-item:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-.search-system-item img {
-    width: 50px;
-    height: 50px;
-    object-fit: contain;
-    border-radius: 6px;
-    background-color: rgba(255, 255, 255, 0.1);
-    padding: 5px;
-}
-
-.search-system-info {
-    flex: 1;
-}
-
-.search-system-info h4 {
-    margin: 0 0 0.25rem 0;
-    font-size: 1.1rem;
-    color: var(--text-primary);
-}
-
-.search-system-info p {
-    margin: 0;
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    line-height: 1.4;
-}
-
-/* Media Queries for Search Systems */
-@media (max-width: 992px) {
-    .search-systems-items {
-        gap: 1rem;
-    }
-    
-    .search-system-item {
-        max-width: 100%;
-        width: 100%;
-    }
-}
-
-@media (max-width: 576px) {
-    .search-system-item {
-        flex-direction: column;
-        text-align: center;
-        padding: 1rem;
-    }
-    
-    .search-system-item img {
-        width: 60px;
-        height: 60px;
-    }
-    
-    .search-systems-title {
-        justify-content: center;
-    }
-}
-
 /* Navbar Styles */
 .nav-toggle {
     position: fixed;
@@ -704,6 +585,8 @@ footer::before {
     min-height: calc(100vh - 200px);
     padding: 0;
 }
+
+
 
 /* Responsive Design */
 @media (max-width: 1400px) {

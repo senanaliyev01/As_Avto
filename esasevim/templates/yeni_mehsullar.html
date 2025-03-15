@@ -32,8 +32,6 @@
                             <td>
                                 {% if mehsul.sekil %}
                                     <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="marka-pr-image product-image" onclick="openModal(this.src)">
-                                {% else %}
-                                    <img src="{% static 'img/no-image.png' %}" alt="Şəkil yoxdur" class="marka-pr-image product-image">
                                 {% endif %}
                             </td>
                             <td>{{ mehsul.adi }}</td>
@@ -41,7 +39,7 @@
                             <td>{{ mehsul.marka.adi }}</td>
                             <td>{{ mehsul.brend_kod }}</td>
                             <td>{{ mehsul.oem }}
-                                <a href="#" title="OEM kodunu axtar" onclick="window.open('https://www.google.com/search?tbm=isch&q={{ mehsul.oem }}', 'googleImages', 'width=600,height=600'); return false;">
+                            <a href="#" title="OEM kodunu axtar" onclick="window.open('https://www.google.com/search?tbm=isch&q={{ mehsul.oem }}', 'googleImages', 'width=600,height=600'); return false;">
                                     <i class="fas fa-camera" style="color:green; margin-left: 5px; cursor: pointer; transition: all 0.3s ease-in-out;"
                                        onmouseover="this.style.color='darkgreen'; this.style.transform='scale(1.2)';"
                                        onmouseout="this.style.color='green'; this.style.transform='scale(1)';">
@@ -61,7 +59,24 @@
                                 {{ mehsul.formatted_qiymet }}
                                 <i class="fa-solid fa-manat-sign" style="font-size: 0.9em; margin-left: 2px;"></i>
                             </td>
-                            <td><a href="{% url 'sebet_ekle' mehsul.id %}" class="cart-icon"><i class="fas fa-shopping-cart"></i></a></td>
+                            <td>
+                                <div class="quantity-container">
+                                    <input type="number" 
+                                           class="quantity-input" 
+                                           value="1" 
+                                           min="1" 
+                                           max="999"
+                                           data-product-id="{{ mehsul.id }}"
+                                           onchange="validateQuantity(this)">
+                                    <div class="quantity-error"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <button onclick="addToCartWithQuantity({{ mehsul.id }})" 
+                                        class="cart-icon">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </button>
+                            </td>
                             <td>
                                 <a href="{% url 'mehsul_haqqinda' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="info-link">
                                     <i class="fas fa-info"></i>

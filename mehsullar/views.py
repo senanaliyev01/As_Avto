@@ -152,21 +152,29 @@ def normalize_search_text(text):
     # Əvvəl və sondakı boşluqları sil
     normalized = normalized.strip()
     
-    # Sözləri ayır və bütün mümkün kombinasiyaları yarat
+    # Sözləri ayır
     words = normalized.split()
+    
+    # Axtarış üçün faydalı kombinasiyalar yaradırıq (permutasiyalar əvəzinə)
     word_combinations = []
     
-    # Orijinal birləşmiş variant
-    word_combinations.append(''.join(words))
+    # Orijinal birləşmiş variant (bütün sözlər birləşdirilmiş)
+    if words:
+        word_combinations.append(''.join(words))
     
-    # Sözlərin yerini dəyişərək bütün mümkün variantları yarat
-    if len(words) > 1:
-        from itertools import permutations
-        perms = permutations(words)
-        for perm in perms:
-            word_combinations.append(''.join(perm))
-            word_combinations.append(' '.join(perm))
+    # Orijinal mətn (boşluqlarla)
+    if normalized:
+        word_combinations.append(normalized)
     
+    # Hər bir sözü ayrıca əlavə et
+    word_combinations.extend(words)
+    
+    # Ardıcıl iki sözü birləşdirərək əlavə et (daha çox axtarış variantı üçün)
+    if len(words) >= 2:
+        for i in range(len(words) - 1):
+            word_combinations.append(words[i] + words[i + 1])
+    
+    # Təkrarları silmək üçün set istifadə edirik
     return normalized, list(set(word_combinations))
 
 @login_required
@@ -203,31 +211,25 @@ def products_list(request):
         # Axtarış mətnini normalize et
         normalized_search, search_combinations = normalize_search_text(search_text)
         
-        # Axtarış sözlərini normalize edib axtarış
-        mehsul_ids = set()
-        for mehsul in mehsullar:
-            # Yalnız axtarış sözlərini normalize et (əgər varsa)
-            axtaris_sozleri_combinations = []
-            if mehsul.axtaris_sozleri:
-                normalized_axtaris, axtaris_combinations = normalize_search_text(mehsul.axtaris_sozleri.sozler)
-                axtaris_sozleri_combinations.extend(axtaris_combinations)
-            
-            # Axtarış sözlərində axtarış
-            for search_variant in search_combinations:
-                if (search_variant in axtaris_sozleri_combinations or
-                    any(search_variant in combo for combo in axtaris_sozleri_combinations)):
-                    mehsul_ids.add(mehsul.id)
-                    break
-        
         # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_text)
         
-        # Axtarış sorğusunu yarat
-        mehsullar = mehsullar.filter(
-            Q(id__in=list(mehsul_ids)) |  # Axtarış sözlərində axtarış
-            Q(oem_kodlar__kod__icontains=clean_search) |  # Əlavə OEM kodlarında axtarış
-            Q(axtaris_sozleri__sozler__icontains=clean_search)  # Axtarış sözlərində axtarış
-        ).distinct()
+        # Axtarış sorğusunu yarat - daha effektiv sorğu
+        query = Q()
+        
+        # OEM kodlarında axtarış
+        query |= Q(oem_kodlar__kod__icontains=clean_search)
+        
+        # Axtarış sözlərində axtarış
+        query |= Q(axtaris_sozleri__sozler__icontains=clean_search)
+        
+        # Hər bir axtarış kombinasiyası üçün sorğu əlavə et
+        # Amma çox böyük sorğular yaratmamaq üçün maksimum 5 kombinasiya istifadə et
+        for combo in search_combinations[:5]:
+            query |= Q(axtaris_sozleri__sozler__icontains=combo)
+        
+        # Sorğunu tətbiq et
+        mehsullar = mehsullar.filter(query).distinct()
 
     return render(request, 'products_list.html', {
         'mehsullar': mehsullar,
@@ -474,31 +476,25 @@ def mehsul_axtaris(request):
         # Axtarış mətnini normalize et və kombinasiyaları al
         normalized_query, query_combinations = normalize_search_text(query)
         
-        # Axtarış sözlərini normalize edib axtarış
-        mehsul_ids = set()
-        for mehsul in mehsullar:
-            # Yalnız axtarış sözlərini normalize et (əgər varsa)
-            axtaris_sozleri_combinations = []
-            if mehsul.axtaris_sozleri:
-                normalized_axtaris, axtaris_combinations = normalize_search_text(mehsul.axtaris_sozleri.sozler)
-                axtaris_sozleri_combinations.extend(axtaris_combinations)
-            
-            # Axtarış sözlərində axtarış
-            for search_variant in query_combinations:
-                if (search_variant in axtaris_sozleri_combinations or
-                    any(search_variant in combo for combo in axtaris_sozleri_combinations)):
-                    mehsul_ids.add(mehsul.id)
-                    break
-        
         # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
         clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
         
-        # Axtarış sorğusunu yarat
-        mehsullar = mehsullar.filter(
-            Q(id__in=list(mehsul_ids)) |
-            Q(oem_kodlar__kod__icontains=clean_query) |
-            Q(axtaris_sozleri__sozler__icontains=clean_query)
-            ).distinct()
+        # Axtarış sorğusunu yarat - daha effektiv sorğu
+        search_query = Q()
+        
+        # OEM kodlarında axtarış
+        search_query |= Q(oem_kodlar__kod__icontains=clean_query)
+        
+        # Axtarış sözlərində axtarış
+        search_query |= Q(axtaris_sozleri__sozler__icontains=clean_query)
+        
+        # Hər bir axtarış kombinasiyası üçün sorğu əlavə et
+        # Amma çox böyük sorğular yaratmamaq üçün maksimum 5 kombinasiya istifadə et
+        for combo in query_combinations[:5]:
+            search_query |= Q(axtaris_sozleri__sozler__icontains=combo)
+        
+        # Sorğunu tətbiq et
+        mehsullar = mehsullar.filter(search_query).distinct()
         
         # Nəticələri qaytarırıq
         return JsonResponse({
@@ -729,30 +725,25 @@ def realtime_search(request):
         # Axtarış mətnini normalize et
         normalized_query, query_combinations = normalize_search_text(query)
         
-        # Axtarış sözlərini normalize edib axtarış
-        mehsul_ids = set()
-        for mehsul in mehsullar:
-            # Yalnız axtarış sözlərini normalize et (əgər varsa)
-            axtaris_sozleri_combinations = []
-            if mehsul.axtaris_sozleri:
-                normalized_axtaris, axtaris_combinations = normalize_search_text(mehsul.axtaris_sozleri.sozler)
-                axtaris_sozleri_combinations.extend(axtaris_combinations)
-            
-            # Axtarış sözlərində axtarış
-            for search_variant in query_combinations:
-                if (search_variant in axtaris_sozleri_combinations or
-                    any(search_variant in combo for combo in axtaris_sozleri_combinations)):
-                    mehsul_ids.add(mehsul.id)
-                    break
-        
         # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
         clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
         
-        mehsullar = mehsullar.filter(
-            Q(id__in=list(mehsul_ids)) |
-            Q(oem_kodlar__kod__icontains=clean_query) |
-            Q(axtaris_sozleri__sozler__icontains=clean_query)
-        ).distinct()
+        # Axtarış sorğusunu yarat - daha effektiv sorğu
+        search_query = Q()
+        
+        # OEM kodlarında axtarış
+        search_query |= Q(oem_kodlar__kod__icontains=clean_query)
+        
+        # Axtarış sözlərində axtarış
+        search_query |= Q(axtaris_sozleri__sozler__icontains=clean_query)
+        
+        # Hər bir axtarış kombinasiyası üçün sorğu əlavə et
+        # Amma çox böyük sorğular yaratmamaq üçün maksimum 5 kombinasiya istifadə et
+        for combo in query_combinations[:5]:
+            search_query |= Q(axtaris_sozleri__sozler__icontains=combo)
+        
+        # Sorğunu tətbiq et
+        mehsullar = mehsullar.filter(search_query).distinct()
     
     results = []
     for mehsul in mehsullar:

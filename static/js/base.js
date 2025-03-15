@@ -1192,3 +1192,27 @@
             }
         });
     });
+
+    // Bildiriş bağlama funksiyası
+    document.addEventListener('DOMContentLoaded', function() {
+        const announcementClose = document.querySelector('.announcement-close');
+        const specialAnnouncement = document.querySelector('.special-announcement');
+        
+        if (announcementClose && specialAnnouncement) {
+            // Əvvəlki vəziyyəti yoxla
+            const isAnnouncementClosed = localStorage.getItem('announcementClosed') === 'true';
+            
+            if (isAnnouncementClosed) {
+                specialAnnouncement.style.display = 'none';
+            }
+            
+            announcementClose.addEventListener('click', function() {
+                specialAnnouncement.style.opacity = '0';
+                setTimeout(() => {
+                    specialAnnouncement.style.display = 'none';
+                    // Vəziyyəti yadda saxla
+                    localStorage.setItem('announcementClosed', 'true');
+                }, 300);
+            });
+        }
+    });

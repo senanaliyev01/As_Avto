@@ -527,40 +527,12 @@
                 // Axtarış mətni inputunu əldə et
                 const searchInput = this.querySelector('input[name="search_text"]');
                 if (searchInput) {
-                    // Orijinal mətni saxla
-                    const originalText = searchInput.value.trim();
+                    // Axtarış mətnini təmizlə - yalnız hərf, rəqəm və tire saxla
+                    const originalText = searchInput.value;
+                    const cleanedText = originalText.replace(/[^a-zA-Z0-9\-]/g, '');
                     
-                    // Əgər mətn boşdursa, heç nə etmə
-                    if (!originalText) {
-                        return;
-                    }
-                    
-                    // Xüsusi kod formatlarını tanımaq üçün regex
-                    const isCodePattern = /^[a-zA-Z0-9\-]+$/;
-                    
-                    // Əgər mətn artıq kod formatındadırsa (yalnız hərf, rəqəm və tire)
-                    if (isCodePattern.test(originalText)) {
-                        // Mətni olduğu kimi saxla
-                        searchInput.value = originalText;
-                    } else {
-                        // Boşluqları və xüsusi simvolları təmizlə
-                        let cleanedText = originalText.replace(/[^a-zA-Z0-9\-\s]/g, '');
-                        
-                        // Əgər mətn SOF-J-2183 kimi formata bənzəyirsə (hərflər, rəqəmlər və tire)
-                        const codeSegments = cleanedText.split(/[\s]+/);
-                        
-                        // Əgər bir neçə hissədən ibarətdirsə və hər biri kod hissəsinə bənzəyirsə
-                        if (codeSegments.length > 1 && codeSegments.every(segment => /^[a-zA-Z0-9\-]+$/.test(segment))) {
-                            // Hissələri tire ilə birləşdir
-                            cleanedText = codeSegments.join('-');
-                        } else {
-                            // Bütün boşluqları sil
-                            cleanedText = cleanedText.replace(/\s/g, '');
-                        }
-                        
-                        // Təmizlənmiş mətni inputa təyin et
-                        searchInput.value = cleanedText;
-                    }
+                    // Təmizlənmiş mətni inputa təyin et
+                    searchInput.value = cleanedText;
                 }
                 
                 let searchButton = document.getElementById('search-button');
@@ -909,7 +881,8 @@
                             const regex = new RegExp(`(${term})`, 'gi');
                             return text.replace(regex, '<span class="highlight">$1</span>');
                         };
-                        return `                            <div class="search-result-item" onclick="window.location.href='/product-detail/${encodeURIComponent(result.adi)}-${encodeURIComponent(result.oem)}-${encodeURIComponent(result.brend_kod)}/${result.id}/'">
+                        return `
+                            <div class="search-result-item" onclick="window.location.href='/product-detail/${encodeURIComponent(result.adi)}-${encodeURIComponent(result.oem)}-${encodeURIComponent(result.brend_kod)}/${result.id}/'">
                                 ${result.sekil_url ? `<img src="${result.sekil_url}" alt="${result.adi}">` : ''}
                                 <div class="search-result-info">
                                     <h4>${highlightTerm(result.adi, query)}</h4>

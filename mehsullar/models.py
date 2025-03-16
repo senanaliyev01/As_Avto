@@ -98,16 +98,7 @@ class Model(models.Model):
         verbose_name = 'Modeller'
         verbose_name_plural = 'Modeller'
 
-class AxtarisSozleri(models.Model):
-    adi = models.CharField(max_length=100, unique=True)
-    sozler = models.TextField(help_text="Axtarış sözlərini boşluqla ayırın. Məsələn: 'sirga sirgalar'")
 
-    def __str__(self):
-        return self.adi
-
-    class Meta:
-        verbose_name = 'Axtarış Sözləri'
-        verbose_name_plural = 'Axtarış Sözləri'
 
 class Mehsul(models.Model):
     adi = models.CharField(max_length=255)
@@ -115,7 +106,6 @@ class Mehsul(models.Model):
     brend = models.ForeignKey(Brend, on_delete=models.CASCADE)
     marka = models.ForeignKey(Marka, on_delete=models.CASCADE)
     model = models.ManyToManyField(Model,blank=True)  
-    axtaris_sozleri = models.ForeignKey(AxtarisSozleri, on_delete=models.SET_NULL, null=True, blank=True, related_name='mehsullar')
     brend_kod = models.CharField(max_length=50, unique=True)
     oem = models.CharField(max_length=100)
     stok = models.IntegerField()

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Kateqoriya, Brend, Marka, Mehsul, Sebet, Sifaris, SifarisMehsul, OEMKod, MusteriReyi, MarkaSekil, Model, Avtomodel, Motor, Il, Yanacaq, AxtarisSozleri
+from .models import Kateqoriya, Brend, Marka, Mehsul, Sebet, Sifaris, SifarisMehsul, OEMKod, MusteriReyi, MarkaSekil, Model, Avtomodel, Motor, Il, Yanacaq
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils import timezone
@@ -60,15 +60,7 @@ class OEMKodInline(admin.TabularInline):
             attrs={'rows': 5, 'style': 'width: 100%; font-family: monospace; resize: both;'})},
     }
 
-# AxtarisSozleri admin paneli
-@admin.register(AxtarisSozleri)
-class AxtarisSozleriAdmin(admin.ModelAdmin):
-    list_display = ('adi', 'sozler')
-    search_fields = ('adi', 'sozler')
-    formfield_overrides = {
-        models.TextField: {'widget': admin.widgets.AdminTextareaWidget(
-            attrs={'rows': 5, 'style': 'width: 100%; font-family: monospace;'})},
-    }
+
 
 # Sifariş admin paneli
 @admin.register(Sifaris)

@@ -5,208 +5,146 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/mehsul_haqqinda.css' %}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 {% endblock %}
 
 {% block content %}
+
+
 <!-- Məhsul Məlumatları -->
 <div class="mehsul-container">
-    <!-- Məhsul Başlığı -->
-    <div class="product-header">
-        <h1 class="product-title">{{ mehsul.adi }}</h1>
-        <div class="product-badges">
-            {% if mehsul.stok > 0 %}
-                <span class="badge {% if mehsul.stok <= 20 %}badge-warning{% else %}badge-success{% endif %}">
-                    {% if mehsul.stok <= 20 %}
-                        <i class="fas fa-exclamation-triangle"></i> Az qalıb
-                    {% else %}
-                        <i class="fas fa-check-circle"></i> Stokda var
-                    {% endif %}
-                </span>
-            {% else %}
-                <span class="badge badge-danger">
-                    <i class="fas fa-times-circle"></i> Stokda yoxdur
-                </span>
+    <div class="mehsul-info">
+        <div class="mehsul-gallery">
+            {% if mehsul.sekil %}
+            <div class="model-viewer-container">
+                <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image_about" id="productImage">
+            </div>
             {% endif %}
+        </div>
+        
+        <div class="mehsul-details">
+            <h1>{{ mehsul.adi }}</h1>
             
-            {% if mehsul.brend %}
-                <span class="badge badge-brand">
-                    <i class="fas fa-industry"></i> {{ mehsul.brend.adi }}
-                </span>
-            {% endif %}
-            
-            {% if mehsul.kateqoriya %}
-                <span class="badge badge-category">
-                    <i class="fas fa-tag"></i> {{ mehsul.kateqoriya }}
-                </span>
-            {% endif %}
+            <div class="specs">
+                <div class="spec-item">
+                    <span class="label">Kateqoriya:</span>
+                    <span class="value">{{ mehsul.kateqoriya }}</span>
+                </div>
+                <div class="spec-item">
+                    <span class="label">Firma:</span>
+                    <span class="value" style="display: flex; align-items: center;">
+                        {% if mehsul.brend.sekilyazi %}
+                        <img src="{{ mehsul.brend.sekilyazi.url }}" alt="{{ mehsul.brend.adi }}" class="marka-image">
+                        {% else %}
+                            {{ mehsul.brend.adi }}
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="spec-item">
+                    <span class="label">Avtomobil:</span>
+                    <span class="value" style="display: flex; align-items: center;">
+                        {% if mehsul.marka.sekiller.all %}
+                            {% for sekil in mehsul.marka.sekiller.all %}
+                                <img src="{{ sekil.sekil.url }}" alt="{{ mehsul.marka.adi }}" class="marka-image-pr-list" style="margin-right: 8px;">
+                            {% endfor %}
+                        {% else %}
+                            {{ mehsul.marka.adi }}
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="spec-item">
+                    <span class="label">Brend:</span>
+                    <span class="value">{{ mehsul.brend_kod }}</span>
+                </div>
+                <div class="spec-item">
+                    <span class="label">OEM:</span>
+                    <span class="value">{{ mehsul.oem }}</span>
+                </div>
+                {% comment %} {% comment %} {% if mehsul.oem_kodlar.all %}
+                <div class="spec-item oem-list">
+                    <span class="label">Dəyişən OEM Kodlar:</span>
+                    <div class="value oem-codes">
+                        {% for oem in mehsul.oem_kodlar.all %}
+                            <span class="oem-code">{{ oem.kod }}</span>
+                        {% endfor %}
+                    </div>
+                </div> 
+                {% endif %} {% endcomment %}
+                <div class="spec-item stock-item">
+                    <span class="label">Mövcudluq:</span>
+                    <span class="value stock-status {% if mehsul.stok == 0 %}out-of-stock{% elif mehsul.stok <= 20 %}low-stock{% else %}in-stock{% endif %}">
+                        {% if mehsul.stok == 0 %}
+                             Yoxdur 
+                        {% elif mehsul.stok <= 20 %}
+                             Az var 
+                        {% else %}
+                             Var 
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="spec-item price-item">
+                    <span class="label">Qiymət:</span>
+                    <span class="value price">{{ mehsul.formatted_qiymet }} ₼</span>
+                </div>
+            </div>
+
+            <a href="{% url 'sebet_ekle' mehsul.id %}" class="cart-icon" data-product-id="{{ mehsul.id }}">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Səbətə Əlavə Et</span>
+            </a>
         </div>
     </div>
 
-    <div class="product-content">
-        <!-- Məhsul Şəkli və Əsas Məlumatlar -->
-        <div class="product-main">
-            <!-- Şəkil Bölməsi -->
-            <div class="product-gallery">
-                {% if mehsul.sekil %}
-                <div class="product-image-container">
-                    <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image" id="productImage">
-                    <div class="image-overlay">
-                        <i class="fas fa-search-plus"></i>
-                    </div>
-                </div>
-                {% endif %}
-                
-                {% if mehsul.brend.sekilyazi %}
-                <div class="brand-logo">
-                    <img src="{{ mehsul.brend.sekilyazi.url }}" alt="{{ mehsul.brend.adi }}">
-                </div>
-                {% endif %}
-            </div>
-            
-            <!-- Məhsul Detalları -->
-            <div class="product-details">
-                <div class="product-price-section">
-                    <div class="price-tag">
-                        <span class="price-value">{{ mehsul.formatted_qiymet }}</span>
-                        <span class="price-currency">₼</span>
-                    </div>
-                    
-                    <a href="{% url 'sebet_ekle' mehsul.id %}" class="add-to-cart-btn" data-product-id="{{ mehsul.id }}">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span>Səbətə Əlavə Et</span>
-                    </a>
-                </div>
-                
-                <div class="product-specs">
-                    <div class="spec-group">
-                        <h3 class="spec-group-title"><i class="fas fa-info-circle"></i> Əsas Məlumatlar</h3>
-                        
-                        <div class="spec-row">
-                            <div class="spec-name">Kateqoriya</div>
-                            <div class="spec-value">{{ mehsul.kateqoriya }}</div>
-                        </div>
-                        
-                        <div class="spec-row">
-                            <div class="spec-name">Firma</div>
-                            <div class="spec-value brand-value">
-                                {% if mehsul.brend.sekilyazi %}
-                                <img src="{{ mehsul.brend.sekilyazi.url }}" alt="{{ mehsul.brend.adi }}" class="marka-image">
-                                {% else %}
-                                    {{ mehsul.brend.adi }}
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="spec-row">
-                            <div class="spec-name">Brend Kodu</div>
-                            <div class="spec-value code-value">{{ mehsul.brend_kod }}</div>
-                        </div>
-                        
-                        <div class="spec-row">
-                            <div class="spec-name">OEM</div>
-                            <div class="spec-value code-value">{{ mehsul.oem }}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="spec-group">
-                        <h3 class="spec-group-title"><i class="fas fa-car"></i> Uyğunluq</h3>
-                        
-                        <div class="spec-row">
-                            <div class="spec-name">Avtomobil</div>
-                            <div class="spec-value car-logos">
-                                {% if mehsul.marka.sekiller.all %}
-                                    {% for sekil in mehsul.marka.sekiller.all %}
-                                        <img src="{{ sekil.sekil.url }}" alt="{{ mehsul.marka.adi }}" class="car-logo">
-                                    {% endfor %}
-                                {% else %}
-                                    {{ mehsul.marka.adi }}
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="spec-row">
-                            <div class="spec-name">Mövcudluq</div>
-                            <div class="spec-value">
-                                <span class="stock-indicator {% if mehsul.stok == 0 %}no-stock{% elif mehsul.stok <= 20 %}low-stock{% else %}in-stock{% endif %}">
-                                    {% if mehsul.stok == 0 %}
-                                        <i class="fas fa-times-circle"></i> Yoxdur
-                                    {% elif mehsul.stok <= 20 %}
-                                        <i class="fas fa-exclamation-triangle"></i> Az var
-                                    {% else %}
-                                        <i class="fas fa-check-circle"></i> Var
-                                    {% endif %}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Əlavə Məlumatlar -->
-        <div class="product-additional-info">
-            {% if mehsul.haqqinda %}
-            <div class="info-section description-section">
-                <h2 class="section-title"><i class="fas fa-file-alt"></i> Məhsul Haqqında</h2>
-                <div class="section-content">
-                    <p>{{ mehsul.haqqinda }}</p>
+    {% if mehsul.haqqinda %}
+    <div class="description">
+        <h2>Məhsul Haqqında</h2>
+        <p>{{ mehsul.haqqinda }}</p>
+    </div>
+    {% endif %}
+
+    {% if mehsul.model.all %}
+    <table>
+       <thead>
+           <tr>
+               <th>Avtomobil</th>
+               <th>Model</th>
+               <th>Motor</th>
+               <th>Yanacaq</th>
+               <th>İl</th>
+           </tr>
+       </thead>
+       <tbody>
+           {% for model in mehsul.model.all %}
+           <tr>
+               <td>{{ model.avtomobil.adi }}</td>
+               <td>{{ model.model.adi }}</td>
+               <td>{{ model.motor.motor }}</td>
+               <td>{{ model.yanacaq.yanacaq }}</td>
+               <td>{{ model.il.il }}</td>
+           </tr>
+           {% endfor %}
+       </tbody>
+    </table>
+    {% endif %}
+
+    {% if mehsul.brend.haqqinda or mehsul.brend.sekil %}
+    <div class="brand-info">
+        <h2>{{ mehsul.brend.adi }} Şirkəti Haqqında</h2>
+        <div class="brand-content">
+            {% if mehsul.brend.sekil %}
+            <div class="brand-image-container">
+                <div class="brand-image">
+                    <img src="{{ mehsul.brend.sekil.url }}" alt="{{ mehsul.brend.adi }}" id="brandImage">
                 </div>
             </div>
             {% endif %}
-            
-            {% if mehsul.model.all %}
-            <div class="info-section compatibility-section">
-                <h2 class="section-title"><i class="fas fa-car"></i> Uyğun Avtomobillər</h2>
-                <div class="section-content">
-                    <div class="table-responsive">
-                        <table class="compatibility-table">
-                            <thead>
-                                <tr>
-                                    <th>Avtomobil</th>
-                                    <th>Model</th>
-                                    <th>Motor</th>
-                                    <th>Yanacaq</th>
-                                    <th>İl</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for model in mehsul.model.all %}
-                                <tr>
-                                    <td>{{ model.avtomobil.adi }}</td>
-                                    <td>{{ model.model.adi }}</td>
-                                    <td>{{ model.motor.motor }}</td>
-                                    <td>{{ model.yanacaq.yanacaq }}</td>
-                                    <td>{{ model.il.il }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-            
-            {% if mehsul.brend.haqqinda or mehsul.brend.sekil %}
-            <div class="info-section brand-section">
-                <h2 class="section-title"><i class="fas fa-building"></i> {{ mehsul.brend.adi }} Şirkəti Haqqında</h2>
-                <div class="section-content brand-content">
-                    {% if mehsul.brend.sekil %}
-                    <div class="brand-image-wrapper">
-                        <img src="{{ mehsul.brend.sekil.url }}" alt="{{ mehsul.brend.adi }}" class="brand-image" id="brandImage">
-                    </div>
-                    {% endif %}
-                    
-                    {% if mehsul.brend.haqqinda %}
-                    <div class="brand-description">
-                        <p>{{ mehsul.brend.haqqinda }}</p>
-                    </div>
-                    {% endif %}
-                </div>
+            {% if mehsul.brend.haqqinda %}
+            <div class="brand-description">
+                <p>{{ mehsul.brend.haqqinda }}</p>
             </div>
             {% endif %}
         </div>
     </div>
+    {% endif %}
 </div>
 {% endblock %}
 

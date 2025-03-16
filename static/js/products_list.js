@@ -126,6 +126,66 @@ function highlightSearchTerms() {
                 cell.innerHTML = newText;
             }
         });
+        
+        // Xüsusi olaraq brend_kod və oem sütunlarını yoxla
+        const brendKodCells = document.querySelectorAll('.products-table tbody td:nth-child(5)'); // Brend Kod sütunu
+        const oemCells = document.querySelectorAll('.products-table tbody td:nth-child(6)'); // OEM Kod sütunu
+        
+        // Brend kod və OEM kod sütunlarını xüsusi olaraq yoxla
+        [brendKodCells, oemCells].forEach(cells => {
+            cells.forEach(cell => {
+                const originalText = cell.textContent.trim();
+                let newText = originalText;
+                
+                // Orijinal axtarış mətni ilə birbaşa yoxla
+                if (originalText.toLowerCase().includes(searchText.toLowerCase())) {
+                    const regex = new RegExp(`(${escapeRegExp(searchText)})`, 'gi');
+                    newText = originalText.replace(regex, '<span class="highlight-term">$1</span>');
+                    cell.innerHTML = newText;
+                    return;
+                }
+                
+                // Əgər axtarış mətni rəqəm və ya simvollardan ibarətdirsə
+                if (/[0-9\-]/.test(searchText)) {
+                    // Boşluqları və xüsusi simvolları sil
+                    const cleanSearchText = searchText.replace(/[^a-zA-Z0-9]/g, '');
+                    const cleanCellText = originalText.replace(/[^a-zA-Z0-9]/g, '');
+                    
+                    if (cleanCellText.toLowerCase().includes(cleanSearchText.toLowerCase())) {
+                        // Orijinal mətndə axtarış sözünü tap və vurğula
+                        let startIndex = cleanCellText.toLowerCase().indexOf(cleanSearchText.toLowerCase());
+                        let endIndex = startIndex + cleanSearchText.length;
+                        
+                        // Orijinal mətndə uyğun hissəni vurğula
+                        let result = '';
+                        let currentCleanIndex = 0;
+                        
+                        for (let i = 0; i < originalText.length; i++) {
+                            const char = originalText[i];
+                            if (/[a-zA-Z0-9]/.test(char)) {
+                                if (currentCleanIndex >= startIndex && currentCleanIndex < endIndex) {
+                                    // Vurğulanacaq hissə
+                                    if (currentCleanIndex === startIndex) {
+                                        result += '<span class="highlight-term">';
+                                    }
+                                    result += char;
+                                    if (currentCleanIndex === endIndex - 1) {
+                                        result += '</span>';
+                                    }
+                                } else {
+                                    result += char;
+                                }
+                                currentCleanIndex++;
+                            } else {
+                                result += char;
+                            }
+                        }
+                        
+                        cell.innerHTML = result;
+                    }
+                }
+            });
+        });
     }
 }
 

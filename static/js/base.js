@@ -518,7 +518,7 @@
             });
         }
 
-        // Axtarış formu
+        // Axtarış form1u
         const searchForm = document.getElementById('search-form');
         if (searchForm) {
             searchForm.addEventListener('submit', function(event) {
@@ -530,22 +530,17 @@
                     // Axtarış mətnini təmizlə
                     let originalText = searchInput.value;
                     
-                    // Xüsusi simvolları təmizlə, amma bütün tireleri saxla
-                    // Əvvəlki versiya: let cleanedText = originalText.replace(/[^a-zA-Z0-9\-]/g, '');
-                    // Yeni versiya: bütün tireleri saxlayırıq
+                    // 1. Əvvəlcə bütün boşluqları və xüsusi simvolları sil, yalnız hərf, rəqəm və tire saxla
                     let cleanedText = originalText.replace(/[^a-zA-Z0-9\-]/g, '');
                     
-                    // Ardıcıl tireleri bir tire ilə əvəz et
+                    // 2. Ardıcıl tireleri bir tire ilə əvəz et
                     cleanedText = cleanedText.replace(/\-+/g, '-');
                     
-                    // Əgər mətnin əvvəlində və ya sonunda tire varsa, onu sil
+                    // 3. Əgər mətnin əvvəlində və ya sonunda tire varsa, onu sil
                     cleanedText = cleanedText.replace(/^\-|\-$/g, '');
                     
                     // Təmizlənmiş mətni inputa təyin et
                     searchInput.value = cleanedText;
-                    
-                    // Axtarış sözünü sessiona saxla ki, vurğulama üçün istifadə edə bilək
-                    sessionStorage.setItem('lastSearchTerm', cleanedText);
                 }
                 
                 let searchButton = document.getElementById('search-button');

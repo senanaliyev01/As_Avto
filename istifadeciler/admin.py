@@ -47,7 +47,7 @@ class LoginCodeAdmin(admin.ModelAdmin):
     remaining_time.short_description = 'Qalan vaxt'
 
     def has_add_permission(self, request):
-        return False  # Əl ilə kod əlavə etməyə icazə vermə
+        return False  # Əl ilə kod əlavə etməyə icaz1ə vermə
 
     def has_change_permission(self, request, obj=None):
         return False  # Kodları dəyişməyə icazə vermə

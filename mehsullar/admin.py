@@ -178,8 +178,8 @@ admin.site.register(Il)
 admin.site.register(Yanacaq)
 
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'axtaris_sozleri', 'maya_qiymet', 'qiymet', 'brend_kod', 'oem', 'stok', 'yenidir')
-    list_filter = ('kateqoriya', 'brend', 'marka', 'axtaris_sozleri')
+    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'maya_qiymet', 'qiymet', 'brend_kod', 'oem', 'stok', 'yenidir')
+    list_filter = ('kateqoriya', 'brend', 'marka')
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'oem_kodlar__kod', 'yenidir', 'axtaris_sozleri__adi', 'axtaris_sozleri__sozler')
     inlines = [OEMKodInline]
     
@@ -224,138 +224,7 @@ class MehsulAdmin(admin.ModelAdmin):
         self.message_user(request, "Seçilmiş məhsullar yenidir olaraq işarələndi.")
     yenidir_et.short_description = "Seçilmiş məhsulları yenidir et"
     
-    def axtaris_sozleri_sil(self, request, queryset):
-        # Axtarış sözləri olan məhsulları sayırıq
-        mehsullar_with_axtaris = queryset.exclude(axtaris_sozleri=None).count()
-        
-        # Axtarış sözlərini silirik (None olaraq təyin edirik)
-        queryset.update(axtaris_sozleri=None)
-        
-        # İstifadəçiyə bildiriş göndəririk
-        if mehsullar_with_axtaris > 0:
-            self.message_user(request, f"{mehsullar_with_axtaris} məhsuldan axtarış sözləri silindi.")
-        else:
-            self.message_user(request, "Seçilmiş məhsulların heç birində axtarış sözü yox idi.", level=messages.INFO)
-    
-    axtaris_sozleri_sil.short_description = "Seçilmiş məhsullardan axtarış sözlərini sil"
-    
-    def axtaris_sozleri_teyin_et(self, request, queryset):
-        # Əgər bu bir POST sorğusudursa və axtarış sözü seçilibsə
-        if 'axtaris_sozleri_id' in request.POST:
-            axtaris_sozleri_id = request.POST.get('axtaris_sozleri_id')
-            if axtaris_sozleri_id:
-                try:
-                    axtaris_sozleri = AxtarisSozleri.objects.get(id=axtaris_sozleri_id)
-                    # Seçilmiş məhsullara axtarış sözlərini təyin edirik
-                    queryset.update(axtaris_sozleri=axtaris_sozleri)
-                    self.message_user(request, f"{queryset.count()} məhsula '{axtaris_sozleri.adi}' axtarış sözlərini təyin edildi.")
-                    return None
-                except AxtarisSozleri.DoesNotExist:
-                    self.message_user(request, "Seçilmiş axtarış sözü tapılmadı.", level=messages.ERROR)
-            else:
-                self.message_user(request, "Axtarış sözü seçilmədi.", level=messages.WARNING)
-                
-        # Bütün axtarış sözlərini əldə edirik
-        axtaris_sozleri = AxtarisSozleri.objects.all()
-        
-        # Əgər heç bir axtarış sözü yoxdursa, xəbərdarlıq edirik
-        if not axtaris_sozleri.exists():
-            self.message_user(request, "Heç bir axtarış sözü tapılmadı. Əvvəlcə axtarış sözləri yaradın.", level=messages.WARNING)
-            return None
-        
-        # Axtarış sözlərini seçmək üçün HTML formu yaradırıq
-        select_options = ''.join([f'<option value="{axtaris.id}">{axtaris.adi} - {axtaris.sozler}</option>' for axtaris in axtaris_sozleri])
-        
-        # Seçilmiş məhsulların ID-lərini formda göndərmək üçün hidden inputlar yaradırıq
-        hidden_inputs = ''.join([f'<input type="hidden" name="_selected_action" value="{obj.pk}">' for obj in queryset])
-        
-        # CSRF token əldə edirik
-        csrf_token = get_token(request)
-        
-        # Formu göstəririk
-        from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
-        
-        html = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Axtarış sözlərini təyin et</title>
-            <style>
-                body {{
-                    font-family: Arial, sans-serif;
-                    margin: 20px;
-                    background-color: #f8f8f8;
-                }}
-                h2 {{
-                    color: #333;
-                    border-bottom: 1px solid #ddd;
-                    padding-bottom: 10px;
-                }}
-                .container {{
-                    background-color: white;
-                    padding: 20px;
-                    border-radius: 5px;
-                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-                    max-width: 600px;
-                    margin: 0 auto;
-                }}
-                label {{
-                    display: block;
-                    margin-bottom: 5px;
-                    font-weight: bold;
-                }}
-                select {{
-                    width: 100%;
-                    padding: 8px;
-                    border: 1px solid #ddd;
-                    border-radius: 4px;
-                    margin-bottom: 15px;
-                    font-size: 14px;
-                }}
-                .btn {{
-                    background-color: #417690;
-                    color: white;
-                    border: none;
-                    padding: 10px 15px;
-                    border-radius: 4px;
-                    cursor: pointer;
-                    font-size: 14px;
-                }}
-                .btn:hover {{
-                    background-color: #2b5070;
-                }}
-                .count {{
-                    font-weight: bold;
-                    color: #417690;
-                }}
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h2>Axtarış sözlərini təyin et</h2>
-                <p>Seçilmiş <span class="count">{queryset.count()}</span> məhsula axtarış sözlərini təyin edin:</p>
-                <form action="" method="post">
-                    <input type="hidden" name="csrfmiddlewaretoken" value="{csrf_token}">
-                    <input type="hidden" name="action" value="axtaris_sozleri_teyin_et">
-                    {hidden_inputs}
-                    <div>
-                        <label for="axtaris_sozleri_id">Axtarış Sözləri:</label>
-                        <select name="axtaris_sozleri_id" id="axtaris_sozleri_id">
-                            <option value="">---------</option>
-                            {select_options}
-                        </select>
-                    </div>
-                    <input type="submit" name="apply" value="Təyin et" class="btn">
-                </form>
-            </div>
-        </body>
-        </html>
-        """
-        
-        # Formu göstəririk
-        return HttpResponse(html)
-    
-    axtaris_sozleri_teyin_et.short_description = "Seçilmiş məhsullara axtarış sözlərini təyin et"
+   
 
 # Qeydiyyatları düzəltdik
 admin.site.register(SifarisMehsul, SifarisMehsulAdmin)

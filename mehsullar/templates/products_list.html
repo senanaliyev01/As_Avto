@@ -52,12 +52,12 @@
                             <td>{{ mehsul.marka.adi }}</td>
                             <td>{{ mehsul.brend_kod }}</td>
                             <td>{{ mehsul.oem }}
-                            <a href="#" title="OEM kodunu axtar" onclick="window.open('https://www.google.com/search?tbm=isch&q={{ mehsul.oem }}', 'googleImages', 'width=600,height=600'); return false;">
+                            {% comment %} <a href="#" title="OEM kodunu axtar" onclick="window.open('https://www.google.com/search?tbm=isch&q={{ mehsul.oem }}', 'googleImages', 'width=600,height=600'); return false;">
                                     <i class="fas fa-camera" style="color:green; margin-left: 5px; cursor: pointer; transition: all 0.3s ease-in-out;"
                                        onmouseover="this.style.color='darkgreen'; this.style.transform='scale(1.2)';"
                                        onmouseout="this.style.color='green'; this.style.transform='scale(1)';">
                                     </i>
-                                </a>
+                                </a> {% endcomment %}
                             </td>
                             <td>
                                 {% if mehsul.stok == 0 %}

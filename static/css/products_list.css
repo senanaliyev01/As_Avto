@@ -85,7 +85,31 @@ body {
     box-shadow: var(--shadow-sm);
 }
 
+/* Axtarış nəticələrini vurğulamaq üçün stil */
+.highlight-term {
+    background-color: rgba(100, 255, 218, 0.3);
+    color: #ffffff;
+    font-weight: bold;
+    padding: 2px 4px;
+    border-radius: 4px;
+    box-shadow: 0 0 5px rgba(100, 255, 218, 0.5);
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+    position: relative;
+    display: inline-block;
+    animation: pulse 2s infinite;
+}
 
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 5px rgba(100, 255, 218, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 10px rgba(100, 255, 218, 0.8);
+    }
+    100% {
+        box-shadow: 0 0 5px rgba(100, 255, 218, 0.5);
+    }
+}
 
 /* Stock Status Badges */
 .stock-status {

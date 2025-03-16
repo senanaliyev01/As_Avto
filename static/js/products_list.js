@@ -63,3 +63,41 @@ document.getElementById('modalImage').onload = function() {
     this.style.opacity = "1";
     this.style.transform = "scale(1) rotate(0deg)";
 }
+
+// Axtarış sözlərini vurğulamaq üçün funksiya
+function highlightSearchTerms() {
+    // URL-dən axtarış parametrlərini əldə et
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchText = urlParams.get('search_text');
+    
+    // Əgər axtarış sözü varsa
+    if (searchText && searchText.trim() !== '') {
+        // Axtarış sözlərini boşluqla ayır
+        const searchTerms = searchText.trim().split(/\s+/).filter(term => term.length > 1);
+        
+        // Cədvəldəki bütün mətn hüceyrələrini seç
+        const tableCells = document.querySelectorAll('.products-table tbody td:not(:first-child):not(:last-child):not(:nth-last-child(2))');
+        
+        // Hər bir hüceyrə üçün
+        tableCells.forEach(cell => {
+            const originalText = cell.textContent;
+            
+            // Hər bir axtarış sözü üçün
+            searchTerms.forEach(term => {
+                // Böyük-kiçik hərfə həssas olmayan regex
+                const regex = new RegExp(`(${term})`, 'gi');
+                
+                // Əgər hüceyrədə axtarış sözü varsa
+                if (regex.test(originalText)) {
+                    // Axtarış sözünü vurğula
+                    cell.innerHTML = originalText.replace(regex, '<span class="highlight-term">$1</span>');
+                }
+            });
+        });
+    }
+}
+
+// Səhifə yükləndikdə axtarış sözlərini vurğula
+document.addEventListener('DOMContentLoaded', function() {
+    highlightSearchTerms();
+});

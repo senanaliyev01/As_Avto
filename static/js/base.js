@@ -522,31 +522,42 @@
         const searchForm = document.getElementById('search-form');
         if (searchForm) {
             searchForm.addEventListener('submit', function(event) {
-        event.preventDefault(); // Formun dərhal göndərilməsini dayandır
-    
-        let searchButton = document.getElementById('search-button');
-        let spinner = document.getElementById('loading-spinner');
-            
-                if (!searchButton || !spinner) return;
-    
-        // Butonun ölçüsünü qorumaq üçün enini və hündürlüyünü sabit saxla
-        searchButton.style.width = `${searchButton.offsetWidth}px`;
-        searchButton.style.height = `${searchButton.offsetHeight}px`;
-        
-        // Axtarış yazısını gizlət, amma spinneri saxla
-                if (searchButton.childNodes[0] && searchButton.childNodes[0].nodeValue) {
-        searchButton.childNodes[0].nodeValue = ''; // Axtar sözünü sil
+                event.preventDefault(); // Formun dərhal göndərilməsini dayandır
+                
+                // Axtarış mətni inputunu əldə et
+                const searchInput = this.querySelector('input[name="search_text"]');
+                if (searchInput) {
+                    // Axtarış mətnini təmizlə - yalnız hərf, rəqəm və tire saxla
+                    const originalText = searchInput.value;
+                    const cleanedText = originalText.replace(/[^a-zA-Z0-9\-]/g, '');
+                    
+                    // Təmizlənmiş mətni inputa təyin et
+                    searchInput.value = cleanedText;
                 }
-        spinner.style.display = 'inline-block'; // Spinneri göstər
-    
-        // Butonu deaktiv et ki, yenidən klik olunmasın
-        searchButton.disabled = true; 
-    
-        // 2 saniyə sonra formu göndər
-        setTimeout(() => {
-            this.submit(); // Formu göndər
-        }, 1000);
-    });
+                
+                let searchButton = document.getElementById('search-button');
+                let spinner = document.getElementById('loading-spinner');
+                
+                if (!searchButton || !spinner) return;
+                
+                // Butonun ölçüsünü qorumaq üçün enini və hündürlüyünü sabit saxla
+                searchButton.style.width = `${searchButton.offsetWidth}px`;
+                searchButton.style.height = `${searchButton.offsetHeight}px`;
+                
+                // Axtarış yazısını gizlət, amma spinneri saxla
+                if (searchButton.childNodes[0] && searchButton.childNodes[0].nodeValue) {
+                    searchButton.childNodes[0].nodeValue = ''; // Axtar sözünü sil
+                }
+                spinner.style.display = 'inline-block'; // Spinneri göstər
+                
+                // Butonu deaktiv et ki, yenidən klik olunmasın
+                searchButton.disabled = true; 
+                
+                // 1 saniyə sonra formu göndər
+                setTimeout(() => {
+                    this.submit(); // Formu göndər
+                }, 1000);
+            });
         }
 
     });

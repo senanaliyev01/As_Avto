@@ -527,9 +527,22 @@
                 // Axtarış mətni inputunu əldə et
                 const searchInput = this.querySelector('input[name="search_text"]');
                 if (searchInput) {
-                    // Axtarış mətnini təmizlə - yalnız hərf, rəqəm və tire saxla
+                    // Axtarış mətnini təmizlə
                     const originalText = searchInput.value;
-                    const cleanedText = originalText.replace(/[^a-zA-Z0-9\-]/g, '');
+                    
+                    // Əvvəlcə bütün boşluqları və xüsusi simvolları sil, yalnız hərf və rəqəmləri saxla
+                    let cleanedText = originalText.replace(/[^a-zA-Z0-9]/g, '');
+                    
+                    // Əgər orijinal mətndə tire varsa, onda bir tire əlavə et
+                    // Tire simvolunu iki rəqəm qrupu arasında yerləşdir (məsələn: 12345-67890)
+                    if (originalText.includes('-')) {
+                        // Rəqəm qruplarını müəyyən et
+                        const match = cleanedText.match(/^(\d+)(\d+)$/);
+                        if (match && match[1] && match[2]) {
+                            // Birinci və ikinci rəqəm qrupları arasına bir tire əlavə et
+                            cleanedText = match[1] + '-' + match[2];
+                        }
+                    }
                     
                     // Təmizlənmiş mətni inputa təyin et
                     searchInput.value = cleanedText;
@@ -881,8 +894,7 @@
                             const regex = new RegExp(`(${term})`, 'gi');
                             return text.replace(regex, '<span class="highlight">$1</span>');
                         };
-                        return `
-                            <div class="search-result-item" onclick="window.location.href='/product-detail/${encodeURIComponent(result.adi)}-${encodeURIComponent(result.oem)}-${encodeURIComponent(result.brend_kod)}/${result.id}/'">
+                        return `                            <div class="search-result-item" onclick="window.location.href='/product-detail/${encodeURIComponent(result.adi)}-${encodeURIComponent(result.oem)}-${encodeURIComponent(result.brend_kod)}/${result.id}/'">
                                 ${result.sekil_url ? `<img src="${result.sekil_url}" alt="${result.adi}">` : ''}
                                 <div class="search-result-info">
                                     <h4>${highlightTerm(result.adi, query)}</h4>

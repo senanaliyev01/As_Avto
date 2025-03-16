@@ -72,8 +72,34 @@ function highlightSearchTerms() {
     
     // Əgər axtarış sözü varsa
     if (searchText && searchText.trim() !== '') {
-        // Axtarış sözlərini boşluqla ayır və yalnız hərf və rəqəmləri saxla
+        // Axtarış sözlərini boşluqla ayır
         const searchTerms = searchText.trim().split(/\s+/).filter(term => term.length > 1);
+        
+        // Xüsusi simvolları təmizlə və birləşik versiyaları əlavə et
+        const enhancedSearchTerms = [];
+        searchTerms.forEach(term => {
+            enhancedSearchTerms.push(term);
+            
+            // Əgər term rəqəm və ya simvollardan ibarətdirsə
+            if (/[0-9\-]/.test(term)) {
+                // Bütün tire və boşluqları silərək birləşik versiya əlavə et
+                const combinedTerm = term.replace(/[\-\s]/g, '');
+                if (combinedTerm !== term && combinedTerm.length > 1) {
+                    enhancedSearchTerms.push(combinedTerm);
+                }
+                
+                // Əgər term birləşikdirsə, tire ilə ayrılmış versiyasını əlavə et
+                if (term.length >= 5 && !/[\-\s]/.test(term)) {
+                    // Rəqəm ardıcıllıqlarını tire ilə ayır (məsələn 2630035504 -> 26300-35504)
+                    const hyphenatedTerm = term.replace(/(\d{5})(\d{5})/g, '$1-$2')
+                                              .replace(/(\d{4})(\d{4})/g, '$1-$2')
+                                              .replace(/(\d{3})(\d{3})/g, '$1-$2');
+                    if (hyphenatedTerm !== term) {
+                        enhancedSearchTerms.push(hyphenatedTerm);
+                    }
+                }
+            }
+        });
         
         // Cədvəldəki bütün mətn hüceyrələrini seç
         const tableCells = document.querySelectorAll('.products-table tbody td:not(:first-child):not(:last-child):not(:nth-last-child(2))');
@@ -81,81 +107,31 @@ function highlightSearchTerms() {
         // Hər bir hüceyrə üçün
         tableCells.forEach(cell => {
             const originalText = cell.textContent;
-            let newHtml = originalText;
+            let newText = originalText;
             
             // Hər bir axtarış sözü üçün
-            searchTerms.forEach(term => {
-                // Xüsusi simvolları təmizlə - yalnız hərf və rəqəmləri saxla
-                const cleanTerm = term.replace(/[^a-zA-Z0-9]/g, '');
+            enhancedSearchTerms.forEach(term => {
+                // Böyük-kiçik hərfə həssas olmayan regex
+                const regex = new RegExp(`(${escapeRegExp(term)})`, 'gi');
                 
-                if (cleanTerm.length > 1) {
-                    // Böyük-kiçik hərfə həssas olmayan və xüsusi simvolları nəzərə almayan regex
-                    // Hərflərin arasında ola biləcək xüsusi simvolları nəzərə alır
-                    const escapedTerm = cleanTerm.split('').join('[^a-zA-Z0-9]*');
-                    const regex = new RegExp(`(${escapedTerm})`, 'gi');
-                    
-                    // Orijinal mətndə xüsusi simvolları təmizlənmiş versiyasını axtar
-                    const cleanText = originalText.replace(/[^a-zA-Z0-9]/g, '');
-                    
-                    if (cleanText.toLowerCase().includes(cleanTerm.toLowerCase())) {
-                        // Orijinal mətndə uyğun hissələri tap və vurğula
-                        const matches = [];
-                        let match;
-                        const flexRegex = new RegExp(escapedTerm, 'gi');
-                        
-                        while ((match = flexRegex.exec(originalText)) !== null) {
-                            matches.push({
-                                index: match.index,
-                                text: match[0]
-                            });
-                        }
-                        
-                        // Əgər heç bir uyğunluq tapılmayıbsa, daha çevik axtarış et
-                        if (matches.length === 0) {
-                            // Hər bir simvolu ayrı-ayrı axtar
-                            let currentIndex = 0;
-                            const termChars = cleanTerm.toLowerCase().split('');
-                            
-                            for (let i = 0; i < originalText.length; i++) {
-                                const char = originalText[i].toLowerCase();
-                                if (char === termChars[currentIndex]) {
-                                    currentIndex++;
-                                    if (currentIndex === termChars.length) {
-                                        // Bütün simvollar tapıldı
-                                        const startIndex = i - termChars.length + 1;
-                                        matches.push({
-                                            index: startIndex,
-                                            text: originalText.substring(startIndex, i + 1)
-                                        });
-                                        currentIndex = 0; // Yenidən axtar
-                                    }
-                                }
-                            }
-                        }
-                        
-                        // Tapılan uyğunluqları vurğula
-                        if (matches.length > 0) {
-                            // Sondan başlayaraq vurğula ki, indekslər pozulmasın
-                            let result = originalText;
-                            for (let i = matches.length - 1; i >= 0; i--) {
-                                const match = matches[i];
-                                result = 
-                                    result.substring(0, match.index) + 
-                                    `<span class="highlight-term">${match.text}</span>` + 
-                                    result.substring(match.index + match.text.length);
-                            }
-                            newHtml = result;
-                        }
-                    }
+                // Əgər hüceyrədə axtarış sözü varsa
+                if (regex.test(newText)) {
+                    // Axtarış sözünü vurğula
+                    newText = newText.replace(regex, '<span class="highlight-term">$1</span>');
                 }
             });
             
-            // Yeni HTML-i təyin et
-            if (newHtml !== originalText) {
-                cell.innerHTML = newHtml;
+            // Əgər mətn dəyişibsə, yeni mətni təyin et
+            if (newText !== originalText) {
+                cell.innerHTML = newText;
             }
         });
     }
+}
+
+// RegExp xüsusi simvollarını qaçırmaq üçün funksiya
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 // Səhifə yükləndikdə axtarış sözlərini vurğula

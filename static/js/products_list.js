@@ -81,33 +81,78 @@ function highlightSearchTerms() {
         // Hər bir hüceyrə üçün
         tableCells.forEach(cell => {
             const originalText = cell.textContent;
-            let cellHtml = originalText;
+            let newHtml = originalText;
             
             // Hər bir axtarış sözü üçün
             searchTerms.forEach(term => {
-                // Xüsusi simvolları təmizlə, yalnız hərf və rəqəmləri saxla
+                // Xüsusi simvolları təmizlə - yalnız hərf və rəqəmləri saxla
                 const cleanTerm = term.replace(/[^a-zA-Z0-9]/g, '');
                 
                 if (cleanTerm.length > 1) {
                     // Böyük-kiçik hərfə həssas olmayan və xüsusi simvolları nəzərə almayan regex
-                    // Hər bir hərf və ya rəqəm arasında istənilən xüsusi simvol ola bilər
-                    const escapedTerm = cleanTerm.split('').map(char => {
-                        return char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                    }).join('[^a-zA-Z0-9]*');
-                    
+                    // Hərflərin arasında ola biləcək xüsusi simvolları nəzərə alır
+                    const escapedTerm = cleanTerm.split('').join('[^a-zA-Z0-9]*');
                     const regex = new RegExp(`(${escapedTerm})`, 'gi');
                     
-                    // Əgər hüceyrədə axtarış sözü varsa
-                    if (regex.test(cellHtml)) {
-                        // Axtarış sözünü vurğula
-                        cellHtml = cellHtml.replace(regex, '<span class="highlight-term">$1</span>');
+                    // Orijinal mətndə xüsusi simvolları təmizlənmiş versiyasını axtar
+                    const cleanText = originalText.replace(/[^a-zA-Z0-9]/g, '');
+                    
+                    if (cleanText.toLowerCase().includes(cleanTerm.toLowerCase())) {
+                        // Orijinal mətndə uyğun hissələri tap və vurğula
+                        const matches = [];
+                        let match;
+                        const flexRegex = new RegExp(escapedTerm, 'gi');
+                        
+                        while ((match = flexRegex.exec(originalText)) !== null) {
+                            matches.push({
+                                index: match.index,
+                                text: match[0]
+                            });
+                        }
+                        
+                        // Əgər heç bir uyğunluq tapılmayıbsa, daha çevik axtarış et
+                        if (matches.length === 0) {
+                            // Hər bir simvolu ayrı-ayrı axtar
+                            let currentIndex = 0;
+                            const termChars = cleanTerm.toLowerCase().split('');
+                            
+                            for (let i = 0; i < originalText.length; i++) {
+                                const char = originalText[i].toLowerCase();
+                                if (char === termChars[currentIndex]) {
+                                    currentIndex++;
+                                    if (currentIndex === termChars.length) {
+                                        // Bütün simvollar tapıldı
+                                        const startIndex = i - termChars.length + 1;
+                                        matches.push({
+                                            index: startIndex,
+                                            text: originalText.substring(startIndex, i + 1)
+                                        });
+                                        currentIndex = 0; // Yenidən axtar
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // Tapılan uyğunluqları vurğula
+                        if (matches.length > 0) {
+                            // Sondan başlayaraq vurğula ki, indekslər pozulmasın
+                            let result = originalText;
+                            for (let i = matches.length - 1; i >= 0; i--) {
+                                const match = matches[i];
+                                result = 
+                                    result.substring(0, match.index) + 
+                                    `<span class="highlight-term">${match.text}</span>` + 
+                                    result.substring(match.index + match.text.length);
+                            }
+                            newHtml = result;
+                        }
                     }
                 }
             });
             
-            // Əgər dəyişiklik olubsa, HTML-i yenilə
-            if (cellHtml !== originalText) {
-                cell.innerHTML = cellHtml;
+            // Yeni HTML-i təyin et
+            if (newHtml !== originalText) {
+                cell.innerHTML = newHtml;
             }
         });
     }

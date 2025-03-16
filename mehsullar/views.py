@@ -774,3 +774,46 @@ def realtime_search(request):
         })
     
     return JsonResponse({'results': results})
+
+@login_required
+def check_product_code(request):
+    """
+    Məhsul kodunun düzgün formatını yoxlayır və qaytarır.
+    Bu funksiya axtarış zamanı istifadə olunur.
+    """
+    code = request.GET.get('code', '')
+    
+    if not code:
+        return JsonResponse({'success': False, 'message': 'Kod təqdim edilməyib'})
+    
+    # Xüsusi simvolları təmizlə
+    clean_code = re.sub(r'[^a-zA-Z0-9]', '', code)
+    
+    # Əvvəlcə OEM kodlarında axtarış et
+    oem_matches = OEMKod.objects.filter(kod__icontains=clean_code)
+    
+    if oem_matches.exists():
+        # İlk uyğun gələn OEM kodunu götür
+        formatted_code = oem_matches.first().kod
+        return JsonResponse({'success': True, 'formatted_code': formatted_code})
+    
+    # Sonra məhsulların OEM və brend kodlarında axtarış et
+    mehsul_matches = Mehsul.objects.filter(
+        Q(oem__icontains=clean_code) | 
+        Q(brend_kod__icontains=clean_code)
+    )
+    
+    if mehsul_matches.exists():
+        # İlk uyğun gələn məhsulu götür
+        mehsul = mehsul_matches.first()
+        
+        # Əgər OEM kodunda uyğunluq varsa, onu istifadə et
+        if clean_code in mehsul.oem.replace('-', ''):
+            return JsonResponse({'success': True, 'formatted_code': mehsul.oem})
+        
+        # Əgər brend kodunda uyğunluq varsa, onu istifadə et
+        if clean_code in mehsul.brend_kod.replace('-', ''):
+            return JsonResponse({'success': True, 'formatted_code': mehsul.brend_kod})
+    
+    # Heç bir uyğunluq tapılmadısa
+    return JsonResponse({'success': False, 'message': 'Uyğun format tapılmadı'})

@@ -518,7 +518,7 @@
             });
         }
 
-        // Axtarış formu
+        // Axtarış form1u
         const searchForm = document.getElementById('search-form');
         if (searchForm) {
             searchForm.addEventListener('submit', function(event) {

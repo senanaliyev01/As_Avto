@@ -184,13 +184,11 @@ def products_list(request):
     kateqoriyalar = Kateqoriya.objects.all()
     brendler = Brend.objects.all()
     markalar = Marka.objects.all()
-    axtaris_sozleri = AxtarisSozleri.objects.all()
 
     # Axtarış parametrlərini alırıq
     category = request.GET.get('category')
     brand = request.GET.get('brand')
     model = request.GET.get('model')
-    axtaris = request.GET.get('axtaris')
     search_text = request.GET.get('search_text')
 
     # Brend, kateqoriya və marka üçün dəqiq filtrasiya
@@ -202,45 +200,20 @@ def products_list(request):
     
     if model:
         mehsullar = mehsullar.filter(marka__adi=model)
-        
-    if axtaris:
-        mehsullar = mehsullar.filter(axtaris_sozleri__adi=axtaris)
 
     # Axtarış mətni varsa
     if search_text:
-        # Axtarış mətnini normalize et
-        normalized_search, search_combinations = normalize_search_text(search_text)
-        
         # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_text)
         
-        # Axtarış sorğusunu yarat - daha effektiv sorğu
-        query = Q()
-        
-        # OEM kodlarında axtarış
-        query |= Q(oem_kodlar__kod__icontains=clean_search)
-        
-        # Axtarış sözlərində axtarış
-        query |= Q(axtaris_sozleri__sozler__icontains=clean_search)
-        
-        # Haqqında məlumatlarında axtarış
-        query |= Q(haqqinda__icontains=search_text)
-        
-        # Hər bir axtarış kombinasiyası üçün sorğu əlavə et
-        # Amma çox böyük sorğular yaratmamaq üçün maksimum 5 kombinasiya istifadə et
-        for combo in search_combinations[:5]:
-            query |= Q(axtaris_sozleri__sozler__icontains=combo)
-            query |= Q(haqqinda__icontains=combo)
-        
-        # Sorğunu tətbiq et
-        mehsullar = mehsullar.filter(query).distinct()
+        # Yalnız OEM kodlarında axtarış
+        mehsullar = mehsullar.filter(oem_kodlar__kod__icontains=clean_search).distinct()
 
     return render(request, 'products_list.html', {
         'mehsullar': mehsullar,
         'kateqoriyalar': kateqoriyalar,
         'brendler': brendler,
-        'markalar': markalar,
-        'axtaris_sozleri': axtaris_sozleri
+        'markalar': markalar
     })
 
 
@@ -477,32 +450,11 @@ def mehsul_axtaris(request):
         # Başlanğıc sorğunu yaradırıq
         mehsullar = Mehsul.objects.all()
         
-        # Axtarış mətnini normalize et və kombinasiyaları al
-        normalized_query, query_combinations = normalize_search_text(query)
-        
         # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
         clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
         
-        # Axtarış sorğusunu yarat - daha effektiv sorğu
-        search_query = Q()
-        
-        # OEM kodlarında axtarış
-        search_query |= Q(oem_kodlar__kod__icontains=clean_query)
-        
-        # Axtarış sözlərində axtarış
-        search_query |= Q(axtaris_sozleri__sozler__icontains=clean_query)
-        
-        # Haqqında məlumatlarında axtarış
-        search_query |= Q(haqqinda__icontains=query)
-        
-        # Hər bir axtarış kombinasiyası üçün sorğu əlavə et
-        # Amma çox böyük sorğular yaratmamaq üçün maksimum 5 kombinasiya istifadə et
-        for combo in query_combinations[:5]:
-            search_query |= Q(axtaris_sozleri__sozler__icontains=combo)
-            search_query |= Q(haqqinda__icontains=combo)
-        
-        # Sorğunu tətbiq et
-        mehsullar = mehsullar.filter(search_query).distinct()
+        # Yalnız OEM kodlarında axtarış
+        mehsullar = mehsullar.filter(oem_kodlar__kod__icontains=clean_query).distinct()
         
         # Nəticələri qaytarırıq
         return JsonResponse({
@@ -515,9 +467,7 @@ def mehsul_axtaris(request):
                 'oem', 
                 'brend_kod', 
                 'qiymet',
-                'stok',
-                'haqqinda',
-                'axtaris_sozleri__adi'
+                'stok'
             ))
         })
     
@@ -716,7 +666,6 @@ def realtime_search(request):
     category = request.GET.get('category', '')
     brand = request.GET.get('brand', '')
     model = request.GET.get('model', '')
-    axtaris = request.GET.get('axtaris', '')
     
     mehsullar = Mehsul.objects.all()
     
@@ -726,36 +675,13 @@ def realtime_search(request):
         mehsullar = mehsullar.filter(brend__adi=brand)
     if model:
         mehsullar = mehsullar.filter(marka__adi=model)
-    if axtaris:
-        mehsullar = mehsullar.filter(axtaris_sozleri__adi=axtaris)
     
     if query:
-        # Axtarış mətnini normalize et
-        normalized_query, query_combinations = normalize_search_text(query)
-        
         # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
         clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
         
-        # Axtarış sorğusunu yarat - daha effektiv sorğu
-        search_query = Q()
-        
-        # OEM kodlarında axtarış
-        search_query |= Q(oem_kodlar__kod__icontains=clean_query)
-        
-        # Axtarış sözlərində axtarış
-        search_query |= Q(axtaris_sozleri__sozler__icontains=clean_query)
-        
-        # Haqqında məlumatlarında axtarış
-        search_query |= Q(haqqinda__icontains=query)
-        
-        # Hər bir axtarış kombinasiyası üçün sorğu əlavə et
-        # Amma çox böyük sorğular yaratmamaq üçün maksimum 5 kombinasiya istifadə et
-        for combo in query_combinations[:5]:
-            search_query |= Q(axtaris_sozleri__sozler__icontains=combo)
-            search_query |= Q(haqqinda__icontains=combo)
-        
-        # Sorğunu tətbiq et
-        mehsullar = mehsullar.filter(search_query).distinct()
+        # Yalnız OEM kodlarında axtarış
+        mehsullar = mehsullar.filter(oem_kodlar__kod__icontains=clean_query).distinct()
     
     results = []
     for mehsul in mehsullar:
@@ -768,9 +694,7 @@ def realtime_search(request):
             'oem': mehsul.oem,
             'qiymet': str(mehsul.qiymet),
             'stok': mehsul.stok,
-            'sekil_url': mehsul.sekil.url if mehsul.sekil else None,
-            'haqqinda': mehsul.haqqinda if mehsul.haqqinda else None,
-            'axtaris_sozleri': mehsul.axtaris_sozleri.adi if mehsul.axtaris_sozleri else None,
+            'sekil_url': mehsul.sekil.url if mehsul.sekil else None
         })
     
     return JsonResponse({'results': results})

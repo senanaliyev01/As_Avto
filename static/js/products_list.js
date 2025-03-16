@@ -72,7 +72,7 @@ function highlightSearchTerms() {
     
     // Əgər axtarış sözü varsa
     if (searchText && searchText.trim() !== '') {
-        // Axtarış sözlərini boşluqla ayır
+        // Axtarış sözlərini boşluqla ayır və yalnız hərf və rəqəmləri saxla
         const searchTerms = searchText.trim().split(/\s+/).filter(term => term.length > 1);
         
         // Cədvəldəki bütün mətn hüceyrələrini seç
@@ -81,18 +81,34 @@ function highlightSearchTerms() {
         // Hər bir hüceyrə üçün
         tableCells.forEach(cell => {
             const originalText = cell.textContent;
+            let cellHtml = originalText;
             
             // Hər bir axtarış sözü üçün
             searchTerms.forEach(term => {
-                // Böyük-kiçik hərfə həssas olmayan regex
-                const regex = new RegExp(`(${term})`, 'gi');
+                // Xüsusi simvolları təmizlə, yalnız hərf və rəqəmləri saxla
+                const cleanTerm = term.replace(/[^a-zA-Z0-9]/g, '');
                 
-                // Əgər hüceyrədə axtarış sözü varsa
-                if (regex.test(originalText)) {
-                    // Axtarış sözünü vurğula
-                    cell.innerHTML = originalText.replace(regex, '<span class="highlight-term">$1</span>');
+                if (cleanTerm.length > 1) {
+                    // Böyük-kiçik hərfə həssas olmayan və xüsusi simvolları nəzərə almayan regex
+                    // Hər bir hərf və ya rəqəm arasında istənilən xüsusi simvol ola bilər
+                    const escapedTerm = cleanTerm.split('').map(char => {
+                        return char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    }).join('[^a-zA-Z0-9]*');
+                    
+                    const regex = new RegExp(`(${escapedTerm})`, 'gi');
+                    
+                    // Əgər hüceyrədə axtarış sözü varsa
+                    if (regex.test(cellHtml)) {
+                        // Axtarış sözünü vurğula
+                        cellHtml = cellHtml.replace(regex, '<span class="highlight-term">$1</span>');
+                    }
                 }
             });
+            
+            // Əgər dəyişiklik olubsa, HTML-i yenilə
+            if (cellHtml !== originalText) {
+                cell.innerHTML = cellHtml;
+            }
         });
     }
 }

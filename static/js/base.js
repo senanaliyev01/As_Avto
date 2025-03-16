@@ -518,7 +518,7 @@
             });
         }
 
-        // Axtarış formu
+        // Axtarış form1u
         const searchForm = document.getElementById('search-form');
         if (searchForm) {
             searchForm.addEventListener('submit', function(event) {
@@ -527,46 +527,20 @@
                 // Axtarış mətni inputunu əldə et
                 const searchInput = this.querySelector('input[name="search_text"]');
                 if (searchInput) {
-                    // Orijinal mətni saxla
-                    const originalText = searchInput.value.trim();
+                    // Axtarış mətnini təmizlə
+                    let originalText = searchInput.value;
                     
-                    // Əgər mətn boşdursa, heç nə etmə
-                    if (!originalText) {
-                        return;
-                    }
+                    // 1. Əvvəlcə bütün boşluqları və xüsusi simvolları sil, yalnız hərf, rəqəm və tire saxla
+                    let cleanedText = originalText.replace(/[^a-zA-Z0-9\-]/g, '');
                     
-                    // Əgər mətn tire ilə yazılıbsa (məsələn SOF-J-2183), birləşik versiyasını da əlavə et
-                    if (originalText.includes('-')) {
-                        // Birləşik versiya (bütün tirələri sil)
-                        const combinedVersion = originalText.replace(/-/g, '');
-                        
-                        // Birləşik versiyanı hidden input kimi əlavə et
-                        let hiddenInput = document.getElementById('combined-search-text');
-                        if (!hiddenInput) {
-                            hiddenInput = document.createElement('input');
-                            hiddenInput.type = 'hidden';
-                            hiddenInput.name = 'combined_search_text';
-                            hiddenInput.id = 'combined-search-text';
-                            this.appendChild(hiddenInput);
-                        }
-                        hiddenInput.value = combinedVersion;
-                    }
-                    // Əgər mətn birləşik yazılıbsa (məsələn SOFJ2183), tire ilə versiyasını da əlavə et
-                    else if (/[A-Za-z]+[0-9]+/.test(originalText)) {
-                        // Hərfləri və rəqəmləri ayırmaq üçün
-                        const hyphenatedVersion = originalText.replace(/([A-Za-z]+)([0-9]+)/g, '$1-$2');
-                        
-                        // Tire ilə versiyanı hidden input kimi əlavə et
-                        let hiddenInput = document.getElementById('hyphenated-search-text');
-                        if (!hiddenInput) {
-                            hiddenInput = document.createElement('input');
-                            hiddenInput.type = 'hidden';
-                            hiddenInput.name = 'hyphenated_search_text';
-                            hiddenInput.id = 'hyphenated-search-text';
-                            this.appendChild(hiddenInput);
-                        }
-                        hiddenInput.value = hyphenatedVersion;
-                    }
+                    // 2. Ardıcıl tireleri bir tire ilə əvəz et
+                    cleanedText = cleanedText.replace(/\-+/g, '-');
+                    
+                    // 3. Əgər mətnin əvvəlində və ya sonunda tire varsa, onu sil
+                    cleanedText = cleanedText.replace(/^\-|\-$/g, '');
+                    
+                    // Təmizlənmiş mətni inputa təyin et
+                    searchInput.value = cleanedText;
                 }
                 
                 let searchButton = document.getElementById('search-button');

@@ -528,21 +528,16 @@
                 const searchInput = this.querySelector('input[name="search_text"]');
                 if (searchInput) {
                     // Axtarış mətnini təmizlə
-                    const originalText = searchInput.value;
+                    let originalText = searchInput.value;
                     
-                    // Əvvəlcə bütün boşluqları və xüsusi simvolları sil, yalnız hərf və rəqəmləri saxla
-                    let cleanedText = originalText.replace(/[^a-zA-Z0-9]/g, '');
+                    // 1. Əvvəlcə bütün boşluqları və xüsusi simvolları sil, yalnız hərf, rəqəm və tire saxla
+                    let cleanedText = originalText.replace(/[^a-zA-Z0-9\-]/g, '');
                     
-                    // Əgər orijinal mətndə tire varsa, onda bir tire əlavə et
-                    // Tire simvolunu iki rəqəm qrupu arasında yerləşdir (məsələn: 12345-67890)
-                    if (originalText.includes('-')) {
-                        // Rəqəm qruplarını müəyyən et
-                        const match = cleanedText.match(/^(\d+)(\d+)$/);
-                        if (match && match[1] && match[2]) {
-                            // Birinci və ikinci rəqəm qrupları arasına bir tire əlavə et
-                            cleanedText = match[1] + '-' + match[2];
-                        }
-                    }
+                    // 2. Ardıcıl tireleri bir tire ilə əvəz et
+                    cleanedText = cleanedText.replace(/\-+/g, '-');
+                    
+                    // 3. Əgər mətnin əvvəlində və ya sonunda tire varsa, onu sil
+                    cleanedText = cleanedText.replace(/^\-|\-$/g, '');
                     
                     // Təmizlənmiş mətni inputa təyin et
                     searchInput.value = cleanedText;

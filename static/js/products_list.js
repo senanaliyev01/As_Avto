@@ -69,64 +69,77 @@ function highlightSearchTerms() {
     // URL-dən axtarış parametrlərini əldə et
     const urlParams = new URLSearchParams(window.location.search);
     const searchText = urlParams.get('search_text');
+    const combinedSearchText = urlParams.get('combined_search_text');
+    const hyphenatedSearchText = urlParams.get('hyphenated_search_text');
     
-    // Əgər axtarış sözü varsa
+    // Bütün axtarış sözlərini bir massivdə topla
+    const searchTerms = [];
+    
+    // Əsas axtarış sözünü əlavə et
     if (searchText && searchText.trim() !== '') {
-        // Axtarış sözlərini boşluqla ayır
-        const searchTerms = searchText.trim().split(/\s+/).filter(term => term.length > 1);
-        
-        // Xüsusi simvolları təmizlə və birləşik versiyaları əlavə et
-        const enhancedSearchTerms = [];
-        searchTerms.forEach(term => {
-            enhancedSearchTerms.push(term);
-            
-            // Əgər term rəqəm və ya simvollardan ibarətdirsə
-            if (/[0-9\-]/.test(term)) {
-                // Bütün tire və boşluqları silərək birləşik versiya əlavə et
-                const combinedTerm = term.replace(/[\-\s]/g, '');
-                if (combinedTerm !== term && combinedTerm.length > 1) {
-                    enhancedSearchTerms.push(combinedTerm);
-                }
-                
-                // Əgər term birləşikdirsə, tire ilə ayrılmış versiyasını əlavə et
-                if (term.length >= 5 && !/[\-\s]/.test(term)) {
-                    // Rəqəm ardıcıllıqlarını tire ilə ayır (məsələn 2630035504 -> 26300-35504)
-                    const hyphenatedTerm = term.replace(/(\d{5})(\d{5})/g, '$1-$2')
-                                              .replace(/(\d{4})(\d{4})/g, '$1-$2')
-                                              .replace(/(\d{3})(\d{3})/g, '$1-$2');
-                    if (hyphenatedTerm !== term) {
-                        enhancedSearchTerms.push(hyphenatedTerm);
-                    }
-                }
-            }
-        });
-        
-        // Cədvəldəki bütün mətn hüceyrələrini seç
-        const tableCells = document.querySelectorAll('.products-table tbody td:not(:first-child):not(:last-child):not(:nth-last-child(2))');
-        
-        // Hər bir hüceyrə üçün
-        tableCells.forEach(cell => {
-            const originalText = cell.textContent;
-            let newText = originalText;
-            
-            // Hər bir axtarış sözü üçün
-            enhancedSearchTerms.forEach(term => {
-                // Böyük-kiçik hərfə həssas olmayan regex
-                const regex = new RegExp(`(${escapeRegExp(term)})`, 'gi');
-                
-                // Əgər hüceyrədə axtarış sözü varsa
-                if (regex.test(newText)) {
-                    // Axtarış sözünü vurğula
-                    newText = newText.replace(regex, '<span class="highlight-term">$1</span>');
-                }
-            });
-            
-            // Əgər mətn dəyişibsə, yeni mətni təyin et
-            if (newText !== originalText) {
-                cell.innerHTML = newText;
-            }
-        });
+        searchTerms.push(searchText.trim());
     }
+    
+    // Birləşik versiyanı əlavə et
+    if (combinedSearchText && combinedSearchText.trim() !== '') {
+        searchTerms.push(combinedSearchText.trim());
+    }
+    
+    // Tire ilə versiyanı əlavə et
+    if (hyphenatedSearchText && hyphenatedSearchText.trim() !== '') {
+        searchTerms.push(hyphenatedSearchText.trim());
+    }
+    
+    // Əgər heç bir axtarış sözü yoxdursa, çıx
+    if (searchTerms.length === 0) {
+        return;
+    }
+    
+    // Cədvəldəki bütün mətn hüceyrələrini seç
+    const tableCells = document.querySelectorAll('.products-table tbody td:not(:first-child):not(:last-child):not(:nth-last-child(2))');
+    
+    // Hər bir hüceyrə üçün
+    tableCells.forEach(cell => {
+        const originalText = cell.textContent;
+        let newText = originalText;
+        
+        // Hər bir axtarış sözü üçün
+        searchTerms.forEach(term => {
+            // Böyük-kiçik hərfə həssas olmayan regex
+            const regex = new RegExp(`(${escapeRegExp(term)})`, 'gi');
+            
+            // Əgər hüceyrədə axtarış sözü varsa
+            if (regex.test(newText)) {
+                // Axtarış sözünü vurğula
+                newText = newText.replace(regex, '<span class="highlight-term">$1</span>');
+            }
+            
+            // Əgər axtarış sözü tire ilə yazılıbsa, birləşik versiyasını da yoxla
+            if (term.includes('-')) {
+                const combinedTerm = term.replace(/-/g, '');
+                const combinedRegex = new RegExp(`(${escapeRegExp(combinedTerm)})`, 'gi');
+                
+                if (combinedRegex.test(newText)) {
+                    newText = newText.replace(combinedRegex, '<span class="highlight-term">$1</span>');
+                }
+            }
+            
+            // Əgər axtarış sözü birləşikdirsə, tire ilə versiyasını da yoxla
+            if (/[A-Za-z]+[0-9]+/.test(term)) {
+                const hyphenatedTerm = term.replace(/([A-Za-z]+)([0-9]+)/g, '$1-$2');
+                const hyphenatedRegex = new RegExp(`(${escapeRegExp(hyphenatedTerm)})`, 'gi');
+                
+                if (hyphenatedRegex.test(newText)) {
+                    newText = newText.replace(hyphenatedRegex, '<span class="highlight-term">$1</span>');
+                }
+            }
+        });
+        
+        // Əgər mətn dəyişibsə, yeni mətni təyin et
+        if (newText !== originalText) {
+            cell.innerHTML = newText;
+        }
+    });
 }
 
 // RegExp xüsusi simvollarını qaçırmaq üçün funksiya

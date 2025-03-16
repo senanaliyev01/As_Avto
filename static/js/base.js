@@ -527,12 +527,46 @@
                 // Axtarış mətni inputunu əldə et
                 const searchInput = this.querySelector('input[name="search_text"]');
                 if (searchInput) {
-                    // Axtarış mətnini təmizlə - yalnız hərf, rəqəm və tire saxla
-                    const originalText = searchInput.value;
-                    const cleanedText = originalText.replace(/[^a-zA-Z0-9\-]/g, '');
+                    // Orijinal mətni saxla
+                    const originalText = searchInput.value.trim();
                     
-                    // Təmizlənmiş mətni inputa təyin et
-                    searchInput.value = cleanedText;
+                    // Əgər mətn boşdursa, heç nə etmə
+                    if (!originalText) {
+                        return;
+                    }
+                    
+                    // Əgər mətn tire ilə yazılıbsa (məsələn SOF-J-2183), birləşik versiyasını da əlavə et
+                    if (originalText.includes('-')) {
+                        // Birləşik versiya (bütün tirələri sil)
+                        const combinedVersion = originalText.replace(/-/g, '');
+                        
+                        // Birləşik versiyanı hidden input kimi əlavə et
+                        let hiddenInput = document.getElementById('combined-search-text');
+                        if (!hiddenInput) {
+                            hiddenInput = document.createElement('input');
+                            hiddenInput.type = 'hidden';
+                            hiddenInput.name = 'combined_search_text';
+                            hiddenInput.id = 'combined-search-text';
+                            this.appendChild(hiddenInput);
+                        }
+                        hiddenInput.value = combinedVersion;
+                    }
+                    // Əgər mətn birləşik yazılıbsa (məsələn SOFJ2183), tire ilə versiyasını da əlavə et
+                    else if (/[A-Za-z]+[0-9]+/.test(originalText)) {
+                        // Hərfləri və rəqəmləri ayırmaq üçün
+                        const hyphenatedVersion = originalText.replace(/([A-Za-z]+)([0-9]+)/g, '$1-$2');
+                        
+                        // Tire ilə versiyanı hidden input kimi əlavə et
+                        let hiddenInput = document.getElementById('hyphenated-search-text');
+                        if (!hiddenInput) {
+                            hiddenInput = document.createElement('input');
+                            hiddenInput.type = 'hidden';
+                            hiddenInput.name = 'hyphenated_search_text';
+                            hiddenInput.id = 'hyphenated-search-text';
+                            this.appendChild(hiddenInput);
+                        }
+                        hiddenInput.value = hyphenatedVersion;
+                    }
                 }
                 
                 let searchButton = document.getElementById('search-button');
@@ -881,8 +915,7 @@
                             const regex = new RegExp(`(${term})`, 'gi');
                             return text.replace(regex, '<span class="highlight">$1</span>');
                         };
-                        return `
-                            <div class="search-result-item" onclick="window.location.href='/product-detail/${encodeURIComponent(result.adi)}-${encodeURIComponent(result.oem)}-${encodeURIComponent(result.brend_kod)}/${result.id}/'">
+                        return `                            <div class="search-result-item" onclick="window.location.href='/product-detail/${encodeURIComponent(result.adi)}-${encodeURIComponent(result.oem)}-${encodeURIComponent(result.brend_kod)}/${result.id}/'">
                                 ${result.sekil_url ? `<img src="${result.sekil_url}" alt="${result.adi}">` : ''}
                                 <div class="search-result-info">
                                     <h4>${highlightTerm(result.adi, query)}</h4>

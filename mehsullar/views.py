@@ -192,6 +192,8 @@ def products_list(request):
     model = request.GET.get('model')
     axtaris = request.GET.get('axtaris')
     search_text = request.GET.get('search_text')
+    combined_search_text = request.GET.get('combined_search_text')
+    hyphenated_search_text = request.GET.get('hyphenated_search_text')
 
     # Brend, kateqoriya və marka üçün dəqiq filtrasiya
     if category:
@@ -231,6 +233,18 @@ def products_list(request):
         for combo in search_combinations[:5]:
             query |= Q(axtaris_sozleri__sozler__icontains=combo)
             query |= Q(haqqinda__icontains=combo)
+        
+        # Birləşik axtarış mətni varsa
+        if combined_search_text:
+            query |= Q(oem_kodlar__kod__icontains=combined_search_text)
+            query |= Q(axtaris_sozleri__sozler__icontains=combined_search_text)
+            query |= Q(haqqinda__icontains=combined_search_text)
+            
+        # Tire ilə axtarış mətni varsa
+        if hyphenated_search_text:
+            query |= Q(oem_kodlar__kod__icontains=hyphenated_search_text)
+            query |= Q(axtaris_sozleri__sozler__icontains=hyphenated_search_text)
+            query |= Q(haqqinda__icontains=hyphenated_search_text)
         
         # Sorğunu tətbiq et
         mehsullar = mehsullar.filter(query).distinct()

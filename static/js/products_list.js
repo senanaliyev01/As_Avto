@@ -68,7 +68,7 @@ document.getElementById('modalImage').onload = function() {
 function highlightSearchTerms() {
     // URL-dən axtarış parametrlərini əldə et
     const urlParams = new URLSearchParams(window.location.search);
-    const searchText = urlParams.get('search_text');
+    const searchText = urlParams.get('search_text') || sessionStorage.getItem('lastSearchTerm');
     
     // Əgər axtarış sözü varsa
     if (searchText && searchText.trim() !== '') {
@@ -98,8 +98,25 @@ function highlightSearchTerms() {
                         enhancedSearchTerms.push(hyphenatedTerm);
                     }
                 }
+                
+                // Əgər termində tire varsa, tiresiz versiyasını da əlavə et
+                if (term.includes('-')) {
+                    const withoutHyphens = term.replace(/-/g, '');
+                    enhancedSearchTerms.push(withoutHyphens);
+                    
+                    // Tire ilə ayrılmış hissələri ayrı-ayrı əlavə et
+                    const parts = term.split('-').filter(part => part.length > 0);
+                    parts.forEach(part => {
+                        if (part.length > 1) {
+                            enhancedSearchTerms.push(part);
+                        }
+                    });
+                }
             }
         });
+        
+        // Təkrarlanan axtarış sözlərini sil
+        const uniqueSearchTerms = [...new Set(enhancedSearchTerms)];
         
         // Cədvəldəki bütün mətn hüceyrələrini seç
         const tableCells = document.querySelectorAll('.products-table tbody td:not(:first-child):not(:last-child):not(:nth-last-child(2))');
@@ -110,7 +127,7 @@ function highlightSearchTerms() {
             let newText = originalText;
             
             // Hər bir axtarış sözü üçün
-            enhancedSearchTerms.forEach(term => {
+            uniqueSearchTerms.forEach(term => {
                 // Böyük-kiçik hərfə həssas olmayan regex
                 const regex = new RegExp(`(${escapeRegExp(term)})`, 'gi');
                 

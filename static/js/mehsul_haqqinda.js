@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Məhsul və brend şəkilləri üçün 3D effekti
     const productImage = document.getElementById('productImage');
     const brandImage = document.getElementById('brandImage');
     
@@ -88,285 +89,188 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Şəkillərin sürüklənməsini əngəlləmək
     document.addEventListener('dragstart', (e) => e.preventDefault());
-
-    // Yeni əlavə edilmiş funksionallıqlar
     
-    // Tab sistemi
-    const tabButtons = document.querySelectorAll('.tab-button');
-    const tabPanes = document.querySelectorAll('.tab-pane');
-    
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            // Aktiv tab-ı təmizlə
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            tabPanes.forEach(pane => pane.classList.remove('active'));
-            
-            // Yeni tab-ı aktiv et
-            button.classList.add('active');
-            const tabId = button.getAttribute('data-tab');
-            document.getElementById(tabId).classList.add('active');
+    // Şəkil böyütmə funksionallığı
+    const imageOverlay = document.querySelector('.image-overlay');
+    if (imageOverlay && productImage) {
+        imageOverlay.addEventListener('click', function() {
+            openImageModal(productImage.src);
         });
-    });
-    
-    // Şəkil böyütmə modal
-    const modal = document.getElementById('imageModal');
-    const modalImg = document.getElementById('modalImage');
-    const captionText = document.getElementById('caption');
-    const closeModal = document.querySelector('.close-modal');
-    
-    // Məhsul şəklini böyütmək
-    if (productImage) {
+        
         productImage.addEventListener('click', function() {
-            modal.style.display = "block";
-            modalImg.src = this.src;
-            captionText.innerHTML = this.alt;
+            openImageModal(this.src);
         });
     }
     
-    // Brend şəklini böyütmək
-    if (brandImage) {
-        brandImage.addEventListener('click', function() {
-            modal.style.display = "block";
-            modalImg.src = this.src;
-            captionText.innerHTML = this.alt;
-        });
-    }
-    
-    // Modalı bağlamaq
-    if (closeModal) {
-        closeModal.addEventListener('click', function() {
-            modal.style.display = "none";
-        });
-    }
-    
-    // Modal xaricində klikləndikdə bağlamaq
-    window.addEventListener('click', function(event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
-    });
-    
-    // Şəkil fırlatma düymələri
-    const rotateLeft = document.getElementById('rotateLeft');
-    const rotateRight = document.getElementById('rotateRight');
-    let currentRotation = 0;
-    
-    if (rotateLeft && productImage) {
-        rotateLeft.addEventListener('click', function() {
-            currentRotation -= 90;
-            productImage.style.transition = 'transform 0.5s ease';
-            productImage.style.transform = `rotate(${currentRotation}deg)`;
-        });
-    }
-    
-    if (rotateRight && productImage) {
-        rotateRight.addEventListener('click', function() {
-            currentRotation += 90;
-            productImage.style.transition = 'transform 0.5s ease';
-            productImage.style.transform = `rotate(${currentRotation}deg)`;
-        });
-    }
-    
-    // İstək siyahısına əlavə etmə
-    const wishlistButtons = document.querySelectorAll('.wishlist-button');
-    
-    wishlistButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const productId = this.getAttribute('data-product-id');
-            
-            // İkon dəyişdirmə
-            const icon = this.querySelector('i');
-            if (icon.classList.contains('far')) {
-                icon.classList.remove('far');
-                icon.classList.add('fas');
-                showNotification('Məhsul istək siyahınıza əlavə edildi', 'success');
-            } else {
-                icon.classList.remove('fas');
-                icon.classList.add('far');
-                showNotification('Məhsul istək siyahınızdan çıxarıldı', 'info');
-            }
-            
-            // Burada AJAX ilə server-ə istək göndərmək olar
-            // fetch('/istək-siyahısı/əlavə-et/' + productId, {...})
-        });
-    });
-    
-    // Sürətli səbətə əlavə etmə
-    const quickAddButtons = document.querySelectorAll('.quick-add-to-cart');
-    
-    quickAddButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            const productId = this.getAttribute('data-product-id');
-            
-            // Animasiya
-            this.classList.add('adding');
+    // Şəkil modalı
+    function openImageModal(imageSrc) {
+        const modal = document.createElement('div');
+        modal.className = 'image-modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <img src="${imageSrc}" alt="Böyüdülmüş şəkil">
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Modal CSS
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        `;
+        
+        const modalContent = modal.querySelector('.modal-content');
+        modalContent.style.cssText = `
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+            margin: auto;
+        `;
+        
+        const modalImage = modal.querySelector('img');
+        modalImage.style.cssText = `
+            max-width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        `;
+        
+        const closeButton = modal.querySelector('.close-modal');
+        closeButton.style.cssText = `
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+        `;
+        
+        // Animasiya
+        setTimeout(() => {
+            modal.style.opacity = '1';
+        }, 10);
+        
+        // Bağlama funksiyası
+        function closeModal() {
+            modal.style.opacity = '0';
             setTimeout(() => {
-                this.classList.remove('adding');
+                document.body.removeChild(modal);
+            }, 300);
+        }
+        
+        // Bağlama hadisələri
+        closeButton.addEventListener('click', closeModal);
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+        
+        // ESC düyməsi ilə bağlama
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    }
+    
+    // Səbətə əlavə et düyməsi animasiyası
+    const addToCartBtn = document.querySelector('.add-to-cart-btn');
+    if (addToCartBtn) {
+        addToCartBtn.addEventListener('click', function(e) {
+            // Səbətə əlavə et animasiyası
+            const icon = this.querySelector('i');
+            icon.classList.add('animate-cart');
+            
+            setTimeout(() => {
+                icon.classList.remove('animate-cart');
             }, 1000);
             
-            // Burada AJAX ilə server-ə istək göndərmək olar
-            fetch('/sebet/ekle/' + productId)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showNotification('Məhsul səbətə əlavə edildi', 'success');
-                    } else {
-                        showNotification('Xəta baş verdi', 'error');
-                    }
-                })
-                .catch(error => {
-                    showNotification('Xəta baş verdi', 'error');
-                });
+            // Səbətə əlavə et bildirişi
+            showNotification('Məhsul səbətə əlavə edildi!', 'success');
         });
-    });
+    }
     
-    // Bildiriş göstərmə funksiyası
+    // Bildiriş funksiyası
     function showNotification(message, type = 'info') {
-        // Əvvəlki bildirişləri təmizlə
-        const existingNotifications = document.querySelectorAll('.notification');
-        existingNotifications.forEach(notification => {
-            notification.remove();
-        });
-        
-        // Yeni bildiriş yarat
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
-        
-        // Bildiriş ikonu
-        let icon = '';
-        switch(type) {
-            case 'success':
-                icon = '<i class="fas fa-check-circle"></i>';
-                break;
-            case 'error':
-                icon = '<i class="fas fa-times-circle"></i>';
-                break;
-            case 'warning':
-                icon = '<i class="fas fa-exclamation-circle"></i>';
-                break;
-            default:
-                icon = '<i class="fas fa-info-circle"></i>';
-        }
-        
         notification.innerHTML = `
-            ${icon}
-            <span>${message}</span>
-            <button class="close-notification"><i class="fas fa-times"></i></button>
+            <div class="notification-content">
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i>
+                <span>${message}</span>
+            </div>
         `;
         
         document.body.appendChild(notification);
         
-        // Bildirişi göstər
-        setTimeout(() => {
-            notification.classList.add('show');
-        }, 10);
-        
-        // Bildirişi bağlama düyməsi
-        const closeButton = notification.querySelector('.close-notification');
-        closeButton.addEventListener('click', () => {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                notification.remove();
-            }, 300);
-        });
-        
-        // Avtomatik bağlanma
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                notification.remove();
-            }, 300);
-        }, 5000);
-    }
-    
-    // Bildiriş stilləri
-    const notificationStyles = document.createElement('style');
-    notificationStyles.textContent = `
-        .notification {
+        // Notification CSS
+        notification.style.cssText = `
             position: fixed;
             bottom: 20px;
             right: 20px;
-            padding: 15px 20px;
-            background: rgba(10, 25, 41, 0.9);
+            background: ${type === 'success' ? 'linear-gradient(135deg, #00c853, #009624)' : 'linear-gradient(135deg, #1a82ff, #0a5dc2)'};
             color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            padding: 15px 25px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             z-index: 1000;
             transform: translateY(100px);
             opacity: 0;
             transition: all 0.3s ease;
+        `;
+        
+        const notificationContent = notification.querySelector('.notification-content');
+        notificationContent.style.cssText = `
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        `;
+        
+        // Animasiya
+        setTimeout(() => {
+            notification.style.transform = 'translateY(0)';
+            notification.style.opacity = '1';
+        }, 10);
+        
+        // Avtomatik bağlanma
+        setTimeout(() => {
+            notification.style.transform = 'translateY(100px)';
+            notification.style.opacity = '0';
+            
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 300);
+        }, 3000);
+    }
+    
+    // CSS animasiyası üçün stil əlavə et
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes cartBounce {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-5px); }
         }
         
-        .notification.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-        
-        .notification.success {
-            border-left: 4px solid #00897b;
-        }
-        
-        .notification.error {
-            border-left: 4px solid #e53935;
-        }
-        
-        .notification.warning {
-            border-left: 4px solid #ffb300;
-        }
-        
-        .notification.info {
-            border-left: 4px solid #1565c0;
-        }
-        
-        .notification i {
-            font-size: 1.2rem;
-        }
-        
-        .notification.success i {
-            color: #00897b;
-        }
-        
-        .notification.error i {
-            color: #e53935;
-        }
-        
-        .notification.warning i {
-            color: #ffb300;
-        }
-        
-        .notification.info i {
-            color: #1565c0;
-        }
-        
-        .close-notification {
-            background: transparent;
-            border: none;
-            color: rgba(255, 255, 255, 0.7);
-            cursor: pointer;
-            margin-left: 10px;
-            padding: 0;
-            font-size: 0.9rem;
-            transition: color 0.2s ease;
-        }
-        
-        .close-notification:hover {
-            color: white;
-        }
-        
-        @keyframes adding {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-        
-        .quick-add-to-cart.adding {
-            animation: adding 0.5s ease;
+        .animate-cart {
+            animation: cartBounce 0.8s ease;
         }
     `;
-    
-    document.head.appendChild(notificationStyles);
+    document.head.appendChild(style);
 });

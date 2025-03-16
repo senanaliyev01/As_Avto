@@ -533,8 +533,8 @@
                     // 1. Əvvəlcə bütün boşluqları və xüsusi simvolları sil, yalnız hərf, rəqəm və tire saxla
                     let cleanedText = originalText.replace(/[^a-zA-Z0-9\-]/g, '');
                     
-                    // 2. Ardıcıl tireleri iki tire ilə əvəz et
-                    cleanedText = cleanedText.replace(/\-+/g, '--');
+                    // 2. Ardıcıl tireleri bir tire ilə əvəz et
+                    cleanedText = cleanedText.replace(/\-+/g, '-');
                     
                     // 3. Əgər mətnin əvvəlində və ya sonunda tire varsa, onu sil
                     cleanedText = cleanedText.replace(/^\-|\-$/g, '');

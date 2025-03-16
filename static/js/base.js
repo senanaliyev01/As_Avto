@@ -518,7 +518,7 @@
             });
         }
 
-        // Axtarış form1u
+        // Axtarış formu
         const searchForm = document.getElementById('search-form');
         if (searchForm) {
             searchForm.addEventListener('submit', function(event) {
@@ -527,20 +527,40 @@
                 // Axtarış mətni inputunu əldə et
                 const searchInput = this.querySelector('input[name="search_text"]');
                 if (searchInput) {
-                    // Axtarış mətnini təmizlə
-                    let originalText = searchInput.value;
+                    // Orijinal mətni saxla
+                    const originalText = searchInput.value.trim();
                     
-                    // 1. Əvvəlcə bütün boşluqları və xüsusi simvolları sil, yalnız hərf, rəqəm və tire saxla
-                    let cleanedText = originalText.replace(/[^a-zA-Z0-9\-]/g, '');
+                    // Əgər mətn boşdursa, heç nə etmə
+                    if (!originalText) {
+                        return;
+                    }
                     
-                    // 2. Ardıcıl tireleri bir tire ilə əvəz et
-                    cleanedText = cleanedText.replace(/\-+/g, '-');
+                    // Xüsusi kod formatlarını tanımaq üçün regex
+                    const isCodePattern = /^[a-zA-Z0-9\-]+$/;
                     
-                    // 3. Əgər mətnin əvvəlində və ya sonunda tire varsa, onu sil
-                    cleanedText = cleanedText.replace(/^\-|\-$/g, '');
-                    
-                    // Təmizlənmiş mətni inputa təyin et
-                    searchInput.value = cleanedText;
+                    // Əgər mətn artıq kod formatındadırsa (yalnız hərf, rəqəm və tire)
+                    if (isCodePattern.test(originalText)) {
+                        // Mətni olduğu kimi saxla
+                        searchInput.value = originalText;
+                    } else {
+                        // Boşluqları və xüsusi simvolları təmizlə
+                        let cleanedText = originalText.replace(/[^a-zA-Z0-9\-\s]/g, '');
+                        
+                        // Əgər mətn SOF-J-2183 kimi formata bənzəyirsə (hərflər, rəqəmlər və tire)
+                        const codeSegments = cleanedText.split(/[\s]+/);
+                        
+                        // Əgər bir neçə hissədən ibarətdirsə və hər biri kod hissəsinə bənzəyirsə
+                        if (codeSegments.length > 1 && codeSegments.every(segment => /^[a-zA-Z0-9\-]+$/.test(segment))) {
+                            // Hissələri tire ilə birləşdir
+                            cleanedText = codeSegments.join('-');
+                        } else {
+                            // Bütün boşluqları sil
+                            cleanedText = cleanedText.replace(/\s/g, '');
+                        }
+                        
+                        // Təmizlənmiş mətni inputa təyin et
+                        searchInput.value = cleanedText;
+                    }
                 }
                 
                 let searchButton = document.getElementById('search-button');

@@ -20,5 +20,4 @@ urlpatterns = [
     path('products-look-all/', views.umumibaxis, name='umumi_baxis'),
     path('reports/', views.hesabatlar, name='hesabatlar'),
     path('realtime-search/', views.realtime_search, name='realtime_search'),
-    path('check_product_code/', views.check_product_code, name='check_product_code'),
 ]

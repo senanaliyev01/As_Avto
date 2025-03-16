@@ -518,7 +518,7 @@
             });
         }
 
-        // Axtarış formu
+        // Axtarış form1u
         const searchForm = document.getElementById('search-form');
         if (searchForm) {
             searchForm.addEventListener('submit', function(event) {
@@ -539,94 +539,32 @@
                     // 3. Əgər mətnin əvvəlində və ya sonunda tire varsa, onu sil
                     cleanedText = cleanedText.replace(/^\-|\-$/g, '');
                     
-                    // 4. Əgər rəqəm ardıcıllığı varsa, formatı düzəlt
-                    // Məsələn: 2630035504 -> 26300-35504
-                    if (/^\d+$/.test(cleanedText) && cleanedText.length >= 8) {
-                        // Cədvəldən düzgün formatı tapmağa çalış
-                        fetch('/check_product_code/?code=' + cleanedText, {
-                            method: 'GET',
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest'
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success && data.formatted_code) {
-                                // Əgər server düzgün formatı qaytarırsa, onu istifadə et
-                                searchInput.value = data.formatted_code;
-                                submitForm();
-                            } else {
-                                // Əgər server düzgün format qaytarmırsa, avtomatik formatla
-                                formatAndSubmit();
-                            }
-                        })
-                        .catch(error => {
-                            // Xəta baş verərsə, avtomatik formatla
-                            formatAndSubmit();
-                        });
-                    } else {
-                        // Rəqəm ardıcıllığı deyilsə, birbaşa təmizlənmiş mətni istifadə et
-                        searchInput.value = cleanedText;
-                        submitForm();
-                    }
-                } else {
-                    // SearchInput yoxdursa, birbaşa formu göndər
-                    submitForm();
-                }
-                
-                // Formu göndərmək üçün funksiya
-                function submitForm() {
-                    let searchButton = document.getElementById('search-button');
-                    let spinner = document.getElementById('loading-spinner');
-                    
-                    if (!searchButton || !spinner) return;
-                    
-                    // Butonun ölçüsünü qorumaq üçün enini və hündürlüyünü sabit saxla
-                    searchButton.style.width = `${searchButton.offsetWidth}px`;
-                    searchButton.style.height = `${searchButton.offsetHeight}px`;
-                    
-                    // Axtarış yazısını gizlət, amma spinneri saxla
-                    if (searchButton.childNodes[0] && searchButton.childNodes[0].nodeValue) {
-                        searchButton.childNodes[0].nodeValue = ''; // Axtar sözünü sil
-                    }
-                    spinner.style.display = 'inline-block'; // Spinneri göstər
-                    
-                    // Butonu deaktiv et ki, yenidən klik olunmasın
-                    searchButton.disabled = true; 
-                    
-                    // 1 saniyə sonra formu göndər
-                    setTimeout(() => {
-                        searchForm.submit(); // Formu göndər
-                    }, 1000);
-                }
-                
-                // Rəqəm ardıcıllığını formatlamaq və formu göndərmək üçün funksiya
-                function formatAndSubmit() {
-                    // Rəqəm ardıcıllığını formatla
-                    if (/^\d+$/.test(cleanedText)) {
-                        // 5 rəqəmli qruplar üçün
-                        if (cleanedText.length === 10) {
-                            cleanedText = cleanedText.replace(/(\d{5})(\d{5})/, '$1-$2');
-                        }
-                        // 4 rəqəmli qruplar üçün
-                        else if (cleanedText.length === 8) {
-                            cleanedText = cleanedText.replace(/(\d{4})(\d{4})/, '$1-$2');
-                        }
-                        // 3 rəqəmli qruplar üçün
-                        else if (cleanedText.length === 6) {
-                            cleanedText = cleanedText.replace(/(\d{3})(\d{3})/, '$1-$2');
-                        }
-                        // Digər uzunluqlar üçün
-                        else if (cleanedText.length > 6) {
-                            // Ortadan bölmək
-                            const middle = Math.floor(cleanedText.length / 2);
-                            cleanedText = cleanedText.substring(0, middle) + '-' + cleanedText.substring(middle);
-                        }
-                    }
-                    
+                    // Təmizlənmiş mətni inputa təyin et
                     searchInput.value = cleanedText;
-                    submitForm();
                 }
+                
+                let searchButton = document.getElementById('search-button');
+                let spinner = document.getElementById('loading-spinner');
+                
+                if (!searchButton || !spinner) return;
+                
+                // Butonun ölçüsünü qorumaq üçün enini və hündürlüyünü sabit saxla
+                searchButton.style.width = `${searchButton.offsetWidth}px`;
+                searchButton.style.height = `${searchButton.offsetHeight}px`;
+                
+                // Axtarış yazısını gizlət, amma spinneri saxla
+                if (searchButton.childNodes[0] && searchButton.childNodes[0].nodeValue) {
+                    searchButton.childNodes[0].nodeValue = ''; // Axtar sözünü sil
+                }
+                spinner.style.display = 'inline-block'; // Spinneri göstər
+                
+                // Butonu deaktiv et ki, yenidən klik olunmasın
+                searchButton.disabled = true; 
+                
+                // 1 saniyə sonra formu göndər
+                setTimeout(() => {
+                    this.submit(); // Formu göndər
+                }, 1000);
             });
         }
 

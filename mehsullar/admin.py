@@ -57,7 +57,7 @@ class OEMKodInline(admin.TabularInline):
     extra = 0
     formfield_overrides = {
         models.TextField: {'widget': admin.widgets.AdminTextareaWidget(
-            attrs={'rows': 5, 'style': 'width: 100%; font-family: monospace;'})},
+            attrs={'rows': 5, 'style': 'width: 100%; font-family: monospace; resize: both;'})},
     }
 
 # AxtarisSozleri admin paneli

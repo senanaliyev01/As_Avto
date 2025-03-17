@@ -641,7 +641,7 @@ def send_verification_email(user, email, code, is_password_reset=False):
     AS AVTO Komandası
     """
     
-    from_email = "as.avto.2025@gmail.com"
+    from_email = "senan.eliyev.9997@gmail.com"
     recipient_list = [email]
     
     try:

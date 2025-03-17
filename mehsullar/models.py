@@ -2,6 +2,8 @@ from pickle import FALSE
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class Kateqoriya(models.Model):
     adi = models.CharField(max_length=100, unique=True)
@@ -218,16 +220,16 @@ class OEMKod(models.Model):
         return self.kod
 
     def save(self, *args, **kwargs):
+        # Əvvəlcə "-" işarələrini silək
+        temiz_kod = self.kod.replace('-', '')
+        # Boşluqla ayrılmış kodları ayırıb təmizləyirik
+        kodlar = temiz_kod.split()
+        
+        # Təkrarlanan kodları silmək üçün set istifadə edirik
+        unikal_kodlar = set(kodlar)
+        
         # Əgər yeni yaradılırsa və ya kod dəyişdirilibsə
         if self.pk is None or self._state.adding:
-            # Əvvəlcə "-" işarələrini silək
-            temiz_kod = self.kod.replace('-', '')
-            # Boşluqla ayrılmış kodları ayırıb hər birini ayrı-ayrı yaradaqq
-            kodlar = temiz_kod.split()
-            
-            # Təkrarlanan kodları silmək üçün set istifadə edirik
-            unikal_kodlar = set(kodlar)
-            
             # Mövcud OEM kodlarını əldə edirik
             movcud_kodlar = set()
             if self.mehsul_id:
@@ -302,5 +304,26 @@ class MusteriReyi(models.Model):
 
     def __str__(self):
         return f"{self.musteri.get_full_name()} - {self.get_qiymetlendirme_display()}"
+
+
+@receiver(post_save, sender=Mehsul)
+def temizle_tekrarlanan_oem_kodlar(sender, instance, **kwargs):
+    """Məhsul yadda saxlanıldıqdan sonra təkrarlanan OEM kodlarını təmizləyir"""
+    # Bütün OEM kodlarını əldə edirik
+    butun_kodlar = OEMKod.objects.filter(mehsul=instance)
+    
+    # Unikal kodları saxlamaq üçün set yaradırıq
+    unikal_kodlar = set()
+    silinecek_kodlar = []
+    
+    # Təkrarlanan kodları tapırıq
+    for kod_obj in butun_kodlar:
+        if kod_obj.kod in unikal_kodlar:
+            silinecek_kodlar.append(kod_obj.id)
+        else:
+            unikal_kodlar.add(kod_obj.kod)
+    
+    # Təkrarlanan kodları silirik
+    OEMKod.objects.filter(id__in=silinecek_kodlar).delete()
 
 

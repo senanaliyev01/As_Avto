@@ -224,20 +224,42 @@ class OEMKod(models.Model):
             temiz_kod = self.kod.replace('-', '')
             # Boşluqla ayrılmış kodları ayırıb hər birini ayrı-ayrı yaradaqq
             kodlar = temiz_kod.split()
-            if kodlar:
+            
+            # Təkrarlanan kodları silmək üçün set istifadə edirik
+            unikal_kodlar = set(kodlar)
+            
+            # Mövcud OEM kodlarını əldə edirik
+            movcud_kodlar = set()
+            if self.mehsul_id:
+                movcud_kodlar = set(OEMKod.objects.filter(mehsul=self.mehsul).values_list('kod', flat=True))
+            
+            # Təkrarlanmayan və mövcud olmayan kodları saxlayırıq
+            yeni_unikal_kodlar = unikal_kodlar - movcud_kodlar
+            
+            if yeni_unikal_kodlar:
                 # İlk kodu bu obyektdə saxlayaq
-                self.kod = kodlar[0]
+                self.kod = next(iter(yeni_unikal_kodlar))
                 super().save(*args, **kwargs)
+                
                 # Qalan kodlar üçün yeni OEMKod obyektləri yaradaq
-                for kod in kodlar[1:]:
+                for kod in list(yeni_unikal_kodlar)[1:]:
                     OEMKod.objects.create(
                         kod=kod,
                         mehsul=self.mehsul
                     )
-            return
+                return
+            elif not yeni_unikal_kodlar and unikal_kodlar:
+                # Əgər bütün kodlar artıq mövcuddursa, heç bir şey etmirik
+                return
         else:
             # Mövcud kod yenilənərkən də "-" işarələrini silək
             self.kod = self.kod.replace('-', '')
+            
+            # Əgər bu kod artıq başqa bir OEMKod obyektində mövcuddursa, bu obyekti silək
+            if OEMKod.objects.filter(mehsul=self.mehsul, kod=self.kod).exclude(pk=self.pk).exists():
+                self.delete()
+                return
+                
         super().save(*args, **kwargs)
 
     class Meta:

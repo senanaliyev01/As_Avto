@@ -641,7 +641,8 @@ def send_verification_email(user, email, code, is_password_reset=False):
     AS AVTO Komandası
     """
     
-    from_email = "senan.eliyev.9997@gmail.com"
+    from django.conf import settings
+    from_email = settings.EMAIL_HOST_USER
     recipient_list = [email]
     
     try:

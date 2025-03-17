@@ -13,7 +13,7 @@
 <div class="mehsul-container">
     <div class="breadcrumb">
         <a href="{% url 'esasevim:main' %}">Əsas Səhifə</a> &gt; 
-        <a href="{% url 'kateqoriya' mehsul.kateqoriya.slug %}">{{ mehsul.kateqoriya }}</a> &gt; 
+        <span>{{ mehsul.kateqoriya.adi }}</span> &gt; 
         <span>{{ mehsul.adi }}</span>
     </div>
 

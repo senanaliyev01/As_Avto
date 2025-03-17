@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const productImage = document.getElementById('productImage');
     const brandImage = document.getElementById('brandImage');
     
-    // Şəkil effektləri üçün dəyərlər
+    // Hər şəkil üçün ayrı rotasiya dəyərləri
     const rotations = {
         product: { x: 0, y: 0 },
         brand: { x: 0, y: 0 }
@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let startX, startY;
     let currentElement = null;
     
-    // Şəkil fırlanma funksiyaları
     function handleStart(e, element, type) {
         isDragging = true;
         currentElement = { element, type };
@@ -89,99 +88,126 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Şəkillərin sürüklənməsini əngəlləmək
     document.addEventListener('dragstart', (e) => e.preventDefault());
-    
-    // Səbətə əlavə et düyməsi üçün animasiya
-    const addToCartBtn = document.querySelector('.add-to-cart .btn-primary');
-    if (addToCartBtn) {
-        addToCartBtn.addEventListener('click', function(e) {
-            // Səbətə əlavə edildi animasiyası
-            const icon = this.querySelector('i');
-            icon.classList.add('animate__animated', 'animate__bounceIn');
+
+    // Tab funksionallığı
+    const tabHeaders = document.querySelectorAll('.tab-header');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+
+    tabHeaders.forEach(header => {
+        header.addEventListener('click', () => {
+            // Aktiv tab-ı təmizlə
+            tabHeaders.forEach(h => h.classList.remove('active'));
+            tabPanels.forEach(p => p.classList.remove('active'));
             
-            setTimeout(() => {
-                icon.classList.remove('animate__animated', 'animate__bounceIn');
-            }, 1000);
-            
-            // Səbət sayğacını yeniləmək üçün AJAX sorğusu burada olacaq
-            // Bu nümunə üçün sadəcə animasiya göstəririk
+            // Yeni tab-ı aktiv et
+            header.classList.add('active');
+            const tabId = header.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
         });
-    }
-    
-    // OEM kodları üçün tooltip
-    const oemCodes = document.querySelectorAll('.oem-code');
-    oemCodes.forEach(code => {
-        code.setAttribute('title', 'Alternativ OEM kodu');
-        code.style.cursor = 'help';
     });
-    
-    // Cədvəl sıralarını filtrlə
-    const tableFilter = document.createElement('input');
-    const compatibleModelsTable = document.querySelector('.compatible-models table');
-    
-    if (compatibleModelsTable) {
-        tableFilter.type = 'text';
-        tableFilter.className = 'form-control mb-3';
-        tableFilter.placeholder = 'Avtomobil və ya model adına görə axtar...';
-        
-        const tableContainer = compatibleModelsTable.parentElement;
-        tableContainer.insertBefore(tableFilter, compatibleModelsTable);
-        
-        tableFilter.addEventListener('keyup', function() {
-            const filterValue = this.value.toLowerCase();
-            const rows = compatibleModelsTable.querySelectorAll('tbody tr');
-            
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                if (text.indexOf(filterValue) > -1) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+
+    // Şəkil böyütmə funksionallığı
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    const closeModal = document.querySelector('.close-modal');
+    const zoomOverlay = document.querySelector('.zoom-overlay');
+
+    if (productImage && modal && modalImg) {
+        // Əsas şəkil üçün böyütmə
+        zoomOverlay.addEventListener('click', function() {
+            modal.style.display = "block";
+            modalImg.src = productImage.src;
+        });
+
+        // Kiçik şəkillər üçün böyütmə və dəyişdirmə
+        const thumbnails = document.querySelectorAll('.thumbnail');
+        thumbnails.forEach(thumb => {
+            thumb.addEventListener('click', function() {
+                // Kiçik şəkilləri aktiv/deaktiv et
+                thumbnails.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Əsas şəkili dəyişdir
+                const imgSrc = this.getAttribute('data-src');
+                productImage.src = imgSrc;
             });
         });
+
+        // Modalı bağla
+        closeModal.addEventListener('click', function() {
+            modal.style.display = "none";
+        });
+
+        // Modal xaricində klikləndikdə bağla
+        window.addEventListener('click', function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        });
     }
-    
-    // Səhifə yüklənəndə yumşaq animasiya
-    const productContainer = document.querySelector('.mehsul-container');
-    const productDescription = document.querySelector('.product-description');
-    const compatibleModels = document.querySelector('.compatible-models');
-    const brandInfo = document.querySelector('.brand-info');
-    
-    if (productContainer) {
-        productContainer.style.opacity = '0';
-        productContainer.style.transform = 'translateY(20px)';
-        productContainer.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+
+    // İstək siyahısı düyməsi
+    const wishlistButton = document.querySelector('.wishlist-button');
+    if (wishlistButton) {
+        wishlistButton.addEventListener('click', function() {
+            const productId = this.getAttribute('data-product-id');
+            
+            // İkon dəyişdirmə
+            const icon = this.querySelector('i');
+            if (icon.classList.contains('far')) {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                
+                // İstək siyahısına əlavə et
+                // Burada AJAX sorğusu əlavə edilə bilər
+                
+                // Bildiriş göstər
+                showNotification('Məhsul istək siyahınıza əlavə edildi', 'success');
+            } else {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+                
+                // İstək siyahısından çıxar
+                // Burada AJAX sorğusu əlavə edilə bilər
+                
+                // Bildiriş göstər
+                showNotification('Məhsul istək siyahınızdan çıxarıldı', 'info');
+            }
+        });
+    }
+
+    // Bildiriş funksiyası
+    function showNotification(message, type) {
+        // Əvvəlki bildirişləri təmizlə
+        const existingNotifications = document.querySelectorAll('.notification');
+        existingNotifications.forEach(notification => {
+            notification.remove();
+        });
         
+        // Yeni bildiriş yarat
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        // Bildirişi səhifəyə əlavə et
+        document.body.appendChild(notification);
+        
+        // Bildirişi göstər
         setTimeout(() => {
-            productContainer.style.opacity = '1';
-            productContainer.style.transform = 'translateY(0)';
+            notification.classList.add('show');
         }, 100);
+        
+        // Bildirişi gizlət
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.remove();
+            }, 500);
+        }, 3000);
     }
-    
-    // Digər bölmələr üçün scroll animasiyası
-    function animateOnScroll(element, delay) {
-        if (!element) return;
-        
-        element.style.opacity = '0';
-        element.style.transform = 'translateY(20px)';
-        element.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-        
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    setTimeout(() => {
-                        element.style.opacity = '1';
-                        element.style.transform = 'translateY(0)';
-                    }, delay);
-                    observer.unobserve(element);
-                }
-            });
-        }, { threshold: 0.1 });
-        
-        observer.observe(element);
-    }
-    
-    animateOnScroll(productDescription, 200);
-    animateOnScroll(compatibleModels, 300);
-    animateOnScroll(brandInfo, 400);
 });

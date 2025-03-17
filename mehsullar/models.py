@@ -2,8 +2,6 @@ from pickle import FALSE
 
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 class Kateqoriya(models.Model):
     adi = models.CharField(max_length=100, unique=True)
@@ -220,9 +218,10 @@ class OEMKod(models.Model):
         return self.kod
 
     def save(self, *args, **kwargs):
-        # Əvvəlcə "-" işarələrini silək
+        # "-" işarələrini silək
         temiz_kod = self.kod.replace('-', '')
-        # Boşluqla ayrılmış kodları ayırıb təmizləyirik
+        
+        # Boşluqla ayrılmış kodları ayıraq
         kodlar = temiz_kod.split()
         
         # Təkrarlanan kodları silmək üçün set istifadə edirik
@@ -254,13 +253,33 @@ class OEMKod(models.Model):
                 # Əgər bütün kodlar artıq mövcuddursa, heç bir şey etmirik
                 return
         else:
-            # Mövcud kod yenilənərkən də "-" işarələrini silək
-            self.kod = self.kod.replace('-', '')
+            # Mövcud kod yenilənərkən
             
             # Əgər bu kod artıq başqa bir OEMKod obyektində mövcuddursa, bu obyekti silək
             if OEMKod.objects.filter(mehsul=self.mehsul, kod=self.kod).exclude(pk=self.pk).exists():
                 self.delete()
                 return
+            
+            # Əgər daxil edilən kodda boşluqlar varsa, yeni kodlar əlavə etmək istəyir
+            if len(kodlar) > 1:
+                # Cari kodu saxlayaq
+                self.kod = kodlar[0]
+                super().save(*args, **kwargs)
+                
+                # Mövcud OEM kodlarını əldə edirik
+                movcud_kodlar = set(OEMKod.objects.filter(mehsul=self.mehsul).values_list('kod', flat=True))
+                
+                # Qalan kodlar üçün yeni OEMKod obyektləri yaradaq (təkrarları yoxlayaraq)
+                for kod in kodlar[1:]:
+                    if kod not in movcud_kodlar:
+                        OEMKod.objects.create(
+                            kod=kod,
+                            mehsul=self.mehsul
+                        )
+                return
+            else:
+                # Tək kod varsa, sadəcə onu saxlayaq
+                self.kod = kodlar[0] if kodlar else temiz_kod
                 
         super().save(*args, **kwargs)
 
@@ -304,26 +323,5 @@ class MusteriReyi(models.Model):
 
     def __str__(self):
         return f"{self.musteri.get_full_name()} - {self.get_qiymetlendirme_display()}"
-
-
-@receiver(post_save, sender=Mehsul)
-def temizle_tekrarlanan_oem_kodlar(sender, instance, **kwargs):
-    """Məhsul yadda saxlanıldıqdan sonra təkrarlanan OEM kodlarını təmizləyir"""
-    # Bütün OEM kodlarını əldə edirik
-    butun_kodlar = OEMKod.objects.filter(mehsul=instance)
-    
-    # Unikal kodları saxlamaq üçün set yaradırıq
-    unikal_kodlar = set()
-    silinecek_kodlar = []
-    
-    # Təkrarlanan kodları tapırıq
-    for kod_obj in butun_kodlar:
-        if kod_obj.kod in unikal_kodlar:
-            silinecek_kodlar.append(kod_obj.id)
-        else:
-            unikal_kodlar.add(kod_obj.kod)
-    
-    # Təkrarlanan kodları silirik
-    OEMKod.objects.filter(id__in=silinecek_kodlar).delete()
 
 

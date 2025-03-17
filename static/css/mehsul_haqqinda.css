@@ -16,39 +16,10 @@ body {
     padding: 0 1.5rem;
 }
 
-/* Navigation Buttons */
-.nav-buttons {
-    margin-bottom: 2rem;
-}
-
-.back-button {
-    background: linear-gradient(135deg, #1a237e, #0d47a1);
-    color: #fff;
-    padding: 0.8rem 1.5rem;
-    border-radius: 8px;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.8rem;
-    transition: all 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.back-button:hover {
-    background: linear-gradient(135deg, #0d47a1, #1a237e);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
-
-.back-button i {
-    font-size: 1.1rem;
-}
-
-/* Product Info Section */
-.mehsul-info {
+/* Product Main Container */
+.product-main-container {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: minmax(300px, 40%) 1fr;
     gap: 2.5rem;
     background: linear-gradient(145deg, #0a1929, #1a2942);
     padding: 2rem;
@@ -56,26 +27,32 @@ body {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.05);
     margin-bottom: 2.5rem;
+    position: relative;
 }
 
-/* Product Gallery */
-.mehsul-gallery {
+/* Product Image Container */
+.product-image-container {
+    position: relative;
     background: rgba(10, 25, 41, 0.5);
     border-radius: 15px;
     padding: 1.5rem;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .model-viewer-container {
     background: rgba(13, 71, 161, 0.1);
     border-radius: 10px;
     padding: 1rem;
-    min-width: 400px;
-    min-height: 400px;
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
 }
 
 .product-image_about {
@@ -89,32 +66,76 @@ body {
     filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.2));
 }
 
-.product-image:hover {
+.product-image_about:hover {
     transform: scale(1.02);
 }
 
-.product-image:active {
+.product-image_about:active {
     cursor: grabbing;
     transform: scale(0.98);
 }
 
-/* Product Details */
-.mehsul-details {
-    padding: 1rem;
+/* Product Title Overlay */
+.product-title-overlay {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(10, 25, 41, 0.85);
+    padding: 15px 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    border-left: 4px solid #1565c0;
+    max-width: 60%;
+    z-index: 10;
 }
 
-.mehsul-details h1 {
+.product-title-overlay h1 {
     color: #fff;
-    font-size: 2.2rem;
-    margin: 0 0 2rem 0;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    font-size: 1.8rem;
+    margin: 0;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.specs {
+.product-code-info {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.product-code-badge {
+    background: rgba(13, 71, 161, 0.3);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.85rem;
+    color: #90caf9;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s ease;
+}
+
+.product-code-badge:hover {
+    background: rgba(13, 71, 161, 0.5);
+    transform: translateY(-2px);
+}
+
+.product-code-badge i {
+    font-size: 0.8rem;
+}
+
+/* Product Details */
+.product-details-container {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+}
+
+.specs-grid {
     display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 1rem;
+    margin-bottom: 1.5rem;
 }
 
 .spec-item {
@@ -246,95 +267,189 @@ body {
     margin-right: 5px;
 }
 
+/* Action Buttons */
+.action-buttons {
+    margin-top: auto;
+    display: flex;
+    gap: 1rem;
+}
+
+.cart-icon {
+    background: linear-gradient(135deg, #1565c0, #0d47a1);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: fit-content;
+    position: relative;
+    overflow: hidden;
+}
+
+.cart-icon:hover {
+    background: linear-gradient(135deg, #0d47a1, #1565c0);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.cart-icon i {
+    font-size: 1.2rem;
+}
+
+/* Səbətə əlavə et animasiyası */
+.adding-to-cart {
+    animation: addToCartPulse 1s ease;
+}
+
+@keyframes addToCartPulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+        background: linear-gradient(135deg, #00897b, #00695c);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.cart-icon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.8);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+}
+
+.adding-to-cart::after {
+    animation: addToCartRipple 1s ease-out;
+}
+
+@keyframes addToCartRipple {
+    0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(20, 20);
+        opacity: 0;
+    }
+}
+
 /* Description Section */
 .description {
     background: linear-gradient(145deg, #0a1929, #1a2942);
+    padding: 2rem;
     border-radius: 20px;
-    padding: 2.5rem;
-    margin: 2.5rem 0;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: 2.5rem;
 }
 
 .description h2 {
     color: #64b5f6;
     font-size: 1.8rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     padding-bottom: 1rem;
     border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-    text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .description p {
     color: #fff;
     line-height: 1.8;
     font-size: 1.1rem;
-    text-align: justify;
-    padding: 1.5rem;
-    background: rgba(13, 71, 161, 0.1);
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Brand Info Section */
-.brand-info {
+/* Compatibility Section */
+.compatibility-section {
     background: linear-gradient(145deg, #0a1929, #1a2942);
+    padding: 2rem;
     border-radius: 20px;
-    padding: 2.5rem;
-    margin: 2.5rem 0;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: 2.5rem;
+}
+
+.compatibility-section h2 {
+    color: #64b5f6;
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Brand Info */
+.brand-info {
+    background: linear-gradient(145deg, #0a1929, #1a2942);
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: 2.5rem;
 }
 
 .brand-info h2 {
     color: #64b5f6;
     font-size: 1.8rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     padding-bottom: 1rem;
     border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-    text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .brand-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: grid;
+    grid-template-columns: minmax(200px, 30%) 1fr;
     gap: 2rem;
+    align-items: center;
 }
 
 .brand-image {
-    background: rgba(13, 71, 161, 0.1);
-    padding: 1.5rem;
+    background: rgba(10, 25, 41, 0.5);
     border-radius: 15px;
-    max-width: 300px;
-    margin: 0 auto;
+    padding: 1.5rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .brand-image img {
-    width: 100%;
+    max-width: 100%;
     height: auto;
     border-radius: 8px;
-    transition: transform 0.3s ease;
+    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.2));
 }
 
 .brand-description {
     color: #fff;
     line-height: 1.8;
-    padding: 1.5rem;
-    background: rgba(13, 71, 161, 0.1);
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    text-align: center;
+    font-size: 1.1rem;
 }
 
-/* Brand and Car Images */
+/* Marka Images */
 .marka-image {
+    max-height: 30px;
     max-width: 100px;
-    max-height: 100px;
     object-fit: contain;
+    margin-right: 10px;
     transition: transform 0.3s ease;
-    filter: brightness(1.1);
 }
 
 .marka-image:hover {
@@ -342,62 +457,78 @@ body {
 }
 
 .marka-image-pr-list {
-    max-width: 60px;
-    max-height: 60px;
+    max-height: 25px;
+    max-width: 80px;
     object-fit: contain;
-    margin-right: 8px;
+    margin-right: 10px;
     transition: transform 0.3s ease;
-    filter: brightness(1.1);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .marka-image-pr-list:hover {
     transform: scale(1.1);
 }
 
-/* Cart Button */
-.cart-icon {
-    display: inline-flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem 2rem;
-    margin-top: 2rem;
-    background: linear-gradient(135deg, #1565c0, #0d47a1);
-    color: white;
-    text-decoration: none;
+/* Table Styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+    background: rgba(10, 25, 41, 0.5);
     border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+    color: #fff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+th {
+    background: rgba(13, 71, 161, 0.3);
+    color: #90caf9;
     font-weight: 600;
-    transition: all 0.3s ease;
-    border: none;
-    box-shadow: 0 4px 15px rgba(13, 71, 161, 0.3);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
 }
 
-.cart-icon:hover {
-    background: linear-gradient(135deg, #0d47a1, #1565c0);
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(13, 71, 161, 0.4);
+tr:nth-child(even) {
+    background: rgba(13, 71, 161, 0.1);
 }
 
-.cart-icon i {
-    font-size: 1.2rem;
-    transition: transform 0.3s ease;
+tr:hover {
+    background: rgba(13, 71, 161, 0.2);
 }
 
-.cart-icon:hover i {
-    transform: scale(1.2) rotate(5deg);
-}
-
-/* Responsive Design */
+/* Responsive Styles */
 @media (max-width: 1024px) {
-    .mehsul-info {
+    .product-main-container {
         grid-template-columns: 1fr;
+    }
+    
+    .product-title-overlay {
+        position: relative;
+        top: 0;
+        right: 0;
+        max-width: 100%;
+        margin-bottom: 1.5rem;
     }
     
     .model-viewer-container {
         min-width: auto;
+        min-height: auto;
     }
-
-    .product-image {
+    
+    .product-image_about {
         max-height: 400px;
+    }
+    
+    .brand-content {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -406,25 +537,24 @@ body {
         padding: 0 1rem;
     }
     
-    .mehsul-details h1 {
-        font-size: 1.8rem;
+    .product-title-overlay h1 {
+        font-size: 1.5rem;
     }
     
     .spec-item {
-        flex-direction: column;
-        align-items: flex-start;
+        padding: 1rem;
     }
     
     .label {
-        width: 100%;
-        margin-bottom: 0.5rem;
+        width: 110px;
     }
-
+    
     .description,
+    .compatibility-section,
     .brand-info {
         padding: 1.5rem;
     }
-
+    
     .cart-icon {
         width: 100%;
         justify-content: center;
@@ -432,49 +562,22 @@ body {
 }
 
 @media (max-width: 480px) {
-    .mehsul-details h1 {
-        font-size: 1.5rem;
+    .product-title-overlay h1 {
+        font-size: 1.3rem;
     }
-
+    
     .price {
         font-size: 1.4rem;
     }
-
+    
     .description h2,
+    .compatibility-section h2,
     .brand-info h2 {
         font-size: 1.5rem;
     }
-}
-
-/* Table Styles */
-table {
-    width: 100%;
-    margin: 2rem 0;
-    background: rgba(10, 25, 41, 0.8);
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
-th, td {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 1rem;
-    text-align: center;
-    color: #ffffff;
-}
-
-th {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: linear-gradient(135deg, #1a237e, #0d47a1);
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-tr:nth-child(even) {
-    background: rgba(13, 71, 161, 0.1);
-}
-
-tr:hover {
-    background: rgba(13, 71, 161, 0.3);
-    transition: background 0.3s ease;
+    
+    table {
+        display: block;
+        overflow-x: auto;
+    }
 }

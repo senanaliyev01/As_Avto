@@ -5,6 +5,8 @@ from django.urls import reverse
 from .models import Profile, Message, LoginCode
 from django.utils import timezone
 from django.utils.safestring import mark_safe
+from django.contrib.auth.admin import UserAdmin
+from django.http import HttpResponseRedirect
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
@@ -59,8 +61,41 @@ class CustomUserAdmin(admin.ModelAdmin):
         if profile and profile.sekil:
             return mark_safe('<img src="{}" width="30" class="img-circle elevation-2" />'.format(profile.sekil.url))
         return mark_safe('<img src="/static/vendor/adminlte/img/user2-160x160.jpg" width="30" class="img-circle elevation-2" />')
+    
+    def reset_password(self, obj):
+        return mark_safe(
+            '<a href="{}?user_id={}" class="button" style="background-color: #ff9800; color: white; padding: 5px 10px; border-radius: 4px; text-decoration: none;">Şifrəni Sıfırla</a>'.format(
+                reverse('admin:reset_user_password'), obj.id
+            )
+        )
+    reset_password.short_description = 'Şifrə Əməliyyatları'
+    
+    def get_urls(self):
+        from django.urls import path
+        urls = super().get_urls()
+        custom_urls = [
+            path('reset-password/', self.admin_site.admin_view(self.reset_password_view), name='reset_user_password'),
+        ]
+        return custom_urls + urls
+    
+    def reset_password_view(self, request):
+        user_id = request.GET.get('user_id')
+        if user_id:
+            user = User.objects.get(id=user_id)
+            # Yeni təsadüfi şifrə yaratmaq (6 simvol)
+            import random
+            import string
+            new_password = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(6))
+            
+            # İstifadəçinin şifrəsini yeniləmək
+            user.set_password(new_password)
+            user.save()
+            
+            self.message_user(request, f"İstifadəçi '{user.username}' üçün şifrə sıfırlandı. Yeni şifrə: {new_password}")
+            
+        return HttpResponseRedirect(reverse('admin:auth_user_changelist'))
 
-    list_display = ("username", "email", "user_avatar")  # Admin paneldə avatar göstərmək üçün
+    list_display = ("username", "email", "user_avatar", "reset_password")  # Admin paneldə avatar və şifrə sıfırlama düyməsi göstərmək üçün
 
 admin.site.unregister(User)  # Əvvəlki User adminini silirik
 admin.site.register(User, CustomUserAdmin)  # Yeni Custom Admini qeydiyyatdan keçiririk

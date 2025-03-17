@@ -88,65 +88,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Şəkillərin sürüklənməsini əngəlləmək
     document.addEventListener('dragstart', (e) => e.preventDefault());
-
-    // Tab funksionallığı
-    const tabHeaders = document.querySelectorAll('.tab-header');
-    const tabPanels = document.querySelectorAll('.tab-panel');
-
-    tabHeaders.forEach(header => {
-        header.addEventListener('click', () => {
-            // Aktiv tab-ı təmizlə
-            tabHeaders.forEach(h => h.classList.remove('active'));
-            tabPanels.forEach(p => p.classList.remove('active'));
-            
-            // Yeni tab-ı aktiv et
-            header.classList.add('active');
-            const tabId = header.getAttribute('data-tab');
-            document.getElementById(tabId).classList.add('active');
-        });
-    });
-
-    // Şəkil böyütmə funksionallığı
-    const modal = document.getElementById('imageModal');
-    const modalImg = document.getElementById('modalImage');
-    const closeModal = document.querySelector('.close-modal');
-    const zoomOverlay = document.querySelector('.zoom-overlay');
-
-    if (productImage && modal && modalImg) {
-        // Əsas şəkil üçün böyütmə
-        zoomOverlay.addEventListener('click', function() {
-            modal.style.display = "block";
-            modalImg.src = productImage.src;
-        });
-
-        // Kiçik şəkillər üçün böyütmə və dəyişdirmə
-        const thumbnails = document.querySelectorAll('.thumbnail');
-        thumbnails.forEach(thumb => {
-            thumb.addEventListener('click', function() {
-                // Kiçik şəkilləri aktiv/deaktiv et
-                thumbnails.forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
-                
-                // Əsas şəkili dəyişdir
-                const imgSrc = this.getAttribute('data-src');
-                productImage.src = imgSrc;
-            });
-        });
-
-        // Modalı bağla
-        closeModal.addEventListener('click', function() {
-            modal.style.display = "none";
-        });
-
-        // Modal xaricində klikləndikdə bağla
-        window.addEventListener('click', function(event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-        });
-    }
-
-    // İstək siyahısı düyməsi
+    
+    // İstək siyahısı funksiyası
     const wishlistButton = document.querySelector('.wishlist-button');
     if (wishlistButton) {
         wishlistButton.addEventListener('click', function() {
@@ -158,56 +101,207 @@ document.addEventListener('DOMContentLoaded', function() {
                 icon.classList.remove('far');
                 icon.classList.add('fas');
                 
-                // İstək siyahısına əlavə et
-                // Burada AJAX sorğusu əlavə edilə bilər
+                // Animasiya əlavə et
+                icon.classList.add('pulse-animation');
+                setTimeout(() => {
+                    icon.classList.remove('pulse-animation');
+                }, 1000);
                 
-                // Bildiriş göstər
                 showNotification('Məhsul istək siyahınıza əlavə edildi', 'success');
+                
+                // Burada istək siyahısına əlavə etmək üçün AJAX sorğusu göndərilə bilər
+                // addToWishlist(productId);
             } else {
                 icon.classList.remove('fas');
                 icon.classList.add('far');
-                
-                // İstək siyahısından çıxar
-                // Burada AJAX sorğusu əlavə edilə bilər
-                
-                // Bildiriş göstər
                 showNotification('Məhsul istək siyahınızdan çıxarıldı', 'info');
+                
+                // Burada istək siyahısından çıxarmaq üçün AJAX sorğusu göndərilə bilər
+                // removeFromWishlist(productId);
             }
         });
     }
-
-    // Bildiriş funksiyası
-    function showNotification(message, type) {
+    
+    // Səbətə əlavə et düyməsi
+    const cartButton = document.querySelector('.cart-icon');
+    if (cartButton) {
+        cartButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            const productId = this.getAttribute('data-product-id');
+            
+            // Animasiya əlavə et
+            const icon = this.querySelector('i');
+            icon.classList.add('bounce-animation');
+            setTimeout(() => {
+                icon.classList.remove('bounce-animation');
+            }, 1000);
+            
+            // AJAX ilə səbətə əlavə et
+            fetch(this.getAttribute('href'))
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification('Məhsul səbətə əlavə edildi', 'success');
+                        // Səbət sayğacını yeniləmək üçün kod əlavə edilə bilər
+                    } else {
+                        showNotification(data.error || 'Xəta baş verdi', 'error');
+                    }
+                })
+                .catch(error => {
+                    showNotification('Xəta baş verdi', 'error');
+                    console.error('Error:', error);
+                });
+        });
+    }
+    
+    // Bildiriş göstərmə funksiyası
+    function showNotification(message, type = 'info') {
         // Əvvəlki bildirişləri təmizlə
         const existingNotifications = document.querySelectorAll('.notification');
         existingNotifications.forEach(notification => {
             notification.remove();
         });
         
-        // Yeni bildiriş yarat
+        // Yeni bildiriş yaratma
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
+        
+        // Bildiriş ikonu
+        let icon = '';
+        switch(type) {
+            case 'success':
+                icon = '<i class="fas fa-check-circle"></i>';
+                break;
+            case 'error':
+                icon = '<i class="fas fa-exclamation-circle"></i>';
+                break;
+            case 'info':
+                icon = '<i class="fas fa-info-circle"></i>';
+                break;
+            case 'warning':
+                icon = '<i class="fas fa-exclamation-triangle"></i>';
+                break;
+        }
+        
         notification.innerHTML = `
             <div class="notification-content">
-                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i>
+                ${icon}
                 <span>${message}</span>
             </div>
+            <button class="notification-close"><i class="fas fa-times"></i></button>
         `;
         
-        // Bildirişi səhifəyə əlavə et
         document.body.appendChild(notification);
         
         // Bildirişi göstər
         setTimeout(() => {
             notification.classList.add('show');
-        }, 100);
+        }, 10);
         
-        // Bildirişi gizlət
+        // Bildirişi bağla düyməsi
+        const closeButton = notification.querySelector('.notification-close');
+        closeButton.addEventListener('click', () => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        });
+        
+        // Avtomatik bağlanma
         setTimeout(() => {
             notification.classList.remove('show');
             setTimeout(() => {
                 notification.remove();
-            }, 500);
-        }, 3000);
+            }, 300);
+        }, 5000);
     }
+    
+    // CSS animasiyaları üçün stil əlavə et
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 0.5s ease-in-out;
+            color: #ff4081;
+        }
+        
+        .bounce-animation {
+            animation: bounce 0.8s ease;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-width: 300px;
+            max-width: 450px;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .notification.success {
+            background: linear-gradient(135deg, #00897b, #00695c);
+            color: white;
+        }
+        
+        .notification.error {
+            background: linear-gradient(135deg, #e53935, #c62828);
+            color: white;
+        }
+        
+        .notification.info {
+            background: linear-gradient(135deg, #1565c0, #0d47a1);
+            color: white;
+        }
+        
+        .notification.warning {
+            background: linear-gradient(135deg, #ffd54f, #ffb300);
+            color: black;
+        }
+        
+        .notification-close {
+            background: transparent;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            padding: 0;
+            margin-left: 10px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .notification-close:hover {
+            opacity: 1;
+        }
+    `;
+    document.head.appendChild(style);
 });

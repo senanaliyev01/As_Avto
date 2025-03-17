@@ -218,69 +218,26 @@ class OEMKod(models.Model):
         return self.kod
 
     def save(self, *args, **kwargs):
-        # "-" işarələrini silək
-        temiz_kod = self.kod.replace('-', '')
-        
-        # Boşluqla ayrılmış kodları ayıraq
-        kodlar = temiz_kod.split()
-        
-        # Təkrarlanan kodları silmək üçün set istifadə edirik
-        unikal_kodlar = set(kodlar)
-        
         # Əgər yeni yaradılırsa və ya kod dəyişdirilibsə
         if self.pk is None or self._state.adding:
-            # Mövcud OEM kodlarını əldə edirik
-            movcud_kodlar = set()
-            if self.mehsul_id:
-                movcud_kodlar = set(OEMKod.objects.filter(mehsul=self.mehsul).values_list('kod', flat=True))
-            
-            # Təkrarlanmayan və mövcud olmayan kodları1 saxlayırıq
-            yeni_unikal_kodlar = unikal_kodlar - movcud_kodlar
-            
-            if yeni_unikal_kodlar:
+            # Əvvəlcə "-" işarələrini silək
+            temiz_kod = self.kod.replace('-', '')
+            # Boşluqla ayrılmış kodları ayırıb hər birini ayrı-ayrı yaradaqq
+            kodlar = temiz_kod.split()
+            if kodlar:
                 # İlk kodu bu obyektdə saxlayaq
-                self.kod = next(iter(yeni_unikal_kodlar))
+                self.kod = kodlar[0]
                 super().save(*args, **kwargs)
-                
                 # Qalan kodlar üçün yeni OEMKod obyektləri yaradaq
-                for kod in list(yeni_unikal_kodlar)[1:]:
+                for kod in kodlar[1:]:
                     OEMKod.objects.create(
                         kod=kod,
                         mehsul=self.mehsul
                     )
-                return
-            elif not yeni_unikal_kodlar and unikal_kodlar:
-                # Əgər bütün kodlar artıq mövcuddursa, heç bir şey etmirik
-                return
+            return
         else:
-            # Mövcud kod yenilənərkən
-            
-            # Əgər bu kod artıq başqa bir OEMKod obyektində mövcuddursa, bu obyekti silək
-            if OEMKod.objects.filter(mehsul=self.mehsul, kod=self.kod).exclude(pk=self.pk).exists():
-                self.delete()
-                return
-            
-            # Əgər daxil edilən kodda boşluqlar varsa, yeni kodlar əlavə etmək istəyir
-            if len(kodlar) > 1:
-                # Cari kodu saxlayaq
-                self.kod = kodlar[0]
-                super().save(*args, **kwargs)
-                
-                # Mövcud OEM kodlarını əldə edirik
-                movcud_kodlar = set(OEMKod.objects.filter(mehsul=self.mehsul).values_list('kod', flat=True))
-                
-                # Qalan kodlar üçün yeni OEMKod obyektləri yaradaq (təkrarları yoxlayaraq)
-                for kod in kodlar[1:]:
-                    if kod not in movcud_kodlar:
-                        OEMKod.objects.create(
-                            kod=kod,
-                            mehsul=self.mehsul
-                        )
-                return
-            else:
-                # Tək kod varsa, sadəcə onu saxlayaq
-                self.kod = kodlar[0] if kodlar else temiz_kod
-                
+            # Mövcud kod yenilənərkən də "-" işarələrini silək
+            self.kod = self.kod.replace('-', '')
         super().save(*args, **kwargs)
 
     class Meta:

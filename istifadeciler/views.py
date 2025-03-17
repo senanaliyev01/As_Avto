@@ -4,7 +4,7 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from .forms import UserUpdateForm, ProfileUpdateForm
-from .models import Profile, Message, LoginCode
+from .models import Profile, Message, LoginCode, EmailVerification
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
 from django.db.models import Q
@@ -16,6 +16,10 @@ from django.urls import reverse
 from django.utils import timezone
 import re
 from esasevim.views import esasevim
+from django.core.mail import send_mail
+from django.conf import settings
+import random
+import string
 
 def check_code_expiration(request):
     """Təhlükəsizlik kodunun müddətini yoxlayır"""
@@ -344,7 +348,8 @@ def register(request):
             user = User.objects.create_user(
                 username=username,
                 email=email,
-                password=password
+                password=password,
+                is_active=False  # Email təsdiqlənənə qədər hesab aktiv olmayacaq
             )
 
             print(f"İstifadəçi yaradıldı: {user.username}")
@@ -358,10 +363,33 @@ def register(request):
             profile.save()
 
             print(f"Profil yeniləndi: {profile}")
+            
+            # Email təsdiq kodu yarat və göndər
+            verification_code = EmailVerification.generate_code()
+            EmailVerification.objects.create(
+                user=user,
+                code=verification_code,
+                email=email
+            )
+            
+            # Email göndər
+            email_sent = send_verification_email(user, email, verification_code)
+            
+            if not email_sent:
+                # Email göndərilə bilmədisə, istifadəçini sil
+                user.delete()
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Email göndərilə bilmədi. Zəhmət olmasa daha sonra yenidən cəhd edin.'
+                })
 
+            # Təsdiq səhifəsinə yönləndir
+            request.session['pending_verification_email'] = email
+            
             return JsonResponse({
                 'status': 'success',
-                'message': 'Qeydiyyatınız uğurla tamamlandı! Hesabınızın təsdiqi üçün adminlə əlaqə saxlayın. Sizinlə əməkdaşlıq etməyə hazırıq!'
+                'message': 'Qeydiyyatınız uğurla tamamlandı! Email ünvanınıza təsdiq kodu göndərildi. Zəhmət olmasa emailinizi yoxlayın.',
+                'redirect': reverse('verify_email')
             })
 
         except Exception as e:
@@ -373,7 +401,91 @@ def register(request):
 
     return render(request, 'register.html')
 
+def verify_email(request):
+    """Email təsdiqi səhifəsi"""
+    email = request.session.get('pending_verification_email')
+    
+    if not email:
+        messages.error(request, 'Təsdiq ediləcək email tapılmadı.')
+        return redirect('login')
+    
+    if request.method == 'POST':
+        code = request.POST.get('verification_code')
+        
+        try:
+            verification = EmailVerification.objects.filter(
+                email=email,
+                code=code,
+                is_used=False
+            ).latest('created_at')
+            
+            if verification.is_valid():
+                user = verification.user
+                user.is_active = True
+                user.save()
+                
+                verification.is_used = True
+                verification.save()
+                
+                # Sessiyadan təmizlə
+                request.session.pop('pending_verification_email', None)
+                
+                messages.success(request, 'Email ünvanınız uğurla təsdiqləndi! İndi daxil ola bilərsiniz.')
+                return redirect('login')
+            else:
+                messages.error(request, 'Təsdiq kodu etibarsızdır və ya müddəti bitib.')
+        except EmailVerification.DoesNotExist:
+            messages.error(request, 'Yanlış təsdiq kodu.')
+    
+    return render(request, 'verify_email.html', {'email': email})
 
+def resend_verification_email(request):
+    """Təsdiq emailini yenidən göndərir"""
+    email = request.session.get('pending_verification_email')
+    
+    if not email:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Təsdiq ediləcək email tapılmadı.'
+        })
+    
+    try:
+        user = User.objects.get(email=email, is_active=False)
+        
+        # Köhnə kodları deaktiv et
+        EmailVerification.objects.filter(user=user, is_used=False).update(is_used=True)
+        
+        # Yeni kod yarat və göndər
+        verification_code = EmailVerification.generate_code()
+        EmailVerification.objects.create(
+            user=user,
+            code=verification_code,
+            email=email
+        )
+        
+        # Email göndər
+        email_sent = send_verification_email(user, email, verification_code)
+        
+        if not email_sent:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Email göndərilə bilmədi. Zəhmət olmasa daha sonra yenidən cəhd edin.'
+            })
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Təsdiq kodu yenidən göndərildi. Zəhmət olmasa emailinizi yoxlayın.'
+        })
+    except User.DoesNotExist:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'İstifadəçi tapılmadı.'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': f'Xəta baş verdi: {str(e)}'
+        })
 
 @login_required
 def get_messages(request, receiver_id):
@@ -511,3 +623,181 @@ def get_chat_users(request):
     except Exception as e:
         print(f"get_chat_users funksiyasında xəta: {str(e)}")
         return JsonResponse({'error': str(e)}, status=500)
+
+def send_verification_email(user, email, code, is_password_reset=False):
+    """Email vasitəsilə təsdiq kodu göndərir"""
+    subject = "Şifrə Sıfırlama Kodu" if is_password_reset else "Email Təsdiq Kodu"
+    
+    message = f"""
+    Hörmətli {user.username},
+    
+    {"Şifrənizi sıfırlamaq" if is_password_reset else "Email ünvanınızı təsdiqləmək"} üçün kodunuz: {code}
+    
+    Bu kod 10 dəqiqə ərzində etibarlıdır.
+    
+    Əgər bu sorğunu siz göndərməmisinizsə, bu emaili nəzərə almayın.
+    
+    Hörmətlə,
+    AS AVTO Komandası
+    """
+    
+    from_email = "as.avto.2025@gmail.com"
+    recipient_list = [email]
+    
+    try:
+        send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+        return True
+    except Exception as e:
+        print(f"Email göndərmə xətası: {str(e)}")
+        return False
+
+def forgot_password(request):
+    """Şifrə sıfırlama səhifəsi"""
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        
+        try:
+            user = User.objects.get(email=email)
+            
+            # Köhnə kodları deaktiv et
+            EmailVerification.objects.filter(user=user, is_used=False).update(is_used=True)
+            
+            # Yeni kod yarat və göndər
+            reset_code = EmailVerification.generate_code()
+            EmailVerification.objects.create(
+                user=user,
+                code=reset_code,
+                email=email
+            )
+            
+            # Email göndər
+            email_sent = send_verification_email(user, email, reset_code, is_password_reset=True)
+            
+            if not email_sent:
+                messages.error(request, 'Email göndərilə bilmədi. Zəhmət olmasa daha sonra yenidən cəhd edin.')
+                return render(request, 'forgot_password.html')
+            
+            # Sessiyada saxla
+            request.session['reset_password_email'] = email
+            
+            messages.success(request, 'Şifrə sıfırlama kodu email ünvanınıza göndərildi.')
+            return redirect('reset_password')
+            
+        except User.DoesNotExist:
+            messages.error(request, 'Bu email ünvanı ilə qeydiyyatdan keçmiş istifadəçi tapılmadı.')
+        except Exception as e:
+            messages.error(request, f'Xəta baş verdi: {str(e)}')
+    
+    return render(request, 'forgot_password.html')
+
+def reset_password(request):
+    """Şifrə sıfırlama kodu təsdiqi və yeni şifrə təyini"""
+    email = request.session.get('reset_password_email')
+    
+    if not email:
+        messages.error(request, 'Şifrə sıfırlama sorğusu tapılmadı.')
+        return redirect('forgot_password')
+    
+    if request.method == 'POST':
+        code = request.POST.get('verification_code')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+        
+        # Şifrələrin uyğunluğunu yoxla
+        if new_password != confirm_password:
+            messages.error(request, 'Şifrələr uyğun gəlmir!')
+            return render(request, 'reset_password.html', {'email': email})
+        
+        # Şifrə tələblərini yoxla
+        if len(new_password) < 8:
+            messages.error(request, 'Şifrə ən azı 8 simvol olmalıdır!')
+            return render(request, 'reset_password.html', {'email': email})
+        
+        if not re.search(r'[A-Z]', new_password):
+            messages.error(request, 'Şifrədə ən azı 1 böyük hərf olmalıdır!')
+            return render(request, 'reset_password.html', {'email': email})
+        
+        if not re.search(r'[0-9]', new_password):
+            messages.error(request, 'Şifrədə ən azı 1 rəqəm olmalıdır!')
+            return render(request, 'reset_password.html', {'email': email})
+        
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', new_password):
+            messages.error(request, 'Şifrədə ən azı 1 xüsusi simvol olmalıdır!')
+            return render(request, 'reset_password.html', {'email': email})
+        
+        try:
+            verification = EmailVerification.objects.filter(
+                email=email,
+                code=code,
+                is_used=False
+            ).latest('created_at')
+            
+            if verification.is_valid():
+                user = verification.user
+                user.set_password(new_password)
+                user.save()
+                
+                verification.is_used = True
+                verification.save()
+                
+                # Sessiyadan təmizlə
+                request.session.pop('reset_password_email', None)
+                
+                messages.success(request, 'Şifrəniz uğurla yeniləndi! İndi yeni şifrənizlə daxil ola bilərsiniz.')
+                return redirect('login')
+            else:
+                messages.error(request, 'Təsdiq kodu etibarsızdır və ya müddəti bitib.')
+        except EmailVerification.DoesNotExist:
+            messages.error(request, 'Yanlış təsdiq kodu.')
+        except Exception as e:
+            messages.error(request, f'Xəta baş verdi: {str(e)}')
+    
+    return render(request, 'reset_password.html', {'email': email})
+
+def resend_reset_code(request):
+    """Şifrə sıfırlama kodunu yenidən göndərir"""
+    email = request.session.get('reset_password_email')
+    
+    if not email:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Şifrə sıfırlama sorğusu tapılmadı.'
+        })
+    
+    try:
+        user = User.objects.get(email=email)
+        
+        # Köhnə kodları deaktiv et
+        EmailVerification.objects.filter(user=user, is_used=False).update(is_used=True)
+        
+        # Yeni kod yarat və göndər
+        reset_code = EmailVerification.generate_code()
+        EmailVerification.objects.create(
+            user=user,
+            code=reset_code,
+            email=email
+        )
+        
+        # Email göndər
+        email_sent = send_verification_email(user, email, reset_code, is_password_reset=True)
+        
+        if not email_sent:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Email göndərilə bilmədi. Zəhmət olmasa daha sonra yenidən cəhd edin.'
+            })
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Şifrə sıfırlama kodu yenidən göndərildi. Zəhmət olmasa emailinizi yoxlayın.'
+        })
+    except User.DoesNotExist:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'İstifadəçi tapılmadı.'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': f'Xəta baş verdi: {str(e)}'
+        })

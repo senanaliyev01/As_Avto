@@ -82,10 +82,10 @@ class CustomUserAdmin(admin.ModelAdmin):
         user_id = request.GET.get('user_id')
         if user_id:
             user = User.objects.get(id=user_id)
-            # Yeni təsadüfi şifrə yaratmaq (6 simvol)
+            # Yeni təsadüfi şifrə yaratmaq (6 rəqəm)
             import random
             import string
-            new_password = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(6))
+            new_password = ''.join(random.choice(string.digits) for _ in range(6))
             
             # İstifadəçinin şifrəsini yeniləmək
             user.set_password(new_password)

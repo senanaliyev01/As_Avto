@@ -234,7 +234,7 @@ class OEMKod(models.Model):
             if self.mehsul_id:
                 movcud_kodlar = set(OEMKod.objects.filter(mehsul=self.mehsul).values_list('kod', flat=True))
             
-            # Təkrarlanmayan və mövcud olmayan kodları saxlayırıq
+            # Təkrarlanmayan və mövcud olmayan kodları1 saxlayırıq
             yeni_unikal_kodlar = unikal_kodlar - movcud_kodlar
             
             if yeni_unikal_kodlar:

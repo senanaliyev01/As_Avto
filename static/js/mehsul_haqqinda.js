@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const productImage = document.getElementById('productImage');
     const brandImage = document.getElementById('brandImage');
     
-    // Hər şəkil üçün ayrı rotasiya dəyərləri
+    // Şəkil effektləri üçün dəyərlər
     const rotations = {
         product: { x: 0, y: 0 },
         brand: { x: 0, y: 0 }
@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let startX, startY;
     let currentElement = null;
     
+    // Şəkil fırlanma funksiyaları
     function handleStart(e, element, type) {
         isDragging = true;
         currentElement = { element, type };
@@ -89,79 +90,98 @@ document.addEventListener('DOMContentLoaded', function() {
     // Şəkillərin sürüklənməsini əngəlləmək
     document.addEventListener('dragstart', (e) => e.preventDefault());
     
-    // Məhsul məlumatlarının animasiyası
-    const specItems = document.querySelectorAll('.spec-item');
-    specItems.forEach((item, index) => {
-        item.style.opacity = '0';
-        item.style.transform = 'translateX(20px)';
-        
-        setTimeout(() => {
-            item.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-            item.style.opacity = '1';
-            item.style.transform = 'translateX(0)';
-        }, 100 + (index * 100));
-    });
-    
-    // Səbətə əlavə et düyməsinin animasiyası
-    const cartButton = document.querySelector('.cart-icon');
-    if (cartButton) {
-        cartButton.style.opacity = '0';
-        cartButton.style.transform = 'translateY(20px)';
-        
-        setTimeout(() => {
-            cartButton.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-            cartButton.style.opacity = '1';
-            cartButton.style.transform = 'translateY(0)';
-        }, 100 + (specItems.length * 100));
-        
-        // Səbətə əlavə et düyməsinə klik hadisəsi
-        cartButton.addEventListener('click', function(e) {
-            const productId = this.getAttribute('data-product-id');
-            
-            // Animasiya effekti
-            this.classList.add('adding-to-cart');
+    // Səbətə əlavə et düyməsi üçün animasiya
+    const addToCartBtn = document.querySelector('.add-to-cart .btn-primary');
+    if (addToCartBtn) {
+        addToCartBtn.addEventListener('click', function(e) {
+            // Səbətə əlavə edildi animasiyası
+            const icon = this.querySelector('i');
+            icon.classList.add('animate__animated', 'animate__bounceIn');
             
             setTimeout(() => {
-                this.classList.remove('adding-to-cart');
+                icon.classList.remove('animate__animated', 'animate__bounceIn');
             }, 1000);
+            
+            // Səbət sayğacını yeniləmək üçün AJAX sorğusu burada olacaq
+            // Bu nümunə üçün sadəcə animasiya göstəririk
         });
     }
     
-    // OEM kodlarının hover effekti
+    // OEM kodları üçün tooltip
     const oemCodes = document.querySelectorAll('.oem-code');
     oemCodes.forEach(code => {
-        code.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-5px)';
-            this.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.2)';
-        });
-        
-        code.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-            this.style.boxShadow = 'none';
-        });
+        code.setAttribute('title', 'Alternativ OEM kodu');
+        code.style.cursor = 'help';
     });
     
-    // Responsive dizayn üçün məhsul başlığının pozisiyasını tənzimləmək
-    function adjustTitlePosition() {
-        const titleOverlay = document.querySelector('.product-title-overlay');
-        const imageContainer = document.querySelector('.product-image-container');
+    // Cədvəl sıralarını filtrlə
+    const tableFilter = document.createElement('input');
+    const compatibleModelsTable = document.querySelector('.compatible-models table');
+    
+    if (compatibleModelsTable) {
+        tableFilter.type = 'text';
+        tableFilter.className = 'form-control mb-3';
+        tableFilter.placeholder = 'Avtomobil və ya model adına görə axtar...';
         
-        if (titleOverlay && imageContainer && window.innerWidth <= 1024) {
-            titleOverlay.style.position = 'relative';
-            titleOverlay.style.top = '0';
-            titleOverlay.style.right = '0';
-            titleOverlay.style.maxWidth = '100%';
-            titleOverlay.style.marginBottom = '1.5rem';
-        } else if (titleOverlay && imageContainer) {
-            titleOverlay.style.position = 'absolute';
-            titleOverlay.style.top = '20px';
-            titleOverlay.style.right = '20px';
-            titleOverlay.style.maxWidth = '60%';
-            titleOverlay.style.marginBottom = '0';
-        }
+        const tableContainer = compatibleModelsTable.parentElement;
+        tableContainer.insertBefore(tableFilter, compatibleModelsTable);
+        
+        tableFilter.addEventListener('keyup', function() {
+            const filterValue = this.value.toLowerCase();
+            const rows = compatibleModelsTable.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.indexOf(filterValue) > -1) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
     }
     
-    // İlkin yükləmə və pəncərə ölçüsü dəyişdikdə
-    adjustTitlePosition();
-    window.addEventListener('resize', adjustTitlePosition);
+    // Səhifə yüklənəndə yumşaq animasiya
+    const productContainer = document.querySelector('.mehsul-container');
+    const productDescription = document.querySelector('.product-description');
+    const compatibleModels = document.querySelector('.compatible-models');
+    const brandInfo = document.querySelector('.brand-info');
+    
+    if (productContainer) {
+        productContainer.style.opacity = '0';
+        productContainer.style.transform = 'translateY(20px)';
+        productContainer.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        
+        setTimeout(() => {
+            productContainer.style.opacity = '1';
+            productContainer.style.transform = 'translateY(0)';
+        }, 100);
+    }
+    
+    // Digər bölmələr üçün scroll animasiyası
+    function animateOnScroll(element, delay) {
+        if (!element) return;
+        
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(20px)';
+        element.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        element.style.opacity = '1';
+                        element.style.transform = 'translateY(0)';
+                    }, delay);
+                    observer.unobserve(element);
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        observer.observe(element);
+    }
+    
+    animateOnScroll(productDescription, 200);
+    animateOnScroll(compatibleModels, 300);
+    animateOnScroll(brandInfo, 400);
 });

@@ -5,257 +5,211 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/mehsul_haqqinda.css' %}">
-<style>
-    .product-header {
-        position: relative;
-        margin-bottom: 2rem;
-    }
-    
-    .product-title-overlay {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        background: rgba(10, 25, 41, 0.85);
-        padding: 15px 25px;
-        border-radius: 10px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        border-left: 4px solid #1565c0;
-        max-width: 60%;
-    }
-    
-    .product-title-overlay h1 {
-        color: #fff;
-        font-size: 1.8rem;
-        margin: 0;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    }
-    
-    .product-code-info {
-        margin-top: 10px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-    
-    .product-code-badge {
-        background: rgba(13, 71, 161, 0.3);
-        padding: 5px 10px;
-        border-radius: 5px;
-        font-size: 0.85rem;
-        color: #90caf9;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-    
-    .product-code-badge i {
-        font-size: 0.8rem;
-    }
-    
-    .product-main-container {
-        display: grid;
-        grid-template-columns: minmax(300px, 40%) 1fr;
-        gap: 2.5rem;
-        background: linear-gradient(145deg, #0a1929, #1a2942);
-        padding: 2rem;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        margin-bottom: 2.5rem;
-    }
-    
-    .product-image-container {
-        position: relative;
-        background: rgba(10, 25, 41, 0.5);
-        border-radius: 15px;
-        padding: 1.5rem;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .product-details-container {
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .specs-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    .action-buttons {
-        margin-top: auto;
-        display: flex;
-        gap: 1rem;
-    }
-</style>
 {% endblock %}
 
 {% block content %}
 <!-- Məhsul Məlumatları -->
-<div class="mehsul-container">
-    <div class="product-main-container">
-        <!-- Məhsul şəkli sol tərəfdə -->
-        <div class="product-image-container">
-            {% if mehsul.sekil %}
-            <div class="model-viewer-container">
-                <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image_about" id="productImage">
-            </div>
-            
-            <!-- Məhsul adı şəklin yuxarı sağında -->
-            <div class="product-title-overlay">
-                <h1>{{ mehsul.adi }}</h1>
-                <div class="product-code-info">
-                    {% if mehsul.brend_kod %}
-                    <div class="product-code-badge">
-                        <i class="fas fa-tag"></i>
-                        <span>{{ mehsul.brend_kod }}</span>
-                    </div>
-                    {% endif %}
-                    
-                    {% if mehsul.oem %}
-                    <div class="product-code-badge">
-                        <i class="fas fa-barcode"></i>
-                        <span>OEM: {{ mehsul.oem }}</span>
-                    </div>
-                    {% endif %}
-                    
-                    {% if mehsul.brend.adi %}
-                    <div class="product-code-badge">
-                        <i class="fas fa-industry"></i>
-                        <span>{{ mehsul.brend.adi }}</span>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-            {% endif %}
-        </div>
-        
-        <!-- Məhsul detalları sağ tərəfdə -->
-        <div class="product-details-container">
-            <div class="specs-grid">
-                <div class="spec-item">
-                    <span class="label">Kateqoriya:</span>
-                    <span class="value">{{ mehsul.kateqoriya }}</span>
-                </div>
-                
-                <div class="spec-item">
-                    <span class="label">Firma:</span>
-                    <span class="value" style="display: flex; align-items: center;">
-                        {% if mehsul.brend.sekilyazi %}
-                        <img src="{{ mehsul.brend.sekilyazi.url }}" alt="{{ mehsul.brend.adi }}" class="marka-image">
-                        {% else %}
-                            {{ mehsul.brend.adi }}
-                        {% endif %}
-                    </span>
-                </div>
-                
-                <div class="spec-item">
-                    <span class="label">Avtomobil:</span>
-                    <span class="value" style="display: flex; align-items: center;">
-                        {% if mehsul.marka.sekiller.all %}
-                            {% for sekil in mehsul.marka.sekiller.all %}
-                                <img src="{{ sekil.sekil.url }}" alt="{{ mehsul.marka.adi }}" class="marka-image-pr-list" style="margin-right: 8px;">
-                            {% endfor %}
-                        {% else %}
-                            {{ mehsul.marka.adi }}
-                        {% endif %}
-                    </span>
-                </div>
-                
-                {% if mehsul.oem_kodlar.all %}
-                <div class="spec-item oem-list">
-                    <span class="label">Dəyişən OEM Kodlar:</span>
-                    <div class="value oem-codes">
-                        {% for oem in mehsul.oem_kodlar.all %}
-                            <span class="oem-code">{{ oem.kod }}</span>
-                        {% endfor %}
-                    </div>
-                </div> 
-                {% endif %}
-                
-                <div class="spec-item stock-item">
-                    <span class="label">Mövcudluq:</span>
-                    <span class="value stock-status {% if mehsul.stok == 0 %}out-of-stock{% elif mehsul.stok <= 20 %}low-stock{% else %}in-stock{% endif %}">
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Ana Səhifə</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'mehsullar' %}">Məhsullar</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'kateqoriya' mehsul.kateqoriya.slug %}">{{ mehsul.kateqoriya }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ mehsul.adi }}</li>
+        </ol>
+    </nav>
+
+    <div class="mehsul-container bg-white rounded-lg shadow-sm p-4 mb-5">
+        <div class="row">
+            <!-- Məhsul Şəkli -->
+            <div class="col-lg-5 mb-4 mb-lg-0">
+                <div class="mehsul-gallery position-relative">
+                    {% if mehsul.sekil %}
+                    <div class="product-image-wrapper">
+                        <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="img-fluid rounded product-image" id="productImage">
                         {% if mehsul.stok == 0 %}
-                             Yoxdur 
+                        <div class="stock-badge out-of-stock">Stokda yoxdur</div>
                         {% elif mehsul.stok <= 20 %}
-                             Az var 
-                        {% else %}
-                             Var 
+                        <div class="stock-badge low-stock">Məhdud sayda</div>
                         {% endif %}
-                    </span>
-                </div>
-                
-                <div class="spec-item price-item">
-                    <span class="label">Qiymət:</span>
-                    <span class="value price">{{ mehsul.formatted_qiymet }} ₼</span>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
             
-            <div class="action-buttons">
-                <a href="{% url 'sebet_ekle' mehsul.id %}" class="cart-icon" data-product-id="{{ mehsul.id }}">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Səbətə Əlavə Et</span>
-                </a>
+            <!-- Məhsul Detalları -->
+            <div class="col-lg-7">
+                <div class="mehsul-details">
+                    <h1 class="product-title mb-3">{{ mehsul.adi }}</h1>
+                    
+                    <div class="product-meta mb-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="badge bg-primary me-2">{{ mehsul.kateqoriya }}</span>
+                            {% if mehsul.brend.sekilyazi %}
+                            <img src="{{ mehsul.brend.sekilyazi.url }}" alt="{{ mehsul.brend.adi }}" class="marka-logo ms-2" style="max-height: 30px;">
+                            {% endif %}
+                        </div>
+                        
+                        <div class="product-code text-muted small">
+                            <span class="me-3"><i class="fas fa-barcode me-1"></i> Brend kodu: <strong>{{ mehsul.brend_kod }}</strong></span>
+                            <span><i class="fas fa-hashtag me-1"></i> OEM: <strong>{{ mehsul.oem }}</strong></span>
+                        </div>
+                    </div>
+                    
+                    <div class="specs card mb-4">
+                        <div class="card-body p-3">
+                            <div class="row mb-2">
+                                <div class="col-md-4 fw-bold">Kateqoriya:</div>
+                                <div class="col-md-8">{{ mehsul.kateqoriya }}</div>
+                            </div>
+                            
+                            <div class="row mb-2">
+                                <div class="col-md-4 fw-bold">Firma:</div>
+                                <div class="col-md-8 d-flex align-items-center">
+                                    {% if mehsul.brend.sekilyazi %}
+                                    <img src="{{ mehsul.brend.sekilyazi.url }}" alt="{{ mehsul.brend.adi }}" class="marka-image me-2" style="max-height: 25px;">
+                                    {% endif %}
+                                    <span>{{ mehsul.brend.adi }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-2">
+                                <div class="col-md-4 fw-bold">Avtomobil:</div>
+                                <div class="col-md-8 d-flex align-items-center flex-wrap">
+                                    {% if mehsul.marka.sekiller.all %}
+                                        {% for sekil in mehsul.marka.sekiller.all %}
+                                            <img src="{{ sekil.sekil.url }}" alt="{{ mehsul.marka.adi }}" class="marka-image-pr-list me-2 mb-1" style="max-height: 25px;">
+                                        {% endfor %}
+                                    {% else %}
+                                        {{ mehsul.marka.adi }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-2">
+                                <div class="col-md-4 fw-bold">Brend kodu:</div>
+                                <div class="col-md-8">{{ mehsul.brend_kod }}</div>
+                            </div>
+                            
+                            <div class="row mb-2">
+                                <div class="col-md-4 fw-bold">OEM:</div>
+                                <div class="col-md-8">{{ mehsul.oem }}</div>
+                            </div>
+                            
+                            {% if mehsul.oem_kodlar.all %}
+                            <div class="row mb-2">
+                                <div class="col-md-4 fw-bold">Dəyişən OEM Kodlar:</div>
+                                <div class="col-md-8">
+                                    <div class="oem-codes d-flex flex-wrap">
+                                        {% for oem in mehsul.oem_kodlar.all %}
+                                            <span class="oem-code badge bg-light text-dark me-1 mb-1">{{ oem.kod }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div> 
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="product-actions d-flex flex-column flex-md-row align-items-md-center mb-4">
+                        <div class="availability me-md-4 mb-3 mb-md-0">
+                            <div class="fw-bold mb-1">Mövcudluq:</div>
+                            <span class="stock-status badge {% if mehsul.stok == 0 %}bg-danger{% elif mehsul.stok <= 20 %}bg-warning text-dark{% else %}bg-success{% endif %} p-2">
+                                {% if mehsul.stok == 0 %}
+                                    <i class="fas fa-times-circle me-1"></i> Stokda yoxdur
+                                {% elif mehsul.stok <= 20 %}
+                                    <i class="fas fa-exclamation-circle me-1"></i> Az qalıb ({{ mehsul.stok }} ədəd)
+                                {% else %}
+                                    <i class="fas fa-check-circle me-1"></i> Stokda var
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="price-block">
+                            <div class="fw-bold mb-1">Qiymət:</div>
+                            <div class="price-value h3 mb-0 text-primary">{{ mehsul.formatted_qiymet }} <span class="currency">₼</span></div>
+                        </div>
+                    </div>
+                    
+                    {% if mehsul.stok > 0 %}
+                    <div class="add-to-cart">
+                        <a href="{% url 'sebet_ekle' mehsul.id %}" class="btn btn-primary btn-lg d-flex align-items-center justify-content-center" data-product-id="{{ mehsul.id }}">
+                            <i class="fas fa-shopping-cart me-2"></i>
+                            <span>Səbətə Əlavə Et</span>
+                        </a>
+                    </div>
+                    {% else %}
+                    <div class="notify-availability">
+                        <button class="btn btn-outline-secondary btn-lg d-flex align-items-center justify-content-center" data-product-id="{{ mehsul.id }}">
+                            <i class="fas fa-bell me-2"></i>
+                            <span>Məhsul gələndə xəbər ver</span>
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Məhsul Haqqında -->
     {% if mehsul.haqqinda %}
-    <div class="description">
-        <h2>Məhsul Haqqında</h2>
-        <p>{{ mehsul.haqqinda }}</p>
+    <div class="product-description bg-white rounded-lg shadow-sm p-4 mb-5">
+        <h2 class="section-title border-bottom pb-3 mb-4"><i class="fas fa-info-circle me-2"></i>Məhsul Haqqında</h2>
+        <div class="description-content">
+            {{ mehsul.haqqinda|linebreaks }}
+        </div>
     </div>
     {% endif %}
 
+    <!-- Uyğun Avtomobillər -->
     {% if mehsul.model.all %}
-    <div class="compatibility-section">
-        <h2>Uyğun Avtomobillər</h2>
-        <table>
-           <thead>
-               <tr>
-                   <th>Avtomobil</th>
-                   <th>Model</th>
-                   <th>Motor</th>
-                   <th>Yanacaq</th>
-                   <th>İl</th>
-               </tr>
-           </thead>
-           <tbody>
-               {% for model in mehsul.model.all %}
-               <tr>
-                   <td>{{ model.avtomobil.adi }}</td>
-                   <td>{{ model.model.adi }}</td>
-                   <td>{{ model.motor.motor }}</td>
-                   <td>{{ model.yanacaq.yanacaq }}</td>
-                   <td>{{ model.il.il }}</td>
-               </tr>
-               {% endfor %}
-           </tbody>
-        </table>
+    <div class="compatible-models bg-white rounded-lg shadow-sm p-4 mb-5">
+        <h2 class="section-title border-bottom pb-3 mb-4"><i class="fas fa-car me-2"></i>Uyğun Avtomobillər</h2>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Avtomobil</th>
+                        <th>Model</th>
+                        <th>Motor</th>
+                        <th>Yanacaq</th>
+                        <th>İl</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for model in mehsul.model.all %}
+                    <tr>
+                        <td>{{ model.avtomobil.adi }}</td>
+                        <td>{{ model.model.adi }}</td>
+                        <td>{{ model.motor.motor }}</td>
+                        <td>{{ model.yanacaq.yanacaq }}</td>
+                        <td>{{ model.il.il }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
     {% endif %}
 
+    <!-- Brend Haqqında -->
     {% if mehsul.brend.haqqinda or mehsul.brend.sekil %}
-    <div class="brand-info">
-        <h2>{{ mehsul.brend.adi }} Şirkəti Haqqında</h2>
-        <div class="brand-content">
+    <div class="brand-info bg-white rounded-lg shadow-sm p-4">
+        <h2 class="section-title border-bottom pb-3 mb-4"><i class="fas fa-trademark me-2"></i>{{ mehsul.brend.adi }} Şirkəti Haqqında</h2>
+        <div class="row">
             {% if mehsul.brend.sekil %}
-            <div class="brand-image-container">
-                <div class="brand-image">
-                    <img src="{{ mehsul.brend.sekil.url }}" alt="{{ mehsul.brend.adi }}" id="brandImage">
+            <div class="col-md-3 mb-4 mb-md-0">
+                <div class="brand-image text-center">
+                    <img src="{{ mehsul.brend.sekil.url }}" alt="{{ mehsul.brend.adi }}" class="img-fluid" id="brandImage">
                 </div>
             </div>
             {% endif %}
+            
             {% if mehsul.brend.haqqinda %}
-            <div class="brand-description">
-                <p>{{ mehsul.brend.haqqinda }}</p>
+            <div class="col-md-{% if mehsul.brend.sekil %}9{% else %}12{% endif %}">
+                <div class="brand-description">
+                    {{ mehsul.brend.haqqinda|linebreaks }}
+                </div>
             </div>
             {% endif %}
         </div>

@@ -534,12 +534,3 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',
     },
 }
-
-# Email tənzimləmələri
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'senan.eliyev.9997@gmail.com'
-EMAIL_HOST_PASSWORD = 'xpre_whjt_roff_jgyg'  # Gmail App Password istifadə edin
-DEFAULT_FROM_EMAIL = 'senan.eliyev.9997@gmail.com'

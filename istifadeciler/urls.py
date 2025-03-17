@@ -11,11 +11,4 @@ urlpatterns = [
     path('api/chat/messages/<int:receiver_id>/', views.get_messages, name='get_messages'),
     path('api/chat/send/', views.send_message, name='send_message'),
     path('check-code-expiration/', views.check_code_expiration, name='check_code_expiration'),
-    
-    # Email təsdiqi və şifrə sıfırlama URL-ləri
-    path('verify-email/', views.verify_email, name='verify_email'),
-    path('resend-verification-email/', views.resend_verification_email, name='resend_verification_email'),
-    path('forgot-password/', views.forgot_password, name='forgot_password'),
-    path('reset-password/', views.reset_password, name='reset_password'),
-    path('resend-reset-code/', views.resend_reset_code, name='resend_reset_code'),
 ]

@@ -56,29 +56,6 @@ class LoginCode(models.Model):
         verbose_name = 'Giriş Kodları'
         verbose_name_plural = 'Giriş Kodları'
 
-class EmailVerification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    code = models.CharField(max_length=6)
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_used = models.BooleanField(default=False)
-    email = models.EmailField()
-
-    @classmethod
-    def generate_code(cls):
-        # 6 xanalı təsadüfi kod yaratmaq (hərf və rəqəmlər)
-        chars = string.ascii_uppercase + string.digits
-        return ''.join(random.choice(chars) for _ in range(6))
-
-    def is_valid(self):
-        # Kodun 10 dəqiqə ərzində aktiv olmasını yoxlayır
-        now = timezone.now()
-        expiration_time = self.created_at + timezone.timedelta(minutes=10)
-        return not self.is_used and now <= expiration_time
-
-    class Meta:
-        verbose_name = 'Email Təsdiqləmə Kodları'
-        verbose_name_plural = 'Email Təsdiqləmə Kodları'
-
 class Message(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.models import User
 from django.utils.html import format_html
 from django.urls import reverse
-from .models import Profile, Message, LoginCode, EmailVerification
+from .models import Profile, Message, LoginCode
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
@@ -97,12 +97,3 @@ class MessageAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False  # Yeni mesaj əlavə etməyə icazə vermə
-
-@admin.register(EmailVerification)
-class EmailVerificationAdmin(admin.ModelAdmin):
-    list_display = ('user', 'email', 'code', 'created_at', 'is_used')
-    list_filter = ('is_used', 'created_at')
-    search_fields = ('user__username', 'email', 'code')
-    readonly_fields = ('created_at',)
-    date_hierarchy = 'created_at'
-    ordering = ('-created_at',)

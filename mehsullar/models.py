@@ -218,10 +218,11 @@ class OEMKod(models.Model):
         return self.kod
 
     def save(self, *args, **kwargs):
+        import string
         # Əgər yeni yaradılırsa və ya kod dəyişdirilibsə
         if self.pk is None or self._state.adding:
-            # Əvvəlcə "-" işarələrini silək
-            temiz_kod = self.kod.replace('-', '')
+            # Bütün xüsusi simvolları silək
+            temiz_kod = ''.join(char for char in self.kod if char not in string.punctuation)
             # Boşluqla ayrılmış kodları ayırıb hər birini ayrı-ayrı yaradaqq
             kodlar = temiz_kod.split()
             if kodlar:
@@ -236,8 +237,8 @@ class OEMKod(models.Model):
                     )
             return
         else:
-            # Mövcud kod yenilənərkən də "-" işarələrini silək
-            self.kod = self.kod.replace('-', '')
+            # Mövcud kod yenilənərkən də xüsusi simvolları silək
+            self.kod = ''.join(char for char in self.kod if char not in string.punctuation)
         super().save(*args, **kwargs)
 
     class Meta:

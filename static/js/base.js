@@ -892,9 +892,9 @@
                         return `                            <div class="search-result-item" onclick="window.location.href='/product-detail/${encodeURIComponent(result.adi)}-${encodeURIComponent(result.oem)}-${encodeURIComponent(result.brend_kod)}/${result.id}/'">
                                 ${result.sekil_url ? `<img src="${result.sekil_url}" alt="${result.adi}">` : ''}
                                 <div class="search-result-info">
-                                    <h4>${highlightTerm(result.adi, query)}</h4>
-                                    <p>${highlightTerm(result.brend, query)}  ${highlightTerm(result.oem, query)}</p>
-                                    <p>${highlightTerm(result.marka, query)}  ${highlightTerm(result.brend_kod, query)}</p>
+                                    <h4>${highlightTerm(result.adi, query)}  ${highlightTerm(result.brend, query)}</h4>
+                                    <p>${highlightTerm(result.brend_kod, query)}  ${highlightTerm(result.oem, query)}</p>
+                                    <p>${highlightTerm(result.marka, query)}</p>
                                 </div>
                                 <div class="search-result-price">
                                     <div class="stock-status ${result.stok === 0 ? 'out-of-stock' : result.stok <= 20 ? 'low-stock' : 'in-stock'}">

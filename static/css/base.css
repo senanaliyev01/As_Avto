@@ -221,6 +221,29 @@ header {
     margin: 0 auto;
 }
 
+.search-notice {
+    background: linear-gradient(135deg, rgba(100, 255, 218, 0.1), rgba(45, 109, 163, 0.1));
+    border: 1px solid rgba(100, 255, 218, 0.2);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    backdrop-filter: blur(5px);
+}
+
+.search-notice i {
+    color: var(--accent-color);
+    font-size: 1.1rem;
+}
+
+.search-notice span {
+    line-height: 1.4;
+}
+
 .search-bar {
     background: rgba(23, 42, 69, 0.8);
     backdrop-filter: blur(10px);
@@ -585,8 +608,6 @@ footer::before {
     min-height: calc(100vh - 200px);
     padding: 0;
 }
-
-
 
 /* Responsive Design */
 @media (max-width: 1400px) {

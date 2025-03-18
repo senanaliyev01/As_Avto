@@ -180,10 +180,10 @@ admin.site.register(Yanacaq)
 class MehsulAdmin(admin.ModelAdmin):
     list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'maya_qiymet', 'qiymet', 'brend_kod', 'oem', 'stok', 'yenidir')
     list_filter = ('kateqoriya', 'brend', 'marka')
-    search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'oem_kodlar__kod', 'yenidir', 'axtaris_sozleri__adi', 'axtaris_sozleri__sozler')
+    search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'oem_kodlar__kod', 'yenidir', )
     inlines = [OEMKodInline]
     
-    actions = ['yenilikden_sil', 'yenidir_et', 'axtaris_sozleri_teyin_et', 'axtaris_sozleri_sil']
+    actions = ['yenilikden_sil', 'yenidir_et', ]
     
     def changelist_view(self, request, extra_context=None):
         # Əsas görünüşü əldə edək

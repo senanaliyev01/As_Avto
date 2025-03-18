@@ -893,8 +893,8 @@
                                 ${result.sekil_url ? `<img src="${result.sekil_url}" alt="${result.adi}">` : ''}
                                 <div class="search-result-info">
                                     <h4>${highlightTerm(result.adi, query)}</h4>
-                                    <p>Brend: ${highlightTerm(result.brend, query)} | OEM: ${highlightTerm(result.oem, query)}</p>
-                                    <p>Marka: ${highlightTerm(result.marka, query)} | Brend Kod: ${highlightTerm(result.brend_kod, query)}</p>
+                                    <p>${highlightTerm(result.brend, query)}  ${highlightTerm(result.oem, query)}</p>
+                                    <p>${highlightTerm(result.marka, query)}  ${highlightTerm(result.brend_kod, query)}</p>
                                 </div>
                                 <div class="search-result-price">
                                     <div class="stock-status ${result.stok === 0 ? 'out-of-stock' : result.stok <= 20 ? 'low-stock' : 'in-stock'}">

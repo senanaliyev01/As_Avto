@@ -38,11 +38,12 @@ body {
 }
 
 .search-result-title {
+    top: 31px;
     text-align: center;
     margin: 0 0 1.5rem 0;
     padding: 1rem;
     font-size: 1.8rem;
-    color: var(--text-primary) !important;
+    color: #52c300 !important;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
     background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
     border-radius: 12px;

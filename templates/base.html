@@ -86,26 +86,11 @@
         </div>
     </header>
 
-    <!-- Axtarış Bölməsi -->
-    <div class="search-section">
-        <div class="search-info">
-            <div class="search-icon">
-                <i class="fas fa-search"></i>
-            </div>
-            <div class="search-text">
-                <h3>Axtarış Tövsiyələri</h3>
-                <p>Axtarış zamanı diqqətli olun: Brend kod ilə axtarış etməyin, yalnız OEM kodu ilə axtarış edin. Bu, daha dəqiq nəticələr əldə etməyə kömək edəcək.</p>
-            </div>
-        </div>
-        <div class="search-form-container">
-            <form id="quick-search-form" method="GET" action="{% url 'products_list' %}">
-                <div class="search-input-group">
-                    <input type="text" name="search_text" placeholder="OEM kodu daxil edin..." class="search-input">
-                    <button type="submit" class="search-button">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-            </form>
+    <!-- Xəbərdarlıq Mesajı -->
+    <div class="warning-message">
+        <div class="warning-content">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>Axtarış zamanı diqqətli olun: Brend kod ilə axtarış etməyin, yalnız OEM kodu ilə axtarış edin. Bu, daha dəqiq nəticələr əldə etməyə kömək edəcək.</p>
         </div>
     </div>
 

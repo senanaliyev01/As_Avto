@@ -96,112 +96,26 @@
 
     <!-- Navbar -->
     <div class="nav-toggle">
-        <div class="nav-toggle-icon">
-            <i class="fa-solid fa-bars"></i>
-        </div>
-        <span class="nav-toggle-text">Menyu</span>
+        <i class="fa-solid fa-caret-right"></i>
     </div>
 
     <nav class="nav-bar">
         <div class="nav-header">
-            <div class="nav-brand">
-                <i class="fas fa-tools nav-logo"></i>
-                <h3>İdarə Paneli</h3>
-            </div>
-            <button class="nav-close" aria-label="Menyunu bağla">
+            <h3>Menyu</h3>
+            <button class="nav-close">
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        
-        <div class="nav-user">
-            <div class="nav-user-avatar">
-                <i class="fas fa-user-circle"></i>
-            </div>
-            <div class="nav-user-info">
-                <h4>Xoş gəlmisiniz</h4>
-                <p>İstifadəçi Paneli</p>
-            </div>
-        </div>
-
-        <div class="nav-search">
-            <div class="nav-search-input">
-                <i class="fas fa-search"></i>
-                <input type="text" placeholder="Axtarış...">
-            </div>
-        </div>
-
         <div class="nav-links">
-            <div class="nav-section">
-                <h5 class="nav-section-title">Əsas</h5>
-                <a href="{% url 'esasevim:main' %}" class="nav-link">
-                    <i class="fa-solid fa-house"></i>
-                    <span>Əsas Səhifə</span>
-                    <span class="nav-link-arrow"><i class="fas fa-chevron-right"></i></span>
-                </a>
-                <a href="{% url 'profile' %}" class="nav-link">
-                    <i class="fas fa-user-circle"></i>
-                    <span>Hesabım</span>
-                    <span class="nav-link-arrow"><i class="fas fa-chevron-right"></i></span>
-                </a>
-            </div>
-
-            <div class="nav-section">
-                <h5 class="nav-section-title">Məhsullar</h5>
-                <a href="{% url 'products_list' %}" class="nav-link">
-                    <i class="fa-solid fa-box"></i>
-                    <span>Məhsullar</span>
-                    <div class="nav-link-badge">Yeni</div>
-                    <span class="nav-link-arrow"><i class="fas fa-chevron-right"></i></span>
-                </a>
-                <a href="{% url 'umumi_baxis' %}" class="nav-link">
-                    <i class="fas fa-box-open"></i>
-                    <span>Məhsullara Baxış</span>
-                    <span class="nav-link-arrow"><i class="fas fa-chevron-right"></i></span>
-                </a>
-                <a href="{% url 'esasevim:yeni_mehsullar' %}" class="nav-link">
-                    <i class="fa-solid fa-bell"></i>
-                    <span>Yeni Məhsullar</span>
-                    <span class="nav-badge">12</span>
-                    <span class="nav-link-arrow"><i class="fas fa-chevron-right"></i></span>
-                </a>
-            </div>
-
-            <div class="nav-section">
-                <h5 class="nav-section-title">Sifarişlər</h5>
-                <a href="{% url 'sifaris_izle' %}" class="nav-link">
-                    <i class="fas fa-shopping-bag"></i>
-                    <span>Sifarişlərim</span>
-                    <span class="nav-badge">3</span>
-                    <span class="nav-link-arrow"><i class="fas fa-chevron-right"></i></span>
-                </a>
-                <a href="{% url 'hesabatlar' %}" class="nav-link">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Hesabatlar</span>
-                    <span class="nav-link-arrow"><i class="fas fa-chevron-right"></i></span>
-                </a>
-            </div>
-
-            <div class="nav-section">
-                <h5 class="nav-section-title">Digər</h5>
-                <a href="{% url 'about' %}" class="nav-link">
-                    <i class="fas fa-info-circle"></i>
-                    <span>Məlumat</span>
-                    <span class="nav-link-arrow"><i class="fas fa-chevron-right"></i></span>
-                </a>
-            </div>
-        </div>
-
-        <div class="nav-footer">
-            <div class="nav-footer-stats">
-                <div class="nav-stat">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>24 Sifariş</span>
-                </div>
-                <div class="nav-stat">
-                    <i class="fas fa-box"></i>
-                    <span>158 Məhsul</span>
-                </div>
-            </div>
+            <a href="{% url 'esasevim:main' %}"><i class="fa-solid fa-house"></i> Əsas Səhifə</a>
+            <a href="{% url 'profile' %}"><i class="fas fa-user-circle"></i> Hesabım</a>
+            <a href="{% url 'products_list' %}"><i class="fa-solid fa-box"></i> Məhsullar</a>
+            <a href="{% url 'umumi_baxis' %}"><i class="fas fa-box-open"></i> Məhsullara Baxış</a>
+            <a href="{% url 'esasevim:yeni_mehsullar' %}"><i class="fa-solid fa-bell"></i> Yeni Məhsullar</a>
+            <a href="{% url 'sifaris_izle' %}"><i class="fas fa-shopping-bag"></i> Sifarişlərim</a>
+            <a href="{% url 'hesabatlar' %}"><i class="fas fa-chart-bar"></i> Hesabatlar</a>
+            {% comment %} <a href="{% url 'car_list' %}"><i class="fas fa-car"></i> Avtomobillər</a> {% endcomment %}
+            <a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> Məlumat</a>
         </div>
     </nav>
 

@@ -99,30 +99,58 @@
         <i class="fa-solid fa-caret-right"></i>
     </div>
 
-    <nav class="nav-bar">
-        <div class="nav-header">
-            <h3>Menyu</h3>
-            <button class="nav-close">
-                <i class="fas fa-times"></i>
-            </button>
+    <nav class="side-navbar">
+        <div class="navbar-brand">
+            <img src="{% static 'img/logo.png' %}" alt="Logo" class="navbar-logo">
         </div>
+        
         <div class="nav-links">
-            <a href="{% url 'esasevim:main' %}"><i class="fa-solid fa-house"></i> Əsas Səhifə</a>
-            <a href="{% url 'profile' %}"><i class="fas fa-user-circle"></i> Hesabım</a>
-            <a href="{% url 'products_list' %}"><i class="fa-solid fa-box"></i> Məhsullar</a>
-            <a href="{% url 'umumi_baxis' %}"><i class="fas fa-box-open"></i> Məhsullara Baxış</a>
-            <a href="{% url 'esasevim:yeni_mehsullar' %}"><i class="fa-solid fa-bell"></i> Yeni Məhsullar</a>
-            <a href="{% url 'sifaris_izle' %}"><i class="fas fa-shopping-bag"></i> Sifarişlərim</a>
-            <a href="{% url 'hesabatlar' %}"><i class="fas fa-chart-bar"></i> Hesabatlar</a>
-            {% comment %} <a href="{% url 'car_list' %}"><i class="fas fa-car"></i> Avtomobillər</a> {% endcomment %}
-            <a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> Məlumat</a>
+            <a href="{% url 'esasevim:main' %}" class="nav-link {% if request.resolver_match.url_name == 'main' %}active{% endif %}">
+                <i class="fa-solid fa-house"></i>
+                <span>Əsas Səhifə</span>
+            </a>
+            
+            <a href="{% url 'profile' %}" class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                <i class="fas fa-user-circle"></i>
+                <span>Hesabım</span>
+            </a>
+            
+            <a href="{% url 'products_list' %}" class="nav-link {% if request.resolver_match.url_name == 'products_list' %}active{% endif %}">
+                <i class="fa-solid fa-box"></i>
+                <span>Məhsullar</span>
+            </a>
+            
+            <a href="{% url 'umumi_baxis' %}" class="nav-link {% if request.resolver_match.url_name == 'umumi_baxis' %}active{% endif %}">
+                <i class="fas fa-box-open"></i>
+                <span>Məhsullara Baxış</span>
+            </a>
+            
+            <a href="{% url 'esasevim:yeni_mehsullar' %}" class="nav-link {% if request.resolver_match.url_name == 'yeni_mehsullar' %}active{% endif %}">
+                <i class="fa-solid fa-bell"></i>
+                <span>Yeni Məhsullar</span>
+            </a>
+            
+            <a href="{% url 'sifaris_izle' %}" class="nav-link {% if request.resolver_match.url_name == 'sifaris_izle' %}active{% endif %}">
+                <i class="fas fa-shopping-bag"></i>
+                <span>Sifarişlərim</span>
+            </a>
+            
+            <a href="{% url 'hesabatlar' %}" class="nav-link {% if request.resolver_match.url_name == 'hesabatlar' %}active{% endif %}">
+                <i class="fas fa-chart-bar"></i>
+                <span>Hesabatlar</span>
+            </a>
+            
+            <a href="{% url 'about' %}" class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">
+                <i class="fas fa-info-circle"></i>
+                <span>Məlumat</span>
+            </a>
         </div>
     </nav>
 
     <div class="nav-overlay"></div>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content-wrapper">
         {% block content %}{% endblock %}
     </div>
 

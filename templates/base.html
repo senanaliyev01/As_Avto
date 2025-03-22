@@ -21,14 +21,27 @@
     </script>
     {% endif %}
     
-    <!-- Header r-->
+    <!-- Header -->
     <header>
         <div class="top-header">
             <div class="logo">
-                <a href="{% url 'esasevim:main' %}"><img src="{% static '/img/Header_Logo.png' %}" alt="Logo"></a>
-             
+                <a href="{% url 'esasevim:main' %}">
+                    <img src="{% static '/img/Header_Logo.png' %}" alt="Logo">
+                </a>
             </div>
             
+            <!-- Navigation -->
+            <nav class="nav-bar">
+                <div class="nav-links">
+                    <a href="{% url 'esasevim:main' %}"><i class="fa-solid fa-house"></i> Əsas Səhifə</a>
+                    <a href="{% url 'products_list' %}"><i class="fa-solid fa-box"></i> Məhsullar</a>
+                    <a href="{% url 'umumi_baxis' %}"><i class="fas fa-box-open"></i> Məhsullara Baxış</a>
+                    <a href="{% url 'esasevim:yeni_mehsullar' %}"><i class="fa-solid fa-bell"></i> Yeni</a>
+                    <a href="{% url 'car_list' %}"><i class="fas fa-car"></i> Avtomobillər</a>
+                    <a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> Haqqımızda</a>
+                </div>
+            </nav>
+
             <!-- Search Container -->
             <div class="search-container">
                 <div class="search-bar">
@@ -60,9 +73,10 @@
                             {% endfor %}
                         </select>
 
-                        <input type="text" name="search_text" placeholder="Axtarış" value="{{ request.GET.search_text }}">
+                        <input type="text" name="search_text" placeholder="OEM kod ilə axtar..." value="{{ request.GET.search_text }}">
                         
                         <button type="submit" id="search-button">
+                            <i class="fas fa-search"></i>
                             Axtar
                             <div id="loading-spinner" class="loading-spinner" style="display: none;">
                                 <div class="spinner"></div>
@@ -75,7 +89,7 @@
             <div class="header-right">
                 <a href="{% url 'profile' %}" class="header-profile-link">
                     <img src="{{ user.profile.sekil.url }}" alt="{{ user.username }}" class="header-profile-image">
-                    {{ user.username }}
+                    <span>{{ user.username }}</span>
                 </a>
                 <a href="#" class="cart-link" id="cart-toggle" onclick="toggleCartModal(event)">
                     <i class="fas fa-shopping-cart"></i>
@@ -86,43 +100,16 @@
         </div>
     </header>
 
-    <!-- Xəbərdarlıq Mesajı -->
-    <div class="warning-message">
-        <div class="warning-content">
-            <i class="fas fa-exclamation-circle"></i>
-            <p>Axtarış zamanı diqqətli olun: Brend kod ilə axtarış etməyin, yalnız OEM kodu ilə axtarış edin. Bu, daha dəqiq nəticələr əldə etməyə kömək edəcək.</p>
-        </div>
-    </div>
-
-    <!-- Navbar -->
+    <!-- Mobile Navigation Toggle -->
     <div class="nav-toggle">
-        <i class="fa-solid fa-caret-right"></i>
+        <i class="fa-solid fa-bars"></i>
     </div>
 
-    <nav class="nav-bar">
-        <div class="nav-header">
-            <h3>Menyu</h3>
-            <button class="nav-close">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="nav-links">
-            <a href="{% url 'esasevim:main' %}"><i class="fa-solid fa-house"></i> Əsas Səhifə</a>
-            <a href="{% url 'profile' %}"><i class="fas fa-user-circle"></i> Hesabım</a>
-            <a href="{% url 'products_list' %}"><i class="fa-solid fa-box"></i> Məhsullar</a>
-            <a href="{% url 'umumi_baxis' %}"><i class="fas fa-box-open"></i> Məhsullara Baxış</a>
-            <a href="{% url 'esasevim:yeni_mehsullar' %}"><i class="fa-solid fa-bell"></i> Yeni Məhsullar</a>
-            <a href="{% url 'sifaris_izle' %}"><i class="fas fa-shopping-bag"></i> Sifarişlərim</a>
-            <a href="{% url 'hesabatlar' %}"><i class="fas fa-chart-bar"></i> Hesabatlar</a>
-            <a href="{% url 'car_list' %}"><i class="fas fa-car"></i> Avtomobillər</a>
-            <a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> Məlumat</a>
-        </div>
-    </nav>
-
+    <!-- Mobile Navigation Overlay -->
     <div class="nav-overlay"></div>
 
-    <!-- Main Content -->
-    <div class="main-content">
+    <!-- Main Content with padding for fixed header -->
+    <div class="main-content" style="padding-top: 120px;">
         {% block content %}{% endblock %}
     </div>
 

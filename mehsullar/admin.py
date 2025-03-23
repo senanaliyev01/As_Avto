@@ -186,6 +186,8 @@ class MehsulAdmin(admin.ModelAdmin):
     
     change_list_template = 'admin/mehsul_changelist.html'
     
+    actions = ['yenilikden_sil', 'yenidir_et']
+    
     def get_urls(self):
         from django.urls import path
         urls = super().get_urls()
@@ -203,7 +205,7 @@ class MehsulAdmin(admin.ModelAdmin):
         if request.method == 'POST':
             excel_file = request.FILES.get("excel_file")
             if not excel_file:
-                messages.error(request, 'Fayl seçilməyib')
+                messages.error(request, 'Zəhmət olmasa Excel faylı seçin')
                 return HttpResponseRedirect("../")
                 
             if not excel_file.name.endswith('.xlsx'):
@@ -212,6 +214,9 @@ class MehsulAdmin(admin.ModelAdmin):
                 
             try:
                 df = pd.read_excel(excel_file)
+                success_count = 0
+                error_count = 0
+                
                 for _, row in df.iterrows():
                     try:
                         kateqoriya, _ = Kateqoriya.objects.get_or_create(adi=row['kateqoriya'])
@@ -229,11 +234,17 @@ class MehsulAdmin(admin.ModelAdmin):
                             maya_qiymet=row['maya_qiymet'],
                             qiymet=row['qiymet']
                         )
+                        success_count += 1
                     except Exception as e:
-                        messages.error(request, f'Xəta: {str(e)}')
+                        error_count += 1
+                        messages.error(request, f'Sətir xətası: {str(e)}')
                         continue
-                        
-                messages.success(request, 'Məhsullar uğurla əlavə edildi')
+                
+                if success_count > 0:
+                    messages.success(request, f'{success_count} məhsul uğurla əlavə edildi.')
+                if error_count > 0:
+                    messages.warning(request, f'{error_count} məhsulun əlavə edilməsində xəta baş verdi.')
+                    
                 return HttpResponseRedirect("../")
                 
             except Exception as e:
@@ -241,7 +252,7 @@ class MehsulAdmin(admin.ModelAdmin):
                 return HttpResponseRedirect("../")
         
         return render(request, 'admin/import_excel.html')
-        
+    
     def changelist_view(self, request, extra_context=None):
         # Əsas görünüşü əldə edək
         response = super().changelist_view(request, extra_context)

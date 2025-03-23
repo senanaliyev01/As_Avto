@@ -201,6 +201,7 @@ class MehsulAdmin(admin.ModelAdmin):
         from django.http import HttpResponseRedirect
         import pandas as pd
         from django.contrib import messages
+        from django.db import transaction
         
         if request.method == 'POST':
             excel_file = request.FILES.get("excel_file")
@@ -214,36 +215,63 @@ class MehsulAdmin(admin.ModelAdmin):
                 
             try:
                 df = pd.read_excel(excel_file)
-                success_count = 0
+                new_count = 0
+                update_count = 0
                 error_count = 0
                 
-                for _, row in df.iterrows():
-                    try:
-                        kateqoriya, _ = Kateqoriya.objects.get_or_create(adi=row['kateqoriya'])
-                        brend, _ = Brend.objects.get_or_create(adi=row['brend'])
-                        marka, _ = Marka.objects.get_or_create(adi=row['marka'])
-                        
-                        Mehsul.objects.create(
-                            adi=row['adi'],
-                            kateqoriya=kateqoriya,
-                            brend=brend,
-                            marka=marka,
-                            brend_kod=row['brend_kod'],
-                            oem=row['oem'],
-                            stok=row['stok'],
-                            maya_qiymet=row['maya_qiymet'],
-                            qiymet=row['qiymet']
-                        )
-                        success_count += 1
-                    except Exception as e:
-                        error_count += 1
-                        messages.error(request, f'Sətir xətası: {str(e)}')
-                        continue
+                with transaction.atomic():  # Bütün əməliyyatları bir transaksiyada edirik
+                    for _, row in df.iterrows():
+                        try:
+                            # Kateqoriya, brend və markanı tap və ya yarat
+                            kateqoriya, _ = Kateqoriya.objects.get_or_create(adi=row['kateqoriya'])
+                            brend, _ = Brend.objects.get_or_create(adi=row['brend'])
+                            marka, _ = Marka.objects.get_or_create(adi=row['marka'])
+                            
+                            # Eyni brend_kod və ya OEM kodu ilə məhsul varmı yoxla
+                            existing_product = Mehsul.objects.filter(
+                                models.Q(brend_kod=row['brend_kod']) | 
+                                models.Q(oem=row['oem'])
+                            ).first()
+                            
+                            if existing_product:
+                                # Mövcud məhsulu yenilə
+                                existing_product.adi = row['adi']
+                                existing_product.kateqoriya = kateqoriya
+                                existing_product.brend = brend
+                                existing_product.marka = marka
+                                existing_product.stok = row['stok']
+                                existing_product.maya_qiymet = row['maya_qiymet']
+                                existing_product.qiymet = row['qiymet']
+                                existing_product.yenidir = True  # Yenilənən məhsulu yeni kimi işarələ
+                                existing_product.save()
+                                update_count += 1
+                            else:
+                                # Yeni məhsul yarat
+                                Mehsul.objects.create(
+                                    adi=row['adi'],
+                                    kateqoriya=kateqoriya,
+                                    brend=brend,
+                                    marka=marka,
+                                    brend_kod=row['brend_kod'],
+                                    oem=row['oem'],
+                                    stok=row['stok'],
+                                    maya_qiymet=row['maya_qiymet'],
+                                    qiymet=row['qiymet'],
+                                    yenidir=True  # Yeni əlavə edilən məhsulu yeni kimi işarələ
+                                )
+                                new_count += 1
+                                
+                        except Exception as e:
+                            error_count += 1
+                            messages.error(request, f'Sətir xətası: {str(e)}')
+                            continue
                 
-                if success_count > 0:
-                    messages.success(request, f'{success_count} məhsul uğurla əlavə edildi.')
+                if new_count > 0:
+                    messages.success(request, f'{new_count} yeni məhsul əlavə edildi.')
+                if update_count > 0:
+                    messages.info(request, f'{update_count} mövcud məhsul yeniləndi.')
                 if error_count > 0:
-                    messages.warning(request, f'{error_count} məhsulun əlavə edilməsində xəta baş verdi.')
+                    messages.warning(request, f'{error_count} məhsulun əlavə/yenilənməsində xəta baş verdi.')
                     
                 return HttpResponseRedirect("../")
                 

@@ -184,19 +184,31 @@ class MehsulAdmin(admin.ModelAdmin):
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'oem_kodlar__kod', 'yenidir', )
     inlines = [OEMKodInline]
     
-    actions = ['yenilikden_sil', 'yenidir_et', 'import_from_excel']
+    change_list_template = 'admin/mehsul_changelist.html'
     
-    def import_from_excel(self, request, queryset):
+    def get_urls(self):
+        from django.urls import path
+        urls = super().get_urls()
+        my_urls = [
+            path('import-excel/', self.import_excel_view, name='import_excel'),
+        ]
+        return my_urls + urls
+    
+    def import_excel_view(self, request):
         from django.shortcuts import render
         from django.http import HttpResponseRedirect
         import pandas as pd
         from django.contrib import messages
         
         if request.method == 'POST':
-            excel_file = request.FILES["excel_file"]
+            excel_file = request.FILES.get("excel_file")
+            if not excel_file:
+                messages.error(request, 'Fayl seçilməyib')
+                return HttpResponseRedirect("../")
+                
             if not excel_file.name.endswith('.xlsx'):
                 messages.error(request, 'Yalnız .xlsx faylları qəbul edilir')
-                return HttpResponseRedirect(request.path_info)
+                return HttpResponseRedirect("../")
                 
             try:
                 df = pd.read_excel(excel_file)
@@ -222,16 +234,14 @@ class MehsulAdmin(admin.ModelAdmin):
                         continue
                         
                 messages.success(request, 'Məhsullar uğurla əlavə edildi')
-                return HttpResponseRedirect(request.path_info)
+                return HttpResponseRedirect("../")
                 
             except Exception as e:
                 messages.error(request, f'Excel faylını oxuyarkən xəta baş verdi: {str(e)}')
-                return HttpResponseRedirect(request.path_info)
+                return HttpResponseRedirect("../")
         
         return render(request, 'admin/import_excel.html')
         
-    import_from_excel.short_description = "Excel faylından məhsulları əlavə et"
-    
     def changelist_view(self, request, extra_context=None):
         # Əsas görünüşü əldə edək
         response = super().changelist_view(request, extra_context)

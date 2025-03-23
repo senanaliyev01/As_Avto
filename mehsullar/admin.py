@@ -8,6 +8,7 @@ from django.contrib import messages
 from django import forms
 from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
+import pandas as pd
 
 class MarkaSekilInline(admin.TabularInline):
     model = MarkaSekil
@@ -183,7 +184,53 @@ class MehsulAdmin(admin.ModelAdmin):
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'oem_kodlar__kod', 'yenidir', )
     inlines = [OEMKodInline]
     
-    actions = ['yenilikden_sil', 'yenidir_et', ]
+    actions = ['yenilikden_sil', 'yenidir_et', 'import_from_excel']
+    
+    def import_from_excel(self, request, queryset):
+        from django.shortcuts import render
+        from django.http import HttpResponseRedirect
+        import pandas as pd
+        from django.contrib import messages
+        
+        if request.method == 'POST':
+            excel_file = request.FILES["excel_file"]
+            if not excel_file.name.endswith('.xlsx'):
+                messages.error(request, 'Yalnız .xlsx faylları qəbul edilir')
+                return HttpResponseRedirect(request.path_info)
+                
+            try:
+                df = pd.read_excel(excel_file)
+                for _, row in df.iterrows():
+                    try:
+                        kateqoriya, _ = Kateqoriya.objects.get_or_create(adi=row['kateqoriya'])
+                        brend, _ = Brend.objects.get_or_create(adi=row['brend'])
+                        marka, _ = Marka.objects.get_or_create(adi=row['marka'])
+                        
+                        Mehsul.objects.create(
+                            adi=row['adi'],
+                            kateqoriya=kateqoriya,
+                            brend=brend,
+                            marka=marka,
+                            brend_kod=row['brend_kod'],
+                            oem=row['oem'],
+                            stok=row['stok'],
+                            maya_qiymet=row['maya_qiymet'],
+                            qiymet=row['qiymet']
+                        )
+                    except Exception as e:
+                        messages.error(request, f'Xəta: {str(e)}')
+                        continue
+                        
+                messages.success(request, 'Məhsullar uğurla əlavə edildi')
+                return HttpResponseRedirect(request.path_info)
+                
+            except Exception as e:
+                messages.error(request, f'Excel faylını oxuyarkən xəta baş verdi: {str(e)}')
+                return HttpResponseRedirect(request.path_info)
+        
+        return render(request, 'admin/import_excel.html')
+        
+    import_from_excel.short_description = "Excel faylından məhsulları əlavə et"
     
     def changelist_view(self, request, extra_context=None):
         # Əsas görünüşü əldə edək

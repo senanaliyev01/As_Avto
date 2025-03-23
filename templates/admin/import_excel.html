@@ -1,0 +1,29 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div>
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <p>Excel faylını seçin:</p>
+        <input type="file" name="excel_file" accept=".xlsx" required>
+        <br><br>
+        <button type="submit">Yüklə</button>
+    </form>
+    
+    <div style="margin-top: 20px;">
+        <h3>Excel faylı nümunəsi:</h3>
+        <p>Excel faylınız aşağıdakı başlıqlara sahib olmalıdır:</p>
+        <ul>
+            <li>adi</li>
+            <li>kateqoriya</li>
+            <li>brend</li>
+            <li>marka</li>
+            <li>brend_kod</li>
+            <li>oem</li>
+            <li>stok</li>
+            <li>maya_qiymet</li>
+            <li>qiymet</li>
+        </ul>
+    </div>
+</div>
+{% endblock %} 

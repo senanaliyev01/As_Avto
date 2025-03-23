@@ -1,29 +1,83 @@
 {% extends "admin/base_site.html" %}
+{% load i18n static %}
 
 {% block content %}
-<div>
-    <form action="" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <p>Excel faylını seçin:</p>
-        <input type="file" name="excel_file" accept=".xlsx" required>
-        <br><br>
-        <button type="submit">Yüklə</button>
-    </form>
-    
-    <div style="margin-top: 20px;">
-        <h3>Excel faylı nümunəsi:</h3>
-        <p>Excel faylınız aşağıdakı başlıqlara sahib olmalıdır:</p>
-        <ul>
-            <li>adi</li>
-            <li>kateqoriya</li>
-            <li>brend</li>
-            <li>marka</li>
-            <li>brend_kod</li>
-            <li>oem</li>
-            <li>stok</li>
-            <li>maya_qiymet</li>
-            <li>qiymet</li>
-        </ul>
+<div id="content-main">
+    <div class="module">
+        <h2>Excel faylından məhsulları əlavə et</h2>
+        <div class="form-row">
+            <form action="." method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div style="margin: 20px 0;">
+                    <label for="excel_file">Excel faylını seçin:</label>
+                    <input type="file" name="excel_file" accept=".xlsx" required id="excel_file">
+                </div>
+                <div class="submit-row">
+                    <input type="submit" value="Məhsulları Əlavə Et" class="default">
+                </div>
+            </form>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <h3>Excel faylı nümunəsi:</h3>
+            <p>Excel faylınız aşağıdakı başlıqlara sahib olmalıdır:</p>
+            <table style="width: 100%; margin-top: 10px; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th style="border: 1px solid #ddd; padding: 8px; background-color: #f5f5f5;">Başlıq</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; background-color: #f5f5f5;">Nümunə</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">adi</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Ön əyləc diski</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">kateqoriya</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Əyləc</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">brend</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Bosch</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">marka</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">BMW</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">brend_kod</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">BD123</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">oem</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">12345678</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">stok</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">10</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">maya_qiymet</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">45.50</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">qiymet</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">65.00</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 20px;">
+                <p><strong>Qeydlər:</strong></p>
+                <ul>
+                    <li>Fayl formatı .xlsx olmalıdır</li>
+                    <li>Başlıqlar tam olaraq yuxarıdakı kimi olmalıdır</li>
+                    <li>Qiymətlər nöqtə (.) ilə ayrılmalıdır, vergül yox</li>
+                    <li>Stok rəqəm olmalıdır</li>
+                </ul>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %} 

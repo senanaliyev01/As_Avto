@@ -26,44 +26,59 @@
                     <tr>
                         <th style="border: 1px solid #ddd; padding: 8px; background-color: #f5f5f5;">Başlıq</th>
                         <th style="border: 1px solid #ddd; padding: 8px; background-color: #f5f5f5;">Nümunə</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; background-color: #f5f5f5;">Açıqlama</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td style="border: 1px solid #ddd; padding: 8px;">adi</td>
                         <td style="border: 1px solid #ddd; padding: 8px;">Ön əyləc diski</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Məhsulun adı</td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #ddd; padding: 8px;">kateqoriya</td>
                         <td style="border: 1px solid #ddd; padding: 8px;">Əyləc</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Məhsulun kateqoriyası</td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #ddd; padding: 8px;">brend</td>
                         <td style="border: 1px solid #ddd; padding: 8px;">Bosch</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">İstehsalçı firma</td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #ddd; padding: 8px;">marka</td>
                         <td style="border: 1px solid #ddd; padding: 8px;">BMW</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Avtomobil markası</td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #ddd; padding: 8px;">brend_kod</td>
                         <td style="border: 1px solid #ddd; padding: 8px;">BD123</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Brendin məhsul kodu</td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #ddd; padding: 8px;">oem</td>
                         <td style="border: 1px solid #ddd; padding: 8px;">12345678</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Əsas OEM kodu</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">elave_oem</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">87654321 98765432 12312312</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Əlavə OEM kodları (boşluqla və ya vergüllə ayrılmış)</td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #ddd; padding: 8px;">stok</td>
                         <td style="border: 1px solid #ddd; padding: 8px;">10</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Stokdakı sayı</td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #ddd; padding: 8px;">maya_qiymet</td>
                         <td style="border: 1px solid #ddd; padding: 8px;">45.50</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Maya dəyəri (AZN)</td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #ddd; padding: 8px;">qiymet</td>
                         <td style="border: 1px solid #ddd; padding: 8px;">65.00</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Satış qiyməti (AZN)</td>
                     </tr>
                 </tbody>
             </table>
@@ -75,6 +90,8 @@
                     <li>Başlıqlar tam olaraq yuxarıdakı kimi olmalıdır</li>
                     <li>Qiymətlər nöqtə (.) ilə ayrılmalıdır, vergül yox</li>
                     <li>Stok rəqəm olmalıdır</li>
+                    <li>Əlavə OEM kodları boşluqla və ya vergüllə ayrılmalıdır</li>
+                    <li>Əgər məhsul mövcuddursa (eyni brend_kod və ya əsas OEM), məlumatlar yenilənəcək</li>
                 </ul>
             </div>
         </div>

@@ -227,6 +227,12 @@ class MehsulAdmin(admin.ModelAdmin):
                             brend, _ = Brend.objects.get_or_create(adi=row['brend'])
                             marka, _ = Marka.objects.get_or_create(adi=row['marka'])
                             
+                            # Əlavə OEM kodlarını hazırla
+                            elave_oem_kodlar = []
+                            if 'elave_oem' in row and pd.notna(row['elave_oem']):
+                                # Vergül və ya boşluqla ayrılmış OEM kodlarını ayır
+                                elave_oem_kodlar = [kod.strip() for kod in str(row['elave_oem']).replace(',', ' ').split() if kod.strip()]
+                            
                             # Eyni brend_kod və ya OEM kodu ilə məhsul varmı yoxla
                             existing_product = Mehsul.objects.filter(
                                 models.Q(brend_kod=row['brend_kod']) | 
@@ -242,12 +248,23 @@ class MehsulAdmin(admin.ModelAdmin):
                                 existing_product.stok = row['stok']
                                 existing_product.maya_qiymet = row['maya_qiymet']
                                 existing_product.qiymet = row['qiymet']
-                                existing_product.yenidir = True  # Yenilənən məhsulu yeni kimi işarələ
+                                existing_product.yenidir = True
                                 existing_product.save()
+                                
+                                # Mövcud əlavə OEM kodlarını sil
+                                existing_product.oem_kodlar.all().delete()
+                                
+                                # Yeni əlavə OEM kodlarını əlavə et
+                                for kod in elave_oem_kodlar:
+                                    OEMKod.objects.create(
+                                        mehsul=existing_product,
+                                        kod=kod
+                                    )
+                                
                                 update_count += 1
                             else:
                                 # Yeni məhsul yarat
-                                Mehsul.objects.create(
+                                yeni_mehsul = Mehsul.objects.create(
                                     adi=row['adi'],
                                     kateqoriya=kateqoriya,
                                     brend=brend,
@@ -257,8 +274,16 @@ class MehsulAdmin(admin.ModelAdmin):
                                     stok=row['stok'],
                                     maya_qiymet=row['maya_qiymet'],
                                     qiymet=row['qiymet'],
-                                    yenidir=True  # Yeni əlavə edilən məhsulu yeni kimi işarələ
+                                    yenidir=True
                                 )
+                                
+                                # Əlavə OEM kodlarını əlavə et
+                                for kod in elave_oem_kodlar:
+                                    OEMKod.objects.create(
+                                        mehsul=yeni_mehsul,
+                                        kod=kod
+                                    )
+                                
                                 new_count += 1
                                 
                         except Exception as e:

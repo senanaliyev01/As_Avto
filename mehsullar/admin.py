@@ -233,11 +233,8 @@ class MehsulAdmin(admin.ModelAdmin):
                                 # Vergül və ya boşluqla ayrılmış OEM kodlarını ayır
                                 elave_oem_kodlar = [kod.strip() for kod in str(row['elave_oem']).replace(',', ' ').split() if kod.strip()]
                             
-                            # Eyni brend_kod və ya OEM kodu ilə məhsul varmı yoxla
-                            existing_product = Mehsul.objects.filter(
-                                models.Q(brend_kod=row['brend_kod']) | 
-                                models.Q(oem=row['oem'])
-                            ).first()
+                            # Eyni brend_kod ilə məhsul varmı yoxla
+                            existing_product = Mehsul.objects.filter(brend_kod=row['brend_kod']).first()
                             
                             if existing_product:
                                 # Mövcud məhsulu yenilə

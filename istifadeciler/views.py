@@ -16,7 +16,6 @@ from django.urls import reverse
 from django.utils import timezone
 import re
 from esasevim.views import esasevim
-import json
 
 def check_code_expiration(request):
     """Təhlükəsizlik kodunun müddətini yoxlayır"""
@@ -55,44 +54,12 @@ def check_code_expiration(request):
     
     return JsonResponse({'error': 'Invalid request method'})
 
-# Admin tərəfindən kodun təsdiqi üçün yeni funksiya
-@csrf_exempt
-@require_POST
-def verify_login_code(request):
-    if not request.user.is_staff and not request.user.is_superuser:
-        return JsonResponse({'success': False, 'error': 'İcazəniz yoxdur'}, status=403)
-    
-    data = json.loads(request.body)
-    code = data.get('code')
-    action = data.get('action', 'verify')  # 'verify' və ya 'reject'
-    
-    try:
-        login_code = LoginCode.objects.filter(code=code, is_used=False).latest('created_at')
-        
-        if not login_code.is_valid():
-            return JsonResponse({'success': False, 'error': 'Kod müddəti bitib'})
-        
-        if action == 'verify':
-            login_code.is_approved = True
-            login_code.save()
-            return JsonResponse({'success': True, 'message': 'Kod təsdiqləndi'})
-        elif action == 'reject':
-            login_code.is_approved = False
-            login_code.is_used = True
-            login_code.save()
-            return JsonResponse({'success': True, 'message': 'Kod rədd edildi'})
-        
-    except LoginCode.DoesNotExist:
-        return JsonResponse({'success': False, 'error': 'Etibarlı kod tapılmadı'})
-    except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
-
-# Kod təsdiq statusunu yoxlamaq üçün yeni funksiya
 def check_code_approval(request):
+    """Təhlükəsizlik kodunun təsdiqlənmə vəziyyətini yoxlayır"""
     if request.method == 'GET':
         user_id = request.session.get('temp_user_id')
         if not user_id:
-            return JsonResponse({'error': 'Sessiya müddəti bitib'})
+            return JsonResponse({'is_approved': False})
         
         try:
             user = User.objects.get(id=user_id)
@@ -101,16 +68,21 @@ def check_code_approval(request):
                 is_used=False
             ).latest('created_at')
             
-            if not login_code.is_valid():
-                return JsonResponse({'status': 'expired', 'message': 'Kodun müddəti bitib'})
+            # Kod təsdiqlənibmi və müddəti keçməyib
+            now = timezone.now()
+            expiration_time = login_code.created_at + timezone.timedelta(minutes=3)
             
-            if hasattr(login_code, 'is_approved') and login_code.is_approved:
-                return JsonResponse({'status': 'approved'})
+            if now <= expiration_time and login_code.is_approved:
+                return JsonResponse({
+                    'is_approved': True
+                })
             
-            return JsonResponse({'status': 'pending'})
-        
+            return JsonResponse({
+                'is_approved': False
+            })
+            
         except (User.DoesNotExist, LoginCode.DoesNotExist):
-            return JsonResponse({'status': 'error', 'message': 'Kod tapılmadı'})
+            return JsonResponse({'is_approved': False})
     
     return JsonResponse({'error': 'Invalid request method'})
 
@@ -123,53 +95,7 @@ def login_view(request):
         return redirect('esasevim:main')
 
     if request.method == 'POST':
-        # AJAX sorğusu ilə admin təsdiqindən sonra giriş tamamlama 
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest' and 'code' in request.POST:
-            code = request.POST.get('code')
-            user_id = request.session.get('temp_user_id')
-            
-            if not user_id:
-                return JsonResponse({'success': False, 'error': 'Sessiya müddəti bitib'})
-            
-            try:
-                user = User.objects.get(id=user_id)
-                login_code = LoginCode.objects.filter(
-                    user=user, 
-                    code=code, 
-                    is_used=False,
-                    is_approved=True
-                ).latest('created_at')
-                
-                if login_code.is_valid():
-                    # Kodu istifadə edilmiş kimi işarələ
-                    login_code.is_used = True
-                    login_code.save()
-                    
-                    # İstifadəçini sistemə daxil et
-                    login(request, user)
-                    
-                    # Sessiyanı tənzimlə
-                    remember_me = request.session.get('temp_remember_me', False)
-                    if remember_me:
-                        request.session.set_expiry(31536000)  # 365 gün
-                        request.session['remember_me'] = True
-                    else:
-                        request.session.set_expiry(0)
-                        request.session['remember_me'] = False
-                    
-                    # Müvəqqəti sessiyanı təmizlə
-                    request.session.pop('temp_user_id', None)
-                    request.session.pop('temp_remember_me', None)
-                    
-                    return JsonResponse({'success': True, 'redirect': reverse('esasevim:main')})
-                else:
-                    return JsonResponse({'success': False, 'error': 'Kodun müddəti bitib'})
-            except (User.DoesNotExist, LoginCode.DoesNotExist):
-                return JsonResponse({'success': False, 'error': 'Etibarlı kod tapılmadı'})
-            except Exception as e:
-                return JsonResponse({'success': False, 'error': str(e)})
-        # Normal form təqdimatı
-        elif 'code' in request.POST:
+        if 'code' in request.POST:
             # Təhlükəsizlik kodunun yoxlanması
             code = request.POST.get('code')
             user_id = request.session.get('temp_user_id')
@@ -180,17 +106,48 @@ def login_view(request):
             
             try:
                 user = User.objects.get(id=user_id)
-                login_code = LoginCode.objects.filter(user=user, code=code, is_used=False).latest('created_at')
+                login_code = LoginCode.objects.filter(
+                    user=user, 
+                    code=code, 
+                    is_used=False
+                ).latest('created_at')
                 
                 if login_code.is_valid():
-                    # User kodu göndərdi və kodun təsdiqlənməsini gözləməlidir
-                    # Kodu hələ istifadə edilmiş kimi işarələmirik, admin təsdiqini gözləyirik
-                    return render(request, 'login.html', {
-                        'show_code_input': False,
-                        'show_waiting_approval': True,
-                        'code': code,
-                        'user_id': user_id
-                    })
+                    if login_code.is_approved:
+                        # Kod təsdiqlənib, istifadəçini daxil et
+                        login_code.is_used = True
+                        login_code.save()
+                        
+                        login(request, user)
+                        
+                        remember_me = request.session.get('temp_remember_me', False)
+                        if remember_me:
+                            request.session.set_expiry(31536000)  # 365 gün
+                            request.session['remember_me'] = True
+                        else:
+                            request.session.set_expiry(0)
+                            request.session['remember_me'] = False
+                        
+                        # Təmizlə
+                        request.session.pop('temp_user_id', None)
+                        request.session.pop('temp_remember_me', None)
+                        
+                        # Uğurlu giriş bildirişi
+                        success_message = 'Uğurla giriş etdiniz! 3 saniyə sonra əsas səhifəyə yönləndirilirsiniz.'
+                        
+                        next_url = request.session.pop('next', None)
+                        if next_url:
+                            redirect_url = next_url
+                        else:
+                            redirect_url = reverse('esasevim:main')
+                        
+                        # Modal göstərmək üçün məlumatları ötür
+                        return render(request, 'login_success.html', {
+                            'success_message': success_message,
+                            'redirect_url': redirect_url
+                        })
+                    else:
+                        messages.info(request, 'Kodunuz hələ təsdiqlənməyib. Zəhmət olmasa gözləyin və ya administratorla əlaqə saxlayın.')
                 else:
                     messages.error(request, 'Kod etibarsızdır və ya müddəti bitib.')
             except User.DoesNotExist:
@@ -222,7 +179,7 @@ def login_view(request):
                     if request.GET.get('next'):
                         request.session['next'] = request.GET['next']
                     
-                    messages.info(request, f'Təhlükəsizlik kodunuz: {code}. Bu kodu administratora bildirin.')
+                    messages.info(request, f'Giriş kodu: {code}. Administratora bildirin ki, kodu təsdiqləsin.')
                     return render(request, 'login.html', {
                         'show_code_input': True,
                         'code_created_at': login_code.created_at.isoformat()

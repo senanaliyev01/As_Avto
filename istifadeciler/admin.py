@@ -15,7 +15,7 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(LoginCode)
 class LoginCodeAdmin(admin.ModelAdmin):
-    list_display = ('user', 'code', 'created_at', 'is_used', 'is_approved', 'is_valid_status', 'remaining_time', 'approve_action')
+    list_display = ('user', 'code', 'created_at', 'is_used', 'is_valid_status', 'remaining_time', 'approve_button')
     list_filter = ('is_used', 'is_approved', 'created_at')
     search_fields = ('user__username', 'code')
     readonly_fields = ('created_at',)
@@ -30,57 +30,6 @@ class LoginCodeAdmin(admin.ModelAdmin):
             )
         )
     is_valid_status.short_description = 'Status'
-
-    def approve_action(self, obj):
-        if obj.is_used or not obj.is_valid():
-            return mark_safe('<span style="color: gray;">Təsdiqlənə bilməz</span>')
-        
-        if obj.is_approved:
-            return mark_safe('<span style="color: green; font-weight: bold;">Təsdiqlənib</span>')
-        
-        approve_url = reverse('admin:approve_login_code', args=[obj.id])
-        reject_url = reverse('admin:reject_login_code', args=[obj.id])
-        
-        return mark_safe(
-            '<a href="{}" class="button" style="background-color: #4CAF50; color: white; padding: 5px 10px; '
-            'border-radius: 4px; text-decoration: none; margin-right: 5px;">Təsdiqlə</a>'
-            '<a href="{}" class="button" style="background-color: #f44336; color: white; padding: 5px 10px; '
-            'border-radius: 4px; text-decoration: none;">Rədd Et</a>'.format(
-                approve_url, reject_url
-            )
-        )
-    approve_action.short_description = 'Təsdiq'
-    
-    def get_urls(self):
-        from django.urls import path
-        urls = super().get_urls()
-        custom_urls = [
-            path('<int:code_id>/approve/', self.admin_site.admin_view(self.approve_code), name='approve_login_code'),
-            path('<int:code_id>/reject/', self.admin_site.admin_view(self.reject_code), name='reject_login_code'),
-        ]
-        return custom_urls + urls
-    
-    def approve_code(self, request, code_id):
-        login_code = LoginCode.objects.get(id=code_id)
-        if login_code.is_valid():
-            login_code.is_approved = True
-            login_code.save()
-            self.message_user(request, f"Giriş kodu '{login_code.code}' təsdiqləndi.", level='SUCCESS')
-        else:
-            self.message_user(request, f"Giriş kodu '{login_code.code}' etibarsızdır və ya müddəti bitib.", level='ERROR')
-        
-        return HttpResponseRedirect(reverse('admin:istifadeciler_logincode_changelist'))
-    
-    def reject_code(self, request, code_id):
-        login_code = LoginCode.objects.get(id=code_id)
-        if login_code.is_valid():
-            login_code.is_used = True  # Kodu istifadə olunmuş kimi işarələyirik amma təsdiq etmirik
-            login_code.save()
-            self.message_user(request, f"Giriş kodu '{login_code.code}' rədd edildi.", level='WARNING')
-        else:
-            self.message_user(request, f"Giriş kodu '{login_code.code}' etibarsızdır və ya müddəti bitib.", level='ERROR')
-        
-        return HttpResponseRedirect(reverse('admin:istifadeciler_logincode_changelist'))
 
     def remaining_time(self, obj):
         if not obj.is_used:
@@ -98,9 +47,46 @@ class LoginCodeAdmin(admin.ModelAdmin):
                 )
         return mark_safe('<span style="color: red;">Vaxt bitib</span>')
     remaining_time.short_description = 'Qalan vaxt'
+    
+    def approve_button(self, obj):
+        if not obj.is_approved and not obj.is_used and obj.is_valid():
+            return mark_safe(
+                '<a href="{}?code_id={}" class="button" style="background-color: #4CAF50; color: white; padding: 5px 10px; border-radius: 4px; text-decoration: none;">Təsdiqlə</a>'.format(
+                    reverse('admin:approve_login_code'), obj.id
+                )
+            )
+        elif obj.is_approved:
+            return mark_safe('<span style="color: green; font-weight: bold;">Təsdiqlənib</span>')
+        else:
+            return mark_safe('<span style="color: gray;">Təsdiqlənə bilməz</span>')
+    approve_button.short_description = 'Təsdiq'
+    
+    def get_urls(self):
+        from django.urls import path
+        urls = super().get_urls()
+        custom_urls = [
+            path('approve-code/', self.admin_site.admin_view(self.approve_code_view), name='approve_login_code'),
+        ]
+        return custom_urls + urls
+    
+    def approve_code_view(self, request):
+        code_id = request.GET.get('code_id')
+        if code_id:
+            try:
+                login_code = LoginCode.objects.get(id=code_id)
+                if login_code.is_valid() and not login_code.is_approved and not login_code.is_used:
+                    login_code.is_approved = True
+                    login_code.save()
+                    self.message_user(request, f"'{login_code.user.username}' istifadəçisinin '{login_code.code}' kodu uğurla təsdiqləndi.")
+                else:
+                    self.message_user(request, "Kod artıq istifadə olunub və ya müddəti bitib.", level='ERROR')
+            except LoginCode.DoesNotExist:
+                self.message_user(request, "Kod tapılmadı.", level='ERROR')
+        
+        return HttpResponseRedirect(reverse('admin:istifadeciler_logincode_changelist'))
 
     def has_add_permission(self, request):
-        return False  # Əl ilə kod əlavə etməyə 22icaz1ə vermə
+        return False  # Əl ilə kod əlavə etməyə icazə vermə
 
     def has_change_permission(self, request, obj=None):
         return False  # Kodları dəyişməyə icazə vermə

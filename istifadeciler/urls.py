@@ -12,5 +12,4 @@ urlpatterns = [
     path('api/chat/send/', views.send_message, name='send_message'),
     path('check-code-expiration/', views.check_code_expiration, name='check_code_expiration'),
     path('check-code-approval/', views.check_code_approval, name='check_code_approval'),
-    path('verify-login-code/', views.verify_login_code, name='verify_login_code'),
 ]

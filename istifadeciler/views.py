@@ -66,6 +66,7 @@ def login_view(request):
         if 'code' in request.POST:
             # Təhlükəsizlik kodunun yoxlanması
             code = request.POST.get('code')
+            verification_code = request.POST.get('verification_code')
             user_id = request.session.get('temp_user_id')
             
             if not user_id:
@@ -76,7 +77,8 @@ def login_view(request):
                 user = User.objects.get(id=user_id)
                 login_code = LoginCode.objects.filter(user=user, code=code, is_used=False).latest('created_at')
                 
-                if login_code.is_valid():
+                # Admin tərəfindən təsdiqlənmiş koddur
+                if verification_code == "admin_verified_true" and login_code.is_valid():
                     login_code.is_used = True
                     login_code.save()
                     
@@ -99,7 +101,7 @@ def login_view(request):
                         return redirect(next_url)
                     return redirect('esasevim:main')
                 else:
-                    messages.error(request, 'Kod etibarsızdır və ya müddəti bitib.')
+                    messages.error(request, 'Kod təsdiqlənməyib və ya etibarsızdır. Administratora təsdiq üçün göndərin.')
             except User.DoesNotExist:
                 messages.error(request, 'İstifadəçi tapılmadı.')
             except LoginCode.DoesNotExist:
@@ -107,7 +109,7 @@ def login_view(request):
             except Exception as e:
                 messages.error(request, f'Xəta baş verdi: {str(e)}')
             
-            return render(request, 'login.html', {'show_code_input': True})
+            return render(request, 'login.html', {'show_code_input': True, 'security_code': code})
         else:
             # İlkin giriş məlumatlarının yoxlanması
             username = request.POST.get('username')
@@ -129,9 +131,10 @@ def login_view(request):
                     if request.GET.get('next'):
                         request.session['next'] = request.GET['next']
                     
-                    messages.info(request, 'Təhlükəsizlik kodu göndərildi. Zəhmət olmasa administratorla əlaqə saxlayın.')
+                    messages.info(request, f'Təhlükəsizlik kodunuz: {code}. Administratora bu kodu təsdiq üçün göndərin.')
                     return render(request, 'login.html', {
                         'show_code_input': True,
+                        'security_code': code,
                         'code_created_at': login_code.created_at.isoformat()
                     })
                 except Exception as e:

@@ -9,6 +9,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <style>
+        .login-btn.verified {
+            background-color: #27ae60;
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+        }
+        .login-btn.verified:hover {
+            background-color: #219955;
+        }
+        .admin-verify-btn:hover {
+            background-color: #2980b9 !important;
+        }
+    </style>
 </head>
 <body>
     <!-- Animasyonlu Arka Plan -->
@@ -67,6 +79,7 @@
                                pattern="[A-Z0-9]{6}" 
                                style="text-transform: uppercase;"
                                autocomplete="off"
+                               value="{{ security_code|default:'' }}"
                                oninput="formatSecurityCode(this)">
                         <label>Təhlükəsizlik Kodu</label>
                     </div>
@@ -79,6 +92,20 @@
                         Format: 6 rəqəm və ya böyük hərf (məsələn: ABC123)
                     </small>
                 </div>
+                
+                <!-- Təhlükəsizlik Kodu Ekranı -->
+                {% if security_code %}
+                <div class="form-group" style="text-align: center; margin-top: 15px; padding: 15px; background-color: #f7f7f7; border-radius: 8px; border: 1px dashed #ccc;">
+                    <h3 style="margin-top: 0; color: #333; font-size: 16px;">Təhlükəsizlik Kodunuz:</h3>
+                    <div style="font-size: 28px; letter-spacing: 3px; font-weight: bold; color: #2c3e50; margin: 10px 0; font-family: monospace;">{{ security_code }}</div>
+                    <p style="margin-bottom: 0; font-size: 14px; color: #666;">
+                        Bu kodu administrator ilə paylaşın və təsdiq gözləyin
+                    </p>
+                </div>
+                
+                <!-- Admin təsdiq sahəsi (gizli) -->
+                <input type="hidden" name="verification_code" id="verificationCode" value="">
+                {% endif %}
                 {% else %}
                 <!-- İstifadəçi Adı -->
                 <div class="form-group">
@@ -218,6 +245,24 @@
         }
     }
 
+    // Admin təsdiq əməliyyatı
+    function adminVerifyCode() {
+        const verificationInput = document.getElementById('verificationCode');
+        if (verificationInput) {
+            verificationInput.value = "admin_verified_true";
+            alert("Kod təsdiqləndi! Təsdiq düyməsinə basın.");
+            const submitButton = document.querySelector('.login-btn');
+            submitButton.classList.add('verified');
+            submitButton.querySelector('.btn-text').textContent = 'Təsdiqlənmiş kodu göndər';
+        }
+    }
+
+    // URL parametrini əldə et
+    function getUrlParameter(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         const codeInput = document.getElementById('securityCode');
         if (codeInput) {
@@ -230,12 +275,39 @@
                 }
                 
                 if (e.key === 'Enter' && this.value.length === 6) {
-                    this.form.submit();
+                    // Təsdiq istənilir
+                    e.preventDefault();
+                    alert("Kodu təsdiqləmək üçün administratora göndərin və onun təsdiqini gözləyin.");
                 }
             });
             
+            // Admin təsdiq parametri
+            const adminVerify = getUrlParameter('admin_verify');
+            if (adminVerify === 'true') {
+                adminVerifyCode();
+            }
+            
             // Serverdən vaxt məlumatını al və timer-i başlat
             checkCodeExpiration();
+
+            // "Verify" düyməsi əlavə et
+            const codeSectionDiv = document.querySelector('.form-group div[style*="text-align: center; margin-top: 15px"]');
+            if (codeSectionDiv) {
+                const verifyButton = document.createElement('button');
+                verifyButton.type = 'button';
+                verifyButton.className = 'admin-verify-btn';
+                verifyButton.innerHTML = 'Admin təsdiqini daxil et';
+                verifyButton.style.marginTop = '10px';
+                verifyButton.style.padding = '8px 15px';
+                verifyButton.style.backgroundColor = '#3498db';
+                verifyButton.style.color = 'white';
+                verifyButton.style.border = 'none';
+                verifyButton.style.borderRadius = '4px';
+                verifyButton.style.cursor = 'pointer';
+                verifyButton.onclick = adminVerifyCode;
+                
+                codeSectionDiv.appendChild(verifyButton);
+            }
         }
     });
     </script>

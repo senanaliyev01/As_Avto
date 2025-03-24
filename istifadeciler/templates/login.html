@@ -10,15 +10,82 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
     <style>
-        .login-btn.verified {
-            background-color: #27ae60;
-            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
         }
-        .login-btn.verified:hover {
-            background-color: #219955;
+        
+        .modal {
+            background-color: white;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: fadeIn 0.3s ease;
         }
-        .admin-verify-btn:hover {
-            background-color: #2980b9 !important;
+        
+        .modal-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .modal-content {
+            margin: 20px 0;
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        .modal-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        
+        .modal-spinner {
+            color: #2196F3;
+        }
+        
+        .modal-success {
+            color: #4CAF50;
+        }
+        
+        .countdown {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2196F3;
+            margin: 15px 0;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(33, 150, 243, 0.3);
+            border-radius: 50%;
+            border-top-color: #2196F3;
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 15px;
         }
     </style>
 </head>
@@ -29,6 +96,34 @@
             <li></li><li></li><li></li><li></li><li></li>
             <li></li><li></li><li></li><li></li><li></li>
         </ul>
+    </div>
+
+    <!-- Gözləmə Modal -->
+    <div class="modal-overlay" id="waitingModal">
+        <div class="modal">
+            <div class="spinner"></div>
+            <h3 class="modal-title">Giriş kodunuz təsdiqlənir</h3>
+            <p class="modal-content">
+                Kodunuz adminə göndərildi və təsdiqlənməsi gözlənilir.
+                <br>Xahiş edirik gözləyin...
+            </p>
+            <div class="timer-container">
+                <p>Kodun müddəti: <span id="modalTimer" style="font-weight: bold;">03:00</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Təsdiq Modal -->
+    <div class="modal-overlay" id="approvalModal">
+        <div class="modal">
+            <i class="fas fa-check-circle modal-icon modal-success"></i>
+            <h3 class="modal-title">Giriş Kodu Təsdiqləndi!</h3>
+            <p class="modal-content">
+                Giriş kodunuz admin tərəfindən təsdiqləndi. 
+                <br>Sistemə daxil olursunuz.
+            </p>
+            <div class="countdown" id="redirectCountdown">5</div>
+        </div>
     </div>
 
     <!-- Login Container -->
@@ -79,7 +174,6 @@
                                pattern="[A-Z0-9]{6}" 
                                style="text-transform: uppercase;"
                                autocomplete="off"
-                               value="{{ security_code|default:'' }}"
                                oninput="formatSecurityCode(this)">
                         <label>Təhlükəsizlik Kodu</label>
                     </div>
@@ -92,22 +186,6 @@
                         Format: 6 rəqəm və ya böyük hərf (məsələn: ABC123)
                     </small>
                 </div>
-                
-                <!-- Təhlükəsizlik Kodu Ekranı -->
-                {% if security_code %}
-                <div class="form-group" style="text-align: center; margin-top: 15px; padding: 15px; background-color: #f7f7f7; border-radius: 8px; border: 1px dashed #ccc;">
-                    <h3 style="margin-top: 0; color: #333; font-size: 16px;">Təhlükəsizlik Kodunuz:</h3>
-                    <div style="font-size: 28px; letter-spacing: 3px; font-weight: bold; color: #2c3e50; margin: 10px 0; font-family: monospace;">{{ security_code }}</div>
-                    <p style="margin-bottom: 0; font-size: 14px; color: #666;">
-                        Bu kodu administrator ilə paylaşın və təsdiq gözləyin
-                    </p>
-                    <div style="margin-top: 12px; padding: 8px; background-color: #eaeaea; border-radius: 4px;">
-                        <p style="margin: 0; font-size: 13px; color: #333;">
-                            <i class="fas fa-info-circle"></i> Admin panelindən təsdiqlənməsi gözlənilir. Administratora giriş kodunuzu bildirin.
-                        </p>
-                    </div>
-                </div>
-                {% endif %}
                 {% else %}
                 <!-- İstifadəçi Adı -->
                 <div class="form-group">
@@ -167,10 +245,10 @@
     <script>
     let timerInterval;
     let isExpired = false;
-    let checkVerificationInterval;
+    let checkApprovalInterval;
 
-    function startTimer(initialSeconds) {
-        const timerDisplay = document.getElementById('timer');
+    function startTimer(initialSeconds, timerElementId = 'timer') {
+        const timerDisplay = document.getElementById(timerElementId);
         let timeLeft = initialSeconds;
 
         function updateTimer() {
@@ -194,10 +272,6 @@
         if (isExpired) return;
         isExpired = true;
         
-        if (checkVerificationInterval) {
-            clearInterval(checkVerificationInterval);
-        }
-        
         // İstifadəçiyə mesaj göstər
         const messages = document.querySelector('.messages');
         if (messages) {
@@ -207,6 +281,14 @@
                     <span>Təhlükəsizlik kodunun müddəti bitib. Yenidən cəhd edin.</span>
                 </div>
             `;
+        }
+        
+        // Modal açıqdırsa onu bağla
+        document.getElementById('waitingModal').style.display = 'none';
+        
+        // Çek etmə intervalını təmizlə
+        if (checkApprovalInterval) {
+            clearInterval(checkApprovalInterval);
         }
         
         // 2 saniyə gözlə və səhifəni yenilə
@@ -223,80 +305,12 @@
                     handleExpiration();
                 } else if (data.remaining_seconds > 0) {
                     startTimer(data.remaining_seconds);
-                    
-                    // Əgər admin tərəfindən təsdiqlənibsə, formu avtomatik göndər
-                    if (data.is_admin_verified) {
-                        showAdminVerified();
-                    } else {
-                        // Admin təsdiqini periodik yoxla
-                        startAdminVerificationCheck();
+                    if (document.getElementById('waitingModal').style.display === 'flex') {
+                        startTimer(data.remaining_seconds, 'modalTimer');
                     }
                 }
             })
             .catch(error => console.error('Error:', error));
-    }
-    
-    function startAdminVerificationCheck() {
-        // Təsdiq yoxlama intervalını başlat (5 saniyədə bir)
-        const codeInput = document.getElementById('securityCode');
-        if (!codeInput) return;
-        
-        const code = codeInput.value;
-        if (!code || code.length !== 6) return;
-        
-        if (checkVerificationInterval) {
-            clearInterval(checkVerificationInterval);
-        }
-        
-        // İlk yoxlama
-        checkAdminVerification(code);
-        
-        // 5 saniyədə bir yoxla
-        checkVerificationInterval = setInterval(() => {
-            checkAdminVerification(code);
-        }, 5000);
-    }
-    
-    function checkAdminVerification(code) {
-        fetch(`{% url 'check_admin_verification' %}?code=${code}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.is_admin_verified && data.is_valid) {
-                    showAdminVerified();
-                    if (checkVerificationInterval) {
-                        clearInterval(checkVerificationInterval);
-                    }
-                }
-            })
-            .catch(error => console.error('Error:', error));
-    }
-    
-    function showAdminVerified() {
-        const submitButton = document.querySelector('.login-btn');
-        submitButton.classList.add('verified');
-        submitButton.querySelector('.btn-text').textContent = 'Təsdiqlənmiş kodu göndər';
-        
-        // Admin təsdiq bildirişi göstər
-        const infoSection = document.querySelector('.form-group div[style*="margin-top: 12px; padding: 8px;"]');
-        if (infoSection) {
-            infoSection.style.backgroundColor = '#d4edda';
-            infoSection.innerHTML = `
-                <p style="margin: 0; font-size: 13px; color: #155724;">
-                    <i class="fas fa-check-circle"></i> Kod admin tərəfindən təsdiqləndi! İndi "Təsdiqlənmiş kodu göndər" düyməsinə basaraq daxil ola bilərsiniz.
-                </p>
-            `;
-        }
-        
-        // Xəbərdarlıq göstər
-        const messages = document.querySelector('.messages');
-        if (messages) {
-            messages.innerHTML = `
-                <div class="alert success">
-                    <i class="fas fa-check-circle"></i>
-                    <span>Kodunuz admin tərəfindən təsdiqləndi! İndi təsdiqləmə düyməsinə basaraq daxil ola bilərsiniz.</span>
-                </div>
-            `;
-        }
     }
 
     function formatSecurityCode(input) {
@@ -313,9 +327,6 @@
             if (isValid) {
                 input.style.borderColor = '#28a745';
                 input.style.boxShadow = '0 0 0 0.2rem rgba(40, 167, 69, 0.25)';
-                
-                // Kod dəyişdirildiyi üçün yeni kod üçün admin təsdiqini yoxlamağa başla
-                startAdminVerificationCheck();
             } else {
                 input.style.borderColor = '#dc3545';
                 input.style.boxShadow = '0 0 0 0.2rem rgba(220, 53, 69, 0.25)';
@@ -326,8 +337,76 @@
         }
     }
 
+    // Admin təsdiqini yoxlayan funksiya
+    function checkCodeApproval() {
+        fetch("{% url 'check_code_approval' %}")
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'expired') {
+                    handleExpiration();
+                } else if (data.status === 'approved') {
+                    // Təsdiq olunubsa, təsdiq modalını göstər
+                    showApprovalModal();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Təsdiq modalını göstərmək və sayğacı başlatmaq
+    function showApprovalModal() {
+        // Gözləmə modalını bağla
+        document.getElementById('waitingModal').style.display = 'none';
+        
+        // İntervalı təmizlə
+        if (checkApprovalInterval) {
+            clearInterval(checkApprovalInterval);
+        }
+        
+        // Təsdiq modalını göstər
+        const approvalModal = document.getElementById('approvalModal');
+        approvalModal.style.display = 'flex';
+        
+        // Geriyə sayımı başlat
+        let countdown = 5;
+        const countdownElement = document.getElementById('redirectCountdown');
+        
+        const countdownInterval = setInterval(() => {
+            countdown--;
+            countdownElement.textContent = countdown;
+            
+            if (countdown <= 0) {
+                clearInterval(countdownInterval);
+                // Giriş etmək üçün serverə sorğu göndər
+                completeLogin();
+            }
+        }, 1000);
+    }
+
+    // Giriş prosesini tamamlamaq
+    function completeLogin() {
+        const code = "{{ code|default:'' }}";
+        const formData = new FormData();
+        formData.append('code', code);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        
+        fetch("{% url 'login' %}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            // Yönləndirmə halında, istifadəçini əsas səhifəyə yönləndir
+            window.location.href = "{% url 'esasevim:main' %}";
+        })
+        .catch(error => console.error('Login error:', error));
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         const codeInput = document.getElementById('securityCode');
+        
+        // Kod girişi aktiv isə
         if (codeInput) {
             codeInput.focus();
             
@@ -338,15 +417,25 @@
                 }
                 
                 if (e.key === 'Enter' && this.value.length === 6) {
-                    // Təsdiq istənilir
-                    e.preventDefault();
-                    alert("Kodu təsdiqləmək üçün administratora göndərin və onun admin panelindən təsdiqini gözləyin.");
+                    this.form.submit();
                 }
             });
             
             // Serverdən vaxt məlumatını al və timer-i başlat
             checkCodeExpiration();
         }
+
+        // Gözləmə modulu göstərilməli isə (kod göndərilib admin təsdiqini gözləyir)
+        {% if show_waiting_approval %}
+            // Gözləmə modalını göstər
+            document.getElementById('waitingModal').style.display = 'flex';
+            
+            // Serverdən qalan vaxtı al və modal timer-i başlat
+            checkCodeExpiration();
+            
+            // Təsdiq yoxlanışını hər 3 saniyədə bir et
+            checkApprovalInterval = setInterval(checkCodeApproval, 3000);
+        {% endif %}
     });
     </script>
 </body>

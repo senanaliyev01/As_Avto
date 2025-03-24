@@ -15,12 +15,17 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(LoginCode)
 class LoginCodeAdmin(admin.ModelAdmin):
-    list_display = ('user', 'code', 'created_at', 'is_used', 'is_valid_status', 'remaining_time')
-    list_filter = ('is_used', 'created_at')
+    list_display = ('user', 'code', 'created_at', 'is_used', 'is_admin_verified')
+    list_filter = ('is_used', 'is_admin_verified', 'created_at')
     search_fields = ('user__username', 'code')
     readonly_fields = ('created_at',)
-    ordering = ('-created_at',)  # Ən son kodlar əvvəldə
+    actions = ['verify_codes']
     
+    def verify_codes(self, request, queryset):
+        updated = queryset.update(is_admin_verified=True)
+        self.message_user(request, f'{updated} kod uğurla təsdiqləndi.')
+    verify_codes.short_description = "Seçilmiş kodları təsdiqlə"
+
     def is_valid_status(self, obj):
         is_valid = obj.is_valid()
         return mark_safe(

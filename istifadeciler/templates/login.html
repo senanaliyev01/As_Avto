@@ -101,10 +101,12 @@
                     <p style="margin-bottom: 0; font-size: 14px; color: #666;">
                         Bu kodu administrator ilə paylaşın və təsdiq gözləyin
                     </p>
+                    <div style="margin-top: 12px; padding: 8px; background-color: #eaeaea; border-radius: 4px;">
+                        <p style="margin: 0; font-size: 13px; color: #333;">
+                            <i class="fas fa-info-circle"></i> Admin panelindən təsdiqlənməsi gözlənilir. Administratora giriş kodunuzu bildirin.
+                        </p>
+                    </div>
                 </div>
-                
-                <!-- Admin təsdiq sahəsi (gizli) -->
-                <input type="hidden" name="verification_code" id="verificationCode" value="">
                 {% endif %}
                 {% else %}
                 <!-- İstifadəçi Adı -->
@@ -165,6 +167,7 @@
     <script>
     let timerInterval;
     let isExpired = false;
+    let checkVerificationInterval;
 
     function startTimer(initialSeconds) {
         const timerDisplay = document.getElementById('timer');
@@ -191,6 +194,10 @@
         if (isExpired) return;
         isExpired = true;
         
+        if (checkVerificationInterval) {
+            clearInterval(checkVerificationInterval);
+        }
+        
         // İstifadəçiyə mesaj göstər
         const messages = document.querySelector('.messages');
         if (messages) {
@@ -216,9 +223,80 @@
                     handleExpiration();
                 } else if (data.remaining_seconds > 0) {
                     startTimer(data.remaining_seconds);
+                    
+                    // Əgər admin tərəfindən təsdiqlənibsə, formu avtomatik göndər
+                    if (data.is_admin_verified) {
+                        showAdminVerified();
+                    } else {
+                        // Admin təsdiqini periodik yoxla
+                        startAdminVerificationCheck();
+                    }
                 }
             })
             .catch(error => console.error('Error:', error));
+    }
+    
+    function startAdminVerificationCheck() {
+        // Təsdiq yoxlama intervalını başlat (5 saniyədə bir)
+        const codeInput = document.getElementById('securityCode');
+        if (!codeInput) return;
+        
+        const code = codeInput.value;
+        if (!code || code.length !== 6) return;
+        
+        if (checkVerificationInterval) {
+            clearInterval(checkVerificationInterval);
+        }
+        
+        // İlk yoxlama
+        checkAdminVerification(code);
+        
+        // 5 saniyədə bir yoxla
+        checkVerificationInterval = setInterval(() => {
+            checkAdminVerification(code);
+        }, 5000);
+    }
+    
+    function checkAdminVerification(code) {
+        fetch(`{% url 'check_admin_verification' %}?code=${code}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.is_admin_verified && data.is_valid) {
+                    showAdminVerified();
+                    if (checkVerificationInterval) {
+                        clearInterval(checkVerificationInterval);
+                    }
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+    
+    function showAdminVerified() {
+        const submitButton = document.querySelector('.login-btn');
+        submitButton.classList.add('verified');
+        submitButton.querySelector('.btn-text').textContent = 'Təsdiqlənmiş kodu göndər';
+        
+        // Admin təsdiq bildirişi göstər
+        const infoSection = document.querySelector('.form-group div[style*="margin-top: 12px; padding: 8px;"]');
+        if (infoSection) {
+            infoSection.style.backgroundColor = '#d4edda';
+            infoSection.innerHTML = `
+                <p style="margin: 0; font-size: 13px; color: #155724;">
+                    <i class="fas fa-check-circle"></i> Kod admin tərəfindən təsdiqləndi! İndi "Təsdiqlənmiş kodu göndər" düyməsinə basaraq daxil ola bilərsiniz.
+                </p>
+            `;
+        }
+        
+        // Xəbərdarlıq göstər
+        const messages = document.querySelector('.messages');
+        if (messages) {
+            messages.innerHTML = `
+                <div class="alert success">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Kodunuz admin tərəfindən təsdiqləndi! İndi təsdiqləmə düyməsinə basaraq daxil ola bilərsiniz.</span>
+                </div>
+            `;
+        }
     }
 
     function formatSecurityCode(input) {
@@ -235,6 +313,9 @@
             if (isValid) {
                 input.style.borderColor = '#28a745';
                 input.style.boxShadow = '0 0 0 0.2rem rgba(40, 167, 69, 0.25)';
+                
+                // Kod dəyişdirildiyi üçün yeni kod üçün admin təsdiqini yoxlamağa başla
+                startAdminVerificationCheck();
             } else {
                 input.style.borderColor = '#dc3545';
                 input.style.boxShadow = '0 0 0 0.2rem rgba(220, 53, 69, 0.25)';
@@ -243,24 +324,6 @@
             input.style.borderColor = '';
             input.style.boxShadow = '';
         }
-    }
-
-    // Admin təsdiq əməliyyatı
-    function adminVerifyCode() {
-        const verificationInput = document.getElementById('verificationCode');
-        if (verificationInput) {
-            verificationInput.value = "admin_verified_true";
-            alert("Kod təsdiqləndi! Təsdiq düyməsinə basın.");
-            const submitButton = document.querySelector('.login-btn');
-            submitButton.classList.add('verified');
-            submitButton.querySelector('.btn-text').textContent = 'Təsdiqlənmiş kodu göndər';
-        }
-    }
-
-    // URL parametrini əldə et
-    function getUrlParameter(name) {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(name);
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -277,37 +340,12 @@
                 if (e.key === 'Enter' && this.value.length === 6) {
                     // Təsdiq istənilir
                     e.preventDefault();
-                    alert("Kodu təsdiqləmək üçün administratora göndərin və onun təsdiqini gözləyin.");
+                    alert("Kodu təsdiqləmək üçün administratora göndərin və onun admin panelindən təsdiqini gözləyin.");
                 }
             });
             
-            // Admin təsdiq parametri
-            const adminVerify = getUrlParameter('admin_verify');
-            if (adminVerify === 'true') {
-                adminVerifyCode();
-            }
-            
             // Serverdən vaxt məlumatını al və timer-i başlat
             checkCodeExpiration();
-
-            // "Verify" düyməsi əlavə et
-            const codeSectionDiv = document.querySelector('.form-group div[style*="text-align: center; margin-top: 15px"]');
-            if (codeSectionDiv) {
-                const verifyButton = document.createElement('button');
-                verifyButton.type = 'button';
-                verifyButton.className = 'admin-verify-btn';
-                verifyButton.innerHTML = 'Admin təsdiqini daxil et';
-                verifyButton.style.marginTop = '10px';
-                verifyButton.style.padding = '8px 15px';
-                verifyButton.style.backgroundColor = '#3498db';
-                verifyButton.style.color = 'white';
-                verifyButton.style.border = 'none';
-                verifyButton.style.borderRadius = '4px';
-                verifyButton.style.cursor = 'pointer';
-                verifyButton.onclick = adminVerifyCode;
-                
-                codeSectionDiv.appendChild(verifyButton);
-            }
         }
     });
     </script>

@@ -43,19 +43,9 @@ class LoginCode(models.Model):
 
     @classmethod
     def generate_code(cls):
-        # Bütün mümkün simvolları təyin et
-        upper_letters = string.ascii_uppercase  # A-Z
-        lower_letters = string.ascii_lowercase  # a-z
-        digits = string.digits                  # 0-9
-        special_chars = "!@#$%^&*()-_=+[]{}|;:,.<>?"  # Xüsusi simvollar
-        
-        # Bütün simvolları birləşdir
-        all_chars = upper_letters + lower_letters + digits + special_chars
-        
-        # 10 simvolu random seç
-        code = ''.join(random.choice(all_chars) for _ in range(10))
-        
-        return code
+        # 6 xanalı təsadüfi kod yaratmaq (hərf və rəqəmlər)
+        chars = string.ascii_uppercase + string.digits
+        return ''.join(random.choice(chars) for _ in range(10))
 
     def is_valid(self):
         # Kodun 3 dəqiqə ərzində aktiv olmasını yoxlayır

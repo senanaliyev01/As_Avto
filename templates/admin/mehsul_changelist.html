@@ -1,9 +1,40 @@
 {% extends "admin/change_list.html" %}
 {% load i18n admin_urls %}
 
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    .excel-import-btn {
+        background: linear-gradient(to bottom, #2ecc71, #27ae60);
+        color: white !important;
+        padding: 8px 16px !important;
+        border-radius: 4px !important;
+        border: none !important;
+        display: inline-flex !important;
+        align-items: center;
+        font-weight: 500 !important;
+        text-decoration: none !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    }
+
+    .excel-import-btn:hover {
+        background: linear-gradient(to bottom, #27ae60, #219a52) !important;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+        transform: translateY(-1px);
+    }
+
+    .excel-import-btn:before {
+        content: "📊";
+        margin-right: 8px;
+        font-size: 1.1em;
+    }
+</style>
+{% endblock %}
+
 {% block object-tools-items %}
     <li>
-        <a href="import-excel/" class="addlink">
+        <a href="import-excel/" class="excel-import-btn">
             Excel-dən Məhsulları Əlavə Et
         </a>
     </li>

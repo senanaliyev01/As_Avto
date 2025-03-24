@@ -155,7 +155,27 @@ def normalize_search_text(text):
     # Sözləri ayır
     words = normalized.split()
     
-    return normalized, words
+    # Axtarış üçün faydalı kombinasiyalar yaradırıq (permutasiyalar əvəzinə)
+    word_combinations = []
+    
+    # Orijinal birləşmiş variant (bütün sözlər birləşdirilmiş)
+    if words:
+        word_combinations.append(''.join(words))
+    
+    # Orijinal mətn (boşluqlarla)
+    if normalized:
+        word_combinations.append(normalized)
+    
+    # Hər bir sözü ayrıca əlavə et
+    word_combinations.extend(words)
+    
+    # Ardıcıl iki sözü birləşdirərək əlavə et (daha çox axtarış variantı üçün)
+    if len(words) >= 2:
+        for i in range(len(words) - 1):
+            word_combinations.append(words[i] + words[i + 1])
+    
+    # Təkrarları silmək üçün set istifadə edirik
+    return normalized, list(set(word_combinations))
 
 @login_required
 def products_list(request):
@@ -433,14 +453,8 @@ def mehsul_axtaris(request):
         # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
         clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
         
-        # Normallaşdırılmış axtarış mətnini əldə edirik
-        normalized_query, _ = normalize_search_text(query)
-        
-        # Mürəkkəb axtarış sorğusu yaradırıq
-        search_query = Q(oem_kodlar__kod__icontains=clean_query) | Q(haqqinda__icontains=normalized_query)
-        
-        # Axtarış nəticələrini əldə edirik
-        mehsullar = mehsullar.filter(search_query).distinct()
+        # Yalnız OEM kodlarında axtarış
+        mehsullar = mehsullar.filter(oem_kodlar__kod__icontains=clean_query).distinct()
         
         # Nəticələri qaytarırıq
         return JsonResponse({
@@ -666,14 +680,8 @@ def realtime_search(request):
         # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
         clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
         
-        # Normallaşdırılmış axtarış mətnini əldə edirik
-        normalized_query, _ = normalize_search_text(query)
-        
-        # Mürəkkəb axtarış sorğusu yaradırıq
-        search_query = Q(oem_kodlar__kod__icontains=clean_query) | Q(haqqinda__icontains=normalized_query)
-        
-        # Axtarış nəticələrini əldə edirik
-        mehsullar = mehsullar.filter(search_query).distinct()
+        # Yalnız OEM kodlarında axtarış
+        mehsullar = mehsullar.filter(oem_kodlar__kod__icontains=clean_query).distinct()
     
     results = []
     for mehsul in mehsullar:

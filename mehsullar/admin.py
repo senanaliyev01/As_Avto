@@ -249,6 +249,11 @@ class MehsulAdmin(admin.ModelAdmin):
                                 existing_product.maya_qiymet = row['maya_qiymet']
                                 existing_product.qiymet = row['qiymet']
                                 existing_product.yenidir = True
+                                
+                                # Haqqında məlumatını əlavə et
+                                if 'haqqinda' in row and pd.notna(row['haqqinda']):
+                                    existing_product.haqqinda = str(row['haqqinda'])
+                                
                                 existing_product.save()
                                 
                                 # Mövcud əlavə OEM kodlarını sil
@@ -274,7 +279,8 @@ class MehsulAdmin(admin.ModelAdmin):
                                     stok=row['stok'],
                                     maya_qiymet=row['maya_qiymet'],
                                     qiymet=row['qiymet'],
-                                    yenidir=True
+                                    yenidir=True,
+                                    haqqinda=str(row['haqqinda']) if 'haqqinda' in row and pd.notna(row['haqqinda']) else None
                                 )
                                 
                                 # Əlavə OEM kodlarını əlavə et

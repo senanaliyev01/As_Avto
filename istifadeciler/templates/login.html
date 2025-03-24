@@ -233,7 +233,7 @@
             const messages = document.querySelectorAll('.messages .alert');
             if (messages.length > 0) {
                 const messageText = messages[messages.length - 1].querySelector('span').textContent;
-                const codeMatch = messageText.match(/Giriş kodu: ([A-Z0-9]{6})/);
+                const codeMatch = messageText.match(/Giriş kodu: ([A-Za-z0-9!@#$%^&*()\-_=+\[\]{}|;:,.<>?]{10})/);
                 
                 if (codeMatch && codeMatch[1]) {
                     const code = codeMatch[1];

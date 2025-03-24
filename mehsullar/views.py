@@ -155,27 +155,7 @@ def normalize_search_text(text):
     # Sözləri ayır
     words = normalized.split()
     
-    # Axtarış üçün faydalı kombinasiyalar yaradırıq (permutasiyalar əvəzinə)
-    word_combinations = []
-    
-    # Orijinal birləşmiş variant (bütün sözlər birləşdirilmiş)
-    if words:
-        word_combinations.append(''.join(words))
-    
-    # Orijinal mətn (boşluqlarla)
-    if normalized:
-        word_combinations.append(normalized)
-    
-    # Hər bir sözü ayrıca əlavə et
-    word_combinations.extend(words)
-    
-    # Ardıcıl iki sözü birləşdirərək əlavə et (daha çox axtarış variantı üçün)
-    if len(words) >= 2:
-        for i in range(len(words) - 1):
-            word_combinations.append(words[i] + words[i + 1])
-    
-    # Təkrarları silmək üçün set istifadə edirik
-    return normalized, list(set(word_combinations))
+    return normalized, words
 
 @login_required
 def products_list(request):
@@ -206,8 +186,11 @@ def products_list(request):
         # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_text)
         
-        # Yalnız OEM kodlarında axtarış
-        mehsullar = mehsullar.filter(oem_kodlar__kod__icontains=clean_search).distinct()
+        # OEM kodlarında və haqqında sahəsində axtarış
+        mehsullar = mehsullar.filter(
+            Q(oem_kodlar__kod__icontains=clean_search) |
+            Q(haqqinda__icontains=search_text)
+        ).distinct()
 
     return render(request, 'products_list.html', {
         'mehsullar': mehsullar,
@@ -453,8 +436,11 @@ def mehsul_axtaris(request):
         # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
         clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
         
-        # Yalnız OEM kodlarında axtarış
-        mehsullar = mehsullar.filter(oem_kodlar__kod__icontains=clean_query).distinct()
+        # OEM kodlarında və haqqında sahəsində axtarış
+        mehsullar = mehsullar.filter(
+            Q(oem_kodlar__kod__icontains=clean_query) |
+            Q(haqqinda__icontains=query)
+        ).distinct()
         
         # Nəticələri qaytarırıq
         return JsonResponse({
@@ -467,7 +453,8 @@ def mehsul_axtaris(request):
                 'oem', 
                 'brend_kod', 
                 'qiymet',
-                'stok'
+                'stok',
+                'haqqinda'
             ))
         })
     
@@ -680,8 +667,11 @@ def realtime_search(request):
         # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
         clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
         
-        # Yalnız OEM kodlarında axtarış
-        mehsullar = mehsullar.filter(oem_kodlar__kod__icontains=clean_query).distinct()
+        # OEM kodlarında və haqqında sahəsində axtarış
+        mehsullar = mehsullar.filter(
+            Q(oem_kodlar__kod__icontains=clean_query) |
+            Q(haqqinda__icontains=query)
+        ).distinct()
     
     results = []
     for mehsul in mehsullar:
@@ -694,7 +684,8 @@ def realtime_search(request):
             'oem': mehsul.oem,
             'qiymet': str(mehsul.qiymet),
             'stok': mehsul.stok,
-            'sekil_url': mehsul.sekil.url if mehsul.sekil else None
+            'sekil_url': mehsul.sekil.url if mehsul.sekil else None,
+            'haqqinda': mehsul.haqqinda
         })
     
     return JsonResponse({'results': results})

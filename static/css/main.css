@@ -433,7 +433,7 @@ body {
 /* Hero Section */
 .hero-section {
     width: 100%;
-    height: 600px;
+    height: 500px;
     overflow: hidden;
     position: relative;
     background-color: var(--primary-color);
@@ -447,7 +447,7 @@ body {
 .hero-slide {
     position: relative;
     width: 100%;
-    height: 600px;
+    height: 500px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -464,19 +464,19 @@ body {
     background: linear-gradient(
         to right,
         rgba(10, 25, 47, 0.85) 0%,
-        rgba(10, 25, 47, 0.5) 50%,
-        rgba(10, 25, 47, 0.2) 100%
+        rgba(10, 25, 47, 0.6) 50%,
+        rgba(10, 25, 47, 0.3) 100%
     );
     z-index: 1;
 }
 
 .hero-slide img {
     width: 100%;
-    height: 100%;
+    height: 500px;
     object-fit: cover;
     transform: scale(1.1);
     transition: transform 8s ease;
-    filter: brightness(1.1) contrast(1.1) saturate(1.1);
+    filter: brightness(1.1) contrast(1.1);
 }
 
 .swiper-slide-active .hero-slide img {
@@ -495,6 +495,7 @@ body {
     max-width: 800px;
     opacity: 0;
     transition: all 0.8s ease;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .swiper-slide-active .hero-content {
@@ -504,17 +505,18 @@ body {
 
 .hero-subtitle {
     display: inline-block;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     text-transform: uppercase;
     letter-spacing: 3px;
     color: var(--accent-color);
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     position: relative;
     padding-left: 40px;
     opacity: 0;
     transform: translateX(-20px);
     transition: all 0.6s ease 0.1s;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    font-weight: 600;
 }
 
 .hero-subtitle::before {
@@ -530,22 +532,22 @@ body {
 }
 
 .hero-title {
-    font-size: 4rem;
+    font-size: 3.5rem;
     margin-bottom: 1.5rem;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     transform: translateY(20px);
     transition: transform 0.6s ease 0.3s;
-    background: linear-gradient(45deg, var(--text-primary), var(--accent-color));
+    background: linear-gradient(45deg, #ffffff, var(--accent-color));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    font-weight: 800;
+    font-weight: 700;
     line-height: 1.2;
     opacity: 0;
-    letter-spacing: -1px;
+    filter: drop-shadow(0 0 10px rgba(100, 255, 218, 0.3));
 }
 
 .hero-description {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
     transform: translateY(20px);
     transition: transform 0.6s ease 0.5s;
@@ -558,19 +560,18 @@ body {
 
 .hero-button {
     display: inline-block;
-    padding: 15px 35px;
+    padding: 12px 30px;
     background-color: var(--accent-color);
     color: var(--primary-color);
     text-decoration: none;
     border-radius: 30px;
     font-weight: 600;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(100, 255, 218, 0.3);
     transform: translateY(20px);
     opacity: 0;
     transition: all 0.6s ease 0.7s;
-    border: 2px solid transparent;
 }
 
 .hero-button i {
@@ -581,8 +582,7 @@ body {
 .hero-button:hover {
     background-color: transparent;
     color: var(--accent-color);
-    border-color: var(--accent-color);
-    box-shadow: 0 0 20px rgba(100, 255, 218, 0.2);
+    box-shadow: 0 0 0 2px var(--accent-color);
 }
 
 .hero-button:hover i {
@@ -605,32 +605,29 @@ body {
 .hero-button-next,
 .hero-button-prev {
     color: var(--accent-color);
-    width: 60px;
-    height: 60px;
-    background-color: rgba(10, 25, 47, 0.7);
+    width: 50px;
+    height: 50px;
+    background-color: rgba(10, 25, 47, 0.5);
     border-radius: 50%;
     transition: all 0.3s ease;
-    border: 2px solid var(--accent-color);
 }
 
 .hero-button-next:hover,
 .hero-button-prev:hover {
     background-color: var(--accent-color);
     color: var(--primary-color);
-    transform: scale(1.1);
-    box-shadow: 0 0 20px rgba(100, 255, 218, 0.3);
 }
 
 .hero-button-next::after,
 .hero-button-prev::after {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: bold;
 }
 
 /* Hero Pagination */
 .hero-pagination {
     position: absolute;
-    bottom: 30px;
+    bottom: 20px;
     z-index: 10;
 }
 
@@ -641,27 +638,25 @@ body {
     opacity: 1;
     margin: 0 5px;
     transition: all 0.3s ease;
-    border: 2px solid transparent;
 }
 
 .hero-pagination .swiper-pagination-bullet-active {
     background: var(--accent-color);
     width: 30px;
     border-radius: 6px;
-    box-shadow: 0 0 10px var(--accent-color);
 }
 
 @media screen and (max-width: 768px) {
     .hero-section {
-        height: 500px;
+        height: 400px;
     }
 
     .hero-slide {
-        height: 500px;
+        height: 400px;
     }
 
     .hero-slide img {
-        height: 500px;
+        height: 400px;
     }
 
     .hero-content {
@@ -672,7 +667,6 @@ body {
     
     .hero-subtitle {
         padding-left: 0;
-        font-size: 1.2rem;
     }
     
     .hero-subtitle::before {
@@ -680,44 +674,38 @@ body {
     }
 
     .hero-title {
-        font-size: 2.5rem;
+        font-size: 2.2rem;
     }
 
     .hero-description {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
     }
     
     .hero-button {
-        padding: 12px 25px;
-        font-size: 1.1rem;
-    }
-
-    .hero-button-next,
-    .hero-button-prev {
-        width: 45px;
-        height: 45px;
+        padding: 10px 20px;
+        font-size: 1rem;
     }
 }
 
 @media screen and (min-width: 1200px) {
     .hero-section {
-        height: 700px;
+        height: 600px;
     }
 
     .hero-slide {
-        height: 700px;
+        height: 600px;
     }
 
     .hero-slide img {
-        height: 700px;
+        height: 600px;
     }
 
     .hero-title {
-        font-size: 4.5rem;
+        font-size: 4rem;
     }
 
     .hero-description {
-        font-size: 1.8rem;
+        font-size: 1.6rem;
     }
 }
 

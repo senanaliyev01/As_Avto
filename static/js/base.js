@@ -885,16 +885,12 @@
                 
                 if (data.results.length > 0) {
                     dropdownContainer.innerHTML = data.results.map(result => {
-                        const highlightTerm = (text, term) => {
-                            const regex = new RegExp(`(${term})`, 'gi');
-                            return text.replace(regex, '<span class="highlight">$1</span>');
-                        };
                         return `                            <div class="search-result-item" onclick="window.location.href='/product-detail/${encodeURIComponent(result.adi)}-${encodeURIComponent(result.oem)}-${encodeURIComponent(result.brend_kod)}/${result.id}/'">
                                 ${result.sekil_url ? `<img src="${result.sekil_url}" alt="${result.adi}">` : ''}
                                 <div class="search-result-info">
-                                    <h4>${highlightTerm(result.adi, query)}  ${highlightTerm(result.brend, query)}</h4>
-                                    <p>${highlightTerm(result.brend_kod, query)}  ${highlightTerm(result.oem, query)}</p>
-                                    <p>${highlightTerm(result.marka, query)}</p>
+                                    <h4>${result.adi}  ${result.brend}</h4>
+                                    <p>${result.brend_kod}  ${result.oem}</p>
+                                    <p>${result.marka}</p>
                                 </div>
                                 <div class="search-result-price">
                                     <div class="stock-status ${result.stok === 0 ? 'out-of-stock' : result.stok <= 20 ? 'low-stock' : 'in-stock'}">

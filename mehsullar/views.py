@@ -559,7 +559,7 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
 
     elements.append(imza_table)
 
-    # Ödənilən məbləği ortada yerləşdirin
+    # Ödənilən məbləği ortada2 yerləşdirin
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq
     elements.append(Paragraph("Ödənilən Məbləğ: ___________________________ AZN | İmza:____________________", styles['Normal']))
 

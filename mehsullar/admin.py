@@ -171,7 +171,7 @@ class SifarisMehsulAdmin(admin.ModelAdmin):
         return f"{obj.miqdar * obj.qiymet} AZN"
     get_total.short_description = 'Cəmi'
 
-# Məhsul admin paaneli
+# Məhsul admin paneli
 admin.site.register(Model)
 admin.site.register(Avtomodel)
 admin.site.register(Motor)

@@ -11,7 +11,7 @@ urlpatterns = [
     path('get_cart_count/', views.get_cart_count, name='get_cart_count'),
     path('get_cart_items/', views.get_cart_items, name='get_cart_items'),
     path('orders_detail/<int:sifaris_id>/', views.sifaris_detallari, name='sifaris_detallari'),
-    path('product-detail/<str:mehsul_adi>-<str:mehsul_oem>-<str:mehsul_brend_kod>/<int:mehsul_id>/', 
+    path('product-detail/<str:mehsul_adi>-<str:mehsul_oem>-<str:mehsul_brend_kod>/', 
          views.mehsul_haqqinda, 
          name='mehsul_haqqinda'),
     path('about/', views.about, name='about'),
@@ -21,3 +21,4 @@ urlpatterns = [
     path('reports/', views.hesabatlar, name='hesabatlar'),
     path('realtime-search/', views.realtime_search, name='realtime_search'),
 ]
+    

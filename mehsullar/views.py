@@ -570,11 +570,9 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
 
 
 @login_required
-def mehsul_haqqinda(request, mehsul_id, mehsul_adi, mehsul_oem, mehsul_brend_kod):
-    mehsul = get_object_or_404(Mehsul, id=mehsul_id)
-    return render(request, 'mehsul_haqqinda.html', {
-        'mehsul': mehsul
-    })
+def mehsul_haqqinda(request, mehsul_adi, mehsul_oem, mehsul_brend_kod):
+    mehsul = get_object_or_404(Mehsul, oem=mehsul_oem, brend_kod=mehsul_brend_kod)
+    return render(request, 'mehsul_haqqinda.html', {'mehsul': mehsul})
 
 @login_required
 def hesabatlar(request):

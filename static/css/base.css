@@ -911,10 +911,10 @@ html {
     margin-right: 5px;
 }
 
-.highlight {
-    background-color:yellowgreen; /* Sarı rəng */
-    font-weight: bold; /* Qalın yazı */
-}
+/* .highlight {
+    background-color:yellowgreen; 
+    font-weight: bold; 
+}   */
 
 /* Profile Link Styles */
 .header-profile-link {

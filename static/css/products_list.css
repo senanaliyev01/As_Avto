@@ -456,19 +456,19 @@ body {
 .products-table td:nth-child(1) { width: 5%; }
 
 .products-table th:nth-child(2),
-.products-table td:nth-child(2) { width: 5%; }
+.products-table td:nth-child(2) { width: 10%; }
 
 .products-table th:nth-child(3),
 .products-table td:nth-child(3) { width: 8%; }
 
 .products-table th:nth-child(4),
-.products-table td:nth-child(4) { width: 5%; }
+.products-table td:nth-child(4) { width: 8%; }
 
 .products-table th:nth-child(5),
-.products-table td:nth-child(5) { width: 10%; }
+.products-table td:nth-child(5) { width: 5%; }
 
 .products-table th:nth-child(6),
-.products-table td:nth-child(6) { width: 10%; }
+.products-table td:nth-child(6) { width: 5%; }
 
 .products-table th:nth-child(7),
 .products-table td:nth-child(7) { width: 5%; }

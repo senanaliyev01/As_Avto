@@ -21,16 +21,16 @@ header {
 
 .top-header {
     display: grid;
-    grid-template-columns: 220px 1fr 250px;
+    grid-template-columns: 200px 1fr 250px;
     align-items: center;
-    gap: 2rem;
+    gap: 1.5rem;
     padding: 0 2rem;
-    max-width: 1600px;
+    max-width: 1400px;
     margin: 0 auto;
 }
 
 .logo img {
-    width: 200px;
+    width: 180px;
     height: auto;
     transition: transform 0.3s ease;
 }
@@ -217,7 +217,7 @@ header {
 /* Search Container */
 .search-container {
     width: 100%;
-    max-width: 100%;
+    max-width: 900px;
     margin: 0 auto;
     padding: 0 1rem;
 }
@@ -227,7 +227,7 @@ header {
     backdrop-filter: blur(10px);
     border: 1px solid rgba(100, 255, 218, 0.2);
     border-radius: 12px;
-    padding: 1.2rem;
+    padding: 1rem;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     width: 100%;
 }
@@ -255,9 +255,9 @@ header {
 /* Axtarış inputu üçün əlavə stillər */
 .search-input {
     border: 1px solid rgba(100, 255, 218, 0.3) !important;
-    height: 52px;
-    font-size: 1.1rem;
-    padding-left: 1.5rem !important;
+    height: 46px;
+    font-size: 1rem;
+    padding-left: 1.2rem !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
     width: 100% !important;
@@ -300,14 +300,14 @@ header {
 }
 
 #search-button {
-    padding: 0.8rem 2rem;
-    height: 52px;
+    padding: 0 1.5rem;
+    height: 46px;
     background: linear-gradient(135deg, var(--accent-color), #38a7e5);
     color: var(--primary-color);
     border: none;
     border-radius: 8px;
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
@@ -315,7 +315,7 @@ header {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    min-width: 120px;
+    min-width: 100px;
     justify-content: center;
 }
 
@@ -739,17 +739,22 @@ footer::before {
         font-size: 0.85rem;
     }
 
+    .search-container {
+        max-width: 700px;
+    }
+    
     .search-bar form {
         gap: 0.8rem;
     }
     
     .search-input {
-        font-size: 1rem;
+        font-size: 0.95rem;
     }
     
     #search-button {
-        font-size: 1rem;
-        padding: 0.6rem 1.5rem;
+        font-size: 0.95rem;
+        padding: 0 1.2rem;
+        min-width: 90px;
     }
 }
 
@@ -770,15 +775,16 @@ footer::before {
     }
 
     .search-container {
-        padding: 0 0.5rem;
+        max-width: 100%;
+        padding: 0 0.8rem;
     }
     
     .search-bar {
-        padding: 1rem 0.8rem;
+        padding: 0.8rem;
     }
     
     .search-bar form {
-        grid-template-columns: 3fr auto;
+        grid-template-columns: 2.5fr auto;
         gap: 0.5rem;
     }
     
@@ -789,7 +795,7 @@ footer::before {
     
     #search-button {
         min-width: 80px;
-        padding: 0.5rem;
+        padding: 0 1rem;
     }
 }
 

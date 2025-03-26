@@ -21,7 +21,7 @@ header {
 
 .top-header {
     display: grid;
-    grid-template-columns: 250px 1fr 250px;
+    grid-template-columns: 220px 1fr 250px;
     align-items: center;
     gap: 2rem;
     padding: 0 2rem;
@@ -217,7 +217,7 @@ header {
 /* Search Container */
 .search-container {
     width: 100%;
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
@@ -226,18 +226,17 @@ header {
     backdrop-filter: blur(10px);
     border: 1px solid rgba(100, 255, 218, 0.2);
     border-radius: 12px;
-    padding: 1rem;
+    padding: 1.2rem;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .search-bar form {
     display: grid;
-    grid-template-columns: repeat(4, 1fr) auto;
+    grid-template-columns: 1fr auto;
     gap: 1rem;
     align-items: center;
 }
 
-.search-bar select,
 .search-bar input[type="text"] {
     padding: 0.8rem 1rem;
     border: 1px solid rgba(100, 255, 218, 0.3);
@@ -253,6 +252,17 @@ header {
 /* Axtarış inputu üçün əlavə stillər */
 .search-input {
     border: 1px solid rgba(100, 255, 218, 0.3) !important;
+    height: 48px;
+    font-size: 1rem;
+    padding-left: 1.2rem !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    box-shadow: 0 0 0 2px rgba(100, 255, 218, 0.3) !important;
+    border-color: var(--accent-color) !important;
+    background-color: rgba(15, 30, 52, 0.8) !important;
 }
 
 .search-input:required:invalid {
@@ -286,11 +296,13 @@ header {
 
 #search-button {
     padding: 0.8rem 2rem;
+    height: 48px;
     background: linear-gradient(135deg, var(--accent-color), #38a7e5);
     color: var(--primary-color);
     border: none;
     border-radius: 8px;
     font-weight: 600;
+    font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
@@ -298,6 +310,8 @@ header {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    min-width: 120px;
+    justify-content: center;
 }
 
 #search-button:hover {
@@ -696,18 +710,7 @@ footer::before {
     }
 
     .search-bar {
-        padding: 0.8rem;
-    }
-
-    .search-bar form {
-        grid-template-columns: 1fr;
-        gap: 0.8rem;
-    }
-
-    .search-bar select,
-    .search-bar input[type="text"],
-    #search-button {
-        width: 100%;
+        padding: 1rem;
     }
 }
 
@@ -715,6 +718,7 @@ footer::before {
     .top-header {
         grid-template-columns: auto 1fr auto;
         gap: 0.8rem;
+        padding: 0 1rem;
     }
 
     .logo img {
@@ -730,15 +734,8 @@ footer::before {
         font-size: 0.85rem;
     }
 
-    .nav-bar {
-        justify-content: center;
-        padding: 0.5rem;
-    }
-
-    .nav-bar a {
-        flex: 0 0 calc(25% - 1rem);
-        justify-content: center;
-        white-space: nowrap;
+    .search-bar form {
+        gap: 0.8rem;
     }
 }
 
@@ -758,19 +755,12 @@ footer::before {
         justify-content: center;
     }
 
-    .nav-bar {
-        width: 280px;
-        left: -280px;
-    }
-
-    .nav-bar a {
-        flex: 0 0 calc(33.333% - 1rem);
-        padding: 0.8rem;
-        min-width: 120px;
-    }
-
     .search-bar {
         margin: 0 1rem;
+    }
+    
+    .search-bar input[type="text"] {
+        font-size: 16px; /* Mobil cihazlarda inputların daha rahat istifadəsi üçün */
     }
 }
 

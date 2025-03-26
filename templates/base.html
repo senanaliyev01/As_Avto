@@ -109,7 +109,7 @@
         <div class="nav-links">
             <a href="{% url 'esasevim:main' %}"><i class="fa-solid fa-house"></i> Əsas Səhifə</a>
             <a href="{% url 'profile' %}"><i class="fas fa-user-circle"></i> Hesabım</a>
-            <a href="{% url 'products_list' %}"><i class="fa-solid fa-box"></i> Məhsullar</a>
+            {% comment %} <a href="{% url 'products_list' %}"><i class="fa-solid fa-box"></i> Məhsullar</a> {% endcomment %}
             <a href="{% url 'umumi_baxis' %}"><i class="fas fa-box-open"></i> Məhsullara Baxış</a>
             <a href="{% url 'esasevim:yeni_mehsullar' %}"><i class="fa-solid fa-bell"></i> Yeni Məhsullar</a>
             <a href="{% url 'sifaris_izle' %}"><i class="fas fa-shopping-bag"></i> Sifarişlərim</a>

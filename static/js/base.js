@@ -872,9 +872,6 @@
     document.addEventListener('DOMContentLoaded', function() {
         const searchForm = document.getElementById('search-form');
         const searchInput = searchForm.querySelector('input[name="search_text"]');
-        const categorySelect = document.getElementById('category');
-        const brandSelect = document.getElementById('brand');
-        const modelSelect = document.getElementById('model');
         const searchButton = document.getElementById('search-button');
         
         // İlk yüklənmədə axtarış düyməsinin vəziyyətini tənzimləyək
@@ -892,25 +889,22 @@
         // Function to perform search
         async function performSearch() {
             const query = searchInput.value.trim();
-            const category = categorySelect.value;
-            const brand = brandSelect.value;
-            const model = modelSelect.value;
             
             // Axtarış düyməsinin aktiv/deaktiv vəziyyətini yeniləyək
             if (searchButton) {
                 searchButton.disabled = !query;
             }
             
-            if (query.length < 2 && !category && !brand && !model) {
+            if (query.length < 2) {
                 dropdownContainer.classList.remove('active');
                 return;
             }
             
             try {
-                const response = await fetch(`/realtime-search/?q=${encodeURIComponent(query)}&category=${encodeURIComponent(category)}&brand=${encodeURIComponent(brand)}&model=${encodeURIComponent(model)}`);
+                const response = await fetch(`/realtime-search/?q=${encodeURIComponent(query)}`);
                 const data = await response.json();
                 
-                if (data.results.length > 0) {
+                if (data.results && data.results.length > 0) {
                     dropdownContainer.innerHTML = data.results.map(result => {
                         return `                            <div class="search-result-item" onclick="window.location.href='/product-detail/${encodeURIComponent(result.adi)}-${encodeURIComponent(result.oem)}-${encodeURIComponent(result.brend_kod)}/${result.id}/'">
                                 ${result.sekil_url ? `<img src="${result.sekil_url}" alt="${result.adi}">` : ''}
@@ -942,11 +936,6 @@
         searchInput.addEventListener('input', () => {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(performSearch, 300);
-        });
-        
-        // Select elements change listener
-        [categorySelect, brandSelect, modelSelect].forEach(select => {
-            select.addEventListener('change', performSearch);
         });
         
         // Close dropdown when clicking outside

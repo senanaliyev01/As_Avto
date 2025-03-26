@@ -217,8 +217,9 @@ header {
 /* Search Container */
 .search-container {
     width: 100%;
-    max-width: 1200px;
+    max-width: 100%;
     margin: 0 auto;
+    padding: 0 1rem;
 }
 
 .search-bar {
@@ -228,13 +229,15 @@ header {
     border-radius: 12px;
     padding: 1.2rem;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    width: 100%;
 }
 
 .search-bar form {
     display: grid;
     grid-template-columns: 1fr auto;
-    gap: 1rem;
+    gap: 1.5rem;
     align-items: center;
+    width: 100%;
 }
 
 .search-bar input[type="text"] {
@@ -252,15 +255,17 @@ header {
 /* Axtarış inputu üçün əlavə stillər */
 .search-input {
     border: 1px solid rgba(100, 255, 218, 0.3) !important;
-    height: 48px;
-    font-size: 1rem;
-    padding-left: 1.2rem !important;
+    height: 52px;
+    font-size: 1.1rem;
+    padding-left: 1.5rem !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
+    width: 100% !important;
+    background-color: rgba(15, 30, 52, 0.7) !important;
 }
 
 .search-input:focus {
-    box-shadow: 0 0 0 2px rgba(100, 255, 218, 0.3) !important;
+    box-shadow: 0 0 0 3px rgba(100, 255, 218, 0.3) !important;
     border-color: var(--accent-color) !important;
     background-color: rgba(15, 30, 52, 0.8) !important;
 }
@@ -296,13 +301,13 @@ header {
 
 #search-button {
     padding: 0.8rem 2rem;
-    height: 48px;
+    height: 52px;
     background: linear-gradient(135deg, var(--accent-color), #38a7e5);
     color: var(--primary-color);
     border: none;
     border-radius: 8px;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 1.1rem;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
@@ -737,6 +742,15 @@ footer::before {
     .search-bar form {
         gap: 0.8rem;
     }
+    
+    .search-input {
+        font-size: 1rem;
+    }
+    
+    #search-button {
+        font-size: 1rem;
+        padding: 0.6rem 1.5rem;
+    }
 }
 
 @media (max-width: 768px) {
@@ -755,12 +769,27 @@ footer::before {
         justify-content: center;
     }
 
-    .search-bar {
-        margin: 0 1rem;
+    .search-container {
+        padding: 0 0.5rem;
     }
     
-    .search-bar input[type="text"] {
+    .search-bar {
+        padding: 1rem 0.8rem;
+    }
+    
+    .search-bar form {
+        grid-template-columns: 3fr auto;
+        gap: 0.5rem;
+    }
+    
+    .search-input {
         font-size: 16px; /* Mobil cihazlarda inputların daha rahat istifadəsi üçün */
+        padding-left: 1rem !important;
+    }
+    
+    #search-button {
+        min-width: 80px;
+        padding: 0.5rem;
     }
 }
 

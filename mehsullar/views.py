@@ -616,26 +616,20 @@ def hesabatlar(request):
 
 @login_required
 def realtime_search(request):
-    query = request.GET.get('q', '')
-    category = request.GET.get('category', '')
-    brand = request.GET.get('brand', '')
-    model = request.GET.get('model', '')
+    query = request.GET.get('q', '').strip()
     
-    mehsullar = Mehsul.objects.all()
+    if not query or len(query) < 2:
+        return JsonResponse({'results': []})
     
-    if category:
-        mehsullar = mehsullar.filter(kateqoriya__adi=category)
-    if brand:
-        mehsullar = mehsullar.filter(brend__adi=brand)
-    if model:
-        mehsullar = mehsullar.filter(marka__adi=model)
+    # Xüsusi simvolları təmizlə
+    clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
     
-    if query:
-        # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
-        clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
-        
-        # Yalnız OEM kodlarında axtarış
-        mehsullar = mehsullar.filter(oem_kodlar__kod__icontains=clean_query).distinct()
+    # Axtarış sorğusu
+    mehsullar = Mehsul.objects.filter(
+        Q(oem_kodlar__kod__icontains=clean_query) |  # OEM kodlarında
+        Q(adi__icontains=query) |                    # Ad
+        Q(brend_kod__icontains=query)                # Brend kodu
+    ).distinct()[:20]  # Performans üçün maksimum 20 nəticə
     
     results = []
     for mehsul in mehsullar:

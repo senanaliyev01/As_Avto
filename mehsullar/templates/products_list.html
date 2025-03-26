@@ -28,8 +28,8 @@
                         <tr>
                             <th>Təsvir</th>
                             <th>Məhsul</th>
-                            <th>Firma</th>
-                            <th>Avtomobil</th>
+                            {% comment %} <th>Firma</th>
+                            <th>Avtomobil</th> {% endcomment %}
                             <th>Brend Kod</th>
                             <th>OEM Kod</th>
                             <th>Mövcudluğ</th>
@@ -48,8 +48,8 @@
                                 {% endif %}
                             </td>
                             <td>{{ mehsul.adi }}</td>
-                            <td>{{ mehsul.brend.adi }}</td>
-                            <td>{{ mehsul.marka.adi }}</td>
+                            {% comment %} <td>{{ mehsul.brend.adi }}</td>
+                            <td>{{ mehsul.marka.adi }}</td> {% endcomment %}
                             <td>{{ mehsul.brend_kod }}</td>
                             <td>{{ mehsul.oem }}
                             {% comment %} <a href="#" title="OEM kodunu axtar" onclick="window.open('https://www.google.com/search?tbm=isch&q={{ mehsul.oem }}', 'googleImages', 'width=600,height=600'); return false;">

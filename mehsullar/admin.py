@@ -239,8 +239,9 @@ class MehsulAdmin(admin.ModelAdmin):
                             # Əlavə OEM kodlarını hazırla
                             elave_oem_kodlar = []
                             if 'elave_oem' in row and pd.notna(row['elave_oem']):
-                                # Vergül və ya boşluqla ayrılmış OEM kodlarını ayır
-                                elave_oem_kodlar = [kod.strip() for kod in str(row['elave_oem']).replace(',', ' ' '/').split() if kod.strip()]
+                                # Vergül, boşluq və / ilə ayrılmış OEM kodlarını ayır
+                                temiz_oem = str(row['elave_oem']).replace(',', ' ').replace('/', ' ')
+                                elave_oem_kodlar = [kod.strip() for kod in temiz_oem.split() if kod.strip()]
                             
                             # brend_kod dəyərini təyin et
                             brend_kod = row['brend_kod'] if 'brend_kod' in row and pd.notna(row['brend_kod']) else ''

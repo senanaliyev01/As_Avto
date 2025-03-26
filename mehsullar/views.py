@@ -133,6 +133,11 @@ def get_stock_class(stok):
 
 @login_required
 def products_list(request):
+    # Yalnız axtarış parametri olan sorğulara icazə ver
+    if not any([param for param in ['search_text', 'category', 'brand', 'model'] if request.GET.get(param)]):
+        # Əgər heç bir axtarış parametri yoxdursa, istifadəçini əsas səhifəyə yönləndir
+        return redirect('esasevim:main')
+    
     # Başlanğıc olaraq bütün məhsulları götürürük
     mehsullar = Mehsul.objects.all()
     kateqoriyalar = Kateqoriya.objects.all()

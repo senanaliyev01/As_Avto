@@ -33,7 +33,10 @@
             <div class="search-container">
                 <div class="search-bar">
                     <form id="search-form" method="GET" action="{% url 'products_list' %}">
-                        <input type="text" name="search_text" placeholder="OEM kodu daxil edin..." value="{{ request.GET.search_text }}" class="search-input" required>
+                        <div class="search-input-wrapper">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" name="search_text" placeholder="OEM kodu daxil edin..." value="{{ request.GET.search_text }}" class="search-input" required>
+                        </div>
                         
                         <button type="submit" id="search-button">
                             Axtar

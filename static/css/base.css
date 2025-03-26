@@ -265,6 +265,7 @@ header {
     width: 100% !important;
     background-color: rgba(15, 30, 52, 0.7) !important;
     position: relative;
+    color: white;
 }
 
 .search-input::placeholder {

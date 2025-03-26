@@ -223,9 +223,18 @@ class MehsulAdmin(admin.ModelAdmin):
                     for _, row in df.iterrows():
                         try:
                             # Kateqoriya, brend və markanı tap və ya yarat
-                            kateqoriya, _ = Kateqoriya.objects.get_or_create(adi=row['kateqoriya'])
-                            brend, _ = Brend.objects.get_or_create(adi=row['brend'])
-                            marka, _ = Marka.objects.get_or_create(adi=row['marka'])
+                            kateqoriya = None
+                            brend = None
+                            marka = None
+                            
+                            if 'kateqoriya' in row and pd.notna(row['kateqoriya']):
+                                kateqoriya, _ = Kateqoriya.objects.get_or_create(adi=row['kateqoriya'])
+                            
+                            if 'brend' in row and pd.notna(row['brend']):
+                                brend, _ = Brend.objects.get_or_create(adi=row['brend'])
+                            
+                            if 'marka' in row and pd.notna(row['marka']):
+                                marka, _ = Marka.objects.get_or_create(adi=row['marka'])
                             
                             # Əlavə OEM kodlarını hazırla
                             elave_oem_kodlar = []
@@ -233,23 +242,44 @@ class MehsulAdmin(admin.ModelAdmin):
                                 # Vergül və ya boşluqla ayrılmış OEM kodlarını ayır
                                 elave_oem_kodlar = [kod.strip() for kod in str(row['elave_oem']).replace(',', ' ').split() if kod.strip()]
                             
-                            # Eyni brend_kod ilə məhsul varmı yoxla
-                            existing_product = Mehsul.objects.filter(brend_kod=row['brend_kod']).first()
+                            # brend_kod dəyərini təyin et
+                            brend_kod = row['brend_kod'] if 'brend_kod' in row and pd.notna(row['brend_kod']) else ''
+                            
+                            # Eyni brend_kod ilə məhsul varmı yoxla (əgər brend_kod boş deyilsə)
+                            existing_product = None
+                            if brend_kod:
+                                existing_product = Mehsul.objects.filter(brend_kod=brend_kod).first()
                             
                             if existing_product:
                                 # Mövcud məhsulu yenilə
-                                existing_product.adi = row['adi']
-                                existing_product.kateqoriya = kateqoriya
-                                existing_product.brend = brend
-                                existing_product.marka = marka
-                                existing_product.stok = row['stok']
-                                existing_product.maya_qiymet = row['maya_qiymet']
-                                existing_product.qiymet = row['qiymet']
+                                if 'adi' in row and pd.notna(row['adi']):
+                                    existing_product.adi = row['adi']
+                                if kateqoriya:
+                                    existing_product.kateqoriya = kateqoriya
+                                if brend:
+                                    existing_product.brend = brend
+                                if marka:
+                                    existing_product.marka = marka
+                                if 'stok' in row and pd.notna(row['stok']):
+                                    existing_product.stok = row['stok']
+                                else:
+                                    existing_product.stok = 0
+                                if 'maya_qiymet' in row and pd.notna(row['maya_qiymet']):
+                                    existing_product.maya_qiymet = row['maya_qiymet']
+                                else:
+                                    existing_product.maya_qiymet = 0
+                                if 'qiymet' in row and pd.notna(row['qiymet']):
+                                    existing_product.qiymet = row['qiymet']
+                                else:
+                                    existing_product.qiymet = 0
                                 existing_product.yenidir = True
                                 
                                 # Haqqında məlumatını əlavə et
                                 if 'haqqinda' in row and pd.notna(row['haqqinda']):
                                     existing_product.haqqinda = str(row['haqqinda'])
+                                
+                                if 'oem' in row and pd.notna(row['oem']):
+                                    existing_product.oem = row['oem']
                                 
                                 existing_product.save()
                                 
@@ -265,20 +295,23 @@ class MehsulAdmin(admin.ModelAdmin):
                                 
                                 update_count += 1
                             else:
+                                # Əsas sahələri hazırla
+                                mehsul_data = {
+                                    'adi': row['adi'] if 'adi' in row and pd.notna(row['adi']) else '',
+                                    'kateqoriya': kateqoriya,
+                                    'brend': brend,
+                                    'marka': marka,
+                                    'brend_kod': brend_kod,
+                                    'oem': row['oem'] if 'oem' in row and pd.notna(row['oem']) else '',
+                                    'stok': row['stok'] if 'stok' in row and pd.notna(row['stok']) else 0,
+                                    'maya_qiymet': row['maya_qiymet'] if 'maya_qiymet' in row and pd.notna(row['maya_qiymet']) else 0,
+                                    'qiymet': row['qiymet'] if 'qiymet' in row and pd.notna(row['qiymet']) else 0,
+                                    'yenidir': True,
+                                    'haqqinda': str(row['haqqinda']) if 'haqqinda' in row and pd.notna(row['haqqinda']) else None
+                                }
+                                
                                 # Yeni məhsul yarat
-                                yeni_mehsul = Mehsul.objects.create(
-                                    adi=row['adi'],
-                                    kateqoriya=kateqoriya,
-                                    brend=brend,
-                                    marka=marka,
-                                    brend_kod=row['brend_kod'],
-                                    oem=row['oem'],
-                                    stok=row['stok'],
-                                    maya_qiymet=row['maya_qiymet'],
-                                    qiymet=row['qiymet'],
-                                    yenidir=True,
-                                    haqqinda=str(row['haqqinda']) if 'haqqinda' in row and pd.notna(row['haqqinda']) else None
-                                )
+                                yeni_mehsul = Mehsul.objects.create(**mehsul_data)
                                 
                                 # Əlavə OEM kodlarını əlavə et
                                 for kod in elave_oem_kodlar:

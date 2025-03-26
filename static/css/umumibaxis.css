@@ -15,6 +15,153 @@ body {
     padding: 0;
 }
 
+/* Filter Section Styles */
+.filter-container {
+    background-color: #162447;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    margin: 20px;
+    padding: 20px;
+}
+
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+}
+
+.filter-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #ffffff;
+}
+
+/* Məhsul sayğacı */
+.product-counter {
+    background-color: rgba(100, 255, 218, 0.1);
+    border: 1px solid rgba(100, 255, 218, 0.3);
+    padding: 6px 12px;
+    border-radius: 20px;
+    color: #64ffda;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-left: auto;
+    margin-right: 15px;
+}
+
+.counter-value, .counter-total {
+    font-weight: 700;
+}
+
+#clear-filters {
+    background-color: #1e3a8a;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#clear-filters:hover {
+    background-color: #2563eb;
+}
+
+.filter-body {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filter-group label {
+    font-weight: 600;
+    color: #64ffda;
+}
+
+.filter-select {
+    background-color: #1f3756;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 14px;
+    width: 100%;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.filter-select:hover {
+    border-color: #64ffda;
+}
+
+.filter-select:focus {
+    border-color: #64ffda;
+    box-shadow: 0 0 0 2px rgba(100, 255, 218, 0.2);
+}
+
+/* No Results Message */
+.no-results-message {
+    text-align: center;
+    background-color: #162447;
+    padding: 40px 20px;
+    border-radius: 8px;
+    margin: 30px auto;
+    max-width: 500px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.no-results-message i {
+    font-size: 3rem;
+    color: #64ffda;
+    margin-bottom: 20px;
+}
+
+.no-results-message h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.no-results-message p {
+    color: #a8b2c1;
+    margin-bottom: 20px;
+}
+
+.reset-button {
+    background-color: #64ffda;
+    color: #0a192f;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.reset-button:hover {
+    background-color: #4fd1a5;
+    transform: translateY(-2px);
+}
+
+/* Fade In Animation */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease forwards;
+}
+
 /* Məhsul siyahısı */
 .product-list {
     display: flex;

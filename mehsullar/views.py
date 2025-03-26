@@ -27,9 +27,17 @@ def umumibaxis(request):
     # Bütün məhsulları əldə3 edirik
     mehsullar = Mehsul.objects.all()
     
+    # Filterləmək üçün lazım olan datalar
+    kateqoriyalar = Kateqoriya.objects.all()
+    brendler = Brend.objects.all()
+    markalar = Marka.objects.all()
+    
     # Şablona göndəriləcək konteksti yaradırıq
     context = {
         'mehsullar': mehsullar,
+        'kateqoriyalar': kateqoriyalar,
+        'brendler': brendler,
+        'markalar': markalar,
     }
     
     return render(request, 'umumibaxis.html', context)

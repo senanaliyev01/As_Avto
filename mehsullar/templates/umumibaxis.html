@@ -8,9 +8,62 @@
 {% endblock %}
 
 {% block content %}
-<div class="product-list">
+<!-- Filter Section -->
+<div class="filter-container">
+    <div class="filter-header">
+        <h2>Filterlər</h2>
+        <button id="clear-filters">Təmizlə</button>
+    </div>
+    <div class="filter-body">
+        <div class="filter-group">
+            <label for="category-filter">Kateqoriya</label>
+            <select id="category-filter" class="filter-select">
+                <option value="">Hamısı</option>
+                {% for kateqoriya in kateqoriyalar %}
+                    <option value="{{ kateqoriya.adi }}">{{ kateqoriya.adi }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label for="brand-filter">Firma</label>
+            <select id="brand-filter" class="filter-select">
+                <option value="">Hamısı</option>
+                {% for brend in brendler %}
+                    <option value="{{ brend.adi }}">{{ brend.adi }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label for="model-filter">Avtomobil</label>
+            <select id="model-filter" class="filter-select">
+                <option value="">Hamısı</option>
+                {% for marka in markalar %}
+                    <option value="{{ marka.adi }}">{{ marka.adi }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label for="stock-filter">Stok vəziyyəti</label>
+            <select id="stock-filter" class="filter-select">
+                <option value="">Hamısı</option>
+                <option value="in-stock">Var</option>
+                <option value="low-stock">Az var</option>
+                <option value="out-of-stock">Yoxdur</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="product-list" id="product-container">
     {% for mehsul in mehsullar %}
-    <div class="product-card">
+    <div class="product-card" 
+         data-category="{{ mehsul.kateqoriya }}" 
+         data-brand="{{ mehsul.brend.adi }}" 
+         data-model="{{ mehsul.marka.adi }}"
+         data-stock="{% if mehsul.stok == 0 %}out-of-stock{% elif mehsul.stok <= 20 %}low-stock{% else %}in-stock{% endif %}">
         <div class="product-image12">
             {% if mehsul.sekil %}
                 <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
@@ -42,6 +95,14 @@
         </div>
     </div>
     {% endfor %}
+</div>
+
+<!-- No Results Message -->
+<div id="no-results" class="no-results-message" style="display: none;">
+    <i class="fas fa-search"></i>
+    <h3>Heç bir nəticə tapılmadı</h3>
+    <p>Zəhmət olmasa, filter parametrlərini dəyişdirin və ya təmizləyin.</p>
+    <button id="reset-filters" class="reset-button">Filterləri təmizlə</button>
 </div>
 {% endblock %}
 

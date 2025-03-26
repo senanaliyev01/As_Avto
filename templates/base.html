@@ -60,7 +60,7 @@
                             {% endfor %}
                         </select>
 
-                        <input type="text" name="search_text" placeholder="Axtarış" value="{{ request.GET.search_text }}">
+                        <input type="text" name="search_text" placeholder="Axtarış daxil edin..." value="{{ request.GET.search_text }}" class="search-input" required>
                         
                         <button type="submit" id="search-button">
                             Axtar

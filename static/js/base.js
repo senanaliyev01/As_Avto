@@ -521,27 +521,43 @@
         // Axtarış form1u
         const searchForm = document.getElementById('search-form');
         if (searchForm) {
+            // Search button control
+            const searchInput = searchForm.querySelector('input[name="search_text"]');
+            const searchButton = document.getElementById('search-button');
+            
+            // İlkin olaraq butonun vəziyyətini yoxlayaq
+            if (searchInput && searchButton) {
+                // Səhifə yükləndikdə butonun vəziyyətini tənzimləyək
+                searchButton.disabled = !searchInput.value.trim();
+                
+                // Input dəyişdikdə butonun vəziyyətini yoxlayaq
+                searchInput.addEventListener('input', function() {
+                    searchButton.disabled = !this.value.trim();
+                });
+            }
+            
             searchForm.addEventListener('submit', function(event) {
                 event.preventDefault(); // Formun dərhal göndərilməsini dayandır
                 
                 // Axtarış mətni inputunu əldə et
                 const searchInput = this.querySelector('input[name="search_text"]');
-                if (searchInput) {
-                    // Axtarış mətnini təmizlə
-                    let originalText = searchInput.value;
-                    
-                    // 1. Əvvəlcə bütün boşluqları və xüsusi simvolları sil, yalnız hərf, rəqəm və tire saxla
-                    let cleanedText = originalText.replace(/[^a-zA-Z0-9\-]/g, '');
-                    
-                    // 2. Ardıcıl tireleri bir tire ilə əvəz et
-                    cleanedText = cleanedText.replace(/\-+/g, '-');
-                    
-                    // 3. Əgər mətnin əvvəlində və ya sonunda tire varsa, onu sil
-                    cleanedText = cleanedText.replace(/^\-|\-$/g, '');
-                    
-                    // Təmizlənmiş mətni inputa təyin et
-                    searchInput.value = cleanedText;
+                if (!searchInput || !searchInput.value.trim()) {
+                    // Axtarış mətni boşdursa formu göndərmə
+                    return false;
                 }
+                
+                // 1. Əvvəlcə bütün boşluqları və xüsusi simvolları sil, yalnız hərf, rəqəm və tire saxla
+                let originalText = searchInput.value;
+                let cleanedText = originalText.replace(/[^a-zA-Z0-9\-]/g, '');
+                
+                // 2. Ardıcıl tireleri bir tire ilə əvəz et
+                cleanedText = cleanedText.replace(/\-+/g, '-');
+                
+                // 3. Əgər mətnin əvvəlində və ya sonunda tire varsa, onu sil
+                cleanedText = cleanedText.replace(/^\-|\-$/g, '');
+                
+                // Təmizlənmiş mətni inputa təyin et
+                searchInput.value = cleanedText;
                 
                 let searchButton = document.getElementById('search-button');
                 let spinner = document.getElementById('loading-spinner');
@@ -859,6 +875,12 @@
         const categorySelect = document.getElementById('category');
         const brandSelect = document.getElementById('brand');
         const modelSelect = document.getElementById('model');
+        const searchButton = document.getElementById('search-button');
+        
+        // İlk yüklənmədə axtarış düyməsinin vəziyyətini tənzimləyək
+        if (searchButton) {
+            searchButton.disabled = !searchInput.value.trim();
+        }
         
         // Create dropdown container
         const dropdownContainer = document.createElement('div');
@@ -873,6 +895,11 @@
             const category = categorySelect.value;
             const brand = brandSelect.value;
             const model = modelSelect.value;
+            
+            // Axtarış düyməsinin aktiv/deaktiv vəziyyətini yeniləyək
+            if (searchButton) {
+                searchButton.disabled = !query;
+            }
             
             if (query.length < 2 && !category && !brand && !model) {
                 dropdownContainer.classList.remove('active');
@@ -931,6 +958,12 @@
         
         // Form submit handler
         searchForm.addEventListener('submit', (e) => {
+            // Axtarış mətni boşdursa formu göndərmə
+            if (!searchInput.value.trim()) {
+                e.preventDefault();
+                return false;
+            }
+            
             if (dropdownContainer.classList.contains('active')) {
                 e.preventDefault();
                 dropdownContainer.classList.remove('active');

@@ -240,7 +240,7 @@ class MehsulAdmin(admin.ModelAdmin):
                             elave_oem_kodlar = []
                             if 'elave_oem' in row and pd.notna(row['elave_oem']):
                                 # Vergül və ya boşluqla ayrılmış OEM kodlarını ayır
-                                elave_oem_kodlar = [kod.strip() for kod in str(row['elave_oem']).replace(',', ' ').split() if kod.strip()]
+                                elave_oem_kodlar = [kod.strip() for kod in str(row['elave_oem']).replace(',', ' ' '/').split() if kod.strip()]
                             
                             # brend_kod dəyərini təyin et
                             brend_kod = row['brend_kod'] if 'brend_kod' in row and pd.notna(row['brend_kod']) else ''

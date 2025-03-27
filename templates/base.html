@@ -21,6 +21,21 @@
     </script>
     {% endif %}
     
+    <!-- Navbar -->
+    <div class="main-nav">
+        <div class="nav-container">
+            <div class="nav-links">
+                <a href="{% url 'esasevim:main' %}"><i class="fa-solid fa-house"></i> Əsas Səhifə</a>
+                <a href="{% url 'umumi_baxis' %}"><i class="fas fa-box-open"></i> Məhsullar</a>
+                <a href="{% url 'esasevim:yeni_mehsullar' %}"><i class="fa-solid fa-bell"></i> Yeni Məhsullar</a>
+                <a href="{% url 'sifaris_izle' %}"><i class="fas fa-shopping-bag"></i> Sifarişlərim</a>
+                <a href="{% url 'hesabatlar' %}"><i class="fas fa-chart-bar"></i> Hesabatlar</a>
+                {% comment %} <a href="{% url 'car_list' %}"><i class="fas fa-car"></i> Avtomobillər</a> {% endcomment %}
+                <a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> Məlumat</a>
+            </div>
+        </div>
+    </div>
+    
     <!-- Header r-->
     <header>
         <div class="top-header">
@@ -51,21 +66,6 @@
                     <span id="cart-count" class="cart-badge">0</span>
                     <span id="cart-total-badge" class="cart-total-badge">0 ₼</span>
                 </a>
-            </div>
-        </div>
-
-        <!-- Navbar -->
-        <div class="main-nav">
-            <div class="nav-container">
-                <div class="nav-links">
-                    <a href="{% url 'esasevim:main' %}"><i class="fa-solid fa-house"></i> Əsas Səhifə</a>
-                    <a href="{% url 'umumi_baxis' %}"><i class="fas fa-box-open"></i> Məhsullar</a>
-                    <a href="{% url 'esasevim:yeni_mehsullar' %}"><i class="fa-solid fa-bell"></i> Yeni Məhsullar</a>
-                    <a href="{% url 'sifaris_izle' %}"><i class="fas fa-shopping-bag"></i> Sifarişlərim</a>
-                    <a href="{% url 'hesabatlar' %}"><i class="fas fa-chart-bar"></i> Hesabatlar</a>
-                    {% comment %} <a href="{% url 'car_list' %}"><i class="fas fa-car"></i> Avtomobillər</a> {% endcomment %}
-                    <a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> Məlumat</a>
-                </div>
             </div>
         </div>
     </header>

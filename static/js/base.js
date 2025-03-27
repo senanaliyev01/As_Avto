@@ -871,6 +871,19 @@
         dropdownContainer.className = 'search-results-dropdown';
         searchForm.appendChild(dropdownContainer);
         
+        // Dropdown-un genişliyini axtarış paneli ilə eyni etmək
+        function updateDropdownWidth() {
+            const searchInputWrapper = searchForm.querySelector('.search-input-wrapper');
+            if (searchInputWrapper) {
+                const inputWidth = searchInputWrapper.offsetWidth;
+                dropdownContainer.style.width = `${inputWidth}px`;
+            }
+        }
+        
+        // İlkin olaraq və pəncərə ölçüsü dəyişdikdə yenilə
+        updateDropdownWidth();
+        window.addEventListener('resize', updateDropdownWidth);
+        
         let searchTimeout;
         
         // Function to perform search
@@ -910,9 +923,11 @@
                         `;
                     }).join('');
                     dropdownContainer.classList.add('active');
+                    updateDropdownWidth();
                 } else {
                     dropdownContainer.innerHTML = '<div class="search-result-item">Heç bir nəticə tapılmadı</div>';
                     dropdownContainer.classList.add('active');
+                    updateDropdownWidth();
                 }
             } catch (error) {
                 console.error('Axtarış xətası:', error);

@@ -384,55 +384,67 @@ header {
     text-align: right;
 }
 
+/* Stock Status Badges */
 .stock-status {
-    font-size: 12px;
-    padding: 3px 8px;
-    border-radius: 50px;
-    margin-bottom: 5px;
-    font-weight: normal;
-    text-align: center;
-    /* width: 80px; */
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 15px;
+    display: inline-block;
+    text-transform: uppercase;
+    color: white;
 }
 
 .in-stock {
-    background-color: rgba(46, 125, 50, 0.2);
-    color: #4caf50;
-    border: 1px solid rgba(46, 125, 50, 0.3);
+    background: linear-gradient(135deg, #00897b, #00695c);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .in-stock::before {
     content: "\f00c";
     font-family: "Font Awesome 5 Free";
+    font-weight: 900;
     margin-right: 5px;
-    color: #4caf50;
 }
 
 .low-stock {
-    background-color: rgba(237, 108, 2, 0.2);
-    color: #ff9800;
-    border: 1px solid rgba(237, 108, 2, 0.3);
+    background: linear-gradient(135deg, #ffd54f, #ffb300);
+    color: black;
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .low-stock::before {
     content: "\f071";
     font-family: "Font Awesome 5 Free";
+    font-weight: 900;
     margin-right: 5px;
-    color: #ff9800;
 }
 
 .out-of-stock {
-    background-color: rgba(211, 47, 47, 0.2);
-    color: #f44336;
-    border: 1px solid rgba(211, 47, 47, 0.3);
+    background: linear-gradient(135deg, #e53935, #c62828);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .out-of-stock::before {
     content: "\f00d";
     font-family: "Font Awesome 5 Free";
+    font-weight: 900;
     margin-right: 5px;
-    color: #f44336;
 }
-
 /* Footer Styles */
 footer {
     background: linear-gradient(to bottom, var(--primary-color), #071422);

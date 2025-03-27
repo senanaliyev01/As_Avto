@@ -402,6 +402,7 @@ header {
 
 .in-stock::before {
     content: "\f00c";
+    font-family: "Font Awesome 5 Free";
     margin-right: 5px;
     color: #4caf50;
 }
@@ -414,6 +415,7 @@ header {
 
 .low-stock::before {
     content: "\f071";
+    font-family: "Font Awesome 5 Free";
     margin-right: 5px;
     color: #ff9800;
 }
@@ -426,6 +428,7 @@ header {
 
 .out-of-stock::before {
     content: "\f00d";
+    font-family: "Font Awesome 5 Free";
     margin-right: 5px;
     color: #f44336;
 }

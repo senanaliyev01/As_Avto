@@ -1188,30 +1188,5 @@
 
     // Navbar funksiyaları
     document.addEventListener('DOMContentLoaded', function() {
-        const navToggle = document.querySelector('.nav-toggle');
-        const navBar = document.querySelector('.nav-bar');
-        const navClose = document.querySelector('.nav-close');
-        const navOverlay = document.querySelector('.nav-overlay');
-        const body = document.body;
-
-        navToggle.addEventListener('click', () => {
-            navBar.classList.add('active');
-            navOverlay.classList.add('active');
-            body.style.overflow = 'hidden';
-        });
-
-        function closeNav() {
-            navBar.classList.remove('active');
-            navOverlay.classList.remove('active');
-            body.style.overflow = '';
-        }
-
-        navClose.addEventListener('click', closeNav);
-        navOverlay.addEventListener('click', closeNav);
-
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && navBar.classList.contains('active')) {
-                closeNav();
-            }
-        });
+        // Köhnə nav-bar açılıb-bağlanma funksiyası silinib
     });

@@ -871,6 +871,8 @@
     // Real-time search functionality
     document.addEventListener('DOMContentLoaded', function() {
         const searchForm = document.getElementById('search-form');
+        if (!searchForm) return;
+        
         const searchInput = searchForm.querySelector('input[name="search_text"]');
         const searchButton = document.getElementById('search-button');
         
@@ -906,7 +908,7 @@
                 
                 if (data.results && data.results.length > 0) {
                     dropdownContainer.innerHTML = data.results.map(result => {
-                        return `                            <div class="search-result-item" onclick="window.location.href='/product-detail/${encodeURIComponent(result.adi)}-${encodeURIComponent(result.oem)}-${encodeURIComponent(result.brend_kod)}/${result.id}/'">
+                        return `<div class="search-result-item" onclick="window.location.href='/product-detail/${encodeURIComponent(result.adi)}-${encodeURIComponent(result.oem)}-${encodeURIComponent(result.brend_kod)}/${result.id}/'">
                                 ${result.sekil_url ? `<img src="${result.sekil_url}" alt="${result.adi}">` : ''}
                                 <div class="search-result-info">
                                     <h4>${result.adi}  ${result.brend}</h4>

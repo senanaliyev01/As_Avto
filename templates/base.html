@@ -26,27 +26,22 @@
         <div class="top-header">
             <div class="logo">
                 <a href="{% url 'esasevim:main' %}"><img src="{% static '/img/Header_Logo.png' %}" alt="Logo"></a>
-             
             </div>
             
-            <!-- Search Container -->
-            <div class="search-container">
-                <div class="search-bar">
-                    <form id="search-form" method="GET" action="{% url 'products_list' %}">
-                        <div class="search-input-wrapper">
-                            <i class="fas fa-search search-icon"></i>
-                            <input type="text" name="search_text" placeholder="OEM kodu daxil edin..." value="{{ request.GET.search_text }}" class="search-input" required>
-                        </div>
-                        
-                        <button type="submit" id="search-button">
-                            Axtar
-                            <div id="loading-spinner" class="loading-spinner" style="display: none;">
-                                <div class="spinner"></div>
-                            </div>
-                        </button>
-                    </form>
+            <!-- Search Form -->
+            <form id="search-form" method="GET" action="{% url 'products_list' %}" class="header-search-form">
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" name="search_text" placeholder="OEM kodu daxil edin..." value="{{ request.GET.search_text }}" class="search-input" required>
                 </div>
-            </div>
+                
+                <button type="submit" id="search-button">
+                    Axtar
+                    <div id="loading-spinner" class="loading-spinner" style="display: none;">
+                        <div class="spinner"></div>
+                    </div>
+                </button>
+            </form>
 
             <div class="header-right">
                 <a href="{% url 'profile' %}" class="header-profile-link">

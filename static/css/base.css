@@ -401,7 +401,7 @@ header {
 }
 
 .in-stock::before {
-    content: "•";
+    content: "\f00c";
     margin-right: 5px;
     color: #4caf50;
 }
@@ -413,7 +413,7 @@ header {
 }
 
 .low-stock::before {
-    content: "•";
+    content: "\f071";
     margin-right: 5px;
     color: #ff9800;
 }
@@ -425,7 +425,7 @@ header {
 }
 
 .out-of-stock::before {
-    content: "•";
+    content: "\f00d";
     margin-right: 5px;
     color: #f44336;
 }

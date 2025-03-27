@@ -391,7 +391,7 @@ header {
     margin-bottom: 5px;
     font-weight: normal;
     text-align: center;
-    width: 80px;
+    /* width: 80px; */
 }
 
 .in-stock {

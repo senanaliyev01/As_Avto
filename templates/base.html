@@ -31,21 +31,18 @@
             
             <!-- Search Container -->
             <div class="search-container">
-                <div class="search-bar">
-                    <form id="search-form" method="GET" action="{% url 'products_list' %}">
-                        <div class="search-input-wrapper">
-                            <i class="fas fa-search search-icon"></i>
-                            <input type="text" name="search_text" placeholder="OEM kodu daxil edin..." value="{{ request.GET.search_text }}" class="search-input" required>
-                        </div>
-                        
+                <form id="search-form" method="GET" action="{% url 'products_list' %}">
+                    <div class="search-input-wrapper">
+                        <input type="text" name="search_text" placeholder="OEM kodu daxil edin..." value="{{ request.GET.search_text }}" class="search-input" required>
+                        <i class="fas fa-search search-icon"></i>
                         <button type="submit" id="search-button">
-                            Axtar
+                            <i class="fas fa-arrow-right"></i>
                             <div id="loading-spinner" class="loading-spinner" style="display: none;">
                                 <div class="spinner"></div>
                             </div>
                         </button>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
 
             <div class="header-right">

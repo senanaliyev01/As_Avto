@@ -560,27 +560,14 @@
                 searchInput.value = cleanedText;
                 
                 let searchButton = document.getElementById('search-button');
-                let spinner = document.getElementById('loading-spinner');
                 
-                if (!searchButton || !spinner) return;
-                
-                // Butonun ölçüsünü qorumaq üçün enini və hündürlüyünü sabit saxla
-                searchButton.style.width = `${searchButton.offsetWidth}px`;
-                searchButton.style.height = `${searchButton.offsetHeight}px`;
-                
-                // Axtarış yazısını gizlət, amma spinneri saxla
-                if (searchButton.childNodes[0] && searchButton.childNodes[0].nodeValue) {
-                    searchButton.childNodes[0].nodeValue = ''; // Axtar sözünü sil
-                }
-                spinner.style.display = 'inline-block'; // Spinneri göstər
+                if (!searchButton) return;
                 
                 // Butonu deaktiv et ki, yenidən klik olunmasın
                 searchButton.disabled = true; 
                 
-                // 1 saniyə sonra formu göndər
-                setTimeout(() => {
-                    this.submit(); // Formu göndər
-                }, 1000);
+                // Formu dərhal göndər
+                this.submit(); // Formu göndər
             });
         }
 

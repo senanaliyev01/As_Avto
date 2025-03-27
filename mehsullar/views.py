@@ -627,8 +627,8 @@ def realtime_search(request):
         return JsonResponse({'results': []})
     
     # Xüsusi simvolları təmizlə
-        clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
-        
+    clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
+    
     # Axtarış sorğusu
     mehsullar = Mehsul.objects.filter(
         Q(oem_kodlar__kod__icontains=clean_query) |  # OEM kodlarında

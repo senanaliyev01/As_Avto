@@ -273,7 +273,7 @@ class MehsulAdmin(admin.ModelAdmin):
                                     existing_product.qiymet = row['qiymet']
                                 else:
                                     existing_product.qiymet = 0
-                                existing_product.yenidir = True
+                                existing_product.yenidir = False
                                 
                                 # Haqqında məlumatını əlavə et
                                 if 'haqqinda' in row and pd.notna(row['haqqinda']):
@@ -307,7 +307,7 @@ class MehsulAdmin(admin.ModelAdmin):
                                     'stok': row['stok'] if 'stok' in row and pd.notna(row['stok']) else 0,
                                     'maya_qiymet': row['maya_qiymet'] if 'maya_qiymet' in row and pd.notna(row['maya_qiymet']) else 0,
                                     'qiymet': row['qiymet'] if 'qiymet' in row and pd.notna(row['qiymet']) else 0,
-                                    'yenidir': True,
+                                    'yenidir': False,
                                     'haqqinda': str(row['haqqinda']) if 'haqqinda' in row and pd.notna(row['haqqinda']) else None
                                 }
                                 

@@ -525,7 +525,7 @@
             const searchInput = searchForm.querySelector('input[name="search_text"]');
             const searchButton = document.getElementById('search-button');
             
-            // İlk yüklənmədə axtarış düyməsinin vəziyyətini tənzimləyək
+            // İlkin olaraq butonun vəziyyətini yoxlayaq
             if (searchInput && searchButton) {
                 // Səhifə yükləndikdə butonun vəziyyətini tənzimləyək
                 searchButton.disabled = !searchInput.value.trim();
@@ -869,23 +869,7 @@
         // Create dropdown container
         const dropdownContainer = document.createElement('div');
         dropdownContainer.className = 'search-results-dropdown';
-        
-        // Dropdown'u search-input-wrapper-in yanında əlavə edirik
-        const searchInputWrapper = searchForm.querySelector('.search-input-wrapper');
         searchForm.appendChild(dropdownContainer);
-        
-        // Dropdown pozisiyasını tənzimləyək ki, input-un altında düzgün görünsün
-        function updateDropdownPosition() {
-            if (searchInputWrapper) {
-                const inputRect = searchInputWrapper.getBoundingClientRect();
-                dropdownContainer.style.width = `${inputRect.width}px`;
-                dropdownContainer.style.left = `${inputRect.left - searchForm.getBoundingClientRect().left}px`;
-            }
-        }
-        
-        // İlkin olaraq və pəncərə ölçüsü dəyişdikdə yenilə
-        updateDropdownPosition();
-        window.addEventListener('resize', updateDropdownPosition);
         
         let searchTimeout;
         
@@ -900,7 +884,6 @@
             
             if (query.length < 2) {
                 dropdownContainer.classList.remove('active');
-                searchForm.classList.remove('search-form-active-dropdown');
                 return;
             }
             
@@ -927,13 +910,9 @@
                         `;
                     }).join('');
                     dropdownContainer.classList.add('active');
-                    searchForm.classList.add('search-form-active-dropdown');
-                    updateDropdownPosition();
                 } else {
                     dropdownContainer.innerHTML = '<div class="search-result-item">Heç bir nəticə tapılmadı</div>';
                     dropdownContainer.classList.add('active');
-                    searchForm.classList.add('search-form-active-dropdown');
-                    updateDropdownPosition();
                 }
             } catch (error) {
                 console.error('Axtarış xətası:', error);
@@ -950,7 +929,6 @@
         document.addEventListener('click', (e) => {
             if (!searchForm.contains(e.target)) {
                 dropdownContainer.classList.remove('active');
-                searchForm.classList.remove('search-form-active-dropdown');
             }
         });
         
@@ -965,7 +943,6 @@
             if (dropdownContainer.classList.contains('active')) {
                 e.preventDefault();
                 dropdownContainer.classList.remove('active');
-                searchForm.classList.remove('search-form-active-dropdown');
             }
         });
     });

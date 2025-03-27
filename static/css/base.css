@@ -301,24 +301,14 @@ header {
     transform: translateY(0);
 }
 
-/* Deaktiv edilmiş axtarış düyməsi stili */
-#search-button:disabled {
-    background: linear-gradient(135deg, #899, #677);
-    color: rgba(255, 255, 255, 0.5);
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-    opacity: 0.7;
+#search-button span {
+    position: relative;
+    z-index: 2;
 }
 
-#search-button:disabled:hover {
-    transform: none;
-    box-shadow: none;
-}
-
-/* Loading Spinner */
 .loading-spinner {
     position: absolute;
+    z-index: 1;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
@@ -336,6 +326,21 @@ header {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* Deaktiv edilmiş axtarış düyməsi stili */
+#search-button:disabled {
+    background: linear-gradient(135deg, #899, #677);
+    color: rgba(255, 255, 255, 0.5);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    opacity: 0.7;
+}
+
+#search-button:disabled:hover {
+    transform: none;
+    box-shadow: none;
 }
 
 /* Footer Styles */
@@ -730,36 +735,38 @@ footer::before {
 
 @media (max-width: 768px) {
     .top-header {
-        grid-template-columns: 1fr;
+        padding: 0.75rem 1rem;
+        flex-direction: column;
         gap: 12px;
-        padding: 0.8rem;
     }
-
+    
     .logo {
-        display: flex;
-        justify-content: center;
+        margin-bottom: 8px;
     }
     
     .header-search-form {
+        flex-direction: column;
         width: 100%;
-        max-width: 100%;
-        margin: 0.5rem 0;
+        gap: 10px;
     }
     
     .search-input {
-        height: 42px;
-        font-size: 16px; /* Mobil cihazlarda inputların daha rahat istifadəsi üçün */
+        width: 100%;
     }
     
     #search-button {
-        height: 42px;
-        min-width: 80px;
-        padding: 0 0.8rem;
+        width: 100%;
+        margin-top: 5px;
     }
-
+    
     .header-right {
-        justify-content: center;
-        margin-top: 4px;
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .search-results-dropdown {
+        width: 100%;
+        max-height: 300px;
     }
 }
 
@@ -810,18 +817,18 @@ html {
 /* Real-time Search Results Dropdown */
 .search-results-dropdown {
     position: absolute;
-    top: 100%;
+    top: calc(100% + 5px);
     left: 0;
     right: 0;
     background: var(--primary-color);
     border: 1px solid var(--accent-color);
-    border-radius: 0 0 8px 8px;
+    border-radius: 8px;
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
     z-index: 1100;
     max-height: 400px;
     overflow-y: auto;
     display: none;
-    margin-top: 5px;
+    width: 100%;
 }
 
 .search-results-dropdown.active {
@@ -848,6 +855,8 @@ html {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     transition: background-color 0.3s;
     cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .search-result-item:hover {
@@ -866,12 +875,17 @@ html {
 
 .search-result-info {
     flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .search-result-info h4 {
     color: var(--text-primary);
     margin: 0 0 5px 0;
     font-size: 1.1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .search-result-info p {
@@ -890,6 +904,8 @@ html {
     font-weight: bold;
     margin-left: 15px;
     min-width: 80px;
+    white-space: nowrap;
+    padding-left: 10px;
 }
 
 .stock-status {

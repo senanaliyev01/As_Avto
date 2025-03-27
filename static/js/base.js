@@ -560,19 +560,22 @@
                 searchInput.value = cleanedText;
                 
                 let searchButton = document.getElementById('search-button');
-                let spinner = document.getElementById('loading-spinner');
+                let searchSpinner = document.getElementById('loading-spinner');
                 
-                if (!searchButton || !spinner) return;
+                if (!searchButton || !searchSpinner) return;
                 
                 // Butonun ölçüsünü qorumaq üçün enini və hündürlüyünü sabit saxla
                 searchButton.style.width = `${searchButton.offsetWidth}px`;
                 searchButton.style.height = `${searchButton.offsetHeight}px`;
                 
                 // Axtarış yazısını gizlət, amma spinneri saxla
-                if (searchButton.childNodes[0] && searchButton.childNodes[0].nodeValue) {
+                const buttonText = searchButton.querySelector('span');
+                if (buttonText) {
+                    buttonText.style.visibility = 'hidden';
+                } else if (searchButton.childNodes[0] && searchButton.childNodes[0].nodeValue) {
                     searchButton.childNodes[0].nodeValue = ''; // Axtar sözünü sil
                 }
-                spinner.style.display = 'inline-block'; // Spinneri göstər
+                searchSpinner.style.display = 'inline-block'; // Spinneri göstər
                 
                 // Butonu deaktiv et ki, yenidən klik olunmasın
                 searchButton.disabled = true; 
@@ -884,7 +887,12 @@
         // Create dropdown container
         const dropdownContainer = document.createElement('div');
         dropdownContainer.className = 'search-results-dropdown';
-        searchForm.appendChild(dropdownContainer);
+        const searchInputWrapper = searchForm.querySelector('.search-input-wrapper');
+        if (searchInputWrapper) {
+            searchInputWrapper.appendChild(dropdownContainer);
+        } else {
+            searchForm.appendChild(dropdownContainer);
+        }
         
         let searchTimeout;
         

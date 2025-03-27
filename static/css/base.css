@@ -313,9 +313,9 @@ header {
 
 .search-results-dropdown {
     position: absolute;
-    top: calc(100% + 10px);
-    left: 0;
-    width: 100%;
+    /* top: calc(100% + 10px);
+    left: 0; */
+    width: 600px;
     max-height: 450px;
     overflow-y: auto;
     background-color: rgba(23, 42, 69, 0.95);

@@ -59,12 +59,11 @@
             <div class="nav-container">
                 <div class="nav-links">
                     <a href="{% url 'esasevim:main' %}"><i class="fa-solid fa-house"></i> Əsas Səhifə</a>
-                    <a href="{% url 'profile' %}"><i class="fas fa-user-circle"></i> Hesabım</a>
-                    <a href="{% url 'umumi_baxis' %}"><i class="fas fa-box-open"></i> Məhsullara Baxış</a>
+                    <a href="{% url 'umumi_baxis' %}"><i class="fas fa-box-open"></i> Məhsullar</a>
                     <a href="{% url 'esasevim:yeni_mehsullar' %}"><i class="fa-solid fa-bell"></i> Yeni Məhsullar</a>
                     <a href="{% url 'sifaris_izle' %}"><i class="fas fa-shopping-bag"></i> Sifarişlərim</a>
                     <a href="{% url 'hesabatlar' %}"><i class="fas fa-chart-bar"></i> Hesabatlar</a>
-                    <a href="{% url 'car_list' %}"><i class="fas fa-car"></i> Avtomobillər</a>
+                    {% comment %} <a href="{% url 'car_list' %}"><i class="fas fa-car"></i> Avtomobillər</a> {% endcomment %}
                     <a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> Məlumat</a>
                 </div>
             </div>

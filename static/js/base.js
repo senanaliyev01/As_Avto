@@ -560,22 +560,19 @@
                 searchInput.value = cleanedText;
                 
                 let searchButton = document.getElementById('search-button');
-                let searchSpinner = document.getElementById('loading-spinner');
+                let spinner = document.getElementById('loading-spinner');
                 
-                if (!searchButton || !searchSpinner) return;
+                if (!searchButton || !spinner) return;
                 
                 // Butonun ölçüsünü qorumaq üçün enini və hündürlüyünü sabit saxla
                 searchButton.style.width = `${searchButton.offsetWidth}px`;
                 searchButton.style.height = `${searchButton.offsetHeight}px`;
                 
                 // Axtarış yazısını gizlət, amma spinneri saxla
-                const buttonText = searchButton.querySelector('span');
-                if (buttonText) {
-                    buttonText.style.visibility = 'hidden';
-                } else if (searchButton.childNodes[0] && searchButton.childNodes[0].nodeValue) {
+                if (searchButton.childNodes[0] && searchButton.childNodes[0].nodeValue) {
                     searchButton.childNodes[0].nodeValue = ''; // Axtar sözünü sil
                 }
-                searchSpinner.style.display = 'inline-block'; // Spinneri göstər
+                spinner.style.display = 'inline-block'; // Spinneri göstər
                 
                 // Butonu deaktiv et ki, yenidən klik olunmasın
                 searchButton.disabled = true; 
@@ -874,8 +871,6 @@
     // Real-time search functionality
     document.addEventListener('DOMContentLoaded', function() {
         const searchForm = document.getElementById('search-form');
-        if (!searchForm) return;
-        
         const searchInput = searchForm.querySelector('input[name="search_text"]');
         const searchButton = document.getElementById('search-button');
         
@@ -887,12 +882,7 @@
         // Create dropdown container
         const dropdownContainer = document.createElement('div');
         dropdownContainer.className = 'search-results-dropdown';
-        const searchInputWrapper = searchForm.querySelector('.search-input-wrapper');
-        if (searchInputWrapper) {
-            searchInputWrapper.appendChild(dropdownContainer);
-        } else {
-            searchForm.appendChild(dropdownContainer);
-        }
+        searchForm.appendChild(dropdownContainer);
         
         let searchTimeout;
         
@@ -916,7 +906,7 @@
                 
                 if (data.results && data.results.length > 0) {
                     dropdownContainer.innerHTML = data.results.map(result => {
-                        return `<div class="search-result-item" onclick="window.location.href='/product-detail/${encodeURIComponent(result.adi)}-${encodeURIComponent(result.oem)}-${encodeURIComponent(result.brend_kod)}/${result.id}/'">
+                        return `                            <div class="search-result-item" onclick="window.location.href='/product-detail/${encodeURIComponent(result.adi)}-${encodeURIComponent(result.oem)}-${encodeURIComponent(result.brend_kod)}/${result.id}/'">
                                 ${result.sekil_url ? `<img src="${result.sekil_url}" alt="${result.adi}">` : ''}
                                 <div class="search-result-info">
                                     <h4>${result.adi}  ${result.brend}</h4>

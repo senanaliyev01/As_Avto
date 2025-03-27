@@ -278,100 +278,33 @@ body {
 /* Məhsul əməliyyatları */
 .product-actions {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    margin-top: 15px;
+    margin-top: 10px;
 }
 
-.product-actions .info-link {
-    flex: 0 0 auto;
+.info-link,
+.cart-icon {
     text-decoration: none;
     padding: 10px 15px;
     border-radius: 5px;
-    background-color: #00a8e1; /* Mavi - Ətraflı */
-    color: #ffffff;
     transition: background-color 0.3s;
 }
 
-.product-actions .info-link:hover {
+.info-link {
+    background-color: #00a8e1; /* Mavi - Ətraflı */
+    color: #ffffff;
+}
+
+.cart-icon {
+    background-color: #ff6f61; /* Qırmızı - Səbətə əlavə et */
+    color: #ffffff;
+}
+
+.info-link:hover {
     background-color: #008bb5; /* Hover zamanı tünd mavi */
 }
 
-.product-actions .cart-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex: 1;
-    margin-left: 10px;
-    text-decoration: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    background-color: #ff6f61; /* Qırmızı - Səbətə əlavə et */
-    color: #ffffff;
-    transition: background-color 0.3s;
-    border: none;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 14px;
-}
-
-.product-actions .cart-icon:hover {
+.cart-icon:hover {
     background-color: #e65c50; /* Hover zamanı tünd qırmızı */
-}
-
-/* Miqdar inputu üçün stillər */
-.quantity-container {
-    position: relative;
-    display: inline-block;
-    margin-right: 10px;
-    vertical-align: middle;
-}
-
-.quantity-input {
-    width: 60px;
-    padding: 8px;
-    border: 1px solid rgba(100, 255, 218, 0.3);
-    border-radius: 4px;
-    background-color: #1f3756;
-    color: white;
-    text-align: center;
-    font-size: 14px;
-    transition: all 0.3s ease;
-}
-
-.quantity-input:focus {
-    outline: none;
-    border-color: #64ffda;
-    box-shadow: 0 0 0 2px rgba(100, 255, 218, 0.2);
-}
-
-.quantity-input::-webkit-inner-spin-button,
-.quantity-input::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-.quantity-input[type=number] {
-    -moz-appearance: textfield;
-}
-
-.quantity-error {
-    position: absolute;
-    bottom: -20px;
-    left: 0;
-    width: 100%;
-    font-size: 0.75rem;
-    color: #ff6b6b;
-    background-color: rgba(22, 36, 71, 0.9);
-    padding: 2px 5px;
-    border-radius: 4px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 5;
-    text-align: center;
-}
-
-.quantity-error.show {
-    opacity: 1;
 }
 

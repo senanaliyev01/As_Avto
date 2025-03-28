@@ -28,7 +28,11 @@ def clean_url(text):
 def clean_description(text):
     if not text:
         return ""
-    # HTML xüsusi simvollarını təmizləyirik (ampersand, quotes və s.)
+    # '+' simvollarını ilk xüsusi olaraq təmizləyək ki, XML-də problem yaranmasın
+    text = text.replace('+', ' plus ')
+    # Digər təhlükəli simvolları təmizləyirik
+    text = text.replace('&', ' and ')
+    # HTML xüsusi simvollarını təmizləyirik
     cleaned = html.escape(text)
     return cleaned
 
@@ -61,8 +65,12 @@ class MehsulSitemap(Sitemap):
         # URL-dəki xüsusi simvolları düzgün kodlaşdırırıq
         # Təhlükəsiz URL üçün clean_url funksiyasını istifadə edirik
         slug_name = clean_url(obj.adi)
-        slug_oem = clean_url(obj.oem)
-        slug_brand_code = clean_url(obj.brend_kod)
+        # OEM və brend kodlarında '+' və '.' simvollarını əvəz edək
+        oem_clean = obj.oem.replace('+', 'plus').replace('.', 'dot') if obj.oem else ""
+        brend_kod_clean = obj.brend_kod.replace('+', 'plus').replace('.', 'dot') if obj.brend_kod else ""
+        
+        slug_oem = clean_url(oem_clean)
+        slug_brand_code = clean_url(brend_kod_clean)
         
         return reverse('mehsul_etrafli', kwargs={
             'mehsul_adi': slug_name,
@@ -100,9 +108,14 @@ class MehsulSitemap(Sitemap):
 
                 # Şəkil məlumatlarını əlavə edirik
                 if hasattr(item, 'sekil') and item.sekil:
-                    # Təsvir mətnləri təmizləyirik
+                    # Təsvir mətnləri təmizləyirik - xüsusi simvolları əvəz edirik
                     title = clean_description(item.adi)
-                    caption = clean_description(f"{item.adi} - {item.brend.adi} - {item.brend_kod} - {item.oem}")
+                    
+                    # OEM və brend kodlarındakı xüsusi simvolları təmizləyərək caption yaradırıq
+                    brend_kod = item.brend_kod.replace('+', ' plus ').replace('.', ' dot ') if item.brend_kod else ""
+                    oem = item.oem.replace('+', ' plus ').replace('.', ' dot ') if item.oem else ""
+                    
+                    caption = clean_description(f"{item.adi} - {item.brend.adi} - {brend_kod} - {oem}")
                     
                     url_info['images'] = [{
                         'loc': f"{protocol}://{domain}{item.sekil.url}",

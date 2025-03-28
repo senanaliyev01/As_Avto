@@ -62,7 +62,7 @@
                 "item": {
                     "@type": "Product",
                     "name": "{{ mehsul.adi|escapejs }}",
-                    "image": "https://as-avto.com{{ mehsul.sekil.url }}",
+                    "image": "https://as-avto.com{{ mehsul.sekil.url|escapejs }}",
                     "description": "{{ mehsul.adi|escapejs }} - {{ mehsul.marka.adi|escapejs }} üçün {{ mehsul.brend.adi|escapejs }} markalı orijinal ehtiyat hissəsi",
                     "brand": {
                         "@type": "Brand",
@@ -92,7 +92,7 @@
                         "@type": "Offer",
                         "url": "https://as-avto.com{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}",
                         "priceCurrency": "AZN",
-                        "price": {{ mehsul.formatted_qiymet|floatformat:2|cut:"," }},
+                        "price": "{{ mehsul.formatted_qiymet|escapejs }}",
                         "priceValidUntil": "2025-12-31",
                         "availability": "https://schema.org/InStock",
                         "shippingDetails": {

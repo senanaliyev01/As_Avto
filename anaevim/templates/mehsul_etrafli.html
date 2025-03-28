@@ -52,7 +52,7 @@
             "@type": "Offer",
             "url": "https://as-avto.com{{ request.path }}",
             "priceCurrency": "AZN",
-            "price": "{{ mehsul.formatted_qiymet }}",
+            "price": {{ mehsul.formatted_qiymet|floatformat:2|cut:"," }},
             "priceValidUntil": "2025-12-31",
             "availability": "https://schema.org/InStock",
             "shippingDetails": {

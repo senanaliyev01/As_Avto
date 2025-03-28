@@ -12,8 +12,8 @@
       {% for image in url.images %}
         <image:image>
           <image:loc>{{ image.loc }}</image:loc>
-          {% if image.title %}<image:title><![CDATA[{{ image.title }}]]></image:title>{% endif %}
-          {% if image.caption %}<image:caption><![CDATA[{{ image.caption }}]]></image:caption>{% endif %}
+          {% if image.title %}<image:title>{{ image.title }}</image:title>{% endif %}
+          {% if image.caption %}<image:caption>{{ image.caption }}</image:caption>{% endif %}
         </image:image>
       {% endfor %}
     {% endif %}

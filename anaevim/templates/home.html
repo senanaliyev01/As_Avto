@@ -90,7 +90,7 @@
                     },
                     "offers": {
                         "@type": "Offer",
-                        "url": "https://as-avto.com{% url 'mehsul_etrafli' mehsul.adi|slugify|default:'item' mehsul.oem|slugify|default:'item' mehsul.brend_kod|slugify|default:'item' mehsul.id %}",
+                        "url": "https://as-avto.com{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}",
                         "priceCurrency": "AZN",
                         "price": "{{ mehsul.formatted_qiymet }}",
                         "priceValidUntil": "2025-12-31",
@@ -379,7 +379,7 @@
                                             <p class="product-card__description">№: {{ mehsul.brend_kod }}</p>
                                             <p class="product-card__description">KOD: {{ mehsul.oem }}</p>
                                             <p class="product-card__description">Qiymət: {{ mehsul.formatted_qiymet }} ₼</p>
-                                            <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify|default:'item' mehsul.oem|slugify|default:'item' mehsul.brend_kod|slugify|default:'item' mehsul.id %}" class="product-card__button">
+                                            <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="product-card__button">
                                                 Ətraflı Məlumat
                                                 <i class="fas fa-arrow-right"></i>
                                             </a>

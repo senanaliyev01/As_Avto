@@ -61,15 +61,15 @@
                 "position": {{ forloop.counter }},
                 "item": {
                     "@type": "Product",
-                    "name": "{{ mehsul.adi|escapejs }}",
-                    "image": "https://as-avto.com{{ mehsul.sekil.url|escapejs }}",
-                    "description": "{{ mehsul.adi|escapejs }} - {{ mehsul.marka.adi|escapejs }} üçün {{ mehsul.brend.adi|escapejs }} markalı orijinal ehtiyat hissəsi",
+                    "name": "{{ mehsul.adi }}",
+                    "image": "https://as-avto.com{{ mehsul.sekil.url }}",
+                    "description": "{{ mehsul.adi }} - {{ mehsul.marka.adi }} üçün {{ mehsul.brend.adi }} markalı orijinal ehtiyat hissəsi",
                     "brand": {
                         "@type": "Brand",
-                        "name": "{{ mehsul.brend.adi|escapejs }}"
+                        "name": "{{ mehsul.brend.adi }}"
                     },
-                    "sku": "{{ mehsul.brend_kod|escapejs }}",
-                    "mpn": "{{ mehsul.oem|escapejs }}",
+                    "sku": "{{ mehsul.brend_kod }}",
+                    "mpn": "{{ mehsul.oem }}",
                     "category": "Auto Parts",
                     "aggregateRating": {
                         "@type": "AggregateRating",
@@ -90,9 +90,9 @@
                     },
                     "offers": {
                         "@type": "Offer",
-                        "url": "https://as-avto.com{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}",
+                        "url": "https://as-avto.com{% url 'mehsul_etrafli' mehsul.adi|slugify|default:'item' mehsul.oem|slugify|default:'item' mehsul.brend_kod|slugify|default:'item' mehsul.id %}",
                         "priceCurrency": "AZN",
-                        "price": "{{ mehsul.formatted_qiymet|escapejs }}",
+                        "price": "{{ mehsul.formatted_qiymet }}",
                         "priceValidUntil": "2025-12-31",
                         "availability": "https://schema.org/InStock",
                         "shippingDetails": {
@@ -379,7 +379,7 @@
                                             <p class="product-card__description">№: {{ mehsul.brend_kod }}</p>
                                             <p class="product-card__description">KOD: {{ mehsul.oem }}</p>
                                             <p class="product-card__description">Qiymət: {{ mehsul.formatted_qiymet }} ₼</p>
-                                            <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="product-card__button">
+                                            <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify|default:'item' mehsul.oem|slugify|default:'item' mehsul.brend_kod|slugify|default:'item' mehsul.id %}" class="product-card__button">
                                                 Ətraflı Məlumat
                                                 <i class="fas fa-arrow-right"></i>
                                             </a>

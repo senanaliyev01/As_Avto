@@ -4,6 +4,24 @@ from mehsullar.models import Mehsul
 from django.utils import timezone
 from django.utils.text import slugify
 from urllib.parse import quote
+import re
+
+# Xüsusi simvolları emal edən funksiya
+def clean_url(text):
+    if not text:
+        return ""
+    # İlk addım - slugify
+    cleaned = slugify(text)
+    # Əgər slugify bütün xüsusi simvolları emal etməyibsə, bunu özümüz edirik
+    if not cleaned or cleaned == "-":
+        # Bütün xüsusi simvolları '-' ilə əvəz edirik
+        cleaned = re.sub(r'[^a-zA-Z0-9]+', '-', text)
+        # Əvvəldəki və sondakı '-' işarələrini təmizləyirik
+        cleaned = cleaned.strip('-')
+        # Boş sətir yaranmaması üçün yoxlayırıq
+        if not cleaned:
+            cleaned = "item"
+    return cleaned
 
 class StaticViewSitemap(Sitemap):
     changefreq = "daily"
@@ -32,10 +50,10 @@ class MehsulSitemap(Sitemap):
 
     def location(self, obj):
         # URL-dəki xüsusi simvolları düzgün kodlaşdırırıq
-        # Burada slugify istifadə etmək lazımdır
-        slug_name = slugify(obj.adi)
-        slug_oem = slugify(obj.oem)
-        slug_brand_code = slugify(obj.brend_kod)
+        # Təhlükəsiz URL üçün clean_url funksiyasını istifadə edirik
+        slug_name = clean_url(obj.adi)
+        slug_oem = clean_url(obj.oem)
+        slug_brand_code = clean_url(obj.brend_kod)
         
         return reverse('mehsul_etrafli', kwargs={
             'mehsul_adi': slug_name,
@@ -50,35 +68,39 @@ class MehsulSitemap(Sitemap):
         all_items_lastmod = True  # track if all items have a lastmod
 
         for item in self.paginator.page(page).object_list:
-            loc = f"{protocol}://{domain}{self._location(item)}"
-            priority = self._get('priority', item)
-            lastmod = self._get('lastmod', item)
+            try:
+                loc = f"{protocol}://{domain}{self._location(item)}"
+                priority = self._get('priority', item)
+                lastmod = self._get('lastmod', item)
 
-            if all_items_lastmod and lastmod is None:
-                all_items_lastmod = False
-            elif all_items_lastmod:
-                if latest_lastmod is None:
-                    latest_lastmod = lastmod
-                else:
-                    latest_lastmod = max(latest_lastmod, lastmod)
+                if all_items_lastmod and lastmod is None:
+                    all_items_lastmod = False
+                elif all_items_lastmod:
+                    if latest_lastmod is None:
+                        latest_lastmod = lastmod
+                    else:
+                        latest_lastmod = max(latest_lastmod, lastmod)
 
-            url_info = {
-                'item': item,
-                'location': loc,
-                'lastmod': lastmod,
-                'changefreq': self._get('changefreq', item),
-                'priority': str(priority if priority is not None else ''),
-            }
+                url_info = {
+                    'item': item,
+                    'location': loc,
+                    'lastmod': lastmod,
+                    'changefreq': self._get('changefreq', item),
+                    'priority': str(priority if priority is not None else ''),
+                }
 
-            # Şəkil məlumatlarını əlavə edirik
-            if hasattr(item, 'sekil') and item.sekil:
-                url_info['images'] = [{
-                    'loc': f"{protocol}://{domain}{item.sekil.url}",
-                    'title': item.adi,
-                    'caption': f"{item.adi} - {item.brend.adi} - {item.brend_kod} - {item.oem}"
-                }]
+                # Şəkil məlumatlarını əlavə edirik
+                if hasattr(item, 'sekil') and item.sekil:
+                    url_info['images'] = [{
+                        'loc': f"{protocol}://{domain}{item.sekil.url}",
+                        'title': item.adi,
+                        'caption': f"{item.adi} - {item.brend.adi} - {item.brend_kod} - {item.oem}"
+                    }]
 
-            urls.append(url_info)
+                urls.append(url_info)
+            except Exception as e:
+                # Xəta baş verərsə, bu məhsulu keçirik və davam edirik
+                continue
 
         if all_items_lastmod and latest_lastmod:
             self.latest_lastmod = latest_lastmod

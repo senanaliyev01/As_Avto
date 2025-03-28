@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 from urllib.parse import quote
 import re
+import html
 
 # Xüsusi simvolları emal edən funksiya
 def clean_url(text):
@@ -21,6 +22,14 @@ def clean_url(text):
         # Boş sətir yaranmaması üçün yoxlayırıq
         if not cleaned:
             cleaned = "item"
+    return cleaned
+
+# Təsvir mətnləri üçün funksiya
+def clean_description(text):
+    if not text:
+        return ""
+    # HTML xüsusi simvollarını təmizləyirik (ampersand, quotes və s.)
+    cleaned = html.escape(text)
     return cleaned
 
 class StaticViewSitemap(Sitemap):
@@ -91,10 +100,14 @@ class MehsulSitemap(Sitemap):
 
                 # Şəkil məlumatlarını əlavə edirik
                 if hasattr(item, 'sekil') and item.sekil:
+                    # Təsvir mətnləri təmizləyirik
+                    title = clean_description(item.adi)
+                    caption = clean_description(f"{item.adi} - {item.brend.adi} - {item.brend_kod} - {item.oem}")
+                    
                     url_info['images'] = [{
                         'loc': f"{protocol}://{domain}{item.sekil.url}",
-                        'title': item.adi,
-                        'caption': f"{item.adi} - {item.brend.adi} - {item.brend_kod} - {item.oem}"
+                        'title': title,
+                        'caption': caption
                     }]
 
                 urls.append(url_info)

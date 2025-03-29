@@ -32,24 +32,24 @@ class MehsulSitemap(Sitemap):
         return timezone.now()
 
     def location(self, obj):
-        # URL-dəki xüsusi simvolları düzgün kodlaşdırırıq
-        # Əvvəlcə bütün xüsusi simvolları temizleyirik
+        # Bütün xüsusi simvolları və boşluqları təmizləyirik
+        
+        # Adi sahəsi üçün - boşluqlar qalsın, digər simvollar təmizlənsin
         clean_name = re.sub(r'[^\w\s]', '-', str(obj.adi))
+        # Sonra boşluqları birbaşa - simvoluna çeviririk 
+        clean_name = clean_name.replace(' ', '-')
+        
+        # OEM və brend_kod üçün bütün xüsusi simvollar və boşluqlar təmizlənsin
         clean_oem = re.sub(r'[^\w]', '-', str(obj.oem))
         clean_brand_code = re.sub(r'[^\w]', '-', str(obj.brend_kod))
         
-        # Boşluqları '-' ilə əvəz edirik, sonra slugify edib URL-yə uyğun hala gətiririk
-        encoded_name = slugify(clean_name.replace(' ', '-'))
-        encoded_oem = slugify(clean_oem)
-        encoded_brand_code = slugify(clean_brand_code)
+        # Bütün ardıcıl - simvollarını bir - simvoluna çeviririk
+        clean_name = re.sub(r'-+', '-', clean_name).strip('-')
+        clean_oem = re.sub(r'-+', '-', clean_oem).strip('-')
+        clean_brand_code = re.sub(r'-+', '-', clean_brand_code).strip('-')
         
-        # URL yaradırıq - mehsul_haqqinda adına düzəltməliyik, mehsul_etrafli deyil
-        return reverse('mehsul_haqqinda', kwargs={
-            'mehsul_adi': encoded_name,
-            'mehsul_oem': encoded_oem,
-            'mehsul_brend_kod': encoded_brand_code,
-            'mehsul_id': obj.id
-        })
+        # URL-ni manual olaraq yaradırıq (view name əvəzinə path istifadə etdiyimiz üçün)
+        return f"/product-detail/{clean_name}-{clean_oem}-{clean_brand_code}/{obj.id}/"
 
     def _urls(self, page, protocol, domain):
         urls = []
@@ -79,10 +79,14 @@ class MehsulSitemap(Sitemap):
 
             # Şəkil məlumatlarını əlavə edirik
             if hasattr(item, 'sekil') and item.sekil:
+                # Xüsusi simvolları təmizləyək
+                clean_title = re.sub(r'[^\w\s]', ' ', str(item.adi)).strip()
+                clean_caption = f"{clean_title} - {item.brend.adi} - {item.id} - {re.sub(r'[^\w\s-]', '-', str(item.oem))}"
+                
                 url_info['images'] = [{
                     'loc': f"{protocol}://{domain}{item.sekil.url}",
-                    'title': item.adi,
-                    'caption': f"{item.adi} - {item.brend.adi} - {item.brend_kod} - {item.oem}"
+                    'title': clean_title,
+                    'caption': clean_caption
                 }]
 
             urls.append(url_info)

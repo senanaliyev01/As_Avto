@@ -148,8 +148,8 @@ class Mehsul(models.Model):
         # oem sahəsində xüsusi simvolları və boşluqları - ilə əvəz edirik
         if self.oem:
             import re
-            # Bütün xüsusi simvolları və boşluqları - ilə əvəz edirik (hərflər və rəqəmlər xaric)
-            self.oem = re.sub(r'[^\w]', '-', str(self.oem))
+            # Bütün xüsusi simvollar və boşluqları - ilə əvəz edirik
+            self.oem = re.sub(r'[^\w]|[\s]', '-', str(self.oem))
             
         if not self.sekil:
             self.sekil = 'mehsul_sekilleri/noimage.webp'

@@ -1,366 +1,360 @@
-<!DOCTYPE html>
+{% extends 'base.html' %}
 {% load static %}
-<html lang="az">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AS-AVTO | Bütün Məhsullar</title>
+
+{% block title %}Bütün Məhsullar{% endblock %}
+
+{% block extra_css %}
+<style>
+    .search-container {
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
     
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="AS-Avto - Azərbaycanın ən böyük avtomobil ehtiyat hissələri mağazası. Bütün məhsullarımız kataloqumuzda.">
-    <meta name="keywords" content="avtomobil hissələri, ehtiyat hissələri, avto hissələr, məhsullar, katalog, as-avto, avtomobil, filter, yağ, yanacaq, Azərbaycan, Bakı">
-    <meta name="author" content="AS-Avto">
-    <meta name="robots" content="index, follow">
-    <meta name="revisit-after" content="1 days">
+    .search-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
     
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="AS-AVTO | Bütün Məhsullar Kataloqu">
-    <meta property="og:description" content="Azərbaycanın ən böyük avtomobil ehtiyat hissələri mağazası. Bütün məhsullarımız kataloqumuzda.">
-    <meta property="og:image" content="{% static 'img/Header_Logo.png' %}">
-    <meta property="og:url" content="https://as-avto.com/mehsullar">
-    <meta property="og:type" content="website">
+    .search-field {
+        flex: 1;
+        min-width: 200px;
+    }
     
-    <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="AS-AVTO | Bütün Məhsullar Kataloqu">
-    <meta name="twitter:description" content="Azərbaycanın ən böyük avtomobil ehtiyat hissələri mağazası. Bütün məhsullarımız kataloqumuzda.">
-    <meta name="twitter:image" content="{% static 'img/Header_Logo.png' %}">
+    .search-button {
+        background-color: #0074cc;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.3s;
+    }
     
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://as-avto.com/mehsullar">
+    .search-button:hover {
+        background-color: #005ca3;
+    }
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="128x128" href="{% static 'img/favicon.png' %}">
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
     
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
     
-    <!-- CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/anaevim.css' %}">
-    <style>
-        /* Məhsullar səhifəsi üçün əlavə CSS */
-        .search-section {
-            padding: 2rem 0;
-            background-color: #f9f9f9;
-            border-radius: 10px;
-            margin-bottom: 2rem;
-        }
-        
-        .search-form {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1rem;
-        }
-        
-        .search-form select,
-        .search-form input {
-            flex: 1;
-            min-width: 200px;
-            padding: 0.75rem 1rem;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-family: 'Poppins', sans-serif;
-        }
-        
-        .search-form button {
-            padding: 0.75rem 2rem;
-            background-color: #e63946;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .search-form button:hover {
-            background-color: #c1121f;
-        }
-        
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 2rem;
-            padding: 1rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        .product-card {
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-        
-        .page-header {
-            text-align: center;
-            padding: 3rem 1rem;
-            background-color: #1d3557;
-            color: white;
-            margin-bottom: 2rem;
-        }
-        
-        .page-header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin: 3rem 0;
-            gap: 0.5rem;
-        }
-        
-        .pagination a,
-        .pagination .current {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            text-decoration: none;
-            color: #333;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        
-        .pagination a:hover {
-            background-color: #f1f1f1;
-        }
-        
-        .pagination .current {
-            background-color: #e63946;
-            color: white;
-            border-color: #e63946;
-        }
-        
-        .no-results {
-            text-align: center;
-            padding: 3rem;
-            font-size: 1.2rem;
-            color: #555;
-        }
-        
-        @media (max-width: 768px) {
-            .products-grid {
-                grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-            }
+    .products-table-container {
+        margin-top: 30px;
+    }
+    
+    .products-table {
+        width: 100%;
+        overflow-x: auto;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    th, td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    th {
+        background-color: #f2f2f2;
+        font-weight: 600;
+    }
+    
+    tr:hover {
+        background-color: #f5f5f5;
+    }
+    
+    .marka-pr-image {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        cursor: pointer;
+    }
+    
+    .search-result-title {
+        margin-bottom: 20px;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .no-results {
+        text-align: center;
+        padding: 30px;
+        font-size: 18px;
+    }
+    
+    .stock-status {
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    
+    .in-stock {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .low-stock {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    
+    .out-of-stock {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .cart-icon {
+        background: none;
+        border: none;
+        color: #0074cc;
+        font-size: 16px;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+    
+    .cart-icon:hover {
+        color: #005ca3;
+    }
+    
+    .info-link {
+        color: #17a2b8;
+        transition: color 0.3s;
+    }
+    
+    .info-link:hover {
+        color: #117a8b;
+    }
+    
+    .quantity-input {
+        width: 60px;
+        padding: 5px;
+        text-align: center;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    
+    /* Modal styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.8);
+    }
+    
+    .modal-content {
+        margin: auto;
+        display: block;
+        max-width: 80%;
+        max-height: 80%;
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    
+    .modal-content img {
+        max-width: 100%;
+        max-height: 80vh;
+    }
+    
+    .close-modal {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: white;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <h1 class="section__title">Bütün Məhsullar</h1>
+    
+    <!-- Axtarış Formu -->
+    <div class="search-container">
+        <form action="{% url 'butun_mehsullar' %}" method="GET" class="search-form">
+            <div class="search-field">
+                <label for="search_text">Axtarış:</label>
+                <input type="text" id="search_text" name="search_text" class="form-control" placeholder="OEM kodu daxil edin..." value="{{ request.GET.search_text|default:'' }}">
+            </div>
             
-            .page-header h1 {
-                font-size: 2rem;
-            }
-        }
-    </style>
-</head>
-<body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header__container container">
-            <a href="{% url 'anaevim' %}" class="header__logo">
-                <img src="{% static 'img/Header_Logo.png' %}" alt="AS AVTO Logo">
-            </a>
-            
-            <nav class="header__nav">
-                <ul class="header__menu">
-                    <li><a href="{% url 'anaevim' %}" class="header__link">Ana Səhifə</a></li>
-                    <li><a href="{% url 'mehsullar' %}" class="header__link active">Məhsullar</a></li>
-                    <li><a href="{% url 'anaevim' %}#about" class="header__link">Haqqımızda</a></li>
-                    <li><a href="{% url 'anaevim' %}#contact" class="header__link">Əlaqə</a></li>
-                </ul>
-                <div class="header__actions">
-                    <a href="{% url 'register' %}" class="btn btn--primary btn--register">
-                        <i class="fas fa-sign-in-alt"></i>
-                        <span>B4B Qeydiyyat</span>
-                    </a>
-                </div>
-
-                <div class="header__actions">
-                    <a href="{% url 'login' %}" class="btn btn--primary btn--login">
-                        <i class="fas fa-sign-in-alt"></i>
-                        <span>B4B Giriş</span>
-                    </a>
-                </div>
-            </nav>
-
-            <button class="header__toggle" aria-label="Menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-        </div>
-    </header>
-
-    <!-- Page Header -->
-    <section class="page-header">
-        <div class="container">
-            <h1>Bütün Məhsullarımız</h1>
-            <p>Avtomobiliniz üçün lazım olan bütün orijinal ehtiyat hissələri</p>
-        </div>
-    </section>
-
-    <!-- Search Section -->
-    <section class="search-section">
-        <div class="container">
-            <form method="get" action="{% url 'mehsullar' %}" class="search-form">
-                <select name="marka" id="marka">
-                    <option value="">Marka Seçin</option>
-                    {% for marka in markalar %}
-                    <option value="{{ marka.id }}" {% if selected_marka == marka.id|stringformat:"i" %}selected{% endif %}>{{ marka.adi }}</option>
+            <div class="search-field">
+                <label for="category">Kateqoriya:</label>
+                <select id="category" name="category" class="form-control">
+                    <option value="">- Bütün kateqoriyalar -</option>
+                    {% for kateqoriya in kateqoriyalar %}
+                        <option value="{{ kateqoriya.adi }}" {% if request.GET.category == kateqoriya.adi %}selected{% endif %}>{{ kateqoriya.adi }}</option>
                     {% endfor %}
                 </select>
-                
-                <select name="brend" id="brend">
-                    <option value="">Brend Seçin</option>
+            </div>
+            
+            <div class="search-field">
+                <label for="brand">Firma:</label>
+                <select id="brand" name="brand" class="form-control">
+                    <option value="">- Bütün firmalar -</option>
                     {% for brend in brendler %}
-                    <option value="{{ brend.id }}" {% if selected_brend == brend.id|stringformat:"i" %}selected{% endif %}>{{ brend.adi }}</option>
+                        <option value="{{ brend.adi }}" {% if request.GET.brand == brend.adi %}selected{% endif %}>{{ brend.adi }}</option>
                     {% endfor %}
                 </select>
-                
-                <input type="text" name="search" placeholder="Məhsul adı və ya kod" value="{{ search_query }}">
-                
-                <button type="submit">
+            </div>
+            
+            <div class="search-field">
+                <label for="model">Avtomobil:</label>
+                <select id="model" name="model" class="form-control">
+                    <option value="">- Bütün avtomobillər -</option>
+                    {% for marka in markalar %}
+                        <option value="{{ marka.adi }}" {% if request.GET.model == marka.adi %}selected{% endif %}>{{ marka.adi }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="search-field" style="display: flex; align-items: flex-end;">
+                <button type="submit" class="search-button">
                     <i class="fas fa-search"></i> Axtar
                 </button>
-            </form>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Axtarış Nəticələri -->
+    <div class="search-results">
+        <!-- Modal for product image -->
+        <div id="imageModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <img id="modalImage" src="" alt="">
+            </div>
         </div>
-    </section>
-
-    <!-- Products Grid -->
-    <section class="products-container">
-        <div class="container">
-            {% if mehsullar %}
-            <div class="products-grid">
-                {% for mehsul in mehsullar %}
-                <div class="product-card">
-                    <div class="product-card__image">
-                        {% if mehsul.sekil %}
-                        <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
-                        {% else %}
-                        <img src="{% static 'img/no-image.png' %}" alt="Şəkil yoxdur">
-                        {% endif %}
-                    </div>
-                    <div class="product-card__content">
-                        <h3 class="product-card__title">{{ mehsul.adi }}</h3>
-                        <p class="product-card__description">Marka: {{ mehsul.marka.adi }}</p>
-                        <p class="product-card__description">Brend: {{ mehsul.brend.adi }}</p>
-                        <p class="product-card__description">№: {{ mehsul.brend_kod }}</p>
-                        <p class="product-card__description">KOD: {{ mehsul.oem }}</p>
-                        <p class="product-card__description">Qiymət: {{ mehsul.formatted_qiymet }} ₼</p>
-                        <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="product-card__button">
-                            Ətraflı Məlumat
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            
-            <!-- Pagination -->
-            {% if mehsullar.has_other_pages %}
-            <div class="pagination">
-                {% if mehsullar.has_previous %}
-                <a href="?{{ search_params }}&page={{ mehsullar.previous_page_number }}"><i class="fas fa-chevron-left"></i></a>
-                {% endif %}
-                
-                {% for i in mehsullar.paginator.page_range %}
-                    {% if mehsullar.number == i %}
-                    <span class="current">{{ i }}</span>
-                    {% else %}
-                    <a href="?{{ search_params }}&page={{ i }}">{{ i }}</a>
-                    {% endif %}
-                {% endfor %}
-                
-                {% if mehsullar.has_next %}
-                <a href="?{{ search_params }}&page={{ mehsullar.next_page_number }}"><i class="fas fa-chevron-right"></i></a>
-                {% endif %}
-            </div>
-            {% endif %}
-            
-            {% else %}
-            <div class="no-results">
-                <i class="fas fa-search fa-3x"></i>
-                <h2>Məhsul tapılmadı</h2>
-                <p>Axtarış kriteriyalarını dəyişib yenidən cəhd edin</p>
-            </div>
-            {% endif %}
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer__top">
-            <div class="container">
-                <div class="footer__grid">
-                    <div class="footer__brand">
-                         <img src="{% static 'img/Header_Logo.png' %}" alt="AS AVTO Logo">
-                        <p>Azərbaycanın avtomobil ehtiyat hissələri bazarında 10 ildən artıq təcrübə</p>
-                        <div class="footer__social">
-                            <a href="https://wa.me/994773059585" target="_blank" rel="noopener" aria-label="WhatsApp">
-                                <i class="fab fa-whatsapp"></i>
-                            </a>
-                            <a href="https://www.tiktok.com/@as_avto_service" target="_blank" rel="noopener" aria-label="TikTok">
-                                <i class="fab fa-tiktok"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="footer__links">
-                        <h3>Sürətli Keçid</h3>
-                        <ul>
-                            <li><a href="{% url 'anaevim' %}">Ana Səhifə</a></li>
-                            <li><a href="{% url 'mehsullar' %}">Məhsullar</a></li>
-                            <li><a href="{% url 'anaevim' %}#about">Haqqımızda</a></li>
-                            <li><a href="{% url 'anaevim' %}#contact">Əlaqə</a></li>
-                            <li><a href="{% url 'login' %}">B4B Giriş</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="footer__contact">
-                        <h3>Əlaqə Məlumatları</h3>
-                        <ul>
-                            <li>
-                                <i class="fas fa-phone"></i>
-                                <a href="tel:+994773059585">+994 77 305 95 85</a>
-                            </li>
-                            <li>
-                                <i class="fas fa-envelope"></i>
-                                <a href="mailto:as.avto.2025@gmail.com">as.avto.2025@gmail.com</a>
-                            </li>
-                            <li>
-                                <i class="fas fa-clock"></i>
-                                <span>Bazar ertəsi - Bazar: 09:00 - 18:00</span>
-                            </li>
-                        </ul>
-                    </div>
+        
+        {% if mehsullar %}
+            <div class="products-table-container">
+                <h2 class="search-result-title">{{ mehsullar.count }} Məhsul tapıldı</h2>
+                <div class="products-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Təsvir</th>
+                                <th>Məhsul</th>
+                                <th>Firma</th>
+                                <th>Avtomobil</th>
+                                <th>№</th>
+                                <th>KOD</th>
+                                <th>Mövcudluğ</th>
+                                <th>Qiymət</th>
+                                <th><i class="fas fa-info"></i></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for mehsul in mehsullar %}
+                            <tr>
+                                <td>
+                                    {% if mehsul.sekil %}
+                                        <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="marka-pr-image" onclick="openModal(this.src)">
+                                    {% endif %}
+                                </td>
+                                <td>{{ mehsul.adi }}</td>
+                                <td>{{ mehsul.brend.adi }}</td>
+                                <td>{{ mehsul.marka.adi }}</td>
+                                <td>{{ mehsul.brend_kod }}</td>
+                                <td>{{ mehsul.oem }}</td>
+                                <td>
+                                    {% if mehsul.stok == 0 %}
+                                        <span class="stock-status out-of-stock">Yoxdur</span>
+                                    {% elif mehsul.stok <= 20 %}
+                                        <span class="stock-status low-stock">Az var</span>
+                                    {% else %}
+                                        <span class="stock-status in-stock">Var</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ mehsul.qiymet }} ₼
+                                </td>
+                                <td>
+                                    <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="info-link">
+                                        <i class="fas fa-info"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </div>
+        {% else %}
+            <h2 class="no-results" style="color: red">Heç bir nəticə tapılmadı. Zəhmət olmasa axtarış parametrlərini yoxlayın.</h2>
+        {% endif %}
+    </div>
+</div>
 
-        <div class="footer__bottom">
-            <div class="container">
-                <p>&copy; 2024-2025 AS AVTO. Bütün hüquqlar qorunur.</p>
-            </div>
-        </div>
-    </footer>
+{% endblock %}
 
-    <!-- Scripts -->
-    <script src="{% static 'js/anaevim.js' %}"></script>
-</body>
-</html> 
+{% block extra_js %}
+<script>
+    // Şəkil modal pəncərəsini açmaq
+    function openModal(src) {
+        var modal = document.getElementById('imageModal');
+        var modalImg = document.getElementById('modalImage');
+        modal.style.display = "block";
+        modalImg.src = src;
+    }
+    
+    // Modal pəncərəsini bağlamaq
+    document.querySelector('.close-modal').addEventListener('click', function() {
+        document.getElementById('imageModal').style.display = "none";
+    });
+    
+    // Modal pəncərəsinin xaricində klikləyəndə bağlamaq
+    window.addEventListener('click', function(event) {
+        var modal = document.getElementById('imageModal');
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    });
+    
+    // Axtarış sözünü vurğulamaq
+    function highlightSearchTerms() {
+        var searchText = "{{ request.GET.search_text|default:'' }}";
+        if (searchText) {
+            // OEM və brend kodlarını vurğulama
+            var elements = document.querySelectorAll('table td:nth-child(5), table td:nth-child(6)');
+            for (var i = 0; i < elements.length; i++) {
+                var content = elements[i].innerHTML;
+                var regex = new RegExp(searchText, 'gi');
+                elements[i].innerHTML = content.replace(regex, match => `<span style="background-color: yellow; font-weight: bold;">${match}</span>`);
+            }
+        }
+    }
+    
+    // Səhifə yükləndikdə axtarış sözlərini vurğula
+    document.addEventListener('DOMContentLoaded', function() {
+        highlightSearchTerms();
+    });
+</script>
+{% endblock %} 

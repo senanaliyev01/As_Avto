@@ -1,8 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from mehsullar.models import Brend, Marka, Mehsul, MarkaSekil
+from mehsullar.models import Brend, Marka, Mehsul, MarkaSekil, Kateqoriya
 from django.template.defaultfilters import slugify
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db.models import Q
 
 def anaevim(request):
     brendler = Brend.objects.all()
@@ -18,63 +16,6 @@ def anaevim(request):
     
     return render(request, 'home.html', context)
 
-def mehsullar(request):
-    # Əsas məlumatlar
-    brendler = Brend.objects.all()
-    markalar = Marka.objects.all()
-    mehsullar_list = Mehsul.objects.all()
-    
-    # Axtarış parametrləri
-    search_query = request.GET.get('search', '')
-    selected_marka = request.GET.get('marka', '')
-    selected_brend = request.GET.get('brend', '')
-    
-    # Axtarış sorğuları
-    if search_query:
-        mehsullar_list = mehsullar_list.filter(
-            Q(adi__icontains=search_query) | 
-            Q(oem__icontains=search_query) | 
-            Q(brend_kod__icontains=search_query)
-        )
-    
-    if selected_marka:
-        mehsullar_list = mehsullar_list.filter(marka_id=selected_marka)
-    
-    if selected_brend:
-        mehsullar_list = mehsullar_list.filter(brend_id=selected_brend)
-    
-    # Səhifələmə
-    page = request.GET.get('page', 1)
-    paginator = Paginator(mehsullar_list, 12)  # Hər səhifədə 12 məhsul
-    
-    try:
-        mehsullar = paginator.page(page)
-    except PageNotAnInteger:
-        mehsullar = paginator.page(1)
-    except EmptyPage:
-        mehsullar = paginator.page(paginator.num_pages)
-    
-    # Axtarış parametrlərini saxlamaq
-    search_params = ""
-    if search_query:
-        search_params += f"search={search_query}"
-    if selected_marka:
-        search_params += f"&marka={selected_marka}" if search_params else f"marka={selected_marka}"
-    if selected_brend:
-        search_params += f"&brend={selected_brend}" if search_params else f"brend={selected_brend}"
-    
-    context = {
-        'brendler': brendler,
-        'markalar': markalar,
-        'mehsullar': mehsullar,
-        'search_query': search_query,
-        'selected_marka': selected_marka,
-        'selected_brend': selected_brend,
-        'search_params': search_params,
-    }
-    
-    return render(request, 'mehsullar.html', context)
-
 def mehsul_etrafli(request, mehsul_id, mehsul_adi=None, mehsul_oem=None, mehsul_brend_kod=None):
     mehsul = get_object_or_404(Mehsul, id=mehsul_id)
     
@@ -89,4 +30,44 @@ def mehsul_etrafli(request, mehsul_id, mehsul_adi=None, mehsul_oem=None, mehsul_
         'mehsul': mehsul
     }
     return render(request, 'mehsul_etrafli.html', context)
+
+def butun_mehsullar(request):
+    mehsullar = Mehsul.objects.all()
+    kateqoriyalar = Kateqoriya.objects.all()
+    brendler = Brend.objects.all()
+    markalar = Marka.objects.all()
+    
+    # Axtarış parametrlərini alırıq
+    category = request.GET.get('category')
+    brand = request.GET.get('brand')
+    model = request.GET.get('model')
+    search_text = request.GET.get('search_text')
+
+    # Brend, kateqoriya və marka üçün dəqiq filtrasiya
+    if category:
+        mehsullar = mehsullar.filter(kateqoriya__adi=category)
+    
+    if brand:
+        mehsullar = mehsullar.filter(brend__adi=brand)
+    
+    if model:
+        mehsullar = mehsullar.filter(marka__adi=model)
+
+    # Axtarış mətni varsa
+    if search_text:
+        # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
+        import re
+        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_text)
+        
+        # Yalnız OEM kodlarında axtarış
+        mehsullar = mehsullar.filter(oem_kodlar__kod__icontains=clean_search).distinct()
+    
+    context = {
+        'mehsullar': mehsullar,
+        'kateqoriyalar': kateqoriyalar,
+        'brendler': brendler,
+        'markalar': markalar
+    }
+    
+    return render(request, 'mehsullar.html', context)
 

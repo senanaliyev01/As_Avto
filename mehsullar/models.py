@@ -139,13 +139,17 @@ class Mehsul(models.Model):
         return []
 
     def save(self, *args, **kwargs):
-        # / simvolunu - ilə əvəz edirik (əgər adi sahəsində varsa)
-        if self.adi and '/' in str(self.adi):
-            self.adi = str(self.adi).replace('/', '-')
+        # adi sahəsində xüsusi simvolları - ilə əvəz edirik
+        if self.adi:
+            import re
+            # Bütün xüsusi simvolları - ilə əvəz edirik (hərflər və rəqəmlər xaric)
+            self.adi = re.sub(r'[^\w\s]', '-', str(self.adi))
             
-        # / və boşluq simvollarını - ilə əvəz edirik (əgər oem sahəsində varsa)
+        # oem sahəsində xüsusi simvolları və boşluqları - ilə əvəz edirik
         if self.oem:
-            self.oem = str(self.oem).replace('/', '-').replace(' ', '-')
+            import re
+            # Bütün xüsusi simvolları və boşluqları - ilə əvəz edirik (hərflər və rəqəmlər xaric)
+            self.oem = re.sub(r'[^\w]', '-', str(self.oem))
             
         if not self.sekil:
             self.sekil = 'mehsul_sekilleri/noimage.webp'

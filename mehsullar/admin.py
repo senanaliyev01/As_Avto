@@ -9,6 +9,7 @@ from django import forms
 from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
 import pandas as pd
+import re
 
 class MarkaSekilInline(admin.TabularInline):
     model = MarkaSekil
@@ -254,8 +255,8 @@ class MehsulAdmin(admin.ModelAdmin):
                             if existing_product:
                                 # Mövcud məhsulu yenilə
                                 if 'adi' in row and pd.notna(row['adi']):
-                                    # Əvvəlcə string'ə çevir, sonra əvəz et
-                                    adi_value = str(row['adi']).replace('/', '-')
+                                    # Bütün xüsusi simvolları - ilə əvəz edirik
+                                    adi_value = re.sub(r'[^\w\s]', '-', str(row['adi']))
                                     existing_product.adi = adi_value
                                 if kateqoriya:
                                     existing_product.kateqoriya = kateqoriya
@@ -282,8 +283,8 @@ class MehsulAdmin(admin.ModelAdmin):
                                     existing_product.haqqinda = str(row['haqqinda'])
                                 
                                 if 'oem' in row and pd.notna(row['oem']):
-                                    # Əvvəlcə string'ə çevir, sonra / və boşluq simvollarını - ilə əvəz et
-                                    oem_value = str(row['oem']).replace('/', '-').replace(' ', '-')
+                                    # Bütün xüsusi simvolları və boşluqları - ilə əvəz edirik
+                                    oem_value = re.sub(r'[^\w]', '-', str(row['oem']))
                                     existing_product.oem = oem_value
                                 
                                 existing_product.save()
@@ -302,12 +303,12 @@ class MehsulAdmin(admin.ModelAdmin):
                             else:
                                 # Əsas sahələri hazırla
                                 mehsul_data = {
-                                    'adi': str(row['adi']).replace('/', '-') if 'adi' in row and pd.notna(row['adi']) else '',
+                                    'adi': re.sub(r'[^\w\s]', '-', str(row['adi'])) if 'adi' in row and pd.notna(row['adi']) else '',
                                     'kateqoriya': kateqoriya,
                                     'brend': brend,
                                     'marka': marka,
                                     'brend_kod': brend_kod,
-                                    'oem': str(row['oem']).replace('/', '-').replace(' ', '-') if 'oem' in row and pd.notna(row['oem']) else '',
+                                    'oem': re.sub(r'[^\w]', '-', str(row['oem'])) if 'oem' in row and pd.notna(row['oem']) else '',
                                     'stok': row['stok'] if 'stok' in row and pd.notna(row['stok']) else 0,
                                     'maya_qiymet': row['maya_qiymet'] if 'maya_qiymet' in row and pd.notna(row['maya_qiymet']) else 0,
                                     'qiymet': row['qiymet'] if 'qiymet' in row and pd.notna(row['qiymet']) else 0,

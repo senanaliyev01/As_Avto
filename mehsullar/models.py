@@ -139,11 +139,13 @@ class Mehsul(models.Model):
         return []
 
     def save(self, *args, **kwargs):
-        # adi sahəsində xüsusi simvolları - ilə əvəz edirik
+        # adi sahəsində xüsusi simvolları və boşluqları - ilə əvəz edirik
         if self.adi:
             import re
-            # Bütün xüsusi simvolları - ilə əvəz edirik (hərflər və rəqəmlər xaric)
-            self.adi = re.sub(r'[^\w\s]', '-', str(self.adi))
+            # 1. Bütün xüsusi simvolları və boşluqları - ilə əvəz edirik
+            adi_temp = re.sub(r'[^\w]|[\s]', '-', str(self.adi))
+            # 2. Ardıcıl - simvollarını bir dənə - ilə əvəz edirik
+            self.adi = re.sub(r'-+', '-', adi_temp)
             
         # oem sahəsində xüsusi simvolları və boşluqları təmizləyirik
         if self.oem:

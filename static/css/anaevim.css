@@ -1668,7 +1668,7 @@ tr:hover {
 
 /* All Products CTA Section */
 .all-products-cta {
-    background-color: var(--color-gray-50);
+    background-color: var(--color-primary);
     padding: var(--spacing-3xl) var(--spacing-lg);
     text-align: center;
     border-radius: var(--border-radius-lg);

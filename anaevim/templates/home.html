@@ -329,34 +329,7 @@
         </div>
     </section>
 
-    <!-- Products Slider Section -->
-    <section class="products-slider">
-        <div class="full-width-container">
-            <!-- Brendlər -->
-            <div class="slider-section" id="brands-slider">
-                <h2 class="section__title">Brendlərimiz</h2>
-                <div class="slider-container">
-                    <div class="slider-wrapper">
-                        <div class="slider-track">
-                            {% for brend in brendler %}
-                                {% if brend.sekil %}
-                                <div class="slider-item">
-                                    <div class="product-card">
-                                        <div class="product-card__image">
-                                            <img src="{{ brend.sekil.url }}" alt="{{ brend.adi }}">
-                                        </div>
-                                        <div class="product-card__content">
-                                            <h3 class="product-card__title">{{ brend.adi }}</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+  
             <!-- Məhsullar Keçidi -->
             <div class="all-products-cta">
                 <h2 class="section__title">Məhsullarımız</h2>

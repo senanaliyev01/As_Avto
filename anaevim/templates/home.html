@@ -215,6 +215,7 @@
                     <li><a href="#home" class="header__link">Ana Səhifə</a></li>
                     <li><a href="#about" class="header__link">Haqqımızda</a></li>
                     <li><a href="#contact" class="header__link">Əlaqə</a></li>
+                    <li><a href="{% url 'mehsullar' %}" class="header__link">Məhsullar</a></li>
                 </ul>
                 <div class="header__actions">
                     <a href="{% url 'register' %}" class="btn btn--primary btn--register">
@@ -356,44 +357,45 @@
                 </div>
             </div>
 
-            <!-- Məhsullar -->
-            <div class="slider-section" id="products-slider">
+            <!-- Məhsullar Bölməsi -->
+            <div class="products-section">
                 <h2 class="section__title">Məhsullarımız</h2>
-                <div class="slider-container">
-                    <button class="slider-arrow slider-arrow--prev">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <div class="slider-wrapper">
-                        <div class="slider-track">
-                            {% for mehsul in mehsullar %}
-                                {% if mehsul.sekil %}
-                                <div class="slider-item">
-                                    <div class="product-card">
-                                        <div class="product-card__image">
-                                            <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
-                                        </div>
-                                        <div class="product-card__content">
-                                            <h3 class="product-card__title">{{ mehsul.adi }}</h3>
-                                            <p class="product-card__description">Marka: {{ mehsul.marka.adi }}</p>
-                                            <p class="product-card__description">Brend: {{ mehsul.brend.adi }}</p>
-                                            <p class="product-card__description">№: {{ mehsul.brend_kod }}</p>
-                                            <p class="product-card__description">KOD: {{ mehsul.oem }}</p>
-                                            <p class="product-card__description">Qiymət: {{ mehsul.formatted_qiymet }} ₼</p>
-                                            <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="product-card__button">
-                                                Ətraflı Məlumat
-                                                <i class="fas fa-arrow-right"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <button class="slider-arrow slider-arrow--next">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
+                <p class="section__description">Geniş çeşiddə avtomobil ehtiyat hissələri kataloqumuzla tanış olmaq üçün aşağıdakı düyməni klikləyin</p>
+                <div class="products-button-container">
+                    <a href="{% url 'mehsullar' %}" class="btn btn--primary products-button">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Bütün Məhsulları Göstər</span>
+                    </a>
                 </div>
+                <style>
+                    .products-section {
+                        text-align: center;
+                        padding: 40px 0;
+                    }
+                    .section__description {
+                        max-width: 800px;
+                        margin: 0 auto 30px;
+                        color: #666;
+                        font-size: 1.1rem;
+                    }
+                    .products-button-container {
+                        display: flex;
+                        justify-content: center;
+                    }
+                    .products-button {
+                        font-size: 1.1rem;
+                        padding: 12px 25px;
+                        border-radius: 5px;
+                        transition: all 0.3s ease;
+                    }
+                    .products-button:hover {
+                        transform: translateY(-3px);
+                        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+                    }
+                    .products-button i {
+                        margin-right: 10px;
+                    }
+                </style>
             </div>
         </div>
     </section>
@@ -522,13 +524,20 @@
                     </div>
 
                     <div class="footer__links">
-                        <h3>Sürətli Keçid</h3>
-                        <ul>
-                            <li><a href="#home">Ana Səhifə</a></li>
-                            <li><a href="#about">Haqqımızda</a></li>
-                            <li><a href="#contact">Əlaqə</a></li>
-                            <li><a href="{% url 'login' %}">B4B Giriş</a></li>
-                        
+                        <h3 class="footer__heading">Faydalı Linklər</h3>
+                        <ul class="footer__list">
+                            <li class="footer__item">
+                                <a href="#home" class="footer__link">Ana Səhifə</a>
+                            </li>
+                            <li class="footer__item">
+                                <a href="#about" class="footer__link">Haqqımızda</a>
+                            </li>
+                            <li class="footer__item">
+                                <a href="{% url 'mehsullar' %}" class="footer__link">Məhsullar</a>
+                            </li>
+                            <li class="footer__item">
+                                <a href="#contact" class="footer__link">Əlaqə</a>
+                            </li>
                         </ul>
                     </div>
 

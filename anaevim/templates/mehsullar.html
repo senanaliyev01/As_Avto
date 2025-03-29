@@ -59,24 +59,9 @@
             flex: 1;
             padding: 12px 15px;
             border: 1px solid #ddd;
-            border-radius: 4px 0 0 4px;
+            border-radius: 4px;
             font-size: 16px;
             outline: none;
-        }
-        
-        .search-button {
-            padding: 12px 20px;
-            background-color: #e53935;
-            color: white;
-            border: none;
-            border-radius: 0 4px 4px 0;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        
-        .search-button:hover {
-            background-color: #d32f2f;
         }
         
         .search-tip {
@@ -99,6 +84,7 @@
             margin-bottom: 15px;
             font-size: 18px;
             font-weight: 600;
+            color: #1a237e;
         }
         
         .filters-grid {
@@ -115,6 +101,7 @@
             display: block;
             margin-bottom: 5px;
             font-weight: 500;
+            color: #1a237e;
         }
         
         .filter-select {
@@ -128,7 +115,7 @@
         
         .filter-button {
             padding: 10px 20px;
-            background-color: #e53935;
+            background-color: #1a237e;
             color: white;
             border: none;
             border-radius: 4px;
@@ -139,7 +126,7 @@
         }
         
         .filter-button:hover {
-            background-color: #d32f2f;
+            background-color: #303f9f;
         }
         
         .products-section {
@@ -150,6 +137,7 @@
             margin-bottom: 20px;
             font-size: 24px;
             font-weight: 600;
+            color: #1a237e;
         }
         
         .products-grid {
@@ -195,6 +183,7 @@
             margin-bottom: 10px;
             font-size: 16px;
             font-weight: 600;
+            color: #1a237e;
         }
         
         .product-info {
@@ -204,7 +193,7 @@
         
         .product-price {
             font-weight: 600;
-            color: #e53935;
+            color: #1a237e;
             margin: 10px 0;
         }
         
@@ -212,7 +201,7 @@
             display: block;
             width: 100%;
             padding: 10px;
-            background-color: #e53935;
+            background-color: #1a237e;
             color: white;
             text-align: center;
             border: none;
@@ -224,7 +213,7 @@
         }
         
         .product-button:hover {
-            background-color: #d32f2f;
+            background-color: #303f9f;
         }
         
         .no-results {
@@ -259,10 +248,6 @@
                 margin-bottom: 10px;
             }
             
-            .search-button {
-                border-radius: 4px;
-            }
-            
             .products-grid {
                 grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
             }
@@ -290,6 +275,25 @@
         .out-of-stock {
             background-color: #ffebee;
             color: #d32f2f;
+        }
+        
+        /* Header CSS */
+        .header__nav .btn--primary, 
+        .header__link:hover, 
+        .header__link.active {
+            color: #1a237e;
+        }
+        
+        .btn--primary {
+            background-color: #1a237e;
+        }
+        
+        .btn--primary:hover {
+            background-color: #303f9f;
+        }
+        
+        .footer {
+            background-color: #1a237e;
         }
         
         /* Home.html CSS-ni elave et */
@@ -343,11 +347,8 @@
             <section class="search-section">
                 <div class="search-container">
                     <input type="text" id="search-input" class="search-input" placeholder="Məhsul adı, OEM kodu və ya brend kodu daxil edin...">
-                    <button id="search-button" class="search-button">
-                        <i class="fas fa-search"></i> Axtar
-                    </button>
                 </div>
-                <p class="search-tip">OEM kodu ilə axtarış etdikdə daha dəqiq nəticələr əldə edə bilərsiniz.</p>
+                <p class="search-tip">OEM kodu ilə axtarış etdikdə daha dəqiq nəticələr əldə edə bilərsiniz. Axtarış realtime olaraq aparılır.</p>
             </section>
 
             <!-- Filters Section -->
@@ -531,7 +532,6 @@
             const resetFiltersBtn = document.getElementById('reset-filters');
             const productsGrid = document.getElementById('products-grid');
             const noResults = document.getElementById('no-results');
-            const searchButton = document.getElementById('search-button');
             
             // Filter products function
             function filterProducts() {
@@ -541,23 +541,21 @@
                 const modelValue = modelFilter.value;
                 const stockValue = stockFilter.value;
                 
+                // Xüsusi simvolları təmizlə - yalnız hərflər və rəqəmlərə icazə ver
+                const cleanSearchValue = searchValue.replace(/[^a-z0-9]/gi, '');
+                
                 let visibleProducts = 0;
                 const products = productsGrid.querySelectorAll('.product-card');
                 
                 products.forEach(product => {
-                    const productName = product.getAttribute('data-name').toLowerCase();
-                    const productOem = product.getAttribute('data-oem').toLowerCase();
-                    const productBrendKod = product.getAttribute('data-brend-kod').toLowerCase();
+                    const productOem = product.getAttribute('data-oem').toLowerCase().replace(/[^a-z0-9]/gi, '');
                     const productCategory = product.getAttribute('data-category');
                     const productBrand = product.getAttribute('data-brand');
                     const productModel = product.getAttribute('data-model');
                     const productStock = product.getAttribute('data-stock');
                     
-                    // Determine if product matches search and filters
-                    const matchesSearch = searchValue === '' || 
-                                         productName.includes(searchValue) || 
-                                         productOem.includes(searchValue) || 
-                                         productBrendKod.includes(searchValue);
+                    // Yalnız OEM kodu ilə axtarış
+                    const matchesSearch = searchValue === '' || productOem.includes(cleanSearchValue);
                     
                     const matchesCategory = categoryValue === '' || productCategory === categoryValue;
                     const matchesBrand = brandValue === '' || productBrand === brandValue;
@@ -587,7 +585,6 @@
             brandFilter.addEventListener('change', filterProducts);
             modelFilter.addEventListener('change', filterProducts);
             stockFilter.addEventListener('change', filterProducts);
-            searchButton.addEventListener('click', filterProducts);
             
             // Clear all filters
             function clearFilters() {

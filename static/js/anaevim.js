@@ -53,9 +53,27 @@ class App {
             const sliderContainers = utils.selectAll('.slider-container');
             this.productSliders = sliderContainers.map(container => new ProductSlider(container));
             
+            // Initialize brands slider
+            const brandsSlider = utils.select('.brands-slider .slider-track');
+            if (brandsSlider) {
+                this.setupBrandsSlider(brandsSlider);
+            }
+            
         } catch (error) {
             console.error('Application initialization error:', error);
         }
+    }
+    
+    setupBrandsSlider(slider) {
+        // Clone items for infinite loop effect
+        const items = utils.selectAll('.slider-item', slider);
+        if (items.length === 0) return;
+        
+        // Clone items and append to slider
+        items.forEach(item => {
+            const clone = item.cloneNode(true);
+            slider.appendChild(clone);
+        });
     }
 }
 

@@ -3,6 +3,7 @@ from mehsullar.models import Brend, Marka, Mehsul, MarkaSekil, Kateqoriya, OEMKo
 from django.template.defaultfilters import slugify
 from django.db.models import Q
 import re
+from django.http import JsonResponse
 
 def anaevim(request):
     brendler = Brend.objects.all()
@@ -60,6 +61,26 @@ def mehsullar(request):
         'brendler': brendler,
         'markalar': markalar,
     }
+    
+    # AJAX sorğusu üçün başlığı yoxlayırıq
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest' and 'json' in request.GET:
+        # Məhsullar haqqında məlumatı JSON formatında qaytarırıq
+        mehsul_list = []
+        for mehsul in mehsullar:
+            mehsul_dict = {
+                'id': mehsul.id,
+                'adi': mehsul.adi,
+                'marka': mehsul.marka.adi if mehsul.marka else '',
+                'brend': mehsul.brend.adi if mehsul.brend else '',
+                'brend_kod': mehsul.brend_kod,
+                'oem': mehsul.oem,
+                'qiymet': str(mehsul.formatted_qiymet),
+                'sekil_url': mehsul.sekil.url if mehsul.sekil else '',
+                'slug': f"{slugify(mehsul.adi)}-{mehsul.oem}-{mehsul.brend_kod}"
+            }
+            mehsul_list.append(mehsul_dict)
+        
+        return JsonResponse({'mehsullar': mehsul_list})
     
     return render(request, 'mehsullar.html', context)
 

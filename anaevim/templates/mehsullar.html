@@ -25,9 +25,47 @@
     <link rel="stylesheet" href="{% static 'css/anaevim.css' %}">
     
     <style>
+        :root {
+            --primary-color: #0f3460;
+            --secondary-color: #16213e;
+            --accent-color: #1e3a8a;
+            --text-color: #333;
+            --text-light: #666;
+            --bg-light: #f8f9fa;
+            --bg-dark: #0a192f;
+            --white: #ffffff;
+            --border-color: #e2e8f0;
+            --hover-color: #2563eb;
+        }
+        
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-color);
+        }
+        
+        .header {
+            background-color: var(--primary-color);
+        }
+        
+        .header__menu .header__link {
+            color: var(--white);
+        }
+        
+        .header__menu .header__link:hover {
+            color: #e2e8f0;
+        }
+        
+        .btn--primary {
+            background-color: var(--accent-color);
+        }
+        
+        .btn--primary:hover {
+            background-color: var(--hover-color);
+        }
+        
         .products-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 20px;
             padding: 20px;
             max-width: 1200px;
@@ -36,15 +74,17 @@
         
         .search-container {
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: var(--primary-color);
+            color: var(--white);
             border-radius: 8px;
             max-width: 1200px;
             margin: 20px auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         
         .search-form {
             display: flex;
-            flex-direction: column;
+            flex-wrap: wrap;
             gap: 15px;
         }
         
@@ -52,46 +92,49 @@
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
+            width: 100%;
         }
         
         .search-group {
             flex: 1;
-            min-width: 200px;
+            min-width: 150px;
         }
         
         .search-group label {
             display: block;
             margin-bottom: 5px;
             font-weight: 500;
+            color: var(--white);
         }
         
         .search-group input,
         .search-group select {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-color);
             border-radius: 4px;
             font-size: 14px;
+            background-color: var(--white);
         }
         
         .search-button {
-            background-color: #e50000;
+            background-color: var(--accent-color);
             color: white;
-            padding: 12px 20px;
+            padding: 10px 15px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-weight: 600;
             transition: background-color 0.3s;
-            margin-top: 10px;
+            flex-shrink: 0;
         }
         
         .search-button:hover {
-            background-color: #cc0000;
+            background-color: var(--hover-color);
         }
         
         .product-card {
-            border: 1px solid #e1e1e1;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             overflow: hidden;
             transition: transform 0.3s, box-shadow 0.3s;
@@ -109,11 +152,15 @@
         .product-card__image {
             height: 200px;
             overflow: hidden;
+            background-color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .product-card__image img {
-            width: 100%;
-            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
             object-fit: contain;
             transition: transform 0.3s;
         }
@@ -133,12 +180,12 @@
             font-size: 16px;
             font-weight: 600;
             margin-bottom: 10px;
-            color: #333;
+            color: var(--text-color);
         }
         
         .product-card__description {
             font-size: 14px;
-            color: #666;
+            color: var(--text-light);
             margin-bottom: 5px;
         }
         
@@ -149,7 +196,7 @@
             gap: 5px;
             margin-top: auto;
             padding: 8px 15px;
-            background-color: #e50000;
+            background-color: var(--primary-color);
             color: white;
             text-decoration: none;
             border-radius: 4px;
@@ -159,22 +206,51 @@
         }
         
         .product-card__button:hover {
-            background-color: #cc0000;
+            background-color: var(--hover-color);
         }
         
         .no-results {
             text-align: center;
             padding: 40px;
             font-size: 18px;
-            color: #666;
+            color: var(--text-light);
         }
         
         .section-title {
             text-align: center;
             margin: 30px 0;
             font-size: 28px;
-            color: #333;
+            color: var(--primary-color);
             font-weight: 600;
+        }
+        
+        .footer {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+        
+        .footer__link {
+            color: var(--white);
+        }
+        
+        .footer__title {
+            color: var(--white);
+        }
+        
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 30px auto;
+            display: none;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         @media (max-width: 768px) {
@@ -231,21 +307,12 @@
         <!-- Search Section -->
         <section class="search-section">
             <div class="search-container">
-                <h2 class="section-title">Məhsul Axtarışı</h2>
-                <form class="search-form" method="GET" action="{% url 'mehsullar' %}">
-                    <div class="search-row">
-                        <div class="search-group">
-                            <label for="oem_search">OEM Kodu ilə Axtarış:</label>
-                            <input type="text" id="oem_search" name="search_text" 
-                                   placeholder="OEM kodu daxil edin" 
-                                   value="{{ request.GET.search_text }}">
-                        </div>
-                    </div>
-                    
+                <h2 class="section-title" style="color: white;">Məhsul Axtarışı</h2>
+                <form class="search-form" id="searchForm" method="GET" action="{% url 'mehsullar' %}">
                     <div class="search-row">
                         <div class="search-group">
                             <label for="category">Kateqoriya:</label>
-                            <select id="category" name="category">
+                            <select id="category" name="category" class="search-filter">
                                 <option value="">Bütün Kateqoriyalar</option>
                                 {% for kateqoriya in kateqoriyalar %}
                                     <option value="{{ kateqoriya.adi }}" 
@@ -258,7 +325,7 @@
                         
                         <div class="search-group">
                             <label for="brand">Brend:</label>
-                            <select id="brand" name="brand">
+                            <select id="brand" name="brand" class="search-filter">
                                 <option value="">Bütün Brendlər</option>
                                 {% for brend in brendler %}
                                     <option value="{{ brend.adi }}" 
@@ -271,7 +338,7 @@
                         
                         <div class="search-group">
                             <label for="model">Marka:</label>
-                            <select id="model" name="model">
+                            <select id="model" name="model" class="search-filter">
                                 <option value="">Bütün Markalar</option>
                                 {% for marka in markalar %}
                                     <option value="{{ marka.adi }}" 
@@ -281,11 +348,15 @@
                                 {% endfor %}
                             </select>
                         </div>
+                        
+                        <div class="search-group">
+                            <label for="oem_search">OEM Kodu:</label>
+                            <input type="text" id="oem_search" name="search_text" 
+                                   placeholder="OEM kodu daxil edin" 
+                                   value="{{ request.GET.search_text }}"
+                                   class="search-filter">
+                        </div>
                     </div>
-                    
-                    <button type="submit" class="search-button">
-                        <i class="fas fa-search"></i> Axtar
-                    </button>
                 </form>
             </div>
         </section>
@@ -294,35 +365,39 @@
         <section class="products-section">
             <h2 class="section-title">Bütün Məhsullar</h2>
             
-            {% if mehsullar %}
-                <div class="products-container">
-                    {% for mehsul in mehsullar %}
-                        {% if mehsul.sekil %}
-                            <div class="product-card">
-                                <div class="product-card__image">
-                                    <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
+            <div class="loader" id="productsLoader"></div>
+            
+            <div id="productsContainer">
+                {% if mehsullar %}
+                    <div class="products-container">
+                        {% for mehsul in mehsullar %}
+                            {% if mehsul.sekil %}
+                                <div class="product-card">
+                                    <div class="product-card__image">
+                                        <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
+                                    </div>
+                                    <div class="product-card__content">
+                                        <h3 class="product-card__title">{{ mehsul.adi }}</h3>
+                                        <p class="product-card__description">Marka: {{ mehsul.marka.adi }}</p>
+                                        <p class="product-card__description">Brend: {{ mehsul.brend.adi }}</p>
+                                        <p class="product-card__description">№: {{ mehsul.brend_kod }}</p>
+                                        <p class="product-card__description">KOD: {{ mehsul.oem }}</p>
+                                        <p class="product-card__description">Qiymət: {{ mehsul.formatted_qiymet }} ₼</p>
+                                        <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="product-card__button">
+                                            Ətraflı Məlumat
+                                            <i class="fas fa-arrow-right"></i>
+                                        </a>
+                                    </div>
                                 </div>
-                                <div class="product-card__content">
-                                    <h3 class="product-card__title">{{ mehsul.adi }}</h3>
-                                    <p class="product-card__description">Marka: {{ mehsul.marka.adi }}</p>
-                                    <p class="product-card__description">Brend: {{ mehsul.brend.adi }}</p>
-                                    <p class="product-card__description">№: {{ mehsul.brend_kod }}</p>
-                                    <p class="product-card__description">KOD: {{ mehsul.oem }}</p>
-                                    <p class="product-card__description">Qiymət: {{ mehsul.formatted_qiymet }} ₼</p>
-                                    <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="product-card__button">
-                                        Ətraflı Məlumat
-                                        <i class="fas fa-arrow-right"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="no-results">
-                    <p>Axtarış kriteriyalarına uyğun məhsul tapılmadı.</p>
-                </div>
-            {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="no-results">
+                        <p>Axtarış kriteriyalarına uyğun məhsul tapılmadı.</p>
+                    </div>
+                {% endif %}
+            </div>
         </section>
     </main>
 
@@ -387,5 +462,83 @@
     <!-- JS -->
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'js/main.js' %}"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Ajax ilə real-time axtarış
+            let searchTimeout;
+            const productsContainer = $('#productsContainer');
+            const loader = $('#productsLoader');
+            
+            // Filter dəyişikliklərini izlə
+            $('.search-filter').on('change keyup', function() {
+                clearTimeout(searchTimeout);
+                
+                // Yükləmə göstər
+                loader.show();
+                
+                // Qısa gecikmə ilə axtarışı yerinə yetir (debounce)
+                searchTimeout = setTimeout(function() {
+                    // Form məlumatlarını topla
+                    let formData = $('#searchForm').serialize();
+                    
+                    // AJAX sorğusunu göndər
+                    $.ajax({
+                        url: '{% url "mehsullar" %}',
+                        type: 'GET',
+                        data: formData,
+                        dataType: 'html',
+                        success: function(response) {
+                            // HTML cavabından məhsullar bölməsini çıxart
+                            let parser = new DOMParser();
+                            let htmlDoc = parser.parseFromString(response, 'text/html');
+                            let newProductsHtml = htmlDoc.getElementById('productsContainer').innerHTML;
+                            
+                            // Məhsullar konteynerini yenilə
+                            productsContainer.html(newProductsHtml);
+                            
+                            // Fade-in effekti ilə yükləmə göstəricisini gizlət
+                            loader.fadeOut(300);
+                            
+                            // URL-i yenilə (tarixçə əlavə etmədən)
+                            window.history.replaceState({}, '', '{% url "mehsullar" %}?' + formData);
+                        },
+                        error: function(error) {
+                            console.error('Axtarış zamanı xəta baş verdi:', error);
+                            loader.hide();
+                            
+                            // Xəta mesajı göstər
+                            alert("Axtarış zamanı xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.");
+                        }
+                    });
+                }, 500); // 500ms gecikmə ilə axtarışı yerinə yetir
+            });
+            
+            // Səhifə yükləndikdə sorğu parametrlərini doldur
+            const fillFormFromQuery = () => {
+                const urlParams = new URLSearchParams(window.location.search);
+                
+                // Hər bir parametr üçün yoxlama et və müvafiq sahəni doldur
+                if (urlParams.has('category')) {
+                    $('#category').val(urlParams.get('category'));
+                }
+                
+                if (urlParams.has('brand')) {
+                    $('#brand').val(urlParams.get('brand'));
+                }
+                
+                if (urlParams.has('model')) {
+                    $('#model').val(urlParams.get('model'));
+                }
+                
+                if (urlParams.has('search_text')) {
+                    $('#oem_search').val(urlParams.get('search_text'));
+                }
+            };
+            
+            // Səhifə yükləndikdə sorğu parametrlərini doldur
+            fillFormFromQuery();
+        });
+    </script>
 </body>
 </html> 

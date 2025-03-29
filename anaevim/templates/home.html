@@ -356,50 +356,12 @@
                 </div>
             </div>
 
-            <!-- Məhsullar -->
-            <div class="slider-section" id="products-slider">
-                <h2 class="section__title">Məhsullarımız</h2>
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <a href="{% url 'butun_mehsullar' %}" class="btn btn-primary" style="display: inline-block; padding: 10px 20px; background-color: #0074cc; color: white; text-decoration: none; border-radius: 5px; font-weight: 600;">
-                        Bütün Məhsulları Göstər
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-                <div class="slider-container">
-                    <button class="slider-arrow slider-arrow--prev">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <div class="slider-wrapper">
-                        <div class="slider-track">
-                            {% for mehsul in mehsullar %}
-                                {% if mehsul.sekil %}
-                                <div class="slider-item">
-                                    <div class="product-card">
-                                        <div class="product-card__image">
-                                            <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
-                                        </div>
-                                        <div class="product-card__content">
-                                            <h3 class="product-card__title">{{ mehsul.adi }}</h3>
-                                            <p class="product-card__description">Marka: {{ mehsul.marka.adi }}</p>
-                                            <p class="product-card__description">Brend: {{ mehsul.brend.adi }}</p>
-                                            <p class="product-card__description">№: {{ mehsul.brend_kod }}</p>
-                                            <p class="product-card__description">KOD: {{ mehsul.oem }}</p>
-                                            <p class="product-card__description">Qiymət: {{ mehsul.formatted_qiymet }} ₼</p>
-                                            <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="product-card__button">
-                                                Ətraflı Məlumat
-                                                <i class="fas fa-arrow-right"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <button class="slider-arrow slider-arrow--next">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
+            <!-- Bütün məhsullar linkini əlavə edirəm -->
+            <div class="see-all-products">
+                <a href="{% url 'mehsullar' %}" class="btn btn--primary">
+                    <i class="fas fa-box-open"></i>
+                    <span>Bütün Məhsullar</span>
+                </a>
             </div>
         </div>
     </section>

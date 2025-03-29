@@ -1,6 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from mehsullar.models import Brend, Marka, Mehsul, MarkaSekil, Kateqoriya
 from django.template.defaultfilters import slugify
+import re
+from django.db.models import Q
 
 def anaevim(request):
     brendler = Brend.objects.all()
@@ -31,7 +33,8 @@ def mehsul_etrafli(request, mehsul_id, mehsul_adi=None, mehsul_oem=None, mehsul_
     }
     return render(request, 'mehsul_etrafli.html', context)
 
-def butun_mehsullar(request):
+def mehsullar(request):
+    # Başlanğıc olaraq bütün məhsulları götürürük
     mehsullar = Mehsul.objects.all()
     kateqoriyalar = Kateqoriya.objects.all()
     brendler = Brend.objects.all()
@@ -42,6 +45,7 @@ def butun_mehsullar(request):
     brand = request.GET.get('brand')
     model = request.GET.get('model')
     search_text = request.GET.get('search_text')
+    oem_search = request.GET.get('oem_search')
 
     # Brend, kateqoriya və marka üçün dəqiq filtrasiya
     if category:
@@ -56,18 +60,27 @@ def butun_mehsullar(request):
     # Axtarış mətni varsa
     if search_text:
         # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
-        import re
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_text)
         
-        # Yalnız OEM kodlarında axtarış
+        # OEM kodlarında axtarış
         mehsullar = mehsullar.filter(oem_kodlar__kod__icontains=clean_search).distinct()
     
-    context = {
+    # Xüsusi OEM axtarışı
+    if oem_search:
+        # Xüsusi simvolları təmizlə
+        clean_oem = re.sub(r'[^a-zA-Z0-9]', '', oem_search)
+        
+        # OEM kodları ilə genişləndirilmiş axtarış
+        mehsullar = mehsullar.filter(
+            Q(oem_kodlar__kod__icontains=clean_oem) |
+            Q(adi__icontains=oem_search) |
+            Q(brend_kod__icontains=oem_search)
+        ).distinct()
+
+    return render(request, 'mehsullar.html', {
         'mehsullar': mehsullar,
         'kateqoriyalar': kateqoriyalar,
         'brendler': brendler,
         'markalar': markalar
-    }
-    
-    return render(request, 'mehsullar.html', context)
+    })
 

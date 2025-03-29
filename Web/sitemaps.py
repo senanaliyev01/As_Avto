@@ -61,20 +61,31 @@ class MehsulSitemap(Sitemap):
                 else:
                     latest_lastmod = max(latest_lastmod, lastmod)
 
+            # XML-safe clean strings for location and other attrs
+            loc = str(loc).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&apos;')
+
             url_info = {
                 'item': item,
                 'location': loc,
                 'lastmod': lastmod,
                 'changefreq': self._get('changefreq', item),
                 'priority': str(priority if priority is not None else ''),
+                'is_sitemap_item': True  # sitemap öğesi olduğunu belirtmek için
             }
 
-            # Şəkil məlumatlarını əlavə edirik
+            # Şəkil məlumatlarını əlavə edirik - güvenli string formatlamalarla
             if hasattr(item, 'sekil') and item.sekil:
+                img_loc = f"{protocol}://{domain}{item.sekil.url}"
+                img_loc = str(img_loc).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&apos;')
+                
+                title = str(item.adi).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&apos;')
+                caption = f"{title} - {item.brend.adi} - {item.brend_kod} - {item.oem}"
+                caption = caption.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&apos;')
+                
                 url_info['images'] = [{
-                    'loc': f"{protocol}://{domain}{item.sekil.url}",
-                    'title': item.adi,
-                    'caption': f"{item.adi} - {item.brend.adi} - {item.brend_kod} - {item.oem}"
+                    'loc': img_loc,
+                    'title': title,
+                    'caption': caption
                 }]
 
             urls.append(url_info)

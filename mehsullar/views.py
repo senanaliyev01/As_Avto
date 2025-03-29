@@ -651,20 +651,3 @@ def realtime_search(request):
         })
     
     return JsonResponse({'results': results})
-
-def mehsullar(request):
-    """
-    Bütün məhsulları göstərən səhifə. İstifadəçi giriş etməyə ehtiyacı yoxdur.
-    Bu səhifə tünd göy rəng sxemində professional dizayn edir, 
-    cədvəl şəklində bütün məhsulları göstərir və
-    sol və sağ tərəfdə brend şəkilləri slide edir.
-    """
-    mehsullar = Mehsul.objects.all()
-    brendler = Brend.objects.all()
-    
-    context = {
-        'mehsullar': mehsullar,
-        'brendler': brendler,
-    }
-    
-    return render(request, 'mehsullar.html', context)

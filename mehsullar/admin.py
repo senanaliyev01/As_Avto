@@ -282,8 +282,8 @@ class MehsulAdmin(admin.ModelAdmin):
                                     existing_product.haqqinda = str(row['haqqinda'])
                                 
                                 if 'oem' in row and pd.notna(row['oem']):
-                                    # Əvvəlcə string'ə çevir, sonra əvəz et
-                                    oem_value = str(row['oem']).replace('/', '-')
+                                    # Əvvəlcə string'ə çevir, sonra / və boşluq simvollarını - ilə əvəz et
+                                    oem_value = str(row['oem']).replace('/', '-').replace(' ', '-')
                                     existing_product.oem = oem_value
                                 
                                 existing_product.save()
@@ -307,7 +307,7 @@ class MehsulAdmin(admin.ModelAdmin):
                                     'brend': brend,
                                     'marka': marka,
                                     'brend_kod': brend_kod,
-                                    'oem': str(row['oem']).replace('/', '-') if 'oem' in row and pd.notna(row['oem']) else '',
+                                    'oem': str(row['oem']).replace('/', '-').replace(' ', '-') if 'oem' in row and pd.notna(row['oem']) else '',
                                     'stok': row['stok'] if 'stok' in row and pd.notna(row['stok']) else 0,
                                     'maya_qiymet': row['maya_qiymet'] if 'maya_qiymet' in row and pd.notna(row['maya_qiymet']) else 0,
                                     'qiymet': row['qiymet'] if 'qiymet' in row and pd.notna(row['qiymet']) else 0,

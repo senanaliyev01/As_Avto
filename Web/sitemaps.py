@@ -32,15 +32,14 @@ class MehsulSitemap(Sitemap):
 
     def location(self, obj):
         # URL-dəki xüsusi simvolları düzgün kodlaşdırırıq
-        # Burada slugify istifadə etmək lazımdır
-        slug_name = slugify(obj.adi)
-        slug_oem = slugify(obj.oem)
-        slug_brand_code = slugify(obj.brend_kod)
+        encoded_name = quote(obj.adi)
+        encoded_oem = quote(obj.oem)
+        encoded_brand_code = quote(obj.brend_kod)
         
         return reverse('mehsul_etrafli', kwargs={
-            'mehsul_adi': slug_name,
-            'mehsul_oem': slug_oem,
-            'mehsul_brend_kod': slug_brand_code,
+            'mehsul_adi': encoded_name,
+            'mehsul_oem': encoded_oem,
+            'mehsul_brend_kod': encoded_brand_code,
             'mehsul_id': obj.id
         })
 

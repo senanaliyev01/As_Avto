@@ -16,15 +16,6 @@ def anaevim(request):
     
     return render(request, 'home.html', context)
 
-def mehsullar(request):
-    mehsullar = Mehsul.objects.all().order_by('-id')  # Ən son əlavə edilən məhsullar əvvəldə
-    
-    context = {
-        'mehsullar': mehsullar,
-    }
-    
-    return render(request, 'mehsullar.html', context)
-
 def mehsul_etrafli(request, mehsul_id, mehsul_adi=None, mehsul_oem=None, mehsul_brend_kod=None):
     mehsul = get_object_or_404(Mehsul, id=mehsul_id)
     

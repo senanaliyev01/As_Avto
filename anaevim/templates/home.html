@@ -213,6 +213,7 @@
             <nav class="header__nav">
                 <ul class="header__menu">
                     <li><a href="#home" class="header__link">Ana Səhifə</a></li>
+                    <li><a href="{% url 'mehsullar' %}" class="header__link">Məhsullar</a></li>
                     <li><a href="#about" class="header__link">Haqqımızda</a></li>
                     <li><a href="#contact" class="header__link">Əlaqə</a></li>
                 </ul>
@@ -328,42 +329,21 @@
         </div>
     </section>
 
-    <!-- Products Section -->
-    <section class="products-section">
+    <!-- Products Slider Section - Removed and moved to mehsullar.html -->
+    <section class="products-banner">
         <div class="container">
-            <h2 class="section__title">Məhsullarımız</h2>
-            <div class="text-center" style="margin-top: var(--spacing-xl);">
-                <a href="{% url 'mehsullar' %}" class="btn" style="background-color: var(--color-primary); color: var(--color-white); padding: var(--spacing-sm) var(--spacing-lg); font-size: var(--font-size-lg);">
-                    Bütün Məhsulları Gör
-                    <i class="fas fa-arrow-right" style="margin-left: var(--spacing-sm);"></i>
+            <div class="products-banner__content">
+                <h2 class="section__title">Məhsullarımız</h2>
+                <p class="products-banner__text">
+                    Avtomobiliniz üçün yüksək keyfiyyətli ehtiyat hissələri, filtrləri və yağları.
+                </p>
+                <a href="{% url 'mehsullar' %}" class="btn btn--primary btn--lg">
+                    Bütün Məhsullar
+                    <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
         </div>
     </section>
-
-    <style>
-        .text-center {
-            text-align: center;
-        }
-        
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            text-decoration: none;
-            border-radius: var(--border-radius-md);
-            transition: all var(--transition-fast);
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-        
-        .products-section {
-            padding: var(--spacing-2xl) 0;
-            background-color: var(--color-gray-50);
-        }
-    </style>
 
     <!-- Features Section -->
     <section class="features">

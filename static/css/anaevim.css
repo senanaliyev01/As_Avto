@@ -391,8 +391,8 @@ button {
 }
 
 .feature__text {
-    color: var(--color-gray-400);
-    font-size: var(--font-size-sm);
+    color: var(--color-gray-600);
+    line-height: 1.6;
 }
 
 /* Section Titles */
@@ -1422,4 +1422,45 @@ tr:nth-child(even) {
 tr:hover {
     background: rgba(13, 71, 161, 0.3);
     transition: background 0.3s ease;
+}
+
+/* Products Banner */
+.products-banner {
+    padding: var(--spacing-3xl) 0;
+    background-color: var(--color-gray-100);
+    background-image: linear-gradient(135deg, rgba(15, 23, 42, 0.05) 0%, rgba(59, 130, 246, 0.1) 100%);
+}
+
+.products-banner__content {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.products-banner__text {
+    color: var(--color-gray-700);
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-xl);
+    line-height: 1.7;
+}
+
+.btn--lg {
+    padding: var(--spacing-md) var(--spacing-xl);
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    gap: var(--spacing-md);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn--lg:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn--lg i {
+    transition: transform 0.3s ease;
+}
+
+.btn--lg:hover i {
+    transform: translateX(5px);
 }

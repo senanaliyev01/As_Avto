@@ -141,14 +141,6 @@ class Mehsul(models.Model):
     def save(self, *args, **kwargs):
         if not self.sekil:
             self.sekil = 'mehsul_sekilleri/noimage.webp'
-        
-        # "/" işarəsini "-" ilə əvəz etmək
-        if self.adi and '/' in self.adi:
-            self.adi = self.adi.replace('/', '-')
-        
-        if self.oem and '/' in self.oem:
-            self.oem = self.oem.replace('/', '-')
-            
         super().save(*args, **kwargs)
 
 class Sebet(models.Model):

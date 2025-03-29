@@ -53,6 +53,7 @@
             <nav class="header__nav">
                 <ul class="header__menu">
                     <li><a href="{% url 'anaevim' %}" class="header__link">Ana Səhifə</a></li>
+                    <li><a href="{% url 'mehsullar' %}" class="header__link">Məhsullar</a></li>
                     <li><a href="{% url 'anaevim' %}#about" class="header__link">Haqqımızda</a></li>
                     <li><a href="{% url 'anaevim' %}#contact" class="header__link">Əlaqə</a></li>
                 </ul>
@@ -88,22 +89,29 @@
     </section>
 
     <!-- Brands Slider -->
-    <section class="brands-slider">
-        <div class="container">
-            <div class="slider-container">
-                <div class="slider-wrapper">
-                    <div class="slider-track">
-                        {% for brend in brendler %}
-                            {% if brend.sekil %}
-                            <div class="slider-item">
-                                <div class="brand-card">
-                                    <div class="brand-card__image">
-                                        <img src="{{ brend.sekil.url }}" alt="{{ brend.adi }}">
+    <section class="products-slider">
+        <div class="full-width-container">
+            <!-- Brendlər -->
+            <div class="slider-section" id="brands-slider">
+                <h2 class="section__title">Brendlərimiz</h2>
+                <div class="slider-container">
+                    <div class="slider-wrapper">
+                        <div class="slider-track">
+                            {% for brend in brendler %}
+                                {% if brend.sekil %}
+                                <div class="slider-item">
+                                    <div class="product-card">
+                                        <div class="product-card__image">
+                                            <img src="{{ brend.sekil.url }}" alt="{{ brend.adi }}">
+                                        </div>
+                                        <div class="product-card__content">
+                                            <h3 class="product-card__title">{{ brend.adi }}</h3>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            {% endif %}
-                        {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
             </div>

@@ -142,18 +142,26 @@ class Mehsul(models.Model):
         # adi sahəsində xüsusi simvolları və boşluqları - ilə əvəz edirik
         if self.adi:
             import re
-            # 1. Bütün xüsusi simvolları və boşluqları - ilə əvəz edirik
-            adi_temp = re.sub(r'[^\w]|[\s]', '-', str(self.adi))
-            # 2. Ardıcıl - simvollarını bir dənə - ilə əvəz edirik
-            self.adi = re.sub(r'-+', '-', adi_temp)
+            # 1. Əvvəlcə başdakı və sondakı boşluqları təmizləyirik
+            adi_temp = str(self.adi).strip()
+            # 2. Bütün xüsusi simvolları və boşluqları - ilə əvəz edirik
+            adi_temp = re.sub(r'[^\w]|[\s]', '-', adi_temp)
+            # 3. Ardıcıl - simvollarını bir dənə - ilə əvəz edirik
+            adi_temp = re.sub(r'-+', '-', adi_temp)
+            # 4. Əgər başda və sonda - simvolu varsa, onları silirik
+            self.adi = adi_temp.strip('-')
             
         # oem sahəsində xüsusi simvolları və boşluqları təmizləyirik
         if self.oem:
             import re
-            # 1. Bütün xüsusi simvolları və boşluqları - ilə əvəz edirik
-            oem_temp = re.sub(r'[^\w]|[\s]', '-', str(self.oem))
-            # 2. Ardıcıl - simvollarını bir dənə - ilə əvəz edirik
-            self.oem = re.sub(r'-+', '-', oem_temp)
+            # 1. Əvvəlcə başdakı və sondakı boşluqları təmizləyirik
+            oem_temp = str(self.oem).strip()
+            # 2. Bütün xüsusi simvolları və boşluqları - ilə əvəz edirik
+            oem_temp = re.sub(r'[^\w]|[\s]', '-', oem_temp)
+            # 3. Ardıcıl - simvollarını bir dənə - ilə əvəz edirik
+            oem_temp = re.sub(r'-+', '-', oem_temp) 
+            # 4. Əgər başda və sonda - simvolu varsa, onları silirik
+            self.oem = oem_temp.strip('-')
             
         if not self.sekil:
             self.sekil = 'mehsul_sekilleri/noimage.webp'

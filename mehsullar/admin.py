@@ -257,8 +257,6 @@ class MehsulAdmin(admin.ModelAdmin):
                                 if 'adi' in row and pd.notna(row['adi']):
                                     # Bütün xüsusi simvolları - ilə əvəz edirik
                                     adi_value = re.sub(r'[^\w\s]', '-', str(row['adi']))
-                                    # Boşluqları da - ilə əvəz edirik
-                                    adi_value = re.sub(r'\s+', '-', adi_value)
                                     existing_product.adi = adi_value
                                 if kateqoriya:
                                     existing_product.kateqoriya = kateqoriya
@@ -305,7 +303,7 @@ class MehsulAdmin(admin.ModelAdmin):
                             else:
                                 # Əsas sahələri hazırla
                                 mehsul_data = {
-                                    'adi': re.sub(r'\s+', '-', re.sub(r'[^\w\s]', '-', str(row['adi']))) if 'adi' in row and pd.notna(row['adi']) else '',
+                                    'adi': re.sub(r'[^\w\s]', '-', str(row['adi'])) if 'adi' in row and pd.notna(row['adi']) else '',
                                     'kateqoriya': kateqoriya,
                                     'brend': brend,
                                     'marka': marka,

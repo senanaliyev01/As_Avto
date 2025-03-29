@@ -524,9 +524,9 @@ def generate_pdf(sifaris, sifaris_mehsullari, profile):
     elements.append(Paragraph("<br/><br/>", styles['Normal']))  # Boşluq əlavə et
 
     # Cədvəl yaradılması
-    data = [['№', 'Adı', '№', 'Brend', 'KOD', 'Say', 'Qiymət', 'Cəmi']]
+    data = [['№', 'Adı',  'Brend', 'KOD', 'Say', 'Qiymət', 'Cəmi']]
     for index, mehsul in enumerate(sifaris_mehsullari, start=1):
-        data.append([index, mehsul.mehsul.adi, mehsul.mehsul.brend.adi, mehsul.mehsul.brend_kod, mehsul.mehsul.oem, mehsul.miqdar, f"{mehsul.qiymet} AZN", f"{mehsul.cemi} AZN"])
+        data.append([index, mehsul.mehsul.adi, mehsul.mehsul.brend.adi, mehsul.mehsul.oem, mehsul.miqdar, f"{mehsul.qiymet} AZN", f"{mehsul.cemi} AZN"])
 
     # Cədvəl yaradılması
     table = Table(data)  # Sütun genişliklərini təyin etmədən cədvəl yaradın

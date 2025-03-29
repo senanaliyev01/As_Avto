@@ -1543,7 +1543,7 @@ tr:hover {
 
 .products-grid .product-card {
     height: 100%;
-    background-color: var(--color-white);
+    /* background-color: var(--color-white); */
     border-radius: var(--border-radius-lg);
     overflow: hidden;
     box-shadow: var(--shadow-md);
@@ -1585,12 +1585,12 @@ tr:hover {
     font-size: var(--font-size-lg);
     font-weight: 600;
     margin-bottom: var(--spacing-md);
-    color: var(--color-primary);
+    color: var(--color-gray-50);
 }
 
 .products-grid .product-card__description {
     font-size: var(--font-size-sm);
-    color: var(--color-gray-600);
+    color: var(--color-gray-50);
     margin-bottom: var(--spacing-xs);
 }
 

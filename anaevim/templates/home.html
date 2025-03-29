@@ -213,7 +213,6 @@
             <nav class="header__nav">
                 <ul class="header__menu">
                     <li><a href="#home" class="header__link">Ana Səhifə</a></li>
-                    <li><a href="{% url 'mehsullar' %}" class="header__link">Məhsullar</a></li>
                     <li><a href="#about" class="header__link">Haqqımızda</a></li>
                     <li><a href="#contact" class="header__link">Əlaqə</a></li>
                 </ul>
@@ -329,35 +328,42 @@
         </div>
     </section>
 
-    <!-- Products Slider Section -->
-    <section class="products-slider">
-        <div class="full-width-container">
-            <!-- Brendlər -->
-            <div class="slider-section" id="brands-slider">
-                <h2 class="section__title">Brendlərimiz</h2>
-                <div class="slider-container">
-                    <div class="slider-wrapper">
-                        <div class="slider-track">
-                            {% for brend in brendler %}
-                                {% if brend.sekil %}
-                                <div class="slider-item">
-                                    <div class="product-card">
-                                        <div class="product-card__image">
-                                            <img src="{{ brend.sekil.url }}" alt="{{ brend.adi }}">
-                                        </div>
-                                        <div class="product-card__content">
-                                            <h3 class="product-card__title">{{ brend.adi }}</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
+    <!-- Products Section -->
+    <section class="products-section">
+        <div class="container">
+            <h2 class="section__title">Məhsullarımız</h2>
+            <div class="text-center" style="margin-top: var(--spacing-xl);">
+                <a href="{% url 'mehsullar' %}" class="btn" style="background-color: var(--color-primary); color: var(--color-white); padding: var(--spacing-sm) var(--spacing-lg); font-size: var(--font-size-lg);">
+                    Bütün Məhsulları Gör
+                    <i class="fas fa-arrow-right" style="margin-left: var(--spacing-sm);"></i>
+                </a>
             </div>
         </div>
     </section>
+
+    <style>
+        .text-center {
+            text-align: center;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+            border-radius: var(--border-radius-md);
+            transition: all var(--transition-fast);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .products-section {
+            padding: var(--spacing-2xl) 0;
+            background-color: var(--color-gray-50);
+        }
+    </style>
 
     <!-- Features Section -->
     <section class="features">
@@ -486,7 +492,6 @@
                         <h3>Sürətli Keçid</h3>
                         <ul>
                             <li><a href="#home">Ana Səhifə</a></li>
-                            <li><a href="{% url 'mehsullar' %}">Məhsullar</a></li>
                             <li><a href="#about">Haqqımızda</a></li>
                             <li><a href="#contact">Əlaqə</a></li>
                             <li><a href="{% url 'login' %}">B4B Giriş</a></li>

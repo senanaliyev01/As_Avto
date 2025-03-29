@@ -17,7 +17,7 @@ def anaevim(request):
     return render(request, 'home.html', context)
 
 def mehsullar(request):
-    mehsullar = Mehsul.objects.all()
+    mehsullar = Mehsul.objects.all().order_by('-id')  # Ən son əlavə edilən məhsullar əvvəldə
     
     context = {
         'mehsullar': mehsullar,

@@ -7,69 +7,28 @@
     <title>Məhsullar | AS-AVTO</title>
     
     <!-- CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/anaevim.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header__container container">
-            <a href="{% url 'anaevim' %}" class="header__logo">
-                <img src="{% static 'img/Header_Logo.png' %}" alt="AS AVTO Logo">
-            </a>
-            
-            <nav class="header__nav">
-                <ul class="header__menu">
-                    <li><a href="{% url 'anaevim' %}" class="header__link">Ana Səhifə</a></li>
-                    <li><a href="{% url 'mehsullar' %}" class="header__link active">Məhsullar</a></li>
-                    <li><a href="{% url 'anaevim' %}#about" class="header__link">Haqqımızda</a></li>
-                    <li><a href="{% url 'anaevim' %}#contact" class="header__link">Əlaqə</a></li>
-                </ul>
-                <div class="header__actions">
-                    <a href="{% url 'register' %}" class="btn btn--primary btn--register">
-                        <i class="fas fa-sign-in-alt"></i>
-                        <span>B4B Qeydiyyat</span>
-                    </a>
-                </div>
-
-                <div class="header__actions">
-                    <a href="{% url 'login' %}" class="btn btn--primary btn--login">
-                        <i class="fas fa-sign-in-alt"></i>
-                        <span>B4B Giriş</span>
-                    </a>
-                </div>
-            </nav>
-
-            <button class="header__toggle" aria-label="Menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-        </div>
-    </header>
-    
-    <!-- Products Page Content -->
-    <main class="products-page">
-        <div class="container">
-            <div class="products-header">
-                <h1>Bütün Məhsullar</h1>
-                <div class="search-bar">
-                    <input type="text" id="searchInput" placeholder="Məhsul axtar...">
-                    <button id="searchButton">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <table class="products-table" id="productsTable">
+    <div class="container" style="margin-top: var(--spacing-xl);">
+        <h1 class="section__title" style="color: var(--color-primary);">Bütün Məhsullar</h1>
+        
+        <div class="table-container" style="margin-top: var(--spacing-xl);">
+            <table>
                 <thead>
-                    <tr>
+                    <tr style="background-color: var(--color-primary); color: var(--color-white);">
                         <th>Şəkil</th>
-                        <th>Məhsul</th>
+                        <th>Məhsul Adı</th>
                         <th>Marka</th>
+                        <th>Model</th>
                         <th>Brend</th>
-                        <th>Brend Kodu</th>
-                        <th>OEM Kodu</th>
+                        <th>OEM</th>
                         <th>Qiymət</th>
                         <th>Ətraflı</th>
                     </tr>
@@ -78,133 +37,62 @@
                     {% for mehsul in mehsullar %}
                     <tr>
                         <td>
-                            {% if mehsul.sekil %}
-                            <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image">
-                            {% else %}
-                            <div class="no-image">Şəkil yoxdur</div>
-                            {% endif %}
+                            <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" style="width: 100px; height: auto;">
                         </td>
-                        <td class="product-name">{{ mehsul.adi }}</td>
+                        <td>{{ mehsul.adi }}</td>
                         <td>{{ mehsul.marka.adi }}</td>
+                        <td>{{ mehsul.model.adi }}</td>
                         <td>{{ mehsul.brend.adi }}</td>
-                        <td>{{ mehsul.brend_kod }}</td>
                         <td>{{ mehsul.oem }}</td>
-                        <td>{{ mehsul.formatted_qiymet }} ₼</td>
+                        <td>{{ mehsul.formatted_qiymet }} AZN</td>
                         <td>
-                            <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="btn-details">
+                            <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" 
+                               class="btn" 
+                               style="background-color: var(--color-primary); color: var(--color-white); padding: var(--spacing-xs) var(--spacing-sm);">
                                 Ətraflı
-                                <i class="fas fa-arrow-right"></i>
                             </a>
                         </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="8" style="text-align: center; padding: 2rem;">Məhsul tapılmadı</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-    </main>
-    
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer__top">
-            <div class="container">
-                <div class="footer__grid">
-                    <div class="footer__brand">
-                         <img src="{% static 'img/Header_Logo.png' %}" alt="AS AVTO Logo">
-                        <p>Azərbaycanın avtomobil ehtiyat hissələri bazarında 10 ildən artıq təcrübə</p>
-                        <div class="footer__social">
-                            <a href="https://wa.me/994773059585" target="_blank" rel="noopener" aria-label="WhatsApp">
-                                <i class="fab fa-whatsapp"></i>
-                            </a>
-                            <a href="https://www.tiktok.com/@as_avto_service" target="_blank" rel="noopener" aria-label="TikTok">
-                                <i class="fab fa-tiktok"></i>
-                            </a>
-                        </div>
-                    </div>
+    </div>
 
-                    <div class="footer__links">
-                        <h3>Sürətli Keçid</h3>
-                        <ul>
-                            <li><a href="{% url 'anaevim' %}">Ana Səhifə</a></li>
-                            <li><a href="{% url 'mehsullar' %}">Məhsullar</a></li>
-                            <li><a href="{% url 'anaevim' %}#about">Haqqımızda</a></li>
-                            <li><a href="{% url 'anaevim' %}#contact">Əlaqə</a></li>
-                            <li><a href="{% url 'login' %}">B4B Giriş</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="footer__contact">
-                        <h3>Əlaqə Məlumatları</h3>
-                        <ul>
-                            <li>
-                                <i class="fas fa-phone"></i>
-                                <a href="tel:+994773059585">+994 77 305 95 85</a>
-                            </li>
-                            <li>
-                                <i class="fas fa-envelope"></i>
-                                <a href="mailto:as.avto.2025@gmail.com">as.avto.2025@gmail.com</a>
-                            </li>
-                            <li>
-                                <i class="fas fa-clock"></i>
-                                <span>Bazar ertəsi - Bazar: 09:00 - 18:00</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="footer__bottom">
-            <div class="container">
-                <p>&copy; 2024-2025 AS AVTO. Bütün hüquqlar qorunur.</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Scripts -->
-    <script src="{% static 'js/anaevim.js' %}"></script>
-    <script>
-        // Axtarış funksionalı
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('searchInput');
-            const searchButton = document.getElementById('searchButton');
-            const table = document.getElementById('productsTable');
-            const rows = table.getElementsByTagName('tr');
-            
-            function searchProducts() {
-                const searchTerm = searchInput.value.toLowerCase();
-                
-                for (let i = 1; i < rows.length; i++) {
-                    let found = false;
-                    const cells = rows[i].getElementsByTagName('td');
-                    
-                    for (let j = 0; j < cells.length; j++) {
-                        const cellText = cells[j].textContent || cells[j].innerText;
-                        
-                        if (cellText.toLowerCase().indexOf(searchTerm) > -1) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    
-                    rows[i].style.display = found ? '' : 'none';
-                }
-            }
-            
-            searchButton.addEventListener('click', searchProducts);
-            
-            searchInput.addEventListener('keyup', function(event) {
-                if (event.key === 'Enter') {
-                    searchProducts();
-                }
-            });
-            
-            // Real-time axtarış
-            searchInput.addEventListener('input', searchProducts);
-        });
-    </script>
+    <style>
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--color-white);
+            box-shadow: var(--shadow-md);
+            border-radius: var(--border-radius-lg);
+        }
+        
+        th, td {
+            padding: var(--spacing-md);
+            text-align: left;
+            border-bottom: 1px solid var(--color-gray-200);
+        }
+        
+        tr:hover {
+            background-color: var(--color-gray-50);
+        }
+        
+        .btn {
+            display: inline-block;
+            text-decoration: none;
+            border-radius: var(--border-radius-md);
+            transition: background-color var(--transition-fast);
+        }
+        
+        .btn:hover {
+            background-color: var(--color-primary) !important;
+            opacity: 0.9;
+        }
+    </style>
 </body>
 </html> 

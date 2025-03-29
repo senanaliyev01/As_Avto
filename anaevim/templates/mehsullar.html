@@ -11,6 +11,7 @@
     <meta name="keywords" content="avtomobil hissələri, ehtiyat hissələri, avto hissələr, as-avto, avtomobil, filter, yağ, yanacaq, Azərbaycan, Bakı">
     <meta name="author" content="AS-Avto">
     <meta name="robots" content="index, follow">
+    <meta name="revisit-after" content="1 days">
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="128x128" href="{% static 'img/favicon.png' %}">
@@ -25,519 +26,641 @@
     <link rel="stylesheet" href="{% static 'css/anaevim.css' %}">
     
     <style>
-        :root {
-            --primary-color: #0f3460;
-            --secondary-color: #16213e;
-            --accent-color: #1e3a8a;
-            --text-color: #333;
-            --text-light: #666;
-            --bg-light: #f8f9fa;
-            --bg-dark: #0a192f;
-            --white: #ffffff;
-            --border-color: #e2e8f0;
-            --hover-color: #2563eb;
-        }
-        
+        /* Məhsullar səhifəsi üçün xüsusi CSS */
         body {
-            background-color: var(--bg-light);
-            color: var(--text-color);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: #333;
         }
         
-        .header {
-            background-color: var(--primary-color);
-        }
-        
-        .header__menu .header__link {
-            color: var(--white);
-        }
-        
-        .header__menu .header__link:hover {
-            color: #e2e8f0;
-        }
-        
-        .btn--primary {
-            background-color: var(--accent-color);
-        }
-        
-        .btn--primary:hover {
-            background-color: var(--hover-color);
-        }
-        
-        .products-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            padding: 20px;
+        .container {
             max-width: 1200px;
             margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        header {
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header__container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+        
+        .header__logo img {
+            height: 50px;
+        }
+        
+        .search-section {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
         
         .search-container {
-            padding: 20px;
-            background-color: var(--primary-color);
-            color: var(--white);
-            border-radius: 8px;
-            max-width: 1200px;
-            margin: 20px auto;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        
-        .search-form {
             display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
+            max-width: 800px;
+            margin: 0 auto;
         }
         
-        .search-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            width: 100%;
-        }
-        
-        .search-group {
+        .search-input {
             flex: 1;
-            min-width: 150px;
-        }
-        
-        .search-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: var(--white);
-        }
-        
-        .search-group input,
-        .search-group select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 14px;
-            background-color: var(--white);
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            font-size: 16px;
+            outline: none;
         }
         
         .search-button {
-            background-color: var(--accent-color);
+            padding: 12px 20px;
+            background-color: #e53935;
             color: white;
-            padding: 10px 15px;
             border: none;
-            border-radius: 4px;
+            border-radius: 0 4px 4px 0;
             cursor: pointer;
-            font-weight: 600;
+            font-size: 16px;
             transition: background-color 0.3s;
-            flex-shrink: 0;
         }
         
         .search-button:hover {
-            background-color: var(--hover-color);
+            background-color: #d32f2f;
+        }
+        
+        .search-tip {
+            margin-top: 10px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .filters-section {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .filters-title {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .filter-group {
+            margin-bottom: 15px;
+        }
+        
+        .filter-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .filter-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fff;
+            font-size: 14px;
+        }
+        
+        .filter-button {
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+        
+        .filter-button:hover {
+            background-color: #555;
+        }
+        
+        .products-section {
+            margin: 20px 0;
+        }
+        
+        .products-title {
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
         }
         
         .product-card {
-            border: 1px solid var(--border-color);
+            background-color: #fff;
             border-radius: 8px;
             overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             transition: transform 0.3s, box-shadow 0.3s;
-            background-color: white;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
         }
         
         .product-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
-        .product-card__image {
+        .product-image {
             height: 200px;
-            overflow: hidden;
-            background-color: var(--white);
+            background-color: #f9f9f9;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
         }
         
-        .product-card__image img {
+        .product-image img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
-            transition: transform 0.3s;
         }
         
-        .product-card:hover .product-card__image img {
-            transform: scale(1.05);
-        }
-        
-        .product-card__content {
+        .product-content {
             padding: 15px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
         }
         
-        .product-card__title {
+        .product-title {
+            margin-top: 0;
+            margin-bottom: 10px;
             font-size: 16px;
             font-weight: 600;
-            margin-bottom: 10px;
-            color: var(--text-color);
         }
         
-        .product-card__description {
-            font-size: 14px;
-            color: var(--text-light);
+        .product-info {
             margin-bottom: 5px;
+            font-size: 14px;
         }
         
-        .product-card__button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            margin-top: auto;
-            padding: 8px 15px;
-            background-color: var(--primary-color);
+        .product-price {
+            font-weight: 600;
+            color: #e53935;
+            margin: 10px 0;
+        }
+        
+        .product-button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #e53935;
             color: white;
-            text-decoration: none;
+            text-align: center;
+            border: none;
             border-radius: 4px;
-            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
             font-weight: 500;
             transition: background-color 0.3s;
         }
         
-        .product-card__button:hover {
-            background-color: var(--hover-color);
+        .product-button:hover {
+            background-color: #d32f2f;
         }
         
         .no-results {
             text-align: center;
-            padding: 40px;
-            font-size: 18px;
-            color: var(--text-light);
+            padding: 50px;
+            color: #666;
         }
         
-        .section-title {
-            text-align: center;
-            margin: 30px 0;
-            font-size: 28px;
-            color: var(--primary-color);
-            font-weight: 600;
+        .no-results i {
+            font-size: 48px;
+            margin-bottom: 10px;
+            color: #999;
         }
         
-        .footer {
-            background-color: var(--primary-color);
-            color: var(--white);
+        footer {
+            background-color: #333;
+            color: #fff;
+            padding: 40px 0 20px;
+            margin-top: 40px;
         }
         
-        .footer__link {
-            color: var(--white);
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 20px;
         }
         
-        .footer__title {
-            color: var(--white);
-        }
-        
-        .loader {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid var(--primary-color);
-            border-radius: 50%;
-            width: 50px;
+        .footer-logo img {
             height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 30px auto;
-            display: none;
+            margin-bottom: 15px;
         }
         
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .footer-description {
+            color: #ddd;
+            line-height: 1.6;
         }
         
+        .footer-heading {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+        
+        .footer-links a {
+            display: block;
+            color: #ddd;
+            text-decoration: none;
+            margin-bottom: 8px;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: #fff;
+        }
+        
+        .footer-contact a {
+            display: flex;
+            align-items: center;
+            color: #ddd;
+            text-decoration: none;
+            margin-bottom: 10px;
+            transition: color 0.3s;
+        }
+        
+        .footer-contact a:hover {
+            color: #fff;
+        }
+        
+        .footer-contact i {
+            margin-right: 10px;
+            min-width: 20px;
+        }
+        
+        .footer-social {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .footer-social a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            color: #fff;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .footer-social a:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #999;
+            font-size: 14px;
+        }
+        
+        .footer-bottom a {
+            color: #ddd;
+            text-decoration: none;
+        }
+        
+        /* Responsive */
         @media (max-width: 768px) {
-            .search-row {
+            .header__container {
+                flex-direction: column;
+                padding: 10px 0;
+            }
+            
+            .header__logo {
+                margin-bottom: 10px;
+            }
+            
+            .search-container {
                 flex-direction: column;
             }
             
-            .search-group {
-                width: 100%;
+            .search-input {
+                border-radius: 4px;
+                margin-bottom: 10px;
             }
+            
+            .search-button {
+                border-radius: 4px;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            }
+        }
+        
+        /* Stok statusu */
+        .stock-status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .in-stock {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+        
+        .low-stock {
+            background-color: #fff8e1;
+            color: #f57c00;
+        }
+        
+        .out-of-stock {
+            background-color: #ffebee;
+            color: #d32f2f;
         }
     </style>
 </head>
 <body>
     <!-- Header -->
-    <header class="header">
+    <header>
         <div class="header__container container">
             <a href="{% url 'anaevim' %}" class="header__logo">
                 <img src="{% static 'img/Header_Logo.png' %}" alt="AS AVTO Logo">
             </a>
-            
-            <nav class="header__nav">
-                <ul class="header__menu">
-                    <li><a href="{% url 'anaevim' %}" class="header__link">Ana Səhifə</a></li>
-                    <li><a href="{% url 'mehsullar' %}" class="header__link">Məhsullar</a></li>
-                    <li><a href="#about" class="header__link">Haqqımızda</a></li>
-                    <li><a href="#contact" class="header__link">Əlaqə</a></li>
-                </ul>
-                <div class="header__actions">
-                    <a href="{% url 'register' %}" class="btn btn--primary btn--register">
-                        <i class="fas fa-sign-in-alt"></i>
-                        <span>B4B Qeydiyyat</span>
-                    </a>
-                </div>
-
-                <div class="header__actions">
-                    <a href="{% url 'login' %}" class="btn btn--primary btn--login">
-                        <i class="fas fa-sign-in-alt"></i>
-                        <span>B4B Giriş</span>
-                    </a>
-                </div>
-            </nav>
-
-            <button class="header__toggle" aria-label="Menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main>
+    <div class="container">
         <!-- Search Section -->
         <section class="search-section">
             <div class="search-container">
-                <h2 class="section-title" style="color: white;">Məhsul Axtarışı</h2>
-                <form class="search-form" id="searchForm" method="GET" action="{% url 'mehsullar' %}">
-                    <div class="search-row">
-                        <div class="search-group">
-                            <label for="category">Kateqoriya:</label>
-                            <select id="category" name="category" class="search-filter">
-                                <option value="">Bütün Kateqoriyalar</option>
-                                {% for kateqoriya in kateqoriyalar %}
-                                    <option value="{{ kateqoriya.adi }}" 
-                                            {% if request.GET.category == kateqoriya.adi %}selected{% endif %}>
-                                        {{ kateqoriya.adi }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <div class="search-group">
-                            <label for="brand">Brend:</label>
-                            <select id="brand" name="brand" class="search-filter">
-                                <option value="">Bütün Brendlər</option>
-                                {% for brend in brendler %}
-                                    <option value="{{ brend.adi }}" 
-                                            {% if request.GET.brand == brend.adi %}selected{% endif %}>
-                                        {{ brend.adi }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <div class="search-group">
-                            <label for="model">Marka:</label>
-                            <select id="model" name="model" class="search-filter">
-                                <option value="">Bütün Markalar</option>
-                                {% for marka in markalar %}
-                                    <option value="{{ marka.adi }}" 
-                                            {% if request.GET.model == marka.adi %}selected{% endif %}>
-                                        {{ marka.adi }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <div class="search-group">
-                            <label for="oem_search">OEM Kodu:</label>
-                            <input type="text" id="oem_search" name="search_text" 
-                                   placeholder="OEM kodu daxil edin" 
-                                   value="{{ request.GET.search_text }}"
-                                   class="search-filter">
-                        </div>
-                    </div>
-                </form>
+                <input type="text" id="search-input" class="search-input" placeholder="Məhsul adı, OEM kodu və ya brend kodu daxil edin...">
+                <button id="search-button" class="search-button">
+                    <i class="fas fa-search"></i> Axtar
+                </button>
             </div>
+            <p class="search-tip">OEM kodu ilə axtarış etdikdə daha dəqiq nəticələr əldə edə bilərsiniz.</p>
+        </section>
+
+        <!-- Filters Section -->
+        <section class="filters-section">
+            <h3 class="filters-title">Filterlər</h3>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label for="category-filter" class="filter-label">Kateqoriya</label>
+                    <select id="category-filter" class="filter-select">
+                        <option value="">Hamısı</option>
+                        {% for kateqoriya in kateqoriyalar %}
+                            <option value="{{ kateqoriya.adi }}">{{ kateqoriya.adi }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="brand-filter" class="filter-label">Firma</label>
+                    <select id="brand-filter" class="filter-select">
+                        <option value="">Hamısı</option>
+                        {% for brend in brendler %}
+                            <option value="{{ brend.adi }}">{{ brend.adi }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="model-filter" class="filter-label">Avtomobil</label>
+                    <select id="model-filter" class="filter-select">
+                        <option value="">Hamısı</option>
+                        {% for marka in markalar %}
+                            <option value="{{ marka.adi }}">{{ marka.adi }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="stock-filter" class="filter-label">Stok vəziyyəti</label>
+                    <select id="stock-filter" class="filter-select">
+                        <option value="">Hamısı</option>
+                        <option value="in-stock">Var</option>
+                        <option value="low-stock">Az var</option>
+                        <option value="out-of-stock">Yoxdur</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button id="clear-filters" class="filter-button">Filterləri Təmizlə</button>
         </section>
 
         <!-- Products Section -->
         <section class="products-section">
-            <h2 class="section-title">Bütün Məhsullar</h2>
+            <h2 class="products-title">Bütün Məhsullar</h2>
             
-            <div class="loader" id="productsLoader"></div>
-            
-            <div id="productsContainer">
-                {% if mehsullar %}
-                    <div class="products-container">
-                        {% for mehsul in mehsullar %}
-                            {% if mehsul.sekil %}
-                                <div class="product-card">
-                                    <div class="product-card__image">
-                                        <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
-                                    </div>
-                                    <div class="product-card__content">
-                                        <h3 class="product-card__title">{{ mehsul.adi }}</h3>
-                                        <p class="product-card__description">Marka: {{ mehsul.marka.adi }}</p>
-                                        <p class="product-card__description">Brend: {{ mehsul.brend.adi }}</p>
-                                        <p class="product-card__description">№: {{ mehsul.brend_kod }}</p>
-                                        <p class="product-card__description">KOD: {{ mehsul.oem }}</p>
-                                        <p class="product-card__description">Qiymət: {{ mehsul.formatted_qiymet }} ₼</p>
-                                        <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="product-card__button">
-                                            Ətraflı Məlumat
-                                            <i class="fas fa-arrow-right"></i>
-                                        </a>
-                                    </div>
-                                </div>
+            <div id="products-grid" class="products-grid">
+                {% for mehsul in mehsullar %}
+                <div class="product-card" 
+                     data-category="{{ mehsul.kateqoriya }}" 
+                     data-brand="{{ mehsul.brend.adi }}" 
+                     data-model="{{ mehsul.marka.adi }}"
+                     data-stock="{% if mehsul.stok == 0 %}out-of-stock{% elif mehsul.stok <= 20 %}low-stock{% else %}in-stock{% endif %}"
+                     data-name="{{ mehsul.adi }}"
+                     data-oem="{{ mehsul.oem }}"
+                     data-brend-kod="{{ mehsul.brend_kod }}">
+                    <div class="product-image">
+                        {% if mehsul.sekil %}
+                            <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
+                        {% endif %}
+                    </div>
+                    <div class="product-content">
+                        <h3 class="product-title">{{ mehsul.adi }}</h3>
+                        <p class="product-info">Kateqoriya: {{ mehsul.kateqoriya }}</p>
+                        <p class="product-info">Firma: {{ mehsul.brend.adi }}</p>
+                        <p class="product-info">Avtomobil: {{ mehsul.marka.adi }}</p>
+                        <p class="product-info">№: {{ mehsul.brend_kod }}</p>
+                        <p class="product-info">KOD: {{ mehsul.oem }}</p>
+                        <p class="product-price">{{ mehsul.qiymet }} ₼</p>
+                        <p class="product-info">
+                            {% if mehsul.stok == 0 %}
+                                <span class="stock-status out-of-stock">Yoxdur</span>
+                            {% elif mehsul.stok <= 20 %}
+                                <span class="stock-status low-stock">Az var</span>
+                            {% else %}
+                                <span class="stock-status in-stock">Var</span>
                             {% endif %}
-                        {% endfor %}
+                        </p>
+                        <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="product-button">
+                            Ətraflı Məlumat
+                        </a>
                     </div>
-                {% else %}
-                    <div class="no-results">
-                        <p>Axtarış kriteriyalarına uyğun məhsul tapılmadı.</p>
-                    </div>
-                {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- No Results Message -->
+            <div id="no-results" class="no-results" style="display: none;">
+                <i class="fas fa-search"></i>
+                <h3>Heç bir nəticə tapılmadı</h3>
+                <p>Zəhmət olmasa, filter parametrlərini dəyişdirin və ya təmizləyin.</p>
+                <button id="reset-filters" class="filter-button">Filterləri təmizlə</button>
             </div>
         </section>
-    </main>
+    </div>
 
     <!-- Footer -->
-    <footer class="footer">
-        <div class="footer__container container">
-            <div class="footer__content">
-                <div class="footer__info">
-                    <a href="#" class="footer__logo">
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div class="footer-logo">
                         <img src="{% static 'img/Header_Logo.png' %}" alt="AS AVTO Logo">
-                    </a>
-                    <p class="footer__description">
-                        Avtomobil hissələrinin etibarlı təchizatçısı
-                    </p>
-                    <div class="footer__social">
-                        <a href="https://www.tiktok.com/@a_avto_service" class="footer__social-link">
-                            <i class="fab fa-tiktok"></i>
-                        </a>
-                        <a href="https://wa.me/994773059585" class="footer__social-link">
-                            <i class="fab fa-whatsapp"></i>
-                        </a>
+                    </div>
+                    <p class="footer-description">AS-Avto - Avtomobil ehtiyat hissələri üzrə Azərbaycanda lider şirkət. Keyfiyyətli xidmət və məhsullar təqdim edirik.</p>
+                </div>
+                
+                <div>
+                    <h3 class="footer-heading">Faydalı Linklər</h3>
+                    <div class="footer-links">
+                        <a href="{% url 'anaevim' %}">Ana Səhifə</a>
+                        <a href="{% url 'mehsullar' %}">Məhsullar</a>
+                        <a href="#">Haqqımızda</a>
+                        <a href="#">Əlaqə</a>
                     </div>
                 </div>
                 
-                <div class="footer__links">
-                    <h3 class="footer__title">Keçidlər</h3>
-                    <ul class="footer__list">
-                        <li><a href="{% url 'anaevim' %}" class="footer__link">Ana səhifə</a></li>
-                        <li><a href="{% url 'mehsullar' %}" class="footer__link">Məhsullar</a></li>
-                        <li><a href="#about" class="footer__link">Haqqımızda</a></li>
-                        <li><a href="#contact" class="footer__link">Əlaqə</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer__contact" id="contact">
-                    <h3 class="footer__title">Əlaqə</h3>
-                    <ul class="footer__list">
-                        <li class="footer__contact-item">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>Binəqədi R. M.Rəsulzadə qəs. As-Avto</span>
-                        </li>
-                        <li class="footer__contact-item">
-                            <i class="fas fa-phone"></i>
-                            <a href="tel:+994773059585">+994 77 305 95 85</a>
-                        </li>
-                        <li class="footer__contact-item">
-                            <i class="fas fa-envelope"></i>
-                            <a href="mailto:senan.eliyev.9997@gmail.com">senan.eliyev.9997@gmail.com</a>
-                        </li>
-                    </ul>
+                <div>
+                    <h3 class="footer-heading">Əlaqə</h3>
+                    <div class="footer-contact">
+                        <a href="tel:+994702754499"><i class="fa-solid fa-tty"></i>+994 70 275 44 99</a>
+                        <a href="tel:+994773059585"><i class="fas fa-phone-alt"></i>+994 77 305 95 85</a>
+                        <a href="mailto:as.avto.2025@gmail.com"><i class="fas fa-envelope"></i>as.avto.2025@gmail.com</a>
+                        <a href="https://maps.app.goo.gl/fU5jUAg8veccL3Zq9"><i class="fa-solid fa-location-dot"></i>Binəqədi R. M.Rəsulzadə qəs. As-Avto</a>
+                    </div>
+                    
+                    <div class="footer-social">
+                        <a href="https://wa.me/994773059585" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                        <a href="https://www.tiktok.com/@as_avto_service" target="_blank"><i class="fab fa-tiktok"></i></a>
+                        <a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+                    </div>
                 </div>
             </div>
             
-            <div class="footer__bottom">
-                <p class="footer__copyright">
-                    &copy; 2024 AS-AVTO. Bütün hüquqlar qorunur.
-                </p>
+            <div class="footer-bottom">
+                <p>&copy; {% now "Y" %} AS-Avto. Bütün hüquqlar qorunur.</p>
             </div>
         </div>
     </footer>
 
-    <!-- JS -->
-    <script src="{% static 'js/jquery.min.js' %}"></script>
-    <script src="{% static 'js/main.js' %}"></script>
-    
+    <!-- JavaScript -->
     <script>
-        $(document).ready(function() {
-            // Ajax ilə real-time axtarış
-            let searchTimeout;
-            const productsContainer = $('#productsContainer');
-            const loader = $('#productsLoader');
+        document.addEventListener('DOMContentLoaded', function() {
+            // Filter elements
+            const searchInput = document.getElementById('search-input');
+            const categoryFilter = document.getElementById('category-filter');
+            const brandFilter = document.getElementById('brand-filter');
+            const modelFilter = document.getElementById('model-filter');
+            const stockFilter = document.getElementById('stock-filter');
+            const clearFiltersBtn = document.getElementById('clear-filters');
+            const resetFiltersBtn = document.getElementById('reset-filters');
+            const productsGrid = document.getElementById('products-grid');
+            const noResults = document.getElementById('no-results');
+            const searchButton = document.getElementById('search-button');
             
-            // Filter dəyişikliklərini izlə
-            $('.search-filter').on('change keyup', function() {
-                clearTimeout(searchTimeout);
+            // Filter products function
+            function filterProducts() {
+                const searchValue = searchInput.value.toLowerCase();
+                const categoryValue = categoryFilter.value;
+                const brandValue = brandFilter.value;
+                const modelValue = modelFilter.value;
+                const stockValue = stockFilter.value;
                 
-                // Yükləmə göstər
-                loader.show();
+                let visibleProducts = 0;
+                const products = productsGrid.querySelectorAll('.product-card');
                 
-                // Qısa gecikmə ilə axtarışı yerinə yetir (debounce)
-                searchTimeout = setTimeout(function() {
-                    // Form məlumatlarını topla
-                    let formData = $('#searchForm').serialize();
+                products.forEach(product => {
+                    const productName = product.getAttribute('data-name').toLowerCase();
+                    const productOem = product.getAttribute('data-oem').toLowerCase();
+                    const productBrendKod = product.getAttribute('data-brend-kod').toLowerCase();
+                    const productCategory = product.getAttribute('data-category');
+                    const productBrand = product.getAttribute('data-brand');
+                    const productModel = product.getAttribute('data-model');
+                    const productStock = product.getAttribute('data-stock');
                     
-                    // AJAX sorğusunu göndər
-                    $.ajax({
-                        url: '{% url "mehsullar" %}',
-                        type: 'GET',
-                        data: formData,
-                        dataType: 'html',
-                        success: function(response) {
-                            // HTML cavabından məhsullar bölməsini çıxart
-                            let parser = new DOMParser();
-                            let htmlDoc = parser.parseFromString(response, 'text/html');
-                            let newProductsHtml = htmlDoc.getElementById('productsContainer').innerHTML;
-                            
-                            // Məhsullar konteynerini yenilə
-                            productsContainer.html(newProductsHtml);
-                            
-                            // Fade-in effekti ilə yükləmə göstəricisini gizlət
-                            loader.fadeOut(300);
-                            
-                            // URL-i yenilə (tarixçə əlavə etmədən)
-                            window.history.replaceState({}, '', '{% url "mehsullar" %}?' + formData);
-                        },
-                        error: function(error) {
-                            console.error('Axtarış zamanı xəta baş verdi:', error);
-                            loader.hide();
-                            
-                            // Xəta mesajı göstər
-                            alert("Axtarış zamanı xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.");
-                        }
-                    });
-                }, 500); // 500ms gecikmə ilə axtarışı yerinə yetir
-            });
+                    // Determine if product matches search and filters
+                    const matchesSearch = searchValue === '' || 
+                                         productName.includes(searchValue) || 
+                                         productOem.includes(searchValue) || 
+                                         productBrendKod.includes(searchValue);
+                    
+                    const matchesCategory = categoryValue === '' || productCategory === categoryValue;
+                    const matchesBrand = brandValue === '' || productBrand === brandValue;
+                    const matchesModel = modelValue === '' || productModel === modelValue;
+                    const matchesStock = stockValue === '' || productStock === stockValue;
+                    
+                    // Show or hide product
+                    if (matchesSearch && matchesCategory && matchesBrand && matchesModel && matchesStock) {
+                        product.style.display = 'block';
+                        visibleProducts++;
+                    } else {
+                        product.style.display = 'none';
+                    }
+                });
+                
+                // Show "no results" message if no products are visible
+                if (visibleProducts === 0) {
+                    noResults.style.display = 'block';
+                } else {
+                    noResults.style.display = 'none';
+                }
+            }
             
-            // Səhifə yükləndikdə sorğu parametrlərini doldur
-            const fillFormFromQuery = () => {
-                const urlParams = new URLSearchParams(window.location.search);
-                
-                // Hər bir parametr üçün yoxlama et və müvafiq sahəni doldur
-                if (urlParams.has('category')) {
-                    $('#category').val(urlParams.get('category'));
-                }
-                
-                if (urlParams.has('brand')) {
-                    $('#brand').val(urlParams.get('brand'));
-                }
-                
-                if (urlParams.has('model')) {
-                    $('#model').val(urlParams.get('model'));
-                }
-                
-                if (urlParams.has('search_text')) {
-                    $('#oem_search').val(urlParams.get('search_text'));
-                }
-            };
+            // Event listeners
+            searchInput.addEventListener('input', filterProducts);
+            categoryFilter.addEventListener('change', filterProducts);
+            brandFilter.addEventListener('change', filterProducts);
+            modelFilter.addEventListener('change', filterProducts);
+            stockFilter.addEventListener('change', filterProducts);
+            searchButton.addEventListener('click', filterProducts);
             
-            // Səhifə yükləndikdə sorğu parametrlərini doldur
-            fillFormFromQuery();
+            // Clear all filters
+            function clearFilters() {
+                searchInput.value = '';
+                categoryFilter.value = '';
+                brandFilter.value = '';
+                modelFilter.value = '';
+                stockFilter.value = '';
+                filterProducts();
+            }
+            
+            clearFiltersBtn.addEventListener('click', clearFilters);
+            resetFiltersBtn.addEventListener('click', clearFilters);
         });
     </script>
 </body>

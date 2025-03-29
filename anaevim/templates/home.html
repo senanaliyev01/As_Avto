@@ -329,65 +329,63 @@
         </div>
     </section>
 
-    <!-- Featured Products Section -->
-    <section class="featured-products">
+    <!-- Products Section with Link -->
+    <section class="products-link-section">
         <div class="container">
-            <h2 class="section__title">Seçilmiş Məhsullar</h2>
-            <p class="section__description">Ən çox baxılan və üstünlük verilən məhsullarımız</p>
-            
-            <div class="featured-products__grid">
-                {% for mehsul in mehsullar|slice:":6" %}
-                    {% if mehsul.sekil %}
-                    <div class="product-card">
-                        <div class="product-card__image">
-                            <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
-                        </div>
-                        <div class="product-card__content">
-                            <h3 class="product-card__title">{{ mehsul.adi }}</h3>
-                            <p class="product-card__description">Marka: {{ mehsul.marka.adi }}</p>
-                            <p class="product-card__description">Brend: {{ mehsul.brend.adi }}</p>
-                            <p class="product-card__description">№: {{ mehsul.brend_kod }}</p>
-                            <p class="product-card__description">KOD: {{ mehsul.oem }}</p>
-                            <p class="product-card__description">Qiymət: {{ mehsul.formatted_qiymet }} ₼</p>
-                            <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="product-card__button">
-                                Ətraflı Məlumat
-                                <i class="fas fa-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
-            
-            <div class="featured-products__action">
+            <h2 class="section__title">Məhsullarımız</h2>
+            <p class="section__description">Yüksək keyfiyyətli ehtiyat hissələrimizin tam kataloqu ilə tanış olun</p>
+            <div class="products-link-btn">
                 <a href="{% url 'mehsullar' %}" class="btn btn--primary">
-                    <span>Bütün Məhsulları Göstər</span>
+                    Bütün Məhsullar
                     <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
         </div>
     </section>
-    
-    <!-- Brands Section -->
-    <section class="brands-section">
+
+    <!-- Features Section -->
+    <section class="features">
         <div class="container">
-            <h2 class="section__title">Brendlərimiz</h2>
-            <p class="section__description">Yalnız yüksək keyfiyyətli və orijinal məhsullar təqdim edirik</p>
-            
-            <div class="brands-grid">
-                {% for brend in brendler %}
-                    {% if brend.sekil %}
-                    <div class="brand-card">
-                        <div class="brand-card__image">
-                            <img src="{{ brend.sekil.url }}" alt="{{ brend.adi }}">
-                        </div>
-                        <h3 class="brand-card__title">{{ brend.adi }}</h3>
+            <h2 class="section__title">Niyə Bizi Seçməlisiniz?</h2>
+            <div class="features__grid">
+                <div class="feature">
+                    <div class="feature__icon">
+                        <i class="fas fa-check-circle"></i>
                     </div>
-                    {% endif %}
-                {% endfor %}
+                    <h3 class="feature__title">Orijinal Məhsullar</h3>
+                    <p class="feature__text">100% orijinal və zəmanətli məhsullar təqdim edirik</p>
+                </div>
+
+                {% comment %} <div class="feature">
+                    <div class="feature__icon">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <h3 class="feature__title">Rent A Car</h3>
+                    <p class="feature__text">Maşınların icarəsi və satışı</p>
+                </div> {% endcomment %}
+
+                <div class="feature">
+                    <div class="feature__icon">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <h3 class="feature__title">Sürətli Çatdırılma</h3>
+                    <p class="feature__text">Bakı daxili pulsuz və sürətli çatdırılma xidməti</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature__icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3 class="feature__title">24/7 Dəstək</h3>
+                    <p class="feature__text">Peşəkar komandamızla hərtərəfli dəstək</p>
+                </div>
+
+                
             </div>
         </div>
     </section>
+
+ 
 
     <!-- About Section1 -->
     <section class="about" id="about">
@@ -519,166 +517,3 @@
     
 </body>
 </html>
-
-<style>
-    /* Featured Products Section */
-    .featured-products {
-        padding: 60px 0;
-        background-color: #f9f9f9;
-    }
-
-    .section__title {
-        font-size: 32px;
-        text-align: center;
-        margin-bottom: 10px;
-        color: #333;
-        font-weight: 600;
-    }
-
-    .section__description {
-        text-align: center;
-        color: #666;
-        margin-bottom: 40px;
-        font-size: 16px;
-    }
-
-    .featured-products__grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 30px;
-        margin-bottom: 40px;
-    }
-
-    .product-card {
-        background-color: #fff;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        transition: transform 0.3s, box-shadow 0.3s;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .product-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    }
-
-    .product-card__image {
-        height: 200px;
-        overflow: hidden;
-    }
-
-    .product-card__image img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        transition: transform 0.3s;
-    }
-
-    .product-card:hover .product-card__image img {
-        transform: scale(1.05);
-    }
-
-    .product-card__content {
-        padding: 20px;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .product-card__title {
-        font-size: 18px;
-        font-weight: 600;
-        margin-bottom: 10px;
-        color: #333;
-    }
-
-    .product-card__description {
-        font-size: 14px;
-        color: #666;
-        margin-bottom: 5px;
-    }
-
-    .product-card__button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-        margin-top: auto;
-        padding: 10px 20px;
-        background-color: #e50000;
-        color: white;
-        text-decoration: none;
-        border-radius: 4px;
-        font-size: 14px;
-        font-weight: 500;
-        transition: background-color 0.3s;
-    }
-
-    .product-card__button:hover {
-        background-color: #cc0000;
-    }
-
-    .featured-products__action {
-        display: flex;
-        justify-content: center;
-    }
-
-    /* Brands Section */
-    .brands-section {
-        padding: 60px 0;
-    }
-
-    .brands-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 30px;
-    }
-
-    .brand-card {
-        background-color: #fff;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        transition: transform 0.3s, box-shadow 0.3s;
-        text-align: center;
-        padding: 20px;
-    }
-
-    .brand-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    }
-
-    .brand-card__image {
-        height: 100px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 15px;
-    }
-
-    .brand-card__image img {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-    }
-
-    .brand-card__title {
-        font-size: 16px;
-        font-weight: 600;
-        color: #333;
-    }
-
-    @media (max-width: 768px) {
-        .featured-products__grid {
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        }
-        
-        .brands-grid {
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        }
-    }
-</style>

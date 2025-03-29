@@ -1,9 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from mehsullar.models import Brend, Marka, Mehsul, MarkaSekil, Kateqoriya, OEMKod
+from mehsullar.models import Brend, Marka, Mehsul, MarkaSekil, Kateqoriya
 from django.template.defaultfilters import slugify
-from django.db.models import Q
-import re
-from django.http import JsonResponse
 
 def anaevim(request):
     brendler = Brend.objects.all()
@@ -20,40 +17,11 @@ def anaevim(request):
     return render(request, 'home.html', context)
 
 def mehsullar(request):
-    # Filtrləmə parametrləri üçün lazımi modellər
+    # Bütün məhsulları, kateqoriyaları, brendləri və markaları əldə etmək
+    mehsullar = Mehsul.objects.all()
     kateqoriyalar = Kateqoriya.objects.all()
     brendler = Brend.objects.all()
     markalar = Marka.objects.all()
-    
-    # Axtarış parametrlərini alırıq
-    category = request.GET.get('category')
-    brand = request.GET.get('brand')
-    model = request.GET.get('model')
-    search_text = request.GET.get('search_text')
-    
-    # Başlanğıc olaraq bütün məhsulları götürürük
-    mehsullar = Mehsul.objects.all()
-    
-    # Filtrləmə əməliyyatları
-    if category:
-        mehsullar = mehsullar.filter(kateqoriya__adi=category)
-    
-    if brand:
-        mehsullar = mehsullar.filter(brend__adi=brand)
-    
-    if model:
-        mehsullar = mehsullar.filter(marka__adi=model)
-    
-    # OEM kodu ilə axtarış
-    if search_text:
-        # Xüsusi simvolları təmizlə
-        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_text)
-        
-        # Birbaşa OEM və ya OEM_kodlar cədvəlində axtarış
-        mehsullar = mehsullar.filter(
-            Q(oem__icontains=clean_search) | 
-            Q(oem_kodlar__kod__icontains=clean_search)
-        ).distinct()
     
     context = {
         'mehsullar': mehsullar,
@@ -61,26 +29,6 @@ def mehsullar(request):
         'brendler': brendler,
         'markalar': markalar,
     }
-    
-    # AJAX sorğusu üçün başlığı yoxlayırıq
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest' and 'json' in request.GET:
-        # Məhsullar haqqında məlumatı JSON formatında qaytarırıq
-        mehsul_list = []
-        for mehsul in mehsullar:
-            mehsul_dict = {
-                'id': mehsul.id,
-                'adi': mehsul.adi,
-                'marka': mehsul.marka.adi if mehsul.marka else '',
-                'brend': mehsul.brend.adi if mehsul.brend else '',
-                'brend_kod': mehsul.brend_kod,
-                'oem': mehsul.oem,
-                'qiymet': str(mehsul.formatted_qiymet),
-                'sekil_url': mehsul.sekil.url if mehsul.sekil else '',
-                'slug': f"{slugify(mehsul.adi)}-{mehsul.oem}-{mehsul.brend_kod}"
-            }
-            mehsul_list.append(mehsul_dict)
-        
-        return JsonResponse({'mehsullar': mehsul_list})
     
     return render(request, 'mehsullar.html', context)
 

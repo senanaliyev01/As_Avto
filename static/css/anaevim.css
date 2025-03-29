@@ -90,7 +90,7 @@ body {
     font-family: var(--font-primary);
     line-height: 1.6;
     color: var(--color-gray-900);
-    background-color: var(--color-gray-50);
+    background-color: var(--color-primary);
     overflow-x: hidden;
 }
 
@@ -1515,7 +1515,7 @@ tr:hover {
 /* Products Grid */
 .products-grid-section {
     padding: var(--spacing-2xl) 0 var(--spacing-4xl);
-    background-color: var(--color-gray-50);
+    background-color: var(--color-primary);
 }
 
 .products-grid {

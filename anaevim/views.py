@@ -17,13 +17,9 @@ def anaevim(request):
     return render(request, 'home.html', context)
 
 def mehsullar(request):
-    brendler = Brend.objects.all()
-    markalar = Marka.objects.all()
     mehsullar = Mehsul.objects.all()
     
     context = {
-        'brendler': brendler,
-        'markalar': markalar,
         'mehsullar': mehsullar,
     }
     

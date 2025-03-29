@@ -4,6 +4,7 @@ from mehsullar.models import Mehsul
 from django.utils import timezone
 from django.utils.text import slugify
 from urllib.parse import quote
+import re
 
 class StaticViewSitemap(Sitemap):
     changefreq = "daily"
@@ -32,11 +33,18 @@ class MehsulSitemap(Sitemap):
 
     def location(self, obj):
         # URL-dəki xüsusi simvolları düzgün kodlaşdırırıq
-        encoded_name = quote(obj.adi)
-        encoded_oem = quote(obj.oem)
-        encoded_brand_code = quote(obj.brend_kod)
+        # Əvvəlcə bütün xüsusi simvolları temizleyirik
+        clean_name = re.sub(r'[^\w\s]', '-', str(obj.adi))
+        clean_oem = re.sub(r'[^\w]', '-', str(obj.oem))
+        clean_brand_code = re.sub(r'[^\w]', '-', str(obj.brend_kod))
         
-        return reverse('mehsul_etrafli', kwargs={
+        # Boşluqları '-' ilə əvəz edirik, sonra slugify edib URL-yə uyğun hala gətiririk
+        encoded_name = slugify(clean_name.replace(' ', '-'))
+        encoded_oem = slugify(clean_oem)
+        encoded_brand_code = slugify(clean_brand_code)
+        
+        # URL yaradırıq - mehsul_haqqinda adına düzəltməliyik, mehsul_etrafli deyil
+        return reverse('mehsul_haqqinda', kwargs={
             'mehsul_adi': encoded_name,
             'mehsul_oem': encoded_oem,
             'mehsul_brend_kod': encoded_brand_code,

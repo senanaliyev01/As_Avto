@@ -254,7 +254,9 @@ class MehsulAdmin(admin.ModelAdmin):
                             if existing_product:
                                 # Mövcud məhsulu yenilə
                                 if 'adi' in row and pd.notna(row['adi']):
-                                    existing_product.adi = row['adi'].replace('/', '-')
+                                    # Əvvəlcə string'ə çevir, sonra əvəz et
+                                    adi_value = str(row['adi']).replace('/', '-')
+                                    existing_product.adi = adi_value
                                 if kateqoriya:
                                     existing_product.kateqoriya = kateqoriya
                                 if brend:
@@ -280,7 +282,9 @@ class MehsulAdmin(admin.ModelAdmin):
                                     existing_product.haqqinda = str(row['haqqinda'])
                                 
                                 if 'oem' in row and pd.notna(row['oem']):
-                                    existing_product.oem = row['oem'].replace('/', '-')
+                                    # Əvvəlcə string'ə çevir, sonra əvəz et
+                                    oem_value = str(row['oem']).replace('/', '-')
+                                    existing_product.oem = oem_value
                                 
                                 existing_product.save()
                                 
@@ -298,12 +302,12 @@ class MehsulAdmin(admin.ModelAdmin):
                             else:
                                 # Əsas sahələri hazırla
                                 mehsul_data = {
-                                    'adi': row['adi'].replace('/', '-') if 'adi' in row and pd.notna(row['adi']) else '',
+                                    'adi': str(row['adi']).replace('/', '-') if 'adi' in row and pd.notna(row['adi']) else '',
                                     'kateqoriya': kateqoriya,
                                     'brend': brend,
                                     'marka': marka,
                                     'brend_kod': brend_kod,
-                                    'oem': row['oem'].replace('/', '-') if 'oem' in row and pd.notna(row['oem']) else '',
+                                    'oem': str(row['oem']).replace('/', '-') if 'oem' in row and pd.notna(row['oem']) else '',
                                     'stok': row['stok'] if 'stok' in row and pd.notna(row['stok']) else 0,
                                     'maya_qiymet': row['maya_qiymet'] if 'maya_qiymet' in row and pd.notna(row['maya_qiymet']) else 0,
                                     'qiymet': row['qiymet'] if 'qiymet' in row and pd.notna(row['qiymet']) else 0,

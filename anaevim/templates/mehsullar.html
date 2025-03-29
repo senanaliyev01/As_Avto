@@ -41,25 +41,6 @@
             padding: 0 15px;
         }
         
-        header {
-            background-color: #fff;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        
-        .header__container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-        }
-        
-        .header__logo img {
-            height: 50px;
-        }
-        
         .search-section {
             margin: 20px 0;
             padding: 20px;
@@ -147,7 +128,7 @@
         
         .filter-button {
             padding: 10px 20px;
-            background-color: #333;
+            background-color: #e53935;
             color: white;
             border: none;
             border-radius: 4px;
@@ -158,7 +139,7 @@
         }
         
         .filter-button:hover {
-            background-color: #555;
+            background-color: #d32f2f;
         }
         
         .products-section {
@@ -258,103 +239,6 @@
             color: #999;
         }
         
-        footer {
-            background-color: #333;
-            color: #fff;
-            padding: 40px 0 20px;
-            margin-top: 40px;
-        }
-        
-        .footer-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            margin-bottom: 20px;
-        }
-        
-        .footer-logo img {
-            height: 50px;
-            margin-bottom: 15px;
-        }
-        
-        .footer-description {
-            color: #ddd;
-            line-height: 1.6;
-        }
-        
-        .footer-heading {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #fff;
-        }
-        
-        .footer-links a {
-            display: block;
-            color: #ddd;
-            text-decoration: none;
-            margin-bottom: 8px;
-            transition: color 0.3s;
-        }
-        
-        .footer-links a:hover {
-            color: #fff;
-        }
-        
-        .footer-contact a {
-            display: flex;
-            align-items: center;
-            color: #ddd;
-            text-decoration: none;
-            margin-bottom: 10px;
-            transition: color 0.3s;
-        }
-        
-        .footer-contact a:hover {
-            color: #fff;
-        }
-        
-        .footer-contact i {
-            margin-right: 10px;
-            min-width: 20px;
-        }
-        
-        .footer-social {
-            display: flex;
-            gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .footer-social a {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 36px;
-            height: 36px;
-            background-color: rgba(255,255,255,0.1);
-            border-radius: 50%;
-            color: #fff;
-            text-decoration: none;
-            transition: background-color 0.3s;
-        }
-        
-        .footer-social a:hover {
-            background-color: rgba(255,255,255,0.2);
-        }
-        
-        .footer-bottom {
-            text-align: center;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            color: #999;
-            font-size: 14px;
-        }
-        
-        .footer-bottom a {
-            color: #ddd;
-            text-decoration: none;
-        }
-        
         /* Responsive */
         @media (max-width: 768px) {
             .header__container {
@@ -407,178 +291,234 @@
             background-color: #ffebee;
             color: #d32f2f;
         }
+        
+        /* Home.html CSS-ni elave et */
+        .main-content {
+            padding-top: 30px;
+        }
     </style>
 </head>
 <body>
     <!-- Header -->
-    <header>
+    <header class="header">
         <div class="header__container container">
             <a href="{% url 'anaevim' %}" class="header__logo">
+                <!-- <img src="{% static 'img/Logo_Winter.png' %}" alt="AS AVTO Logo"> -->
                 <img src="{% static 'img/Header_Logo.png' %}" alt="AS AVTO Logo">
             </a>
+            
+            <nav class="header__nav">
+                <ul class="header__menu">
+                    <li><a href="{% url 'anaevim' %}" class="header__link">Ana Səhifə</a></li>
+                    <li><a href="{% url 'mehsullar' %}" class="header__link">Məhsullar</a></li>
+                    <li><a href="{% url 'anaevim' %}#about" class="header__link">Haqqımızda</a></li>
+                    <li><a href="{% url 'anaevim' %}#contact" class="header__link">Əlaqə</a></li>
+                </ul>
+                <div class="header__actions">
+                    <a href="{% url 'register' %}" class="btn btn--primary btn--register">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>B4B Qeydiyyat</span>
+                    </a>
+                </div>
+
+                <div class="header__actions">
+                    <a href="{% url 'login' %}" class="btn btn--primary btn--login">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>B4B Giriş</span>
+                    </a>
+                </div>
+            </nav>
+
+            <button class="header__toggle" aria-label="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
     </header>
 
-    <div class="container">
-        <!-- Search Section -->
-        <section class="search-section">
-            <div class="search-container">
-                <input type="text" id="search-input" class="search-input" placeholder="Məhsul adı, OEM kodu və ya brend kodu daxil edin...">
-                <button id="search-button" class="search-button">
-                    <i class="fas fa-search"></i> Axtar
-                </button>
-            </div>
-            <p class="search-tip">OEM kodu ilə axtarış etdikdə daha dəqiq nəticələr əldə edə bilərsiniz.</p>
-        </section>
+    <div class="main-content">
+        <div class="container">
+            <!-- Search Section -->
+            <section class="search-section">
+                <div class="search-container">
+                    <input type="text" id="search-input" class="search-input" placeholder="Məhsul adı, OEM kodu və ya brend kodu daxil edin...">
+                    <button id="search-button" class="search-button">
+                        <i class="fas fa-search"></i> Axtar
+                    </button>
+                </div>
+                <p class="search-tip">OEM kodu ilə axtarış etdikdə daha dəqiq nəticələr əldə edə bilərsiniz.</p>
+            </section>
 
-        <!-- Filters Section -->
-        <section class="filters-section">
-            <h3 class="filters-title">Filterlər</h3>
-            <div class="filters-grid">
-                <div class="filter-group">
-                    <label for="category-filter" class="filter-label">Kateqoriya</label>
-                    <select id="category-filter" class="filter-select">
-                        <option value="">Hamısı</option>
-                        {% for kateqoriya in kateqoriyalar %}
-                            <option value="{{ kateqoriya.adi }}">{{ kateqoriya.adi }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label for="brand-filter" class="filter-label">Firma</label>
-                    <select id="brand-filter" class="filter-select">
-                        <option value="">Hamısı</option>
-                        {% for brend in brendler %}
-                            <option value="{{ brend.adi }}">{{ brend.adi }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label for="model-filter" class="filter-label">Avtomobil</label>
-                    <select id="model-filter" class="filter-select">
-                        <option value="">Hamısı</option>
-                        {% for marka in markalar %}
-                            <option value="{{ marka.adi }}">{{ marka.adi }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label for="stock-filter" class="filter-label">Stok vəziyyəti</label>
-                    <select id="stock-filter" class="filter-select">
-                        <option value="">Hamısı</option>
-                        <option value="in-stock">Var</option>
-                        <option value="low-stock">Az var</option>
-                        <option value="out-of-stock">Yoxdur</option>
-                    </select>
-                </div>
-            </div>
-            
-            <button id="clear-filters" class="filter-button">Filterləri Təmizlə</button>
-        </section>
-
-        <!-- Products Section -->
-        <section class="products-section">
-            <h2 class="products-title">Bütün Məhsullar</h2>
-            
-            <div id="products-grid" class="products-grid">
-                {% for mehsul in mehsullar %}
-                <div class="product-card" 
-                     data-category="{{ mehsul.kateqoriya }}" 
-                     data-brand="{{ mehsul.brend.adi }}" 
-                     data-model="{{ mehsul.marka.adi }}"
-                     data-stock="{% if mehsul.stok == 0 %}out-of-stock{% elif mehsul.stok <= 20 %}low-stock{% else %}in-stock{% endif %}"
-                     data-name="{{ mehsul.adi }}"
-                     data-oem="{{ mehsul.oem }}"
-                     data-brend-kod="{{ mehsul.brend_kod }}">
-                    <div class="product-image">
-                        {% if mehsul.sekil %}
-                            <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
-                        {% endif %}
+            <!-- Filters Section -->
+            <section class="filters-section">
+                <h3 class="filters-title">Filterlər</h3>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label for="category-filter" class="filter-label">Kateqoriya</label>
+                        <select id="category-filter" class="filter-select">
+                            <option value="">Hamısı</option>
+                            {% for kateqoriya in kateqoriyalar %}
+                                <option value="{{ kateqoriya.adi }}">{{ kateqoriya.adi }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
-                    <div class="product-content">
-                        <h3 class="product-title">{{ mehsul.adi }}</h3>
-                        <p class="product-info">Kateqoriya: {{ mehsul.kateqoriya }}</p>
-                        <p class="product-info">Firma: {{ mehsul.brend.adi }}</p>
-                        <p class="product-info">Avtomobil: {{ mehsul.marka.adi }}</p>
-                        <p class="product-info">№: {{ mehsul.brend_kod }}</p>
-                        <p class="product-info">KOD: {{ mehsul.oem }}</p>
-                        <p class="product-price">{{ mehsul.qiymet }} ₼</p>
-                        <p class="product-info">
-                            {% if mehsul.stok == 0 %}
-                                <span class="stock-status out-of-stock">Yoxdur</span>
-                            {% elif mehsul.stok <= 20 %}
-                                <span class="stock-status low-stock">Az var</span>
-                            {% else %}
-                                <span class="stock-status in-stock">Var</span>
+                    
+                    <div class="filter-group">
+                        <label for="brand-filter" class="filter-label">Firma</label>
+                        <select id="brand-filter" class="filter-select">
+                            <option value="">Hamısı</option>
+                            {% for brend in brendler %}
+                                <option value="{{ brend.adi }}">{{ brend.adi }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="model-filter" class="filter-label">Avtomobil</label>
+                        <select id="model-filter" class="filter-select">
+                            <option value="">Hamısı</option>
+                            {% for marka in markalar %}
+                                <option value="{{ marka.adi }}">{{ marka.adi }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="stock-filter" class="filter-label">Stok vəziyyəti</label>
+                        <select id="stock-filter" class="filter-select">
+                            <option value="">Hamısı</option>
+                            <option value="in-stock">Var</option>
+                            <option value="low-stock">Az var</option>
+                            <option value="out-of-stock">Yoxdur</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button id="clear-filters" class="filter-button">Filterləri Təmizlə</button>
+            </section>
+
+            <!-- Products Section -->
+            <section class="products-section">
+                <h2 class="products-title">Bütün Məhsullar</h2>
+                
+                <div id="products-grid" class="products-grid">
+                    {% for mehsul in mehsullar %}
+                    <div class="product-card" 
+                        data-category="{{ mehsul.kateqoriya }}" 
+                        data-brand="{{ mehsul.brend.adi }}" 
+                        data-model="{{ mehsul.marka.adi }}"
+                        data-stock="{% if mehsul.stok == 0 %}out-of-stock{% elif mehsul.stok <= 20 %}low-stock{% else %}in-stock{% endif %}"
+                        data-name="{{ mehsul.adi }}"
+                        data-oem="{{ mehsul.oem }}"
+                        data-brend-kod="{{ mehsul.brend_kod }}">
+                        <div class="product-image">
+                            {% if mehsul.sekil %}
+                                <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
                             {% endif %}
-                        </p>
-                        <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="product-button">
-                            Ətraflı Məlumat
-                        </a>
+                        </div>
+                        <div class="product-content">
+                            <h3 class="product-title">{{ mehsul.adi }}</h3>
+                            <p class="product-info">Kateqoriya: {{ mehsul.kateqoriya }}</p>
+                            <p class="product-info">Firma: {{ mehsul.brend.adi }}</p>
+                            <p class="product-info">Avtomobil: {{ mehsul.marka.adi }}</p>
+                            <p class="product-info">№: {{ mehsul.brend_kod }}</p>
+                            <p class="product-info">KOD: {{ mehsul.oem }}</p>
+                            <p class="product-price">{{ mehsul.qiymet }} ₼</p>
+                            <p class="product-info">
+                                {% if mehsul.stok == 0 %}
+                                    <span class="stock-status out-of-stock">Yoxdur</span>
+                                {% elif mehsul.stok <= 20 %}
+                                    <span class="stock-status low-stock">Az var</span>
+                                {% else %}
+                                    <span class="stock-status in-stock">Var</span>
+                                {% endif %}
+                            </p>
+                            <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="product-button">
+                                Ətraflı Məlumat
+                            </a>
+                        </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
-            </div>
-            
-            <!-- No Results Message -->
-            <div id="no-results" class="no-results" style="display: none;">
-                <i class="fas fa-search"></i>
-                <h3>Heç bir nəticə tapılmadı</h3>
-                <p>Zəhmət olmasa, filter parametrlərini dəyişdirin və ya təmizləyin.</p>
-                <button id="reset-filters" class="filter-button">Filterləri təmizlə</button>
-            </div>
-        </section>
+                
+                <!-- No Results Message -->
+                <div id="no-results" class="no-results" style="display: none;">
+                    <i class="fas fa-search"></i>
+                    <h3>Heç bir nəticə tapılmadı</h3>
+                    <p>Zəhmət olmasa, filter parametrlərini dəyişdirin və ya təmizləyin.</p>
+                    <button id="reset-filters" class="filter-button">Filterləri təmizlə</button>
+                </div>
+            </section>
+        </div>
     </div>
 
     <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-grid">
-                <div>
-                    <div class="footer-logo">
-                        <img src="{% static 'img/Header_Logo.png' %}" alt="AS AVTO Logo">
+    <footer class="footer">
+        <div class="footer__top">
+            <div class="container">
+                <div class="footer__grid">
+                    <div class="footer__brand">
+                         <img src="{% static 'img/Header_Logo.png' %}" alt="AS AVTO Logo">
+                        <!-- <img src="{% static 'img/Logo_Winter.png' %}" alt="AS AVTO Logo"> -->
+                        <p>Azərbaycanın avtomobil ehtiyat hissələri bazarında 10 ildən artıq təcrübə</p>
+                        <div class="footer__social">
+                            <a href="https://wa.me/994773059585" target="_blank" rel="noopener" aria-label="WhatsApp">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                            <a href="https://www.tiktok.com/@as_avto_service" target="_blank" rel="noopener" aria-label="TikTok">
+                                <i class="fab fa-tiktok"></i>
+                            </a>
+                         
+                        </div>
                     </div>
-                    <p class="footer-description">AS-Avto - Avtomobil ehtiyat hissələri üzrə Azərbaycanda lider şirkət. Keyfiyyətli xidmət və məhsullar təqdim edirik.</p>
-                </div>
-                
-                <div>
-                    <h3 class="footer-heading">Faydalı Linklər</h3>
-                    <div class="footer-links">
-                        <a href="{% url 'anaevim' %}">Ana Səhifə</a>
-                        <a href="{% url 'mehsullar' %}">Məhsullar</a>
-                        <a href="#">Haqqımızda</a>
-                        <a href="#">Əlaqə</a>
+
+                    <div class="footer__links">
+                        <h3>Sürətli Keçid</h3>
+                        <ul>
+                            <li><a href="{% url 'anaevim' %}">Ana Səhifə</a></li>
+                            <li><a href="{% url 'mehsullar' %}">Məhsullar</a></li>
+                            <li><a href="{% url 'anaevim' %}#about">Haqqımızda</a></li>
+                            <li><a href="{% url 'anaevim' %}#contact">Əlaqə</a></li>
+                            <li><a href="{% url 'login' %}">B4B Giriş</a></li>
+                        
+                        </ul>
                     </div>
-                </div>
-                
-                <div>
-                    <h3 class="footer-heading">Əlaqə</h3>
-                    <div class="footer-contact">
-                        <a href="tel:+994702754499"><i class="fa-solid fa-tty"></i>+994 70 275 44 99</a>
-                        <a href="tel:+994773059585"><i class="fas fa-phone-alt"></i>+994 77 305 95 85</a>
-                        <a href="mailto:as.avto.2025@gmail.com"><i class="fas fa-envelope"></i>as.avto.2025@gmail.com</a>
-                        <a href="https://maps.app.goo.gl/fU5jUAg8veccL3Zq9"><i class="fa-solid fa-location-dot"></i>Binəqədi R. M.Rəsulzadə qəs. As-Avto</a>
-                    </div>
-                    
-                    <div class="footer-social">
-                        <a href="https://wa.me/994773059585" target="_blank"><i class="fab fa-whatsapp"></i></a>
-                        <a href="https://www.tiktok.com/@as_avto_service" target="_blank"><i class="fab fa-tiktok"></i></a>
-                        <a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+
+                    <div class="footer__contact">
+                        <h3>Əlaqə Məlumatları</h3>
+                        <ul>
+                            <li>
+                                <i class="fas fa-phone"></i>
+                                <a href="tel:+994773059585">+994 77 305 95 85</a>
+                            </li>
+                            <li>
+                                <i class="fas fa-envelope"></i>
+                                <a href="mailto:as.avto.2025@gmail.com">as.avto.2025@gmail.com</a>
+                            </li>
+                            <li>
+                                <i class="fas fa-clock"></i>
+                                <span>Bazar ertəsi - Bazar: 09:00 - 18:00</span>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; {% now "Y" %} AS-Avto. Bütün hüquqlar qorunur.</p>
+        </div>
+
+        <div class="footer__bottom">
+            <div class="container">
+                <p>&copy; 2024-2025 AS AVTO. Bütün hüquqlar qorunur.</p>
+                <div class="footer__payments">
+                    {% comment %} <img src="{% static 'img/visa.png' %}" alt="Visa">
+                    <img src="{% static 'img/mastercard.png' %}" alt="Mastercard"> {% endcomment %}
+                </div>
             </div>
         </div>
     </footer>
 
     <!-- JavaScript -->
+    <script src="{% static 'js/anaevim.js' %}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Filter elements

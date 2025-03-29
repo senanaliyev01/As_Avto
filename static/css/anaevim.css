@@ -904,7 +904,7 @@ html {
 
 /* Products Slider Section */
 .products-slider {
-    padding: var(--spacing-4xl) 0;
+    
     background-color: var(--color-primary);
 }
 

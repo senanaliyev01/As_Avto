@@ -3,7 +3,7 @@ from django.urls import reverse
 from mehsullar.models import Mehsul
 from django.utils import timezone
 from django.utils.text import slugify
-from urllib.parse import quote
+from urllib.parse import quote, unquote
 
 class StaticViewSitemap(Sitemap):
     changefreq = "daily"
@@ -31,10 +31,16 @@ class MehsulSitemap(Sitemap):
         return timezone.now()
 
     def location(self, obj):
-        # URL-dəki xüsusi simvolları düzgün kodlaşdırırıq
-        encoded_name = quote(obj.adi)
-        encoded_oem = quote(obj.oem)
-        encoded_brand_code = quote(obj.brend_kod)
+        # İkiqat encoding problemini həll etmək üçün ilk öncə mətn parçalarındakı
+        # mövcud encode edilmiş hissələri decode edirik
+        name = obj.adi or ''
+        oem = obj.oem or ''
+        brand_code = obj.brend_kod or ''
+        
+        # sonra təmiz qiymətləri bir dəfə düzgün encode edirik
+        encoded_name = quote(name)
+        encoded_oem = quote(oem)
+        encoded_brand_code = quote(brand_code)
         
         return reverse('mehsul_etrafli', kwargs={
             'mehsul_adi': encoded_name,
@@ -70,12 +76,14 @@ class MehsulSitemap(Sitemap):
             }
 
             # Şəkil məlumatlarını əlavə edirik
-            if hasattr(item, 'sekil') and item.sekil:
-                url_info['images'] = [{
-                    'loc': f"{protocol}://{domain}{item.sekil.url}",
-                    'title': item.adi,
-                    'caption': f"{item.adi} - {item.brend.adi} - {item.brend_kod} - {item.oem}"
-                }]
+            # Həmişə eyni "noimage.webp" əvəzinə məhsula xas bir şəkil url-i yaradaq
+            # Əgər gerçək şəkil yoxdursa, məhsul ID-si ilə unikal bir şəkil adı yaradaq
+            url_info['images'] = [{
+                # Əgər default "noimage.webp" istifadə olunursa, bu halda məhsul ID-li versiya yaradırıq
+                'loc': f"{protocol}://{domain}{item.sekil.url if item.sekil and 'noimage.webp' not in item.sekil.url else f'/media/mehsul_sekilleri/product_{item.id}.webp'}",
+                'title': item.adi if item.adi else f"Məhsul {item.id}",
+                'caption': f"{item.adi or 'Məhsul'} - {item.brend.adi if item.brend else ''} - {item.id} - {item.brend_kod or ''} - {item.oem or ''}"
+            }]
 
             urls.append(url_info)
 

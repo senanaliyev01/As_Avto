@@ -243,21 +243,12 @@ class MehsulAdmin(admin.ModelAdmin):
                                 temiz_oem = str(row['elave_oem']).replace(',', ' ').replace('/', ' ')
                                 elave_oem_kodlar = [kod.strip() for kod in temiz_oem.split() if kod.strip()]
                                 
+                                # Yalnız ilk iki kodu götür
+                                elave_oem_kodlar = elave_oem_kodlar[:2]
+                                
                                 # Əlavə OEM kodlarını birləşdirib OEM sütununa da əlavə et
                                 if elave_oem_kodlar:
                                     birlesdirilmis_oem = '-'.join(elave_oem_kodlar)
-                                    # Əgər birləşdirilmiş OEM kodları çox uzundursa, kəsək
-                                    if len(birlesdirilmis_oem) > 250:
-                                        # Sadəcə ilk kodları götürək, limiti keçməsin
-                                        qisa_kodlar = []
-                                        toplam_uzunluq = 0
-                                        for kod in elave_oem_kodlar:
-                                            if toplam_uzunluq + len(kod) + 1 < 250:  # 1 əlavə simvol "-" üçün
-                                                qisa_kodlar.append(kod)
-                                                toplam_uzunluq += len(kod) + 1
-                                            else:
-                                                break
-                                        birlesdirilmis_oem = '-'.join(qisa_kodlar)
                                     
                                     # Əgər oem sütunu dolu deyilsə, birləşdirilmiş kodları əlavə et
                                     if 'oem' not in row or not pd.notna(row['oem']) or not row['oem']:

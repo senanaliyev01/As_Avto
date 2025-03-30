@@ -139,13 +139,6 @@ class Mehsul(models.Model):
         return []
 
     def save(self, *args, **kwargs):
-        # Əvvəldə və sonda olan boşluqları sil, ardıcıl boşluqları tək boşluğa çevir
-        if self.adi:
-            import re
-            self.adi = self.adi.strip()
-            self.adi = re.sub(r'\s+', ' ', self.adi)
-            
-        # Şəkil yoxdursa default şəkil təyin et
         if not self.sekil:
             self.sekil = 'mehsul_sekilleri/noimage.webp'
         super().save(*args, **kwargs)

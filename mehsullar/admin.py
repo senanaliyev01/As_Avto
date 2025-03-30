@@ -9,7 +9,6 @@ from django import forms
 from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
 import pandas as pd
-import re
 
 class MarkaSekilInline(admin.TabularInline):
     model = MarkaSekil
@@ -284,12 +283,7 @@ class MehsulAdmin(admin.ModelAdmin):
                             if existing_product:
                                 # Mövcud məhsulu yenilə
                                 if 'adi' in row and pd.notna(row['adi']):
-                                    # Adın əvvəlindəki və sonundakı boşluqları silək, 
-                                    # ardıcıl boşluqları tək boşluğa çevirək
-                                    adi = str(row['adi']).strip()
-                                    # Birdən çox boşluqları tək boşluğa çevir
-                                    adi = re.sub(r'\s+', ' ', adi)
-                                    existing_product.adi = adi
+                                    existing_product.adi = row['adi']
                                 if kateqoriya:
                                     existing_product.kateqoriya = kateqoriya
                                 if brend:
@@ -332,16 +326,8 @@ class MehsulAdmin(admin.ModelAdmin):
                                 update_count += 1
                             else:
                                 # Əsas sahələri hazırla
-                                adi = ''
-                                if 'adi' in row and pd.notna(row['adi']):
-                                    # Adın əvvəlindəki və sonundakı boşluqları silək, 
-                                    # ardıcıl boşluqları tək boşluğa çevirək
-                                    adi = str(row['adi']).strip()
-                                    # Birdən çox boşluqları tək boşluğa çevir
-                                    adi = re.sub(r'\s+', ' ', adi)
-                                
                                 mehsul_data = {
-                                    'adi': adi,
+                                    'adi': row['adi'] if 'adi' in row and pd.notna(row['adi']) else '',
                                     'kateqoriya': kateqoriya,
                                     'brend': brend,
                                     'marka': marka,

@@ -9,6 +9,8 @@ from django import forms
 from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
 import pandas as pd
+from django.core.files import File
+import os
 
 class MarkaSekilInline(admin.TabularInline):
     model = MarkaSekil
@@ -311,6 +313,14 @@ class MehsulAdmin(admin.ModelAdmin):
                                 if 'oem' in row and pd.notna(row['oem']):
                                     existing_product.oem = row['oem']
                                 
+                                # Şəkil yolunu əlavə et
+                                if 'sekil' in row and pd.notna(row['sekil']):
+                                    sekil_yolu = str(row['sekil']).strip()
+                                    if os.path.exists(sekil_yolu):
+                                        with open(sekil_yolu, 'rb') as f:
+                                            file_name = os.path.basename(sekil_yolu)
+                                            existing_product.sekil.save(file_name, File(f), save=False)
+                                
                                 existing_product.save()
                                 
                                 # Mövcud əlavə OEM kodlarını sil
@@ -342,6 +352,15 @@ class MehsulAdmin(admin.ModelAdmin):
                                 
                                 # Yeni məhsul yarat
                                 yeni_mehsul = Mehsul.objects.create(**mehsul_data)
+                                
+                                # Şəkil əlavə et
+                                if 'sekil' in row and pd.notna(row['sekil']):
+                                    sekil_yolu = str(row['sekil']).strip()
+                                    if os.path.exists(sekil_yolu):
+                                        with open(sekil_yolu, 'rb') as f:
+                                            file_name = os.path.basename(sekil_yolu)
+                                            yeni_mehsul.sekil.save(file_name, File(f), save=False)
+                                        yeni_mehsul.save()
                                 
                                 # Əlavə OEM kodlarını əlavə et
                                 for kod in elave_oem_kodlar:

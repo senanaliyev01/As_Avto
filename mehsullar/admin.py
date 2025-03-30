@@ -242,6 +242,16 @@ class MehsulAdmin(admin.ModelAdmin):
                                 # Vergül, boşluq və / ilə ayrılmış OEM kodlarını ayır
                                 temiz_oem = str(row['elave_oem']).replace(',', ' ').replace('/', ' ')
                                 elave_oem_kodlar = [kod.strip() for kod in temiz_oem.split() if kod.strip()]
+                                
+                                # Əlavə OEM kodlarını birləşdirib OEM sütununa da əlavə et
+                                if elave_oem_kodlar:
+                                    birlesdirilmis_oem = '-'.join(elave_oem_kodlar)
+                                    # Əgər oem sütunu dolu deyilsə, birləşdirilmiş kodları əlavə et
+                                    if 'oem' not in row or not pd.notna(row['oem']) or not row['oem']:
+                                        row['oem'] = birlesdirilmis_oem
+                                    # Əgər oem sütunu doluysa və orada bu kodlar yoxdursa, əlavə et
+                                    elif birlesdirilmis_oem not in str(row['oem']):
+                                        row['oem'] = f"{row['oem']}-{birlesdirilmis_oem}"
                             
                             # brend_kod dəyərini təyin et
                             brend_kod = row['brend_kod'] if 'brend_kod' in row and pd.notna(row['brend_kod']) else ''

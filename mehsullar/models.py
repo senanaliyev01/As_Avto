@@ -107,7 +107,7 @@ class Mehsul(models.Model):
     marka = models.ForeignKey(Marka, on_delete=models.CASCADE, null=True, blank=True)
     model = models.ManyToManyField(Model,blank=True)  
     brend_kod = models.CharField(max_length=50, null=True, blank=True)
-    oem = models.CharField(max_length=100, null=True, blank=True)
+    oem = models.CharField(max_length=255, null=True, blank=True)
     stok = models.IntegerField(null=True, blank=True)
     maya_qiymet = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     qiymet = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)

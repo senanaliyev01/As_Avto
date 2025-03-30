@@ -246,12 +246,31 @@ class MehsulAdmin(admin.ModelAdmin):
                                 # Əlavə OEM kodlarını birləşdirib OEM sütununa da əlavə et
                                 if elave_oem_kodlar:
                                     birlesdirilmis_oem = '-'.join(elave_oem_kodlar)
+                                    # Əgər birləşdirilmiş OEM kodları çox uzundursa, kəsək
+                                    if len(birlesdirilmis_oem) > 250:
+                                        # Sadəcə ilk kodları götürək, limiti keçməsin
+                                        qisa_kodlar = []
+                                        toplam_uzunluq = 0
+                                        for kod in elave_oem_kodlar:
+                                            if toplam_uzunluq + len(kod) + 1 < 250:  # 1 əlavə simvol "-" üçün
+                                                qisa_kodlar.append(kod)
+                                                toplam_uzunluq += len(kod) + 1
+                                            else:
+                                                break
+                                        birlesdirilmis_oem = '-'.join(qisa_kodlar)
+                                    
                                     # Əgər oem sütunu dolu deyilsə, birləşdirilmiş kodları əlavə et
                                     if 'oem' not in row or not pd.notna(row['oem']) or not row['oem']:
                                         row['oem'] = birlesdirilmis_oem
                                     # Əgər oem sütunu doluysa və orada bu kodlar yoxdursa, əlavə et
                                     elif birlesdirilmis_oem not in str(row['oem']):
-                                        row['oem'] = f"{row['oem']}-{birlesdirilmis_oem}"
+                                        yeni_oem = f"{row['oem']}-{birlesdirilmis_oem}"
+                                        # Əgər yeni OEM dəyəri çox uzundursa
+                                        if len(yeni_oem) > 250:
+                                            # Birinci orijinal OEM-i saxlayaq, sahənin limitini aşmasın
+                                            row['oem'] = str(row['oem'])[:250]
+                                        else:
+                                            row['oem'] = yeni_oem
                             
                             # brend_kod dəyərini təyin et
                             brend_kod = row['brend_kod'] if 'brend_kod' in row and pd.notna(row['brend_kod']) else ''

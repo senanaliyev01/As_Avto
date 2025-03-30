@@ -9,7 +9,6 @@ from django import forms
 from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
 import pandas as pd
-import re
 
 class MarkaSekilInline(admin.TabularInline):
     model = MarkaSekil
@@ -255,16 +254,7 @@ class MehsulAdmin(admin.ModelAdmin):
                             if existing_product:
                                 # Mövcud məhsulu yenilə
                                 if 'adi' in row and pd.notna(row['adi']):
-                                    # Bütün xüsusi simvolları və boşluqları - ilə əvəz edirik
-                                    # 1. Əvvəlcə başdakı və sondakı boşluqları təmizləyirik
-                                    adi_temp = str(row['adi']).strip()
-                                    # 2. Xüsusi simvolları və boşluqları - ilə əvəz et
-                                    adi_temp = re.sub(r'[^\w]|[\s]', '-', adi_temp)
-                                    # 3. Ardıcıl - simvollarını bir dənə - ilə əvəz et
-                                    adi_temp = re.sub(r'-+', '-', adi_temp)
-                                    # 4. Başda və sonda - simvolu varsa, onları silirik
-                                    adi_value = adi_temp.strip('-')
-                                    existing_product.adi = adi_value
+                                    existing_product.adi = row['adi']
                                 if kateqoriya:
                                     existing_product.kateqoriya = kateqoriya
                                 if brend:
@@ -290,16 +280,7 @@ class MehsulAdmin(admin.ModelAdmin):
                                     existing_product.haqqinda = str(row['haqqinda'])
                                 
                                 if 'oem' in row and pd.notna(row['oem']):
-                                    # Bütün xüsusi simvolları və boşluqları - ilə əvəz edirik
-                                    # 1. Əvvəlcə başdakı və sondakı boşluqları təmizləyirik
-                                    oem_temp = str(row['oem']).strip()
-                                    # 2. Xüsusi simvolları və boşluqları - ilə əvəz et
-                                    oem_temp = re.sub(r'[^\w]|[\s]', '-', oem_temp)
-                                    # 3. Ardıcıl - simvollarını bir dənə - ilə əvəz et
-                                    oem_temp = re.sub(r'-+', '-', oem_temp)
-                                    # 4. Başda və sonda - simvolu varsa, onları silirik
-                                    oem_value = oem_temp.strip('-')
-                                    existing_product.oem = oem_value
+                                    existing_product.oem = row['oem']
                                 
                                 existing_product.save()
                                 
@@ -317,12 +298,12 @@ class MehsulAdmin(admin.ModelAdmin):
                             else:
                                 # Əsas sahələri hazırla
                                 mehsul_data = {
-                                    'adi': (lambda s: re.sub(r'-+', '-', re.sub(r'[^\w]|[\s]', '-', str(s).strip())).strip('-'))(row['adi']) if 'adi' in row and pd.notna(row['adi']) else '',
+                                    'adi': row['adi'] if 'adi' in row and pd.notna(row['adi']) else '',
                                     'kateqoriya': kateqoriya,
                                     'brend': brend,
                                     'marka': marka,
                                     'brend_kod': brend_kod,
-                                    'oem': (lambda s: re.sub(r'-+', '-', re.sub(r'[^\w]|[\s]', '-', str(s).strip())).strip('-'))(row['oem']) if 'oem' in row and pd.notna(row['oem']) else '',
+                                    'oem': row['oem'] if 'oem' in row and pd.notna(row['oem']) else '',
                                     'stok': row['stok'] if 'stok' in row and pd.notna(row['stok']) else 0,
                                     'maya_qiymet': row['maya_qiymet'] if 'maya_qiymet' in row and pd.notna(row['maya_qiymet']) else 0,
                                     'qiymet': row['qiymet'] if 'qiymet' in row and pd.notna(row['qiymet']) else 0,

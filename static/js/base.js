@@ -1058,13 +1058,13 @@
         }
     }
 
-    // Səbət Modal Funksiyaları
-    function toggleCartModal(event) {
+    // Səbət Drawer Funksiyaları
+    function toggleCartDrawer(event) {
         event.preventDefault();
-        const cartModal = document.getElementById('cart-modal');
-        cartModal.classList.toggle('active');
+        const cartDrawer = document.getElementById('cart-drawer');
+        cartDrawer.classList.toggle('active');
         
-        if (cartModal.classList.contains('active')) {
+        if (cartDrawer.classList.contains('active')) {
             loadCartItems();
             // Səhifənin scroll olmasını əngəlləyək
             document.body.style.overflow = 'hidden';
@@ -1154,30 +1154,30 @@
         });
     }
 
-    // Səbət modalını bağlamaq üçün
+    // Səbət drawer-ini bağlamaq üçün
     document.addEventListener('DOMContentLoaded', function() {
-        const cartModal = document.getElementById('cart-modal');
+        const cartDrawer = document.getElementById('cart-drawer');
         const closeButton = document.querySelector('.cart-close');
         
         if (closeButton) {
             closeButton.addEventListener('click', function() {
-                cartModal.classList.remove('active');
+                cartDrawer.classList.remove('active');
                 document.body.style.overflow = '';
             });
         }
         
-        // Modal xaricində kliklənəndə bağlanması
-        cartModal.addEventListener('click', function(event) {
-            if (event.target === cartModal) {
-                cartModal.classList.remove('active');
+        // Drawer xaricində kliklənəndə bağlanması
+        cartDrawer.addEventListener('click', function(event) {
+            if (event.target === cartDrawer) {
+                cartDrawer.classList.remove('active');
                 document.body.style.overflow = '';
             }
         });
         
-        // ESC2 düyməsi ilə bağlanması
+        // ESC düyməsi ilə bağlanması
         document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape' && cartModal.classList.contains('active')) {
-                cartModal.classList.remove('active');
+            if (event.key === 'Escape' && cartDrawer.classList.contains('active')) {
+                cartDrawer.classList.remove('active');
                 document.body.style.overflow = '';
             }
         });

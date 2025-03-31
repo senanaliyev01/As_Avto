@@ -61,7 +61,7 @@
                     <img src="{{ user.profile.sekil.url }}" alt="{{ user.username }}" class="header-profile-image">
                     {{ user.username }}
                 </a>
-                <a href="#" class="cart-link" id="cart-toggle" onclick="toggleCartDrawer(event)">
+                <a href="{% url 'view_cart' %}" class="cart-link" id="cart-toggle">
                     <i class="fas fa-shopping-cart"></i>
                     <span id="cart-count" class="cart-badge">0</span>
                     <span id="cart-total-badge" class="cart-total-badge">0 ₼</span>
@@ -129,36 +129,6 @@
             <p>&copy; {% now "Y" %} AS-Avto. Bütün hüquqlar qorunur. | Dizayn: <a href="#">AS-Avto</a></p>
         </div>
     </footer>
-
-    <!-- Cart Modal -->
-    <div id="cart-drawer" class="cart-drawer">
-        <div class="cart-drawer-content">
-            <div class="cart-drawer-header">
-                <h2>Səbətim</h2>
-                <span class="cart-close">&times;</span>
-            </div>
-            <div class="cart-drawer-body">
-                <div id="cart-items-container">
-                    <!-- Səbət məlumatları JavaScript ilə doldurulacaq -->
-                    <div class="loading-spinner-container">
-                        <div class="spinner"></div>
-                    </div>
-                </div>
-                <div id="cart-details-container" class="cart-details-container">
-                    <!-- cart.html məzmunu burada göstəriləcək -->
-                </div>
-            </div>
-            <div class="cart-drawer-footer">
-                <div class="cart-total">
-                    <span>Ümumi Cəmi:</span>
-                    <span id="cart-modal-total">0 ₼</span>
-                </div>
-                <div class="cart-actions">
-                    <button id="cart-checkout-btn" class="cart-checkout-btn">Sifariş Et</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     {% if user.is_authenticated %}
   

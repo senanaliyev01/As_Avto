@@ -99,24 +99,19 @@ def sebet_ekle(request, mehsul_id):
 
 @login_required
 def view_cart(request):
-    sebet = Sebet.objects.filter(istifadeci=request.user)
-    sebet = sebet.prefetch_related('mehsul', 'mehsul__marka', 'mehsul__brend')
-    cemi_mebleg = sum(item.cemi for item in sebet)
-    
-    context = {
+    sebet = Sebet.objects.filter(user=request.user)
+    cemi_mebleg = sebet.aggregate(total=Sum(F('miqdar') * F('mehsul__qiymet')))['total'] or 0
+
+    # Hər məhsul üçün stok məlumatını və cəmi məbləği əlavə et
+    for item in sebet:
+        item.stok_status = get_stock_status(item.mehsul.stok)
+        item.stok_class = get_stock_class(item.mehsul.stok)
+        item.cemi = item.mehsul.qiymet * item.miqdar  # Hər məhsul üçün cəmi məbləğ
+
+    return render(request, 'cart.html', {
         'sebet': sebet,
-        'cemi_mebleg': cemi_mebleg,
-    }
-    
-    # AJAX sorğusu olduğunu yoxlayırıq
-    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
-    
-    if is_ajax:
-        # Yalnız cart.html şablonunu render edirik (layout olmadan)
-        return render(request, 'cart.html', context)
-    
-    # Normal sorğu üçün standart render
-    return render(request, 'cart.html', context)
+        'cemi_mebleg': cemi_mebleg
+    })
 
 def get_stock_status(stok):
     if stok == 0:

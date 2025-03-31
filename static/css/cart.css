@@ -744,3 +744,89 @@ td {
     border-width: 0;
 }
 
+/* Sağdan sola açılan panel üslubu */
+.slide-in-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 100%;
+    max-width: 500px;
+    height: 100vh;
+    background-color: var(--secondary-color);
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+    overflow-y: auto;
+    border-left: 2px solid var(--accent-color);
+}
+
+.slide-in-panel.active {
+    transform: translateX(0);
+}
+
+body.panel-open {
+    overflow: hidden;
+}
+
+.panel-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.panel-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.panel-close-btn {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background-color: var(--secondary-color);
+    color: var(--accent-color);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--accent-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.panel-close-btn:hover {
+    background-color: var(--accent-color);
+    color: var(--secondary-color);
+}
+
+.panel-header {
+    padding: 20px 20px 20px 70px;
+    border-bottom: 1px solid var(--accent-color);
+    text-align: center;
+    position: sticky;
+    top: 0;
+    background-color: var(--secondary-color);
+    z-index: 10;
+}
+
+.panel-content {
+    padding: 20px;
+}
+
+/* Kartı panel kimi göstərmək üçün media sorgular */
+@media (max-width: 768px) {
+    .slide-in-panel {
+        max-width: 100%;
+    }
+}
+

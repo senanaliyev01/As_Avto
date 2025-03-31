@@ -1053,12 +1053,138 @@
 
     function decrementQuantity(productId) {
         const quantityInput = document.getElementById(`quantity-${productId}`);
-        if (quantityInput && quantityInput.value > 1) {
+        if (quantityInput && parseInt(quantityInput.value) > 1) {
             quantityInput.value = parseInt(quantityInput.value) - 1;
         }
     }
 
-    // Səbət modal funksiyaları silib yerinə yeni əlavə etmirəm, çünki artıq URL ilə birbaşa cart.html səhifəsinə yönləndirik
+    // Səbət Modal Funksiyaları
+    function toggleCartModal(event) {
+        event.preventDefault();
+        const cartModal = document.getElementById('cart-modal');
+        cartModal.classList.toggle('active');
+        
+        if (cartModal.classList.contains('active')) {
+            loadCartItems();
+            // Səhifənin scroll olmasını əngəlləyək
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+    }
+
+    function loadCartItems() {
+        const cartItemsContainer = document.getElementById('cart-items-container');
+        
+        // Yükləmə animasiyasını göstər
+        cartItemsContainer.innerHTML = `
+            <div class="loading-spinner-container">
+                <div class="spinner"></div>
+            </div>
+        `;
+        
+        // Səbət məlumatlarını serverdən al
+        fetch('/get_cart_items/', {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.items && data.items.length > 0) {
+                let cartHTML = '';
+                
+                // Hər bir səbət elementi üçün HTML yaradaq
+                data.items.forEach(item => {
+                    cartHTML += `
+                        <div class="cart-item" data-item-id="${item.id}">
+                            <img src="${item.image || '/static/img/no-image.png'}" alt="${item.name}" class="cart-item-image">
+                            <div class="cart-item-details">
+                                <div class="cart-item-name">${item.name}</div>
+                                <div class="cart-item-info">
+                                    <span>${item.brand}</span>
+                                    <span>${item.model}</span>
+                                    <span>${item.oem}</span>
+                                    <span>${item.brend_kod || '-'}</span>
+                                </div>
+                                <div class="cart-item-quantity">
+                                    <span>Miqdar: ${item.quantity}</span>
+                                </div>
+                            </div>
+                            <div class="cart-item-price">${item.price} ₼</div>
+                        </div>
+                    `;
+                });
+                
+                cartItemsContainer.innerHTML = cartHTML;
+                document.getElementById('cart-modal-total').textContent = data.total + ' ₼';
+                
+                // Səbət ikonunun altındakı cəmi də yeniləyək
+                const cartTotalBadge = document.getElementById('cart-total-badge');
+                if (cartTotalBadge) {
+                    cartTotalBadge.textContent = data.total + ' ₼';
+                }
+            } else {
+                // Səbət boşdursa
+                cartItemsContainer.innerHTML = `
+                    <div class="empty-cart-message">
+                        <i class="fas fa-shopping-cart"></i>
+                        <p>Səbətiniz boşdur</p>
+                    </div>
+                `;
+                document.getElementById('cart-modal-total').textContent = '0 ₼';
+                
+                // Səbət ikonunun altındakı cəmi də sıfırlayaq
+                const cartTotalBadge = document.getElementById('cart-total-badge');
+                if (cartTotalBadge) {
+                    cartTotalBadge.textContent = '0 ₼';
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Səbət məlumatları yüklənərkən xəta baş verdi:', error);
+            cartItemsContainer.innerHTML = `
+                <div class="empty-cart-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <p>Məlumatlar yüklənərkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.</p>
+                </div>
+            `;
+        });
+    }
+
+    // Səbət modalını bağlamaq üçün
+    document.addEventListener('DOMContentLoaded', function() {
+        const cartModal = document.getElementById('cart-modal');
+        const closeButton = document.querySelector('.cart-close');
+        
+        if (closeButton) {
+            closeButton.addEventListener('click', function() {
+                cartModal.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        }
+        
+        // Modal xaricində kliklənəndə bağlanması
+        cartModal.addEventListener('click', function(event) {
+            if (event.target === cartModal) {
+                cartModal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+        
+        // ESC2 düyməsi ilə bağlanması
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && cartModal.classList.contains('active')) {
+                cartModal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+        
+        // Səhifə yükləndikdə səbət sayını və cəmini yeniləyək
+        updateCartCount();
+    });
 
     // Navbar funksiyaları
     document.addEventListener('DOMContentLoaded', function() {

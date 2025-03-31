@@ -8,129 +8,139 @@
 {% endblock %}
 
 {% block content %}
-<div class="panel-overlay" id="cart-overlay"></div>
-<div class="slide-in-panel" id="cart-panel">
-    <button class="panel-close-btn" id="close-cart-panel">
-        <i class="fas fa-arrow-right"></i>
-    </button>
-    
-    <div class="panel-header">
+<div class="container">
+    <div class="header">
+       
         <h1>Səbətim</h1>
     </div>
-    
-    <div class="panel-content">
-        {% if sebet %}
-        <div class="cart-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>
-                            <div class="custom-checkbox">
-                                <input type="checkbox" id="selectAll" onchange="toggleAllItems(this)">
-                                <label for="selectAll" class="sr-only">Hamısını Seç</label>
-                            </div>
-                        </th>
-                        <th>Məhsul</th>
-                        <th>Firma</th>
-                        <th>Avtomobil</th>
-                        <th>№</th>
-                        <th>KOD</th>
-                        <th>Mövcudluq</th>
-                        <th>Miqdar</th>
-                        <th>Qiymət</th>
-                        <th>Cəmi</th>
-                        <th>Sil</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in sebet %}
-                    <tr data-item-id="{{ item.id }}" data-price="{{ item.mehsul.formatted_qiymet }}">
-                        <td>
-                            <div class="custom-checkbox">
-                                <input type="checkbox" class="item-checkbox" id="item-{{ item.id }}" data-item-id="{{ item.id }}" onchange="updateTotalAmount()">
-                                <label for="item-{{ item.id }}" class="sr-only">Məhsulu Seç</label>
-                            </div>
-                        </td>
-                        <td>{{ item.mehsul.adi }}</td>
-                        <td>{{ item.mehsul.brend.adi }}</td>
-                        <td>{{ item.mehsul.marka.adi }}</td>
-                        <td>{{ item.mehsul.brend_kod }}</td>
-                        <td>{{ item.mehsul.oem }}</td>
-                        <td>
-                            {% if item.mehsul.stok == 0 %}
-                                <span class="stock-status out-of-stock">
-                                     Yoxdur
-                                </span>
-                            {% elif item.mehsul.stok <= 20 %}
-                                <span class="stock-status low-stock">
-                                    Az var
-                                </span>
-                            {% else %}
-                                <span class="stock-status in-stock">
-                                   Var
-                                </span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <div class="quantity-controls">
-                                <input type="number" 
-                                       class="quantity-input" 
-                                       value="{{ item.miqdar }}"
-                                       min="1"
-                                       max="999"
-                                       data-item-id="{{ item.id }}"
-                                       onchange="validateCartQuantity(this)"
-                                       onkeyup="if(event.key === 'Enter') validateCartQuantity(this)"
-                                       onblur="validateCartQuantity(this)"
-                                       style="width: 60px; text-align: center;">
-                            </div>
-                        </td>
-                        <td class="price">{{ item.mehsul.formatted_qiymet }} ₼</td>
-                        <td class="item-total">{{ item.cemi }} ₼</td>
-                        <td>
-                            <form action="{% url 'sebetden_sil' item.id %}" method="post" style="display: inline;">
-                                {% csrf_token %}
-                                <button type="submit" class="delete-btn" title="Sil" onclick="return confirm('Məhsulu silmək istədiyinizə əminsiniz?')">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
 
-            <div colspan="11" style="text-align: center; padding: 1.5rem;">
-                <div style="display: inline-flex; align-items: center; gap: 1rem; background: linear-gradient(145deg, #0a1929, #1a2942); padding: 1rem 2rem; border-radius: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
-                    <strong style="color: #64ffda; font-size: 1.2rem;">Seçilmiş Məhsulların Cəmi:</strong>
-                    <span id="selected-total-amount" style="color: white; font-size: 1.2rem; font-weight: 600;">0 ₼</span>
-                </div>
+    {% if sebet %}
+    <div class="cart-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>
+                        <div class="custom-checkbox">
+                            <input type="checkbox" id="selectAll" onchange="toggleAllItems(this)">
+                            <label for="selectAll" class="sr-only">Hamısını Seç</label>
+                        </div>
+                    </th>
+                    <th>Məhsul</th>
+                    <th>Firma</th>
+                    <th>Avtomobil</th>
+                    <th>№</th>
+                    <th>KOD</th>
+                    <th>Mövcudluq</th>
+                    <th>Miqdar</th>
+                    <th>Qiymət</th>
+                    <th>Cəmi</th>
+                    <th>Sil</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in sebet %}
+                <tr data-item-id="{{ item.id }}" data-price="{{ item.mehsul.formatted_qiymet }}">
+                    <td>
+                        <div class="custom-checkbox">
+                            <input type="checkbox" class="item-checkbox" id="item-{{ item.id }}" data-item-id="{{ item.id }}" onchange="updateTotalAmount()">
+                            <label for="item-{{ item.id }}" class="sr-only">Məhsulu Seç</label>
+                        </div>
+                    </td>
+                    <td>{{ item.mehsul.adi }}</td>
+                    <td>{{ item.mehsul.brend.adi }}</td>
+                    <td>{{ item.mehsul.marka.adi }}</td>
+                    <td>{{ item.mehsul.brend_kod }}</td>
+                    <td>{{ item.mehsul.oem }}</td>
+                    <td>
+                        {% if item.mehsul.stok == 0 %}
+                            <span class="stock-status out-of-stock">
+                                 Yoxdur
+                            </span>
+                        {% elif item.mehsul.stok <= 20 %}
+                            <span class="stock-status low-stock">
+                                Az var
+                            </span>
+                        {% else %}
+                            <span class="stock-status in-stock">
+                               Var
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="quantity-controls">
+                            {% comment %} <button type="button" class="quantity-btn minus" onclick="updateQuantity({{ item.id }}, -1)">
+                                <i class="fas fa-minus"></i>
+                            </button> {% endcomment %}
+                            <input type="number" 
+                                   class="quantity-input" 
+                                   value="{{ item.miqdar }}"
+                                   min="1"
+                                   max="999"
+                                   data-item-id="{{ item.id }}"
+                                   onchange="validateCartQuantity(this)"
+                                   onkeyup="if(event.key === 'Enter') validateCartQuantity(this)"
+                                   onblur="validateCartQuantity(this)"
+                                   style="width: 60px; text-align: center;">
+                            {% comment %} <button type="button" class="quantity-btn plus" onclick="updateQuantity({{ item.id }}, 1)">
+                                <i class="fas fa-plus"></i>
+                            </button> {% endcomment %}
+                        </div>
+                    </td>
+                    <td class="price">{{ item.mehsul.formatted_qiymet }} ₼</td>
+                    <td class="item-total">{{ item.cemi }} ₼</td>
+                    <td>
+                        <form action="{% url 'sebetden_sil' item.id %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="delete-btn" title="Sil" onclick="return confirm('Məhsulu silmək istədiyinizə əminsiniz?')">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% comment %} <tfoot>
+                <tr>
+                    <td colspan="11" style="text-align: center; padding: 1.5rem;">
+                        <div style="display: inline-flex; align-items: center; gap: 1rem; background: linear-gradient(145deg, #0a1929, #1a2942); padding: 1rem 2rem; border-radius: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
+                            <strong style="color: #64ffda; font-size: 1.2rem;">Ümumi Cəmi:</strong>
+                            <span id="total-amount" style="color: white; font-size: 1.2rem; font-weight: 600;">{{ cemi_mebleg }} ₼</span>
+                        </div>
+                    </td>
+                </tr>
+            </tfoot> {% endcomment %}
+        </table>
+
+        <div colspan="11" style="text-align: center; padding: 1.5rem;">
+            <div style="display: inline-flex; align-items: center; gap: 1rem; background: linear-gradient(145deg, #0a1929, #1a2942); padding: 1rem 2rem; border-radius: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
+                <strong style="color: #64ffda; font-size: 1.2rem;">Seçilmiş Məhsulların Cəmi:</strong>
+                <span id="selected-total-amount" style="color: white; font-size: 1.2rem; font-weight: 600;">0 ₼</span>
             </div>
+        </div>
 
-            <div class="cart-actions">
-                <button onclick="recalculateCart()" class="recalculate-btn" id="recalculateBtn">
-                    <i class="fas fa-sync-alt"></i>
-                    Yenidən Hesabla
+        <div class="cart-actions">
+            <button onclick="recalculateCart()" class="recalculate-btn" id="recalculateBtn">
+                <i class="fas fa-sync-alt"></i>
+                Yenidən Hesabla
+            </button>
+            <form id="orderForm" onsubmit="return handleOrderSubmit(event)">
+                {% csrf_token %}
+                <button type="submit" class="order-btn" id="orderButton" disabled>
+                    <i class="fas fa-shopping-cart"></i>
+                    Seçilmiş Məhsulları Sifariş Et
                 </button>
-                <form id="orderForm" onsubmit="return handleOrderSubmit(event)">
-                    {% csrf_token %}
-                    <button type="submit" class="order-btn" id="orderButton" disabled>
-                        <i class="fas fa-shopping-cart"></i>
-                        Seçilmiş Məhsulları Sifariş Et
-                    </button>
-                </form>
-            </div>
+            </form>
         </div>
-        {% else %}
-        <div class="empty-cart">
-            <i class="fas fa-shopping-cart"></i>
-            <p>Səbətiniz boşdur</p>
-            <a href="{% url 'umumi_baxis' %}" class="continue-shopping">
-                Alış-verişə davam et
-            </a>
-        </div>
-        {% endif %}
     </div>
+    {% else %}
+    <div class="empty-cart">
+        <i class="fas fa-shopping-cart"></i>
+        <p>Səbətiniz boşdur</p>
+        <a href="{% url 'umumi_baxis' %}" class="continue-shopping">
+            Alış-verişə davam et
+        </a>
+    </div>
+    {% endif %}
 </div>
 
 <!-- Loading Bar -->
@@ -152,57 +162,6 @@
 {% block extra_js %}
 {{ block.super }}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Səbət panelini avtomatik olaraq aç
-        openCartPanel();
-        
-        // Bağlama düyməsi üçün event listener
-        document.getElementById('close-cart-panel').addEventListener('click', closeCartPanel);
-        
-        // Panel xaricində klikləyərək bağlamaq
-        document.getElementById('cart-overlay').addEventListener('click', closeCartPanel);
-        
-        // ESC düyməsi ilə bağlamaq
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeCartPanel();
-            }
-        });
-        
-        // Səbət panelini açmaqla yanaşı, 
-        // digər inicializasiyaları da edirik
-        updateOrderButton();
-        
-        // Səhifə yüklənərkən cəmi hesabla
-        updateTotalAmount();
-        
-        // Miqdar dəyişdikdə cəmi yenilə
-        const quantityInputs = document.querySelectorAll('.quantity-input');
-        quantityInputs.forEach(input => {
-            input.addEventListener('change', function() {
-                // Miqdar dəyişdikdə cəmi yenilə
-                setTimeout(updateTotalAmount, 500);
-            });
-        });
-    });
-    
-    function openCartPanel() {
-        document.getElementById('cart-panel').classList.add('active');
-        document.getElementById('cart-overlay').classList.add('active');
-        document.body.classList.add('panel-open');
-    }
-    
-    function closeCartPanel() {
-        document.getElementById('cart-panel').classList.remove('active');
-        document.getElementById('cart-overlay').classList.remove('active');
-        document.body.classList.remove('panel-open');
-        
-        // Ana səhifəyə qayıt
-        setTimeout(function() {
-            window.history.back();
-        }, 300);
-    }
-    
     function toggleAllItems(checkbox) {
         const itemCheckboxes = document.querySelectorAll('.item-checkbox');
         itemCheckboxes.forEach(item => {
@@ -253,9 +212,9 @@
         orderButton.disabled = checkedItems.length === 0;
     }
     
-    function handleOrderSubmit(event) {
-        event.preventDefault();
-        
+function handleOrderSubmit(event) {
+    event.preventDefault();
+    
         const checkedItems = document.querySelectorAll('.item-checkbox:checked');
         if (checkedItems.length === 0) {
             alert('Zəhmət olmasa ən azı bir məhsul seçin');
@@ -268,28 +227,49 @@
             );
             
             fetch('{% url "sifarisi_gonder" %}', {
-                method: 'POST',
-                headers: {
+            method: 'POST',
+            headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
+                'X-CSRFToken': '{{ csrf_token }}'
                 },
                 body: JSON.stringify({
                     selected_items: selectedItemIds
                 })
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert('Sifarişiniz uğurla qeydə alındı.');
-                    window.location.href = '{% url "view_cart" %}';
-                } else {
-                    alert('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
-                }
-            })
-            .catch(error => {
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Sifarişiniz uğurla qeydə alındı.');
+                window.location.href = '{% url "view_cart" %}';
+            } else {
                 alert('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
-            });
-        }
+            }
+        })
+        .catch(error => {
+            alert('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+        });
     }
+    return false;
+}
+    
+    // Initialize order button state
+    document.addEventListener('DOMContentLoaded', function() {
+        updateOrderButton();
+        
+        // Səhifə yüklənərkən cəmi hesabla
+        updateTotalAmount();
+        
+        // Miqdar dəyişdikdə cəmi yenilə
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        quantityInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                // Miqdar dəyişdikdə cəmi yenilə
+                setTimeout(updateTotalAmount, 500);
+            });
+        });
+        
+        // Debug məlumatı
+        console.log('Səhifə yükləndi, cəmi hesablandı');
+    });
     
     function recalculateCart() {
         const loadingBar = document.getElementById('loadingBar');

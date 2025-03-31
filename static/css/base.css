@@ -1854,3 +1854,37 @@ html {
         max-width: 100%;
     }
 }
+
+.checkout-btn {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    font-size: 1.1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.checkout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, #45a049, #3d8b40);
+}
+
+.checkout-btn:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+    .checkout-btn {
+        padding: 10px 20px;
+        font-size: 1rem;
+    }
+}

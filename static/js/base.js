@@ -368,6 +368,9 @@
     document.addEventListener('DOMContentLoaded', function() {
         console.log('DOM yükləndi, funksiyalar başladılır...');
         
+        // Səbət drawer-ini quraşdıraq
+        setupCartDrawer();
+        
         // Global funksiyaları window obyektinə əlavə et
         window.selectUser = selectUser;
         window.confirmLogout = confirmLogout;
@@ -571,6 +574,32 @@
             });
         }
 
+        // Səbət drawer-ini bağlamaq üçün
+        const cartDrawer = document.getElementById('cart-drawer');
+        const closeButton = document.querySelector('.cart-close');
+        
+        if (closeButton) {
+            closeButton.addEventListener('click', function() {
+                cartDrawer.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        }
+        
+        // Drawer xaricində kliklənəndə bağlanması
+        cartDrawer.addEventListener('click', function(event) {
+            if (event.target === cartDrawer) {
+                cartDrawer.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+        
+        // ESC düyməsi ilə bağlanması
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && cartDrawer.classList.contains('active')) {
+                cartDrawer.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
     });
 
     // Sifariş funksiyaları
@@ -1075,6 +1104,7 @@
 
     function loadCartItems() {
         const cartItemsContainer = document.getElementById('cart-items-container');
+        const cartDetailsContainer = document.getElementById('cart-details-container');
         
         // Yükləmə animasiyasını göstər
         cartItemsContainer.innerHTML = `
@@ -1083,21 +1113,30 @@
             </div>
         `;
         
-        // Səbət məlumatlarını serverdən al
-        fetch('/get_cart_items/', {
-            method: 'GET',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': getCookie('csrftoken')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.items && data.items.length > 0) {
+        // Səbət məlumatlarını və cart.html məzmununu yüklə
+        Promise.all([
+            fetch('/get_cart_items/', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            }).then(response => response.json()),
+            
+            fetch('/view_cart/', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            }).then(response => response.text())
+        ])
+        .then(([cartData, cartHtml]) => {
+            // Səbət məlumatlarını əlavə et
+            if (cartData.items && cartData.items.length > 0) {
                 let cartHTML = '';
                 
                 // Hər bir səbət elementi üçün HTML yaradaq
-                data.items.forEach(item => {
+                cartData.items.forEach(item => {
                     cartHTML += `
                         <div class="cart-item" data-item-id="${item.id}">
                             <img src="${item.image || '/static/img/no-image.png'}" alt="${item.name}" class="cart-item-image">
@@ -1119,13 +1158,16 @@
                 });
                 
                 cartItemsContainer.innerHTML = cartHTML;
-                document.getElementById('cart-modal-total').textContent = data.total + ' ₼';
+                document.getElementById('cart-modal-total').textContent = cartData.total + ' ₼';
                 
                 // Səbət ikonunun altındakı cəmi də yeniləyək
                 const cartTotalBadge = document.getElementById('cart-total-badge');
                 if (cartTotalBadge) {
-                    cartTotalBadge.textContent = data.total + ' ₼';
+                    cartTotalBadge.textContent = cartData.total + ' ₼';
                 }
+                
+                // Cart.html məzmununu əlavə et
+                loadCartDetailsFromHtml(cartHtml);
             } else {
                 // Səbət boşdursa
                 cartItemsContainer.innerHTML = `
@@ -1141,6 +1183,9 @@
                 if (cartTotalBadge) {
                     cartTotalBadge.textContent = '0 ₼';
                 }
+                
+                // Cart details-i boşalt
+                cartDetailsContainer.innerHTML = '';
             }
         })
         .catch(error => {
@@ -1154,8 +1199,63 @@
         });
     }
 
-    // Səbət drawer-ini bağlamaq üçün
+    // HTML məzmunundan səbət detaylarını yükləmək üçün funksiya
+    function loadCartDetailsFromHtml(html) {
+        const cartDetailsContainer = document.getElementById('cart-details-container');
+        
+        // Html-dən sadəcə cart məzmununun lazım olan hissəsini çıxaraq
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        
+        // "container" class-nı tapaq və onun içindəkiləri götürək
+        const cartContent = tempDiv.querySelector('.cart-container');
+        
+        if (cartContent) {
+            // Drawer-ə uyğunlaşdırmaq üçün bəzi əlavə CSS siniflərini əlavə edək
+            cartContent.classList.add('cart-drawer-details');
+            cartDetailsContainer.innerHTML = '';
+            cartDetailsContainer.appendChild(cartContent);
+            
+            // Event listener-lər əlavə edək
+            initializeCartDetailsFunctions();
+        } else {
+            cartDetailsContainer.innerHTML = '<p>Səbət məlumatları yüklənə bilmədi</p>';
+        }
+    }
+
+    // Cart details üçün funksiyaları initialize edək
+    function initializeCartDetailsFunctions() {
+        // Checkbox-ların dəyişməsini izləyək
+        const itemCheckboxes = document.querySelectorAll('.cart-drawer-details .item-checkbox');
+        itemCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateTotalAmount();
+                updateOrderButton();
+            });
+        });
+        
+        // "Sifariş Et" düyməsinə klik hadisəsini izləyək
+        const checkoutBtn = document.getElementById('cart-checkout-btn');
+        if (checkoutBtn) {
+            checkoutBtn.addEventListener('click', function() {
+                const checkedItems = document.querySelectorAll('.cart-drawer-details .item-checkbox:checked');
+                if (checkedItems.length === 0) {
+                    alert('Zəhmət olmasa ən azı bir məhsul seçin');
+                    return;
+                }
+                
+                handleOrderSubmit(new Event('click'));
+            });
+        }
+    }
+
+    // Navbar funksiyaları
     document.addEventListener('DOMContentLoaded', function() {
+        // Köhnə nav-bar açılıb-bağlanma funksiyası silinib
+    });
+
+    // Səbət drawer işləmləri üçün funksiya
+    function setupCartDrawer() {
         const cartDrawer = document.getElementById('cart-drawer');
         const closeButton = document.querySelector('.cart-close');
         
@@ -1181,12 +1281,53 @@
                 document.body.style.overflow = '';
             }
         });
-        
-        // Səhifə yükləndikdə səbət sayını və cəmini yeniləyək
-        updateCartCount();
-    });
+    }
 
-    // Navbar funksiyaları
-    document.addEventListener('DOMContentLoaded', function() {
-        // Köhnə nav-bar açılıb-bağlanma funksiyası silinib
-    });
+    // Sifariş göndərmə funksiyası
+    function handleOrderSubmit(event) {
+        event.preventDefault();
+        
+        const checkedItems = document.querySelectorAll('.cart-drawer-details .item-checkbox:checked');
+        if (checkedItems.length === 0) {
+            alert('Zəhmət olmasa ən azı bir məhsul seçin');
+            return false;
+        }
+        
+        if (confirm('Seçilmiş məhsulları sifariş etmək istədiyinizə əminsiniz?')) {
+            const selectedItemIds = Array.from(checkedItems).map(checkbox => 
+                checkbox.getAttribute('data-item-id')
+            );
+            
+            fetch('/sifarisi_gonder/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    selected_items: selectedItemIds
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Sifarişiniz uğurla qeydə alındı.');
+                    
+                    // Drawer-i bağla
+                    const cartDrawer = document.getElementById('cart-drawer');
+                    cartDrawer.classList.remove('active');
+                    document.body.style.overflow = '';
+                    
+                    // Səbət sayını yenilə
+                    updateCartCount();
+                    
+                    // Sifariş səhifəsinə yönləndir
+                    window.location.href = '/sifaris_izle/';
+                } else {
+                    alert('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+                }
+            })
+            .catch(error => {
+                alert('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+            });
+        }
+    }

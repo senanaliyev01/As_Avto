@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Kateqoriya, Brend, Marka, Mehsul, Sebet, Sifaris, SifarisMehsul, OEMKod, MusteriReyi, MarkaSekil, Model, Avtomodel, Motor, Il, Yanacaq
+from .models import Kateqoriya, Brend, Marka, Mehsul, Sebet, Sifaris, SifarisMehsul, OEMKod, MusteriReyi, MarkaSekil, Model, Avtomodel, Motor, Il, Yanacaq, POSTerminal, Satis, SatisMehsul
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils import timezone
@@ -9,6 +9,8 @@ from django import forms
 from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
 import pandas as pd
+import re
+from django.db.models import Q
 
 class MarkaSekilInline(admin.TabularInline):
     model = MarkaSekil
@@ -188,6 +190,28 @@ class MehsulAdmin(admin.ModelAdmin):
     
     actions = ['yenilikden_sil', 'yenidir_et']
     
+    # Autocomplete əlavə et
+    autocomplete_fields = ['kateqoriya', 'brend', 'marka']
+    
+    def get_search_results(self, request, queryset, search_term):
+        """Axtarış nəticələrini təkmilləşdirmək üçün"""
+        queryset, use_distinct = super().get_search_results(request, queryset, search_term)
+        
+        # Tam dəqiq axtarış əlavə edirik
+        if search_term:
+            # Xüsusi simvolları təmizləyirik
+            clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_term)
+            
+            # Əlavə axtarış imkanları
+            kodlar_queryset = Mehsul.objects.filter(
+                Q(oem_kodlar__kod__icontains=clean_search) |  # OEM kodlarında
+                Q(brend_kod__iexact=search_term)              # Brend kodunda
+            ).distinct()
+            
+            queryset = queryset | kodlar_queryset
+        
+        return queryset, True  # True for distinct
+
     def get_urls(self):
         from django.urls import path
         urls = super().get_urls()
@@ -425,3 +449,86 @@ class MusteriReyiAdmin(admin.ModelAdmin):
     def tesdiq_legv_et(self, request, queryset):
         queryset.update(tesdiq=False)
     tesdiq_legv_et.short_description = "Seçilmiş rəylərin təsdiqini ləğv et"
+
+# Yeni model adminlərini təyin edirik
+class SatisMehsulInline(admin.TabularInline):
+    model = SatisMehsul
+    extra = 1
+    autocomplete_fields = ['mehsul']
+    readonly_fields = ('total_price',)
+    
+    def total_price(self, obj):
+        if obj.id:
+            return f"{obj.total_price()} AZN"
+        return "-"
+    total_price.short_description = "Cəmi"
+
+class SatisAdmin(admin.ModelAdmin):
+    list_display = ('satis_nomresi', 'musteri_adi', 'cemi_mebleg', 'odenilen_mebleg', 'get_borc', 'status', 'odenis_tipi', 'tarix')
+    list_filter = ('status', 'odenis_tipi', 'tarix')
+    search_fields = ('satis_nomresi', 'musteri_adi', 'musteri_telefon')
+    readonly_fields = ('cemi_mebleg', 'get_borc', 'transaction_id', 'satis_nomresi')
+    inlines = [SatisMehsulInline]
+    fieldsets = (
+        ('Əsas Məlumatlar', {
+            'fields': ('satis_nomresi', 'user', 'status', 'odenis_tipi', 'cemi_mebleg', 'odenilen_mebleg', 'endirim', 'get_borc')
+        }),
+        ('Müştəri Məlumatları', {
+            'fields': ('musteri_adi', 'musteri_telefon')
+        }),
+        ('Terminal', {
+            'fields': ('terminal', 'transaction_id')
+        }),
+        ('Digər', {
+            'fields': ('qeyd',)
+        }),
+    )
+    
+    def get_borc(self, obj):
+        return f"{obj.borc()} AZN"
+    get_borc.short_description = "Borc"
+    
+    def pos_terminal_odenis(self, request, queryset):
+        """POS Terminal vasitəsi ilə ödəniş etmək üçün admin əməliyyatı"""
+        basarili = 0
+        for satis in queryset:
+            if satis.terminal and satis.borc() > 0:
+                success, message = satis.terminal_odenis_et()
+                if success:
+                    basarili += 1
+                    self.message_user(request, f"{satis.satis_nomresi} nömrəli satış üçün ödəniş tamamlandı.")
+                else:
+                    self.message_user(request, f"{satis.satis_nomresi} nömrəli satış üçün ödəniş xətası: {message}", level=messages.ERROR)
+        
+        if basarili:
+            self.message_user(request, f"Cəmi {basarili} satış üçün POS terminal ödənişi başarılı oldu.")
+        else:
+            self.message_user(request, "Heç bir ödəniş tamamlanmadı. Terminalları və qalıq borcları yoxlayın.", level=messages.ERROR)
+    
+    pos_terminal_odenis.short_description = "POS Terminal ilə ödəniş et"
+    
+    def get_qebz(self, request, queryset):
+        """Satış qəbzi yaratmaq üçün admin əməliyyatı"""
+        # Burada qəbz yaratma funksionallığı əlavə edə bilərsiniz
+        # Misal üçün PDF fayl yaratma
+        self.message_user(request, "Qəbz yaratma funksionallığı hələ hazırlanır.")
+    
+    get_qebz.short_description = "Qəbz çap et"
+    
+    actions = ['pos_terminal_odenis', 'get_qebz']
+
+class POSTerminalAdmin(admin.ModelAdmin):
+    list_display = ('terminal_adi', 'ip_adres', 'port', 'aktiv', 'online_status', 'yaradilma_tarixi')
+    list_filter = ('aktiv', 'yaradilma_tarixi')
+    search_fields = ('terminal_adi', 'ip_adres')
+    
+    def online_status(self, obj):
+        if obj.baglanti_yoxla():
+            return True
+        return False
+    online_status.boolean = True
+    online_status.short_description = "Online"
+
+admin.site.register(POSTerminal, POSTerminalAdmin)
+admin.site.register(Satis, SatisAdmin)
+admin.site.register(SatisMehsul)

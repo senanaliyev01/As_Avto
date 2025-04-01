@@ -1,0 +1,65 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+
+{% block submit_buttons_bottom %}
+{{ block.super }}
+<style>
+    .pos-payment-button {
+        background: linear-gradient(to bottom, #3498db, #2980b9);
+        color: white !important;
+        padding: 10px 16px !important;
+        border-radius: 4px !important;
+        border: none !important;
+        display: inline-flex !important;
+        align-items: center;
+        font-weight: 500 !important;
+        text-decoration: none !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+        margin-left: 10px;
+    }
+
+    .pos-payment-button:hover {
+        background: linear-gradient(to bottom, #2980b9, #2471a3) !important;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+        transform: translateY(-1px);
+    }
+
+    .check-payment-button {
+        background: linear-gradient(to bottom, #f39c12, #e67e22);
+        color: white !important;
+        padding: 10px 16px !important;
+        border-radius: 4px !important;
+        border: none !important;
+        display: inline-flex !important;
+        align-items: center;
+        font-weight: 500 !important;
+        text-decoration: none !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+        margin-left: 10px;
+    }
+
+    .check-payment-button:hover {
+        background: linear-gradient(to bottom, #e67e22, #d35400) !important;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+        transform: translateY(-1px);
+    }
+</style>
+
+{% if show_pos_create_button %}
+<div class="submit-row" style="margin-top: 10px;">
+    <a href="{% url 'admin:pos-odeme-yarat' satis_id=original.pk %}" class="pos-payment-button">
+        POS Terminal Ödəməsi Yarat
+    </a>
+</div>
+{% endif %}
+
+{% if show_pos_check_button %}
+<div class="submit-row" style="margin-top: 10px;">
+    <a href="{% url 'admin:yoxla-odeme-statusu' satis_id=original.pk %}" class="check-payment-button">
+        Ödəmə Statusunu Yoxla
+    </a>
+</div>
+{% endif %}
+{% endblock %} 

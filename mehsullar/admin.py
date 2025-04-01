@@ -9,7 +9,6 @@ from django import forms
 from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
 import pandas as pd
-import logging
 
 class MarkaSekilInline(admin.TabularInline):
     model = MarkaSekil
@@ -429,238 +428,223 @@ class MusteriReyiAdmin(admin.ModelAdmin):
 
 class SatisMehsulInline(admin.TabularInline):
     model = SatisMehsul
-    extra = 0
+    extra = 1
     fields = ('mehsul', 'miqdar', 'qiymet')
-    readonly_fields = ('get_brend', 'get_brend_kod', 'get_total')
+    readonly_fields = ('mebleg',)
     
-    def get_brend(self, obj):
-        if obj.mehsul.brend:
-            return obj.mehsul.brend.adi
+    def mebleg(self, obj):
+        if obj.pk:
+            return f"{obj.mebleg()} AZN"
         return "-"
-    get_brend.short_description = 'Firma'
     
-    def get_brend_kod(self, obj):
-        return obj.mehsul.brend_kod if obj.mehsul.brend_kod else "-"
-    get_brend_kod.short_description = 'Brend Kodu'
-    
-    def get_total(self, obj):
-        if hasattr(obj, 'miqdar') and hasattr(obj, 'qiymet'):
-            return f"{obj.miqdar * obj.qiymet} AZN"
-        return "0 AZN"
-    get_total.short_description = 'Cəmi'
+    mebleg.short_description = "Məbləğ"
 
 @admin.register(POSTerminal)
 class POSTerminalAdmin(admin.ModelAdmin):
-    list_display = ('ad', 'ip_adres', 'port', 'aktiv', 'yaradilma_tarixi', 'test_connection')
+    list_display = ('adi', 'terminal_id', 'aktiv', 'yaradilma_tarixi')
     list_filter = ('aktiv',)
-    search_fields = ('ad', 'ip_adres')
-    list_editable = ('aktiv',)
-    
-    def test_connection(self, obj):
-        """Terminal bağlantısını yoxlamaq üçün button"""
-        return format_html(
-            '<a href="{}" class="button" style="background-color: #007bff; color: white;">Bağlantını Yoxla</a>',
-            reverse('admin:test_terminal_connection', args=[obj.pk])
-        )
-    test_connection.short_description = 'Bağlantı testi'
-    
-    def get_urls(self):
-        from django.urls import path
-        urls = super().get_urls()
-        my_urls = [
-            path('<int:terminal_id>/test-connection/', self.admin_site.admin_view(self.test_terminal_connection), name='test_terminal_connection'),
-        ]
-        return my_urls + urls
-    
-    def test_terminal_connection(self, request, terminal_id):
-        """Terminal ilə bağlantını yoxlayır və nəticəni ekrana çıxarır"""
-        from django.shortcuts import get_object_or_404, redirect
-        from django.contrib import messages
-        from mehsullar.pos_terminal import get_terminal
-        
-        # Loqları ekranda göstərmək üçün
-        logger = logging.getLogger('mehsullar.pos_terminal')
-        
-        terminal = get_object_or_404(POSTerminal, id=terminal_id)
-        
-        # IP localhost-sa dummy terminal istifadə et (test və debug üçün)
-        use_dummy = terminal.ip_adres in ["localhost", "127.0.0.1"]
-        if use_dummy:
-            messages.info(request, f"Dummy terminal rejimi aktiv edildi (simulyasiya). IP: {terminal.ip_adres}")
-        
-        try:
-            # Terminal inteqrasiyası
-            integration = get_terminal(
-                terminal.ip_adres, 
-                terminal.port, 
-                debug=True,
-                dummy=use_dummy
-            )
-            
-            # Bağlantını sına
-            connected = integration.connect()
-            
-            if connected:
-                # Terminal ilə bağlantı quruldu, status sorğusu göndərək
-                status, status_message = integration.check_status()
-                
-                if status:
-                    messages.success(request, f"Terminal ilə bağlantı quruldu! Status: {status_message}")
-                    
-                    # Əlavə debug informasiyası üçün simulyasiya ödəməsi
-                    if use_dummy:
-                        result, tx_id, pay_message = integration.process_payment(1.0, "TEST-REF")
-                        if result:
-                            messages.info(request, f"Test ödəməsi uğurlu: {tx_id} - {pay_message}")
-                        else:
-                            messages.warning(request, f"Test ödəməsi xətası: {pay_message}")
-                else:
-                    messages.warning(request, f"Terminal ilə bağlantı quruldu, lakin hazır deyil. Status: {status_message}")
-            else:
-                messages.error(request, f"Terminal ilə bağlantı qurula bilmədi. Lütfən IP ({terminal.ip_adres}) və port ({terminal.port}) parametrlərini yoxlayın.")
-                
-            # Bağlantını bağlayaq
-            integration.disconnect()
-            
-        except Exception as e:
-            import traceback
-            error_details = traceback.format_exc()
-            messages.error(request, f"Terminal bağlantısı zamanı xəta: {str(e)}")
-            messages.debug(request, f"Xəta detalları: {error_details}")
-            logger.error(f"Terminal bağlantısı xətası: {e}")
-            logger.debug(f"Xəta izləməsi: {error_details}")
-        
-        return redirect('admin:mehsullar_posterminal_change', terminal_id)
+    search_fields = ('adi', 'terminal_id')
+    fields = ('adi', 'terminal_id', 'api_key', 'aktiv')
 
 @admin.register(Satis)
 class SatisAdmin(admin.ModelAdmin):
-    list_display = ('id', 'tarix', 'umumi_mebleg', 'odenis_usulu', 'get_pos_terminal', 'status', 'operator', 'emeliyyat_actions')
-    list_filter = ('status', 'odenis_usulu', 'operator')
-    search_fields = ('id', 'qeyd')
-    readonly_fields = ('tarix', 'emeliyyat_id')
+    list_display = ('id', 'musteri_adi', 'format_tarix', 'format_umumi_mebleg', 'odeme_usulu', 'get_pos_terminal', 'get_status')
+    search_fields = ('musteri_adi', 'musteri_tel', 'qeyd')
+    list_filter = ('status', 'odeme_usulu', 'tarix')
     inlines = [SatisMehsulInline]
+    fields = ('musteri_adi', 'musteri_tel', 'qeyd', 'umumi_mebleg', 'odeme_usulu', 'pos_terminal', 'odeme_kodu', 'status')
+    
+    def format_tarix(self, obj):
+        return obj.tarix.strftime('%d.%m.%Y %H:%M')
+    format_tarix.short_description = 'Tarix'
+    
+    def format_umumi_mebleg(self, obj):
+        return f"{obj.umumi_mebleg} AZN"
+    format_umumi_mebleg.short_description = 'Ümumi məbləğ'
     
     def get_pos_terminal(self, obj):
         if obj.pos_terminal:
-            return obj.pos_terminal.ad
+            return obj.pos_terminal.adi
         return "-"
     get_pos_terminal.short_description = 'POS Terminal'
-
+    
+    def get_status(self, obj):
+        status_classes = {
+            'gozleme': 'background: #FFA500;',  # Narıncı
+            'tamamlandi': 'background: #90EE90;',  # Yaşıl
+            'legv_edildi': 'background: #FF6347;'  # Qırmızı
+        }
+        style = status_classes.get(obj.status, '')
+        return format_html('<span style="padding: 5px 10px; border-radius: 4px; color: black; {}">{}</span>', style, obj.get_status_display())
+    get_status.short_description = 'Status'
+    
     def save_model(self, request, obj, form, change):
-        if not change:  # Yeni satis yaradılırsa
-            obj.operator = request.user
-        
-        # Əvvəlcə obyekti yadda saxlayaq
+        """POS ödəmə metodu seçilərsə, POS terminal də seçilməlidir"""
+        if obj.odeme_usulu == 'pos' and not obj.pos_terminal:
+            messages.error(request, "POS ödəmə metodu seçildiyi halda terminal də seçilməlidir!")
+            return
         super().save_model(request, obj, form, change)
-        
-        # Əgər POS terminal ödəmə üsulu seçilibsə və status gözləyəndirsə, ödəməni başlat
-        self.process_terminal_payment(request, obj)
-        
+    
     def save_formset(self, request, form, formset, change):
+        """Satış məhsulları əlavə edildiyi zaman ümumi məbləği hesabla"""
         instances = formset.save(commit=False)
+        # Check if it's the SatisMehsul formset
+        if formset.model == SatisMehsul:
+            # Calculate total sum
+            total = 0
+            for instance in instances:
+                if instance.miqdar and instance.qiymet:
+                    total += instance.miqdar * instance.qiymet
+            # Update the Satis object
+            satis = form.instance
+            satis.umumi_mebleg = total
+            satis.save()
+        
+        # Save formset normally
         for instance in instances:
-            if isinstance(instance, SatisMehsul):
-                # Məhsul stokunu azalt
-                if instance.mehsul.stok is not None:
-                    instance.mehsul.stok -= instance.miqdar
-                    instance.mehsul.save()
             instance.save()
         formset.save_m2m()
-        
-        # Ümumi məbləği yenilə
-        if instances and hasattr(instances[0], 'satis'):
-            satis = instances[0].satis
-            toplam = sum(item.miqdar * item.qiymet for item in satis.mehsullar.all())
-            satis.umumi_mebleg = toplam
-            satis.save()
-            
-            # Əgər POS terminal ödəmə üsulu seçilibsə və status gözləyəndirsə, ödəməni başlat
-            self.process_terminal_payment(request, satis)
-    
-    def process_terminal_payment(self, request, satis):
-        """POS terminal ödəməsini avtomatik başlat"""
-        if satis.odenis_usulu == 'terminal' and satis.status == 'gozleyen' and satis.pos_terminal and satis.mehsullar.exists():
-            try:
-                # Ödəmə prosesini başlat
-                success, message = satis.pos_terminal_odeme()
-                
-                if success:
-                    messages.success(request, f"POS terminal ödəməsi uğurla həyata keçirildi. {message}")
-                else:
-                    messages.error(request, f"POS terminal ödəməsi xətası: {message}")
-            except Exception as e:
-                messages.error(request, f"POS terminal ödəməsi zamanı xəta: {str(e)}")
-            
-    def emeliyyat_actions(self, obj):
-        """Terminal əməliyyatları üçün butonları göstərir"""
-        if obj.odenis_usulu == 'terminal':
-            if obj.status == 'gozleyen':
-                return format_html(
-                    '<a href="{}" class="button" style="background-color: #28a745; color: white;">POS Terminal İlə Ödə</a>',
-                    reverse('admin:pos_terminal_odeme', args=[obj.pk])
-                )
-            elif obj.status == 'tamamlandi' and obj.emeliyyat_id:
-                return format_html(
-                    '<a href="{}" class="button" style="background-color: #dc3545; color: white;">Ödəməni Ləğv Et</a>',
-                    reverse('admin:pos_terminal_legv', args=[obj.pk])
-                )
-        return "-"
 
+    def pos_odeme_yarat(self, request, satis_id):
+        """POS ödəmə yaratmaq üçün CashPos APİ ilə əlaqə"""
+        satis = Satis.objects.get(id=satis_id)
+        if not satis.pos_terminal:
+            messages.error(request, "Satış üçün POS terminal seçilməyib!")
+            return HttpResponseRedirect(reverse('admin:mehsullar_satis_change', args=[satis_id]))
+        
+        if satis.status != 'gozleme':
+            messages.error(request, "Bu satış artıq tamamlanıb və ya ləğv edilib!")
+            return HttpResponseRedirect(reverse('admin:mehsullar_satis_change', args=[satis_id]))
+        
+        # CashPos API ilə əlaqə
+        import requests
+        import json
+        import uuid
+        
+        # Hazırlıq məlumatları
+        terminal = satis.pos_terminal
+        endpoint = "https://api.cashpos.az/v1/payment/create"  # Fərqli ola bilər, rəsmi CashPos APİ sənədlərinə baxın
+        
+        # Unikal ödəmə ID yaradın
+        payment_id = str(uuid.uuid4())
+        
+        # Ödəmə məlumatlarını hazırlayın
+        data = {
+            "terminalId": terminal.terminal_id,
+            "amount": float(satis.umumi_mebleg),
+            "currency": "AZN",
+            "orderId": f"satis-{satis.id}-{payment_id}",
+            "description": f"Satış #{satis.id} üçün ödəmə"
+        }
+        
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {terminal.api_key}"
+        }
+        
+        try:
+            response = requests.post(endpoint, json=data, headers=headers)
+            response_data = response.json()
+            
+            if response.status_code == 200 and response_data.get("success"):
+                # Ödəmə yaradıldı, kodunu saxlayın
+                satis.odeme_kodu = response_data.get("paymentCode")
+                satis.save()
+                
+                messages.success(request, f"POS ödəmə kodu yaradıldı: {satis.odeme_kodu}")
+                return HttpResponseRedirect(reverse('admin:mehsullar_satis_change', args=[satis_id]))
+            else:
+                # Xəta baş verdi
+                error_message = response_data.get("message", "Bilinməyən xəta")
+                messages.error(request, f"POS ödəmə yaratma xətası: {error_message}")
+                return HttpResponseRedirect(reverse('admin:mehsullar_satis_change', args=[satis_id]))
+        
+        except Exception as e:
+            messages.error(request, f"POS ödəmə API xətası: {str(e)}")
+            return HttpResponseRedirect(reverse('admin:mehsullar_satis_change', args=[satis_id]))
+    
+    def yoxla_odeme_statusu(self, request, satis_id):
+        """Mövcud ödəmənin vəziyyətini yoxlamaq üçün API sorğusu"""
+        satis = Satis.objects.get(id=satis_id)
+        if not satis.pos_terminal or not satis.odeme_kodu:
+            messages.error(request, "Bu satış üçün POS ödəmə kodu tapılmadı!")
+            return HttpResponseRedirect(reverse('admin:mehsullar_satis_change', args=[satis_id]))
+        
+        # CashPos API ilə əlaqə
+        import requests
+        import json
+        
+        # Hazırlıq məlumatları
+        terminal = satis.pos_terminal
+        endpoint = f"https://api.cashpos.az/v1/payment/status/{satis.odeme_kodu}"  # Fərqli ola bilər
+        
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {terminal.api_key}"
+        }
+        
+        try:
+            response = requests.get(endpoint, headers=headers)
+            response_data = response.json()
+            
+            if response.status_code == 200:
+                payment_status = response_data.get("status")
+                
+                if payment_status == "COMPLETED":
+                    satis.status = 'tamamlandi'
+                    satis.save()
+                    messages.success(request, "Ödəmə uğurla tamamlandı!")
+                elif payment_status == "CANCELED":
+                    satis.status = 'legv_edildi'
+                    satis.save()
+                    messages.warning(request, "Ödəmə ləğv edildi!")
+                elif payment_status == "PENDING":
+                    messages.info(request, "Ödəmə hələ gözləmədədir. Daha sonra yenidən yoxlayın.")
+                else:
+                    messages.warning(request, f"Ödəmə statusu: {payment_status}")
+                
+                return HttpResponseRedirect(reverse('admin:mehsullar_satis_change', args=[satis_id]))
+            else:
+                error_message = response_data.get("message", "Bilinməyən xəta")
+                messages.error(request, f"Ödəmə statusu yoxlama xətası: {error_message}")
+                return HttpResponseRedirect(reverse('admin:mehsullar_satis_change', args=[satis_id]))
+        
+        except Exception as e:
+            messages.error(request, f"POS ödəmə API xətası: {str(e)}")
+            return HttpResponseRedirect(reverse('admin:mehsullar_satis_change', args=[satis_id]))
+    
     def get_urls(self):
         from django.urls import path
         urls = super().get_urls()
-        my_urls = [
-            path('pos_terminal_odeme/<int:satis_id>/', self.admin_site.admin_view(self.pos_terminal_odeme_view), name='pos_terminal_odeme'),
-            path('pos_terminal_legv/<int:satis_id>/', self.admin_site.admin_view(self.pos_terminal_legv_view), name='pos_terminal_legv'),
+        custom_urls = [
+            path(
+                '<path:satis_id>/pos-odeme-yarat/',
+                self.admin_site.admin_view(self.pos_odeme_yarat),
+                name='pos-odeme-yarat',
+            ),
+            path(
+                '<path:satis_id>/yoxla-odeme-statusu/',
+                self.admin_site.admin_view(self.yoxla_odeme_statusu),
+                name='yoxla-odeme-statusu',
+            ),
         ]
-        return my_urls + urls
+        return custom_urls + urls
+    
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        """Satış detay səhifəsində əlavə əməliyyat düymələri göstər"""
+        extra_context = extra_context or {}
+        satis = Satis.objects.get(pk=object_id)
         
-    def pos_terminal_odeme_view(self, request, satis_id):
-        """POS terminal ilə ödəmə əməliyyatı"""
-        from django.shortcuts import get_object_or_404, redirect
-        from django.contrib import messages
-        
-        satis = get_object_or_404(Satis, id=satis_id)
-        
-        if satis.odenis_usulu != 'terminal':
-            messages.error(request, "Bu satış POS terminal ödəmə üsulu ilə aparılmır.")
-            return redirect('admin:mehsullar_satis_change', satis_id)
+        # Əgər satış POS terminalı ilə ödəniləcəksə
+        if satis.odeme_usulu == 'pos':
+            # Ödəmə kodu hələ yaradılmayıbsa, yaratma düyməsini göstər
+            if not satis.odeme_kodu and satis.status == 'gozleme':
+                extra_context['show_pos_create_button'] = True
             
-        if satis.status != 'gozleyen':
-            messages.error(request, "Bu satış artıq tamamlanıb və ya ləğv edilib.")
-            return redirect('admin:mehsullar_satis_change', satis_id)
+            # Ödəmə kodu artıq varsa, status yoxlama düyməsini göstər
+            if satis.odeme_kodu and satis.status == 'gozleme':
+                extra_context['show_pos_check_button'] = True
         
-        # POS terminal ödəməsini həyata keçir
-        success, message = satis.pos_terminal_odeme()
-        
-        if success:
-            messages.success(request, f"Ödəmə uğurla tamamlandı. {message}")
-        else:
-            messages.error(request, f"Ödəmə zamanı xəta: {message}")
-            
-        return redirect('admin:mehsullar_satis_change', satis_id)
-        
-    def pos_terminal_legv_view(self, request, satis_id):
-        """POS terminal ödəməsini ləğv edir"""
-        from django.shortcuts import get_object_or_404, redirect
-        from django.contrib import messages
-        
-        satis = get_object_or_404(Satis, id=satis_id)
-        
-        if satis.odenis_usulu != 'terminal':
-            messages.error(request, "Bu satış POS terminal ödəmə üsulu ilə aparılmır.")
-            return redirect('admin:mehsullar_satis_change', satis_id)
-            
-        if satis.status != 'tamamlandi' or not satis.emeliyyat_id:
-            messages.error(request, "Bu satış hələ tamamlanmayıb və ya əməliyyat ID-si yoxdur.")
-            return redirect('admin:mehsullar_satis_change', satis_id)
-        
-        # POS terminal ödəməsini ləğv et
-        success, message = satis.pos_legv_et()
-        
-        if success:
-            messages.success(request, f"Ödəmə uğurla ləğv edildi. {message}")
-        else:
-            messages.error(request, f"Ləğv zamanı xəta: {message}")
-            
-        return redirect('admin:mehsullar_satis_change', satis_id)
+        return super().change_view(
+            request, object_id, form_url, extra_context=extra_context,
+        )

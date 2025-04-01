@@ -252,7 +252,7 @@ class SebetItem(models.Model):
     yaradilma_tarixi = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.mehsul.adi} - {self.miqdar}"
+        return f"{self.mehsul.adi} ({self.miqdar})"
 
     class Meta:
         verbose_name = 'Səbət elementi'
@@ -283,188 +283,73 @@ class MusteriReyi(models.Model):
         return f"{self.musteri.get_full_name()} - {self.get_qiymetlendirme_display()}"
 
 class POSTerminal(models.Model):
-    ad = models.CharField(max_length=100, verbose_name="Terminal adı")
-    ip_adres = models.CharField(max_length=50, verbose_name="IP Adresi")
-    port = models.IntegerField(default=8080, verbose_name="Port")
+    """
+    CashPos POS terminal qeydiyyatı üçün model
+    """
+    adi = models.CharField(max_length=100, verbose_name="Terminal adı")
+    terminal_id = models.CharField(max_length=50, verbose_name="Terminal ID", unique=True)
+    api_key = models.CharField(max_length=255, verbose_name="API Açarı", help_text="CashPos tərəfindən verilən API açarı")
     aktiv = models.BooleanField(default=True, verbose_name="Aktivdir")
     yaradilma_tarixi = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"{self.ad} ({self.ip_adres}:{self.port})"
-        
+        return f"{self.adi} ({self.terminal_id})"
+    
     class Meta:
         verbose_name = 'POS Terminal'
-        verbose_name_plural = 'POS Terminallar'
-        
+        verbose_name_plural = 'POS Terminalları'
+
 class Satis(models.Model):
-    ODENIS_USULLARI = [
+    """
+    Məhsul satışları üçün model - stok azalması olmadan
+    """
+    STATUS_CHOICES = [
+        ('gozleme', 'Gözləmədə'),
+        ('tamamlandi', 'Tamamlandı'),
+        ('legv_edildi', 'Ləğv edildi'),
+    ]
+    
+    ODEME_USULU_CHOICES = [
         ('nagd', 'Nağd'),
         ('kart', 'Kart'),
-        ('terminal', 'POS Terminal')
+        ('pos', 'POS Terminal'),
     ]
     
-    STATUS_CHOICES = [
-        ('gozleyen', 'Gözləyən'),
-        ('tamamlandi', 'Tamamlandı'),
-        ('legv_edildi', 'Ləğv edildi')
-    ]
-    
+    musteri_adi = models.CharField(max_length=255, verbose_name="Müştəri adı")
+    musteri_tel = models.CharField(max_length=20, verbose_name="Telefon", null=True, blank=True)
     tarix = models.DateTimeField(auto_now_add=True, verbose_name="Satış tarixi")
+    qeyd = models.TextField(null=True, blank=True, verbose_name="Əlavə qeyd")
     umumi_mebleg = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Ümumi məbləğ")
-    odenis_usulu = models.CharField(max_length=20, choices=ODENIS_USULLARI, default='nagd', verbose_name="Ödəniş üsulu")
+    odeme_usulu = models.CharField(max_length=20, choices=ODEME_USULU_CHOICES, default='nagd', verbose_name="Ödəmə üsulu")
     pos_terminal = models.ForeignKey(POSTerminal, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="POS Terminal")
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='gozleyen', verbose_name="Status")
-    qeyd = models.TextField(blank=True, null=True, verbose_name="Qeyd")
-    operator = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name="Operator")
-    emeliyyat_id = models.CharField(max_length=100, blank=True, null=True, verbose_name="Əməliyyat ID")
+    odeme_kodu = models.CharField(max_length=100, null=True, blank=True, verbose_name="Ödəmə kodu", help_text="POS terminal tərəfindən verilən kod")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='gozleme', verbose_name="Status")
     
     def __str__(self):
-        return f"Satış #{self.id} - {self.tarix.strftime('%d-%m-%Y %H:%M')}"
+        return f"Satış #{self.id} - {self.musteri_adi} - {self.tarix.strftime('%d.%m.%Y %H:%M')}"
     
-    def pos_terminal_odeme(self):
-        """POS Terminal vasitəsilə ödəmə edir"""
-        from .pos_terminal import get_terminal
-        import logging
-        
-        logger = logging.getLogger(__name__)
-        logger.info(f"POS Terminal ödəməsi başladılır. Terminal: {self.pos_terminal}")
-        
-        if not self.pos_terminal:
-            logger.error("POS Terminal seçilməyib")
-            return False, "POS Terminal seçilməyib"
-        
-        # IP localhost-sa dummy terminal istifadə et (test və debug üçün)
-        use_dummy = self.pos_terminal.ip_adres in ["localhost", "127.0.0.1"]
-        
-        # Terminal servisi yarat
-        terminal = get_terminal(
-            self.pos_terminal.ip_adres, 
-            self.pos_terminal.port,
-            debug=True,  # Debug rejimini aktiv edirik
-            dummy=use_dummy  # Test rejimi
-        )
-        
-        # Əvvəlcə terminal ilə bağlantı qurmağı sınayaq
-        if not terminal.connect():
-            logger.error(f"Terminal ilə bağlantı qurula bilmədi: {self.pos_terminal.ip_adres}:{self.pos_terminal.port}")
-            return False, f"Terminal ilə bağlantı qurula bilmədi. Lütfən IP adresini ({self.pos_terminal.ip_adres}) və portu ({self.pos_terminal.port}) yoxlayın."
-        
-        # Terminalın statusunu yoxlayaq
-        status, status_message = terminal.check_status()
-        if not status:
-            logger.warning(f"Terminal hazır deyil: {status_message}")
-            terminal.disconnect()
-            return False, f"Terminal hazır deyil: {status_message}"
-        
-        logger.info(f"Terminal ilə bağlantı quruldu və hazırdır: {status_message}")
-        
-        # Əlavə məlumatları hazırlayaq (çekdə göstəriləcək)
-        mehsul_sayi = self.mehsullar.count()
-        
-        # Satış detallarını hazırla
-        mehsul_detallari = []
-        for item in self.mehsullar.all():
-            mehsul_detallari.append({
-                'ad': item.mehsul.adi,
-                'kod': item.mehsul.brend_kod or '',
-                'miqdar': item.miqdar,
-                'qiymet': float(item.qiymet),
-                'cem': float(item.miqdar * item.qiymet)
-            })
-        
-        # Ödəməni həyata keçir
-        reference_no = f"TR{self.id}-{int(self.tarix.timestamp())}"
-        logger.info(f"Ödəmə prosesi başladılır, məbləğ: {self.umumi_mebleg}, istinad: {reference_no}")
-        
-        success, transaction_id, message = terminal.process_payment(
-            self.umumi_mebleg, 
-            reference_no,
-            {
-                'operator': self.operator.get_full_name() or self.operator.username,
-                'satis_id': self.id,
-                'tarix': self.tarix.strftime('%d-%m-%Y %H:%M'),
-                'mehsul_sayi': mehsul_sayi,
-                'mehsullar': mehsul_detallari
-            }
-        )
-        
-        # Bağlantını kəsək
-        terminal.disconnect()
-        
-        # Əməliyyat nəticəsini qeyd et
-        if success:
-            logger.info(f"Ödəmə uğurla tamamlandı: {transaction_id}")
-            self.emeliyyat_id = transaction_id
-            self.status = 'tamamlandi'
-            self.save()
-        else:
-            logger.error(f"Ödəmə xətası: {message}")
-        
-        return success, message
-    
-    def pos_legv_et(self):
-        """POS Terminal vasitəsilə edilmiş ödəməni ləğv edir"""
-        from .pos_terminal import get_terminal
-        import logging
-        
-        logger = logging.getLogger(__name__)
-        logger.info(f"POS Terminal ləğv əməliyyatı başladılır. Terminal: {self.pos_terminal}, Əməliyyat ID: {self.emeliyyat_id}")
-        
-        if not self.pos_terminal or not self.emeliyyat_id:
-            logger.error("Ləğv ediləcək əməliyyat tapılmadı")
-            return False, "Ləğv ediləcək əməliyyat tapılmadı"
-        
-        # IP localhost-sa dummy terminal istifadə et (test və debug üçün)
-        use_dummy = self.pos_terminal.ip_adres in ["localhost", "127.0.0.1"]
-        
-        # Terminal servisi yarat
-        terminal = get_terminal(
-            self.pos_terminal.ip_adres, 
-            self.pos_terminal.port,
-            debug=True,
-            dummy=use_dummy
-        )
-        
-        # Əvvəlcə terminal ilə bağlantı qurmağı sınayaq
-        if not terminal.connect():
-            logger.error(f"Terminal ilə bağlantı qurula bilmədi: {self.pos_terminal.ip_adres}:{self.pos_terminal.port}")
-            return False, f"Terminal ilə bağlantı qurula bilmədi. Lütfən IP adresini yoxlayın."
-        
-        # Ləğv et
-        success, message = terminal.cancel_transaction(self.emeliyyat_id)
-        
-        # Bağlantını kəsək
-        terminal.disconnect()
-        
-        # Əməliyyat nəticəsini qeyd et
-        if success:
-            logger.info(f"Ödəmə uğurla ləğv edildi: {self.emeliyyat_id}")
-            self.status = 'legv_edildi'
-            self.save()
-        else:
-            logger.error(f"Ləğv xətası: {message}")
-        
-        return success, message
-        
     class Meta:
         verbose_name = 'Satış'
         verbose_name_plural = 'Satışlar'
         ordering = ['-tarix']
 
 class SatisMehsul(models.Model):
-    satis = models.ForeignKey(Satis, related_name='mehsullar', on_delete=models.CASCADE)
-    mehsul = models.ForeignKey(Mehsul, on_delete=models.PROTECT)
-    miqdar = models.PositiveIntegerField(default=1, verbose_name="Miqdar")
+    """
+    Satış zamanı alınan məhsullar
+    """
+    satis = models.ForeignKey(Satis, related_name="mehsullar", on_delete=models.CASCADE, verbose_name="Satış")
+    mehsul = models.ForeignKey(Mehsul, on_delete=models.CASCADE, verbose_name="Məhsul")
+    miqdar = models.PositiveIntegerField(verbose_name="Miqdar")
     qiymet = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Qiymət")
     
     def __str__(self):
-        return f"{self.mehsul.adi} - {self.miqdar} ədəd"
+        return f"{self.mehsul.adi} ({self.miqdar} ədəd)"
     
-    def total_qiymet(self):
+    def mebleg(self):
         return self.miqdar * self.qiymet
-        
+    
     class Meta:
-        verbose_name = 'Satış Məhsulu'
-        verbose_name_plural = 'Satış Məhsulları'
+        verbose_name = 'Satış məhsulu'
+        verbose_name_plural = 'Satış məhsulları'
 
 

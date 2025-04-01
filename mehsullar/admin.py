@@ -9,6 +9,7 @@ from django import forms
 from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
 import pandas as pd
+import logging
 
 class MarkaSekilInline(admin.TabularInline):
     model = MarkaSekil
@@ -450,10 +451,86 @@ class SatisMehsulInline(admin.TabularInline):
 
 @admin.register(POSTerminal)
 class POSTerminalAdmin(admin.ModelAdmin):
-    list_display = ('ad', 'ip_adres', 'port', 'aktiv', 'yaradilma_tarixi')
+    list_display = ('ad', 'ip_adres', 'port', 'aktiv', 'yaradilma_tarixi', 'test_connection')
     list_filter = ('aktiv',)
     search_fields = ('ad', 'ip_adres')
     list_editable = ('aktiv',)
+    
+    def test_connection(self, obj):
+        """Terminal bağlantısını yoxlamaq üçün button"""
+        return format_html(
+            '<a href="{}" class="button" style="background-color: #007bff; color: white;">Bağlantını Yoxla</a>',
+            reverse('admin:test_terminal_connection', args=[obj.pk])
+        )
+    test_connection.short_description = 'Bağlantı testi'
+    
+    def get_urls(self):
+        from django.urls import path
+        urls = super().get_urls()
+        my_urls = [
+            path('<int:terminal_id>/test-connection/', self.admin_site.admin_view(self.test_terminal_connection), name='test_terminal_connection'),
+        ]
+        return my_urls + urls
+    
+    def test_terminal_connection(self, request, terminal_id):
+        """Terminal ilə bağlantını yoxlayır və nəticəni ekrana çıxarır"""
+        from django.shortcuts import get_object_or_404, redirect
+        from django.contrib import messages
+        from mehsullar.pos_terminal import get_terminal
+        
+        # Loqları ekranda göstərmək üçün
+        logger = logging.getLogger('mehsullar.pos_terminal')
+        
+        terminal = get_object_or_404(POSTerminal, id=terminal_id)
+        
+        # IP localhost-sa dummy terminal istifadə et (test və debug üçün)
+        use_dummy = terminal.ip_adres in ["localhost", "127.0.0.1"]
+        if use_dummy:
+            messages.info(request, f"Dummy terminal rejimi aktiv edildi (simulyasiya). IP: {terminal.ip_adres}")
+        
+        try:
+            # Terminal inteqrasiyası
+            integration = get_terminal(
+                terminal.ip_adres, 
+                terminal.port, 
+                debug=True,
+                dummy=use_dummy
+            )
+            
+            # Bağlantını sına
+            connected = integration.connect()
+            
+            if connected:
+                # Terminal ilə bağlantı quruldu, status sorğusu göndərək
+                status, status_message = integration.check_status()
+                
+                if status:
+                    messages.success(request, f"Terminal ilə bağlantı quruldu! Status: {status_message}")
+                    
+                    # Əlavə debug informasiyası üçün simulyasiya ödəməsi
+                    if use_dummy:
+                        result, tx_id, pay_message = integration.process_payment(1.0, "TEST-REF")
+                        if result:
+                            messages.info(request, f"Test ödəməsi uğurlu: {tx_id} - {pay_message}")
+                        else:
+                            messages.warning(request, f"Test ödəməsi xətası: {pay_message}")
+                else:
+                    messages.warning(request, f"Terminal ilə bağlantı quruldu, lakin hazır deyil. Status: {status_message}")
+            else:
+                messages.error(request, f"Terminal ilə bağlantı qurula bilmədi. Lütfən IP ({terminal.ip_adres}) və port ({terminal.port}) parametrlərini yoxlayın.")
+                
+            # Bağlantını bağlayaq
+            integration.disconnect()
+            
+        except Exception as e:
+            import traceback
+            error_details = traceback.format_exc()
+            messages.error(request, f"Terminal bağlantısı zamanı xəta: {str(e)}")
+            messages.debug(request, f"Xəta detalları: {error_details}")
+            logger.error(f"Terminal bağlantısı xətası: {e}")
+            logger.debug(f"Xəta izləməsi: {error_details}")
+        
+        return redirect('admin:mehsullar_posterminal_change', terminal_id)
 
 @admin.register(Satis)
 class SatisAdmin(admin.ModelAdmin):

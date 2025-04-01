@@ -323,16 +323,40 @@ class Satis(models.Model):
     
     def pos_terminal_odeme(self):
         """POS Terminal vasitəsilə ödəmə edir"""
-        from .pos_terminal import POSTerminalIntegration
+        from .pos_terminal import get_terminal
+        import logging
+        
+        logger = logging.getLogger(__name__)
+        logger.info(f"POS Terminal ödəməsi başladılır. Terminal: {self.pos_terminal}")
         
         if not self.pos_terminal:
+            logger.error("POS Terminal seçilməyib")
             return False, "POS Terminal seçilməyib"
         
+        # IP localhost-sa dummy terminal istifadə et (test və debug üçün)
+        use_dummy = self.pos_terminal.ip_adres in ["localhost", "127.0.0.1"]
+        
         # Terminal servisi yarat
-        terminal = POSTerminalIntegration(
+        terminal = get_terminal(
             self.pos_terminal.ip_adres, 
-            self.pos_terminal.port
+            self.pos_terminal.port,
+            debug=True,  # Debug rejimini aktiv edirik
+            dummy=use_dummy  # Test rejimi
         )
+        
+        # Əvvəlcə terminal ilə bağlantı qurmağı sınayaq
+        if not terminal.connect():
+            logger.error(f"Terminal ilə bağlantı qurula bilmədi: {self.pos_terminal.ip_adres}:{self.pos_terminal.port}")
+            return False, f"Terminal ilə bağlantı qurula bilmədi. Lütfən IP adresini ({self.pos_terminal.ip_adres}) və portu ({self.pos_terminal.port}) yoxlayın."
+        
+        # Terminalın statusunu yoxlayaq
+        status, status_message = terminal.check_status()
+        if not status:
+            logger.warning(f"Terminal hazır deyil: {status_message}")
+            terminal.disconnect()
+            return False, f"Terminal hazır deyil: {status_message}"
+        
+        logger.info(f"Terminal ilə bağlantı quruldu və hazırdır: {status_message}")
         
         # Əlavə məlumatları hazırlayaq (çekdə göstəriləcək)
         mehsul_sayi = self.mehsullar.count()
@@ -350,6 +374,8 @@ class Satis(models.Model):
         
         # Ödəməni həyata keçir
         reference_no = f"TR{self.id}-{int(self.tarix.timestamp())}"
+        logger.info(f"Ödəmə prosesi başladılır, məbləğ: {self.umumi_mebleg}, istinad: {reference_no}")
+        
         success, transaction_id, message = terminal.process_payment(
             self.umumi_mebleg, 
             reference_no,
@@ -362,34 +388,61 @@ class Satis(models.Model):
             }
         )
         
+        # Bağlantını kəsək
+        terminal.disconnect()
+        
         # Əməliyyat nəticəsini qeyd et
         if success:
+            logger.info(f"Ödəmə uğurla tamamlandı: {transaction_id}")
             self.emeliyyat_id = transaction_id
             self.status = 'tamamlandi'
             self.save()
+        else:
+            logger.error(f"Ödəmə xətası: {message}")
         
         return success, message
     
     def pos_legv_et(self):
         """POS Terminal vasitəsilə edilmiş ödəməni ləğv edir"""
-        from .pos_terminal import POSTerminalIntegration
+        from .pos_terminal import get_terminal
+        import logging
+        
+        logger = logging.getLogger(__name__)
+        logger.info(f"POS Terminal ləğv əməliyyatı başladılır. Terminal: {self.pos_terminal}, Əməliyyat ID: {self.emeliyyat_id}")
         
         if not self.pos_terminal or not self.emeliyyat_id:
+            logger.error("Ləğv ediləcək əməliyyat tapılmadı")
             return False, "Ləğv ediləcək əməliyyat tapılmadı"
         
+        # IP localhost-sa dummy terminal istifadə et (test və debug üçün)
+        use_dummy = self.pos_terminal.ip_adres in ["localhost", "127.0.0.1"]
+        
         # Terminal servisi yarat
-        terminal = POSTerminalIntegration(
+        terminal = get_terminal(
             self.pos_terminal.ip_adres, 
-            self.pos_terminal.port
+            self.pos_terminal.port,
+            debug=True,
+            dummy=use_dummy
         )
+        
+        # Əvvəlcə terminal ilə bağlantı qurmağı sınayaq
+        if not terminal.connect():
+            logger.error(f"Terminal ilə bağlantı qurula bilmədi: {self.pos_terminal.ip_adres}:{self.pos_terminal.port}")
+            return False, f"Terminal ilə bağlantı qurula bilmədi. Lütfən IP adresini yoxlayın."
         
         # Ləğv et
         success, message = terminal.cancel_transaction(self.emeliyyat_id)
         
+        # Bağlantını kəsək
+        terminal.disconnect()
+        
         # Əməliyyat nəticəsini qeyd et
         if success:
+            logger.info(f"Ödəmə uğurla ləğv edildi: {self.emeliyyat_id}")
             self.status = 'legv_edildi'
             self.save()
+        else:
+            logger.error(f"Ləğv xətası: {message}")
         
         return success, message
         

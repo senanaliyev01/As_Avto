@@ -206,33 +206,10 @@ class POSTerminalIntegration:
         parts = response.split(":", 1)
         if parts[0] == "READY":
             logger.info("Terminal hazırdır")
-            # Uğurlu olarsa terminal məlumatlarını əldə et
-            terminal_info = self.get_terminal_info()
-            return True, f"Terminal işləyir. {terminal_info}"
+            return True, "Terminal işləyir"
         else:
             logger.warning(f"Terminal hazır deyil: {parts[1] if len(parts) > 1 else 'Naməlum səbəb'}")
             return False, parts[1] if len(parts) > 1 else "Terminal hazır deyil"
-    
-    def get_terminal_info(self):
-        """Terminal haqqında ətraflı məlumat alır"""
-        logger.info("Terminal məlumatları istənilir")
-        response = self.send_command("INFO")
-        
-        if not response:
-            logger.warning("Terminal məlumatları alına bilmədi")
-            return "Məlumat əldə edilə bilmədi"
-        
-        # INFO:Model=XYZ:Version=1.0:SerialNo=123456:State=READY
-        parts = response.split(":")
-        if parts[0] == "INFO" and len(parts) > 1:
-            # Məlumatları format et
-            info_parts = parts[1:]
-            info_str = ", ".join(info_parts)
-            logger.info(f"Terminal məlumatları: {info_str}")
-            return info_str
-        else:
-            logger.warning("Terminal məlumatları tanınmadı")
-            return "Məlumat formatı tanınmadı"
     
     def cancel_transaction(self, transaction_id):
         """
@@ -320,8 +297,6 @@ class DummyPOSTerminal(POSTerminalIntegration):
         # Əmrə görə müxtəlif cavablar qaytaraq
         if command.startswith("STATUS"):
             return "READY:Terminal hazırdır (simulyasiya)"
-        elif command.startswith("INFO"):
-            return "INFO:Model=SimulationPOS:Version=1.0:SerialNo=SIM123456:State=READY:Mode=TEST"
         elif command.startswith("PAYMENT"):
             parts = command.split(":")
             amount = int(parts[1]) / 100 if len(parts) > 1 else 0

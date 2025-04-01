@@ -10,8 +10,6 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
 import pandas as pd
 import logging
-import subprocess
-import platform
 
 class MarkaSekilInline(admin.TabularInline):
     model = MarkaSekil
@@ -453,7 +451,7 @@ class SatisMehsulInline(admin.TabularInline):
 
 @admin.register(POSTerminal)
 class POSTerminalAdmin(admin.ModelAdmin):
-    list_display = ('ad', 'ip_adres', 'port', 'aktiv', 'yaradilma_tarixi', 'test_connection', 'create_client')
+    list_display = ('ad', 'ip_adres', 'port', 'aktiv', 'yaradilma_tarixi', 'test_connection')
     list_filter = ('aktiv',)
     search_fields = ('ad', 'ip_adres')
     list_editable = ('aktiv',)
@@ -466,20 +464,11 @@ class POSTerminalAdmin(admin.ModelAdmin):
         )
     test_connection.short_description = 'Bağlantı testi'
     
-    def create_client(self, obj):
-        """Terminal testi üçün bağlantı scripti yaradar"""
-        return format_html(
-            '<a href="{}" class="button" style="background-color: #28a745; color: white;">Test Scripti</a>',
-            reverse('admin:create_terminal_test_client', args=[obj.pk])
-        )
-    create_client.short_description = 'Terminal Test Scripti'
-
     def get_urls(self):
         from django.urls import path
         urls = super().get_urls()
         my_urls = [
             path('<int:terminal_id>/test-connection/', self.admin_site.admin_view(self.test_terminal_connection), name='test_terminal_connection'),
-            path('<int:terminal_id>/create-test-client/', self.admin_site.admin_view(self.create_terminal_test_client), name='create_terminal_test_client'),
         ]
         return my_urls + urls
     
@@ -493,41 +482,6 @@ class POSTerminalAdmin(admin.ModelAdmin):
         logger = logging.getLogger('mehsullar.pos_terminal')
         
         terminal = get_object_or_404(POSTerminal, id=terminal_id)
-        
-        # Əvvəlcə ping testi edək - terminalın IP ünvanı aşkarlanırmı?
-        try:
-            messages.info(request, f"Terminal şəbəkə yoxlaması aparılır: {terminal.ip_adres}")
-            
-            # Əməliyyat sistemindən asılı olaraq ping əmri dəyişir
-            ping_param = "-n" if platform.system().lower() == "windows" else "-c"
-            ping_count = "3"  # 3 ping paketi göndər
-            
-            # Ping əmrinin nəticəsi
-            ping_command = ["ping", ping_param, ping_count, terminal.ip_adres]
-            ping_process = subprocess.run(ping_command, 
-                                         stdout=subprocess.PIPE, 
-                                         stderr=subprocess.PIPE, 
-                                         text=True, 
-                                         timeout=10)
-            
-            # Ping nəticələrini ekranda göstər
-            if ping_process.returncode == 0:
-                messages.success(request, f"Terminal IP ünvanı şəbəkədə aşkarlandı: {terminal.ip_adres}")
-                messages.info(request, f"Ping nəticəsi: {ping_process.stdout}")
-            else:
-                messages.error(request, f"Terminal IP ünvanı şəbəkədə aşkarlanmadı! IP: {terminal.ip_adres}")
-                messages.info(request, f"Ping nəticəsi: {ping_process.stdout}")
-                messages.info(request, f"Ping xətası: {ping_process.stderr}")
-                
-                # Terminal IP aşkarlanmadısa, amma localhost deyilsə
-                if terminal.ip_adres not in ["localhost", "127.0.0.1"]:
-                    messages.warning(request, 
-                                   "Terminal IP aşkarlanmadı. Lütfən terminalın eyni şəbəkəyə qoşulduğunu və IP adresinin düzgün olduğunu yoxlayın. "
-                                   "Əgər terminal servisini yenicə başlatmısınızsa, bir neçə saniyə gözləyib təkrar yoxlayın.")
-                    return redirect('admin:mehsullar_posterminal_change', terminal_id)
-        
-        except Exception as e:
-            messages.warning(request, f"Ping testi zamanı xəta: {str(e)}")
         
         # IP localhost-sa dummy terminal istifadə et (test və debug üçün)
         use_dummy = terminal.ip_adres in ["localhost", "127.0.0.1"]
@@ -544,12 +498,10 @@ class POSTerminalAdmin(admin.ModelAdmin):
             )
             
             # Bağlantını sına
-            messages.info(request, f"Terminal ilə bağlantı qurulmağa çalışılır: {terminal.ip_adres}:{terminal.port}")
             connected = integration.connect()
             
             if connected:
                 # Terminal ilə bağlantı quruldu, status sorğusu göndərək
-                messages.success(request, f"TCP Bağlantısı quruldu: {terminal.ip_adres}:{terminal.port}")
                 status, status_message = integration.check_status()
                 
                 if status:
@@ -567,15 +519,6 @@ class POSTerminalAdmin(admin.ModelAdmin):
             else:
                 messages.error(request, f"Terminal ilə bağlantı qurula bilmədi. Lütfən IP ({terminal.ip_adres}) və port ({terminal.port}) parametrlərini yoxlayın.")
                 
-                if terminal.ip_adres not in ["localhost", "127.0.0.1"]:
-                    messages.warning(request, 
-                                    "Tövsiyələr: \n"
-                                    "1. Terminalın inteqrasiya servisinin aktiv olduğundan əmin olun.\n"
-                                    "2. IP adresini və portu terminalın ekranında göstərilən kimi yazın.\n"
-                                    "3. Terminal və kompüter eyni WiFi şəbəkəsinə qoşulmalıdır.\n"
-                                    "4. Firewall'un bağlantıya mane olmadığını yoxlayın.\n"
-                                    "5. Test məqsədi ilə IP adresini 127.0.0.1 təyin edə bilərsiniz.")
-            
             # Bağlantını bağlayaq
             integration.disconnect()
             
@@ -588,88 +531,6 @@ class POSTerminalAdmin(admin.ModelAdmin):
             logger.debug(f"Xəta izləməsi: {error_details}")
         
         return redirect('admin:mehsullar_posterminal_change', terminal_id)
-
-    def create_terminal_test_client(self, request, terminal_id):
-        """Terminal testi üçün Python script yaradır və istifadəçiyə göstərir"""
-        from django.shortcuts import get_object_or_404, render
-        
-        terminal = get_object_or_404(POSTerminal, id=terminal_id)
-        
-        # Terminal test scripti
-        script = f"""
-import socket
-import time
-
-def test_terminal_connection(ip_address="{terminal.ip_adres}", port={terminal.port}):
-    """Terminal ilə bağlantını test edir"""
-    print(f"Terminal testi başladılır: {{ip_address}}:{{port}}")
-    
-    try:
-        # TCP socket yarat
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(5)  # 5 saniyə timeout
-        
-        # Qoşulmağa çalış
-        print(f"{{ip_address}}:{{port}} qoşulmağa çalışılır...")
-        sock.connect((ip_address, port))
-        print("Bağlantı quruldu!")
-        
-        # Status sorğusu göndər
-        command = "STATUS"
-        print(f"Terminala əmr göndərilir: {{command}}")
-        sock.sendall(command.encode())
-        
-        # Cavabı gözlə
-        response = sock.recv(1024).decode().strip()
-        print(f"Terminaldan cavab alındı: {{response}}")
-        
-        # Bağlantını bağla
-        sock.close()
-        print("Bağlantı uğurla bağlandı.")
-        return True
-        
-    except socket.timeout:
-        print(f"XƏTA: Bağlantı zamanı timeout! {{ip_address}}:{{port}} cavab vermir.")
-        return False
-    except socket.error as e:
-        print(f"XƏTA: Socket xətası: {{e}}")
-        return False
-    except Exception as e:
-        print(f"XƏTA: {{e}}")
-        return False
-
-if __name__ == "__main__":
-    test_terminal_connection()
-    
-    # Program bitmədən əvvəl gözlə
-    input("\\nBitirmək üçün Enter düyməsini basın...")
-"""
-        
-        # Script faylını yarat
-        import os
-        from django.conf import settings
-        
-        # Media qovluğu altında terminal_scripts qovluğu yarat
-        script_dir = os.path.join(settings.MEDIA_ROOT, 'terminal_scripts')
-        os.makedirs(script_dir, exist_ok=True)
-        
-        # Script faylını yaz
-        script_file = os.path.join(script_dir, f'terminal_test_{terminal.id}.py')
-        with open(script_file, 'w') as f:
-            f.write(script)
-        
-        # Script yolunu əldə et
-        script_url = os.path.join(settings.MEDIA_URL, 'terminal_scripts', f'terminal_test_{terminal.id}.py')
-        
-        # İstifadəçiyə məlumat ver
-        context = {
-            'terminal': terminal,
-            'script': script,
-            'script_url': script_url,
-            'title': 'Terminal Test Scripti'
-        }
-        
-        return render(request, 'admin/terminal_test_client.html', context)
 
 @admin.register(Satis)
 class SatisAdmin(admin.ModelAdmin):

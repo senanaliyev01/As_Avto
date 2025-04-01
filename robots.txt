@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
 Allow: /product/
+Allow: /products-look-all-view/
 Disallow: /admin-as-avto-1983-2002/
 Disallow: /istifadeciler/
 Disallow: /main/

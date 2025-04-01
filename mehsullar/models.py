@@ -283,170 +283,114 @@ class MusteriReyi(models.Model):
         return f"{self.musteri.get_full_name()} - {self.get_qiymetlendirme_display()}"
 
 class POSTerminal(models.Model):
-    terminal_adi = models.CharField(max_length=100, verbose_name="Terminal adı")
-    ip_adres = models.GenericIPAddressField(verbose_name="IP Ünvanı")
+    ad = models.CharField(max_length=100, verbose_name="Terminal adı")
+    ip_adres = models.CharField(max_length=50, verbose_name="IP Adresi")
     port = models.IntegerField(default=8080, verbose_name="Port")
     aktiv = models.BooleanField(default=True, verbose_name="Aktivdir")
     yaradilma_tarixi = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"{self.terminal_adi} ({self.ip_adres}:{self.port})"
-    
+        return f"{self.ad} ({self.ip_adres}:{self.port})"
+        
     class Meta:
         verbose_name = 'POS Terminal'
         verbose_name_plural = 'POS Terminallar'
-    
-    def baglanti_yoxla(self):
-        """Terminalla bağlantı olub olmadığını yoxlayır"""
-        import socket
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(2)
-            s.connect((self.ip_adres, self.port))
-            s.close()
-            return True
-        except:
-            return False
-    
-    def odenis_et(self, mebleg, kart_nomresi=None):
-        """POS terminalı üzərindən ödəniş etmək üçün funksiya"""
-        import socket
-        import json
         
-        if not self.baglanti_yoxla():
-            return False, "Terminalla bağlantı qurula bilmədi"
-            
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(60)  # Ödəniş 1 dəqiqə ərzində tamamlanmalıdır
-            s.connect((self.ip_adres, self.port))
-            
-            # Ödəniş məlumatlarını hazırlayırıq
-            data = {
-                "method": "payment",
-                "amount": float(mebleg),
-                "card_number": kart_nomresi
-            }
-            
-            # Məlumatları JSON formatında göndəririk
-            s.sendall(json.dumps(data).encode())
-            
-            # Cavabı gözləyirik
-            response = s.recv(1024).decode()
-            s.close()
-            
-            # Cavabı təhlil edirik
-            response_data = json.loads(response)
-            if response_data.get("success"):
-                return True, response_data.get("transaction_id", "")
-            else:
-                return False, response_data.get("error", "Bilinməyən xəta")
-        except Exception as e:
-            return False, str(e)
-
 class Satis(models.Model):
-    STATUS_CHOICES = [
-        ('gozleyir', 'Ödəniş gözləyir'),
-        ('tamamlandi', 'Tamamlandı'),
-        ('legv_edildi', 'Ləğv edildi'),
-    ]
-    
-    ODENIS_TIPI_CHOICES = [
+    ODENIS_USULLARI = [
         ('nagd', 'Nağd'),
         ('kart', 'Kart'),
-        ('terminal', 'POS Terminal'),
-        ('hisse', 'Hissəli ödəniş'),
+        ('terminal', 'POS Terminal')
     ]
     
-    satis_nomresi = models.CharField(max_length=50, unique=True, blank=True, null=True, verbose_name="Satış nömrəsi")
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="İstifadəçi")
-    cemi_mebleg = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Cəmi məbləğ")
-    odenilen_mebleg = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Ödənilən məbləğ")
-    endirim = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Endirim")
-    tarix = models.DateTimeField(auto_now_add=True, verbose_name="Satış tarixi")
-    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='gozleyir', verbose_name="Status")
-    odenis_tipi = models.CharField(max_length=50, choices=ODENIS_TIPI_CHOICES, default='nagd', verbose_name="Ödəniş tipi")
-    terminal = models.ForeignKey(POSTerminal, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="POS Terminal")
-    transaction_id = models.CharField(max_length=255, null=True, blank=True, verbose_name="Əməliyyat ID")
-    musteri_adi = models.CharField(max_length=255, null=True, blank=True, verbose_name="Müştəri adı")
-    musteri_telefon = models.CharField(max_length=20, null=True, blank=True, verbose_name="Müştəri telefonu")
-    qeyd = models.TextField(null=True, blank=True, verbose_name="Qeyd")
+    STATUS_CHOICES = [
+        ('gozleyen', 'Gözləyən'),
+        ('tamamlandi', 'Tamamlandı'),
+        ('legv_edildi', 'Ləğv edildi')
+    ]
     
-    def save(self, *args, **kwargs):
-        # Satis nömrəsini yaratmaq
-        if not self.satis_nomresi:
-            import datetime
-            current_date = datetime.datetime.now()
-            # Tarix və vaxt əsasında satış nömrəsi yaratmaq
-            self.satis_nomresi = f"S-{current_date.strftime('%Y%m%d')}-{current_date.strftime('%H%M%S')}"
-        super(Satis, self).save(*args, **kwargs)
+    tarix = models.DateTimeField(auto_now_add=True, verbose_name="Satış tarixi")
+    umumi_mebleg = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Ümumi məbləğ")
+    odenis_usulu = models.CharField(max_length=20, choices=ODENIS_USULLARI, default='nagd', verbose_name="Ödəniş üsulu")
+    pos_terminal = models.ForeignKey(POSTerminal, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="POS Terminal")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='gozleyen', verbose_name="Status")
+    qeyd = models.TextField(blank=True, null=True, verbose_name="Qeyd")
+    operator = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name="Operator")
+    emeliyyat_id = models.CharField(max_length=100, blank=True, null=True, verbose_name="Əməliyyat ID")
     
     def __str__(self):
-        return f"Satış #{self.satis_nomresi} - {self.tarix.strftime('%d.%m.%Y %H:%M')}"
+        return f"Satış #{self.id} - {self.tarix.strftime('%d-%m-%Y %H:%M')}"
     
+    def pos_terminal_odeme(self):
+        """POS Terminal vasitəsilə ödəmə edir"""
+        from .pos_terminal import POSTerminalIntegration
+        
+        if not self.pos_terminal:
+            return False, "POS Terminal seçilməyib"
+        
+        # Terminal servisi yarat
+        terminal = POSTerminalIntegration(
+            self.pos_terminal.ip_adres, 
+            self.pos_terminal.port
+        )
+        
+        # Ödəməni həyata keçir
+        reference_no = f"TR{self.id}-{int(self.tarix.timestamp())}"
+        success, transaction_id, message = terminal.process_payment(
+            self.umumi_mebleg, 
+            reference_no
+        )
+        
+        # Əməliyyat nəticəsini qeyd et
+        if success:
+            self.emeliyyat_id = transaction_id
+            self.status = 'tamamlandi'
+            self.save()
+        
+        return success, message
+    
+    def pos_legv_et(self):
+        """POS Terminal vasitəsilə edilmiş ödəməni ləğv edir"""
+        from .pos_terminal import POSTerminalIntegration
+        
+        if not self.pos_terminal or not self.emeliyyat_id:
+            return False, "Ləğv ediləcək əməliyyat tapılmadı"
+        
+        # Terminal servisi yarat
+        terminal = POSTerminalIntegration(
+            self.pos_terminal.ip_adres, 
+            self.pos_terminal.port
+        )
+        
+        # Ləğv et
+        success, message = terminal.cancel_transaction(self.emeliyyat_id)
+        
+        # Əməliyyat nəticəsini qeyd et
+        if success:
+            self.status = 'legv_edildi'
+            self.save()
+        
+        return success, message
+        
     class Meta:
         verbose_name = 'Satış'
         verbose_name_plural = 'Satışlar'
         ordering = ['-tarix']
-    
-    def borc(self):
-        return self.cemi_mebleg - self.odenilen_mebleg - self.endirim
-    
-    def terminal_odenis_et(self):
-        """POS terminal vasitəsilə ödəniş etmək üçün metod"""
-        if not self.terminal:
-            return False, "Terminal seçilməyib"
-        
-        # Qalan məbləği hesablayırıq
-        odenilecek_mebleg = self.borc()
-        if odenilecek_mebleg <= 0:
-            return False, "Bütün məbləğ artıq ödənilib"
-        
-        # Terminal vasitəsilə ödəniş edirik
-        success, message = self.terminal.odenis_et(odenilecek_mebleg)
-        
-        if success:
-            # Ödənişi qeyd edirik
-            self.odenilen_mebleg += odenilecek_mebleg
-            self.transaction_id = message  # transaction ID
-            
-            # Əgər bütün məbləğ ödənilibsə, statusu dəyişdiririk
-            if self.borc() <= 0:
-                self.status = 'tamamlandi'
-                
-            self.save()
-            return True, "Ödəniş uğurla tamamlandı"
-        else:
-            return False, f"Ödəniş xətası: {message}"
 
 class SatisMehsul(models.Model):
-    satis = models.ForeignKey(Satis, related_name='mehsullar', on_delete=models.CASCADE, verbose_name="Satış")
-    mehsul = models.ForeignKey(Mehsul, on_delete=models.CASCADE, verbose_name="Məhsul")
-    miqdar = models.PositiveIntegerField(verbose_name="Miqdar")
+    satis = models.ForeignKey(Satis, related_name='mehsullar', on_delete=models.CASCADE)
+    mehsul = models.ForeignKey(Mehsul, on_delete=models.PROTECT)
+    miqdar = models.PositiveIntegerField(default=1, verbose_name="Miqdar")
     qiymet = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Qiymət")
     
+    def __str__(self):
+        return f"{self.mehsul.adi} - {self.miqdar} ədəd"
+    
+    def total_qiymet(self):
+        return self.miqdar * self.qiymet
+        
     class Meta:
         verbose_name = 'Satış Məhsulu'
         verbose_name_plural = 'Satış Məhsulları'
-
-    def __str__(self):
-        return f"{self.mehsul.adi} - {self.miqdar} ədəd"
-
-    def total_price(self):
-        return self.miqdar * self.qiymet
-
-    def save(self, *args, **kwargs):
-        # Məhsulun stokunu yeniləmək
-        if not self.pk:  # Yeni əlavə olunmuş məhsul
-            mehsul = self.mehsul
-            if mehsul.stok is not None and mehsul.stok >= self.miqdar:
-                mehsul.stok -= self.miqdar
-                mehsul.save()
-        
-        super(SatisMehsul, self).save(*args, **kwargs)
-        
-        # Satışın cəmini yeniləyin
-        self.satis.cemi_mebleg = sum(item.total_price() for item in self.satis.mehsullar.all())
-        self.satis.save()
 
 

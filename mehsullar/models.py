@@ -252,7 +252,7 @@ class SebetItem(models.Model):
     yaradilma_tarixi = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.mehsul.adi} ({self.miqdar})"
+        return f"{self.mehsul.adi} - {self.miqdar}"
 
     class Meta:
         verbose_name = 'Səbət elementi'
@@ -281,75 +281,5 @@ class MusteriReyi(models.Model):
 
     def __str__(self):
         return f"{self.musteri.get_full_name()} - {self.get_qiymetlendirme_display()}"
-
-class POSTerminal(models.Model):
-    """
-    CashPos POS terminal qeydiyyatı üçün model
-    """
-    adi = models.CharField(max_length=100, verbose_name="Terminal adı")
-    terminal_id = models.CharField(max_length=50, verbose_name="Terminal ID", unique=True)
-    api_key = models.CharField(max_length=255, verbose_name="API Açarı", help_text="CashPos tərəfindən verilən API açarı")
-    aktiv = models.BooleanField(default=True, verbose_name="Aktivdir")
-    yaradilma_tarixi = models.DateTimeField(auto_now_add=True)
-    
-    def __str__(self):
-        return f"{self.adi} ({self.terminal_id})"
-    
-    class Meta:
-        verbose_name = 'POS Terminal'
-        verbose_name_plural = 'POS Terminalları'
-
-class Satis(models.Model):
-    """
-    Məhsul satışları üçün model - stok azalması olmadan
-    """
-    STATUS_CHOICES = [
-        ('gozleme', 'Gözləmədə'),
-        ('tamamlandi', 'Tamamlandı'),
-        ('legv_edildi', 'Ləğv edildi'),
-    ]
-    
-    ODEME_USULU_CHOICES = [
-        ('nagd', 'Nağd'),
-        ('kart', 'Kart'),
-        ('pos', 'POS Terminal'),
-    ]
-    
-    musteri_adi = models.CharField(max_length=255, verbose_name="Müştəri adı")
-    musteri_tel = models.CharField(max_length=20, verbose_name="Telefon", null=True, blank=True)
-    tarix = models.DateTimeField(auto_now_add=True, verbose_name="Satış tarixi")
-    qeyd = models.TextField(null=True, blank=True, verbose_name="Əlavə qeyd")
-    umumi_mebleg = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Ümumi məbləğ")
-    odeme_usulu = models.CharField(max_length=20, choices=ODEME_USULU_CHOICES, default='nagd', verbose_name="Ödəmə üsulu")
-    pos_terminal = models.ForeignKey(POSTerminal, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="POS Terminal")
-    odeme_kodu = models.CharField(max_length=100, null=True, blank=True, verbose_name="Ödəmə kodu", help_text="POS terminal tərəfindən verilən kod")
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='gozleme', verbose_name="Status")
-    
-    def __str__(self):
-        return f"Satış #{self.id} - {self.musteri_adi} - {self.tarix.strftime('%d.%m.%Y %H:%M')}"
-    
-    class Meta:
-        verbose_name = 'Satış'
-        verbose_name_plural = 'Satışlar'
-        ordering = ['-tarix']
-
-class SatisMehsul(models.Model):
-    """
-    Satış zamanı alınan məhsullar
-    """
-    satis = models.ForeignKey(Satis, related_name="mehsullar", on_delete=models.CASCADE, verbose_name="Satış")
-    mehsul = models.ForeignKey(Mehsul, on_delete=models.CASCADE, verbose_name="Məhsul")
-    miqdar = models.PositiveIntegerField(verbose_name="Miqdar")
-    qiymet = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Qiymət")
-    
-    def __str__(self):
-        return f"{self.mehsul.adi} ({self.miqdar} ədəd)"
-    
-    def mebleg(self):
-        return self.miqdar * self.qiymet
-    
-    class Meta:
-        verbose_name = 'Satış məhsulu'
-        verbose_name_plural = 'Satış məhsulları'
 
 

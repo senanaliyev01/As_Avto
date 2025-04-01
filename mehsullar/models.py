@@ -334,11 +334,32 @@ class Satis(models.Model):
             self.pos_terminal.port
         )
         
+        # Əlavə məlumatları hazırlayaq (çekdə göstəriləcək)
+        mehsul_sayi = self.mehsullar.count()
+        
+        # Satış detallarını hazırla
+        mehsul_detallari = []
+        for item in self.mehsullar.all():
+            mehsul_detallari.append({
+                'ad': item.mehsul.adi,
+                'kod': item.mehsul.brend_kod or '',
+                'miqdar': item.miqdar,
+                'qiymet': float(item.qiymet),
+                'cem': float(item.miqdar * item.qiymet)
+            })
+        
         # Ödəməni həyata keçir
         reference_no = f"TR{self.id}-{int(self.tarix.timestamp())}"
         success, transaction_id, message = terminal.process_payment(
             self.umumi_mebleg, 
-            reference_no
+            reference_no,
+            {
+                'operator': self.operator.get_full_name() or self.operator.username,
+                'satis_id': self.id,
+                'tarix': self.tarix.strftime('%d-%m-%Y %H:%M'),
+                'mehsul_sayi': mehsul_sayi,
+                'mehsullar': mehsul_detallari
+            }
         )
         
         # Əməliyyat nəticəsini qeyd et

@@ -472,7 +472,12 @@ class SatisAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         if not change:  # Yeni satis yaradılırsa
             obj.operator = request.user
+        
+        # Əvvəlcə obyekti yadda saxlayaq
         super().save_model(request, obj, form, change)
+        
+        # Əgər POS terminal ödəmə üsulu seçilibsə və status gözləyəndirsə, ödəməni başlat
+        self.process_terminal_payment(request, obj)
         
     def save_formset(self, request, form, formset, change):
         instances = formset.save(commit=False)
@@ -492,6 +497,23 @@ class SatisAdmin(admin.ModelAdmin):
             satis.umumi_mebleg = toplam
             satis.save()
             
+            # Əgər POS terminal ödəmə üsulu seçilibsə və status gözləyəndirsə, ödəməni başlat
+            self.process_terminal_payment(request, satis)
+    
+    def process_terminal_payment(self, request, satis):
+        """POS terminal ödəməsini avtomatik başlat"""
+        if satis.odenis_usulu == 'terminal' and satis.status == 'gozleyen' and satis.pos_terminal and satis.mehsullar.exists():
+            try:
+                # Ödəmə prosesini başlat
+                success, message = satis.pos_terminal_odeme()
+                
+                if success:
+                    messages.success(request, f"POS terminal ödəməsi uğurla həyata keçirildi. {message}")
+                else:
+                    messages.error(request, f"POS terminal ödəməsi xətası: {message}")
+            except Exception as e:
+                messages.error(request, f"POS terminal ödəməsi zamanı xəta: {str(e)}")
+            
     def emeliyyat_actions(self, obj):
         """Terminal əməliyyatları üçün butonları göstərir"""
         if obj.odenis_usulu == 'terminal':
@@ -506,8 +528,7 @@ class SatisAdmin(admin.ModelAdmin):
                     reverse('admin:pos_terminal_legv', args=[obj.pk])
                 )
         return "-"
-    emeliyyat_actions.short_description = 'Əməliyyatlar'
-    
+
     def get_urls(self):
         from django.urls import path
         urls = super().get_urls()

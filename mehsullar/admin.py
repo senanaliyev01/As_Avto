@@ -20,6 +20,7 @@ class MarkaSekilInline(admin.TabularInline):
 class MarkaAdmin(admin.ModelAdmin):
     inlines = [MarkaSekilInline]
     list_display = ('adi',)
+    search_fields = ['adi']
 
 # Sifarişlərdə məhsul detalını əlavə etmək üçün
 class SifarisMehsulInline(admin.TabularInline):
@@ -174,7 +175,12 @@ class SifarisMehsulAdmin(admin.ModelAdmin):
     get_total.short_description = 'Cəmi'
 
 # Məhsul admin paaneli
-admin.site.register(Model)
+@admin.register(Model)
+class ModelAdmin(admin.ModelAdmin):
+    list_display = ('__str__',)
+    search_fields = ['avtomobil__adi', 'model__adi', 'motor__motor', 'yanacaq__yanacaq', 'il__il']
+    autocomplete_fields = ['avtomobil', 'model', 'motor', 'yanacaq', 'il']
+
 admin.site.register(Avtomodel)
 admin.site.register(Motor)
 admin.site.register(Il)
@@ -430,8 +436,17 @@ class MehsulAdmin(admin.ModelAdmin):
 
 # Qeydiyyatları düzəltdik
 admin.site.register(SifarisMehsul, SifarisMehsulAdmin)
-admin.site.register(Kateqoriya)
-admin.site.register(Brend)
+@admin.register(Kateqoriya)
+class KateqoriyaAdmin(admin.ModelAdmin):
+    list_display = ('adi',)
+    search_fields = ['adi']
+
+# Brend admin klassı əlavə edirəm
+@admin.register(Brend)
+class BrendAdmin(admin.ModelAdmin):
+    list_display = ('adi',)
+    search_fields = ['adi']
+
 admin.site.register(Sebet)
 admin.site.register(Mehsul, MehsulAdmin)
 

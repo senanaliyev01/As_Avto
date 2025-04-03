@@ -75,32 +75,6 @@ function highlightSearchTerms() {
         // Axtarış sözlərini boşluqla ayır
         const searchTerms = searchText.trim().split(/\s+/).filter(term => term.length > 1);
         
-        // Xüsusi simvolları təmizlə və birləşik versiyaları əlavə et
-        const enhancedSearchTerms = [];
-        searchTerms.forEach(term => {
-            enhancedSearchTerms.push(term);
-            
-            // Əgər term rəqəm və ya simvollardan ibarətdirsə
-            if (/[0-9\-]/.test(term)) {
-                // Bütün tire və boşluqları silərək birləşik versiya əlavə et
-                const combinedTerm = term.replace(/[\-\s]/g, '');
-                if (combinedTerm !== term && combinedTerm.length > 1) {
-                    enhancedSearchTerms.push(combinedTerm);
-                }
-                
-                // Əgər term birləşikdirsə, tire ilə ayrılmış versiyasını əlavə et
-                if (term.length >= 5 && !/[\-\s]/.test(term)) {
-                    // Rəqəm ardıcıllıqlarını tire ilə ayır (məsələn 2630035504 -> 26300-35504)
-                    const hyphenatedTerm = term.replace(/(\d{5})(\d{5})/g, '$1-$2')
-                                              .replace(/(\d{4})(\d{4})/g, '$1-$2')
-                                              .replace(/(\d{3})(\d{3})/g, '$1-$2');
-                    if (hyphenatedTerm !== term) {
-                        enhancedSearchTerms.push(hyphenatedTerm);
-                    }
-                }
-            }
-        });
-        
         // Cədvəldəki bütün mətn hüceyrələrini seç
         const tableCells = document.querySelectorAll('.products-table tbody td:not(:first-child):not(:last-child):not(:nth-last-child(2))');
         
@@ -110,7 +84,7 @@ function highlightSearchTerms() {
             let newText = originalText;
             
             // Hər bir axtarış sözü üçün
-            enhancedSearchTerms.forEach(term => {
+            searchTerms.forEach(term => {
                 // Böyük-kiçik hərfə həssas olmayan regex
                 const regex = new RegExp(`(${escapeRegExp(term)})`, 'gi');
                 
@@ -142,47 +116,6 @@ function highlightSearchTerms() {
                     const regex = new RegExp(`(${escapeRegExp(searchText)})`, 'gi');
                     newText = originalText.replace(regex, '<span class="highlight-term">$1</span>');
                     cell.innerHTML = newText;
-                    return;
-                }
-                
-                // Əgər axtarış mətni rəqəm və ya simvollardan ibarətdirsə
-                if (/[0-9\-]/.test(searchText)) {
-                    // Boşluqları və xüsusi simvolları sil
-                    const cleanSearchText = searchText.replace(/[^a-zA-Z0-9]/g, '');
-                    const cleanCellText = originalText.replace(/[^a-zA-Z0-9]/g, '');
-                    
-                    if (cleanCellText.toLowerCase().includes(cleanSearchText.toLowerCase())) {
-                        // Orijinal mətndə axtarış sözünü tap və vurğula
-                        let startIndex = cleanCellText.toLowerCase().indexOf(cleanSearchText.toLowerCase());
-                        let endIndex = startIndex + cleanSearchText.length;
-                        
-                        // Orijinal mətndə uyğun hissəni vurğula
-                        let result = '';
-                        let currentCleanIndex = 0;
-                        
-                        for (let i = 0; i < originalText.length; i++) {
-                            const char = originalText[i];
-                            if (/[a-zA-Z0-9]/.test(char)) {
-                                if (currentCleanIndex >= startIndex && currentCleanIndex < endIndex) {
-                                    // Vurğulanacaq hissə
-                                    if (currentCleanIndex === startIndex) {
-                                        result += '<span class="highlight-term">';
-                                    }
-                                    result += char;
-                                    if (currentCleanIndex === endIndex - 1) {
-                                        result += '</span>';
-                                    }
-                                } else {
-                                    result += char;
-                                }
-                                currentCleanIndex++;
-                            } else {
-                                result += char;
-                            }
-                        }
-                        
-                        cell.innerHTML = result;
-                    }
                 }
             });
         });

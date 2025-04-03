@@ -165,8 +165,11 @@ def products_list(request):
         # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_text)
         
-        # Yalnız OEM kodlarında axtarış
-        mehsullar = mehsullar.filter(oem_kodlar__kod__icontains=clean_search).distinct()
+        # Həm OEM kodlarında, həm də məhsul adında axtarış
+        mehsullar = mehsullar.filter(
+            Q(oem_kodlar__kod__icontains=clean_search) |  # OEM kodlarında
+            Q(adi__icontains=search_text)                 # Məhsul adına görə
+        ).distinct()
 
     return render(request, 'products_list.html', {
         'mehsullar': mehsullar,
@@ -412,8 +415,11 @@ def mehsul_axtaris(request):
         # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
         clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
         
-        # Yalnız OEM kodlarında axtarış
-        mehsullar = mehsullar.filter(oem_kodlar__kod__icontains=clean_query).distinct()
+        # Həm OEM kodlarında, həm də məhsul adında axtarış
+        mehsullar = mehsullar.filter(
+            Q(oem_kodlar__kod__icontains=clean_query) |  # OEM kodlarında 
+            Q(adi__icontains=query)                      # Məhsul adına görə
+        ).distinct()
         
         # Nəticələri qaytarırıq
         return JsonResponse({

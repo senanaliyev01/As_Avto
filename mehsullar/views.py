@@ -139,7 +139,7 @@ def products_list(request):
         return redirect('esasevim:main')
     
     # Başlanğıc olaraq bütün məhsulları götürürük
-    mehsullar_base = Mehsul.objects.all()
+    mehsullar = Mehsul.objects.all()
     kateqoriyalar = Kateqoriya.objects.all()
     brendler = Brend.objects.all()
     markalar = Marka.objects.all()
@@ -148,82 +148,34 @@ def products_list(request):
     category = request.GET.get('category')
     brand = request.GET.get('brand')
     model = request.GET.get('model')
-    search_text = request.GET.get('search_text', '').strip()
+    search_text = request.GET.get('search_text')
 
     # Brend, kateqoriya və marka üçün dəqiq filtrasiya
     if category:
-        mehsullar_base = mehsullar_base.filter(kateqoriya__adi=category)
+        mehsullar = mehsullar.filter(kateqoriya__adi=category)
     
     if brand:
-        mehsullar_base = mehsullar_base.filter(brend__adi=brand)
+        mehsullar = mehsullar.filter(brend__adi=brand)
     
     if model:
-        mehsullar_base = mehsullar_base.filter(marka__adi=model)
+        mehsullar = mehsullar.filter(marka__adi=model)
 
     # Axtarış mətni varsa
     if search_text:
-        # Axtarış sözlərini ayıraq
-        search_terms = [term.strip() for term in search_text.split() if term.strip()]
-        
-        # OEM kodları üçün xüsusi simvolları təmizləyək
+        # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_text)
         
-        # Prioritet əsaslı axtarış
-        # 1. Tam məhsul adı uyğunluğu (exact match)
-        exact_matches = mehsullar_base.filter(adi__iexact=search_text)
-        
-        # 2. Bütün axtarış sözləri ilə uyğunluq (AND sorğusu)
-        if search_terms:
-            all_words_query = Q()
-            for term in search_terms:
-                all_words_query &= Q(adi__icontains=term)
-            all_words_matches = mehsullar_base.filter(all_words_query)
-        else:
-            all_words_matches = Mehsul.objects.none()
-        
-        # 3. OEM kod və brend kod uyğunluğu
-        code_matches = mehsullar_base.filter(
-            Q(oem_kodlar__kod__icontains=clean_search) | 
-            Q(brend_kod__icontains=clean_search)
-        )
-        
-        # 4. Hər hansı bir axtarış sözü ilə uyğunluq (OR sorğusu)
-        if search_terms:
-            any_word_query = Q()
-            for term in search_terms:
-                any_word_query |= Q(adi__icontains=term)
-            any_word_matches = mehsullar_base.filter(any_word_query)
-        else:
-            any_word_matches = Mehsul.objects.none()
-        
-        # Prioritet sırasına görə birləşdirək
-        result_ids = list(exact_matches.values_list('id', flat=True))
-        result_ids += [id for id in all_words_matches.values_list('id', flat=True) if id not in result_ids]
-        result_ids += [id for id in code_matches.values_list('id', flat=True) if id not in result_ids]
-        result_ids += [id for id in any_word_matches.values_list('id', flat=True) if id not in result_ids]
-        
-        # İD siyahısına görə sorted edilmiş queryset yaradaq
-        if result_ids:
-            from django.db.models import Case, When, Value, IntegerField
-            preserved_order = Case(*[When(id=id, then=Value(pos)) for pos, id in enumerate(result_ids)], 
-                                  output_field=IntegerField())
-            mehsullar = Mehsul.objects.filter(id__in=result_ids).order_by(preserved_order)
-        else:
-            mehsullar = Mehsul.objects.none()
-    else:
-        # Axtarış mətni olmadıqda baza queryset-i qaytarır
-        mehsullar = mehsullar_base
-    
-    # Əlavə malumatları üçün formatlaşdırılmış qiymət əlavə edək
-    for mehsul in mehsullar:
-        mehsul.formatted_qiymet = str(mehsul.qiymet)
+        # OEM kodlarında və məhsul adında axtarış
+        mehsullar = mehsullar.filter(
+            Q(oem_kodlar__kod__icontains=clean_search) |
+            Q(adi__icontains=search_text)  # Məhsul adı ilə axtarış
+        ).distinct()
 
     return render(request, 'products_list.html', {
         'mehsullar': mehsullar,
         'kateqoriyalar': kateqoriyalar,
         'brendler': brendler,
-        'markalar': markalar,
-        'search_query': search_text  # Template-də axtarış sözlərini göstərmək üçün
+        'markalar': markalar
     })
 
 
@@ -455,93 +407,38 @@ def update_quantity(request, item_id, new_quantity):
 
 @login_required
 def mehsul_axtaris(request):
-    query = request.GET.get('q', '').strip()
-    if not query:
+    query = request.GET.get('q')
+    if query:
+        # Başlanğıc sorğunu yaradırıq
+        mehsullar = Mehsul.objects.all()
+        
+        # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
+        clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
+        
+        # OEM kodlarında və məhsul adında axtarış
+        mehsullar = mehsullar.filter(
+            Q(oem_kodlar__kod__icontains=clean_query) | 
+            Q(adi__icontains=query)  # Məhsul adı ilə axtarış
+        ).distinct()
+        
+        # Nəticələri qaytarırıq
         return JsonResponse({
-            'success': False,
-            'message': 'Axtarış parametri daxil edilməyib'
+            'success': True,
+            'mehsullar': list(mehsullar.values(
+                'id', 
+                'adi', 
+                'brend__adi', 
+                'marka__adi',
+                'oem', 
+                'brend_kod', 
+                'qiymet',
+                'stok'
+            ))
         })
     
-    # Başlanğıc sorğunu yaradırıq
-    mehsullar_base = Mehsul.objects.all()
-    
-    # Axtarış sözlərini ayrı-ayrı işləmək
-    search_terms = [term.strip() for term in query.split() if term.strip()]
-    
-    # OEM kod axtarışı üçün xüsusi simvolları təmizləyək
-    clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
-    
-    # Hər bir söz üçün Q obyektləri yaradaq
-    ad_queries = [Q(adi__icontains=term) for term in search_terms]
-    oem_queries = Q(oem_kodlar__kod__icontains=clean_query)
-    brend_kod_queries = Q(brend_kod__icontains=clean_query)
-    
-    # Tam ad uyğunluğu üçün xüsusi prioritet
-    exact_matches = mehsullar_base.filter(adi__iexact=query)
-    
-    # Bütün ad sözləri ilə uyğunluq üçün sorğu (AND sorğusu)
-    if ad_queries:
-        combined_ad_query = ad_queries[0]
-        for q in ad_queries[1:]:
-            combined_ad_query &= q
-        all_words_matches = mehsullar_base.filter(combined_ad_query)
-    else:
-        all_words_matches = Mehsul.objects.none()
-    
-    # Hər hansı bir sözlə uyğunluq üçün sorğu (OR sorğusu)
-    if ad_queries:
-        any_word_query = ad_queries[0]
-        for q in ad_queries[1:]:
-            any_word_query |= q
-        any_word_matches = mehsullar_base.filter(any_word_query)
-    else:
-        any_word_matches = Mehsul.objects.none()
-    
-    # OEM kodları və Brend kodları ilə uyğunluq
-    code_matches = mehsullar_base.filter(oem_queries | brend_kod_queries)
-    
-    # Prioritetə görə nəticələri birləşdirək
-    # 1. Tam ad uyğunluğu
-    # 2. Bütün sözlərlə uyğunluq
-    # 3. OEM/Brend kod uyğunluğu
-    # 4. Hər hansı bir sözlə uyğunluq
-    result_ids = list(exact_matches.values_list('id', flat=True))
-    result_ids += [id for id in all_words_matches.values_list('id', flat=True) if id not in result_ids]
-    result_ids += [id for id in code_matches.values_list('id', flat=True) if id not in result_ids]
-    result_ids += [id for id in any_word_matches.values_list('id', flat=True) if id not in result_ids]
-    
-    # İD siyahısına əsasən məhsulları prioritetli sıra ilə qaytaraq
-    if result_ids:
-        # İD siyahısına görə preserve_order=True istifadə edək
-        from django.db.models import Case, When, Value, IntegerField
-        preserved_order = Case(*[When(id=id, then=Value(pos)) for pos, id in enumerate(result_ids)], 
-                                output_field=IntegerField())
-        final_queryset = Mehsul.objects.filter(id__in=result_ids).order_by(preserved_order)
-    else:
-        final_queryset = Mehsul.objects.none()
-    
-    # Nəticələr əldə edilirsə, qaytarırıq
     return JsonResponse({
-        'success': True,
-        'mehsullar': list(final_queryset.values(
-            'id', 
-            'adi', 
-            'brend__adi', 
-            'marka__adi',
-            'oem', 
-            'brend_kod', 
-            'qiymet',
-            'stok'
-        )),
-        'query_info': {
-            'original_query': query,
-            'search_terms': search_terms,
-            'total_results': len(result_ids),
-            'exact_matches': exact_matches.count(),
-            'all_words_matches': all_words_matches.count(),
-            'code_matches': code_matches.count(),
-            'any_word_matches': any_word_matches.count()
-        }
+        'success': False,
+        'message': 'Axtarış parametri daxil edilməyib'
     })
 
 @login_required
@@ -735,70 +632,18 @@ def realtime_search(request):
     if not query or len(query) < 2:
         return JsonResponse({'results': []})
     
-    # Axtarış sözlərini ayıraq
-    search_terms = [term.strip() for term in query.split() if term.strip()]
-    
-    # OEM kodları üçün xüsusi simvolları təmizlə
+    # Xüsusi simvolları təmizlə
     clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
     
-    # Prioritet əsaslı axtarış sistemi
-    # 1. Tam ad uyğunluğu
-    exact_matches = Mehsul.objects.filter(adi__iexact=query)
+    # Axtarış sorğusu
+    mehsullar = Mehsul.objects.filter(
+        Q(oem_kodlar__kod__icontains=clean_query) |  # OEM kodlarında
+        Q(adi__icontains=query) |                    # Ad
+        Q(brend_kod__icontains=query)                # Brend kodu
+    ).distinct()[:20]  # Performans üçün maksimum 20 nəticə
     
-    # 2. Bütün axtarış sözləri ilə uyğunluq (AND sorğusu)
-    if search_terms:
-        all_terms_query = Q()
-        for term in search_terms:
-            all_terms_query &= Q(adi__icontains=term)
-        all_terms_matches = Mehsul.objects.filter(all_terms_query)
-    else:
-        all_terms_matches = Mehsul.objects.none()
-    
-    # 3. Kodu və brend kodu uyğunluğu
-    code_matches = Mehsul.objects.filter(
-        Q(oem_kodlar__kod__icontains=clean_query) | 
-        Q(brend_kod__icontains=clean_query) |
-        Q(oem__icontains=clean_query)
-    )
-    
-    # 4. Ən azı bir söz ilə uyğunluq (OR sorğusu)
-    if search_terms:
-        any_term_query = Q()
-        for term in search_terms:
-            any_term_query |= Q(adi__icontains=term)
-        any_term_matches = Mehsul.objects.filter(any_term_query)
-    else:
-        any_term_matches = Mehsul.objects.none()
-    
-    # Prioritet sırasına görə birləşdirək
-    result_ids = list(exact_matches.values_list('id', flat=True))
-    result_ids += [id for id in all_terms_matches.values_list('id', flat=True) if id not in result_ids]
-    result_ids += [id for id in code_matches.values_list('id', flat=True) if id not in result_ids]
-    result_ids += [id for id in any_term_matches.values_list('id', flat=True) if id not in result_ids]
-    
-    # ID siyahısına görə sorted etdiyimiz query yaradaq
-    if result_ids:
-        from django.db.models import Case, When, Value, IntegerField
-        preserved_order = Case(*[When(id=id, then=Value(pos)) for pos, id in enumerate(result_ids)], 
-                              output_field=IntegerField())
-        sorted_results = Mehsul.objects.filter(id__in=result_ids).order_by(preserved_order)[:20]  # Maksimum 20 nəticə
-    else:
-        sorted_results = Mehsul.objects.none()
-    
-    # Nəticələri formatlaşdıraq
     results = []
-    for mehsul in sorted_results:
-        # Axtarış sözlərinə uyğunluq prioritet dərəcəsini hesablayaq
-        match_score = 0
-        if mehsul.id in exact_matches.values_list('id', flat=True):
-            match_score = 100  # Tam uyğunluq - ən yüksək
-        elif mehsul.id in all_terms_matches.values_list('id', flat=True):
-            match_score = 80   # Bütün sözlər uyğundur
-        elif mehsul.id in code_matches.values_list('id', flat=True):
-            match_score = 70   # Kod uyğunluğu
-        else:
-            match_score = 50   # Hər hansı bir söz uyğundur
-        
+    for mehsul in mehsullar:
         results.append({
             'id': mehsul.id,
             'adi': mehsul.adi,
@@ -808,12 +653,7 @@ def realtime_search(request):
             'oem': mehsul.oem,
             'qiymet': str(mehsul.qiymet),
             'stok': mehsul.stok,
-            'sekil_url': mehsul.sekil.url if mehsul.sekil else None,
-            'match_score': match_score  # Uyğunluq dərəcəsi
+            'sekil_url': mehsul.sekil.url if mehsul.sekil else None
         })
     
-    return JsonResponse({
-        'results': results,
-        'query': query,
-        'total_results': len(results)
-    })
+    return JsonResponse({'results': results})

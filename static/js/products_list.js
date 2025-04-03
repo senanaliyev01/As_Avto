@@ -128,8 +128,8 @@ function highlightSearchTerms() {
         });
         
         // Xüsusi olaraq brend_kod və oem sütunlarını yoxla
-        const brendKodCells = document.querySelectorAll('.products-table tbody td:nth-child(5)'); // Brend Kod sütunu
-        const oemCells = document.querySelectorAll('.products-table tbody td:nth-child(6)'); // OEM Kod sütunu
+        const brendKodCells = document.querySelectorAll('.products-table tbody td:nth-child(3)'); // Brend Kod sütunu
+        const oemCells = document.querySelectorAll('.products-table tbody td:nth-child(4)'); // OEM Kod sütunu
         
         // Brend kod və OEM kod sütunlarını xüsusi olaraq yoxla
         [brendKodCells, oemCells].forEach(cells => {

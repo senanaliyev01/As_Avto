@@ -165,11 +165,26 @@ def products_list(request):
         # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_text)
         
-        # Həm OEM kodlarında, həm də məhsul adında axtarış
-        mehsullar = mehsullar.filter(
-            Q(oem_kodlar__kod__icontains=clean_search) |  # OEM kodlarında
-            Q(adi__icontains=search_text)                 # Məhsul adına görə
-        ).distinct()
+        # Axtarış mətnini sözlərə böl
+        search_words = search_text.split()
+        
+        # Filter yaradırıq
+        query_filter = Q()
+        
+        # Bütöv axtarış mətni ilə yoxla
+        query_filter |= Q(adi__icontains=search_text)
+        query_filter |= Q(oem_kodlar__kod__icontains=clean_search)
+        query_filter |= Q(brend_kod__icontains=clean_search)
+        
+        # Hər bir söz üçün ayrıca filter əlavə et
+        for word in search_words:
+            clean_word = re.sub(r'[^a-zA-Z0-9]', '', word)
+            if len(clean_word) > 2:  # Minimum 3 simvol
+                query_filter |= Q(adi__icontains=word)
+                query_filter |= Q(oem_kodlar__kod__icontains=clean_word)
+                query_filter |= Q(brend_kod__icontains=clean_word)
+        
+        mehsullar = mehsullar.filter(query_filter).distinct()
 
     return render(request, 'products_list.html', {
         'mehsullar': mehsullar,
@@ -415,11 +430,26 @@ def mehsul_axtaris(request):
         # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
         clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
         
-        # Həm OEM kodlarında, həm də məhsul adında axtarış
-        mehsullar = mehsullar.filter(
-            Q(oem_kodlar__kod__icontains=clean_query) |  # OEM kodlarında 
-            Q(adi__icontains=query)                      # Məhsul adına görə
-        ).distinct()
+        # Axtarış mətnini sözlərə böl
+        query_words = query.split()
+        
+        # Filter yaradırıq
+        query_filter = Q()
+        
+        # Bütöv axtarış mətni ilə yoxla
+        query_filter |= Q(adi__icontains=query)
+        query_filter |= Q(oem_kodlar__kod__icontains=clean_query)
+        query_filter |= Q(brend_kod__icontains=clean_query)
+        
+        # Hər bir söz üçün ayrıca filter əlavə et
+        for word in query_words:
+            clean_word = re.sub(r'[^a-zA-Z0-9]', '', word)
+            if len(clean_word) > 2:  # Minimum 3 simvol
+                query_filter |= Q(adi__icontains=word)
+                query_filter |= Q(oem_kodlar__kod__icontains=clean_word)
+                query_filter |= Q(brend_kod__icontains=clean_word)
+        
+        mehsullar = mehsullar.filter(query_filter).distinct()
         
         # Nəticələri qaytarırıq
         return JsonResponse({
@@ -635,12 +665,27 @@ def realtime_search(request):
     # Xüsusi simvolları təmizlə
     clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
     
+    # Axtarış mətnini sözlərə böl
+    query_words = query.split()
+    
+    # Filter yaradırıq
+    query_filter = Q()
+    
+    # Bütöv axtarış mətni ilə yoxla
+    query_filter |= Q(adi__icontains=query)
+    query_filter |= Q(oem_kodlar__kod__icontains=clean_query)
+    query_filter |= Q(brend_kod__icontains=clean_query)
+    
+    # Hər bir söz üçün ayrıca filter əlavə et
+    for word in query_words:
+        clean_word = re.sub(r'[^a-zA-Z0-9]', '', word)
+        if len(clean_word) > 2:  # Minimum 3 simvol
+            query_filter |= Q(adi__icontains=word)
+            query_filter |= Q(oem_kodlar__kod__icontains=clean_word)
+            query_filter |= Q(brend_kod__icontains=clean_word)
+    
     # Axtarış sorğusu
-    mehsullar = Mehsul.objects.filter(
-        Q(oem_kodlar__kod__icontains=clean_query) |  # OEM kodlarında
-        Q(adi__icontains=query) |                    # Ad
-        Q(brend_kod__icontains=query)                # Brend kodu
-    ).distinct()[:20]  # Performans üçün maksimum 20 nəticə
+    mehsullar = Mehsul.objects.filter(query_filter).distinct()[:20]  # Performans üçün maksimum 20 nəticə
     
     results = []
     for mehsul in mehsullar:

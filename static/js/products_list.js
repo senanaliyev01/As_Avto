@@ -72,46 +72,80 @@ function highlightSearchTerms() {
     
     // Əgər axtarış sözü varsa
     if (searchText && searchText.trim() !== '') {
+        // Orijinal axtarış mətni
+        const originalSearchText = searchText.trim();
+        
         // Cədvəldəki bütün mətn hüceyrələrini seç
-        const tableCells = document.querySelectorAll('.products-table tbody td:not(:first-child):not(:last-child):not(:nth-last-child(2))');
+        const tableCells = document.querySelectorAll('.products-table tbody td');
         
-        // Hər bir hüceyrə üçün
+        // Bütün hüceyrələri yoxla
         tableCells.forEach(cell => {
-            const originalText = cell.textContent;
-            let newText = originalText;
+            const cellText = cell.textContent.trim();
             
-            // Axtarış mətnini olduğu kimi istifadə et, təmizləmə və parçalama olmadan
-            const escapedSearchText = escapeRegExp(searchText.trim());
-            const regex = new RegExp(`(${escapedSearchText})`, 'gi');
-            
-            // Əgər hüceyrədə axtarış sözü varsa
-            if (regex.test(newText)) {
-                // Axtarış sözünü vurğula
-                newText = newText.replace(regex, '<span class="highlight-term">$1</span>');
-                cell.innerHTML = newText;
-            }
-        });
-        
-        // Xüsusi olaraq brend_kod və oem sütunlarını yoxla
-        const oemCells = document.querySelectorAll('.products-table tbody td:nth-child(4)'); // OEM Kod sütunu
-        const adiCells = document.querySelectorAll('.products-table tbody td:nth-child(3)'); // Məhsul adı sütunu
-        
-        // Brend kod, ad və OEM kod sütunlarını xüsusi olaraq yoxla
-        [brendKodCells, oemCells, adiCells].forEach(cells => {
-            cells.forEach(cell => {
-                const originalText = cell.textContent.trim();
+            // Xüsusi simvol və boşluqları daxil olmaqla  axtarış 
+            if (cellText.toLowerCase().includes(originalSearchText.toLowerCase())) {
+                // Bu üsulla escape edərək təhlükəsiz regex yaradırıq
+                const safeSearchText = escapeRegExp(originalSearchText);
+                const regex = new RegExp(`(${safeSearchText})`, 'gi');
                 
-                // Axtarış mətnini olduğu kimi istifadə et
-                const escapedSearchText = escapeRegExp(searchText.trim());
-                const regex = new RegExp(`(${escapedSearchText})`, 'gi');
+                // Orijinal formatla əvəz edərək vurğulayırıq
+                cell.innerHTML = cellText.replace(regex, '<span class="highlight-term">$1</span>');
+            } else {
+                // Axtarış mətninə tire və boşluqları silərək yoxlamaq
+                const cleanSearchText = originalSearchText.replace(/[\s\-_!@#$%^&*()+=,.?":;{}|<>\/\\[\]]/g, '');
+                const cleanCellText = cellText.replace(/[\s\-_!@#$%^&*()+=,.?":;{}|<>\/\\[\]]/g, '');
                 
-                // Əgər hüceyrədə axtarış sözü varsa
-                if (regex.test(originalText)) {
-                    // Axtarış sözünü vurğula
-                    const newText = originalText.replace(regex, '<span class="highlight-term">$1</span>');
-                    cell.innerHTML = newText;
+                if (cleanSearchText.length > 2 && cleanCellText.toLowerCase().includes(cleanSearchText.toLowerCase())) {
+                    // Orijinal mətndə pozisiyasını tapmaq
+                    let index = cleanCellText.toLowerCase().indexOf(cleanSearchText.toLowerCase());
+                    
+                    if (index !== -1) {
+                        // Xüsusi simvolları nəzərə alaraq orijinal mətndə pozisiyanı tapmaq üçün əlavə hesablamalar
+                        let startPosInOriginal = 0;
+                        let cleanCharCount = 0;
+                        
+                        for (let i = 0; i < cellText.length; i++) {
+                            const char = cellText[i];
+                            if (!/[\s\-_!@#$%^&*()+=,.?":;{}|<>\/\\[\]]/.test(char)) {
+                                cleanCharCount++;
+                            }
+                            
+                            if (cleanCharCount > index) {
+                                startPosInOriginal = i - (cleanCharCount - index) + 1;
+                                break;
+                            }
+                        }
+                        
+                        // Vurğulanacaq mətn uzunluğunu hesabla
+                        let endPosInOriginal = startPosInOriginal;
+                        let highlightedChars = 0;
+                        
+                        for (let i = startPosInOriginal; i < cellText.length; i++) {
+                            const char = cellText[i];
+                            if (!/[\s\-_!@#$%^&*()+=,.?":;{}|<>\/\\[\]]/.test(char)) {
+                                highlightedChars++;
+                            }
+                            
+                            endPosInOriginal = i;
+                            
+                            if (highlightedChars >= cleanSearchText.length) {
+                                break;
+                            }
+                        }
+                        
+                        // Mətni hissələrə bölüb vurğulama əlavə et
+                        const beforeText = cellText.substring(0, startPosInOriginal);
+                        const highlightedText = cellText.substring(startPosInOriginal, endPosInOriginal + 1);
+                        const afterText = cellText.substring(endPosInOriginal + 1);
+                        
+                        cell.innerHTML = beforeText + 
+                                        '<span class="highlight-term">' + 
+                                        highlightedText + 
+                                        '</span>' + 
+                                        afterText;
+                    }
                 }
-            });
+            }
         });
     }
 }

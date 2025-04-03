@@ -5,7 +5,6 @@ from django.db.models import F, Sum, Q
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from django.db import connection
 import json
 import re
 from django.contrib.auth.models import User
@@ -163,23 +162,14 @@ def products_list(request):
 
     # Axtarış mətni varsa
     if search_text:
-        # 1. OEM kodları üçün axtarış
-        # Xüsusi simvolları təmizlə
+        # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_text)
-        oem_results = mehsullar.filter(oem_kodlar__kod__icontains=clean_search)
         
-        # 2. PostgreSQL-in tsvector və plainto_tsquery funksiyaları ilə məhsul adında axtarış
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                SELECT id FROM mehsullar_mehsul 
-                WHERE to_tsvector('simple', coalesce(adi, '')) @@ plainto_tsquery('simple', %s)
-            """, [search_text])
-            name_result_ids = [row[0] for row in cursor.fetchall()]
-        
-        name_results = mehsullar.filter(id__in=name_result_ids)
-        
-        # Nəticələri birləşdir
-        mehsullar = (oem_results | name_results).distinct()
+        # OEM kodlarında və məhsul adında axtarış
+        mehsullar = mehsullar.filter(
+            Q(oem_kodlar__kod__icontains=clean_search) |
+            Q(adi__icontains=search_text)  # Məhsul adı ilə axtarış
+        ).distinct()
 
     return render(request, 'products_list.html', {
         'mehsullar': mehsullar,
@@ -419,29 +409,17 @@ def update_quantity(request, item_id, new_quantity):
 def mehsul_axtaris(request):
     query = request.GET.get('q')
     if query:
-        # PostgreSQL-in tam mətn axtarışı ilə məhsul adına görə axtarış
-        
         # Başlanğıc sorğunu yaradırıq
         mehsullar = Mehsul.objects.all()
         
-        # Xüsusi simvolları təmizlə (OEM kodları üçün)
+        # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
         clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
         
-        # 1. OEM kodlarında axtarış
-        oem_results = mehsullar.filter(oem_kodlar__kod__icontains=clean_query)
-        
-        # 2. PostgreSQL-in tsvector və plainto_tsquery funksiyaları ilə məhsul adında axtarış
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                SELECT id FROM mehsullar_mehsul 
-                WHERE to_tsvector('simple', coalesce(adi, '')) @@ plainto_tsquery('simple', %s)
-            """, [query])
-            name_result_ids = [row[0] for row in cursor.fetchall()]
-        
-        name_results = Mehsul.objects.filter(id__in=name_result_ids)
-        
-        # Nəticələri birləşdir
-        mehsullar = (oem_results | name_results).distinct()
+        # OEM kodlarında və məhsul adında axtarış
+        mehsullar = mehsullar.filter(
+            Q(oem_kodlar__kod__icontains=clean_query) | 
+            Q(adi__icontains=query)  # Məhsul adı ilə axtarış
+        ).distinct()
         
         # Nəticələri qaytarırıq
         return JsonResponse({
@@ -654,27 +632,15 @@ def realtime_search(request):
     if not query or len(query) < 2:
         return JsonResponse({'results': []})
     
-    # Xüsusi simvolları təmizlə (OEM kodları üçün)
+    # Xüsusi simvolları təmizlə
     clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
     
-    # 1. OEM kodlarında və brend kodunda axtarış
-    mehsullar_oem_brend = Mehsul.objects.filter(
+    # Axtarış sorğusu
+    mehsullar = Mehsul.objects.filter(
         Q(oem_kodlar__kod__icontains=clean_query) |  # OEM kodlarında
+        Q(adi__icontains=query) |                    # Ad
         Q(brend_kod__icontains=query)                # Brend kodu
-    )
-    
-    # 2. PostgreSQL-in tsvector və plainto_tsquery funksiyaları ilə məhsul adında axtarış
-    with connection.cursor() as cursor:
-        cursor.execute("""
-            SELECT id FROM mehsullar_mehsul 
-            WHERE to_tsvector('simple', coalesce(adi, '')) @@ plainto_tsquery('simple', %s)
-        """, [query])
-        name_result_ids = [row[0] for row in cursor.fetchall()]
-    
-    mehsullar_ad = Mehsul.objects.filter(id__in=name_result_ids)
-    
-    # Bütün nəticələri birləşdir və limit tətbiq et
-    mehsullar = (mehsullar_oem_brend | mehsullar_ad).distinct()[:20]  # Performans üçün maksimum 20 nəticə
+    ).distinct()[:20]  # Performans üçün maksimum 20 nəticə
     
     results = []
     for mehsul in mehsullar:

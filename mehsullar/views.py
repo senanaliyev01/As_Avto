@@ -162,53 +162,14 @@ def products_list(request):
 
     # Axtarış mətni varsa
     if search_text:
-        # Bütün xüsusi simvolları və artıq boşluqları təmizlə
-        normalized_search = re.sub(r'[^\w\s]', ' ', search_text).lower()
-        normalized_search = re.sub(r'\s+', ' ', normalized_search).strip()
-        
-        # OEM kodları üçün xüsusi simvolları tam təmizlə
+        # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_text)
         
-        # Əsas axtarış məhsul adında olacaq
-        matching_products = []
-        
-        # Əvvəlcə bütün məhsulları bir-bir yoxla
-        for mehsul in mehsullar:
-            # Məhsul adını normallaşdır
-            normalized_name = re.sub(r'[^\w\s]', ' ', mehsul.adi.lower())
-            normalized_name = re.sub(r'\s+', ' ', normalized_name).strip()
-            
-            # Bütün axtarış sözlərini məhsulun adında axtar
-            match_found = True
-            for word in normalized_search.split():
-                if word not in normalized_name:
-                    match_found = False
-                    break
-            
-            if match_found:
-                matching_products.append(mehsul.id)
-        
-        # Əlavə olaraq OEM kodlarında da axtar
-        oem_based_matches = mehsullar.filter(
+        # OEM kodlarında və məhsul adında axtarış
+        mehsullar = mehsullar.filter(
             Q(oem_kodlar__kod__icontains=clean_search) |
-            Q(brend_kod__icontains=clean_search)
-        ).values_list('id', flat=True)
-        
-        # Nəticələri birləşdir
-        all_matching_ids = set(matching_products) | set(oem_based_matches)
-        
-        if all_matching_ids:
-            mehsullar = mehsullar.filter(id__in=all_matching_ids)
-        else:
-            # Əgər heç bir nəticə tapılmasa, daha ümumi axtarış et
-            query_filter = Q()
-            
-            # Axtarış mətnini sözlərə böl
-            for word in normalized_search.split():
-                if len(word) >= 2:  # Minimum 2 simvol
-                    query_filter |= Q(adi__icontains=word)
-            
-            mehsullar = mehsullar.filter(query_filter)
+            Q(adi__icontains=search_text)  # Məhsul adı ilə axtarış
+        ).distinct()
 
     return render(request, 'products_list.html', {
         'mehsullar': mehsullar,
@@ -451,53 +412,14 @@ def mehsul_axtaris(request):
         # Başlanğıc sorğunu yaradırıq
         mehsullar = Mehsul.objects.all()
         
-        # Bütün xüsusi simvolları və artıq boşluqları təmizlə
-        normalized_query = re.sub(r'[^\w\s]', ' ', query).lower()
-        normalized_query = re.sub(r'\s+', ' ', normalized_query).strip()
-        
-        # OEM kodları üçün xüsusi simvolları tam təmizlə
+        # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
         clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
         
-        # Əsas axtarış məhsul adında olacaq
-        matching_products = []
-        
-        # Əvvəlcə bütün məhsulları bir-bir yoxla
-        for mehsul in mehsullar:
-            # Məhsul adını normallaşdır
-            normalized_name = re.sub(r'[^\w\s]', ' ', mehsul.adi.lower())
-            normalized_name = re.sub(r'\s+', ' ', normalized_name).strip()
-            
-            # Bütün axtarış sözlərini məhsulun adında axtar
-            match_found = True
-            for word in normalized_query.split():
-                if word not in normalized_name:
-                    match_found = False
-                    break
-            
-            if match_found:
-                matching_products.append(mehsul.id)
-        
-        # Əlavə olaraq OEM kodlarında da axtar
-        oem_based_matches = mehsullar.filter(
-            Q(oem_kodlar__kod__icontains=clean_query) |
-            Q(brend_kod__icontains=clean_query)
-        ).values_list('id', flat=True)
-        
-        # Nəticələri birləşdir
-        all_matching_ids = set(matching_products) | set(oem_based_matches)
-        
-        if all_matching_ids:
-            mehsullar = mehsullar.filter(id__in=all_matching_ids)
-        else:
-            # Əgər heç bir nəticə tapılmasa, daha ümumi axtarış et
-            query_filter = Q()
-            
-            # Axtarış mətnini sözlərə böl
-            for word in normalized_query.split():
-                if len(word) >= 2:  # Minimum 2 simvol
-                    query_filter |= Q(adi__icontains=word)
-            
-            mehsullar = mehsullar.filter(query_filter)
+        # OEM kodlarında və məhsul adında axtarış
+        mehsullar = mehsullar.filter(
+            Q(oem_kodlar__kod__icontains=clean_query) | 
+            Q(adi__icontains=query)  # Məhsul adı ilə axtarış
+        ).distinct()
         
         # Nəticələri qaytarırıq
         return JsonResponse({
@@ -710,59 +632,18 @@ def realtime_search(request):
     if not query or len(query) < 2:
         return JsonResponse({'results': []})
     
-    # Bütün xüsusi simvolları və artıq boşluqları təmizlə
-    normalized_query = re.sub(r'[^\w\s]', ' ', query).lower()
-    normalized_query = re.sub(r'\s+', ' ', normalized_query).strip()
-    
-    # OEM kodları üçün xüsusi simvolları tam təmizlə
+    # Xüsusi simvolları təmizlə
     clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
     
-    # Başlanğıc sorğunu yaradırıq
-    mehsullar = Mehsul.objects.all()
-    
-    # Əsas axtarış məhsul adında olacaq
-    matching_products = []
-    
-    # Əvvəlcə bütün məhsulları bir-bir yoxla
-    for mehsul in mehsullar:
-        # Məhsul adını normallaşdır
-        normalized_name = re.sub(r'[^\w\s]', ' ', mehsul.adi.lower())
-        normalized_name = re.sub(r'\s+', ' ', normalized_name).strip()
-        
-        # Bütün axtarış sözlərini məhsulun adında axtar
-        match_found = True
-        for word in normalized_query.split():
-            if word not in normalized_name:
-                match_found = False
-                break
-        
-        if match_found:
-            matching_products.append(mehsul.id)
-    
-    # Əlavə olaraq OEM kodlarında da axtar
-    oem_based_matches = mehsullar.filter(
-        Q(oem_kodlar__kod__icontains=clean_query) |
-        Q(brend_kod__icontains=clean_query)
-    ).values_list('id', flat=True)
-    
-    # Nəticələri birləşdir
-    all_matching_ids = set(matching_products) | set(oem_based_matches)
-    
-    if all_matching_ids:
-        result_mehsullar = mehsullar.filter(id__in=all_matching_ids)[:20]  # Maksimum 20 nəticə
-    else:
-        # Əgər heç bir nəticə tapılmasa, daha ümumi axtarış et
-        query_filter = Q()
-        
-        # Axtarış mətnini sözlərə böl
-        for word in normalized_query.split():
-            if len(word) >= 2:  # Minimum 2 simvol
-                query_filter |= Q(adi__icontains=word)
-        
-        result_mehsullar = mehsullar.filter(query_filter)[:20]
+    # Axtarış sorğusu
+    mehsullar = Mehsul.objects.filter(
+        Q(oem_kodlar__kod__icontains=clean_query) |  # OEM kodlarında
+        Q(adi__icontains=query) |                    # Ad
+        Q(brend_kod__icontains=query)                # Brend kodu
+    ).distinct()[:20]  # Performans üçün maksimum 20 nəticə
     
     results = []
-    for mehsul in result_mehsullar:
+    for mehsul in mehsullar:
         results.append({
             'id': mehsul.id,
             'adi': mehsul.adi,

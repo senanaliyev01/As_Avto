@@ -546,6 +546,19 @@
                     return false;
                 }
                 
+                // 1. Əvvəlcə bütün boşluqları və xüsusi simvolları sil, yalnız hərf, rəqəm və tire saxla
+                let originalText = searchInput.value;
+                let cleanedText = originalText.replace(/[^a-zA-Z0-9\-]/g, '');
+                
+                // 2. Ardıcıl tireleri bir tire ilə əvəz et
+                cleanedText = cleanedText.replace(/\-+/g, '-');
+                
+                // 3. Əgər mətnin əvvəlində və ya sonunda tire varsa, onu sil
+                cleanedText = cleanedText.replace(/^\-|\-$/g, '');
+                
+                // Təmizlənmiş mətni inputa təyin et
+                searchInput.value = cleanedText;
+                
                 let searchButton = document.getElementById('search-button');
                 
                 if (!searchButton) return;

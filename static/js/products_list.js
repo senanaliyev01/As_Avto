@@ -72,9 +72,6 @@ function highlightSearchTerms() {
     
     // Əgər axtarış sözü varsa
     if (searchText && searchText.trim() !== '') {
-        // Axtarış sözlərini boşluqla ayır
-        const searchTerms = searchText.trim().split(/\s+/).filter(term => term.length > 1);
-        
         // Cədvəldəki bütün mətn hüceyrələrini seç
         const tableCells = document.querySelectorAll('.products-table tbody td:not(:first-child):not(:last-child):not(:nth-last-child(2))');
         
@@ -83,38 +80,35 @@ function highlightSearchTerms() {
             const originalText = cell.textContent;
             let newText = originalText;
             
-            // Hər bir axtarış sözü üçün
-            searchTerms.forEach(term => {
-                // Böyük-kiçik hərfə həssas olmayan regex
-                const regex = new RegExp(`(${escapeRegExp(term)})`, 'gi');
-                
-                // Əgər hüceyrədə axtarış sözü varsa
-                if (regex.test(newText)) {
-                    // Axtarış sözünü vurğula
-                    newText = newText.replace(regex, '<span class="highlight-term">$1</span>');
-                }
-            });
+            // Axtarış mətnini olduğu kimi istifadə et, təmizləmə və parçalama olmadan
+            const escapedSearchText = escapeRegExp(searchText.trim());
+            const regex = new RegExp(`(${escapedSearchText})`, 'gi');
             
-            // Əgər mətn dəyişibsə, yeni mətni təyin et
-            if (newText !== originalText) {
+            // Əgər hüceyrədə axtarış sözü varsa
+            if (regex.test(newText)) {
+                // Axtarış sözünü vurğula
+                newText = newText.replace(regex, '<span class="highlight-term">$1</span>');
                 cell.innerHTML = newText;
             }
         });
         
         // Xüsusi olaraq brend_kod və oem sütunlarını yoxla
-        const brendKodCells = document.querySelectorAll('.products-table tbody td:nth-child(2)'); // Brend Kod sütunu
         const oemCells = document.querySelectorAll('.products-table tbody td:nth-child(4)'); // OEM Kod sütunu
+        const adiCells = document.querySelectorAll('.products-table tbody td:nth-child(3)'); // Məhsul adı sütunu
         
-        // Brend kod və OEM kod sütunlarını xüsusi olaraq yoxla
-        [brendKodCells, oemCells].forEach(cells => {
+        // Brend kod, ad və OEM kod sütunlarını xüsusi olaraq yoxla
+        [brendKodCells, oemCells, adiCells].forEach(cells => {
             cells.forEach(cell => {
                 const originalText = cell.textContent.trim();
-                let newText = originalText;
                 
-                // Orijinal axtarış mətni ilə birbaşa yoxla
-                if (originalText.toLowerCase().includes(searchText.toLowerCase())) {
-                    const regex = new RegExp(`(${escapeRegExp(searchText)})`, 'gi');
-                    newText = originalText.replace(regex, '<span class="highlight-term">$1</span>');
+                // Axtarış mətnini olduğu kimi istifadə et
+                const escapedSearchText = escapeRegExp(searchText.trim());
+                const regex = new RegExp(`(${escapedSearchText})`, 'gi');
+                
+                // Əgər hüceyrədə axtarış sözü varsa
+                if (regex.test(originalText)) {
+                    // Axtarış sözünü vurğula
+                    const newText = originalText.replace(regex, '<span class="highlight-term">$1</span>');
                     cell.innerHTML = newText;
                 }
             });

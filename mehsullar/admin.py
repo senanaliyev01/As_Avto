@@ -219,8 +219,24 @@ class MehsulAdmin(admin.ModelAdmin):
                 new_count = 0
                 update_count = 0
                 error_count = 0
+                deleted_count = 0
                 
                 with transaction.atomic():  # Bütün əməliyyatları bir transaksiyada edirik
+                    # Excel faylındakı brend kodlarını toplayırıq
+                    excel_brend_kodlari = []
+                    for _, row in df.iterrows():
+                        if 'brend_kod' in row and pd.notna(row['brend_kod']) and row['brend_kod']:
+                            excel_brend_kodlari.append(str(row['brend_kod']).strip())
+                    
+                    # Excel faylında olmayan brend kodlu məhsulları silek
+                    if excel_brend_kodlari:
+                        # Databazadakı və Excel'də olmayan brend kodlu məhsulları tapırıq
+                        silinecek_mehsullar = Mehsul.objects.filter(brend_kod__isnull=False).exclude(brend_kod__in=excel_brend_kodlari)
+                        deleted_count = silinecek_mehsullar.count()
+                        # Məhsulları silirik
+                        silinecek_mehsullar.delete()
+                    
+                    # Mövcud məhsulları yeniləyək və yeni məhsulları əlavə edək
                     for _, row in df.iterrows():
                         try:
                             # Kateqoriya, brend və markanı tap və ya yarat
@@ -367,6 +383,8 @@ class MehsulAdmin(admin.ModelAdmin):
                     messages.success(request, f'{new_count} yeni məhsul əlavə edildi.')
                 if update_count > 0:
                     messages.info(request, f'{update_count} mövcud məhsul yeniləndi.')
+                if deleted_count > 0:
+                    messages.warning(request, f'{deleted_count} məhsul silindi (Excel-də tapılmadı).')
                 if error_count > 0:
                     messages.warning(request, f'{error_count} məhsulun əlavə/yenilənməsində xəta baş verdi.')
                     

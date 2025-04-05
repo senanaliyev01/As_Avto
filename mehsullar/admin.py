@@ -9,6 +9,7 @@ from django import forms
 from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
 import pandas as pd
+import re
 
 class MarkaSekilInline(admin.TabularInline):
     model = MarkaSekil
@@ -266,6 +267,17 @@ class MehsulAdmin(admin.ModelAdmin):
                             # brend_kod dəyərini təyin et
                             brend_kod = row['brend_kod'] if 'brend_kod' in row and pd.notna(row['brend_kod']) else ''
                             
+                            # Əgər məhsulun adı varsa, boşluqları təmizlə:
+                            # 1. Əvvəl və sondakı boşluqları sil (strip)
+                            # 2. Sözlər arasındakı çoxlu boşluqları bir boşluğa çevir
+                            if 'adi' in row and pd.notna(row['adi']):
+                                # strip() əvvəl və sondakı boşluqları silir
+                                temiz_ad = row['adi'].strip()
+                                # \s+ bir və ya daha çox boşluq simvolu üçün regex patterndir
+                                # Bu pattern ardıcıl boşluqları bir boşluğa çevirir
+                                temiz_ad = re.sub(r'\s+', ' ', temiz_ad)
+                                row['adi'] = temiz_ad
+                            
                             # Eyni brend_kod ilə məhsul varmı yoxla (əgər brend_kod boş deyilsə)
                             existing_product = None
                             if brend_kod:
@@ -274,7 +286,10 @@ class MehsulAdmin(admin.ModelAdmin):
                             if existing_product:
                                 # Mövcud məhsulu yenilə
                                 if 'adi' in row and pd.notna(row['adi']):
-                                    existing_product.adi = row['adi']
+                                    # Adı təmizlə - əvvəl və sondakı boşluqları sil, çoxlu boşluqları bir boşluğa çevir
+                                    temiz_ad = row['adi'].strip()
+                                    temiz_ad = re.sub(r'\s+', ' ', temiz_ad)
+                                    existing_product.adi = temiz_ad
                                 if kateqoriya:
                                     existing_product.kateqoriya = kateqoriya
                                 if brend:
@@ -318,7 +333,7 @@ class MehsulAdmin(admin.ModelAdmin):
                             else:
                                 # Əsas sahələri hazırla
                                 mehsul_data = {
-                                    'adi': row['adi'] if 'adi' in row and pd.notna(row['adi']) else '',
+                                    'adi': row['adi'].strip() if 'adi' in row and pd.notna(row['adi']) else '',
                                     'kateqoriya': kateqoriya,
                                     'brend': brend,
                                     'marka': marka,

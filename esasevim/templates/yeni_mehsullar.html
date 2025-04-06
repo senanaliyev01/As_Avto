@@ -17,9 +17,8 @@
                             <th>Təsvir</th>
                             <th>Məhsul</th>
                             <th>Firma</th>
-                            <th>Avtomobil</th>
-                            <th>Brend</th>
-                            <th>OEM</th>
+                            {% comment %} <th>Avtomobil</th> {% endcomment %}
+                            <th>KOD</th>
                             <th>Mövcudluğ</th>
                             <th>Qiymət</th>
                             <th>Miqdar</th>
@@ -37,8 +36,7 @@
                             </td>
                             <td>{{ mehsul.adi }}</td>
                             <td>{{ mehsul.brend.adi }}</td>
-                            <td>{{ mehsul.marka.adi }}</td>
-                            <td>{{ mehsul.brend_kod }}</td>
+                            {% comment %} <td>{{ mehsul.marka.adi }}</td> {% endcomment %}
                             <td>{{ mehsul.oem }}
                             <a href="#" title="OEM kodunu axtar" onclick="window.open('https://www.google.com/search?tbm=isch&q={{ mehsul.oem }}', 'googleImages', 'width=600,height=600'); return false;">
                                     <i class="fas fa-camera" style="color:green; margin-left: 5px; cursor: pointer; transition: all 0.3s ease-in-out;"

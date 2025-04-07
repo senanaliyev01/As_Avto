@@ -1,0 +1,22 @@
+<div class="chat-input">
+    <select id="message-type" class="message-type-select">
+        <option value="text">Mətn</option>
+        <option value="image">Şəkil</option>
+        <option value="video">Video</option>
+        <option value="audio">Səs</option>
+        <option value="file">Fayl</option>
+        <option value="link">Link</option>
+    </select>
+    
+    <div class="file-input-wrapper">
+        <button class="file-input-btn">
+            <i class="fas fa-paperclip"></i>
+        </button>
+        <input type="file" id="file-input" style="display: none;">
+    </div>
+    
+    <input type="text" id="message-input" placeholder="Mesaj yazın...">
+    <button onclick="sendMessage()">
+        <i class="fas fa-paper-plane"></i>
+    </button>
+</div> 

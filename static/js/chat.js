@@ -439,9 +439,31 @@ function appendMessage(message) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${message.is_mine ? 'mine' : 'theirs'}`;
     
+    let messageContent = '';
+    if (message.message_type === 'image' && message.file_url) {
+        messageContent = `<img src="${message.file_url}" alt="Şəkil" class="message-image">`;
+    } else if (message.message_type === 'video' && message.file_url) {
+        messageContent = `<video controls><source src="${message.file_url}" type="video/mp4">Video formatı dəstəklənmir</video>`;
+    } else if (message.message_type === 'audio' && message.file_url) {
+        messageContent = `<audio controls><source src="${message.file_url}" type="audio/mpeg">Səs formatı dəstəklənmir</audio>`;
+    } else if (message.message_type === 'file' && message.file_url) {
+        messageContent = `<div class="file-message">
+            <i class="fas fa-file"></i>
+            <span>${message.file_name}</span>
+            <span class="file-size">(${message.file_size})</span>
+            <a href="${message.file_url}" download class="download-btn">
+                <i class="fas fa-download"></i>
+            </a>
+        </div>`;
+    } else if (message.message_type === 'link' && message.file_url) {
+        messageContent = `<a href="${message.file_url}" target="_blank" class="message-link">${message.content}</a>`;
+    } else {
+        messageContent = message.content;
+    }
+    
     messageDiv.innerHTML = `
         ${!message.is_mine ? `<div class="message-sender">${message.sender}</div>` : ''}
-        <div class="message-content">${message.content}</div>
+        <div class="message-content">${messageContent}</div>
         ${message.is_mine ? `
             <div class="message-status ${getMessageStatus(message)}">
                 ${getStatusIcons(message)}
@@ -886,11 +908,16 @@ function getStatusIcons(msg) {
     }
 }
 
+// Mesaj göndərmə funksiyası
 function sendMessage() {
     const input = document.getElementById('message-input');
-    if (!input) return;
+    const fileInput = document.getElementById('file-input');
+    const messageType = document.getElementById('message-type').value;
     
-    const content = input.value.trim();
+    if (!input && !fileInput) return;
+    
+    const content = input ? input.value.trim() : '';
+    const file = fileInput ? fileInput.files[0] : null;
     
     // Əgər qrup seçilibsə, qrup mesajı göndər
     if (isCurrentChatGroup && currentGroupId) {
@@ -899,21 +926,39 @@ function sendMessage() {
     }
     
     // Əgər istifadəçi seçilməyibsə, funksiyadan çıx
-    if (!content || !currentReceiverId) return;
+    if (!content && !file) return;
 
-    if (!suppressWebSocketErrors) {
-        console.log(`Mesaj göndərilir: ${content} (Alıcı ID: ${currentReceiverId})`);
-    }
-
-    // Mesajı əvvəlcədən göstər (daha yaxşı istifadəçi təcrübəsi üçün)
+    // Mesajı əvvəlcədən göstər
     const tempMessageId = 'temp_' + Date.now();
     const chatMessages = document.getElementById('chat-messages');
     if (chatMessages) {
         const tempMessageDiv = document.createElement('div');
         tempMessageDiv.className = 'message mine';
         tempMessageDiv.id = tempMessageId;
+        
+        let messageContent = '';
+        if (file) {
+            if (messageType === 'image') {
+                messageContent = `<img src="${URL.createObjectURL(file)}" alt="Şəkil" class="message-image">`;
+            } else if (messageType === 'video') {
+                messageContent = `<video controls><source src="${URL.createObjectURL(file)}" type="${file.type}">Video formatı dəstəklənmir</video>`;
+            } else if (messageType === 'audio') {
+                messageContent = `<audio controls><source src="${URL.createObjectURL(file)}" type="${file.type}">Səs formatı dəstəklənmir</audio>`;
+            } else {
+                messageContent = `<div class="file-message">
+                    <i class="fas fa-file"></i>
+                    <span>${file.name}</span>
+                    <span class="file-size">(${formatFileSize(file.size)})</span>
+                </div>`;
+            }
+        } else if (messageType === 'link') {
+            messageContent = `<a href="${content}" target="_blank" class="message-link">${content}</a>`;
+        } else {
+            messageContent = content;
+        }
+        
         tempMessageDiv.innerHTML = `
-            <div class="message-content">${content}</div>
+            <div class="message-content">${messageContent}</div>
             <div class="message-status">
                 <i class="fas fa-check"></i>
             </div>
@@ -923,78 +968,31 @@ function sendMessage() {
     }
     
     // İnput sahəsini təmizlə
-    input.value = '';
+    if (input) input.value = '';
+    if (fileInput) fileInput.value = '';
     
     // Mesaj sahəsini fokusla
-    input.focus();
+    if (input) input.focus();
 
-    // WebSocket ilə mesaj göndərməyə çalış (yalnız HTTP istifadə edilmirsə)
-    let websocketSent = false;
-    if (!useOnlyHTTP && usingWebSocket && chatSocket && chatSocket.readyState === WebSocket.OPEN) {
-        try {
-            chatSocket.send(JSON.stringify({
-                'message': content,
-                'sender': currentUserId,
-                'receiver': currentReceiverId
-            }));
-            websocketSent = true;
-            if (!suppressWebSocketErrors) {
-                console.log('Mesaj WebSocket ilə göndərildi');
-            }
-        } catch (error) {
-            if (!suppressWebSocketErrors) {
-                console.error('WebSocket ilə mesaj göndərilərkən xəta:', error);
-            }
-        }
-    } else {
-        if (!suppressWebSocketErrors) {
-            console.log('WebSocket bağlantısı açıq deyil, HTTP sorğusu ilə mesaj göndərilir');
-        }
-    }
-
-    // Əgər mesaj göndərilməkdədirsə, yeni sorğu göndərmə
-    if (window.sendingMessage) {
-        if (!suppressWebSocketErrors) {
-            console.log('Mesaj artıq göndərilir, gözlənilir...');
-        }
-        return;
-    }
-    
-    window.sendingMessage = true;
-
-    // HTTP sorğusu ilə mesaj göndər
+    // FormData yarat
     const formData = new FormData();
     formData.append('receiver_id', currentReceiverId);
     formData.append('content', content);
+    formData.append('message_type', messageType);
+    if (file) {
+        formData.append('file', file);
+    }
 
+    // Mesajı göndər
     fetch('/istifadeciler/api/chat/send/', {
         method: 'POST',
         body: formData,
         headers: {
-            'X-CSRFToken': getCookie('csrftoken'),
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        timeout: 10000 // 10 saniyə timeout
-    })
-    .then(response => {
-        window.sendingMessage = false;
-        
-        if (!response.ok) {
-            if (response.status === 502) {
-                if (!suppressWebSocketErrors) {
-                    console.error('Bad Gateway xətası (502): Server cavab vermir');
-                }
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            'X-CSRFToken': getCookie('csrftoken')
         }
-        return response.json();
     })
+    .then(response => response.json())
     .then(data => {
-        if (!suppressWebSocketErrors) {
-            console.log('Mesaj göndərildi:', data);
-        }
-        
         if (data.status === 'success') {
             // Müvəqqəti mesajı yenisi ilə əvəz et
             if (chatMessages && document.getElementById(tempMessageId)) {
@@ -1005,69 +1003,31 @@ function sendMessage() {
             
             // Mesajları yenilə
             loadMessages(currentReceiverId);
-            
-            // Uğurlu sorğudan sonra xəta sayğacını sıfırla
-            window.sendMessageErrors = 0;
         } else {
             // Müvəqqəti mesajı sil
             if (chatMessages && document.getElementById(tempMessageId)) {
                 document.getElementById(tempMessageId).remove();
             }
-            
-            if (!suppressWebSocketErrors) {
-                console.error('Mesaj göndərilə bilmədi:', data.message);
-            }
-            if (typeof showAnimatedMessage === 'function') {
-                showAnimatedMessage('Mesaj göndərilə bilmədi: ' + data.message, true);
-            } else {
-                alert('Mesaj göndərilə bilmədi: ' + data.message);
-            }
+            alert(data.message);
         }
     })
     .catch(error => {
-        window.sendingMessage = false;
-        
-        // Xəta sayğacını artır
-        window.sendMessageErrors = (window.sendMessageErrors || 0) + 1;
-        
+        console.error('Error:', error);
         // Müvəqqəti mesajı sil
         if (chatMessages && document.getElementById(tempMessageId)) {
             document.getElementById(tempMessageId).remove();
         }
-        
-        if (!suppressWebSocketErrors) {
-            console.error('Mesaj göndərilərkən xəta:', error);
-        }
-        
-        // Əgər 3-dən az xəta varsa və 502 xətasıdırsa, yenidən cəhd et
-        if (window.sendMessageErrors < 3 && error.message && error.message.includes('502')) {
-            if (!suppressWebSocketErrors) {
-                console.log(`Mesaj göndərilərkən server xətası baş verdi, ${window.sendMessageErrors} cəhd. 5 saniyə sonra yenidən cəhd ediləcək...`);
-            }
-            
-            // Mesajı yenidən göndərmək üçün input-a qaytar
-            input.value = content;
-            
-            // 5 saniyə sonra yenidən cəhd et
-            setTimeout(() => {
-                if (typeof showAnimatedMessage === 'function') {
-                    showAnimatedMessage('Mesaj göndərilməyə yenidən cəhd edilir...', false);
-                }
-                sendMessage();
-            }, 5000);
-        } else {
-            if (typeof showAnimatedMessage === 'function') {
-                showAnimatedMessage('Mesaj göndərilərkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.', true);
-            } else {
-                alert('Mesaj göndərilərkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
-            }
-            
-            // 1 dəqiqə sonra xəta sayğacını sıfırla
-            setTimeout(() => {
-                window.sendMessageErrors = 0;
-            }, 60000);
-        }
+        alert('Mesaj göndərilərkən xəta baş verdi');
     });
+}
+
+// Fayl ölçüsünü formatla
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
 }
 
 function filterUsers() {

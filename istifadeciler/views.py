@@ -466,21 +466,48 @@ def send_message(request):
         try:
             receiver_id = request.POST.get('receiver_id')
             content = request.POST.get('content')
+            message_type = request.POST.get('message_type', 'text')
             
-            print(f"send_message called: receiver_id={receiver_id}, content={content}") # Debug üçün
-            
-            if not content:
+            if not content and not request.FILES.get('file'):
                 return JsonResponse({'status': 'error', 'message': 'Mesaj boş ola bilməz'})
                 
             receiver = User.objects.get(id=receiver_id)
+            
+            # Fayl yükləmə
+            file = request.FILES.get('file')
+            file_name = None
+            file_size = None
+            file_url = None
+            
+            if file:
+                file_name = file.name
+                file_size = file.size
+                
+                # Fayl tipini yoxla
+                if message_type == 'image' and not file.content_type.startswith('image/'):
+                    return JsonResponse({'status': 'error', 'message': 'Yalnız şəkil faylları qəbul edilir'})
+                elif message_type == 'video' and not file.content_type.startswith('video/'):
+                    return JsonResponse({'status': 'error', 'message': 'Yalnız video faylları qəbul edilir'})
+                elif message_type == 'audio' and not file.content_type.startswith('audio/'):
+                    return JsonResponse({'status': 'error', 'message': 'Yalnız səs faylları qəbul edilir'})
+            
+            # Link yoxlaması
+            if message_type == 'link':
+                if not content.startswith(('http://', 'https://')):
+                    content = 'http://' + content
+                file_url = content
+            
             message = Message.objects.create(
                 sender=request.user,
                 receiver=receiver,
                 content=content,
-                is_delivered=True  # Avtomatik çatdırıldı kimi qeyd et
+                message_type=message_type,
+                file=file,
+                file_name=file_name,
+                file_size=file_size,
+                file_url=file_url,
+                is_delivered=True
             )
-            
-            print(f"Mesaj yaradıldı: id={message.id}") # Debug üçün
             
             return JsonResponse({
                 'status': 'success',
@@ -490,15 +517,18 @@ def send_message(request):
                     'sender': message.sender.username,
                     'is_mine': True,
                     'is_delivered': True,
-                    'is_read': False
+                    'is_read': False,
+                    'message_type': message.message_type,
+                    'file_url': message.file.url if message.file else None,
+                    'file_name': message.file_name,
+                    'file_size': message.get_file_size_display(),
+                    'file_url': message.file_url
                 }
             })
             
         except User.DoesNotExist:
-            print(f"İstifadəçi tapılmadı: receiver_id={receiver_id}")
             return JsonResponse({'status': 'error', 'message': 'İstifadəçi tapılmadı'})
         except Exception as e:
-            print(f"send_message funksiyasında xəta: {str(e)}")
             return JsonResponse({'status': 'error', 'message': str(e)})
             
     return JsonResponse({'status': 'error', 'message': 'Yanlış sorğu metodu'})

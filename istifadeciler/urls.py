@@ -14,4 +14,7 @@ urlpatterns = [
     path('api/chat/group/send/', views.send_group_message, name='send_group_message'),
     path('check-code-expiration/', views.check_code_expiration, name='check_code_expiration'),
     path('check-code-approval/', views.check_code_approval, name='check_code_approval'),
+    
+    # Admin panel üçün
+    path('admin/chat-group/<int:group_id>/members/', views.add_group_members, name='add_group_members'),
 ]

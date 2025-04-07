@@ -1,0 +1,260 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrastyle %}
+<style>
+    .user-selection-container {
+        display: flex;
+        margin-top: 20px;
+        gap: 20px;
+    }
+    
+    .user-list {
+        flex: 1;
+        border: 1px solid #ddd;
+        padding: 20px;
+        border-radius: 5px;
+        max-height: 600px;
+        overflow-y: auto;
+    }
+    
+    .user-list h3 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .user-item {
+        padding: 8px;
+        margin-bottom: 5px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .user-item:hover {
+        background-color: #f5f5f5;
+    }
+    
+    .user-item label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        width: 100%;
+    }
+    
+    .user-item input[type="checkbox"] {
+        margin-right: 10px;
+    }
+    
+    .user-item.selected {
+        background-color: #e8f5e9;
+    }
+    
+    .admin-checkbox {
+        margin-left: 10px;
+        background-color: #fffde7;
+        padding: 3px 8px;
+        border-radius: 3px;
+        font-size: 0.8em;
+        display: none;
+    }
+    
+    .user-item.selected .admin-checkbox {
+        display: inline-flex;
+    }
+    
+    .actions {
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .select-actions {
+        margin-bottom: 20px;
+    }
+    
+    .btn {
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        border: none;
+        font-weight: bold;
+    }
+    
+    .btn-select-all {
+        background-color: #e3f2fd;
+        color: #1565c0;
+    }
+    
+    .btn-deselect-all {
+        background-color: #ffebee;
+        color: #c62828;
+    }
+    
+    .btn-primary {
+        background-color: #4caf50;
+        color: white;
+    }
+    
+    .btn-secondary {
+        background-color: #f5f5f5;
+        color: #333;
+        border: 1px solid #ddd;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .header-title {
+        font-size: 20px;
+        font-weight: bold;
+    }
+    
+    .flush-option {
+        margin-top: 15px;
+        padding: 15px;
+        background-color: #fff8e1;
+        border-radius: 4px;
+        border: 1px solid #ffe082;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Ana Səhifə</a>
+    &rsaquo; <a href="{% url 'admin:istifadeciler_chatgroup_changelist' %}">Chat Qrupları</a>
+    &rsaquo; <a href="{% url 'admin:istifadeciler_chatgroup_change' group.pk %}">{{ group.name }}</a>
+    &rsaquo; Üzvləri İdarə Et
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <div class="header-actions">
+        <div class="header-title">{{ group.name }} - Üzvləri İdarə Et</div>
+        <a href="{% url 'admin:istifadeciler_chatgroup_change' group.pk %}" class="btn btn-secondary">Qrupa Qayıt</a>
+    </div>
+    
+    <p>Bu səhifədə qrup üzvlərini idarə edə bilərsiniz. İstifadəçiləri seçin və onları qrupa əlavə edin.</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="select-actions">
+            <button type="button" class="btn btn-select-all" id="select-all">Hamısını Seç</button>
+            <button type="button" class="btn btn-deselect-all" id="deselect-all">Seçimi Ləğv Et</button>
+        </div>
+        
+        <input type="text" id="user-search" class="search-input" placeholder="İstifadəçi axtar...">
+        
+        <div class="user-selection-container">
+            <div class="user-list">
+                <h3>İstifadəçilər</h3>
+                {% for user in all_users %}
+                <div class="user-item {% if user.id|stringformat:'s' in current_member_ids %}selected{% endif %}" data-username="{{ user.username|lower }}">
+                    <label>
+                        <input type="checkbox" name="users" value="{{ user.id }}" 
+                               {% if user.id|stringformat:'s' in current_member_ids %}checked{% endif %}>
+                        {{ user.username }}
+                        <div class="admin-checkbox">
+                            <label>
+                                <input type="checkbox" name="make_admin" value="{{ user.id }}"
+                                       {% if user.id|stringformat:'s' in current_admin_ids %}checked{% endif %}>
+                                Admin
+                            </label>
+                        </div>
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="flush-option">
+            <label>
+                <input type="checkbox" name="flush_existing" value="true">
+                Qrupdan yuxarıda göstərilməyən bütün üzvləri sil (DİQQƏT: bu, seçilməmiş bütün üzvləri siləcək)
+            </label>
+        </div>
+        
+        <div class="actions">
+            <button type="submit" class="btn btn-primary">Dəyişiklikləri Saxla</button>
+            <a href="{% url 'admin:istifadeciler_chatgroup_change' group.pk %}" class="btn btn-secondary">Ləğv Et</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Seçim funksionallığı
+        const selectAllBtn = document.getElementById('select-all');
+        const deselectAllBtn = document.getElementById('deselect-all');
+        const userSearch = document.getElementById('user-search');
+        const userItems = document.querySelectorAll('.user-item');
+        
+        // İstifadəçi seçimi dəyişdikdə stil dəyişdirmək
+        userItems.forEach(item => {
+            const checkbox = item.querySelector('input[type="checkbox"][name="users"]');
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        });
+        
+        // Hamısını seç düyməsi
+        selectAllBtn.addEventListener('click', function() {
+            userItems.forEach(item => {
+                if (item.style.display !== 'none') {  // Yalnız görünən elementlər
+                    const checkbox = item.querySelector('input[type="checkbox"][name="users"]');
+                    checkbox.checked = true;
+                    item.classList.add('selected');
+                }
+            });
+        });
+        
+        // Seçimi ləğv et düyməsi
+        deselectAllBtn.addEventListener('click', function() {
+            userItems.forEach(item => {
+                if (item.style.display !== 'none') {  // Yalnız görünən elementlər
+                    const checkbox = item.querySelector('input[type="checkbox"][name="users"]');
+                    checkbox.checked = false;
+                    item.classList.remove('selected');
+                }
+            });
+        });
+        
+        // İstifadəçi axtarışı
+        userSearch.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            userItems.forEach(item => {
+                const username = item.dataset.username;
+                if (username.includes(searchTerm)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %} 

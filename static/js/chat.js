@@ -628,6 +628,7 @@ function createUserItem(user) {
     `;
 }
 
+// Qrup elementi yaratmaq üçün yeni funksiya
 function createGroupItem(group) {
     // Qrupa kilid qoymaq əgər giriş yoxdursa
     const isLocked = group.is_locked;

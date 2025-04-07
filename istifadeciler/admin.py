@@ -172,10 +172,15 @@ class MessageAdmin(admin.ModelAdmin):
 
 @admin.register(ChatGroup)
 class ChatGroupAdmin(admin.ModelAdmin):
-    list_display = ('name', 'creator', 'created_at', 'is_active', 'members_count', 'view_members')
+    list_display = ('name', 'creator', 'created_at', 'is_active', 'members_count', 'view_members', 'manage_members')
     list_filter = ('is_active', 'created_at')
     search_fields = ('name', 'description', 'creator__username')
     readonly_fields = ('created_at',)
+    fieldsets = (
+        ('Əsas məlumatlar', {
+            'fields': ('name', 'description', 'avatar', 'creator', 'is_active')
+        }),
+    )
     
     def members_count(self, obj):
         return obj.members.count()
@@ -188,16 +193,47 @@ class ChatGroupAdmin(admin.ModelAdmin):
             f'padding: 5px 10px; border-radius: 4px; text-decoration: none;">Üzvlərə bax</a>'
         )
     view_members.short_description = 'Üzvlər'
+    
+    def manage_members(self, obj):
+        members_url = reverse('add_group_members', args=[obj.id])
+        return mark_safe(
+            f'<a href="{members_url}" class="button" style="background-color: #FF5722; color: white; '
+            f'padding: 5px 10px; border-radius: 4px; text-decoration: none;">Üzvləri idarə et</a>'
+        )
+    manage_members.short_description = 'Üzvləri idarə et'
+    
+    def get_inline_instances(self, request, obj=None):
+        inlines = super().get_inline_instances(request, obj)
+        if obj:  # Yalnız mövcud qruplar üçün inline göstər
+            inlines.append(GroupMemberInline(self.model, self.admin_site))
+        return inlines
+    
+    def save_model(self, request, obj, form, change):
+        if not change:  # Yeni qrup yaradılarkən
+            if not obj.creator:
+                obj.creator = request.user
+        super().save_model(request, obj, form, change)
+        
+    def response_add(self, request, obj, post_url_continue=None):
+        """Qrup yaratdıqdan sonra qrup üzvlərini əlavə etmək səhifəsinə yönləndir"""
+        # Default davranış
+        response = super().response_add(request, obj, post_url_continue)
+        
+        # Əgər 'Save' və ya 'Save and continue editing' düyməsinə basılıbsa
+        if '_continue' in request.POST or '_save' in request.POST:
+            # Qrup üzvləri əlavə etmək səhifəsinə yönləndir
+            change_url = reverse('admin:istifadeciler_groupmember_add')
+            return HttpResponseRedirect(f"{change_url}?group={obj.id}")
+        
+        return response
 
-@admin.register(GroupMember)
-class GroupMemberAdmin(admin.ModelAdmin):
-    list_display = ('user', 'group', 'is_admin', 'joined_at')
-    list_filter = ('is_admin', 'joined_at', 'group')
-    search_fields = ('user__username', 'group__name')
-    readonly_fields = ('joined_at',)
+class GroupMemberInline(admin.TabularInline):
+    model = GroupMember
+    extra = 1
+    verbose_name = "Qrup üzvü"
+    verbose_name_plural = "Qrup üzvləri"
     
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        # User seçərkən dropdown siyahısını azaltmaq üçün
         if db_field.name == "user":
             kwargs["queryset"] = User.objects.filter(is_active=True).order_by('username')
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
@@ -224,3 +260,22 @@ class GroupMessageAdmin(admin.ModelAdmin):
     
     def has_add_permission(self, request):
         return False  # Yeni mesaj əlavə etməyə icazə vermə
+
+@admin.register(GroupMember)
+class GroupMemberAdmin(admin.ModelAdmin):
+    list_display = ('user', 'group', 'is_admin', 'joined_at')
+    list_filter = ('is_admin', 'joined_at', 'group')
+    search_fields = ('user__username', 'group__name')
+    readonly_fields = ('joined_at',)
+    
+    # Qrup parametri ilə açılanda o qrup avtomatik seçilir
+    def get_changeform_initial_data(self, request):
+        initial = super().get_changeform_initial_data(request)
+        if 'group' in request.GET:
+            initial['group'] = request.GET.get('group')
+        return initial
+    
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "user":
+            kwargs["queryset"] = User.objects.filter(is_active=True).order_by('username')
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)

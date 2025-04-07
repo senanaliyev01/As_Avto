@@ -518,6 +518,15 @@ def get_chat_users(request):
             is_active=True
         ).distinct()
         
+        # İstifadəçi admin deyilsə, bütün digər aktiv qrupları əldə et (kilitli göstərmək üçün)
+        other_groups = []
+        if not request.user.is_staff:
+            other_groups = ChatGroup.objects.filter(
+                is_active=True
+            ).exclude(
+                id__in=user_groups.values_list('id', flat=True)
+            )
+        
         # Bütün aktiv qrupları əldə et (admin istifadəçilər üçün)
         all_groups = []
         if request.user.is_staff:
@@ -610,6 +619,22 @@ def get_chat_users(request):
                         })
                     except Exception as e:
                         print(f"Admin qrup məlumatları hazırlanarkən xəta: {str(e)}")
+        
+        # Normal istifadəçilər üçün - üzvü olmadığı qrupları kilitli şəkildə göstər
+        if not request.user.is_staff:
+            for group in other_groups:
+                try:
+                    groups.append({
+                        'id': group.id,
+                        'name': group.name,
+                        'unread_count': 0,
+                        'is_admin': False,
+                        'is_locked': True,  # Qrup kilitlidir
+                        'type': 'group',
+                        'members_count': group.members.count()
+                    })
+                except Exception as e:
+                    print(f"Kilitli qrup məlumatları hazırlanarkən xəta: {str(e)}")
         
         response_data = {
             'admins': admins,
@@ -711,3 +736,65 @@ def send_group_message(request):
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
             
     return JsonResponse({'status': 'error', 'message': 'Yanlış sorğu metodu'}, status=405)
+
+@login_required
+def add_group_members(request, group_id):
+    """Qrupa birbaşa çoxlu istifadəçi əlavə etmək üçün view"""
+    if not request.user.is_staff:
+        return JsonResponse({'status': 'error', 'message': 'Bu əməliyyat üçün icazəniz yoxdur'}, status=403)
+    
+    try:
+        group = ChatGroup.objects.get(id=group_id)
+        
+        if request.method == 'POST':
+            user_ids = request.POST.getlist('users')
+            make_admin = request.POST.getlist('make_admin')
+            
+            # Əvvəlcə göndərilən siyahıda olmayan üzvləri sil (əgər flush_existing=true)
+            if request.POST.get('flush_existing') == 'true':
+                GroupMember.objects.filter(group=group).exclude(user_id__in=user_ids).delete()
+            
+            # Yeni üzvləri əlavə et
+            count = 0
+            for user_id in user_ids:
+                try:
+                    user = User.objects.get(id=user_id)
+                    is_admin = user_id in make_admin
+                    
+                    # Əgər artıq üzvdürsə, admin statusunu yenilə
+                    member, created = GroupMember.objects.update_or_create(
+                        group=group, 
+                        user=user,
+                        defaults={'is_admin': is_admin}
+                    )
+                    
+                    if created:
+                        count += 1
+                except User.DoesNotExist:
+                    continue
+            
+            messages.success(request, f'{count} yeni istifadəçi qrupa əlavə edildi.')
+            return redirect('admin:istifadeciler_chatgroup_change', object_id=group_id)
+        
+        # Hazırda qrupda olan üzvlər
+        current_members = GroupMember.objects.filter(group=group).select_related('user')
+        current_member_ids = [str(member.user.id) for member in current_members]
+        current_admin_ids = [str(member.user.id) for member in current_members if member.is_admin]
+        
+        # Bütün aktiv istifadəçilər
+        all_users = User.objects.filter(is_active=True).order_by('username')
+        
+        context = {
+            'group': group,
+            'all_users': all_users,
+            'current_member_ids': current_member_ids,
+            'current_admin_ids': current_admin_ids,
+            'admin_site_header': 'Admin Panel',
+            'title': f'{group.name} - Üzvlər'
+        }
+        
+        return render(request, 'admin/add_group_members.html', context)
+    
+    except ChatGroup.DoesNotExist:
+        messages.error(request, 'Qrup tapılmadı.')
+        return redirect('admin:istifadeciler_chatgroup_changelist')

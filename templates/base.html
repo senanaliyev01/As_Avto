@@ -171,9 +171,6 @@
             <div class="chat-header">
                 <div class="chat-title">Dəstək Komandası</div>
                 <div class="chat-controls">
-                    <button id="test-sound" class="test-sound-button" title="Səsi yoxla">
-                        <i class="fas fa-volume-up"></i>
-                    </button>
                     <button id="fullscreen-chat" class="fullscreen-button" title="Tam ekran">
                         <i class="fas fa-expand"></i>
                     </button>
@@ -209,6 +206,14 @@
         </div>
     </div>
     {% endif %}
+
+    <!-- Audio elementləri -->
+    <audio id="new-message-sound" preload="auto">
+        <source src="{% static 'audio/notification.mp3' %}" type="audio/mpeg">
+    </audio>
+    <audio id="chat-message-sound" preload="auto">
+        <source src="{% static 'audio/chat-message.mp3' %}" type="audio/mpeg">
+    </audio>
 
     <!-- Common Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>

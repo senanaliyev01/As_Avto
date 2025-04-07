@@ -1839,19 +1839,3 @@ html {
         opacity: 1;
     }
 }
-
-.test-sound-button {
-    background: none;
-    border: none;
-    color: var(--accent-color);
-    font-size: 18px;
-    cursor: pointer;
-    transition: color 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.test-sound-button:hover {
-    color: var(--text-primary);
-}

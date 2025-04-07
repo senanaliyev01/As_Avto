@@ -26,19 +26,8 @@ let lastMessageCount = 0;
 let lastMessageId = 0;
 let chatSocket = null;
 let usingWebSocket = false; // WebSocket istifadə edilib-edilmədiyini izləmək üçün
-let suppressWebSocketErrors = false; // WebSocket xətalarını göstər
+let suppressWebSocketErrors = true; // WebSocket xətalarını gizlətmək üçün
 let useOnlyHTTP = true; // Yalnız HTTP istifadə et, WebSocket-i tamamilə söndür
-let disableNotificationSounds = false; // Bildiriş səsləri deaktiv edilib/edilməyib
-
-// Səs faylları üçün yollar
-const SOUND_PATHS = {
-    newMessage: '/as_avto/static/audio/notification.mp3',
-    chatMessage: '/as_avto/static/audio/chat-message.mp3'
-};
-
-// Audio elementləri
-let newMessageSound = null;
-let chatMessageSound = null;
 
 // CSRF token funksiyası
 function getCookie(name) {
@@ -55,6 +44,8 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
+
 
 // Chat funksiyasını başlat
 function initChat() {
@@ -74,7 +65,6 @@ function initChat() {
     const chatWindow = document.getElementById('chat-window');
     const closeChat = document.getElementById('close-chat');
     const fullscreenChat = document.getElementById('fullscreen-chat');
-    const testSound = document.getElementById('test-sound');
     const backButton = document.getElementById('back-to-users');
     const messageInput = document.getElementById('message-input');
     const sendButton = document.getElementById('send-message');
@@ -122,67 +112,6 @@ function initChat() {
     // Tam ekran düyməsinə klik
     if (fullscreenChat) {
         fullscreenChat.addEventListener('click', toggleFullScreen);
-    }
-    
-    // Səs test düyməsinə klik
-    if (testSound) {
-        testSound.addEventListener('click', () => {
-            // İlk öncə köhnə audio obyektlərini təmizlə və yenidən yarat
-            if (newMessageSound) {
-                newMessageSound.pause();
-                newMessageSound.currentTime = 0;
-            }
-            
-            if (chatMessageSound) {
-                chatMessageSound.pause();
-                chatMessageSound.currentTime = 0;
-            }
-            
-            // Yeni audio obyektləri yarat
-            newMessageSound = new Audio(SOUND_PATHS.newMessage);
-            chatMessageSound = new Audio(SOUND_PATHS.chatMessage);
-            
-            console.log('Test üçün yeni audio obyektləri yaradıldı:');
-            console.log('Bildiriş səsi yolu:', SOUND_PATHS.newMessage);
-            console.log('Chat mesajı səsi yolu:', SOUND_PATHS.chatMessage);
-            
-            // Bildirişi göstər
-            alert('Səs bildirişləri test edilir. İki səs ardıcıl çalınacaq.');
-            
-            // Birinci səsi çal
-            console.log('Bildiriş səsini test edirəm...');
-            newMessageSound.volume = 1.0;
-            newMessageSound.play()
-                .then(() => {
-                    console.log('Bildiriş səsi uğurla çalındı');
-                    
-                    // 1.5 saniyə sonra ikinci səsi çal
-                    setTimeout(() => {
-                        console.log('Chat mesaj səsini test edirəm...');
-                        chatMessageSound.volume = 1.0;
-                        chatMessageSound.play()
-                            .then(() => {
-                                console.log('Chat mesaj səsi uğurla çalındı');
-                                // Test uğurlu oldu
-                                setTimeout(() => {
-                                    alert('Səs testi uğurla tamamlandı. Əgər səsləri eşitdinizsə, sistem düzgün işləyir.');
-                                }, 500);
-                            })
-                            .catch(error => {
-                                console.error('Chat mesaj səsini test edərkən xəta:', error);
-                                alert('Chat mesaj səsini test edərkən xəta baş verdi: ' + error.message);
-                            });
-                    }, 1500);
-                })
-                .catch(error => {
-                    console.error('Bildiriş səsini test edərkən xəta:', error);
-                    alert('Bildiriş səsini test edərkən xəta baş verdi: ' + error.message);
-                    
-                    if (error.name === 'NotSupportedError' || error.name === 'NotFoundError') {
-                        alert('Bildiriş səs faylı tapılmadı və ya dəstəklənmir: ' + SOUND_PATHS.newMessage);
-                    }
-                });
-        });
     }
 
     // İstifadəçilər siyahısına qayıt
@@ -1115,54 +1044,71 @@ document.addEventListener('click', function initAudioOnUserInteraction() {
 // Audio elementlərini inicializasiya et
 function initAudio() {
     try {
-        // Yeni səs elementlərini yarat
-        newMessageSound = new Audio(SOUND_PATHS.newMessage);
-        chatMessageSound = new Audio(SOUND_PATHS.chatMessage);
+        const newMessageSound = document.getElementById('new-message-sound');
+        const chatMessageSound = document.getElementById('chat-message-sound');
         
-        // Yeni mesaj bildiriş səsini konfiqurasiya et
         if (newMessageSound) {
             // Səsi yüklə
-            newMessageSound.preload = 'auto';
-            newMessageSound.volume = 1.0; // Tam səs səviyyəsi
+            newMessageSound.load();
+            
+            // Səsi unmute et (istifadəçi qarşılıqlı əlaqəsindən sonra)
+            document.addEventListener('click', function unmuteSounds() {
+                newMessageSound.muted = false;
+                if (chatMessageSound) {
+                    chatMessageSound.muted = false;
+                }
+                document.removeEventListener('click', unmuteSounds);
                 
                 if (!suppressWebSocketErrors) {
-                console.log('Yeni mesaj bildiriş səsi yaradıldı:', SOUND_PATHS.newMessage);
-            }
+                    console.log('Səslər unmute edildi');
+                }
+            }, { once: true });
             
-            // Yükləmə xətasını izlə
-            newMessageSound.addEventListener('error', (e) => {
+            // Səsi səssiz çal və dayandır (istifadəçi qarşılıqlı əlaqəsini təmin etmək üçün)
+            newMessageSound.volume = 0;
+            const playPromise = newMessageSound.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    // Səs uğurla çalındı, dayandır və səsi normal səviyyəyə qaytar
+                    newMessageSound.pause();
+                    newMessageSound.currentTime = 0;
+                    newMessageSound.volume = 1;
                     if (!suppressWebSocketErrors) {
-                    console.error('Bildiriş səsi yüklənərkən xəta:', e);
+                        console.log('Bildiriş səsi inicializasiya edildi');
                     }
-            });
-        } else {
+                }).catch(error => {
                     if (!suppressWebSocketErrors) {
-                console.error('Yeni mesaj bildiriş səsi yaradıla bilmədi!');
-            }
-        }
-        
-        // Chat mesaj səsini konfiqurasiya et
-        if (chatMessageSound) {
-            // Səsi yüklə
-            chatMessageSound.preload = 'auto';
-            chatMessageSound.volume = 1.0; // Tam səs səviyyəsi
-            
-                    if (!suppressWebSocketErrors) {
-                console.log('Chat mesaj səsi yaradıldı:', SOUND_PATHS.chatMessage);
-                    }
-            
-            // Yükləmə xətasını izlə
-            chatMessageSound.addEventListener('error', (e) => {
-                    if (!suppressWebSocketErrors) {
-                    console.error('Chat mesaj səsi yüklənərkən xəta:', e);
+                        console.error('Bildiriş səsi inicializasiya edilərkən xəta:', error);
                     }
                 });
-        } else {
-            if (!suppressWebSocketErrors) {
-                console.error('Chat mesaj səsi yaradıla bilmədi!');
             }
         }
         
+        if (chatMessageSound) {
+            // Səsi yüklə
+            chatMessageSound.load();
+            
+            // Səsi səssiz çal və dayandır (istifadəçi qarşılıqlı əlaqəsini təmin etmək üçün)
+            chatMessageSound.volume = 0;
+            const playPromise = chatMessageSound.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    // Səs uğurla çalındı, dayandır və səsi normal səviyyəyə qaytar
+                    chatMessageSound.pause();
+                    chatMessageSound.currentTime = 0;
+                    chatMessageSound.volume = 1;
+                    if (!suppressWebSocketErrors) {
+                        console.log('Chat mesajı səsi inicializasiya edildi');
+                    }
+                }).catch(error => {
+                    if (!suppressWebSocketErrors) {
+                        console.error('Chat mesajı səsi inicializasiya edilərkən xəta:', error);
+                    }
+                });
+            }
+        }
     } catch (error) {
         if (!suppressWebSocketErrors) {
             console.error('Audio inicializasiya edilərkən xəta:', error);
@@ -1195,221 +1141,32 @@ function toggleFullScreen() {
 // DOM yükləndikdə chat funksiyasını başlat
 document.addEventListener('DOMContentLoaded', function() {
     try {
+        if (!suppressWebSocketErrors) {
             console.log('DOM yükləndi, chat funksiyası başladılır...');
-        
-        // Səs fayllarının yollarını yoxla
-        console.log('Səs fayllarının yolları:');
-        console.log('Bildiriş səsi:', SOUND_PATHS.newMessage);
-        console.log('Chat mesajı səsi:', SOUND_PATHS.chatMessage);
-        
-        // Səs fayllarının mövcudluğunu yoxla
-        testAudioFileExistence(SOUND_PATHS.newMessage, 'Bildiriş səsi');
-        testAudioFileExistence(SOUND_PATHS.chatMessage, 'Chat mesajı səsi');
+        }
         
         // Global funksiyaları window obyektinə əlavə et
         window.selectUser = selectUser;
         
-        // Səs fayllarını yüklə
+        // Audio elementlərini inicializasiya et
         initAudio();
         
-        // Səs kilidlərini açmaq üçün istifadəçi qarşılıqlı əlaqəsini gözlə
-        setupAudioUnlock();
-        
-        // Chat funksiyasını başlat
+        // Chat widget-i inicializasiya et
         const chatWidget = document.getElementById('chat-widget');
         if (chatWidget) {
+            if (!suppressWebSocketErrors) {
                 console.log('Chat widget tapıldı, inicializasiya edilir...');
+            }
             initChat();
         } else {
+            if (!suppressWebSocketErrors) {
                 console.log('Chat widget tapılmadı!');
             }
-        
-        // Bir neçə saniyə sonra audio elementlərini yenidən yükləməyə çalış (bəzi brauzerlər üçün)
-        setTimeout(() => {
-            console.log('Səs faylları yenidən yüklənir...');
-            initAudio();
-            setupAudioUnlock();
-        }, 3000);
+        }
     } catch (error) {
-        // Xətaları göstər
+        // Xətaları gizlət
+        if (!suppressWebSocketErrors) {
             console.error('Chat inicializasiya edilərkən xəta:', error);
         }
-});
-
-// Səs faylının mövcudluğunu yoxlamaq üçün test funksiyası
-function testAudioFileExistence(url, name) {
-    console.log(`${name} faylını yoxlayıram: ${url}`);
-    
-    fetch(url)
-        .then(response => {
-            if (response.ok) {
-                console.log(`✅ ${name} faylı mövcuddur və əlçatandır.`);
-            } else {
-                console.error(`❌ ${name} faylına giriş mümkün deyil. Status: ${response.status}`);
-                alert(`❌ ${name} faylına giriş mümkün deyil. Status: ${response.status}`);
-            }
-        })
-        .catch(error => {
-            console.error(`❌ ${name} faylına giriş xətası:`, error);
-            alert(`❌ ${name} faylına giriş xətası: ${error.message}`);
-        });
-}
-
-// Səs kilidlərini açmaq üçün funksiya
-function setupAudioUnlock() {
-    console.log('Səs kilidlərini açmağa çalışıram...');
-    
-    // Bütün səs elementləri üçün kilid açma funksiyası
-    const unlockAudio = () => {
-        console.log('İstifadəçi səs kilidi açma hadisəsini başlatdı (klik/toxunma)');
-        
-        // İlk öncə köhnə audio obyektlərini təmizlə və yenidən yarat
-        if (newMessageSound) {
-            newMessageSound.pause();
-            newMessageSound.currentTime = 0;
-        }
-        
-        if (chatMessageSound) {
-            chatMessageSound.pause();
-            chatMessageSound.currentTime = 0;
-        }
-        
-        // Yeni audio obyektləri yarat
-        newMessageSound = new Audio(SOUND_PATHS.newMessage);
-        chatMessageSound = new Audio(SOUND_PATHS.chatMessage);
-        
-        console.log('Yeni audio obyektləri yaradıldı:');
-        console.log('Bildiriş səsi yolu:', SOUND_PATHS.newMessage);
-        console.log('Chat mesajı səsi yolu:', SOUND_PATHS.chatMessage);
-        
-        // Səsləri aşağı səviyyədə çalıb dayandır
-        const playAndPause = (sound, name) => {
-            sound.volume = 0.01; // Çox aşağı səs
-            sound.muted = false;
-            
-            sound.play()
-                .then(() => {
-                    setTimeout(() => {
-                        sound.pause();
-                        sound.currentTime = 0;
-                        sound.volume = 1.0;
-                        console.log(`${name} səs kilidi açıldı`);
-                    }, 10);
-                })
-                .catch(error => {
-                    console.error(`${name} səs kilidi açılarkən xəta:`, error);
-                    
-                    if (error.name === 'NotSupportedError' || error.name === 'NotFoundError') {
-                        console.error(`${name} səs faylı tapılmadı və ya dəstəklənmir:`, sound.src);
-                    }
-                });
-        };
-        
-        // Səsləri ardıcıl çal və dayandır
-        if (newMessageSound) {
-            playAndPause(newMessageSound, 'Bildiriş səsi');
-        }
-        
-        setTimeout(() => {
-            if (chatMessageSound) {
-                playAndPause(chatMessageSound, 'Chat mesajı səsi');
-            }
-        }, 100);
-        
-        // Hadisə dinləyicilərini sil
-        document.body.removeEventListener('click', unlockAudio);
-        document.body.removeEventListener('touchstart', unlockAudio);
-    };
-    
-    // Həm klik, həm toxunma hadisələrini izlə
-    document.body.addEventListener('click', unlockAudio, { once: true });
-    document.body.addEventListener('touchstart', unlockAudio, { once: true });
-}
-
-// Yeni mesaj bildirişi üçün səs çal
-function playNewMessageSound() {
-    try {
-        if (disableNotificationSounds) return;
-        
-        // Əgər səs obyekti yoxdursa, yenidən yarat
-        if (!newMessageSound) {
-            newMessageSound = new Audio(SOUND_PATHS.newMessage);
-            newMessageSound.preload = 'auto';
-        }
-        
-        // Səs səviyyəsini tam təyin et
-        newMessageSound.volume = 1.0;
-        
-        // Mövcud səsi dayandır və başa qaytar
-        newMessageSound.pause();
-        newMessageSound.currentTime = 0;
-        
-        // Səs faylını yoxla
-        console.log('Bildiriş səsi yüklənir:', SOUND_PATHS.newMessage);
-        
-        // Səsi çal
-        newMessageSound.play()
-            .then(() => {
-                console.log('Bildiriş səsi uğurla çalındı');
-            })
-            .catch(error => {
-                console.error('Bildiriş səsini çalarkən xəta:', error);
-                
-                if (error.name === 'NotSupportedError' || error.name === 'NotFoundError') {
-                    console.error('Bildiriş səs faylı tapılmadı və ya dəstəklənmir:', SOUND_PATHS.newMessage);
-                }
-                
-                // Avtomatik səs çalma məhdudiyyəti varsa (NotAllowedError)
-                if (error.name === 'NotAllowedError') {
-                    console.log('Bildiriş səsini çalmaq üçün istifadəçi qarşılıqlı əlaqəsi tələb olunur');
-                    setupAudioUnlock();
-                }
-            });
-    } catch (error) {
-        console.error('Bildiriş səsi çalınarkən xəta:', error);
     }
-}
-
-// Chat mesajı üçün səs çal
-function playChatMessageSound() {
-    try {
-        if (disableNotificationSounds) return;
-        
-        // Əgər səs obyekti yoxdursa, yenidən yarat
-        if (!chatMessageSound) {
-            chatMessageSound = new Audio(SOUND_PATHS.chatMessage);
-            chatMessageSound.preload = 'auto';
-        }
-        
-        // Səs səviyyəsini tam təyin et
-        chatMessageSound.volume = 1.0;
-        
-        // Mövcud səsi dayandır və başa qaytar
-        chatMessageSound.pause();
-        chatMessageSound.currentTime = 0;
-        
-        // Səs faylını yoxla
-        console.log('Chat mesajı səsi yüklənir:', SOUND_PATHS.chatMessage);
-        
-        // Səsi çal
-        chatMessageSound.play()
-            .then(() => {
-                console.log('Chat mesajı səsi uğurla çalındı');
-            })
-            .catch(error => {
-                console.error('Chat mesajı səsini çalarkən xəta:', error);
-                
-                if (error.name === 'NotSupportedError' || error.name === 'NotFoundError') {
-                    console.error('Chat mesajı səs faylı tapılmadı və ya dəstəklənmir:', SOUND_PATHS.chatMessage);
-                }
-                
-                // Avtomatik səs çalma məhdudiyyəti varsa (NotAllowedError)
-                if (error.name === 'NotAllowedError') {
-                    console.log('Chat mesajı səsini çalmaq üçün istifadəçi qarşılıqlı əlaqəsi tələb olunur');
-                    setupAudioUnlock();
-                }
-            });
-    } catch (error) {
-        console.error('Chat mesajı səsi çalınarkən xəta:', error);
-    }
-} 
+}); 

@@ -1066,6 +1066,8 @@ html {
     flex-direction: column;
     border-right: 1px solid var(--border-color);
     background-color: var(--secondary-color);
+    height: 100%;
+    overflow: hidden;
 }
 
 .search-box {
@@ -1097,8 +1099,28 @@ html {
 
 .users-list {
     flex: 1;
-    overflow-y: auto;
+    overflow-y: scroll;
     background-color: var(--secondary-color);
+    max-height: 360px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-color) var(--secondary-color);
+}
+
+.users-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.users-list::-webkit-scrollbar-track {
+    background: var(--secondary-color);
+}
+
+.users-list::-webkit-scrollbar-thumb {
+    background-color: var(--accent-color);
+    border-radius: 4px;
+}
+
+.users-list::-webkit-scrollbar-thumb:hover {
+    background-color: var(--highlight-color);
 }
 
 .user-group-title {

@@ -64,6 +64,7 @@ function initChat() {
     const chatIcon = document.getElementById('chat-icon');
     const chatWindow = document.getElementById('chat-window');
     const closeChat = document.getElementById('close-chat');
+    const fullscreenChat = document.getElementById('fullscreen-chat');
     const backButton = document.getElementById('back-to-users');
     const messageInput = document.getElementById('message-input');
     const sendButton = document.getElementById('send-message');
@@ -102,7 +103,16 @@ function initChat() {
     // Chat pəncərəsini bağla
     closeChat.addEventListener('click', () => {
         chatWindow.style.display = 'none';
+        // Tam ekrandan çıx
+        if (chatWindow.classList.contains('fullscreen')) {
+            toggleFullScreen();
+        }
     });
+    
+    // Tam ekran düyməsinə klik
+    if (fullscreenChat) {
+        fullscreenChat.addEventListener('click', toggleFullScreen);
+    }
 
     // İstifadəçilər siyahısına qayıt
     backButton.addEventListener('click', () => {
@@ -148,6 +158,13 @@ function initChat() {
     if (searchInput) {
         searchInput.addEventListener('input', filterUsers);
     }
+    
+    // ESC düyməsinə basıldıqda tam ekrandan çıx
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && chatWindow.classList.contains('fullscreen')) {
+            toggleFullScreen();
+        }
+    });
 }
 
 // WebSocket bağlantısını yarat
@@ -1097,6 +1114,28 @@ function initAudio() {
             console.error('Audio inicializasiya edilərkən xəta:', error);
         }
     }
+}
+
+// Tam ekran rejimini açıb/bağlamaq
+function toggleFullScreen() {
+    const chatWindow = document.getElementById('chat-window');
+    const fullscreenButton = document.getElementById('fullscreen-chat');
+    
+    if (!chatWindow || !fullscreenButton) return;
+    
+    chatWindow.classList.toggle('fullscreen');
+    
+    // Tam ekran ikonunu dəyiş
+    if (chatWindow.classList.contains('fullscreen')) {
+        fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
+        fullscreenButton.setAttribute('title', 'Tam ekrandan çıx');
+    } else {
+        fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
+        fullscreenButton.setAttribute('title', 'Tam ekran');
+    }
+    
+    // İstifadəçilər siyahısını yenidən yüklə
+    loadChatUsers();
 }
 
 // DOM yükləndikdə chat funksiyasını başlat

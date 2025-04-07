@@ -196,12 +196,20 @@
                     </div>
                     <div class="chat-messages" id="chat-messages"></div>
                     <div class="chat-input">
-                        <input type="file" id="file-input" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt">
-                        <button class="file-button" onclick="document.getElementById('file-input').click()">
-                            <i class="fas fa-paperclip"></i>
-                        </button>
+                        <div class="chat-input-buttons">
+                            <button class="voice-button" onclick="startVoiceRecording()" title="Səs yaz">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                            <button class="camera-button" onclick="openCamera()" title="Kamera">
+                                <i class="fas fa-camera"></i>
+                            </button>
+                            <input type="file" id="file-input" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt" style="display: none;">
+                            <button class="file-button" onclick="document.getElementById('file-input').click()" title="Fayl">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                        </div>
                         <input type="text" id="message-input" placeholder="Mesajınızı yazın...">
-                        <button onclick="sendMessage()">
+                        <button onclick="sendMessage()" title="Göndər">
                             <i class="fas fa-paper-plane"></i>
                         </button>
                     </div>

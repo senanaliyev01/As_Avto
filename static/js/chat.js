@@ -34,6 +34,10 @@ let currentGroupId = null;
 let currentGroupName = null;
 let isCurrentChatGroup = false; // Chat-ın qrup və ya şəxsi olduğunu saxlayır
 
+let mediaRecorder;
+let audioChunks = [];
+let isRecording = false;
+
 // CSRF token funksiyası
 function getCookie(name) {
     let cookieValue = null;
@@ -948,27 +952,38 @@ function getStatusIcons(msg) {
 function sendMessage() {
     const messageInput = document.getElementById('message-input');
     const fileInput = document.getElementById('file-input');
-    const message = messageInput.value.trim();
+    const content = messageInput.value.trim();
     const file = fileInput.files[0];
     
-    if (!message && !file) return;
+    if (!content && !file) {
+        return;
+    }
     
     const formData = new FormData();
-    formData.append('receiver_id', currentReceiverId);
-    
+    if (content) {
+        formData.append('content', content);
+    }
     if (file) {
         formData.append('file', file);
-        const fileType = file.type.split('/')[0];
-        formData.append('message_type', fileType === 'image' ? 'image' : 
-                       fileType === 'video' ? 'video' : 
-                       fileType === 'audio' ? 'audio' : 'file');
-    } else if (message.startsWith('http://') || message.startsWith('https://')) {
-        formData.append('content', message);
-        formData.append('message_type', 'link');
-    } else {
-        formData.append('content', message);
-        formData.append('message_type', 'text');
     }
+    
+    // Determine message type
+    let messageType = 'text';
+    if (file) {
+        if (file.type.startsWith('image/')) {
+            messageType = 'image';
+        } else if (file.type.startsWith('video/')) {
+            messageType = 'video';
+        } else if (file.type.startsWith('audio/')) {
+            messageType = 'audio';
+        } else {
+            messageType = 'file';
+        }
+    } else if (content.match(/^https?:\/\/\S+$/)) {
+        messageType = 'link';
+    }
+    
+    formData.append('message_type', messageType);
     
     fetch('/send_message/', {
         method: 'POST',
@@ -984,12 +999,12 @@ function sendMessage() {
             messageInput.value = '';
             fileInput.value = '';
         } else {
-            alert(data.message);
+            alert(data.message || 'Mesaj göndərilmədi!');
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        alert('Mesaj göndərilmədi. Yenidən cəhd edin.');
+        console.error('Error sending message:', error);
+        alert('Mesaj göndərilmədi!');
     });
 }
 
@@ -1527,4 +1542,96 @@ function sendGroupMessage() {
             }, 60000);
         }
     });
+}
+
+function startVoiceRecording() {
+    const voiceButton = document.querySelector('.voice-button');
+    
+    if (!isRecording) {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+                };
+                
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    
+                    // Create audio file from blob
+                    const audioFile = new File([audioBlob], 'voice-message.wav', { type: 'audio/wav' });
+                    
+                    // Send the audio file
+                    const fileInput = document.getElementById('file-input');
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(audioFile);
+                    fileInput.files = dataTransfer.files;
+                    
+                    // Trigger file upload
+                    sendMessage();
+                };
+                
+                mediaRecorder.start();
+                isRecording = true;
+                voiceButton.classList.add('recording');
+            })
+            .catch(error => {
+                console.error('Error accessing microphone:', error);
+                alert('Mikrofon istifadəsinə icazə verilməyib!');
+            });
+    } else {
+        mediaRecorder.stop();
+        isRecording = false;
+        voiceButton.classList.remove('recording');
+    }
+}
+
+function openCamera() {
+    const constraints = {
+        video: true,
+        audio: false
+    };
+    
+    navigator.mediaDevices.getUserMedia(constraints)
+        .then(stream => {
+            const video = document.createElement('video');
+            video.srcObject = stream;
+            video.autoplay = true;
+            
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            
+            video.onloadedmetadata = () => {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                
+                // Draw video frame to canvas
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                // Convert canvas to blob
+                canvas.toBlob(blob => {
+                    // Create image file from blob
+                    const imageFile = new File([blob], 'camera-photo.jpg', { type: 'image/jpeg' });
+                    
+                    // Send the image file
+                    const fileInput = document.getElementById('file-input');
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(imageFile);
+                    fileInput.files = dataTransfer.files;
+                    
+                    // Trigger file upload
+                    sendMessage();
+                    
+                    // Stop video stream
+                    stream.getTracks().forEach(track => track.stop());
+                }, 'image/jpeg');
+            };
+        })
+        .catch(error => {
+            console.error('Error accessing camera:', error);
+            alert('Kameraya giriş icazəsi verilməyib!');
+        });
 } 

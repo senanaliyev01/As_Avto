@@ -27,7 +27,7 @@ let lastMessageId = 0;
 let chatSocket = null;
 let usingWebSocket = false; // WebSocket istifadə edilib-edilmədiyini izləmək üçün
 let suppressWebSocketErrors = true; // WebSocket xətalarını gizlətmək üçün
-let useOnlyHTTP = false; // Yalnız HTTP istifadə et, WebSocket-i tamamilə söndür
+let useOnlyHTTP = true; // Yalnız HTTP istifadə et, WebSocket-i tamamilə söndür
 
 // Əlavə edildi - qruplar üçün dəyişənlər
 let currentGroupId = null;
@@ -1001,10 +1001,12 @@ function sendMessage() {
                 const tempMessage = document.getElementById(tempMessageId);
                 tempMessage.querySelector('.message-status').className = 'message-status read';
                 tempMessage.querySelector('.message-status').innerHTML = '<i class="fas fa-check"></i><i class="fas fa-check"></i>';
+                // Müvəqqəti mesaja ID əlavə et
+                tempMessage.setAttribute('data-id', data.message_id);
             }
             
-            // Mesajları yenilə
-            loadMessages(currentReceiverId);
+            // Mesajları yeniləmə (artıq müvəqqəti mesaj var, yenidən yükləməyə ehtiyac yoxdur)
+            // loadMessages(currentReceiverId);
             
             // Uğurlu sorğudan sonra xəta sayğacını sıfırla
             window.sendMessageErrors = 0;

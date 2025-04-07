@@ -635,11 +635,15 @@ function createGroupItem(group) {
     const lockClass = isLocked ? 'locked' : '';
     const onClick = isLocked ? '' : `onclick="selectGroup(${group.id}, '${group.name}')"`;
     
+    // Qrup ikonunu təyin et - kilid, ya da users ikonu
+    const icon = isLocked ? 'fa-lock' : 'fa-users';
+    const adminClass = group.is_admin ? 'admin-icon' : '';
+    
     return `
         <div class="user-item group-item ${group.unread_count > 0 ? 'has-unread' : ''} ${lockClass}" 
              ${onClick}>
             <div class="user-info">
-                <i class="fas ${isLocked ? 'fa-lock' : 'fa-users'} ${group.is_admin ? 'admin-icon' : ''}"></i>
+                <i class="fas ${icon} ${adminClass}"></i>
                 <span>${group.name}</span>
                 <span class="group-members-count">(${group.members_count})</span>
             </div>

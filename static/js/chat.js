@@ -28,6 +28,7 @@ let chatSocket = null;
 let usingWebSocket = false; // WebSocket istifadə edilib-edilmədiyini izləmək üçün
 let suppressWebSocketErrors = true; // WebSocket xətalarını gizlətmək üçün
 let useOnlyHTTP = true; // Yalnız HTTP istifadə et, WebSocket-i tamamilə söndür
+let disableNotificationSounds = false; // Bildiriş səsləri deaktiv edilib/edilməyib
 
 // CSRF token funksiyası
 function getCookie(name) {
@@ -44,8 +45,6 @@ function getCookie(name) {
     }
     return cookieValue;
 }
-
-
 
 // Chat funksiyasını başlat
 function initChat() {
@@ -1050,65 +1049,70 @@ function initAudio() {
         if (newMessageSound) {
             // Səsi yüklə
             newMessageSound.load();
+            newMessageSound.muted = false;
             
-            // Səsi unmute et (istifadəçi qarşılıqlı əlaqəsindən sonra)
-            document.addEventListener('click', function unmuteSounds() {
-                newMessageSound.muted = false;
-                if (chatMessageSound) {
-                    chatMessageSound.muted = false;
-                }
-                document.removeEventListener('click', unmuteSounds);
-                
-                if (!suppressWebSocketErrors) {
-                    console.log('Səslər unmute edildi');
-                }
-            }, { once: true });
-            
-            // Səsi səssiz çal və dayandır (istifadəçi qarşılıqlı əlaqəsini təmin etmək üçün)
-            newMessageSound.volume = 0;
-            const playPromise = newMessageSound.play();
-            
-            if (playPromise !== undefined) {
-                playPromise.then(_ => {
-                    // Səs uğurla çalındı, dayandır və səsi normal səviyyəyə qaytar
-                    newMessageSound.pause();
-                    newMessageSound.currentTime = 0;
-                    newMessageSound.volume = 1;
-                    if (!suppressWebSocketErrors) {
-                        console.log('Bildiriş səsi inicializasiya edildi');
-                    }
-                }).catch(error => {
-                    if (!suppressWebSocketErrors) {
-                        console.error('Bildiriş səsi inicializasiya edilərkən xəta:', error);
-                    }
-                });
+            if (!suppressWebSocketErrors) {
+                console.log('Yeni mesaj bildiriş səsi yükləndi');
+            }
+        } else {
+            if (!suppressWebSocketErrors) {
+                console.error('Yeni mesaj bildiriş səsi elementi tapılmadı!');
             }
         }
         
         if (chatMessageSound) {
             // Səsi yüklə
             chatMessageSound.load();
+            chatMessageSound.muted = false;
             
-            // Səsi səssiz çal və dayandır (istifadəçi qarşılıqlı əlaqəsini təmin etmək üçün)
-            chatMessageSound.volume = 0;
-            const playPromise = chatMessageSound.play();
-            
-            if (playPromise !== undefined) {
-                playPromise.then(_ => {
-                    // Səs uğurla çalındı, dayandır və səsi normal səviyyəyə qaytar
-                    chatMessageSound.pause();
-                    chatMessageSound.currentTime = 0;
-                    chatMessageSound.volume = 1;
-                    if (!suppressWebSocketErrors) {
-                        console.log('Chat mesajı səsi inicializasiya edildi');
-                    }
-                }).catch(error => {
-                    if (!suppressWebSocketErrors) {
-                        console.error('Chat mesajı səsi inicializasiya edilərkən xəta:', error);
-                    }
-                });
+            if (!suppressWebSocketErrors) {
+                console.log('Chat mesaj səsi yükləndi');
+            }
+        } else {
+            if (!suppressWebSocketErrors) {
+                console.error('Chat mesaj səsi elementi tapılmadı!');
             }
         }
+        
+        // Səsləri sınaqdan keçir
+        document.addEventListener('click', function testSound() {
+            if (newMessageSound) {
+                newMessageSound.play()
+                    .then(() => {
+                        newMessageSound.pause();
+                        newMessageSound.currentTime = 0;
+                        
+                        if (!suppressWebSocketErrors) {
+                            console.log('Yeni mesaj bildiriş səsi test edildi');
+                        }
+                    })
+                    .catch(error => {
+                        if (!suppressWebSocketErrors) {
+                            console.error('Yeni mesaj bildiriş səsi test edilərkən xəta:', error);
+                        }
+                    });
+            }
+            
+            if (chatMessageSound) {
+                chatMessageSound.play()
+                    .then(() => {
+                        chatMessageSound.pause();
+                        chatMessageSound.currentTime = 0;
+                        
+                        if (!suppressWebSocketErrors) {
+                            console.log('Chat mesaj səsi test edildi');
+                        }
+                    })
+                    .catch(error => {
+                        if (!suppressWebSocketErrors) {
+                            console.error('Chat mesaj səsi test edilərkən xəta:', error);
+                        }
+                    });
+            }
+            
+            document.removeEventListener('click', testSound);
+        }, { once: true });
+        
     } catch (error) {
         if (!suppressWebSocketErrors) {
             console.error('Audio inicializasiya edilərkən xəta:', error);
@@ -1169,4 +1173,78 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Chat inicializasiya edilərkən xəta:', error);
         }
     }
-}); 
+});
+
+// Yeni mesaj bildirişi üçün səs çal
+function playNewMessageSound() {
+    try {
+        const sound = document.getElementById('new-message-sound');
+        if (sound && !disableNotificationSounds) {
+            sound.currentTime = 0;
+            
+            // Səsi çal
+            const playPromise = sound.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    if (!suppressWebSocketErrors) {
+                        console.error('Bildiriş səsini çalarkən xəta:', error);
+                    }
+                    
+                    // Əgər avtomatik çalma məhdudiyyəti varsa, istifadəçi qarşılıqlı əlaqəsindən sonra cəhd et
+                    if (error.name === 'NotAllowedError') {
+                        document.addEventListener('click', function playOnUserInteraction() {
+                            sound.play().catch(e => {
+                                if (!suppressWebSocketErrors) {
+                                    console.error('İstifadəçi qarşılıqlı əlaqəsindən sonra səs çalarkən xəta:', e);
+                                }
+                            });
+                            document.removeEventListener('click', playOnUserInteraction);
+                        }, { once: true });
+                    }
+                });
+            }
+        }
+    } catch (error) {
+        if (!suppressWebSocketErrors) {
+            console.error('Bildiriş səsi çalınarkən xəta:', error);
+        }
+    }
+}
+
+// Chat mesajı üçün səs çal
+function playChatMessageSound() {
+    try {
+        const sound = document.getElementById('chat-message-sound');
+        if (sound && !disableNotificationSounds) {
+            sound.currentTime = 0;
+            
+            // Səsi çal
+            const playPromise = sound.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    if (!suppressWebSocketErrors) {
+                        console.error('Chat mesaj səsini çalarkən xəta:', error);
+                    }
+                    
+                    // Əgər avtomatik çalma məhdudiyyəti varsa, istifadəçi qarşılıqlı əlaqəsindən sonra cəhd et
+                    if (error.name === 'NotAllowedError') {
+                        document.addEventListener('click', function playOnUserInteraction() {
+                            sound.play().catch(e => {
+                                if (!suppressWebSocketErrors) {
+                                    console.error('İstifadəçi qarşılıqlı əlaqəsindən sonra səs çalarkən xəta:', e);
+                                }
+                            });
+                            document.removeEventListener('click', playOnUserInteraction);
+                        }, { once: true });
+                    }
+                });
+            }
+        }
+    } catch (error) {
+        if (!suppressWebSocketErrors) {
+            console.error('Chat mesaj səsi çalınarkən xəta:', error);
+        }
+    }
+} 

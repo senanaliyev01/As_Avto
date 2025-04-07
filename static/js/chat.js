@@ -58,11 +58,15 @@ function getCookie(name) {
 
 // Chat funksiyasını başlat
 function initChat() {
-    console.log('Chat funksiyası başladılır...');
+    if (!suppressWebSocketErrors) {
+        console.log('Chat funksiyası başladılır...');
+    }
     
     // İstifadəçi daxil olmayıbsa, funksiyadan çıx
     if (typeof currentUserId === 'undefined' || !currentUserId) {
-        console.log('İstifadəçi daxil olmayıb, chat funksiyası başladılmır');
+        if (!suppressWebSocketErrors) {
+            console.log('İstifadəçi daxil olmayıb, chat funksiyası başladılmır');
+        }
         return;
     }
     
@@ -78,7 +82,9 @@ function initChat() {
     const chatSidebar = document.querySelector('.chat-sidebar');
 
     if (!chatIcon || !chatWindow) {
-        console.log('Chat elementləri tapılmadı!');
+        if (!suppressWebSocketErrors) {
+            console.log('Chat elementləri tapılmadı!');
+        }
         return;
     }
 
@@ -87,8 +93,10 @@ function initChat() {
         try {
             connectWebSocket();
         } catch (error) {
-            console.error('WebSocket bağlantısı yaradılarkən xəta:', error);
-            console.log('WebSocket bağlantısı yaradıla bilmədi, HTTP sorğularından istifadə ediləcək');
+            if (!suppressWebSocketErrors) {
+                console.error('WebSocket bağlantısı yaradılarkən xəta:', error);
+                console.log('WebSocket bağlantısı yaradıla bilmədi, HTTP sorğularından istifadə ediləcək');
+            }
         }
     }
 
@@ -1238,12 +1246,12 @@ function testAudioFileExistence(url, name) {
                 console.log(`✅ ${name} faylı mövcuddur və əlçatandır.`);
             } else {
                 console.error(`❌ ${name} faylına giriş mümkün deyil. Status: ${response.status}`);
-                alert(`❌ ${name} faylına giriş mümkün deyil. Status: ${response.status}`);
+                // Bildirişi göstərmə
             }
         })
         .catch(error => {
             console.error(`❌ ${name} faylına giriş xətası:`, error);
-            alert(`❌ ${name} faylına giriş xətası: ${error.message}`);
+            // Bildirişi göstərmə
         });
 }
 
@@ -1293,7 +1301,7 @@ function setupAudioUnlock() {
                     
                     if (error.name === 'NotSupportedError' || error.name === 'NotFoundError') {
                         console.error(`${name} səs faylı tapılmadı və ya dəstəklənmir:`, sound.src);
-                        alert(`${name} səs faylı tapılmadı: ` + sound.src);
+                        // Bildirişi göstərmə
                     }
                 });
         };
@@ -1309,9 +1317,6 @@ function setupAudioUnlock() {
             }
         }, 100);
         
-        // Bildiriş göstər
-        alert('Səs bildirişlərini aktivləşdirildi. İndi mesajlarınız üçün bildiriş səsləri eşidəcəksiniz.');
-        
         // Hadisə dinləyicilərini sil
         document.body.removeEventListener('click', unlockAudio);
         document.body.removeEventListener('touchstart', unlockAudio);
@@ -1320,9 +1325,6 @@ function setupAudioUnlock() {
     // Həm klik, həm toxunma hadisələrini izlə
     document.body.addEventListener('click', unlockAudio, { once: true });
     document.body.addEventListener('touchstart', unlockAudio, { once: true });
-    
-    // İstifadəçiyə bildiriş göstər
-    alert('Səs bildirişlərini aktivləşdirmək üçün lütfən ekrana klik edin.');
 }
 
 // Yeni mesaj bildirişi üçün səs çal
@@ -1356,8 +1358,6 @@ function playNewMessageSound() {
                 
                 if (error.name === 'NotSupportedError' || error.name === 'NotFoundError') {
                     console.error('Bildiriş səs faylı tapılmadı və ya dəstəklənmir:', SOUND_PATHS.newMessage);
-                    // Əlavə olaraq bildiriş göstər
-                    alert('Bildiriş səs faylı tapılmadı: ' + SOUND_PATHS.newMessage);
                 }
                 
                 // Avtomatik səs çalma məhdudiyyəti varsa (NotAllowedError)
@@ -1402,8 +1402,6 @@ function playChatMessageSound() {
                 
                 if (error.name === 'NotSupportedError' || error.name === 'NotFoundError') {
                     console.error('Chat mesajı səs faylı tapılmadı və ya dəstəklənmir:', SOUND_PATHS.chatMessage);
-                    // Əlavə olaraq bildiriş göstər
-                    alert('Chat mesajı səs faylı tapılmadı: ' + SOUND_PATHS.chatMessage);
                 }
                 
                 // Avtomatik səs çalma məhdudiyyəti varsa (NotAllowedError)

@@ -4,7 +4,7 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from .forms import UserUpdateForm, ProfileUpdateForm
-from .models import Profile, Message, LoginCode
+from .models import Profile, Message, LoginCode, ChatGroup, GroupMember, GroupMessage
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
 from django.db.models import Q
@@ -512,11 +512,23 @@ def get_chat_users(request):
         admin_users = User.objects.filter(is_staff=True).exclude(id=request.user.id)
         normal_users = User.objects.filter(is_staff=False).exclude(id=request.user.id)
         
-        print(f"Found {admin_users.count()} admins and {normal_users.count()} users") # Debug üçün
+        # İstifadəçinin üzv olduğu qrupları əldə et
+        user_groups = ChatGroup.objects.filter(
+            members__user=request.user,
+            is_active=True
+        ).distinct()
+        
+        # Bütün aktiv qrupları əldə et (admin istifadəçilər üçün)
+        all_groups = []
+        if request.user.is_staff:
+            all_groups = ChatGroup.objects.filter(is_active=True)
+        
+        print(f"Found {admin_users.count()} admins, {normal_users.count()} users, {user_groups.count()} user groups") # Debug üçün
         
         # Admin və normal istifadəçilər üçün məlumatları hazırla
         admins = []
         users = []
+        groups = []
         
         for user in admin_users:
             try:
@@ -530,7 +542,8 @@ def get_chat_users(request):
                     'id': user.id,
                     'username': user.username,
                     'unread_count': unread_count,
-                    'is_admin': True
+                    'is_admin': True,
+                    'type': 'user'
                 })
             except Exception as e:
                 print(f"Admin istifadəçi məlumatları hazırlanarkən xəta: {str(e)}")
@@ -547,17 +560,154 @@ def get_chat_users(request):
                     'id': user.id,
                     'username': user.username,
                     'unread_count': unread_count,
-                    'is_admin': False
+                    'is_admin': False,
+                    'type': 'user'
                 })
             except Exception as e:
                 print(f"Normal istifadəçi məlumatları hazırlanarkən xəta: {str(e)}")
         
+        # İstifadəçinin üzv olduğu qrupları əlavə et
+        for group in user_groups:
+            try:
+                # Qrup üçün oxunmamış mesajları hesabla
+                unread_count = GroupMessage.objects.filter(
+                    group=group
+                ).exclude(sender=request.user).count()  # Sadəcə mesaj sayını qaytarır
+                
+                # İstifadəçinin qrupdakı statusunu əldə et
+                is_group_admin = GroupMember.objects.filter(
+                    user=request.user,
+                    group=group,
+                    is_admin=True
+                ).exists()
+                
+                groups.append({
+                    'id': group.id,
+                    'name': group.name,
+                    'unread_count': unread_count,
+                    'is_admin': is_group_admin,
+                    'is_locked': False,  # İstifadəçi qrupa daxil olduğu üçün kilid deyil
+                    'type': 'group',
+                    'members_count': group.members.count()
+                })
+            except Exception as e:
+                print(f"Qrup məlumatları hazırlanarkən xəta: {str(e)}")
+        
+        # Admin istifadəçilər üçün bütün qrupları əlavə et
+        if request.user.is_staff:
+            for group in all_groups:
+                # Əgər istifadəçi artıq bu qrupun üzvü deyilsə, onu əlavə et
+                if not user_groups.filter(id=group.id).exists():
+                    try:
+                        groups.append({
+                            'id': group.id,
+                            'name': group.name,
+                            'unread_count': 0,
+                            'is_admin': True,  # Admin bütün qruplar üçün admin sayılır
+                            'is_locked': False,  # Admin bütün qruplara daxil ola bilir
+                            'type': 'group',
+                            'members_count': group.members.count()
+                        })
+                    except Exception as e:
+                        print(f"Admin qrup məlumatları hazırlanarkən xəta: {str(e)}")
+        
         response_data = {
             'admins': admins,
-            'users': users
+            'users': users,
+            'groups': groups
         }
         print("Sending response:", response_data) # Debug üçün
         return JsonResponse(response_data)
     except Exception as e:
         print(f"get_chat_users funksiyasında xəta: {str(e)}")
         return JsonResponse({'error': str(e)}, status=500)
+
+@login_required
+def get_group_messages(request, group_id):
+    """Qrup mesajlarını qaytarır"""
+    try:
+        group = ChatGroup.objects.get(id=group_id)
+        
+        # İstifadəçinin qrupa üzv olub-olmadığını yoxla
+        is_member = GroupMember.objects.filter(group=group, user=request.user).exists()
+        
+        # İstifadəçi admin deyilsə və qrupun üzvü deyilsə, mesajları göstərmə
+        if not request.user.is_staff and not is_member:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Bu qrupa daxil olmaq üçün icazəniz yoxdur'
+            }, status=403)
+        
+        # Qrup mesajlarını əldə et
+        messages = GroupMessage.objects.filter(group=group).order_by('created_at')
+        
+        # Mesajları JSON formatına çevir
+        messages_data = []
+        for message in messages:
+            messages_data.append({
+                'id': message.id,
+                'content': message.content,
+                'sender': message.sender.username,
+                'is_mine': message.sender == request.user,
+                'created_at': message.created_at.isoformat()
+            })
+        
+        return JsonResponse(messages_data, safe=False)
+    
+    except ChatGroup.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Qrup tapılmadı'}, status=404)
+    except Exception as e:
+        print(f"get_group_messages funksiyasında xəta: {str(e)}")
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+@login_required
+@csrf_exempt
+def send_group_message(request):
+    """Qrupa mesaj göndərir"""
+    if request.method == 'POST':
+        try:
+            # POST məlumatlarını əldə et
+            group_id = request.POST.get('group_id')
+            content = request.POST.get('content')
+            
+            if not group_id or not content:
+                return JsonResponse({'status': 'error', 'message': 'Qrup ID və məzmun tələb olunur'})
+            
+            # Qrupu əldə et
+            group = ChatGroup.objects.get(id=group_id)
+            
+            # İstifadəçinin qrupa üzv olub-olmadığını yoxla
+            is_member = GroupMember.objects.filter(group=group, user=request.user).exists()
+            
+            # İstifadəçi admin deyilsə və qrupun üzvü deyilsə, mesaj göndərməyə icazə vermə
+            if not request.user.is_staff and not is_member:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Bu qrupa mesaj göndərmək üçün icazəniz yoxdur'
+                }, status=403)
+            
+            # Yeni qrup mesajı yarat
+            message = GroupMessage.objects.create(
+                group=group,
+                sender=request.user,
+                content=content
+            )
+            
+            return JsonResponse({
+                'status': 'success',
+                'message': {
+                    'id': message.id,
+                    'content': message.content,
+                    'sender': message.sender.username,
+                    'is_mine': True,
+                    'created_at': message.created_at.isoformat()
+                }
+            })
+            
+        except ChatGroup.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Qrup tapılmadı'}, status=404)
+        except Exception as e:
+            print(f"send_group_message funksiyasında xəta: {str(e)}")
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+            
+    return JsonResponse({'status': 'error', 'message': 'Yanlış sorğu metodu'}, status=405)

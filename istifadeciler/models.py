@@ -67,10 +67,52 @@ class Message(models.Model):
 
     class Meta:
         ordering = ['created_at']
+        verbose_name = 'Mesajlar'
+        verbose_name_plural = 'Mesajlar'
 
     def __str__(self):
         return f'Message from {self.sender.username} to {self.receiver.username}'
+
+class ChatGroup(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Qrup adı")
+    description = models.TextField(blank=True, null=True, verbose_name="Qrup təsviri")
+    avatar = models.ImageField(upload_to='group_avatars/', default='group_avatars/default_group.png', verbose_name="Qrup avatarı")
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_groups', verbose_name="Yaradıcı")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Yaradılma tarixi")
+    is_active = models.BooleanField(default=True, verbose_name="Aktivdir")
+
+    class Meta:
+        verbose_name = 'Chat Qrupu'
+        verbose_name_plural = 'Chat Qrupları'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.name
+
+class GroupMember(models.Model):
+    group = models.ForeignKey(ChatGroup, on_delete=models.CASCADE, related_name='members', verbose_name="Qrup")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='group_memberships', verbose_name="İstifadəçi")
+    is_admin = models.BooleanField(default=False, verbose_name="Qrup adminidir")
+    joined_at = models.DateTimeField(auto_now_add=True, verbose_name="Qoşulma tarixi")
     
     class Meta:
-        verbose_name = 'Mesajlar'
-        verbose_name_plural = 'Mesajlar'
+        verbose_name = 'Qrup üzvü'
+        verbose_name_plural = 'Qrup üzvləri'
+        unique_together = ['group', 'user']  # Bir istifadəçi eyni qrupa bir dəfə əlavə oluna bilər
+        
+    def __str__(self):
+        return f"{self.user.username} - {self.group.name}"
+
+class GroupMessage(models.Model):
+    group = models.ForeignKey(ChatGroup, on_delete=models.CASCADE, related_name='messages', verbose_name="Qrup")
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='group_messages', verbose_name="Göndərən")
+    content = models.TextField(verbose_name="Məzmun")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Göndərilmə tarixi")
+    
+    class Meta:
+        verbose_name = 'Qrup mesajı'
+        verbose_name_plural = 'Qrup mesajları'
+        ordering = ['created_at']
+        
+    def __str__(self):
+        return f"{self.sender.username} - {self.group.name}: {self.content[:20]}..."

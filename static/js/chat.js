@@ -28,7 +28,11 @@ let chatSocket = null;
 let usingWebSocket = false; // WebSocket istifadə edilib-edilmədiyini izləmək üçün
 let suppressWebSocketErrors = true; // WebSocket xətalarını gizlətmək üçün
 let useOnlyHTTP = true; // Yalnız HTTP istifadə et, WebSocket-i tamamilə söndür
-let disableNotificationSounds = false; // Bildiriş səslərini söndürmək üçün
+
+// Əlavə edildi - qruplar üçün dəyişənlər
+let currentGroupId = null;
+let currentGroupName = null;
+let isCurrentChatGroup = false; // Chat-ın qrup və ya şəxsi olduğunu saxlayır
 
 // CSRF token funksiyası
 function getCookie(name) {
@@ -46,42 +50,7 @@ function getCookie(name) {
     return cookieValue;
 }
 
-// Səs fayllarını çalmaq üçün funksiyalar
-function playNewMessageSound() {
-    try {
-        const audio = document.getElementById('new-message-sound');
-        if (audio && !disableNotificationSounds) {
-            audio.currentTime = 0;
-            audio.play().catch(error => {
-                if (!suppressWebSocketErrors) {
-                    console.warn('Bildiriş səsi çalınarkən xəta:', error);
-                }
-            });
-        }
-    } catch (error) {
-        if (!suppressWebSocketErrors) {
-            console.error('Bildiriş səsi çalınarkən xəta:', error);
-        }
-    }
-}
 
-function playChatMessageSound() {
-    try {
-        const audio = document.getElementById('chat-message-sound');
-        if (audio && !disableNotificationSounds) {
-            audio.currentTime = 0;
-            audio.play().catch(error => {
-                if (!suppressWebSocketErrors) {
-                    console.warn('Chat mesaj səsi çalınarkən xəta:', error);
-                }
-            });
-        }
-    } catch (error) {
-        if (!suppressWebSocketErrors) {
-            console.error('Chat mesaj səsi çalınarkən xəta:', error);
-        }
-    }
-}
 
 // Chat funksiyasını başlat
 function initChat() {
@@ -154,8 +123,13 @@ function initChat() {
     backButton.addEventListener('click', () => {
         chatMain.style.display = 'none';
         chatSidebar.style.display = 'block';
+        
+        // Bütün dəyişənləri sıfırla
         currentReceiverId = null;
         currentReceiverName = null;
+        currentGroupId = null;
+        currentGroupName = null;
+        isCurrentChatGroup = false;
     });
 
     // Mesaj göndər
@@ -179,7 +153,12 @@ function initChat() {
     
     setInterval(() => {
         try {
-            if (currentReceiverId) {
+            // Əgər cari çat qrupdursa, qrup mesajlarını yenilə
+            if (isCurrentChatGroup && currentGroupId) {
+                loadGroupMessages(currentGroupId);
+            }
+            // Əgər cari çat şəxsiidirsə, şəxsi mesajları yenilə
+            else if (currentReceiverId) {
                 loadMessages(currentReceiverId);
             }
         } catch (error) {
@@ -578,6 +557,15 @@ function loadChatUsers() {
                     usersList.innerHTML += createUserItem(user);
                 });
             }
+            
+            // Qrupları əlavə et
+            if (data.groups && data.groups.length > 0) {
+                usersList.innerHTML += '<div class="user-group-title">Qruplar</div>';
+                data.groups.forEach(group => {
+                    totalUnread += group.unread_count;
+                    usersList.innerHTML += createGroupItem(group);
+                });
+            }
 
             // Yeni mesaj varsa bildiriş səsini çal
             if (totalUnread > lastMessageCount && !disableNotificationSounds) {
@@ -640,6 +628,32 @@ function createUserItem(user) {
     `;
 }
 
+function createGroupItem(group) {
+    // Qrupa kilid qoymaq əgər giriş yoxdursa
+    const isLocked = group.is_locked;
+    const lockClass = isLocked ? 'locked' : '';
+    const onClick = isLocked ? '' : `onclick="selectGroup(${group.id}, '${group.name}')"`;
+    
+    return `
+        <div class="user-item group-item ${group.unread_count > 0 ? 'has-unread' : ''} ${lockClass}" 
+             ${onClick}>
+            <div class="user-info">
+                <i class="fas ${isLocked ? 'fa-lock' : 'fa-users'} ${group.is_admin ? 'admin-icon' : ''}"></i>
+                <span>${group.name}</span>
+                <span class="group-members-count">(${group.members_count})</span>
+            </div>
+            ${isLocked ? 
+                `<span class="lock-info" title="Bu qrupa daxil olmaq üçün icazəniz yoxdur">
+                    <i class="fas fa-lock"></i>
+                </span>` : 
+                (group.unread_count > 0 ? 
+                    `<span class="unread-count">${group.unread_count}</span>` : 
+                    '')
+            }
+        </div>
+    `;
+}
+
 function updateUnreadCount(totalUnread) {
     const totalUnreadElement = document.getElementById('total-unread');
     const chatIcon = document.getElementById('chat-icon');
@@ -661,6 +675,12 @@ function selectUser(userId, username) {
         console.log(`İstifadəçi seçildi: ${username} (ID: ${userId})`);
     }
     
+    // İstifadəçi seçildikdə qrup dəyişənlərini sıfırla
+    currentGroupId = null;
+    currentGroupName = null;
+    isCurrentChatGroup = false;
+    
+    // Cari istifadəçi məlumatlarını təyin et
     currentReceiverId = userId;
     currentReceiverName = username;
     
@@ -855,6 +875,13 @@ function sendMessage() {
     
     const content = input.value.trim();
     
+    // Əgər qrup seçilibsə, qrup mesajı göndər
+    if (isCurrentChatGroup && currentGroupId) {
+        sendGroupMessage();
+        return;
+    }
+    
+    // Əgər istifadəçi seçilməyibsə, funksiyadan çıx
     if (!content || !currentReceiverId) return;
 
     if (!suppressWebSocketErrors) {
@@ -1183,6 +1210,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Global funksiyaları window obyektinə əlavə et
         window.selectUser = selectUser;
+        window.selectGroup = selectGroup;
         
         // Audio elementlərini inicializasiya et
         initAudio();
@@ -1194,35 +1222,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Chat widget tapıldı, inicializasiya edilir...');
             }
             initChat();
-            
-            // Səs testini gizli formada əlavə et (istifadəçi qarşılıqlı əlaqəsi üçün)
-            document.addEventListener('click', function testAudioOnFirstInteraction() {
-                // Səs testini gizli şəkildə yoxla
-                const newMessageSound = document.getElementById('new-message-sound');
-                const chatMessageSound = document.getElementById('chat-message-sound');
-                
-                if (newMessageSound && chatMessageSound) {
-                    // Səsləri 0 səviyyəsində oynat və dayandır
-                    newMessageSound.volume = 0;
-                    chatMessageSound.volume = 0;
-                    
-                    // İlk qarşılıqlı əlaqədə səsləri test et
-                    newMessageSound.play().then(() => {
-                        newMessageSound.pause();
-                        newMessageSound.currentTime = 0;
-                        newMessageSound.volume = 1;
-                    }).catch(() => {});
-                    
-                    chatMessageSound.play().then(() => {
-                        chatMessageSound.pause();
-                        chatMessageSound.currentTime = 0;
-                        chatMessageSound.volume = 1;
-                    }).catch(() => {});
-                }
-                
-                // Bu eventi yalnız bir dəfə işlət
-                document.removeEventListener('click', testAudioOnFirstInteraction);
-            }, { once: true });
         } else {
             if (!suppressWebSocketErrors) {
                 console.log('Chat widget tapılmadı!');
@@ -1234,4 +1233,358 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Chat inicializasiya edilərkən xəta:', error);
         }
     }
-}); 
+});
+
+function selectGroup(groupId, groupName) {
+    if (!suppressWebSocketErrors) {
+        console.log(`Qrup seçildi: ${groupName} (ID: ${groupId})`);
+    }
+    
+    // Əvvəlki seçilmiş istifadəçi/qrupu sıfırlayaq
+    currentReceiverId = null;
+    currentReceiverName = null;
+    
+    // Qrup ID və adını saxlayaq
+    currentGroupId = groupId;
+    currentGroupName = groupName;
+    isCurrentChatGroup = true;
+    
+    const chatMain = document.querySelector('.chat-main');
+    const chatSidebar = document.querySelector('.chat-sidebar');
+    const selectedUsername = document.getElementById('selected-username');
+    
+    if (!chatMain || !chatSidebar || !selectedUsername) {
+        if (!suppressWebSocketErrors) {
+            console.error('Chat elementləri tapılmadı!');
+        }
+        return;
+    }
+    
+    chatSidebar.style.display = 'none';
+    chatMain.style.display = 'flex';
+    selectedUsername.textContent = `${groupName} (Qrup)`;
+    
+    loadGroupMessages(groupId);
+}
+
+// Qrup mesajlarını yükləmək üçün funksiya
+function loadGroupMessages(groupId) {
+    try {
+        if (!suppressWebSocketErrors) {
+            console.log(`Qrup mesajları yüklənir: Qrup ID ${groupId}`);
+        }
+        
+        // Sorğu göndərmədən əvvəl yoxla ki, əvvəlki sorğu hələ davam edirmi
+        if (window.loadingGroupMessages) {
+            if (!suppressWebSocketErrors) {
+                console.log('Qrup mesajları artıq yüklənir, gözlənilir...');
+            }
+            return;
+        }
+        
+        window.loadingGroupMessages = true;
+        
+        fetch(`/istifadeciler/api/chat/group/messages/${groupId}/`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            },
+            credentials: 'same-origin',
+            timeout: 10000 // 10 saniyə timeout
+        })
+        .then(response => {
+            window.loadingGroupMessages = false;
+            
+            if (!response.ok) {
+                if (response.status === 403) {
+                    if (!suppressWebSocketErrors) {
+                        console.error('Bu qrupa daxil olmaq üçün icazəniz yoxdur');
+                    }
+                    
+                    // İstifadəçilər siyahısına qayıt
+                    const chatMain = document.querySelector('.chat-main');
+                    const chatSidebar = document.querySelector('.chat-sidebar');
+                    
+                    if (chatMain && chatSidebar) {
+                        chatMain.style.display = 'none';
+                        chatSidebar.style.display = 'block';
+                    }
+                    
+                    if (typeof showAnimatedMessage === 'function') {
+                        showAnimatedMessage('Bu qrupa daxil olmaq üçün icazəniz yoxdur', true);
+                    } else {
+                        alert('Bu qrupa daxil olmaq üçün icazəniz yoxdur');
+                    }
+                    
+                    // Qrup ID və adını sıfırla
+                    currentGroupId = null;
+                    currentGroupName = null;
+                    isCurrentChatGroup = false;
+                    
+                    throw new Error('Bu qrupa daxil olmaq üçün icazəniz yoxdur');
+                } else if (response.status === 404) {
+                    if (!suppressWebSocketErrors) {
+                        console.error('Qrup tapılmadı');
+                    }
+                    
+                    // İstifadəçilər siyahısına qayıt
+                    const chatMain = document.querySelector('.chat-main');
+                    const chatSidebar = document.querySelector('.chat-sidebar');
+                    
+                    if (chatMain && chatSidebar) {
+                        chatMain.style.display = 'none';
+                        chatSidebar.style.display = 'block';
+                    }
+                    
+                    if (typeof showAnimatedMessage === 'function') {
+                        showAnimatedMessage('Qrup tapılmadı', true);
+                    } else {
+                        alert('Qrup tapılmadı');
+                    }
+                    
+                    // Qrup ID və adını sıfırla
+                    currentGroupId = null;
+                    currentGroupName = null;
+                    isCurrentChatGroup = false;
+                    
+                    throw new Error('Qrup tapılmadı');
+                }
+                
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(messages => {
+            if (!suppressWebSocketErrors) {
+                console.log(`${messages.length} qrup mesajı alındı`);
+            }
+            
+            const chatMessages = document.getElementById('chat-messages');
+            if (!chatMessages) {
+                if (!suppressWebSocketErrors) {
+                    console.error('chat-messages elementi tapılmadı!');
+                }
+                return;
+            }
+            
+            // Mesajları tarixə görə sırala (köhnədən yeniyə)
+            messages.sort((a, b) => {
+                const dateA = new Date(a.created_at || 0);
+                const dateB = new Date(b.created_at || 0);
+                return dateA - dateB;
+            });
+            
+            // HTML-i yenilə
+            chatMessages.innerHTML = messages.map(msg => `
+                <div class="message ${msg.is_mine ? 'mine' : 'theirs'}" data-id="${msg.id}">
+                    ${!msg.is_mine ? `<div class="message-sender">${msg.sender}</div>` : ''}
+                    <div class="message-content">${msg.content}</div>
+                </div>
+            `).join('');
+            
+            // Mesajları aşağı sürüşdür
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Uğurlu sorğudan sonra xəta sayğacını sıfırla
+            window.groupMessageLoadErrors = 0;
+        })
+        .catch(error => {
+            window.loadingGroupMessages = false;
+            
+            // Xəta sayğacını artır
+            window.groupMessageLoadErrors = (window.groupMessageLoadErrors || 0) + 1;
+            
+            if (!suppressWebSocketErrors) {
+                console.error('Qrup mesajları yüklənərkən xəta:', error);
+            }
+            
+            // Əgər 3-dən az xəta varsa, yenidən cəhd et
+            if (window.groupMessageLoadErrors < 3 && error.message !== 'Bu qrupa daxil olmaq üçün icazəniz yoxdur' && error.message !== 'Qrup tapılmadı') {
+                if (!suppressWebSocketErrors) {
+                    console.log(`Qrup mesajları yüklənərkən xəta baş verdi, ${window.groupMessageLoadErrors} cəhd. 5 saniyə sonra yenidən cəhd ediləcək...`);
+                }
+                setTimeout(() => loadGroupMessages(groupId), 5000);
+            } else {
+                if (!suppressWebSocketErrors) {
+                    console.error('Qrup mesajları yüklənərkən çoxlu xəta baş verdi, yenidən cəhd edilmir.');
+                }
+                // 1 dəqiqə sonra xəta sayğacını sıfırla
+                setTimeout(() => {
+                    window.groupMessageLoadErrors = 0;
+                }, 60000);
+            }
+        });
+    } catch (error) {
+        window.loadingGroupMessages = false;
+        
+        if (!suppressWebSocketErrors) {
+            console.error('Qrup mesajları yüklənərkən ümumi xəta:', error);
+        }
+    }
+}
+
+// Qrupa mesaj göndərmək üçün funksiya
+function sendGroupMessage() {
+    // Əgər qrup seçilməyibsə, çıx
+    if (!currentGroupId || !isCurrentChatGroup) {
+        return;
+    }
+    
+    const input = document.getElementById('message-input');
+    if (!input) return;
+    
+    const content = input.value.trim();
+    
+    if (!content) return;
+
+    if (!suppressWebSocketErrors) {
+        console.log(`Qrupa mesaj göndərilir: ${content} (Qrup ID: ${currentGroupId})`);
+    }
+
+    // Mesajı əvvəlcədən göstər (daha yaxşı istifadəçi təcrübəsi üçün)
+    const tempMessageId = 'temp_' + Date.now();
+    const chatMessages = document.getElementById('chat-messages');
+    if (chatMessages) {
+        const tempMessageDiv = document.createElement('div');
+        tempMessageDiv.className = 'message mine';
+        tempMessageDiv.id = tempMessageId;
+        tempMessageDiv.innerHTML = `
+            <div class="message-content">${content}</div>
+        `;
+        chatMessages.appendChild(tempMessageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    // İnput sahəsini təmizlə
+    input.value = '';
+    
+    // Mesaj sahəsini fokusla
+    input.focus();
+
+    // Əgər mesaj göndərilməkdədirsə, yeni sorğu göndərmə
+    if (window.sendingGroupMessage) {
+        if (!suppressWebSocketErrors) {
+            console.log('Qrup mesajı artıq göndərilir, gözlənilir...');
+        }
+        return;
+    }
+    
+    window.sendingGroupMessage = true;
+
+    // HTTP sorğusu ilə mesaj göndər
+    const formData = new FormData();
+    formData.append('group_id', currentGroupId);
+    formData.append('content', content);
+
+    fetch('/istifadeciler/api/chat/group/send/', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        timeout: 10000 // 10 saniyə timeout
+    })
+    .then(response => {
+        window.sendingGroupMessage = false;
+        
+        if (!response.ok) {
+            if (response.status === 403) {
+                // Müvəqqəti mesajı sil
+                if (chatMessages && document.getElementById(tempMessageId)) {
+                    document.getElementById(tempMessageId).remove();
+                }
+                
+                if (typeof showAnimatedMessage === 'function') {
+                    showAnimatedMessage('Bu qrupa mesaj göndərmək üçün icazəniz yoxdur', true);
+                } else {
+                    alert('Bu qrupa mesaj göndərmək üçün icazəniz yoxdur');
+                }
+                
+                throw new Error('Bu qrupa mesaj göndərmək üçün icazəniz yoxdur');
+            }
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (!suppressWebSocketErrors) {
+            console.log('Qrup mesajı göndərildi:', data);
+        }
+        
+        if (data.status === 'success') {
+            // Müvəqqəti mesajı yenisi ilə əvəz et
+            if (chatMessages && document.getElementById(tempMessageId)) {
+                document.getElementById(tempMessageId).remove();
+            }
+            
+            // Mesajları yenilə
+            loadGroupMessages(currentGroupId);
+            
+            // Uğurlu sorğudan sonra xəta sayğacını sıfırla
+            window.sendGroupMessageErrors = 0;
+        } else {
+            // Müvəqqəti mesajı sil
+            if (chatMessages && document.getElementById(tempMessageId)) {
+                document.getElementById(tempMessageId).remove();
+            }
+            
+            if (!suppressWebSocketErrors) {
+                console.error('Qrup mesajı göndərilə bilmədi:', data.message);
+            }
+            if (typeof showAnimatedMessage === 'function') {
+                showAnimatedMessage('Qrup mesajı göndərilə bilmədi: ' + data.message, true);
+            } else {
+                alert('Qrup mesajı göndərilə bilmədi: ' + data.message);
+            }
+        }
+    })
+    .catch(error => {
+        window.sendingGroupMessage = false;
+        
+        // Xəta sayğacını artır
+        window.sendGroupMessageErrors = (window.sendGroupMessageErrors || 0) + 1;
+        
+        // Müvəqqəti mesajı sil
+        if (chatMessages && document.getElementById(tempMessageId)) {
+            document.getElementById(tempMessageId).remove();
+        }
+        
+        if (!suppressWebSocketErrors) {
+            console.error('Qrup mesajı göndərilərkən xəta:', error);
+        }
+        
+        // Əgər 3-dən az xəta varsa, yenidən cəhd et
+        if (window.sendGroupMessageErrors < 3 && error.message !== 'Bu qrupa mesaj göndərmək üçün icazəniz yoxdur') {
+            if (!suppressWebSocketErrors) {
+                console.log(`Qrup mesajı göndərilərkən xəta baş verdi, ${window.sendGroupMessageErrors} cəhd. 5 saniyə sonra yenidən cəhd ediləcək...`);
+            }
+            
+            // Mesajı yenidən göndərmək üçün input-a qaytar
+            input.value = content;
+            
+            // 5 saniyə sonra yenidən cəhd et
+            setTimeout(() => {
+                if (typeof showAnimatedMessage === 'function') {
+                    showAnimatedMessage('Qrup mesajı göndərilməyə yenidən cəhd edilir...', false);
+                }
+                sendGroupMessage();
+            }, 5000);
+        } else {
+            if (typeof showAnimatedMessage === 'function') {
+                showAnimatedMessage('Qrup mesajı göndərilərkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.', true);
+            } else {
+                alert('Qrup mesajı göndərilərkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+            }
+            
+            // 1 dəqiqə sonra xəta sayğacını sıfırla
+            setTimeout(() => {
+                window.sendGroupMessageErrors = 0;
+            }, 60000);
+        }
+    });
+} 

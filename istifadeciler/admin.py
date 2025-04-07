@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.models import User
 from django.utils.html import format_html
 from django.urls import reverse
-from .models import Profile, Message, LoginCode
+from .models import Profile, Message, LoginCode, ChatGroup, GroupMember, GroupMessage
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.contrib.auth.admin import UserAdmin
@@ -167,5 +167,60 @@ class MessageAdmin(admin.ModelAdmin):
     delete_button.short_description = 'Əməliyyatlar'
     delete_button.allow_tags = True
 
+    def has_add_permission(self, request):
+        return False  # Yeni mesaj əlavə etməyə icazə vermə
+
+@admin.register(ChatGroup)
+class ChatGroupAdmin(admin.ModelAdmin):
+    list_display = ('name', 'creator', 'created_at', 'is_active', 'members_count', 'view_members')
+    list_filter = ('is_active', 'created_at')
+    search_fields = ('name', 'description', 'creator__username')
+    readonly_fields = ('created_at',)
+    
+    def members_count(self, obj):
+        return obj.members.count()
+    members_count.short_description = 'Üzvlərin sayı'
+    
+    def view_members(self, obj):
+        members_url = reverse('admin:istifadeciler_groupmember_changelist') + f'?group__id__exact={obj.id}'
+        return mark_safe(
+            f'<a href="{members_url}" class="button" style="background-color: #2196F3; color: white; '
+            f'padding: 5px 10px; border-radius: 4px; text-decoration: none;">Üzvlərə bax</a>'
+        )
+    view_members.short_description = 'Üzvlər'
+
+@admin.register(GroupMember)
+class GroupMemberAdmin(admin.ModelAdmin):
+    list_display = ('user', 'group', 'is_admin', 'joined_at')
+    list_filter = ('is_admin', 'joined_at', 'group')
+    search_fields = ('user__username', 'group__name')
+    readonly_fields = ('joined_at',)
+    
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        # User seçərkən dropdown siyahısını azaltmaq üçün
+        if db_field.name == "user":
+            kwargs["queryset"] = User.objects.filter(is_active=True).order_by('username')
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+@admin.register(GroupMessage)
+class GroupMessageAdmin(admin.ModelAdmin):
+    list_display = ('sender_username', 'group_name', 'short_content', 'created_at')
+    list_filter = ('created_at', 'group', 'sender')
+    search_fields = ('sender__username', 'group__name', 'content')
+    date_hierarchy = 'created_at'
+    ordering = ('-created_at',)
+    
+    def sender_username(self, obj):
+        return obj.sender.username
+    sender_username.short_description = 'Göndərən'
+    
+    def group_name(self, obj):
+        return obj.group.name
+    group_name.short_description = 'Qrup'
+    
+    def short_content(self, obj):
+        return obj.content[:50] + '...' if len(obj.content) > 50 else obj.content
+    short_content.short_description = 'Mesaj'
+    
     def has_add_permission(self, request):
         return False  # Yeni mesaj əlavə etməyə icazə vermə

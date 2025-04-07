@@ -171,6 +171,9 @@
             <div class="chat-header">
                 <div class="chat-title">Dəstək Komandası</div>
                 <div class="chat-controls">
+                    <button id="test-sound" class="test-sound-button" title="Səsi yoxla">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
                     <button id="fullscreen-chat" class="fullscreen-button" title="Tam ekran">
                         <i class="fas fa-expand"></i>
                     </button>
@@ -207,10 +210,10 @@
     </div>
     
     <!-- Audio elementləri -->
-    <audio id="new-message-sound" preload="auto" muted>
+    <audio id="new-message-sound" preload="auto">
         <source src="{% static 'audio/notification.mp3' %}" type="audio/mpeg">
     </audio>
-    <audio id="chat-message-sound" preload="auto" muted>
+    <audio id="chat-message-sound" preload="auto">
         <source src="{% static 'audio/chat-message.mp3' %}" type="audio/mpeg">
     </audio>
     {% endif %}

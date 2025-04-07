@@ -537,6 +537,15 @@ function loadChatUsers() {
             // Cari istifadəçinin admin olub-olmadığını yoxla
             const isCurrentUserAdmin = typeof isAdmin !== 'undefined' && isAdmin;
             
+            // Qrupları əlavə et
+            if (data.groups && data.groups.length > 0) {
+                usersList.innerHTML += '<div class="user-group-title">Qruplar</div>';
+                data.groups.forEach(group => {
+                    totalUnread += group.unread_count;
+                    usersList.innerHTML += createGroupItem(group);
+                });
+            }
+            
             // Adminləri əlavə et (bütün istifadəçilər adminləri görə bilər)
             if (data.admins && data.admins.length > 0) {
                 usersList.innerHTML += '<div class="user-group-title">Adminlər</div>';
@@ -555,15 +564,6 @@ function loadChatUsers() {
                 data.users.forEach(user => {
                     totalUnread += user.unread_count;
                     usersList.innerHTML += createUserItem(user);
-                });
-            }
-            
-            // Qrupları əlavə et
-            if (data.groups && data.groups.length > 0) {
-                usersList.innerHTML += '<div class="user-group-title">Qruplar</div>';
-                data.groups.forEach(group => {
-                    totalUnread += group.unread_count;
-                    usersList.innerHTML += createGroupItem(group);
                 });
             }
 

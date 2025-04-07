@@ -637,9 +637,9 @@ def get_chat_users(request):
                     print(f"Kilitli qrup məlumatları hazırlanarkən xəta: {str(e)}")
         
         response_data = {
+            'groups': groups,
             'admins': admins,
-            'users': users,
-            'groups': groups
+            'users': users
         }
         print("Sending response:", response_data) # Debug üçün
         return JsonResponse(response_data)

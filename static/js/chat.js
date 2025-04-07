@@ -27,7 +27,7 @@ let lastMessageId = 0;
 let chatSocket = null;
 let usingWebSocket = false; // WebSocket istifadə edilib-edilmədiyini izləmək üçün
 let suppressWebSocketErrors = true; // WebSocket xətalarını gizlətmək üçün
-let useOnlyHTTP = true; // Yalnız HTTP istifadə et, WebSocket-i tamamilə söndür
+let useOnlyHTTP = false; // Yalnız HTTP istifadə et, WebSocket-i tamamilə söndür
 
 // Əlavə edildi - qruplar üçün dəyişənlər
 let currentGroupId = null;

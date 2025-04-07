@@ -32,8 +32,8 @@ let disableNotificationSounds = false; // Bildiriş səsləri deaktiv edilib/edi
 
 // Səs faylları üçün yollar
 const SOUND_PATHS = {
-    newMessage: '/static/audio/notification.mp3',
-    chatMessage: '/static/audio/chat-message.mp3'
+    newMessage: '/as_avto/static/audio/notification.mp3',
+    chatMessage: '/as_avto/static/audio/chat-message.mp3'
 };
 
 // Audio elementləri
@@ -1246,12 +1246,12 @@ function testAudioFileExistence(url, name) {
                 console.log(`✅ ${name} faylı mövcuddur və əlçatandır.`);
             } else {
                 console.error(`❌ ${name} faylına giriş mümkün deyil. Status: ${response.status}`);
-                // Bildirişi göstərmə
+                alert(`❌ ${name} faylına giriş mümkün deyil. Status: ${response.status}`);
             }
         })
         .catch(error => {
             console.error(`❌ ${name} faylına giriş xətası:`, error);
-            // Bildirişi göstərmə
+            alert(`❌ ${name} faylına giriş xətası: ${error.message}`);
         });
 }
 
@@ -1301,7 +1301,6 @@ function setupAudioUnlock() {
                     
                     if (error.name === 'NotSupportedError' || error.name === 'NotFoundError') {
                         console.error(`${name} səs faylı tapılmadı və ya dəstəklənmir:`, sound.src);
-                        // Bildirişi göstərmə
                     }
                 });
         };

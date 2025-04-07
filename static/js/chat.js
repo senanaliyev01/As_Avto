@@ -904,23 +904,6 @@ function sendMessage() {
     if (!suppressWebSocketErrors) {
         console.log(`Mesaj göndərilir: ${content} (Alıcı ID: ${currentReceiverId})`);
     }
-
-    // Mesajı əvvəlcədən göstər (daha yaxşı istifadəçi təcrübəsi üçün)
-    const tempMessageId = 'temp_' + Date.now();
-    const chatMessages = document.getElementById('chat-messages');
-    if (chatMessages) {
-        const tempMessageDiv = document.createElement('div');
-        tempMessageDiv.className = 'message mine';
-        tempMessageDiv.id = tempMessageId;
-        tempMessageDiv.innerHTML = `
-            <div class="message-content">${content}</div>
-            <div class="message-status">
-                <i class="fas fa-check"></i>
-            </div>
-        `;
-        chatMessages.appendChild(tempMessageDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
     
     // İnput sahəsini təmizlə
     input.value = '';
@@ -996,26 +979,25 @@ function sendMessage() {
         }
         
         if (data.status === 'success') {
-            // Müvəqqəti mesajı yenisi ilə əvəz et
-            if (chatMessages && document.getElementById(tempMessageId)) {
-                const tempMessage = document.getElementById(tempMessageId);
-                tempMessage.querySelector('.message-status').className = 'message-status read';
-                tempMessage.querySelector('.message-status').innerHTML = '<i class="fas fa-check"></i><i class="fas fa-check"></i>';
-                // Müvəqqəti mesaja ID əlavə et
-                tempMessage.setAttribute('data-id', data.message_id);
+            // Mesajı birbaşa əlavə et
+            const chatMessages = document.getElementById('chat-messages');
+            if (chatMessages) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message mine';
+                messageDiv.setAttribute('data-id', data.message_id);
+                messageDiv.innerHTML = `
+                    <div class="message-content">${content}</div>
+                    <div class="message-status read">
+                        <i class="fas fa-check"></i><i class="fas fa-check"></i>
+                    </div>
+                `;
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
             }
-            
-            // Mesajları yeniləmə (artıq müvəqqəti mesaj var, yenidən yükləməyə ehtiyac yoxdur)
-            // loadMessages(currentReceiverId);
             
             // Uğurlu sorğudan sonra xəta sayğacını sıfırla
             window.sendMessageErrors = 0;
         } else {
-            // Müvəqqəti mesajı sil
-            if (chatMessages && document.getElementById(tempMessageId)) {
-                document.getElementById(tempMessageId).remove();
-            }
-            
             if (!suppressWebSocketErrors) {
                 console.error('Mesaj göndərilə bilmədi:', data.message);
             }
@@ -1031,11 +1013,6 @@ function sendMessage() {
         
         // Xəta sayğacını artır
         window.sendMessageErrors = (window.sendMessageErrors || 0) + 1;
-        
-        // Müvəqqəti mesajı sil
-        if (chatMessages && document.getElementById(tempMessageId)) {
-            document.getElementById(tempMessageId).remove();
-        }
         
         if (!suppressWebSocketErrors) {
             console.error('Mesaj göndərilərkən xəta:', error);
@@ -1464,20 +1441,6 @@ function sendGroupMessage() {
         console.log(`Qrupa mesaj göndərilir: ${content} (Qrup ID: ${currentGroupId})`);
     }
 
-    // Mesajı əvvəlcədən göstər (daha yaxşı istifadəçi təcrübəsi üçün)
-    const tempMessageId = 'temp_' + Date.now();
-    const chatMessages = document.getElementById('chat-messages');
-    if (chatMessages) {
-        const tempMessageDiv = document.createElement('div');
-        tempMessageDiv.className = 'message mine';
-        tempMessageDiv.id = tempMessageId;
-        tempMessageDiv.innerHTML = `
-            <div class="message-content">${content}</div>
-        `;
-        chatMessages.appendChild(tempMessageDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-    
     // İnput sahəsini təmizlə
     input.value = '';
     
@@ -1514,8 +1477,19 @@ function sendGroupMessage() {
         if (!response.ok) {
             if (response.status === 403) {
                 // Müvəqqəti mesajı sil
-                if (chatMessages && document.getElementById(tempMessageId)) {
-                    document.getElementById(tempMessageId).remove();
+                const chatMessages = document.getElementById('chat-messages');
+                if (chatMessages) {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'message mine';
+                    messageDiv.setAttribute('data-id', data.message_id);
+                    messageDiv.innerHTML = `
+                        <div class="message-content">${content}</div>
+                        <div class="message-status read">
+                            <i class="fas fa-check"></i><i class="fas fa-check"></i>
+                        </div>
+                    `;
+                    chatMessages.appendChild(messageDiv);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
                 }
                 
                 if (typeof showAnimatedMessage === 'function') {
@@ -1536,9 +1510,20 @@ function sendGroupMessage() {
         }
         
         if (data.status === 'success') {
-            // Müvəqqəti mesajı yenisi ilə əvəz et
-            if (chatMessages && document.getElementById(tempMessageId)) {
-                document.getElementById(tempMessageId).remove();
+            // Mesajı birbaşa əlavə et
+            const chatMessages = document.getElementById('chat-messages');
+            if (chatMessages) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message mine';
+                messageDiv.setAttribute('data-id', data.message_id);
+                messageDiv.innerHTML = `
+                    <div class="message-content">${content}</div>
+                    <div class="message-status read">
+                        <i class="fas fa-check"></i><i class="fas fa-check"></i>
+                    </div>
+                `;
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
             }
             
             // Mesajları yenilə
@@ -1548,8 +1533,19 @@ function sendGroupMessage() {
             window.sendGroupMessageErrors = 0;
         } else {
             // Müvəqqəti mesajı sil
-            if (chatMessages && document.getElementById(tempMessageId)) {
-                document.getElementById(tempMessageId).remove();
+            const chatMessages = document.getElementById('chat-messages');
+            if (chatMessages) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message mine';
+                messageDiv.setAttribute('data-id', data.message_id);
+                messageDiv.innerHTML = `
+                    <div class="message-content">${content}</div>
+                    <div class="message-status read">
+                        <i class="fas fa-check"></i><i class="fas fa-check"></i>
+                    </div>
+                `;
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
             }
             
             if (!suppressWebSocketErrors) {
@@ -1569,8 +1565,19 @@ function sendGroupMessage() {
         window.sendGroupMessageErrors = (window.sendGroupMessageErrors || 0) + 1;
         
         // Müvəqqəti mesajı sil
-        if (chatMessages && document.getElementById(tempMessageId)) {
-            document.getElementById(tempMessageId).remove();
+        const chatMessages = document.getElementById('chat-messages');
+        if (chatMessages) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message mine';
+            messageDiv.setAttribute('data-id', data.message_id);
+            messageDiv.innerHTML = `
+                <div class="message-content">${content}</div>
+                <div class="message-status read">
+                    <i class="fas fa-check"></i><i class="fas fa-check"></i>
+                </div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
         
         if (!suppressWebSocketErrors) {

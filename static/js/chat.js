@@ -434,45 +434,82 @@ function tryAlternativeWebSocket() {
 // Mesajı əlavə et
 function appendMessage(message) {
     const chatMessages = document.getElementById('chat-messages');
-    if (!chatMessages) return;
-    
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${message.is_mine ? 'mine' : 'theirs'}`;
     
     let messageContent = '';
-    if (message.message_type === 'image' && message.file_url) {
-        messageContent = `<img src="${message.file_url}" alt="Şəkil" class="message-image">`;
-    } else if (message.message_type === 'video' && message.file_url) {
-        messageContent = `<video controls><source src="${message.file_url}" type="video/mp4">Video formatı dəstəklənmir</video>`;
-    } else if (message.message_type === 'audio' && message.file_url) {
-        messageContent = `<audio controls><source src="${message.file_url}" type="audio/mpeg">Səs formatı dəstəklənmir</audio>`;
-    } else if (message.message_type === 'file' && message.file_url) {
-        messageContent = `<div class="file-message">
-            <i class="fas fa-file"></i>
-            <span>${message.file_name}</span>
-            <span class="file-size">(${message.file_size})</span>
-            <a href="${message.file_url}" download class="download-btn">
-                <i class="fas fa-download"></i>
-            </a>
-        </div>`;
-    } else if (message.message_type === 'link' && message.file_url) {
-        messageContent = `<a href="${message.file_url}" target="_blank" class="message-link">${message.content}</a>`;
-    } else {
-        messageContent = message.content;
+    
+    switch(message.message_type) {
+        case 'image':
+            messageContent = `
+                <div class="message-content">
+                    <img src="${message.file_url}" alt="Image" class="message-image" onclick="openMedia('${message.file_url}')">
+                </div>
+            `;
+            break;
+        case 'video':
+            messageContent = `
+                <div class="message-content">
+                    <video controls class="message-video" onclick="openMedia('${message.file_url}')">
+                        <source src="${message.file_url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            `;
+            break;
+        case 'audio':
+            messageContent = `
+                <div class="message-content">
+                    <audio controls class="message-audio">
+                        <source src="${message.file_url}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            `;
+            break;
+        case 'file':
+            messageContent = `
+                <div class="message-content">
+                    <a href="${message.file_url}" download="${message.file_name}" class="message-file">
+                        <i class="fas fa-file"></i>
+                        <span>${message.file_name}</span>
+                        <span class="file-size">${message.file_size}</span>
+                    </a>
+                </div>
+            `;
+            break;
+        case 'link':
+            messageContent = `
+                <div class="message-content">
+                    <a href="${message.file_url}" target="_blank" class="message-link">
+                        <i class="fas fa-link"></i>
+                        <span>${message.file_url}</span>
+                    </a>
+                </div>
+            `;
+            break;
+        default:
+            messageContent = `
+                <div class="message-content">
+                    <span class="message-text">${message.content}</span>
+                </div>
+            `;
     }
     
     messageDiv.innerHTML = `
-        ${!message.is_mine ? `<div class="message-sender">${message.sender}</div>` : ''}
-        <div class="message-content">${messageContent}</div>
-        ${message.is_mine ? `
-            <div class="message-status ${getMessageStatus(message)}">
-                ${getStatusIcons(message)}
-            </div>
-        ` : ''}
+        <div class="message-sender">${message.sender}</div>
+        ${messageContent}
+        <div class="message-status">
+            ${getStatusIcons(message)}
+        </div>
     `;
     
     chatMessages.appendChild(messageDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function openMedia(url) {
+    window.open(url, '_blank');
 }
 
 // Chat istifadəçilərini yükləmə funksiyası
@@ -908,83 +945,32 @@ function getStatusIcons(msg) {
     }
 }
 
-// Mesaj göndərmə funksiyası
 function sendMessage() {
-    const input = document.getElementById('message-input');
+    const messageInput = document.getElementById('message-input');
     const fileInput = document.getElementById('file-input');
-    const messageType = document.getElementById('message-type').value;
+    const message = messageInput.value.trim();
+    const file = fileInput.files[0];
     
-    if (!input && !fileInput) return;
+    if (!message && !file) return;
     
-    const content = input ? input.value.trim() : '';
-    const file = fileInput ? fileInput.files[0] : null;
-    
-    // Əgər qrup seçilibsə, qrup mesajı göndər
-    if (isCurrentChatGroup && currentGroupId) {
-        sendGroupMessage();
-        return;
-    }
-    
-    // Əgər istifadəçi seçilməyibsə, funksiyadan çıx
-    if (!content && !file) return;
-
-    // Mesajı əvvəlcədən göstər
-    const tempMessageId = 'temp_' + Date.now();
-    const chatMessages = document.getElementById('chat-messages');
-    if (chatMessages) {
-        const tempMessageDiv = document.createElement('div');
-        tempMessageDiv.className = 'message mine';
-        tempMessageDiv.id = tempMessageId;
-        
-        let messageContent = '';
-        if (file) {
-            if (messageType === 'image') {
-                messageContent = `<img src="${URL.createObjectURL(file)}" alt="Şəkil" class="message-image">`;
-            } else if (messageType === 'video') {
-                messageContent = `<video controls><source src="${URL.createObjectURL(file)}" type="${file.type}">Video formatı dəstəklənmir</video>`;
-            } else if (messageType === 'audio') {
-                messageContent = `<audio controls><source src="${URL.createObjectURL(file)}" type="${file.type}">Səs formatı dəstəklənmir</audio>`;
-            } else {
-                messageContent = `<div class="file-message">
-                    <i class="fas fa-file"></i>
-                    <span>${file.name}</span>
-                    <span class="file-size">(${formatFileSize(file.size)})</span>
-                </div>`;
-            }
-        } else if (messageType === 'link') {
-            messageContent = `<a href="${content}" target="_blank" class="message-link">${content}</a>`;
-        } else {
-            messageContent = content;
-        }
-        
-        tempMessageDiv.innerHTML = `
-            <div class="message-content">${messageContent}</div>
-            <div class="message-status">
-                <i class="fas fa-check"></i>
-            </div>
-        `;
-        chatMessages.appendChild(tempMessageDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-    
-    // İnput sahəsini təmizlə
-    if (input) input.value = '';
-    if (fileInput) fileInput.value = '';
-    
-    // Mesaj sahəsini fokusla
-    if (input) input.focus();
-
-    // FormData yarat
     const formData = new FormData();
     formData.append('receiver_id', currentReceiverId);
-    formData.append('content', content);
-    formData.append('message_type', messageType);
+    
     if (file) {
         formData.append('file', file);
+        const fileType = file.type.split('/')[0];
+        formData.append('message_type', fileType === 'image' ? 'image' : 
+                       fileType === 'video' ? 'video' : 
+                       fileType === 'audio' ? 'audio' : 'file');
+    } else if (message.startsWith('http://') || message.startsWith('https://')) {
+        formData.append('content', message);
+        formData.append('message_type', 'link');
+    } else {
+        formData.append('content', message);
+        formData.append('message_type', 'text');
     }
-
-    // Mesajı göndər
-    fetch('/istifadeciler/api/chat/send/', {
+    
+    fetch('/send_message/', {
         method: 'POST',
         body: formData,
         headers: {
@@ -994,40 +980,17 @@ function sendMessage() {
     .then(response => response.json())
     .then(data => {
         if (data.status === 'success') {
-            // Müvəqqəti mesajı yenisi ilə əvəz et
-            if (chatMessages && document.getElementById(tempMessageId)) {
-                const tempMessage = document.getElementById(tempMessageId);
-                tempMessage.querySelector('.message-status').className = 'message-status read';
-                tempMessage.querySelector('.message-status').innerHTML = '<i class="fas fa-check"></i><i class="fas fa-check"></i>';
-            }
-            
-            // Mesajları yenilə
-            loadMessages(currentReceiverId);
+            appendMessage(data.message);
+            messageInput.value = '';
+            fileInput.value = '';
         } else {
-            // Müvəqqəti mesajı sil
-            if (chatMessages && document.getElementById(tempMessageId)) {
-                document.getElementById(tempMessageId).remove();
-            }
             alert(data.message);
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        // Müvəqqəti mesajı sil
-        if (chatMessages && document.getElementById(tempMessageId)) {
-            document.getElementById(tempMessageId).remove();
-        }
-        alert('Mesaj göndərilərkən xəta baş verdi');
+        alert('Mesaj göndərilmədi. Yenidən cəhd edin.');
     });
-}
-
-// Fayl ölçüsünü formatla
-function formatFileSize(bytes) {
-    if (bytes === 0) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
 }
 
 function filterUsers() {

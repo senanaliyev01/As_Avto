@@ -482,20 +482,9 @@ def send_message(request):
             if file:
                 file_name = file.name
                 file_size = file.size
-                
-                # Fayl tipini yoxla
-                if message_type == 'image' and not file.content_type.startswith('image/'):
-                    return JsonResponse({'status': 'error', 'message': 'Yalnız şəkil faylları qəbul edilir'})
-                elif message_type == 'video' and not file.content_type.startswith('video/'):
-                    return JsonResponse({'status': 'error', 'message': 'Yalnız video faylları qəbul edilir'})
-                elif message_type == 'audio' and not file.content_type.startswith('audio/'):
-                    return JsonResponse({'status': 'error', 'message': 'Yalnız səs faylları qəbul edilir'})
-            
-            # Link yoxlaması
-            if message_type == 'link':
-                if not content.startswith(('http://', 'https://')):
-                    content = 'http://' + content
+            elif message_type == 'link':
                 file_url = content
+                content = None
             
             message = Message.objects.create(
                 sender=request.user,
@@ -519,10 +508,9 @@ def send_message(request):
                     'is_delivered': True,
                     'is_read': False,
                     'message_type': message.message_type,
-                    'file_url': message.file.url if message.file else None,
+                    'file_url': message.file.url if message.file else message.file_url,
                     'file_name': message.file_name,
-                    'file_size': message.get_file_size_display(),
-                    'file_url': message.file_url
+                    'file_size': message.get_file_size_display()
                 }
             })
             

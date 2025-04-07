@@ -93,11 +93,6 @@ class Message(models.Model):
             size /= 1024
         return f"{size:.1f} TB"
 
-    class Meta:
-        ordering = ['created_at']
-        verbose_name = 'Mesajlar'
-        verbose_name_plural = 'Mesajlar'
-
 class ChatGroup(models.Model):
     name = models.CharField(max_length=100, verbose_name="Qrup adı")
     description = models.TextField(blank=True, null=True, verbose_name="Qrup təsviri")

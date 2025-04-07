@@ -635,15 +635,27 @@ function createGroupItem(group) {
     const lockClass = isLocked ? 'locked' : '';
     const onClick = isLocked ? '' : `onclick="selectGroup(${group.id}, '${group.name}')"`;
     
-    // Qrup ikonunu təyin et - kilid, ya da users ikonu
-    const icon = isLocked ? 'fa-lock' : 'fa-users';
-    const adminClass = group.is_admin ? 'admin-icon' : '';
+    // Qrup avatarı və ya ikonu təyin et
+    let avatarHtml = '';
+    
+    if (group.avatar) {
+        // Qrupun avatarı varsa onu göstər
+        avatarHtml = `<img src="${group.avatar}" alt="${group.name}" class="group-avatar">`;
+    } else {
+        // Qrupun avatarı yoxdursa, icon göstər (kilid və ya users)
+        const icon = isLocked ? 'fa-lock' : 'fa-users';
+        const adminClass = group.is_admin ? 'admin-icon' : '';
+        avatarHtml = `<i class="fas ${icon} ${adminClass}"></i>`;
+    }
     
     return `
         <div class="user-item group-item ${group.unread_count > 0 ? 'has-unread' : ''} ${lockClass}" 
              ${onClick}>
             <div class="user-info">
-                <i class="fas ${icon} ${adminClass}"></i>
+                <div class="avatar-container">
+                    ${avatarHtml}
+                    ${isLocked ? '<i class="fas fa-lock lock-overlay"></i>' : ''}
+                </div>
                 <span>${group.name}</span>
                 <span class="group-members-count">(${group.members_count})</span>
             </div>

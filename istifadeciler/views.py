@@ -597,7 +597,8 @@ def get_chat_users(request):
                     'is_admin': is_group_admin,
                     'is_locked': False,  # İstifadəçi qrupa daxil olduğu üçün kilid deyil
                     'type': 'group',
-                    'members_count': group.members.count()
+                    'members_count': group.members.count(),
+                    'avatar': group.avatar.url if group.avatar else None
                 })
             except Exception as e:
                 print(f"Qrup məlumatları hazırlanarkən xəta: {str(e)}")
@@ -615,7 +616,8 @@ def get_chat_users(request):
                             'is_admin': True,  # Admin bütün qruplar üçün admin sayılır
                             'is_locked': False,  # Admin bütün qruplara daxil ola bilir
                             'type': 'group',
-                            'members_count': group.members.count()
+                            'members_count': group.members.count(),
+                            'avatar': group.avatar.url if group.avatar else None
                         })
                     except Exception as e:
                         print(f"Admin qrup məlumatları hazırlanarkən xəta: {str(e)}")
@@ -631,7 +633,8 @@ def get_chat_users(request):
                         'is_admin': False,
                         'is_locked': True,  # Qrup kilitlidir
                         'type': 'group',
-                        'members_count': group.members.count()
+                        'members_count': group.members.count(),
+                        'avatar': group.avatar.url if group.avatar else None
                     })
                 except Exception as e:
                     print(f"Kilitli qrup məlumatları hazırlanarkən xəta: {str(e)}")

@@ -32,8 +32,8 @@ let disableNotificationSounds = false; // Bildiriş səsləri deaktiv edilib/edi
 
 // Səs faylları üçün yollar
 const SOUND_PATHS = {
-    newMessage: document.location.origin + '/static/audio/notification.mp3',
-    chatMessage: document.location.origin + '/static/audio/chat-message.mp3'
+    newMessage: '/static/audio/notification.mp3',
+    chatMessage: '/static/audio/chat-message.mp3'
 };
 
 // Audio elementləri
@@ -58,15 +58,11 @@ function getCookie(name) {
 
 // Chat funksiyasını başlat
 function initChat() {
-    if (!suppressWebSocketErrors) {
-        console.log('Chat funksiyası başladılır...');
-    }
+    console.log('Chat funksiyası başladılır...');
     
     // İstifadəçi daxil olmayıbsa, funksiyadan çıx
     if (typeof currentUserId === 'undefined' || !currentUserId) {
-        if (!suppressWebSocketErrors) {
-            console.log('İstifadəçi daxil olmayıb, chat funksiyası başladılmır');
-        }
+        console.log('İstifadəçi daxil olmayıb, chat funksiyası başladılmır');
         return;
     }
     
@@ -82,9 +78,7 @@ function initChat() {
     const chatSidebar = document.querySelector('.chat-sidebar');
 
     if (!chatIcon || !chatWindow) {
-        if (!suppressWebSocketErrors) {
-            console.log('Chat elementləri tapılmadı!');
-        }
+        console.log('Chat elementləri tapılmadı!');
         return;
     }
 
@@ -93,10 +87,8 @@ function initChat() {
         try {
             connectWebSocket();
         } catch (error) {
-            if (!suppressWebSocketErrors) {
-                console.error('WebSocket bağlantısı yaradılarkən xəta:', error);
-                console.log('WebSocket bağlantısı yaradıla bilmədi, HTTP sorğularından istifadə ediləcək');
-            }
+            console.error('WebSocket bağlantısı yaradılarkən xəta:', error);
+            console.log('WebSocket bağlantısı yaradıla bilmədi, HTTP sorğularından istifadə ediləcək');
         }
     }
 
@@ -1124,19 +1116,19 @@ function initAudio() {
             // Səsi yüklə
             newMessageSound.preload = 'auto';
             newMessageSound.volume = 1.0; // Tam səs səviyyəsi
-            
-            if (!suppressWebSocketErrors) {
+                
+                if (!suppressWebSocketErrors) {
                 console.log('Yeni mesaj bildiriş səsi yaradıldı:', SOUND_PATHS.newMessage);
             }
             
             // Yükləmə xətasını izlə
             newMessageSound.addEventListener('error', (e) => {
-                if (!suppressWebSocketErrors) {
+                    if (!suppressWebSocketErrors) {
                     console.error('Bildiriş səsi yüklənərkən xəta:', e);
-                }
+                    }
             });
         } else {
-            if (!suppressWebSocketErrors) {
+                    if (!suppressWebSocketErrors) {
                 console.error('Yeni mesaj bildiriş səsi yaradıla bilmədi!');
             }
         }
@@ -1147,16 +1139,16 @@ function initAudio() {
             chatMessageSound.preload = 'auto';
             chatMessageSound.volume = 1.0; // Tam səs səviyyəsi
             
-            if (!suppressWebSocketErrors) {
+                    if (!suppressWebSocketErrors) {
                 console.log('Chat mesaj səsi yaradıldı:', SOUND_PATHS.chatMessage);
-            }
+                    }
             
             // Yükləmə xətasını izlə
             chatMessageSound.addEventListener('error', (e) => {
-                if (!suppressWebSocketErrors) {
+                    if (!suppressWebSocketErrors) {
                     console.error('Chat mesaj səsi yüklənərkən xəta:', e);
-                }
-            });
+                    }
+                });
         } else {
             if (!suppressWebSocketErrors) {
                 console.error('Chat mesaj səsi yaradıla bilmədi!');
@@ -1195,7 +1187,7 @@ function toggleFullScreen() {
 // DOM yükləndikdə chat funksiyasını başlat
 document.addEventListener('DOMContentLoaded', function() {
     try {
-        console.log('DOM yükləndi, chat funksiyası başladılır...');
+            console.log('DOM yükləndi, chat funksiyası başladılır...');
         
         // Səs fayllarının yollarını yoxla
         console.log('Səs fayllarının yolları:');
@@ -1218,11 +1210,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // Chat funksiyasını başlat
         const chatWidget = document.getElementById('chat-widget');
         if (chatWidget) {
-            console.log('Chat widget tapıldı, inicializasiya edilir...');
+                console.log('Chat widget tapıldı, inicializasiya edilir...');
             initChat();
         } else {
-            console.log('Chat widget tapılmadı!');
-        }
+                console.log('Chat widget tapılmadı!');
+            }
         
         // Bir neçə saniyə sonra audio elementlərini yenidən yükləməyə çalış (bəzi brauzerlər üçün)
         setTimeout(() => {
@@ -1232,8 +1224,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     } catch (error) {
         // Xətaları göstər
-        console.error('Chat inicializasiya edilərkən xəta:', error);
-    }
+            console.error('Chat inicializasiya edilərkən xəta:', error);
+        }
 });
 
 // Səs faylının mövcudluğunu yoxlamaq üçün test funksiyası

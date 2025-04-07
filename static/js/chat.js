@@ -34,10 +34,6 @@ let currentGroupId = null;
 let currentGroupName = null;
 let isCurrentChatGroup = false; // Chat-ın qrup və ya şəxsi olduğunu saxlayır
 
-let mediaRecorder;
-let audioChunks = [];
-let isRecording = false;
-
 // CSRF token funksiyası
 function getCookie(name) {
     let cookieValue = null;
@@ -438,82 +434,23 @@ function tryAlternativeWebSocket() {
 // Mesajı əlavə et
 function appendMessage(message) {
     const chatMessages = document.getElementById('chat-messages');
+    if (!chatMessages) return;
+    
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${message.is_mine ? 'mine' : 'theirs'}`;
     
-    let messageContent = '';
-    
-    switch(message.message_type) {
-        case 'image':
-            messageContent = `
-                <div class="message-content">
-                    <img src="${message.file_url}" alt="Image" class="message-image" onclick="openMedia('${message.file_url}')">
-                </div>
-            `;
-            break;
-        case 'video':
-            messageContent = `
-                <div class="message-content">
-                    <video controls class="message-video" onclick="openMedia('${message.file_url}')">
-                        <source src="${message.file_url}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                </div>
-            `;
-            break;
-        case 'audio':
-            messageContent = `
-                <div class="message-content">
-                    <audio controls class="message-audio">
-                        <source src="${message.file_url}" type="audio/mpeg">
-                        Your browser does not support the audio element.
-                    </audio>
-                </div>
-            `;
-            break;
-        case 'file':
-            messageContent = `
-                <div class="message-content">
-                    <a href="${message.file_url}" download="${message.file_name}" class="message-file">
-                        <i class="fas fa-file"></i>
-                        <span>${message.file_name}</span>
-                        <span class="file-size">${message.file_size}</span>
-                    </a>
-                </div>
-            `;
-            break;
-        case 'link':
-            messageContent = `
-                <div class="message-content">
-                    <a href="${message.file_url}" target="_blank" class="message-link">
-                        <i class="fas fa-link"></i>
-                        <span>${message.file_url}</span>
-                    </a>
-                </div>
-            `;
-            break;
-        default:
-            messageContent = `
-                <div class="message-content">
-                    <span class="message-text">${message.content}</span>
-                </div>
-            `;
-    }
-    
     messageDiv.innerHTML = `
-        <div class="message-sender">${message.sender}</div>
-        ${messageContent}
-        <div class="message-status">
-            ${getStatusIcons(message)}
-        </div>
+        ${!message.is_mine ? `<div class="message-sender">${message.sender}</div>` : ''}
+        <div class="message-content">${message.content}</div>
+        ${message.is_mine ? `
+            <div class="message-status ${getMessageStatus(message)}">
+                ${getStatusIcons(message)}
+            </div>
+        ` : ''}
     `;
     
     chatMessages.appendChild(messageDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-function openMedia(url) {
-    window.open(url, '_blank');
 }
 
 // Chat istifadəçilərini yükləmə funksiyası
@@ -950,66 +887,186 @@ function getStatusIcons(msg) {
 }
 
 function sendMessage() {
-    const messageInput = document.getElementById('message-input');
-    const fileInput = document.getElementById('file-input');
-    const content = messageInput.value.trim();
-    const file = fileInput.files[0];
+    const input = document.getElementById('message-input');
+    if (!input) return;
     
-    if (!content && !file) {
+    const content = input.value.trim();
+    
+    // Əgər qrup seçilibsə, qrup mesajı göndər
+    if (isCurrentChatGroup && currentGroupId) {
+        sendGroupMessage();
         return;
     }
     
-    const formData = new FormData();
-    if (content) {
-        formData.append('content', content);
+    // Əgər istifadəçi seçilməyibsə, funksiyadan çıx
+    if (!content || !currentReceiverId) return;
+
+    if (!suppressWebSocketErrors) {
+        console.log(`Mesaj göndərilir: ${content} (Alıcı ID: ${currentReceiverId})`);
     }
-    if (file) {
-        formData.append('file', file);
+
+    // Mesajı əvvəlcədən göstər (daha yaxşı istifadəçi təcrübəsi üçün)
+    const tempMessageId = 'temp_' + Date.now();
+    const chatMessages = document.getElementById('chat-messages');
+    if (chatMessages) {
+        const tempMessageDiv = document.createElement('div');
+        tempMessageDiv.className = 'message mine';
+        tempMessageDiv.id = tempMessageId;
+        tempMessageDiv.innerHTML = `
+            <div class="message-content">${content}</div>
+            <div class="message-status">
+                <i class="fas fa-check"></i>
+            </div>
+        `;
+        chatMessages.appendChild(tempMessageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
     }
     
-    // Determine message type
-    let messageType = 'text';
-    if (file) {
-        if (file.type.startsWith('image/')) {
-            messageType = 'image';
-        } else if (file.type.startsWith('video/')) {
-            messageType = 'video';
-        } else if (file.type.startsWith('audio/')) {
-            messageType = 'audio';
-        } else {
-            messageType = 'file';
+    // İnput sahəsini təmizlə
+    input.value = '';
+    
+    // Mesaj sahəsini fokusla
+    input.focus();
+
+    // WebSocket ilə mesaj göndərməyə çalış (yalnız HTTP istifadə edilmirsə)
+    let websocketSent = false;
+    if (!useOnlyHTTP && usingWebSocket && chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+        try {
+            chatSocket.send(JSON.stringify({
+                'message': content,
+                'sender': currentUserId,
+                'receiver': currentReceiverId
+            }));
+            websocketSent = true;
+            if (!suppressWebSocketErrors) {
+                console.log('Mesaj WebSocket ilə göndərildi');
+            }
+        } catch (error) {
+            if (!suppressWebSocketErrors) {
+                console.error('WebSocket ilə mesaj göndərilərkən xəta:', error);
+            }
         }
-    } else if (content.match(/^https?:\/\/\S+$/)) {
-        messageType = 'link';
+    } else {
+        if (!suppressWebSocketErrors) {
+            console.log('WebSocket bağlantısı açıq deyil, HTTP sorğusu ilə mesaj göndərilir');
+        }
+    }
+
+    // Əgər mesaj göndərilməkdədirsə, yeni sorğu göndərmə
+    if (window.sendingMessage) {
+        if (!suppressWebSocketErrors) {
+            console.log('Mesaj artıq göndərilir, gözlənilir...');
+        }
+        return;
     }
     
-    formData.append('message_type', messageType);
-    
-    fetch('/send_message/', {
+    window.sendingMessage = true;
+
+    // HTTP sorğusu ilə mesaj göndər
+    const formData = new FormData();
+    formData.append('receiver_id', currentReceiverId);
+    formData.append('content', content);
+
+    fetch('/istifadeciler/api/chat/send/', {
         method: 'POST',
         body: formData,
         headers: {
-            'X-CSRFToken': getCookie('csrftoken')
-        }
+            'X-CSRFToken': getCookie('csrftoken'),
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        timeout: 10000 // 10 saniyə timeout
     })
     .then(response => {
+        window.sendingMessage = false;
+        
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            if (response.status === 502) {
+                if (!suppressWebSocketErrors) {
+                    console.error('Bad Gateway xətası (502): Server cavab vermir');
+                }
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
         return response.json();
     })
     .then(data => {
+        if (!suppressWebSocketErrors) {
+            console.log('Mesaj göndərildi:', data);
+        }
+        
         if (data.status === 'success') {
-            appendMessage(data.message);
-            messageInput.value = '';
-            fileInput.value = '';
+            // Müvəqqəti mesajı yenisi ilə əvəz et
+            if (chatMessages && document.getElementById(tempMessageId)) {
+                const tempMessage = document.getElementById(tempMessageId);
+                tempMessage.querySelector('.message-status').className = 'message-status read';
+                tempMessage.querySelector('.message-status').innerHTML = '<i class="fas fa-check"></i><i class="fas fa-check"></i>';
+            }
+            
+            // Mesajları yenilə
+            loadMessages(currentReceiverId);
+            
+            // Uğurlu sorğudan sonra xəta sayğacını sıfırla
+            window.sendMessageErrors = 0;
         } else {
-            alert(data.message || 'Mesaj göndərilmədi!');
+            // Müvəqqəti mesajı sil
+            if (chatMessages && document.getElementById(tempMessageId)) {
+                document.getElementById(tempMessageId).remove();
+            }
+            
+            if (!suppressWebSocketErrors) {
+                console.error('Mesaj göndərilə bilmədi:', data.message);
+            }
+            if (typeof showAnimatedMessage === 'function') {
+                showAnimatedMessage('Mesaj göndərilə bilmədi: ' + data.message, true);
+            } else {
+                alert('Mesaj göndərilə bilmədi: ' + data.message);
+            }
         }
     })
     .catch(error => {
-        console.error('Error sending message:', error);
-        alert('Mesaj göndərilmədi!');
+        window.sendingMessage = false;
+        
+        // Xəta sayğacını artır
+        window.sendMessageErrors = (window.sendMessageErrors || 0) + 1;
+        
+        // Müvəqqəti mesajı sil
+        if (chatMessages && document.getElementById(tempMessageId)) {
+            document.getElementById(tempMessageId).remove();
+        }
+        
+        if (!suppressWebSocketErrors) {
+            console.error('Mesaj göndərilərkən xəta:', error);
+        }
+        
+        // Əgər 3-dən az xəta varsa və 502 xətasıdırsa, yenidən cəhd et
+        if (window.sendMessageErrors < 3 && error.message && error.message.includes('502')) {
+            if (!suppressWebSocketErrors) {
+                console.log(`Mesaj göndərilərkən server xətası baş verdi, ${window.sendMessageErrors} cəhd. 5 saniyə sonra yenidən cəhd ediləcək...`);
+            }
+            
+            // Mesajı yenidən göndərmək üçün input-a qaytar
+            input.value = content;
+            
+            // 5 saniyə sonra yenidən cəhd et
+            setTimeout(() => {
+                if (typeof showAnimatedMessage === 'function') {
+                    showAnimatedMessage('Mesaj göndərilməyə yenidən cəhd edilir...', false);
+                }
+                sendMessage();
+            }, 5000);
+        } else {
+            if (typeof showAnimatedMessage === 'function') {
+                showAnimatedMessage('Mesaj göndərilərkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.', true);
+            } else {
+                alert('Mesaj göndərilərkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+            }
+            
+            // 1 dəqiqə sonra xəta sayğacını sıfırla
+            setTimeout(() => {
+                window.sendMessageErrors = 0;
+            }, 60000);
+        }
     });
 }
 
@@ -1547,96 +1604,4 @@ function sendGroupMessage() {
             }, 60000);
         }
     });
-}
-
-function startVoiceRecording() {
-    const voiceButton = document.querySelector('.voice-button');
-    
-    if (!isRecording) {
-        navigator.mediaDevices.getUserMedia({ audio: true })
-            .then(stream => {
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-                
-                mediaRecorder.ondataavailable = event => {
-                    audioChunks.push(event.data);
-                };
-                
-                mediaRecorder.onstop = () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    
-                    // Create audio file from blob
-                    const audioFile = new File([audioBlob], 'voice-message.wav', { type: 'audio/wav' });
-                    
-                    // Send the audio file
-                    const fileInput = document.getElementById('file-input');
-                    const dataTransfer = new DataTransfer();
-                    dataTransfer.items.add(audioFile);
-                    fileInput.files = dataTransfer.files;
-                    
-                    // Trigger file upload
-                    sendMessage();
-                };
-                
-                mediaRecorder.start();
-                isRecording = true;
-                voiceButton.classList.add('recording');
-            })
-            .catch(error => {
-                console.error('Error accessing microphone:', error);
-                alert('Mikrofon istifadəsinə icazə verilməyib!');
-            });
-    } else {
-        mediaRecorder.stop();
-        isRecording = false;
-        voiceButton.classList.remove('recording');
-    }
-}
-
-function openCamera() {
-    const constraints = {
-        video: true,
-        audio: false
-    };
-    
-    navigator.mediaDevices.getUserMedia(constraints)
-        .then(stream => {
-            const video = document.createElement('video');
-            video.srcObject = stream;
-            video.autoplay = true;
-            
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            
-            video.onloadedmetadata = () => {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                
-                // Draw video frame to canvas
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                
-                // Convert canvas to blob
-                canvas.toBlob(blob => {
-                    // Create image file from blob
-                    const imageFile = new File([blob], 'camera-photo.jpg', { type: 'image/jpeg' });
-                    
-                    // Send the image file
-                    const fileInput = document.getElementById('file-input');
-                    const dataTransfer = new DataTransfer();
-                    dataTransfer.items.add(imageFile);
-                    fileInput.files = dataTransfer.files;
-                    
-                    // Trigger file upload
-                    sendMessage();
-                    
-                    // Stop video stream
-                    stream.getTracks().forEach(track => track.stop());
-                }, 'image/jpeg');
-            };
-        })
-        .catch(error => {
-            console.error('Error accessing camera:', error);
-            alert('Kameraya giriş icazəsi verilməyib!');
-        });
 } 

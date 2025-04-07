@@ -60,38 +60,18 @@ class LoginCode(models.Model):
 class Message(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
-    content = models.TextField(blank=True, null=True)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
     is_delivered = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    
-    # Yeni sahələr
-    message_type = models.CharField(max_length=20, choices=[
-        ('text', 'Text'),
-        ('image', 'Image'),
-        ('video', 'Video'),
-        ('audio', 'Audio'),
-        ('file', 'File'),
-        ('link', 'Link')
-    ], default='text')
-    
-    file = models.FileField(upload_to='chat_files/', null=True, blank=True)
-    file_name = models.CharField(max_length=255, null=True, blank=True)
-    file_size = models.IntegerField(null=True, blank=True)  # Fayl ölçüsü bayt cinsindən
-    file_url = models.URLField(max_length=500, null=True, blank=True)  # Link üçün
-    
+
+    class Meta:
+        ordering = ['created_at']
+        verbose_name = 'Mesajlar'
+        verbose_name_plural = 'Mesajlar'
+
     def __str__(self):
-        return f"{self.sender.username} -> {self.receiver.username}: {self.content[:50]}"
-    
-    def get_file_size_display(self):
-        if not self.file_size:
-            return "0 B"
-        size = self.file_size
-        for unit in ['B', 'KB', 'MB', 'GB']:
-            if size < 1024:
-                return f"{size:.1f} {unit}"
-            size /= 1024
-        return f"{size:.1f} TB"
+        return f'Message from {self.sender.username} to {self.receiver.username}'
 
 class ChatGroup(models.Model):
     name = models.CharField(max_length=100, verbose_name="Qrup adı")

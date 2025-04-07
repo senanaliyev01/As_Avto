@@ -1263,71 +1263,49 @@ html {
 }
 
 .chat-input {
+    padding: 10px;
     display: flex;
     align-items: center;
-    padding: 10px;
-    background: #f5f5f5;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--primary-color);
 }
 
-.chat-input-buttons {
-    display: flex;
-    gap: 5px;
-    margin-right: 10px;
-}
-
-.voice-button,
-.camera-button,
-.file-button {
-    background: none;
-    border: none;
-    color: #666;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-}
-
-.voice-button:hover,
-.camera-button:hover,
-.file-button:hover {
-    background: #e0e0e0;
-    color: #333;
-}
-
-.voice-button.recording {
-    color: #ff4444;
-    animation: pulse 1.5s infinite;
-}
-
-.chat-input input[type="text"] {
+.chat-input input {
     flex: 1;
-    padding: 10px 15px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 20px;
+    padding: 8px 15px;
     outline: none;
-    font-size: 14px;
+    background-color: var(--secondary-color);
+    color: var(--text-primary);
+    transition: border-color 0.2s;
 }
 
-.chat-input button[onclick="sendMessage()"] {
-    background: #4CAF50;
-    color: white;
+.chat-input input:focus {
+    border-color: var(--accent-color);
+}
+
+.chat-input input::placeholder {
+    color: var(--text-secondary);
+}
+
+.chat-input button {
+    background-color: var(--accent-color);
+    color: var(--text-primary);
     border: none;
-    padding: 10px 15px;
-    border-radius: 20px;
-    cursor: pointer;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
     margin-left: 10px;
-    transition: background 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
 }
 
-.chat-input button[onclick="sendMessage()"]:hover {
-    background: #45a049;
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
+.chat-input button:hover {
+    background-color: var(--highlight-color);
 }
 
 /* Rəy bildirişi stillərini əlavə edirəm */
@@ -1938,123 +1916,4 @@ html {
     justify-content: center;
     font-size: 10px;
     border: 1px solid var(--border-color);
-}
-
-.message-image {
-    max-width: 300px;
-    max-height: 300px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.message-image:hover {
-    transform: scale(1.05);
-}
-
-.message-video {
-    max-width: 300px;
-    max-height: 300px;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.message-audio {
-    width: 100%;
-    max-width: 300px;
-}
-
-.message-file {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    background-color: #f0f0f0;
-    border-radius: 8px;
-    text-decoration: none;
-    color: #333;
-    transition: background-color 0.2s;
-}
-
-.message-file:hover {
-    background-color: #e0e0e0;
-}
-
-.message-file i {
-    margin-right: 10px;
-    font-size: 20px;
-}
-
-.message-file span {
-    margin-right: 10px;
-}
-
-.file-size {
-    color: #666;
-    font-size: 0.8em;
-}
-
-.message-link {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    background-color: #f0f0f0;
-    border-radius: 8px;
-    text-decoration: none;
-    color: #333;
-    transition: background-color 0.2s;
-    word-break: break-all;
-}
-
-.message-link:hover {
-    background-color: #e0e0e0;
-}
-
-.message-link i {
-    margin-right: 10px;
-    font-size: 20px;
-}
-
-.chat-input {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    background-color: #f0f0f0;
-    border-top: 1px solid #ddd;
-}
-
-.chat-input input[type="text"] {
-    flex: 1;
-    padding: 10px;
-    border: none;
-    border-radius: 20px;
-    margin-right: 10px;
-    outline: none;
-}
-
-.chat-input input[type="file"] {
-    display: none;
-}
-
-.chat-input button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.chat-input button:hover {
-    background-color: #0056b3;
-}
-
-.chat-input .file-button {
-    margin-right: 10px;
-    background-color: #6c757d;
-}
-
-.chat-input .file-button:hover {
-    background-color: #5a6268;
 }

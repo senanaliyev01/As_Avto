@@ -28,6 +28,7 @@ let chatSocket = null;
 let usingWebSocket = false; // WebSocket istifadə edilib-edilmədiyini izləmək üçün
 let suppressWebSocketErrors = true; // WebSocket xətalarını gizlətmək üçün
 let useOnlyHTTP = true; // Yalnız HTTP istifadə et, WebSocket-i tamamilə söndür
+let disableNotificationSounds = false; // Bildiriş səslərini söndürmək üçün
 
 // CSRF token funksiyası
 function getCookie(name) {
@@ -45,7 +46,42 @@ function getCookie(name) {
     return cookieValue;
 }
 
+// Səs fayllarını çalmaq üçün funksiyalar
+function playNewMessageSound() {
+    try {
+        const audio = document.getElementById('new-message-sound');
+        if (audio && !disableNotificationSounds) {
+            audio.currentTime = 0;
+            audio.play().catch(error => {
+                if (!suppressWebSocketErrors) {
+                    console.warn('Bildiriş səsi çalınarkən xəta:', error);
+                }
+            });
+        }
+    } catch (error) {
+        if (!suppressWebSocketErrors) {
+            console.error('Bildiriş səsi çalınarkən xəta:', error);
+        }
+    }
+}
 
+function playChatMessageSound() {
+    try {
+        const audio = document.getElementById('chat-message-sound');
+        if (audio && !disableNotificationSounds) {
+            audio.currentTime = 0;
+            audio.play().catch(error => {
+                if (!suppressWebSocketErrors) {
+                    console.warn('Chat mesaj səsi çalınarkən xəta:', error);
+                }
+            });
+        }
+    } catch (error) {
+        if (!suppressWebSocketErrors) {
+            console.error('Chat mesaj səsi çalınarkən xəta:', error);
+        }
+    }
+}
 
 // Chat funksiyasını başlat
 function initChat() {
@@ -1158,6 +1194,35 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Chat widget tapıldı, inicializasiya edilir...');
             }
             initChat();
+            
+            // Səs testini gizli formada əlavə et (istifadəçi qarşılıqlı əlaqəsi üçün)
+            document.addEventListener('click', function testAudioOnFirstInteraction() {
+                // Səs testini gizli şəkildə yoxla
+                const newMessageSound = document.getElementById('new-message-sound');
+                const chatMessageSound = document.getElementById('chat-message-sound');
+                
+                if (newMessageSound && chatMessageSound) {
+                    // Səsləri 0 səviyyəsində oynat və dayandır
+                    newMessageSound.volume = 0;
+                    chatMessageSound.volume = 0;
+                    
+                    // İlk qarşılıqlı əlaqədə səsləri test et
+                    newMessageSound.play().then(() => {
+                        newMessageSound.pause();
+                        newMessageSound.currentTime = 0;
+                        newMessageSound.volume = 1;
+                    }).catch(() => {});
+                    
+                    chatMessageSound.play().then(() => {
+                        chatMessageSound.pause();
+                        chatMessageSound.currentTime = 0;
+                        chatMessageSound.volume = 1;
+                    }).catch(() => {});
+                }
+                
+                // Bu eventi yalnız bir dəfə işlət
+                document.removeEventListener('click', testAudioOnFirstInteraction);
+            }, { once: true });
         } else {
             if (!suppressWebSocketErrors) {
                 console.log('Chat widget tapılmadı!');

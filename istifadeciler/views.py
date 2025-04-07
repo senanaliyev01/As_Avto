@@ -16,6 +16,7 @@ from django.urls import reverse
 from django.utils import timezone
 import re
 from esasevim.views import esasevim
+from django.core.files.storage import FileSystemStorage
 
 def check_code_expiration(request):
     """Təhlükəsizlik kodunun müddətini yoxlayır"""
@@ -464,38 +465,37 @@ def get_messages(request, receiver_id):
 def send_message(request):
     if request.method == 'POST':
         try:
-            receiver_id = request.POST.get('receiver_id')
-            content = request.POST.get('content')
+            content = request.POST.get('content', '').strip()
+            file = request.FILES.get('file')
             message_type = request.POST.get('message_type', 'text')
             
-            if not content and not request.FILES.get('file'):
-                return JsonResponse({'status': 'error', 'message': 'Mesaj boş ola bilməz'})
-                
-            receiver = User.objects.get(id=receiver_id)
+            if not content and not file:
+                return JsonResponse({'status': 'error', 'message': 'Mesaj və ya fayl boş ola bilməz!'})
             
             # Fayl yükləmə
-            file = request.FILES.get('file')
+            file_url = None
             file_name = None
             file_size = None
-            file_url = None
             
             if file:
+                # Fayl adını və ölçüsünü al
                 file_name = file.name
                 file_size = file.size
-            elif message_type == 'link':
-                file_url = content
-                content = None
+                
+                # Faylı yüklə
+                fs = FileSystemStorage(location='media/chat_files')
+                filename = fs.save(file.name, file)
+                file_url = fs.url(filename)
             
+            # Mesaj yarat
             message = Message.objects.create(
                 sender=request.user,
-                receiver=receiver,
                 content=content,
                 message_type=message_type,
                 file=file,
                 file_name=file_name,
                 file_size=file_size,
-                file_url=file_url,
-                is_delivered=True
+                file_url=file_url
             )
             
             return JsonResponse({
@@ -505,21 +505,19 @@ def send_message(request):
                     'content': message.content,
                     'sender': message.sender.username,
                     'is_mine': True,
-                    'is_delivered': True,
-                    'is_read': False,
+                    'is_delivered': message.is_delivered,
+                    'is_read': message.is_read,
                     'message_type': message.message_type,
-                    'file_url': message.file.url if message.file else message.file_url,
+                    'file_url': message.file_url,
                     'file_name': message.file_name,
-                    'file_size': message.get_file_size_display()
+                    'file_size': message.get_file_size_display() if message.file_size else None
                 }
             })
             
-        except User.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'İstifadəçi tapılmadı'})
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)})
-            
-    return JsonResponse({'status': 'error', 'message': 'Yanlış sorğu metodu'})
+    
+    return JsonResponse({'status': 'error', 'message': 'Yalnız POST sorğuları qəbul edilir!'})
 
 @login_required
 def get_chat_users(request):

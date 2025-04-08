@@ -56,5 +56,3 @@ class LoginCode(models.Model):
     class Meta:
         verbose_name = 'Giriş Kodları'
         verbose_name_plural = 'Giriş Kodları'
-class Message(models.Model):
-    adi = models.TextField(max_length=155, null=True,blank=True)

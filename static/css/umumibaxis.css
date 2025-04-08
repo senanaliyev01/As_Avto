@@ -278,33 +278,69 @@ body {
 /* Məhsul əməliyyatları */
 .product-actions {
     display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
+    gap: 10px;
+    margin-top: 15px;
+    align-items: center;
+}
+
+.quantity-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.quantity-input {
+    width: 60px;
+    padding: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    background-color: #1f3756;
+    color: white;
+    text-align: center;
+}
+
+.quantity-error {
+    color: #ff6b6b;
+    font-size: 0.8rem;
+    height: 0;
+    overflow: hidden;
+    transition: height 0.3s ease;
+}
+
+.quantity-error.show {
+    height: auto;
 }
 
 .info-link,
 .cart-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 15px;
+    border-radius: 4px;
     text-decoration: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
 .info-link {
-    background-color: #00a8e1; /* Mavi - Ətraflı */
-    color: #ffffff;
+    background-color: #1e3a8a;
+    color: white;
 }
 
 .cart-icon {
-    background-color: #ff6f61; /* Qırmızı - Səbətə əlavə et */
-    color: #ffffff;
+    background-color: #2563eb;
+    color: white;
+    border: none;
 }
 
 .info-link:hover {
-    background-color: #008bb5; /* Hover zamanı tünd mavi */
+    background-color: #2563eb;
+    transform: translateY(-2px);
 }
 
 .cart-icon:hover {
-    background-color: #e65c50; /* Hover zamanı tünd qırmızı */
+    background-color: #1d4ed8;
+    transform: translateY(-2px);
 }
 

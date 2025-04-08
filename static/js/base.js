@@ -250,76 +250,76 @@
                 width: 100%;
             }
             .message-text {
-                flex: 1;
-            }
-            .success-checkmark {
-                width: 30px;
-                height: 30px;
-                background: #4caf50;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            .check-icon {
-                width: 20px;
-                height: 20px;
-                background: #fff;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                animation: pop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            }
-            .check-icon i {
-                color: #4caf50;
-                font-size: 12px;
-            }
-            .error-icon {
-                width: 30px;
-                height: 30px;
-                background: #dc3545;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            .error-icon i {
-                color: #fff;
-                font-size: 16px;
-            }
-            .product-info {
-                margin-top: 10px;
+                font-size: 1rem;
+                font-weight: 500;
                 display: flex;
                 flex-direction: column;
                 gap: 5px;
             }
-            .product-image-image-tr {
-                width: 50px;
-                height: 50px;
-                object-fit: cover;
-                border-radius: 4px;
+            .success-checkmark {
+                width: 30px;
+                height: 30px;
+                position: relative;
             }
+            .check-icon {
+                width: 30px;
+                height: 30px;
+                position: relative;
+                border-radius: 50%;
+                background-color: #4CAF50;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                animation: pop 0.5s forwards;
+            }
+            .check-icon i {
+                color: white;
+                font-size: 16px;
+            }
+            @keyframes pop {
+                0% { transform: scale(0) }
+                50% { transform: scale(1.2) }
+                100% { transform: scale(1) }
+            }
+            .product-info {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin: 10px 0;
+                padding: 8px;
+                background: #f8f9fa;
+                border-radius: 6px;
+            }
+            
+            .product-image-image-tr {
+                width: 80px;
+                height: auto;
+                object-fit: cover;
+            }
+            
             .product-name {
-                font-size: 14px;
-                color: #fff;
+                font-size: 0.9em;
+                font-weight: 500;
+                color: #495057;
             }
         `;
 
         document.head.appendChild(style);
         document.body.appendChild(messageDiv);
 
-        // Animasiya başlat
+        // Mesajın görünməsi
         requestAnimationFrame(() => {
             messageDiv.style.right = '20px';
+            messageDiv.style.transform = 'translateY(0)';
         });
 
-        // 3 saniyədən sonra mesajı sil
+        // 3 saniyədən sonra mesajın yox olması
         setTimeout(() => {
             messageDiv.style.right = '-400px';
+            messageDiv.style.transform = 'translateY(10px)';
+            
             setTimeout(() => {
-                messageDiv.remove();
-                style.remove();
+                document.body.removeChild(messageDiv);
             }, 500);
         }, 3000);
     }
@@ -977,72 +977,39 @@
     });
 
     function addToCartWithQuantity(productId) {
-        const quantityInput = document.querySelector(`.quantity-input[data-product-id="${productId}"]`);
-        const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
-        const cartButton = document.querySelector(`button[onclick="addToCartWithQuantity(${productId})"]`);
-        
-        if (cartButton) {
-            // Spinner əlavə et
-            const spinner = document.createElement('div');
-            spinner.className = 'spinner';
-            spinner.innerHTML = '<i class="fas fa-shopping-cart"></i>';
-            cartButton.innerHTML = '';
-            cartButton.appendChild(spinner);
-            
-            // Spinner animasiyası
-            spinner.style.animation = 'spin 1s linear infinite';
-            
-            // CSRF token əldə et
-            const csrftoken = getCookie('csrftoken');
-            
-            // API-yə sorğu göndər
-            fetch('/add_to_cart/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrftoken
-                },
-                body: JSON.stringify({
-                    product_id: productId,
-                    quantity: quantity
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Səbət sayını yenilə
-                    updateCartCount();
-                    
-                    // Uğurlu mesaj göstər
-                    showAnimatedMessage('Məhsul səbətə əlavə edildi', false, {
-                        adi: data.product_name,
-                        oem: data.product_oem,
-                        sekil: data.product_image
-                    });
-                    
-                    // Spinner animasiyasını dayandır və orijinal ikonu bərpa et
-                    setTimeout(() => {
-                        spinner.style.animation = 'none';
-                        cartButton.innerHTML = '<i class="fas fa-shopping-cart"></i>';
-                    }, 1000);
-                } else {
-                    // Xəta mesajı göstər
-                    showAnimatedMessage(data.message || 'Xəta baş verdi', true);
-                    
-                    // Spinner animasiyasını dayandır və orijinal ikonu bərpa et
-                    spinner.style.animation = 'none';
-                    cartButton.innerHTML = '<i class="fas fa-shopping-cart"></i>';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showAnimatedMessage('Xəta baş verdi', true);
-                
-                // Spinner animasiyasını dayandır və orijinal ikonu bərpa et
-                spinner.style.animation = 'none';
-                cartButton.innerHTML = '<i class="fas fa-shopping-cart"></i>';
-            });
+        const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
+        const quantity = parseInt(quantityInput.value);
+
+        if (isNaN(quantity) || quantity <= 0) {
+            showAnimatedMessage('Zəhmət olmasa düzgün miqdar daxil edin', true);
+            return;
         }
+
+        if (quantity > 999) {
+            showAnimatedMessage('Maksimum 999 ədəd sifariş edə bilərsiniz', true);
+            return;
+        }
+
+        fetch(`/sebet/ekle/${productId}/?miqdar=${quantity}`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAnimatedMessage(`${data.mehsul.adi} səbətə əlavə edildi (${quantity} ədəd)`, false, data.mehsul);
+                updateCartCount();
+            } else {
+                showAnimatedMessage(data.error || 'Xəta baş verdi', true);
+            }
+        })
+        .catch(error => {
+            showAnimatedMessage('Xəta baş verdi', true);
+            console.error('Error:', error);
+        });
     }
 
     function validateQuantity(input) {

@@ -354,27 +354,63 @@ body {
     transform: scale(1.1);
 }
 
-/* Cart Button */
+/* Product Actions */
+.product-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    align-items: center;
+}
+
+.quantity-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.quantity-input {
+    width: 60px;
+    padding: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    background-color: #1f3756;
+    color: white;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.quantity-error {
+    color: #ff6b6b;
+    font-size: 0.8rem;
+    height: 0;
+    overflow: hidden;
+    transition: height 0.3s ease;
+}
+
+.quantity-error.show {
+    height: auto;
+}
+
 .cart-icon {
     display: inline-flex;
     align-items: center;
-    gap: 1rem;
-    padding: 1rem 2rem;
-    margin-top: 2rem;
-    background: linear-gradient(135deg, #1565c0, #0d47a1);
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
     color: white;
-    text-decoration: none;
-    border-radius: 10px;
-    font-weight: 600;
-    transition: all 0.3s ease;
     border: none;
-    box-shadow: 0 4px 15px rgba(13, 71, 161, 0.3);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    font-weight: 500;
 }
 
 .cart-icon:hover {
-    background: linear-gradient(135deg, #0d47a1, #1565c0);
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(13, 71, 161, 0.4);
+    background: linear-gradient(135deg, #1d4ed8, #2563eb);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .cart-icon i {
@@ -383,7 +419,7 @@ body {
 }
 
 .cart-icon:hover i {
-    transform: scale(1.2) rotate(5deg);
+    transform: scale(1.1);
 }
 
 /* Responsive Design */
@@ -425,6 +461,19 @@ body {
         padding: 1.5rem;
     }
 
+    .product-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .quantity-container {
+        width: 100%;
+    }
+    
+    .quantity-input {
+        width: 100%;
+    }
+    
     .cart-icon {
         width: 100%;
         justify-content: center;

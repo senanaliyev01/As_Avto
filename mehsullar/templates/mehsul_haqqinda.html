@@ -83,10 +83,22 @@
                 </div>
             </div>
 
-            <a href="{% url 'sebet_ekle' mehsul.id %}" class="cart-icon" data-product-id="{{ mehsul.id }}">
-                <i class="fas fa-shopping-cart"></i>
-                <span>Səbətə Əlavə Et</span>
-            </a>
+            <div class="product-actions">
+                <div class="quantity-container">
+                    <input type="number" 
+                           class="quantity-input" 
+                           value="1" 
+                           min="1" 
+                           max="999"
+                           data-product-id="{{ mehsul.id }}"
+                           onchange="validateQuantity(this)">
+                    <div class="quantity-error"></div>
+                </div>
+                <button onclick="addToCartWithQuantity({{ mehsul.id }})" class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Səbətə Əlavə Et</span>
+                </button>
+            </div>
         </div>
     </div>
 

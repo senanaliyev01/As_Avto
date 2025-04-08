@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.models import User
 from django.utils.html import format_html
 from django.urls import reverse
-from .models import Profile, Message, LoginCode, ChatGroup, GroupMember, GroupMessage
+from .models import Profile, Message, LoginCode
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.contrib.auth.admin import UserAdmin

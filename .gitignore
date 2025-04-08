@@ -5,10 +5,10 @@ venv/
 # Environment Variables
 .env
 
-# Migrations (Amma əsas `__init__.py` faylını saxlamalısan)
-**/migrations/*.pyc
+# Migrations (yalnız __init__.py qalacaq)
 **/migrations/*.py
 !**/migrations/__init__.py
+**/migrations/*.pyc
 
 # Database
 *.sqlite3

@@ -43,7 +43,7 @@ class LoginCode(models.Model):
 
     @classmethod
     def generate_code(cls):
-        # 6 xanalı təsadüfi kod yaratmaq (hərf və rəqəmlər)
+        # 6 xan2alı təsadüfi kod yaratmaq (hərf və rəqəmlər)
         chars = string.ascii_uppercase + string.digits
         return ''.join(random.choice(chars) for _ in range(10))
 

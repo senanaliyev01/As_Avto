@@ -14,12 +14,7 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    {% if user.is_authenticated %}
-    <script>
-        const currentUserId = {{ user.id }};
-        const isAdmin = {% if user.is_staff %}true{% else %}false{% endif %};
-    </script>
-    {% endif %}
+  
     
     <!-- Navbar -->
     <div class="main-nav">
@@ -126,7 +121,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; {% now "Y" %} AS-Avto. Bütün hüquqlar qorunur. | Dizayn: <a href="#">AS-Avto</a></p>
+            <p>&copy; {% now "2024"-"Y" %} AS-Avto. Bütün hüquqlar qorunur. | Dizayn: <a href="#">AS-Avto</a></p>
         </div>
     </footer>
 
@@ -157,61 +152,16 @@
         </div>
     </div>
 
-    {% if user.is_authenticated %}
+    
   
 
-    <!-- Chat widget -->
-    <div id="chat-widget" class="chat-widget">
-        <div id="chat-icon" class="chat-icon">
-            <i class="fas fa-comments"></i>
-            <span id="total-unread" class="unread-count" style="display: none;">0</span>
-        </div>
-        
-        <div id="chat-window" class="chat-window" style="display: none;">
-            <div class="chat-header">
-                <div class="chat-title">Dəstək Komandası</div>
-                <div class="chat-controls">
-                    <button id="fullscreen-chat" class="fullscreen-button" title="Tam ekran">
-                        <i class="fas fa-expand"></i>
-                    </button>
-                    <button id="close-chat" class="close-button">&times;</button>
-                </div>
-            </div>
-            
-            <div class="chat-container">
-                <!-- İstifadəçilər siyahısı -->
-                <div class="chat-sidebar">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="user-search" placeholder="İstifadəçi axtar...">
-                    </div>
-                    <div id="users-list" class="users-list"></div>
-                </div>
-                
-                <!-- Mesajlaşma bölməsi -->
-                <div class="chat-main" style="display: none;">
-                    <div class="selected-user">
-                        <i class="fas fa-arrow-left" id="back-to-users"></i>
-                        <span id="selected-username"></span>
-                    </div>
-                    <div class="chat-messages" id="chat-messages"></div>
-                    <div class="chat-input">
-                        <input type="text" id="message-input" placeholder="Mesajınızı yazın...">
-                        <button id="send-message" type="button">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+   
     {% endif %}
 
     <!-- Common Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="{% static 'js/loading.js' %}"></script>
     <script src="{% static 'js/base.js' %}"></script>
-    <script src="{% static 'js/chat.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

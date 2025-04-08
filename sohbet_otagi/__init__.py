@@ -1,1 +1,0 @@
-# Sohbet otağı tətbiqi 

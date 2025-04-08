@@ -806,7 +806,7 @@
                 window.showNotification('Xəta baş verdi', 'error');
             })
             .finally(() => {
-                // Düymələri və inputu yenidən aktiv et
+                // Düymələri2 və inputu yenidən aktiv et
                 buttons.forEach(btn => {
                     btn.disabled = false;
                     btn.style.opacity = '1';

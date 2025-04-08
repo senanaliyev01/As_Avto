@@ -56,7 +56,7 @@ CSRF_USE_SESSIONS = True
 CSRF_COOKIE_NAME = '__Secure-csrftoken'
 CSRF_COOKIE_AGE = 86400  # 24 saat
 
-# Əlavə Təhlükəsizlik Başlıqları
+# Əlavə Təhlükəsizli1 Başlıqları
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
 

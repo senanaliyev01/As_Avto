@@ -978,7 +978,6 @@
 
     function addToCartWithQuantity(productId) {
         const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
-        const cartButton = document.querySelector(`button[onclick="addToCartWithQuantity(${productId})"]`);
         const quantity = parseInt(quantityInput.value);
 
         if (isNaN(quantity) || quantity <= 0) {
@@ -991,12 +990,6 @@
             return;
         }
 
-        // Show loading spinner
-        const originalContent = cartButton.innerHTML;
-        cartButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        cartButton.style.pointerEvents = 'none';
-        cartButton.style.opacity = '0.7';
-
         fetch(`/sebet/ekle/${productId}/?miqdar=${quantity}`, {
             method: 'GET',
             headers: {
@@ -1006,11 +999,6 @@
         })
         .then(response => response.json())
         .then(data => {
-            // Restore original button content
-            cartButton.innerHTML = originalContent;
-            cartButton.style.pointerEvents = '';
-            cartButton.style.opacity = '';
-
             if (data.success) {
                 showAnimatedMessage(`${data.mehsul.adi} səbətə əlavə edildi (${quantity} ədəd)`, false, data.mehsul);
                 updateCartCount();
@@ -1019,11 +1007,6 @@
             }
         })
         .catch(error => {
-            // Restore original button content
-            cartButton.innerHTML = originalContent;
-            cartButton.style.pointerEvents = '';
-            cartButton.style.opacity = '';
-
             showAnimatedMessage('Xəta baş verdi', true);
             console.error('Error:', error);
         });

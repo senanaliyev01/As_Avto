@@ -536,25 +536,85 @@
                 });
             }
             
-            searchForm.addEventListener('submit', function(event) {
-                event.preventDefault(); // Formun dərhal göndərilməsini dayandır
+            // Create dropdown container
+            const dropdownContainer = document.createElement('div');
+            dropdownContainer.className = 'search-results-dropdown';
+            searchForm.appendChild(dropdownContainer);
+            
+            let searchTimeout;
+            
+            // Function to perform search
+            async function performSearch() {
+                const query = searchInput.value.trim();
                 
-                // Axtarış mətni inputunu əldə et
-                const searchInput = this.querySelector('input[name="search_text"]');
-                if (!searchInput || !searchInput.value.trim()) {
-                    // Axtarış mətni boşdursa formu göndərmə
+                // Axtarış düyməsinin aktiv/deaktiv vəziyyətini yeniləyək
+                if (searchButton) {
+                    searchButton.disabled = !query;
+                }
+                
+                if (query.length < 2) {
+                    dropdownContainer.classList.remove('active');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(`/realtime-search/?q=${encodeURIComponent(query)}`);
+                    const data = await response.json();
+                    
+                    if (data.results && data.results.length > 0) {
+                        dropdownContainer.innerHTML = data.results.map(result => {
+                            return `                            <div class="search-result-item" onclick="window.location.href='/product-detail/${encodeURIComponent(result.adi)}-${encodeURIComponent(result.oem)}-${encodeURIComponent(result.brend_kod)}/${result.id}/'">
+                                    ${result.sekil_url ? `<img src="${result.sekil_url}" alt="${result.adi}">` : ''}
+                                    <div class="search-result-info">
+                                        <h4>${result.adi}  ${result.brend}</h4>
+                                        <p>${result.brend_kod}  ${result.oem}</p>
+                                        <p>${result.marka}</p>
+                                    </div>
+                                    <div class="search-result-price">
+                                        <div class="stock-status ${result.stok === 0 ? 'out-of-stock' : result.stok <= 20 ? 'low-stock' : 'in-stock'}">
+                                            ${result.stok === 0 ? 'Yoxdur' : result.stok <= 20 ? 'Az var' : 'Var'}
+                                        </div>
+                                        ${result.qiymet} ₼
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                        dropdownContainer.classList.add('active');
+                    } else {
+                        dropdownContainer.innerHTML = '<div class="search-result-item">Heç bir nəticə tapılmadı</div>';
+                        dropdownContainer.classList.add('active');
+                    }
+                } catch (error) {
+                    console.error('Axtarış xətası:', error);
+                }
+            }
+            
+            // Input event listener with debounce
+            searchInput.addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(performSearch, 300);
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!searchForm.contains(e.target)) {
+                    dropdownContainer.classList.remove('active');
+                }
+            });
+            
+            // Form submit handler
+            searchForm.addEventListener('submit', (e) => {
+                // Axtarış mətni boşdursa formu göndərmə
+                if (!searchInput.value.trim()) {
+                    e.preventDefault();
                     return false;
                 }
                 
-                let searchButton = document.getElementById('search-button');
+                // Dropdown varsa gizlət
+                dropdownContainer.classList.remove('active');
                 
-                if (!searchButton) return;
-                
-                // Butonu deaktiv et ki, yenidən klik olunmasın
-                searchButton.disabled = true; 
-                
-                // Formu dərhal göndər
-                this.submit(); // Formu göndər
+                // Formu göndər
+                return true;
             });
         }
 
@@ -927,10 +987,11 @@
                 return false;
             }
             
-            if (dropdownContainer.classList.contains('active')) {
-                e.preventDefault();
-                dropdownContainer.classList.remove('active');
-            }
+            // Dropdown varsa gizlət
+            dropdownContainer.classList.remove('active');
+            
+            // Formu göndər
+            return true;
         });
     });
 

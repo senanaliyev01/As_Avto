@@ -36,7 +36,7 @@ def save_user_profile(sender, instance, **kwargs):
 
 class LoginCode(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    code = models.CharField(max_length=10)
+    code = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
     is_used = models.BooleanField(default=False)
     is_approved = models.BooleanField(default=False)
@@ -45,7 +45,7 @@ class LoginCode(models.Model):
     def generate_code(cls):
         # 6 xanalı təsadüfi kod yaratmaq (hərf və rəqəmlər)
         chars = string.ascii_uppercase + string.digits
-        return ''.join(random.choice(chars) for _ in range(10))
+        return ''.join(random.choice(chars) for _ in range(6))
 
     def is_valid(self):
         # Kodun 3 dəqiqə ərzində aktiv olmasını yoxlayır

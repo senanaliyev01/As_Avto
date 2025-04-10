@@ -24,7 +24,7 @@ from django.contrib import messages
 
 @login_required
 def umumibaxis(request):
-    # Bütün məhsulları əldə3 edirik
+    # Bütün məhsulları əldə edirik
     mehsullar = Mehsul.objects.all()
     
     # Filterləmək üçün lazım olan datalar

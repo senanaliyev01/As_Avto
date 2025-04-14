@@ -376,7 +376,6 @@
         console.log('DOM yükləndi, funksiyalar başladılır...');
         
         // Global funksiyaları window obyektinə əlavə et
-        window.selectUser = selectUser;
         window.confirmLogout = confirmLogout;
 
         // Səbət sayını yenilə

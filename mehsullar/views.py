@@ -657,3 +657,20 @@ def realtime_search(request):
         })
     
     return JsonResponse({'results': results})
+
+def get_statistics(request):
+    """
+    Statistika məlumatlarını qaytarır:
+    - kateqoriyaların sayı
+    - brendlərin sayı
+    - məhsulların sayı
+    """
+    categories_count = Kateqoriya.objects.count()
+    brands_count = Brend.objects.count()
+    products_count = Mehsul.objects.count()
+    
+    return JsonResponse({
+        'categories': categories_count,
+        'brands': brands_count,
+        'products': products_count
+    })

@@ -49,26 +49,33 @@
         })
         .then(response => response.json())
         .then(data => {
-            // Hər bir1 statistika kartını yenilə
+            // İlk olaraq gələn məlumatları konsola yazdıraq
+            console.log('Statistika məlumatları:', data);
+            
+            // Hər bir statistika kartını yenilə
             Object.keys(data).forEach(key => {
                 const element = document.querySelector(`.statistics-card .count[data-type="${key}"]`);
+                console.log(`${key} üçün element:`, element);
+                
                 if (element) {
                     const currentValue = parseInt(element.textContent) || 0;
                     const newValue = data[key];
                     
-                    if (currentValue !== newValue) {
-                        // Kartı vurğula
-                        const card = element.closest('.statistics-card');
-                        card.classList.add('updating');
-                        
-                        // Sayı animasiyası
-                        animateCount(element, newValue);
-                        
-                        // Animasiyanı təmizlə
-                        setTimeout(() => {
-                            card.classList.remove('updating');
-                        }, 8000);
-                    }
+                    console.log(`${key}: ${currentValue} -> ${newValue}`);
+                    
+                    // Hər zaman dəyərləri yenilə
+                    const card = element.closest('.statistics-card');
+                    card.classList.add('updating');
+                    
+                    // Sayı animasiyası
+                    animateCount(element, newValue);
+                    
+                    // Animasiyanı təmizlə
+                    setTimeout(() => {
+                        card.classList.remove('updating');
+                    }, 8000);
+                } else {
+                    console.error(`Element tapılmadı: ${key}`);
                 }
             });
         })

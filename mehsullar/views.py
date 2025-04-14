@@ -658,15 +658,18 @@ def realtime_search(request):
     
     return JsonResponse({'results': results})
 
+@login_required
 def get_statistics(request):
     """
-    Statistika məlumatlarını qaytarır:
-    - kateqoriyaların sayı
-    - brendlərin sayı
-    - məhsulların sayı
+    Statistika məlumatlarını qaytaran API
     """
+    # Kateqoriyaların sayı
     categories_count = Kateqoriya.objects.count()
+    
+    # Brendlərin sayı
     brands_count = Brend.objects.count()
+    
+    # Məhsulların sayı
     products_count = Mehsul.objects.count()
     
     return JsonResponse({

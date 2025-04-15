@@ -208,7 +208,7 @@
                     <div class="message-text">
                         ${message}
                         ${mehsulData && mehsulData.adi ? `
-                            <div class="product-info">
+                            <div class="product-info-1">
                                 ${mehsulData.sekil ? 
                                     `<img src="${mehsulData.sekil}" alt="${mehsulData.adi}" class="product-image-image-tr">` 
                                     : ''
@@ -288,7 +288,7 @@
                 50% { transform: scale(1.2) }
                 100% { transform: scale(1) }
             }
-            .product-info {
+            .product-info-1 {
                 display: flex;
                 align-items: center;
                 gap: 10px;

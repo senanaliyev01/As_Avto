@@ -34,40 +34,40 @@
 </section>
 
 <!-- Yeni Məhsullar Slider -->
-<section class="latest-products-section">
+<section class="new-products-section">
     <h2 class="section-title">Yeni Məhsullar</h2>
     
-    <div class="swiper latest-products-slider">
+    <div class="swiper new-products-slider">
         <div class="swiper-wrapper">
             {% for mehsul in yeni_mehsullar %}
             <div class="swiper-slide">
-                <div class="latest-product-card">
+                <div class="product-card">
                     {% if mehsul.sekil %}
                         <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
                     {% else %}
                         <img src="{% static 'img/no-image.png' %}" alt="Şəkil yoxdur">
                     {% endif %}
-                    <div class="latest-product-info">
+                    <div class="product-info">
                         <h3>{{ mehsul.adi }}</h3>
                         <h4>OEM: {{ mehsul.oem }}</h4>
-                        <p class="latest-brand">{{ mehsul.brend.adi }}</p>
-                        <p class="latest-price">{{ mehsul.formatted_qiymet }} AZN</p>
-                        <div class="latest-product-actions">
-                            <a href="{% url 'mehsul_haqqinda' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="latest-info-link">
+                        <p class="brand">{{ mehsul.brend.adi }}</p>
+                        <p class="price">{{ mehsul.formatted_qiymet }} AZN</p>
+                        <div class="product-actions">
+                            <a href="{% url 'mehsul_haqqinda' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="info-link">
                                 <i class="fas fa-info"></i>
                                 Ətraflı
                             </a>
-                            <div class="latest-quantity-container">
+                            <div class="quantity-container">
                                 <input type="number" 
-                                       class="latest-quantity-input" 
+                                       class="quantity-input" 
                                        value="1" 
                                        min="1" 
                                        max="999"
                                        data-product-id="{{ mehsul.id }}"
-                                       onchange="validateLatestQuantity(this)">
-                                <div class="latest-quantity-error"></div>
+                                       onchange="validateQuantity(this)">
+                                <div class="quantity-error"></div>
                             </div>
-                            <button onclick="addToCartWithLatestQuantity({{ mehsul.id }})" class="latest-cart-icon">
+                            <button onclick="addToCartWithQuantity({{ mehsul.id }})" class="cart-icon">
                                 <i class="fas fa-shopping-cart"></i>
                             </button>
                         </div>

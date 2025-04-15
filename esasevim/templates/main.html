@@ -34,41 +34,44 @@
 </section>
 
 <!-- Yeni Məhsullar Slider -->
-<section class="new-products-container">
-    <h2 class="new-products-title">Yeni Məhsullar</h2>
+<section class="new-products-section">
+    <h2 class="section-title">Yeni Məhsullar</h2>
     
-    <div class="swiper new-products-slider-container">
+    <div class="swiper new-products-slider">
         <div class="swiper-wrapper">
             {% for mehsul in yeni_mehsullar %}
             <div class="swiper-slide">
-                <div class="new-products-slide">
-                    {% if mehsul.sekil %}
-                        <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="new-products-image">
-                    {% else %}
-                        <img src="{% static 'img/no-image.png' %}" alt="Şəkil yoxdur" class="new-products-image">
-                    {% endif %}
-                    <div class="new-products-details">
-                        <h3 class="new-products-name">{{ mehsul.adi }}</h3>
-                        <h4 class="new-products-oem">OEM: {{ mehsul.oem }}</h4>
-                        <p class="new-products-brand">{{ mehsul.brend.adi }}</p>
-                        <p class="new-products-price">{{ mehsul.formatted_qiymet }} AZN</p>
-                        <div class="new-products-actions">
-                            <a href="{% url 'mehsul_haqqinda' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="new-products-detail-link">
+                <div class="new-product-card">
+                    <div class="new-product-image">
+                        {% if mehsul.sekil %}
+                            <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
+                        {% else %}
+                            <img src="{% static 'img/no-image.png' %}" alt="Şəkil yoxdur">
+                        {% endif %}
+                    </div>
+                    <div class="new-product-content">
+                        <h3 class="new-product-title">{{ mehsul.adi }}</h3>
+                        <h4 class="new-product-oem">OEM: {{ mehsul.oem }}</h4>
+                        <p class="new-product-brand">{{ mehsul.brend.adi }}</p>
+                        <p class="new-product-price">{{ mehsul.formatted_qiymet }} AZN</p>
+                        <div class="new-product-actions">
+                            <a href="{% url 'mehsul_haqqinda' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="new-product-info-link">
                                 <i class="fas fa-info"></i>
                                 Ətraflı
                             </a>
-                            <div class="new-products-quantity-box">
+                            <div class="new-product-quantity">
                                 <input type="number" 
-                                       class="new-products-quantity" 
+                                       class="new-quantity-input" 
                                        value="1" 
                                        min="1" 
                                        max="999"
                                        data-product-id="{{ mehsul.id }}"
                                        onchange="validateQuantity(this)">
-                                <div class="new-products-quantity-error"></div>
+                                <div class="new-quantity-error"></div>
                             </div>
-                            <button onclick="addToCartWithQuantity({{ mehsul.id }})" class="new-products-cart-btn">
+                            <button onclick="addToCartWithQuantity({{ mehsul.id }})" class="new-cart-button">
                                 <i class="fas fa-shopping-cart"></i>
+                                Səbətə əlavə et
                             </button>
                         </div>
                     </div>

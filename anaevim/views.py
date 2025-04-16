@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from mehsullar.models import Brend, Marka, Mehsul, MarkaSekil, Kateqoriya
+from mehsullar.models import Brend, Marka, Mehsul, MarkaSekil, Kateqoriya, OEMKod
 from django.template.defaultfilters import slugify
 from django.db.models import Q
 import re
@@ -27,17 +27,25 @@ def mehsullar(request):
     
     # Axtarış parametrini alırıq
     search_query = request.GET.get('q')
+    search_performed = False
     
     # Əgər axtarış parametri varsa, məhsulları filter edirik
     if search_query:
+        search_performed = True
         # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query)
         
-        # Sadəcə məhsul adı və əlavə OEM kodları ilə axtarış
+        # Məhsul adı və əlavə OEM kodları ilə axtarış
+        # Qeyd: OEMKod modelində əlavə OEM kodları saxlanılır və mehsul ilə ForeignKey əlaqəsi var
+        # Buna görə də "oem_kodlar__kod" ilə axtarış aparırıq (related_name = 'oem_kodlar')
         mehsullar = mehsullar.filter(
             Q(adi__icontains=search_query) |           # Məhsul adı ilə axtarış
             Q(oem_kodlar__kod__icontains=clean_search)  # Əlavə OEM kodları ilə axtarış
-        ).distinct()
+        ).distinct()  # Təkrarlanmaları aradan qaldırmaq üçün distinct() istifadə edirik
+    
+    # Axtarış nəticəsi boşdursa və axtarış edilmişdirsə, konsola mesaj çap edirik (debug məqsədilə)
+    if search_performed and not mehsullar.exists():
+        print(f"OEM axtarışı üçün heç bir nəticə tapılmadı: {search_query} (təmizlənmiş: {clean_search})")
     
     context = {
         'kateqoriyalar': kateqoriyalar,
@@ -45,6 +53,7 @@ def mehsullar(request):
         'markalar': markalar,
         'mehsullar': mehsullar,
         'search_query': search_query,
+        'search_performed': search_performed
     }
     
     return render(request, 'mehsullar.html', context)

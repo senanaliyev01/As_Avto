@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from mehsullar.models import Brend, Marka, Mehsul, MarkaSekil, Kateqoriya
+from mehsullar.models import Brend, Marka, Mehsul, MarkaSekil
 from django.template.defaultfilters import slugify
 
 def anaevim(request):
@@ -17,40 +17,12 @@ def anaevim(request):
     return render(request, 'home.html', context)
 
 def mehsullar(request):
-    # Filterləmə parametrləri
-    kateqoriya_id = request.GET.get('kateqoriya')
-    brend_id = request.GET.get('brend')
-    marka_id = request.GET.get('marka')
-    search_query = request.GET.get('q')
-    
-    # Bütün məlumatları əldə et
     brendler = Brend.objects.all()
-    markalar = Marka.objects.all()
-    kateqoriyalar = Kateqoriya.objects.all()
     mehsullar = Mehsul.objects.all()
-    
-    # Filtr parametrlərinə əsasən məhsulları filtrləmək
-    if kateqoriya_id:
-        mehsullar = mehsullar.filter(kateqoriya_id=kateqoriya_id)
-    
-    if brend_id:
-        mehsullar = mehsullar.filter(brend_id=brend_id)
-    
-    if marka_id:
-        mehsullar = mehsullar.filter(marka_id=marka_id)
-    
-    if search_query:
-        mehsullar = mehsullar.filter(adi__icontains=search_query)
     
     context = {
         'brendler': brendler,
-        'markalar': markalar,
-        'kateqoriyalar': kateqoriyalar,
         'mehsullar': mehsullar,
-        'selected_category': kateqoriya_id,
-        'selected_brend': brend_id,
-        'selected_marka': marka_id,
-        'query': search_query,
     }
     
     return render(request, 'mehsullar.html', context)

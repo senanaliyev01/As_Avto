@@ -42,14 +42,12 @@ class App {
             this.heroSlider = new HeroSlider();
             this.mobileMenu = new MobileMenu();
             this.scrollAnimations = new ScrollAnimations();
-            this.mobileFilters = new MobileFilters();
             
             // Start components
             this.header.init();
             this.heroSlider.init();
             this.mobileMenu.init();
             this.scrollAnimations.init();
-            this.mobileFilters.init();
             
             // Initialize product sliders
             const sliderContainers = utils.selectAll('.slider-container');
@@ -61,6 +59,19 @@ class App {
                 this.setupBrandsSlider(brandsSlider);
             }
             
+            // Initialize product filters
+            const productFiltersElement = utils.select('.product-filters');
+            if (productFiltersElement) {
+                this.productFilters = new ProductFilters();
+                this.productFilters.init();
+            }
+            
+            // Initialize price range slider
+            const priceSlider = utils.select('.price-slider');
+            if (priceSlider) {
+                this.priceRangeSlider = new PriceRangeSlider();
+                this.priceRangeSlider.init();
+            }
         } catch (error) {
             console.error('Application initialization error:', error);
         }
@@ -76,56 +87,6 @@ class App {
             const clone = item.cloneNode(true);
             slider.appendChild(clone);
         });
-    }
-}
-
-// Mobile Filters Component
-class MobileFilters {
-    constructor() {
-        this.toggleButton = utils.select('.mobile-filters-toggle');
-        this.filtersSidebar = utils.select('.filters-sidebar');
-        this.isOpen = false;
-    }
-
-    init() {
-        if (!this.toggleButton || !this.filtersSidebar) return;
-        
-        this.setupEventListeners();
-    }
-
-    setupEventListeners() {
-        // Toggle filters
-        this.toggleButton.addEventListener('click', () => this.toggleFilters());
-        
-        // Close when clicking outside
-        document.addEventListener('click', (e) => {
-            if (this.isOpen && 
-                !this.filtersSidebar.contains(e.target) && 
-                !this.toggleButton.contains(e.target)) {
-                this.closeFilters();
-            }
-        });
-
-        // Close on escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && this.isOpen) {
-                this.closeFilters();
-            }
-        });
-    }
-
-    toggleFilters() {
-        this.isOpen ? this.closeFilters() : this.openFilters();
-    }
-
-    openFilters() {
-        this.isOpen = true;
-        document.body.classList.add('filters-visible');
-    }
-
-    closeFilters() {
-        this.isOpen = false;
-        document.body.classList.remove('filters-visible');
     }
 }
 
@@ -488,6 +449,236 @@ class ProductSlider {
         };
 
         requestAnimationFrame(animate);
+    }
+}
+
+// Product Filters Component
+class ProductFilters {
+    constructor() {
+        this.filtersContainer = utils.select('.product-filters');
+        this.filterToggle = utils.select('.filter-toggle');
+        this.filterClose = utils.select('.filter-close');
+        this.filterGroups = utils.selectAll('.filter-group--collapsible');
+        this.applyFiltersBtn = utils.select('.apply-filters');
+        this.isOpen = false;
+    }
+
+    init() {
+        if (!this.filtersContainer) return;
+        
+        this.setupEventListeners();
+    }
+
+    setupEventListeners() {
+        // Toggle mobile filters panel
+        if (this.filterToggle) {
+            this.filterToggle.addEventListener('click', () => this.toggleFilters());
+        }
+        
+        // Close mobile filters panel
+        if (this.filterClose) {
+            this.filterClose.addEventListener('click', () => this.closeFilters());
+        }
+        
+        // Collapsible filter groups
+        this.filterGroups.forEach(group => {
+            const title = group.querySelector('.filter-group__title');
+            if (title) {
+                title.addEventListener('click', () => this.toggleFilterGroup(group));
+            }
+        });
+        
+        // Apply filters
+        if (this.applyFiltersBtn) {
+            this.applyFiltersBtn.addEventListener('click', () => this.applyFilters());
+        }
+        
+        // Close filters when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (this.isOpen && 
+                !this.filtersContainer.contains(e.target) && 
+                !this.filterToggle.contains(e.target)) {
+                this.closeFilters();
+            }
+        });
+        
+        // Close filters on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.isOpen) {
+                this.closeFilters();
+            }
+        });
+        
+        // Prevent body scroll when filters panel is open on mobile
+        this.filtersContainer.addEventListener('touchmove', (e) => {
+            if (this.isOpen && window.innerWidth <= 768) {
+                // Allow scrolling inside the filters but not the body
+                if (this.filtersContainer.scrollHeight > this.filtersContainer.clientHeight && 
+                    this.isElementScrollable(this.filtersContainer)) {
+                    e.stopPropagation();
+                } else {
+                    e.preventDefault();
+                }
+            }
+        }, { passive: false });
+    }
+    
+    isElementScrollable(element) {
+        return element.scrollHeight > element.clientHeight;
+    }
+
+    toggleFilters() {
+        this.isOpen ? this.closeFilters() : this.openFilters();
+    }
+
+    openFilters() {
+        this.isOpen = true;
+        this.filtersContainer.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    closeFilters() {
+        this.isOpen = false;
+        this.filtersContainer.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    toggleFilterGroup(group) {
+        group.classList.toggle('filter-group--collapsed');
+        const icon = group.querySelector('.filter-toggle-icon i');
+        if (icon) {
+            icon.classList.toggle('fa-chevron-down');
+            icon.classList.toggle('fa-chevron-up');
+        }
+    }
+    
+    applyFilters() {
+        // Collect all filter values
+        const filters = {
+            brands: [],
+            makes: [],
+            price: {
+                min: parseFloat(utils.select('#min-value').value),
+                max: parseFloat(utils.select('#max-value').value)
+            }
+        };
+        
+        // Collect brand filters
+        utils.selectAll('input[name="brand"]:checked').forEach(input => {
+            filters.brands.push(input.value);
+        });
+        
+        // Collect make filters
+        utils.selectAll('input[name="make"]:checked').forEach(input => {
+            filters.makes.push(input.value);
+        });
+        
+        console.log('Applied filters:', filters);
+        
+        // Close mobile filters after applying
+        if (window.innerWidth <= 768) {
+            this.closeFilters();
+        }
+        
+        // Here you would normally filter the products or redirect with query params
+        // For now we'll just log the filters
+        
+        // Animate the apply button to provide feedback
+        this.animateApplyButton();
+    }
+    
+    animateApplyButton() {
+        if (!this.applyFiltersBtn) return;
+        
+        this.applyFiltersBtn.textContent = 'Filtrlər tətbiq edildi!';
+        this.applyFiltersBtn.disabled = true;
+        
+        setTimeout(() => {
+            this.applyFiltersBtn.textContent = 'Filtri tətbiq et';
+            this.applyFiltersBtn.disabled = false;
+        }, 2000);
+    }
+}
+
+// Price Range Slider Component
+class PriceRangeSlider {
+    constructor() {
+        this.rangeInputs = utils.selectAll('.range-input');
+        this.priceInputs = utils.selectAll('.price-inputs input');
+        this.range = utils.select('.slider-range');
+        this.progress = utils.select('.slider-track');
+        this.minVal = 0;
+        this.maxVal = 1000;
+        this.minGap = 100;
+    }
+    
+    init() {
+        if (this.rangeInputs.length < 2 || this.priceInputs.length < 2) return;
+        
+        this.setupEventListeners();
+        this.updateView();
+    }
+    
+    setupEventListeners() {
+        // Update range slider when dragging
+        this.rangeInputs.forEach(input => {
+            input.addEventListener('input', () => this.updateRangeSlider(input));
+        });
+        
+        // Update range slider when typing values
+        this.priceInputs.forEach(input => {
+            input.addEventListener('input', () => this.updateFromInput(input));
+        });
+    }
+    
+    updateRangeSlider(input) {
+        this.minVal = parseInt(this.rangeInputs[0].value);
+        this.maxVal = parseInt(this.rangeInputs[1].value);
+        
+        if (this.maxVal - this.minVal < this.minGap) {
+            if (input === this.rangeInputs[0]) {
+                this.minVal = this.maxVal - this.minGap;
+                this.rangeInputs[0].value = this.minVal;
+            } else {
+                this.maxVal = this.minVal + this.minGap;
+                this.rangeInputs[1].value = this.maxVal;
+            }
+        }
+        
+        // Update price inputs
+        this.priceInputs[0].value = this.minVal;
+        this.priceInputs[1].value = this.maxVal;
+        
+        this.updateView();
+    }
+    
+    updateFromInput(input) {
+        let minPrice = parseInt(this.priceInputs[0].value);
+        let maxPrice = parseInt(this.priceInputs[1].value);
+        
+        if ((maxPrice - minPrice >= this.minGap) && maxPrice <= 1000) {
+            if (input === this.priceInputs[0]) {
+                this.minVal = minPrice;
+                this.rangeInputs[0].value = minPrice;
+            } else {
+                this.maxVal = maxPrice;
+                this.rangeInputs[1].value = maxPrice;
+            }
+        }
+        
+        this.updateView();
+    }
+    
+    updateView() {
+        // Calculate percentages for the range track
+        const minPercent = (this.minVal / 1000) * 100;
+        const maxPercent = (this.maxVal / 1000) * 100;
+        
+        // Update the range track and colored range
+        if (this.range) {
+            this.range.style.left = minPercent + '%';
+            this.range.style.width = (maxPercent - minPercent) + '%';
+        }
     }
 }
 

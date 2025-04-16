@@ -81,186 +81,67 @@
         </div>
     </header>
 
-    <!-- Products Page -->
-    <main class="products-page">
-        <div class="products-page__container container">
-            <!-- Mobile Filter Toggle -->
-            <button class="filter-toggle">
-                <i class="fas fa-filter"></i> Filtrlər
-            </button>
-            
-            <!-- Left Sidebar - Filters -->
-            <aside class="product-filters">
-                <div class="filter-header">
-                    <h3>Filtrlər</h3>
-                    <button class="filter-close"><i class="fas fa-times"></i></button>
-                </div>
-                
-                <!-- Categories Filter -->
-                <div class="filter-group">
-                    <h4 class="filter-group__title">Kateqoriyalar</h4>
-                    <ul class="filter-group__list">
-                        <li>
-                            <a href="#" class="filter-group__item">
-                                Bütün məhsullar
-                                <span class="filter-count">{{ mehsullar.count }}</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="filter-group__item">
-                                Yağlar
-                                <span class="filter-count">24</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="filter-group__item">
-                                Filterlər
-                                <span class="filter-count">18</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="filter-group__item">
-                                Əyləc sistemi
-                                <span class="filter-count">12</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="filter-group__item">
-                                Mühərrik hissələri
-                                <span class="filter-count">30</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                
-                <!-- Brands Filter -->
-                <div class="filter-group filter-group--collapsible">
-                    <h4 class="filter-group__title">Brendlər
-                        <span class="filter-toggle-icon"><i class="fas fa-chevron-down"></i></span>
-                    </h4>
-                    <ul class="filter-group__list">
-                        {% for brend in brendler %}
-                        <li>
-                            <label class="filter-checkbox">
-                                <input type="checkbox" name="brand" value="{{ brend.id }}">
-                                <span class="checkmark"></span>
-                                {{ brend.adi }}
-                            </label>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                
-                <!-- Car Makes Filter -->
-                <div class="filter-group filter-group--collapsible">
-                    <h4 class="filter-group__title">Avtomobil Markası
-                        <span class="filter-toggle-icon"><i class="fas fa-chevron-down"></i></span>
-                    </h4>
-                    <ul class="filter-group__list">
-                        <li>
-                            <label class="filter-checkbox">
-                                <input type="checkbox" name="make" value="bmw">
-                                <span class="checkmark"></span>
-                                BMW
-                            </label>
-                        </li>
-                        <li>
-                            <label class="filter-checkbox">
-                                <input type="checkbox" name="make" value="mercedes">
-                                <span class="checkmark"></span>
-                                Mercedes-Benz
-                            </label>
-                        </li>
-                        <li>
-                            <label class="filter-checkbox">
-                                <input type="checkbox" name="make" value="toyota">
-                                <span class="checkmark"></span>
-                                Toyota
-                            </label>
-                        </li>
-                        <li>
-                            <label class="filter-checkbox">
-                                <input type="checkbox" name="make" value="honda">
-                                <span class="checkmark"></span>
-                                Honda
-                            </label>
-                        </li>
-                    </ul>
-                </div>
-                
-                <!-- Price Range Filter -->
-                <div class="filter-group">
-                    <h4 class="filter-group__title">Qiymət Aralığı</h4>
-                    <div class="price-slider">
-                        <div class="price-range">
-                            <input type="range" id="price-min" min="0" max="1000" value="0" class="range-input">
-                            <input type="range" id="price-max" min="0" max="1000" value="1000" class="range-input">
-                            <div class="slider-track"></div>
-                            <div class="slider-range"></div>
-                        </div>
-                        <div class="price-inputs">
-                            <div class="field">
-                                <span>Min:</span>
-                                <input type="number" id="min-value" value="0" min="0" max="1000">
-                            </div>
-                            <div class="field">
-                                <span>Max:</span>
-                                <input type="number" id="max-value" value="1000" min="0" max="1000">
-                            </div>
+  
+
+    <!-- Brands Slider -->
+    <section class="products-slider">
+        <div class="full-width-container">
+            <!-- Brendlər -->
+            <div class="slider-section" id="brands-slider">
+                <h2 class="section__title">Brendlərimiz</h2>
+                <div class="slider-container">
+                    <div class="slider-wrapper">
+                        <div class="slider-track">
+                            {% for brend in brendler %}
+                                {% if brend.sekil %}
+                                <div class="slider-item">
+                                    <div class="product-card">
+                                        <div class="product-card__image">
+                                            <img src="{{ brend.sekil.url }}" alt="{{ brend.adi }}">
+                                        </div>
+                                        <div class="product-card__content">
+                                            <h3 class="product-card__title">{{ brend.adi }}</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
                         </div>
                     </div>
-                </div>
-                
-                <!-- Apply Filters Button -->
-                <button class="btn btn--primary apply-filters">
-                    Filtri tətbiq et
-                </button>
-            </aside>
-            
-            <!-- Right Side - Products Grid -->
-            <div class="products-content">
-                <!-- Sorting and View Options -->
-                <div class="products-header">
-                    <div class="products-count">{{ mehsullar.count }} məhsul</div>
-                    <div class="products-sort">
-                        <label for="sort-select">Sırala:</label>
-                        <select id="sort-select" class="sort-select">
-                            <option value="popular">Populyar</option>
-                            <option value="price_asc">Ucuzdan bahaya</option>
-                            <option value="price_desc">Bahadan ucuza</option>
-                            <option value="newest">Ən yeni</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <!-- Products Grid -->
-                <div class="products-grid">
-                    {% for mehsul in mehsullar %}
-                        {% if mehsul.sekil %}
-                        <div class="grid-item">
-                            <div class="product-card">
-                                <div class="product-card__image">
-                                    <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
-                                </div>
-                                <div class="product-card__content">
-                                    <h3 class="product-card__title">{{ mehsul.adi }}</h3>
-                                    <p class="product-card__description">Marka: {{ mehsul.marka.adi }}</p>
-                                    <p class="product-card__description">Brend: {{ mehsul.brend.adi }}</p>
-                                    <p class="product-card__description">KOD: {{ mehsul.oem }}</p>
-                                    <p class="product-card__description">Qiymət: {{ mehsul.formatted_qiymet }} ₼</p>
-                                    <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="product-card__button">
-                                        Ətraflı Məlumat
-                                        <i class="fas fa-arrow-right"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
-                    {% endfor %}
                 </div>
             </div>
         </div>
-    </main>
+    </section>
+
+    <!-- Products Grid -->
+    <section class="products-grid-section">
+        <div class="container">
+            <div class="products-grid">
+                {% for mehsul in mehsullar %}
+                    {% if mehsul.sekil %}
+                    <div class="grid-item">
+                        <div class="product-card">
+                            <div class="product-card__image">
+                                <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
+                            </div>
+                            <div class="product-card__content">
+                                <h3 class="product-card__title">{{ mehsul.adi }}</h3>
+                                <p class="product-card__description">Marka: {{ mehsul.marka.adi }}</p>
+                                <p class="product-card__description">Brend: {{ mehsul.brend.adi }}</p>
+                                <p class="product-card__description">KOD: {{ mehsul.oem }}</p>
+                                <p class="product-card__description">Qiymət: {{ mehsul.formatted_qiymet }} ₼</p>
+                                <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="product-card__button">
+                                    Ətraflı Məlumat
+                                    <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </section>
 
     <!-- Footer -->
     <footer class="footer">

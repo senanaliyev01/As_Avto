@@ -453,6 +453,8 @@ class ProductsPage {
         this.noProducts = utils.select('#noProducts');
         
         // Filterlər
+        this.filterTitles = utils.selectAll('.filter-title');
+        this.filterLists = utils.selectAll('.filter-list');
         this.categoryLinks = utils.selectAll('#categoryList .filter-link');
         this.brandLinks = utils.selectAll('#brandList .filter-link');
         this.markaLinks = utils.selectAll('#markaList .filter-link');
@@ -480,6 +482,11 @@ class ProductsPage {
         // Olay dinləyicilərini qurur
         this.setupEventListeners();
         
+        // İlk filteri aktiv et
+        if (this.filterTitles.length > 0) {
+            this.toggleFilterPanel(this.filterTitles[0]);
+        }
+        
         // Məhsulların sayını yeniləyirik
         this.updateProductCount();
     }
@@ -497,6 +504,13 @@ class ProductsPage {
                 this.clearSearch();
             });
         }
+        
+        // Filter başlıqları üçün olay dinləyiciləri
+        this.filterTitles.forEach(title => {
+            title.addEventListener('click', () => {
+                this.toggleFilterPanel(title);
+            });
+        });
         
         // Kateqoriya filter linkləri
         this.categoryLinks.forEach(link => {
@@ -536,6 +550,16 @@ class ProductsPage {
                 }
             }, 300));
         }
+    }
+    
+    toggleFilterPanel(title) {
+        const list = title.nextElementSibling;
+        
+        // Toggle active class on title
+        title.classList.toggle('active');
+        
+        // Toggle active class on list
+        list.classList.toggle('active');
     }
     
     handleSearch() {

@@ -439,226 +439,266 @@ class ProductSlider {
     }
 }
 
-// Məhsullar Səhifəsi
-class ProductsPage {
-    constructor() {
-        // DOM elementlərini seçirik
-        this.searchForm = utils.select('#searchForm');
-        this.searchInput = utils.select('#searchInput');
-        this.searchResults = utils.select('#searchResults');
-        this.searchQuery = utils.select('#searchQuery');
-        this.clearSearchBtn = utils.select('#clearSearch');
-        this.productsGrid = utils.select('#productsGrid');
-        this.productsCount = utils.select('#productsCount');
-        this.noProducts = utils.select('#noProducts');
-        
-        // Filterlər
-        this.filterTitles = utils.selectAll('.filter-title');
-        this.filterLists = utils.selectAll('.filter-list');
-        this.categoryLinks = utils.selectAll('#categoryList .filter-link');
-        this.brandLinks = utils.selectAll('#brandList .filter-link');
-        this.markaLinks = utils.selectAll('#markaList .filter-link');
-        
-        // Aktiv filterlər
-        this.activeFilters = {
-            category: 'all',
-            brand: 'all',
-            marka: 'all'
-        };
-        
-        // Axtarış mətni
-        this.searchText = '';
-        
-        // Məhsulların sayı
-        this.totalProducts = utils.selectAll('#productsGrid .grid-item').length;
-        this.visibleProducts = this.totalProducts;
-        
-        this.init();
-    }
+// Initialize application when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    new App();
     
-    init() {
-        if (!this.searchForm) return;
-        
-        // Olay dinləyicilərini qurur
-        this.setupEventListeners();
-        
-        // İlk filteri aktiv et
-        if (this.filterTitles.length > 0) {
-            // Bütün filterlər üçün başlanğıcda qapat
-            this.filterLists.forEach(list => {
-                list.classList.remove('active');
-            });
-            this.filterTitles.forEach(title => {
-                title.classList.remove('active');
-            });
-            
-            // Yalnız ilk filteri aç
-            this.toggleFilterPanel(this.filterTitles[0]);
-        }
-        
-        // Məhsulların sayını yeniləyirik
-        this.updateProductCount();
-    }
+    // Dropdown filter functionality
+    const dropdownFilters = document.querySelectorAll('.dropdown-filter');
     
-    setupEventListeners() {
-        // Axtarış formu təqdim edildikdə
-        this.searchForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.handleSearch();
-        });
+    dropdownFilters.forEach(filter => {
+        const header = filter.querySelector('.dropdown-header');
         
-        // Axtarış təmizlə düyməsi
-        if (this.clearSearchBtn) {
-            this.clearSearchBtn.addEventListener('click', () => {
-                this.clearSearch();
-            });
-        }
-        
-        // Filter başlıqları üçün olay dinləyiciləri
-        this.filterTitles.forEach(title => {
-            title.addEventListener('click', () => {
-                this.toggleFilterPanel(title);
-            });
-        });
-        
-        // Kateqoriya filter linkləri
-        this.categoryLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.setActiveFilter(this.categoryLinks, link);
-                this.activeFilters.category = link.getAttribute('data-category');
-                this.filterProducts();
-            });
-        });
-        
-        // Brend filter linkləri
-        this.brandLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.setActiveFilter(this.brandLinks, link);
-                this.activeFilters.brand = link.getAttribute('data-brand');
-                this.filterProducts();
-            });
-        });
-        
-        // Marka filter linkləri
-        this.markaLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.setActiveFilter(this.markaLinks, link);
-                this.activeFilters.marka = link.getAttribute('data-marka');
-                this.filterProducts();
-            });
-        });
-        
-        // Axtarış inputu dəyişdikdə real vaxtda axtarış
-        if (this.searchInput) {
-            this.searchInput.addEventListener('input', utils.debounce(() => {
-                if (this.searchInput.value.length >= 3 || this.searchInput.value.length === 0) {
-                    this.handleSearch();
+        header.addEventListener('click', () => {
+            // Close other open dropdowns
+            dropdownFilters.forEach(df => {
+                if (df !== filter && df.classList.contains('active')) {
+                    df.classList.remove('active');
                 }
-            }, 300));
-        }
-    }
-    
-    toggleFilterPanel(title) {
-        const list = title.nextElementSibling;
-        
-        // Toggle active class on title
-        title.classList.toggle('active');
-        
-        // Toggle active class on list
-        list.classList.toggle('active');
-    }
-    
-    handleSearch() {
-        const query = this.searchInput.value.trim().toLowerCase();
-        this.searchText = query;
-        
-        if (query) {
-            // Axtarış nəticələri başlığını göstəririk
-            this.searchResults.style.display = 'flex';
-            this.searchQuery.textContent = query;
-        } else {
-            // Axtarış nəticələri başlığını gizlədirik
-            this.searchResults.style.display = 'none';
-        }
-        
-        this.filterProducts();
-    }
-    
-    clearSearch() {
-        this.searchInput.value = '';
-        this.searchText = '';
-        this.searchResults.style.display = 'none';
-        this.filterProducts();
-    }
-    
-    setActiveFilter(links, activeLink) {
-        links.forEach(link => {
-            link.classList.remove('active');
+            });
+            
+            // Toggle active class
+            filter.classList.toggle('active');
         });
-        activeLink.classList.add('active');
-    }
+    });
     
-    filterProducts() {
-        const items = utils.selectAll('#productsGrid .grid-item');
-        let visibleCount = 0;
-        
-        items.forEach(item => {
-            const category = item.getAttribute('data-category');
-            const brand = item.getAttribute('data-brand');
-            const marka = item.getAttribute('data-marka');
-            const title = item.querySelector('.product-card__title').textContent.toLowerCase();
-            const code = item.querySelector('.product-card__description:nth-of-type(3)').textContent.toLowerCase();
-            
-            // Kateqoriya, brend və markaya görə filter
-            const categoryMatch = this.activeFilters.category === 'all' || category === this.activeFilters.category;
-            const brandMatch = this.activeFilters.brand === 'all' || brand === this.activeFilters.brand;
-            const markaMatch = this.activeFilters.marka === 'all' || marka === this.activeFilters.marka;
-            
-            // Axtarış mətninə görə filter
-            const searchMatch = !this.searchText || 
-                                title.includes(this.searchText) || 
-                                code.includes(this.searchText);
-            
-            // Bütün filterlərə uyğundursa göstər
-            if (categoryMatch && brandMatch && markaMatch && searchMatch) {
-                item.style.display = 'block';
-                visibleCount++;
-            } else {
-                item.style.display = 'none';
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        dropdownFilters.forEach(filter => {
+            if (!filter.contains(e.target) && filter.classList.contains('active')) {
+                filter.classList.remove('active');
             }
         });
-        
-        this.visibleProducts = visibleCount;
-        this.updateProductCount();
-        
-        // Məhsul tapılmadı mesajını göstər və ya gizlət
-        if (visibleCount === 0) {
-            this.noProducts.style.display = 'flex';
-            this.productsGrid.style.display = 'none';
-        } else {
-            this.noProducts.style.display = 'none';
-            this.productsGrid.style.display = 'grid';
-        }
+    });
+    
+    // Filter apply button
+    const filterApplyBtn = document.querySelector('.filter-apply-btn');
+    if (filterApplyBtn) {
+        filterApplyBtn.addEventListener('click', () => {
+            applyFilters();
+        });
     }
     
-    updateProductCount() {
-        if (this.productsCount) {
-            this.productsCount.textContent = `${this.visibleProducts} məhsul`;
+    // Filter reset button
+    const filterResetBtn = document.querySelector('.filter-reset-btn');
+    if (filterResetBtn) {
+        filterResetBtn.addEventListener('click', () => {
+            resetFilters();
+        });
+    }
+    
+    // Mobile filter toggle functionality
+    const filterToggle = document.querySelector('.filter-toggle');
+    const filterSidebar = document.querySelector('.filter-sidebar');
+    const filterOverlay = document.querySelector('.filter-overlay');
+    
+    if (filterToggle && filterSidebar && filterOverlay) {
+        filterToggle.addEventListener('click', () => {
+            filterSidebar.classList.add('active');
+            filterOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        filterOverlay.addEventListener('click', () => {
+            filterSidebar.classList.remove('active');
+            filterOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+    }
+    
+    // Search functionality
+    setupSearch();
+});
+
+// Apply filters
+function applyFilters() {
+    // Get selected filters
+    const selectedBrends = getSelectedValues('brend');
+    const selectedMarkas = getSelectedValues('marka');
+    
+    // Build query string
+    let queryParams = new URLSearchParams(window.location.search);
+    
+    // Add selected brands to query
+    if (selectedBrends.length > 0) {
+        queryParams.set('brand', selectedBrends.join(','));
+    } else {
+        queryParams.delete('brand');
+    }
+    
+    // Add selected markas to query
+    if (selectedMarkas.length > 0) {
+        queryParams.set('model', selectedMarkas.join(','));
+    } else {
+        queryParams.delete('model');
+    }
+    
+    // Redirect with new query params
+    window.location.href = `${window.location.pathname}?${queryParams.toString()}`;
+}
+
+// Get selected values for a filter
+function getSelectedValues(name) {
+    const checkboxes = document.querySelectorAll(`input[name="${name}"]:checked`);
+    return Array.from(checkboxes).map(cb => cb.value);
+}
+
+// Reset all filters
+function resetFilters() {
+    // Uncheck all checkboxes
+    document.querySelectorAll('.dropdown-item input[type="checkbox"]').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    
+    // Redirect to base URL without query params
+    window.location.href = window.location.pathname;
+}
+
+// Setup search functionality
+function setupSearch() {
+    const searchForm = document.getElementById('search-form');
+    const searchInput = document.getElementById('search-input');
+    const searchButton = document.getElementById('search-button');
+    const dropdownContainer = document.querySelector('.search-results-dropdown');
+    
+    if (!searchForm || !searchInput || !dropdownContainer) {
+        return;
+    }
+    
+    // Initially disable search button
+    if (searchButton) {
+        searchButton.disabled = !searchInput.value.trim();
+    }
+    
+    let searchTimeout;
+    
+    // Input event with debounce
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value.trim();
+        
+        // Update button state
+        if (searchButton) {
+            searchButton.disabled = !query;
         }
+        
+        // Clear previous timeout
+        clearTimeout(searchTimeout);
+        
+        // If empty or short query, hide dropdown
+        if (!query || query.length < 2) {
+            dropdownContainer.classList.remove('active');
+            return;
+        }
+        
+        // Set new timeout for search
+        searchTimeout = setTimeout(() => {
+            performSearch(query, dropdownContainer);
+        }, 300);
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!searchForm.contains(e.target)) {
+            dropdownContainer.classList.remove('active');
+        }
+    });
+    
+    // Search form submit
+    searchForm.addEventListener('submit', (e) => {
+        const query = searchInput.value.trim();
+        
+        // Prevent empty submissions
+        if (!query) {
+            e.preventDefault();
+            return false;
+        }
+        
+        // Hide dropdown
+        dropdownContainer.classList.remove('active');
+        
+        // Load results page
+        window.location.href = `?search_text=${encodeURIComponent(query)}`;
+        
+        // Prevent form submission as we handle it manually
+        e.preventDefault();
+        return false;
+    });
+}
+
+// Perform search API call
+async function performSearch(query, dropdownContainer) {
+    try {
+        // Fetch search results
+        const response = await fetch(`/realtime-search/?q=${encodeURIComponent(query)}`);
+        
+        if (!response.ok) {
+            throw new Error('Axtarış sorğusu zamanı xəta baş verdi');
+        }
+        
+        const data = await response.json();
+        
+        // Display results in dropdown
+        if (data.results && data.results.length > 0) {
+            const html = data.results.map(result => {
+                const stockStatus = result.stok === 0 
+                    ? '<div class="stock-status out-of-stock">Yoxdur</div>' 
+                    : result.stok <= 20 
+                        ? '<div class="stock-status low-stock">Az var</div>' 
+                        : '<div class="stock-status in-stock">Var</div>';
+                
+                return `
+                    <div class="search-result-item" onclick="window.location.href='/product/${encodeURIComponent(result.adi)}-${encodeURIComponent(result.oem)}-${encodeURIComponent(result.brend_kod)}/${result.id}/'">
+                        ${result.sekil_url ? `<img src="${result.sekil_url}" alt="${result.adi}">` : ''}
+                        <div class="search-result-info">
+                            <h4>${result.adi}</h4>
+                            <p>${result.brend} ${result.marka}</p>
+                            <p>Kod: ${result.brend_kod} ${result.oem}</p>
+                        </div>
+                        <div class="search-result-price">
+                            ${stockStatus}
+                            ${result.qiymet} ₼
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            dropdownContainer.innerHTML = html;
+            dropdownContainer.classList.add('active');
+        } else {
+            dropdownContainer.innerHTML = '<div class="search-result-item">Heç bir nəticə tapılmadı</div>';
+            dropdownContainer.classList.add('active');
+        }
+    } catch (error) {
+        console.error('Axtarış xətası:', error);
+        dropdownContainer.innerHTML = '<div class="search-result-item">Xəta baş verdi</div>';
+        dropdownContainer.classList.add('active');
     }
 }
 
-// Application initiation
-document.addEventListener('DOMContentLoaded', () => {
-    // Existing code
-    new App();
+// Load existing filters from URL on page load
+function loadFiltersFromURL() {
+    const params = new URLSearchParams(window.location.search);
     
-    // Initialize Products Page
-    const currentPath = window.location.pathname;
-    if (currentPath.includes('mehsullar') || currentPath.includes('products')) {
-        new ProductsPage();
+    // Load brands
+    if (params.has('brand')) {
+        const brands = params.get('brand').split(',');
+        brands.forEach(brand => {
+            const checkbox = document.querySelector(`input[name="brend"][value="${brand}"]`);
+            if (checkbox) checkbox.checked = true;
+        });
     }
+    
+    // Load markas
+    if (params.has('model')) {
+        const markas = params.get('model').split(',');
+        markas.forEach(marka => {
+            const checkbox = document.querySelector(`input[name="marka"][value="${marka}"]`);
+            if (checkbox) checkbox.checked = true;
+        });
+    }
+}
+
+// Call load filters when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    loadFiltersFromURL();
 }); 

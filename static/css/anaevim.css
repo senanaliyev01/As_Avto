@@ -1823,8 +1823,7 @@ tr:hover {
     list-style: none;
     padding: 0;
     margin: 0;
-    max-height: 200px;
-    overflow-y: auto;
+    max-height: none;
 }
 
 .filter-item {
@@ -1936,23 +1935,21 @@ tr:hover {
     font-size: var(--font-size-lg);
 }
 
-/* Filter panelində scrollbar */
+/* Filter panelində scrollbar artıq lazım deyil */
 .filter-list::-webkit-scrollbar {
-    width: 6px;
+    display: none;
 }
 
 .filter-list::-webkit-scrollbar-track {
-    background: var(--color-gray-800);
-    border-radius: 3px;
+    display: none;
 }
 
 .filter-list::-webkit-scrollbar-thumb {
-    background: var(--color-gray-600);
-    border-radius: 3px;
+    display: none;
 }
 
 .filter-list::-webkit-scrollbar-thumb:hover {
-    background: var(--color-gray-500);
+    display: none;
 }
 
 /* Yeni məhsul gridi */

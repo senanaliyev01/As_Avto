@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from mehsullar.models import Brend, Marka, Mehsul, MarkaSekil, Kateqoriya
 from django.template.defaultfilters import slugify
 from django.db.models import Q
+import re
 
 def anaevim(request):
     brendler = Brend.objects.all()
@@ -29,10 +30,13 @@ def mehsullar(request):
     
     # Əgər axtarış parametri varsa, məhsulları filter edirik
     if search_query:
+        # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
+        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query)
+        
+        # OEM kodlarında və məhsul adında axtarış
         mehsullar = mehsullar.filter(
-            Q(adi__icontains=search_query) | 
-            Q(oem__icontains=search_query) |
-            Q(brend_kod__icontains=search_query)
+            Q(oem_kodlar__kod__icontains=clean_search) |
+            Q(adi__icontains=search_query)  # Məhsul adı ilə axtarış
         ).distinct()
     
     context = {

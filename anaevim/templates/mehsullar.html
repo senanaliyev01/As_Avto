@@ -81,166 +81,161 @@
         </div>
     </header>
 
-    <!-- Axtarış Bölməsi -->
-    <section class="search-section">
-        <div class="container">
-            <form id="search-form" class="search-form" method="GET">
-                <div class="search-input-container">
-                    <input type="text" name="search_text" id="search-input" placeholder="Məhsul adı və ya OEM kodu ilə axtar..." autocomplete="off">
-                    <button type="submit" id="search-button" class="search-button">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-                <div class="search-results-dropdown"></div>
-            </form>
+    <main class="products-page">
+        <!-- Axtarış paneli -->
+        <div class="search-container">
+            <div class="container">
+                <form method="get" action="{% url 'mehsullar' %}" class="search-form">
+                    <div class="search-input-wrapper">
+                        <input type="text" name="q" placeholder="Məhsul axtar..." class="search-input" {% if query %}value="{{ query }}"{% endif %}>
+                        <button type="submit" class="search-button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </section>
 
-    <!-- Ana Məzmun -->
-    <div class="products-page-layout">
-        <div class="container">
-            <div class="products-container">
-                <!-- Filtr Paneli -->
-                <div class="filter-sidebar">
-                    <div class="filter-section">
-                        <h3 class="filter-title">Kateqoriyalar</h3>
-                        <div class="filter-content">
-                            <ul class="category-list">
-                                {% for kateqoriya in kateqoriyalar %}
-                                <li>
-                                    <a href="?category={{ kateqoriya.adi }}" class="category-item">
-                                        {{ kateqoriya.adi }}
-                                    </a>
-                                </li>
-                                {% empty %}
-                                <li>Kateqoriya tapılmadı</li>
-                                {% endfor %}
-                            </ul>
+        <!-- Kateqoriya üst panel -->
+        <div class="category-breadcrumb">
+            <div class="container">
+                <ul class="breadcrumb">
+                    <li><a href="{% url 'anaevim' %}">Ana səhifə</a></li>
+                    <li>Məhsullar</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Əsas məzmun -->
+        <div class="products-content container">
+            <!-- Sol panel (Filtrlər) -->
+            <aside class="filters-sidebar">
+                <!-- Kateqoriyalar -->
+                <div class="filter-group">
+                    <h3 class="filter-title">Kateqoriyalar</h3>
+                    <div class="filter-items">
+                        <div class="filter-item">
+                            <a href="{% url 'mehsullar' %}" class="filter-link {% if not selected_category %}active{% endif %}">
+                                Bütün kateqoriyalar
+                            </a>
                         </div>
-                    </div>
-
-                    <div class="filter-section">
-                        <h3 class="filter-title">Markalar</h3>
-                        <div class="filter-content">
-                            <div class="dropdown-filter">
-                                <div class="dropdown-header">
-                                    <span>Marka seçin</span>
-                                    <i class="fas fa-chevron-down"></i>
-                                </div>
-                                <div class="dropdown-content">
-                                    {% for marka in markalar %}
-                                    <div class="dropdown-item">
-                                        <label>
-                                            <input type="checkbox" name="marka" value="{{ marka.adi }}">
-                                            <span>{{ marka.adi }}</span>
-                                        </label>
-                                    </div>
-                                    {% empty %}
-                                    <div class="dropdown-item">Marka tapılmadı</div>
-                                    {% endfor %}
-                                </div>
-                            </div>
+                        
+                        {% for kateqoriya in kateqoriyalar %}
+                        <div class="filter-item">
+                            <a href="?kateqoriya={{ kateqoriya.id }}" class="filter-link {% if selected_category == kateqoriya.id %}active{% endif %}">
+                                {{ kateqoriya.adi }}
+                            </a>
                         </div>
-                    </div>
-
-                    <div class="filter-section">
-                        <h3 class="filter-title">Brendlər</h3>
-                        <div class="filter-content">
-                            <div class="dropdown-filter">
-                                <div class="dropdown-header">
-                                    <span>Brend seçin</span>
-                                    <i class="fas fa-chevron-down"></i>
-                                </div>
-                                <div class="dropdown-content">
-                                    {% for brend in brendler %}
-                                    <div class="dropdown-item">
-                                        <label>
-                                            <input type="checkbox" name="brend" value="{{ brend.adi }}">
-                                            <span>{{ brend.adi }}</span>
-                                        </label>
-                                    </div>
-                                    {% empty %}
-                                    <div class="dropdown-item">Brend tapılmadı</div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="filter-actions">
-                        <button type="button" class="btn filter-apply-btn">Filtri tətbiq et</button>
-                        <button type="button" class="btn filter-reset-btn">Sıfırla</button>
+                        {% endfor %}
                     </div>
                 </div>
 
-                <!-- Məhsullar Görünüş Sahəsi -->
-                <div class="products-main-content">
-                    <!-- Brendlər Slayderi -->
-                    <section class="products-slider">
-                        <div class="full-width-container">
-                            <div class="slider-section" id="brands-slider">
-                                <h2 class="section__title">Brendlərimiz</h2>
-                                <div class="slider-container">
-                                    <div class="slider-wrapper">
-                                        <div class="slider-track">
-                                            {% for brend in brendler %}
-                                                {% if brend.sekil %}
-                                                <div class="slider-item">
-                                                    <div class="product-card">
-                                                        <div class="product-card__image">
-                                                            <img src="{{ brend.sekil.url }}" alt="{{ brend.adi }}">
-                                                        </div>
-                                                        <div class="product-card__content">
-                                                            <h3 class="product-card__title">{{ brend.adi }}</h3>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                <!-- Brendlər -->
+                <div class="filter-group">
+                    <h3 class="filter-title">Firmalar</h3>
+                    <div class="filter-items">
+                        <div class="filter-item">
+                            <a href="{% url 'mehsullar' %}" class="filter-link {% if not selected_brend %}active{% endif %}">
+                                Bütün firmalar
+                            </a>
                         </div>
-                    </section>
+                        
+                        {% for brend in brendler %}
+                        <div class="filter-item">
+                            <a href="?brend={{ brend.id }}" class="filter-link {% if selected_brend == brend.id %}active{% endif %}">
+                                {{ brend.adi }}
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
 
-                    <!-- Məhsullar Grid -->
-                    <section class="products-grid-section">
-                        <div class="container">
-                            <div class="products-grid">
-                                {% for mehsul in mehsullar %}
-                                    {% if mehsul.sekil %}
-                                    <div class="grid-item">
+                <!-- Markalar -->
+                <div class="filter-group">
+                    <h3 class="filter-title">Markalar</h3>
+                    <div class="filter-items">
+                        <div class="filter-item">
+                            <a href="{% url 'mehsullar' %}" class="filter-link {% if not selected_marka %}active{% endif %}">
+                                Bütün markalar
+                            </a>
+                        </div>
+                        
+                        {% for marka in markalar %}
+                        <div class="filter-item">
+                            <a href="?marka={{ marka.id }}" class="filter-link {% if selected_marka == marka.id %}active{% endif %}">
+                                {{ marka.adi }}
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Məhsullar (sağ panel) -->
+            <div class="products-main">
+                <!-- Brendlər Slayder -->
+                <section class="brands-slider-section">
+                    <h2 class="section__title">Brendlərimiz</h2>
+                    <div class="slider-container">
+                        <div class="slider-wrapper">
+                            <div class="slider-track">
+                                {% for brend in brendler %}
+                                    {% if brend.sekil %}
+                                    <div class="slider-item">
                                         <div class="product-card">
                                             <div class="product-card__image">
-                                                <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
+                                                <img src="{{ brend.sekil.url }}" alt="{{ brend.adi }}">
                                             </div>
                                             <div class="product-card__content">
-                                                <h3 class="product-card__title">{{ mehsul.adi }}</h3>
-                                                <p class="product-card__description">Marka: {{ mehsul.marka.adi }}</p>
-                                                <p class="product-card__description">Brend: {{ mehsul.brend.adi }}</p>
-                                                <p class="product-card__description">KOD: {{ mehsul.oem }}</p>
-                                                <p class="product-card__description">Qiymət: {{ mehsul.formatted_qiymet }} ₼</p>
-                                                <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="product-card__button">
-                                                    Ətraflı Məlumat
-                                                    <i class="fas fa-arrow-right"></i>
-                                                </a>
+                                                <h3 class="product-card__title">{{ brend.adi }}</h3>
                                             </div>
                                         </div>
                                     </div>
                                     {% endif %}
-                                {% empty %}
-                                <div class="no-results">
-                                    <p>Heç bir məhsul tapılmadı.</p>
-                                </div>
                                 {% endfor %}
                             </div>
                         </div>
-                    </section>
-                </div>
+                    </div>
+                </section>
+
+                <!-- Məhsullar -->
+                <section class="products-grid-section">
+                    <h2 class="section__title">Məhsullarımız</h2>
+                    {% if mehsullar %}
+                    <div class="products-grid">
+                        {% for mehsul in mehsullar %}
+                            {% if mehsul.sekil %}
+                            <div class="grid-item">
+                                <div class="product-card">
+                                    <div class="product-card__image">
+                                        <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
+                                    </div>
+                                    <div class="product-card__content">
+                                        <h3 class="product-card__title">{{ mehsul.adi }}</h3>
+                                        <p class="product-card__description">Marka: {{ mehsul.marka.adi }}</p>
+                                        <p class="product-card__description">Brend: {{ mehsul.brend.adi }}</p>
+                                        <p class="product-card__description">KOD: {{ mehsul.oem }}</p>
+                                        <p class="product-card__description">Qiymət: {{ mehsul.formatted_qiymet }} ₼</p>
+                                        <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="product-card__button">
+                                            Ətraflı Məlumat
+                                            <i class="fas fa-arrow-right"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="no-products">
+                        <p>Təəssüf ki, axtarışınıza uyğun məhsul tapılmadı.</p>
+                        <a href="{% url 'mehsullar' %}" class="btn btn--primary">Bütün məhsulları göstər</a>
+                    </div>
+                    {% endif %}
+                </section>
             </div>
         </div>
-    </div>
+    </main>
 
     <!-- Footer -->
     <footer class="footer">
@@ -300,6 +295,12 @@
             </div>
         </div>
     </footer>
+
+    <!-- Mobile Filters Button -->
+    <button class="mobile-filters-toggle">
+        <i class="fas fa-filter"></i>
+        Filtrlər
+    </button>
 
     <!-- Scripts -->
     <script src="{% static 'js/anaevim.js' %}"></script>

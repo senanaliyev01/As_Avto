@@ -42,12 +42,14 @@ class App {
             this.heroSlider = new HeroSlider();
             this.mobileMenu = new MobileMenu();
             this.scrollAnimations = new ScrollAnimations();
+            this.mobileFilters = new MobileFilters();
             
             // Start components
             this.header.init();
             this.heroSlider.init();
             this.mobileMenu.init();
             this.scrollAnimations.init();
+            this.mobileFilters.init();
             
             // Initialize product sliders
             const sliderContainers = utils.selectAll('.slider-container');
@@ -74,6 +76,56 @@ class App {
             const clone = item.cloneNode(true);
             slider.appendChild(clone);
         });
+    }
+}
+
+// Mobile Filters Component
+class MobileFilters {
+    constructor() {
+        this.toggleButton = utils.select('.mobile-filters-toggle');
+        this.filtersSidebar = utils.select('.filters-sidebar');
+        this.isOpen = false;
+    }
+
+    init() {
+        if (!this.toggleButton || !this.filtersSidebar) return;
+        
+        this.setupEventListeners();
+    }
+
+    setupEventListeners() {
+        // Toggle filters
+        this.toggleButton.addEventListener('click', () => this.toggleFilters());
+        
+        // Close when clicking outside
+        document.addEventListener('click', (e) => {
+            if (this.isOpen && 
+                !this.filtersSidebar.contains(e.target) && 
+                !this.toggleButton.contains(e.target)) {
+                this.closeFilters();
+            }
+        });
+
+        // Close on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.isOpen) {
+                this.closeFilters();
+            }
+        });
+    }
+
+    toggleFilters() {
+        this.isOpen ? this.closeFilters() : this.openFilters();
+    }
+
+    openFilters() {
+        this.isOpen = true;
+        document.body.classList.add('filters-visible');
+    }
+
+    closeFilters() {
+        this.isOpen = false;
+        document.body.classList.remove('filters-visible');
     }
 }
 
@@ -442,263 +494,4 @@ class ProductSlider {
 // Initialize application when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     new App();
-    
-    // Dropdown filter functionality
-    const dropdownFilters = document.querySelectorAll('.dropdown-filter');
-    
-    dropdownFilters.forEach(filter => {
-        const header = filter.querySelector('.dropdown-header');
-        
-        header.addEventListener('click', () => {
-            // Close other open dropdowns
-            dropdownFilters.forEach(df => {
-                if (df !== filter && df.classList.contains('active')) {
-                    df.classList.remove('active');
-                }
-            });
-            
-            // Toggle active class
-            filter.classList.toggle('active');
-        });
-    });
-    
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-        dropdownFilters.forEach(filter => {
-            if (!filter.contains(e.target) && filter.classList.contains('active')) {
-                filter.classList.remove('active');
-            }
-        });
-    });
-    
-    // Filter apply button
-    const filterApplyBtn = document.querySelector('.filter-apply-btn');
-    if (filterApplyBtn) {
-        filterApplyBtn.addEventListener('click', () => {
-            applyFilters();
-        });
-    }
-    
-    // Filter reset button
-    const filterResetBtn = document.querySelector('.filter-reset-btn');
-    if (filterResetBtn) {
-        filterResetBtn.addEventListener('click', () => {
-            resetFilters();
-        });
-    }
-    
-    // Mobile filter toggle functionality
-    const filterToggle = document.querySelector('.filter-toggle');
-    const filterSidebar = document.querySelector('.filter-sidebar');
-    const filterOverlay = document.querySelector('.filter-overlay');
-    
-    if (filterToggle && filterSidebar && filterOverlay) {
-        filterToggle.addEventListener('click', () => {
-            filterSidebar.classList.add('active');
-            filterOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        });
-        
-        filterOverlay.addEventListener('click', () => {
-            filterSidebar.classList.remove('active');
-            filterOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-    }
-    
-    // Search functionality
-    setupSearch();
-});
-
-// Apply filters
-function applyFilters() {
-    // Get selected filters
-    const selectedBrends = getSelectedValues('brend');
-    const selectedMarkas = getSelectedValues('marka');
-    
-    // Build query string
-    let queryParams = new URLSearchParams(window.location.search);
-    
-    // Add selected brands to query
-    if (selectedBrends.length > 0) {
-        queryParams.set('brand', selectedBrends.join(','));
-    } else {
-        queryParams.delete('brand');
-    }
-    
-    // Add selected markas to query
-    if (selectedMarkas.length > 0) {
-        queryParams.set('model', selectedMarkas.join(','));
-    } else {
-        queryParams.delete('model');
-    }
-    
-    // Redirect with new query params
-    window.location.href = `${window.location.pathname}?${queryParams.toString()}`;
-}
-
-// Get selected values for a filter
-function getSelectedValues(name) {
-    const checkboxes = document.querySelectorAll(`input[name="${name}"]:checked`);
-    return Array.from(checkboxes).map(cb => cb.value);
-}
-
-// Reset all filters
-function resetFilters() {
-    // Uncheck all checkboxes
-    document.querySelectorAll('.dropdown-item input[type="checkbox"]').forEach(checkbox => {
-        checkbox.checked = false;
-    });
-    
-    // Redirect to base URL without query params
-    window.location.href = window.location.pathname;
-}
-
-// Setup search functionality
-function setupSearch() {
-    const searchForm = document.getElementById('search-form');
-    const searchInput = document.getElementById('search-input');
-    const searchButton = document.getElementById('search-button');
-    const dropdownContainer = document.querySelector('.search-results-dropdown');
-    
-    if (!searchForm || !searchInput || !dropdownContainer) {
-        return;
-    }
-    
-    // Initially disable search button
-    if (searchButton) {
-        searchButton.disabled = !searchInput.value.trim();
-    }
-    
-    let searchTimeout;
-    
-    // Input event with debounce
-    searchInput.addEventListener('input', () => {
-        const query = searchInput.value.trim();
-        
-        // Update button state
-        if (searchButton) {
-            searchButton.disabled = !query;
-        }
-        
-        // Clear previous timeout
-        clearTimeout(searchTimeout);
-        
-        // If empty or short query, hide dropdown
-        if (!query || query.length < 2) {
-            dropdownContainer.classList.remove('active');
-            return;
-        }
-        
-        // Set new timeout for search
-        searchTimeout = setTimeout(() => {
-            performSearch(query, dropdownContainer);
-        }, 300);
-    });
-    
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!searchForm.contains(e.target)) {
-            dropdownContainer.classList.remove('active');
-        }
-    });
-    
-    // Search form submit
-    searchForm.addEventListener('submit', (e) => {
-        const query = searchInput.value.trim();
-        
-        // Prevent empty submissions
-        if (!query) {
-            e.preventDefault();
-            return false;
-        }
-        
-        // Hide dropdown
-        dropdownContainer.classList.remove('active');
-        
-        // Load results page
-        window.location.href = `?search_text=${encodeURIComponent(query)}`;
-        
-        // Prevent form submission as we handle it manually
-        e.preventDefault();
-        return false;
-    });
-}
-
-// Perform search API call
-async function performSearch(query, dropdownContainer) {
-    try {
-        // Fetch search results
-        const response = await fetch(`/realtime-search/?q=${encodeURIComponent(query)}`);
-        
-        if (!response.ok) {
-            throw new Error('Axtarış sorğusu zamanı xəta baş verdi');
-        }
-        
-        const data = await response.json();
-        
-        // Display results in dropdown
-        if (data.results && data.results.length > 0) {
-            const html = data.results.map(result => {
-                const stockStatus = result.stok === 0 
-                    ? '<div class="stock-status out-of-stock">Yoxdur</div>' 
-                    : result.stok <= 20 
-                        ? '<div class="stock-status low-stock">Az var</div>' 
-                        : '<div class="stock-status in-stock">Var</div>';
-                
-                return `
-                    <div class="search-result-item" onclick="window.location.href='/product/${encodeURIComponent(result.adi)}-${encodeURIComponent(result.oem)}-${encodeURIComponent(result.brend_kod)}/${result.id}/'">
-                        ${result.sekil_url ? `<img src="${result.sekil_url}" alt="${result.adi}">` : ''}
-                        <div class="search-result-info">
-                            <h4>${result.adi}</h4>
-                            <p>${result.brend} ${result.marka}</p>
-                            <p>Kod: ${result.brend_kod} ${result.oem}</p>
-                        </div>
-                        <div class="search-result-price">
-                            ${stockStatus}
-                            ${result.qiymet} ₼
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            
-            dropdownContainer.innerHTML = html;
-            dropdownContainer.classList.add('active');
-        } else {
-            dropdownContainer.innerHTML = '<div class="search-result-item">Heç bir nəticə tapılmadı</div>';
-            dropdownContainer.classList.add('active');
-        }
-    } catch (error) {
-        console.error('Axtarış xətası:', error);
-        dropdownContainer.innerHTML = '<div class="search-result-item">Xəta baş verdi</div>';
-        dropdownContainer.classList.add('active');
-    }
-}
-
-// Load existing filters from URL on page load
-function loadFiltersFromURL() {
-    const params = new URLSearchParams(window.location.search);
-    
-    // Load brands
-    if (params.has('brand')) {
-        const brands = params.get('brand').split(',');
-        brands.forEach(brand => {
-            const checkbox = document.querySelector(`input[name="brend"][value="${brand}"]`);
-            if (checkbox) checkbox.checked = true;
-        });
-    }
-    
-    // Load markas
-    if (params.has('model')) {
-        const markas = params.get('model').split(',');
-        markas.forEach(marka => {
-            const checkbox = document.querySelector(`input[name="marka"][value="${marka}"]`);
-            if (checkbox) checkbox.checked = true;
-        });
-    }
-}
-
-// Call load filters when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    loadFiltersFromURL();
 }); 

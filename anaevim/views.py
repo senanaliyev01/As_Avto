@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from mehsullar.models import Brend, Marka, Mehsul, MarkaSekil
+from mehsullar.models import Brend, Marka, Mehsul, MarkaSekil, Kateqoriya
 from django.template.defaultfilters import slugify
+from django.db.models import Q
 
 def anaevim(request):
     brendler = Brend.objects.all()
@@ -17,12 +18,29 @@ def anaevim(request):
     return render(request, 'home.html', context)
 
 def mehsullar(request):
+    # Kateqoriyaları və digər məlumatları əldə edirik
+    kateqoriyalar = Kateqoriya.objects.all()
     brendler = Brend.objects.all()
+    markalar = Marka.objects.all()
     mehsullar = Mehsul.objects.all()
     
+    # Axtarış parametrini alırıq
+    search_query = request.GET.get('q')
+    
+    # Əgər axtarış parametri varsa, məhsulları filter edirik
+    if search_query:
+        mehsullar = mehsullar.filter(
+            Q(adi__icontains=search_query) | 
+            Q(oem__icontains=search_query) |
+            Q(brend_kod__icontains=search_query)
+        ).distinct()
+    
     context = {
+        'kateqoriyalar': kateqoriyalar,
         'brendler': brendler,
+        'markalar': markalar,
         'mehsullar': mehsullar,
+        'search_query': search_query,
     }
     
     return render(request, 'mehsullar.html', context)

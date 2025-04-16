@@ -439,7 +439,193 @@ class ProductSlider {
     }
 }
 
-// Initialize application when DOM is ready
+// Məhsullar Səhifəsi
+class ProductsPage {
+    constructor() {
+        // DOM elementlərini seçirik
+        this.searchForm = utils.select('#searchForm');
+        this.searchInput = utils.select('#searchInput');
+        this.searchResults = utils.select('#searchResults');
+        this.searchQuery = utils.select('#searchQuery');
+        this.clearSearchBtn = utils.select('#clearSearch');
+        this.productsGrid = utils.select('#productsGrid');
+        this.productsCount = utils.select('#productsCount');
+        this.noProducts = utils.select('#noProducts');
+        
+        // Filterlər
+        this.categoryLinks = utils.selectAll('#categoryList .filter-link');
+        this.brandLinks = utils.selectAll('#brandList .filter-link');
+        this.markaLinks = utils.selectAll('#markaList .filter-link');
+        
+        // Aktiv filterlər
+        this.activeFilters = {
+            category: 'all',
+            brand: 'all',
+            marka: 'all'
+        };
+        
+        // Axtarış mətni
+        this.searchText = '';
+        
+        // Məhsulların sayı
+        this.totalProducts = utils.selectAll('#productsGrid .grid-item').length;
+        this.visibleProducts = this.totalProducts;
+        
+        this.init();
+    }
+    
+    init() {
+        if (!this.searchForm) return;
+        
+        // Olay dinləyicilərini qurur
+        this.setupEventListeners();
+        
+        // Məhsulların sayını yeniləyirik
+        this.updateProductCount();
+    }
+    
+    setupEventListeners() {
+        // Axtarış formu təqdim edildikdə
+        this.searchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleSearch();
+        });
+        
+        // Axtarış təmizlə düyməsi
+        if (this.clearSearchBtn) {
+            this.clearSearchBtn.addEventListener('click', () => {
+                this.clearSearch();
+            });
+        }
+        
+        // Kateqoriya filter linkləri
+        this.categoryLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.setActiveFilter(this.categoryLinks, link);
+                this.activeFilters.category = link.getAttribute('data-category');
+                this.filterProducts();
+            });
+        });
+        
+        // Brend filter linkləri
+        this.brandLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.setActiveFilter(this.brandLinks, link);
+                this.activeFilters.brand = link.getAttribute('data-brand');
+                this.filterProducts();
+            });
+        });
+        
+        // Marka filter linkləri
+        this.markaLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.setActiveFilter(this.markaLinks, link);
+                this.activeFilters.marka = link.getAttribute('data-marka');
+                this.filterProducts();
+            });
+        });
+        
+        // Axtarış inputu dəyişdikdə real vaxtda axtarış
+        if (this.searchInput) {
+            this.searchInput.addEventListener('input', utils.debounce(() => {
+                if (this.searchInput.value.length >= 3 || this.searchInput.value.length === 0) {
+                    this.handleSearch();
+                }
+            }, 300));
+        }
+    }
+    
+    handleSearch() {
+        const query = this.searchInput.value.trim().toLowerCase();
+        this.searchText = query;
+        
+        if (query) {
+            // Axtarış nəticələri başlığını göstəririk
+            this.searchResults.style.display = 'flex';
+            this.searchQuery.textContent = query;
+        } else {
+            // Axtarış nəticələri başlığını gizlədirik
+            this.searchResults.style.display = 'none';
+        }
+        
+        this.filterProducts();
+    }
+    
+    clearSearch() {
+        this.searchInput.value = '';
+        this.searchText = '';
+        this.searchResults.style.display = 'none';
+        this.filterProducts();
+    }
+    
+    setActiveFilter(links, activeLink) {
+        links.forEach(link => {
+            link.classList.remove('active');
+        });
+        activeLink.classList.add('active');
+    }
+    
+    filterProducts() {
+        const items = utils.selectAll('#productsGrid .grid-item');
+        let visibleCount = 0;
+        
+        items.forEach(item => {
+            const category = item.getAttribute('data-category');
+            const brand = item.getAttribute('data-brand');
+            const marka = item.getAttribute('data-marka');
+            const title = item.querySelector('.product-card__title').textContent.toLowerCase();
+            const code = item.querySelector('.product-card__description:nth-of-type(3)').textContent.toLowerCase();
+            
+            // Kateqoriya, brend və markaya görə filter
+            const categoryMatch = this.activeFilters.category === 'all' || category === this.activeFilters.category;
+            const brandMatch = this.activeFilters.brand === 'all' || brand === this.activeFilters.brand;
+            const markaMatch = this.activeFilters.marka === 'all' || marka === this.activeFilters.marka;
+            
+            // Axtarış mətninə görə filter
+            const searchMatch = !this.searchText || 
+                                title.includes(this.searchText) || 
+                                code.includes(this.searchText);
+            
+            // Bütün filterlərə uyğundursa göstər
+            if (categoryMatch && brandMatch && markaMatch && searchMatch) {
+                item.style.display = 'block';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        
+        this.visibleProducts = visibleCount;
+        this.updateProductCount();
+        
+        // Məhsul tapılmadı mesajını göstər və ya gizlət
+        if (visibleCount === 0) {
+            this.noProducts.style.display = 'flex';
+            this.productsGrid.style.display = 'none';
+        } else {
+            this.noProducts.style.display = 'none';
+            this.productsGrid.style.display = 'grid';
+        }
+    }
+    
+    updateProductCount() {
+        if (this.productsCount) {
+            this.productsCount.textContent = `${this.visibleProducts} məhsul`;
+        }
+    }
+}
+
+// Application initiation
 document.addEventListener('DOMContentLoaded', () => {
+    // Existing code
     new App();
+    
+    // Initialize Products Page
+    const currentPath = window.location.pathname;
+    if (currentPath.includes('mehsullar') || currentPath.includes('products')) {
+        new ProductsPage();
+    }
 }); 

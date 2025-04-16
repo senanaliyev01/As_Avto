@@ -81,64 +81,119 @@
         </div>
     </header>
 
-  
+    <!-- Axtarış paneli -->
+    <div class="search-panel">
+        <div class="container">
+            <form class="search-form" id="searchForm" method="GET" action="{% url 'mehsullar' %}">
+                <div class="search-input-container">
+                    <input type="text" class="search-input" placeholder="Məhsul adı və ya OEM nömrəsi ilə axtarış..." 
+                           id="searchInput" name="q" value="{{ search_query }}">
+                    <button type="submit" class="search-button">
+                        <i class="fas fa-search"></i>
+                        Axtar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    <!-- Brands Slider -->
-    <section class="products-slider">
-        <div class="full-width-container">
-            <!-- Brendlər -->
-            <div class="slider-section" id="brands-slider">
-                <h2 class="section__title">Brendlərimiz</h2>
-                <div class="slider-container">
-                    <div class="slider-wrapper">
-                        <div class="slider-track">
-                            {% for brend in brendler %}
-                                {% if brend.sekil %}
-                                <div class="slider-item">
-                                    <div class="product-card">
-                                        <div class="product-card__image">
-                                            <img src="{{ brend.sekil.url }}" alt="{{ brend.adi }}">
-                                        </div>
-                                        <div class="product-card__content">
-                                            <h3 class="product-card__title">{{ brend.adi }}</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endif %}
+    <!-- Məhsullar bölməsi -->
+    <section class="products-section">
+        <div class="container">
+            <div class="products-layout">
+                <!-- Sol panel (filterlər) -->
+                <div class="filters-panel">
+                    <div class="filter-section">
+                        <h3 class="filter-title">Kateqoriyalar</h3>
+                        <ul class="filter-list" id="categoryList">
+                            <li class="filter-item">
+                                <a href="#" class="filter-link active" data-category="all">Hamısı</a>
+                            </li>
+                            {% for kateqoriya in kateqoriyalar %}
+                            <li class="filter-item">
+                                <a href="#" class="filter-link" data-category="{{ kateqoriya.adi }}">{{ kateqoriya.adi }}</a>
+                            </li>
                             {% endfor %}
-                        </div>
+                        </ul>
+                    </div>
+
+                    <div class="filter-section">
+                        <h3 class="filter-title">Brendlər</h3>
+                        <ul class="filter-list" id="brandList">
+                            <li class="filter-item">
+                                <a href="#" class="filter-link active" data-brand="all">Hamısı</a>
+                            </li>
+                            {% for brend in brendler %}
+                            <li class="filter-item">
+                                <a href="#" class="filter-link" data-brand="{{ brend.adi }}">{{ brend.adi }}</a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div class="filter-section">
+                        <h3 class="filter-title">Markalar</h3>
+                        <ul class="filter-list" id="markaList">
+                            <li class="filter-item">
+                                <a href="#" class="filter-link active" data-marka="all">Hamısı</a>
+                            </li>
+                            {% for marka in markalar %}
+                            <li class="filter-item">
+                                <a href="#" class="filter-link" data-marka="{{ marka.adi }}">{{ marka.adi }}</a>
+                            </li>
+                            {% endfor %}
+                        </ul>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Products Grid -->
-    <section class="products-grid-section">
-        <div class="container">
-            <div class="products-grid">
-                {% for mehsul in mehsullar %}
-                    {% if mehsul.sekil %}
-                    <div class="grid-item">
-                        <div class="product-card">
-                            <div class="product-card__image">
-                                <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
-                            </div>
-                            <div class="product-card__content">
-                                <h3 class="product-card__title">{{ mehsul.adi }}</h3>
-                                <p class="product-card__description">Marka: {{ mehsul.marka.adi }}</p>
-                                <p class="product-card__description">Brend: {{ mehsul.brend.adi }}</p>
-                                <p class="product-card__description">KOD: {{ mehsul.oem }}</p>
-                                <p class="product-card__description">Qiymət: {{ mehsul.formatted_qiymet }} ₼</p>
-                                <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="product-card__button">
-                                    Ətraflı Məlumat
-                                    <i class="fas fa-arrow-right"></i>
-                                </a>
-                            </div>
-                        </div>
+                <!-- Sağ panel (məhsullar) -->
+                <div class="products-panel">
+                    <div class="products-header">
+                        <h2 class="products-title">Məhsullarımız</h2>
+                        <div class="products-count" id="productsCount">{{ mehsullar.count }} məhsul</div>
                     </div>
-                    {% endif %}
-                {% endfor %}
+
+                    <!-- Axtarış nəticələri -->
+                    <div class="search-results" id="searchResults" style="display:none;">
+                        <h3>Axtarış nəticələri: <span id="searchQuery"></span></h3>
+                        <button id="clearSearch" class="clear-search-btn">Təmizlə</button>
+                    </div>
+
+                    <!-- Məhsullar gridi -->
+                    <div class="products-grid" id="productsGrid">
+                        {% for mehsul in mehsullar %}
+                            {% if mehsul.sekil %}
+                            <div class="grid-item" 
+                                 data-category="{{ mehsul.kateqoriya.adi|default:'unknown' }}" 
+                                 data-brand="{{ mehsul.brend.adi|default:'unknown' }}" 
+                                 data-marka="{{ mehsul.marka.adi|default:'unknown' }}">
+                                <div class="product-card">
+                                    <div class="product-card__image">
+                                        <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
+                                    </div>
+                                    <div class="product-card__content">
+                                        <h3 class="product-card__title">{{ mehsul.adi }}</h3>
+                                        <p class="product-card__description">Marka: {{ mehsul.marka.adi }}</p>
+                                        <p class="product-card__description">Brend: {{ mehsul.brend.adi }}</p>
+                                        <p class="product-card__description">KOD: {{ mehsul.oem }}</p>
+                                        <p class="product-card__description">Qiymət: {{ mehsul.formatted_qiymet }} ₼</p>
+                                        <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="product-card__button">
+                                            Ətraflı Məlumat
+                                            <i class="fas fa-arrow-right"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <!-- Məhsul tapılmadı mesajı -->
+                    <div class="no-products" id="noProducts" style="display:none;">
+                        <i class="fas fa-search"></i>
+                        <p>Axtarışınıza uyğun məhsul tapılmadı.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>

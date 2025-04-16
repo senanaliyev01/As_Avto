@@ -33,10 +33,10 @@ def mehsullar(request):
         # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query)
         
-        # OEM kodlarında və məhsul adında axtarış
+        # Sadəcə məhsul adı və əlavə OEM kodları ilə axtarış
         mehsullar = mehsullar.filter(
-            Q(oem_kodlar__kod__icontains=clean_search) |
-            Q(adi__icontains=search_query)  # Məhsul adı ilə axtarış
+            Q(adi__icontains=search_query) |           # Məhsul adı ilə axtarış
+            Q(oem_kodlar__kod__icontains=clean_search)  # Əlavə OEM kodları ilə axtarış
         ).distinct()
     
     context = {

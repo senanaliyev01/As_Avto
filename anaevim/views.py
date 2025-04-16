@@ -27,25 +27,19 @@ def mehsullar(request):
     
     # Axtarış parametrini alırıq
     search_query = request.GET.get('q')
-    search_performed = False
     
     # Əgər axtarış parametri varsa, məhsulları filter edirik
     if search_query:
-        search_performed = True
-        # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
+        # Xüsusi simvolları təmizlə
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query)
         
-        # Məhsul adı və əlavə OEM kodları ilə axtarış
-        # Qeyd: OEMKod modelində əlavə OEM kodları saxlanılır və mehsul ilə ForeignKey əlaqəsi var
-        # Buna görə də "oem_kodlar__kod" ilə axtarış aparırıq (related_name = 'oem_kodlar')
+        # OEM kodlarında və məhsul adında axtarış
         mehsullar = mehsullar.filter(
-            Q(adi__icontains=search_query) |           # Məhsul adı ilə axtarış
-            Q(oem_kodlar__kod__icontains=clean_search)  # Əlavə OEM kodları ilə axtarış
-        ).distinct()  # Təkrarlanmaları aradan qaldırmaq üçün distinct() istifadə edirik
-    
-    # Axtarış nəticəsi boşdursa və axtarış edilmişdirsə, konsola mesaj çap edirik (debug məqsədilə)
-    if search_performed and not mehsullar.exists():
-        print(f"OEM axtarışı üçün heç bir nəticə tapılmadı: {search_query} (təmizlənmiş: {clean_search})")
+            Q(oem__icontains=clean_search) |  # Əsas OEM kodunda
+            Q(oem_kodlar__kod__icontains=clean_search) |  # Əlavə OEM kodlarında
+            Q(brend_kod__icontains=clean_search) |  # Brend kodunda
+            Q(adi__icontains=search_query)  # Məhsul adında
+        ).distinct()
     
     context = {
         'kateqoriyalar': kateqoriyalar,
@@ -53,7 +47,6 @@ def mehsullar(request):
         'markalar': markalar,
         'mehsullar': mehsullar,
         'search_query': search_query,
-        'search_performed': search_performed
     }
     
     return render(request, 'mehsullar.html', context)

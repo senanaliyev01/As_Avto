@@ -484,6 +484,15 @@ class ProductsPage {
         
         // İlk filteri aktiv et
         if (this.filterTitles.length > 0) {
+            // Bütün filterlər üçün başlanğıcda qapat
+            this.filterLists.forEach(list => {
+                list.classList.remove('active');
+            });
+            this.filterTitles.forEach(title => {
+                title.classList.remove('active');
+            });
+            
+            // Yalnız ilk filteri aç
             this.toggleFilterPanel(this.filterTitles[0]);
         }
         

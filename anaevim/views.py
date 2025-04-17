@@ -42,5 +42,3 @@ def mehsul_etrafli(request, mehsul_id, mehsul_adi=None, mehsul_oem=None, mehsul_
     }
     return render(request, 'mehsul_etrafli.html', context)
 
-def gizlilik(request):
-    return render(request,'gizlilik.html')

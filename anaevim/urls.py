@@ -8,5 +8,4 @@ urlpatterns = [
     path('product/<str:mehsul_adi>-<str:mehsul_oem>-<str:mehsul_brend_kod>/<int:mehsul_id>/', 
          views.mehsul_etrafli, 
          name='mehsul_etrafli'),  # Məhsul haqqında ətraflı
-    path('security',views.gizlilik, name='security')
 ]

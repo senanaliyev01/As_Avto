@@ -376,8 +376,8 @@
                                             <h3 class="product-card__title">{{ mehsul.adi }}</h3>
                                             <p class="product-card__description">Marka: {{ mehsul.marka.adi }}</p>
                                             <p class="product-card__description">Brend: {{ mehsul.brend.adi }}</p>
-                                            <p class="product-card__description">№: {{ mehsul.brend_kod }}</p>
-                                            <p class="product-card__description">KOD: {{ mehsul.oem }}</p>
+                                            <p class="product-card__description">Brend Kodu: {{ mehsul.brend_kod }}</p>
+                                            <p class="product-card__description">OEM: {{ mehsul.oem }}</p>
                                             <p class="product-card__description">Qiymət: {{ mehsul.formatted_qiymet }} ₼</p>
                                             <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="product-card__button">
                                                 Ətraflı Məlumat
@@ -411,13 +411,13 @@
                     <p class="feature__text">100% orijinal və zəmanətli məhsullar təqdim edirik</p>
                 </div>
 
-                {% comment %} <div class="feature">
+                <div class="feature">
                     <div class="feature__icon">
                         <i class="fas fa-car"></i>
                     </div>
                     <h3 class="feature__title">Rent A Car</h3>
                     <p class="feature__text">Maşınların icarəsi və satışı</p>
-                </div> {% endcomment %}
+                </div>
 
                 <div class="feature">
                     <div class="feature__icon">
@@ -455,7 +455,7 @@
                     </p>
                     <ul class="about__features">
                         <li><i class="fas fa-check"></i> Premium keyfiyyətli məhsullar</li>
-                        {% comment %} <li><i class="fas fa-check"></i> Maşınların icarəsi və satışı</li> {% endcomment %}
+                        <li><i class="fas fa-check"></i> Maşınların icarəsi və satışı</li>
                         <li><i class="fas fa-check"></i> Professional komanda</li>
                         <li><i class="fas fa-check"></i> Münasib qiymətlər</li>
                         <li><i class="fas fa-check"></i> Zəmanətli xidmət</li>
@@ -490,7 +490,7 @@
                         <i class="fas fa-envelope"></i>
                         <div>
                             <h3>E-mail</h3>
-                            <p>as.avto.2025@gmail.com</p>
+                            <p>senan.eliyev.9997@gmail.com</p>
                         </div>
                     </div>
                 </div>
@@ -514,7 +514,7 @@
                             <a href="https://wa.me/994773059585" target="_blank" rel="noopener" aria-label="WhatsApp">
                                 <i class="fab fa-whatsapp"></i>
                             </a>
-                            <a href="https://www.tiktok.com/@as_avto_service" target="_blank" rel="noopener" aria-label="TikTok">
+                            <a href="https://www.tiktok.com/@a_avto_service" target="_blank" rel="noopener" aria-label="TikTok">
                                 <i class="fab fa-tiktok"></i>
                             </a>
                          
@@ -541,7 +541,7 @@
                             </li>
                             <li>
                                 <i class="fas fa-envelope"></i>
-                                <a href="mailto:as.avto.2025@gmail.com">as.avto.2025@gmail.com</a>
+                                <a href="mailto:senan.eliyev.9997@gmail.com">senan.eliyev.9997@gmail.com</a>
                             </li>
                             <li>
                                 <i class="fas fa-clock"></i>

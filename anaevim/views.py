@@ -130,8 +130,9 @@ def catalogue_search(request):
         'search_type': search_type,
         'selected_category': category,
         'selected_brand': brand,
-        'selected_model': model
+        'selected_model': model,
+        'search_submitted': True  # Axtarış nəticələrini göstərmək üçün
     }
     
-    return render(request, 'catalogue_results.html', context)
+    return render(request, 'catalogue.html', context)
 

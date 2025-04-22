@@ -162,13 +162,14 @@ def products_list(request):
 
     # Axtarış mətni varsa
     if search_text:
-        # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
+        # Xüsusi simvolları təmizlə
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_text)
         
-        # OEM kodlarında və məhsul adında axtarış
+        # OEM kodlarında, AS kodunda və məhsul adında axtarış
         mehsullar = mehsullar.filter(
             Q(oem_kodlar__kod__icontains=clean_search) |
-            Q(adi__icontains=search_text)  # Məhsul adı ilə axtarış
+            Q(adi__icontains=search_text) |  # Məhsul adı ilə axtarış
+            Q(as_kodu__icontains=clean_search)  # AS kodu ilə axtarış
         ).distinct()
 
     return render(request, 'products_list.html', {
@@ -412,13 +413,14 @@ def mehsul_axtaris(request):
         # Başlanğıc sorğunu yaradırıq
         mehsullar = Mehsul.objects.all()
         
-        # Xüsusi simvolları təmizlə (əlavə OEM kodları üçün)
+        # Xüsusi simvolları təmizlə
         clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
         
-        # OEM kodlarında və məhsul adında axtarış
+        # OEM kodlarında, AS kodunda və məhsul adında axtarış
         mehsullar = mehsullar.filter(
             Q(oem_kodlar__kod__icontains=clean_query) | 
-            Q(adi__icontains=query)  # Məhsul adı ilə axtarış
+            Q(adi__icontains=query) |  # Məhsul adı ilə axtarış
+            Q(as_kodu__icontains=clean_query)  # AS kodu ilə axtarış
         ).distinct()
         
         # Nəticələri qaytarırıq
@@ -430,7 +432,8 @@ def mehsul_axtaris(request):
                 'brend__adi', 
                 'marka__adi',
                 'oem', 
-                'brend_kod', 
+                'brend_kod',
+                'as_kodu',  # AS kodunu əlavə edirik 
                 'qiymet',
                 'stok'
             ))
@@ -639,7 +642,8 @@ def realtime_search(request):
     mehsullar = Mehsul.objects.filter(
         Q(oem_kodlar__kod__icontains=clean_query) |  # OEM kodlarında
         Q(adi__icontains=query) |                    # Ad
-        Q(brend_kod__icontains=query)                # Brend kodu
+        Q(brend_kod__icontains=query) |              # Brend kodu
+        Q(as_kodu__icontains=clean_query)            # AS kodu ilə axtarış
     ).distinct()[:20]  # Performans üçün maksimum 20 nəticə
     
     results = []
@@ -651,6 +655,7 @@ def realtime_search(request):
             'marka': mehsul.marka.adi,
             'brend_kod': mehsul.brend_kod,
             'oem': mehsul.oem,
+            'as_kodu': mehsul.as_kodu,  # AS kodunu nəticələrdə qaytarırıq
             'qiymet': str(mehsul.qiymet),
             'stok': mehsul.stok,
             'sekil_url': mehsul.sekil.url if mehsul.sekil else None

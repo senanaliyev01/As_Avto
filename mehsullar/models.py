@@ -148,6 +148,10 @@ class Mehsul(models.Model):
         if not self.sekil:
             self.sekil = 'mehsul_sekilleri/noimage.webp'
             
+        # AS kodunu yaratmadan əvvəlki vəziyyəti saxlayın
+        had_as_code_before = bool(self.as_kodu)
+        as_code_changed = False
+            
         # OEM kodu əsasında AS kodunu təyin edin
         if self.oem and not self.as_kodu:
             # Eyni OEM kodu olan məhsulu tapın
@@ -156,15 +160,25 @@ class Mehsul(models.Model):
             if existing_product and existing_product.as_kodu:
                 # Eyni OEM koduna malik məhsul varsa, onun AS kodunu istifadə edin
                 self.as_kodu = existing_product.as_kodu
+                as_code_changed = True
             else:
                 # Yeni bir təkrarsız AS kodu yaradın
                 while True:
                     new_code = "AS-" + generate_as_code()
                     if not Mehsul.objects.filter(as_kodu=new_code).exists():
                         self.as_kodu = new_code
+                        as_code_changed = True
                         break
                         
         super().save(*args, **kwargs)
+        
+        # AS kodu yaradıldısa, bunu əlavə OEM kodlarına əlavə et
+        if as_code_changed and self.as_kodu and not OEMKod.objects.filter(kod=self.as_kodu, mehsul=self).exists():
+            # AS kodunu əlavə OEM olaraq əlavə et
+            OEMKod.objects.create(
+                kod=self.as_kodu,
+                mehsul=self
+            )
 
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

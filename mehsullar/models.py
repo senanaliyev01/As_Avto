@@ -108,6 +108,7 @@ class Mehsul(models.Model):
     model = models.ManyToManyField(Model,blank=True)  
     brend_kod = models.CharField(max_length=50, null=True, blank=True)
     oem = models.CharField(max_length=255, null=True, blank=True)
+    as_kod = models.CharField(max_length=9, null=True, blank=True, unique=True, help_text="AS kodları OEM kodlarına uyğun olaraq avtomatik yaradılır. Format: AS123456")
     stok = models.IntegerField(null=True, blank=True)
     maya_qiymet = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     qiymet = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
@@ -141,6 +142,29 @@ class Mehsul(models.Model):
     def save(self, *args, **kwargs):
         if not self.sekil:
             self.sekil = 'mehsul_sekilleri/noimage.webp'
+            
+        # Əgər as_kod təyin olunmayıbsa, eyni OEM koduna sahib məhsulu axtaraq
+        if not self.as_kod and self.oem:
+            # Əvvəlcə eyni OEM koduna sahib məhsulu axtaraq
+            import random
+            import string
+            eyni_oem = Mehsul.objects.filter(oem=self.oem, as_kod__isnull=False).first()
+            
+            if eyni_oem:
+                # Eyni OEM koduna sahib məhsul varsa, onun AS kodunu istifadə et
+                self.as_kod = eyni_oem.as_kod
+            else:
+                # Yeni unikal AS kodu yarat
+                while True:
+                    # 6 rəqəmli bir kod yarat
+                    random_kod = ''.join(random.choices(string.digits, k=6))
+                    yeni_as_kod = f"AS{random_kod}"
+                    
+                    # Yoxla ki, bu kod artıq istifadə olunurmu
+                    if not Mehsul.objects.filter(as_kod=yeni_as_kod).exists():
+                        self.as_kod = yeni_as_kod
+                        break
+        
         super().save(*args, **kwargs)
 
 class Sebet(models.Model):

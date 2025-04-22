@@ -27,6 +27,28 @@
         .results-table tbody tr:hover {
             background-color: rgba(0, 0, 0, 0.03);
         }
+        
+        .back-to-results-btn {
+            display: flex;
+            align-items: center;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 8px 16px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #333;
+            transition: all 0.2s;
+        }
+        
+        .back-to-results-btn:hover {
+            background-color: #e9e9e9;
+        }
+        
+        .back-to-results-btn i {
+            margin-right: 8px;
+        }
     </style>
 </head>
 <body>
@@ -280,7 +302,7 @@
                             </thead>
                             <tbody>
                                 {% for mehsul in mehsullar %}
-                                    <tr data-url="/product/{{ mehsul.adi|slugify }}-{{ mehsul.oem }}-{{ mehsul.brend_kod }}/{{ mehsul.id }}/" class="product-row">
+                                    <tr data-url="/product/{{ mehsul.adi|slugify }}-{{ mehsul.oem }}-{{ mehsul.brend_kod }}/{{ mehsul.id }}/" class="product-row" data-id="{{ mehsul.id }}">
                                         <!-- Şəkil -->
                                         <td class="col-image">
                                             {% if mehsul.sekil %}
@@ -529,9 +551,129 @@
                 row.addEventListener('click', function(e) {
                     // Əgər kliklənən element stopPropagation sinfidə deyilsə
                     if (!e.target.closest('.stop-propagation')) {
-                        const url = this.getAttribute('data-url');
-                        if (url) {
-                            window.location.href = url;
+                        e.preventDefault();
+                        
+                        // Məhsul məlumatlarını alırıq
+                        const mehsulId = this.getAttribute('data-id');
+                        const mehsulAdi = this.querySelector('.product-name').textContent;
+                        const mehsulImage = this.querySelector('.col-image img')?.getAttribute('src') || '';
+                        
+                        // Brend və marka
+                        let brendAdi = '';
+                        let markaAdi = '';
+                        const brandInfo = this.querySelector('.brand-info');
+                        if (brandInfo) {
+                            brendAdi = brandInfo.querySelector('.brand')?.textContent?.replace('Brend:', '').trim() || '';
+                            markaAdi = brandInfo.querySelector('.model')?.textContent?.replace('Model:', '').trim() || '';
+                        }
+                        
+                        // Kodlar
+                        const productCodes = this.querySelector('.product-codes');
+                        let oemKod = '';
+                        let asKod = '';
+                        let brendKod = '';
+                        let oemKodlarHTML = '';
+                        
+                        if (productCodes) {
+                            oemKod = productCodes.querySelector('.code-item:nth-child(1)')?.textContent?.replace('OEM:', '').trim() || '';
+                            asKod = productCodes.querySelector('.code-item:nth-child(2)')?.textContent?.replace('AS:', '').trim() || '';
+                            brendKod = productCodes.querySelector('.code-item:nth-child(3)')?.textContent?.replace('BREND:', '').trim() || '';
+                            
+                            // Əlavə OEM kodları
+                            const extraCodes = productCodes.querySelector('.hidden-codes');
+                            if (extraCodes) {
+                                const kodlar = extraCodes.querySelectorAll('.code-item');
+                                if (kodlar.length > 0) {
+                                    kodlar.forEach(kod => {
+                                        oemKodlarHTML += `<span class="oem-code">${kod.textContent}</span>`;
+                                    });
+                                }
+                            }
+                        }
+                        
+                        // Qiymət və stok
+                        const qiymet = this.querySelector('.product-price')?.textContent || '';
+                        const stokElement = this.querySelector('.stock-badge');
+                        let stokHTML = '';
+                        
+                        if (stokElement) {
+                            const stokClass = stokElement.classList.contains('out') ? 'out' : 
+                                             stokElement.classList.contains('low') ? 'low' : 'in';
+                            const stokText = stokElement.textContent;
+                            stokHTML = `<span class="stock-badge ${stokClass}">${stokText}</span>`;
+                        }
+                        
+                        // Məhsul URL
+                        const mehsulURL = this.getAttribute('data-url');
+                        
+                        // Tək məhsul görünüşünü yaradaq
+                        const singleProductHTML = `
+                            <div class="single-product-result">
+                                <div class="product-detail-card">
+                                    <div class="product-detail-grid">
+                                        <div class="product-image">
+                                            ${mehsulImage ? `<img src="${mehsulImage}" alt="${mehsulAdi}">` : 
+                                            `<div class="no-image"><i class="fas fa-image"></i></div>`}
+                                        </div>
+                                        <div class="product-info">
+                                            <h2 class="product-title">${mehsulAdi}</h2>
+                                            <div class="product-specs">
+                                                ${brendAdi ? `<div class="spec-item"><span class="label">Brend:</span><span class="value">${brendAdi}</span></div>` : ''}
+                                                ${markaAdi ? `<div class="spec-item"><span class="label">Model:</span><span class="value">${markaAdi}</span></div>` : ''}
+                                                ${oemKod ? `<div class="spec-item"><span class="label">OEM:</span><span class="value">${oemKod}</span></div>` : ''}
+                                                ${asKod ? `<div class="spec-item"><span class="label">AS:</span><span class="value">${asKod}</span></div>` : ''}
+                                                ${brendKod ? `<div class="spec-item"><span class="label">BREND KODU:</span><span class="value">${brendKod}</span></div>` : ''}
+                                                ${oemKodlarHTML ? `
+                                                <div class="spec-item oem-list">
+                                                    <span class="label">Dəyişən OEM Kodlar:</span>
+                                                    <div class="value oem-codes">${oemKodlarHTML}</div>
+                                                </div>` : ''}
+                                                <div class="spec-item">
+                                                    <span class="label">Qiymət:</span>
+                                                    <span class="value price">${qiymet}</span>
+                                                </div>
+                                                <div class="spec-item">
+                                                    <span class="label">Stok:</span>
+                                                    <span class="value stock">${stokHTML}</span>
+                                                </div>
+                                            </div>
+                                            <div class="product-actions">
+                                                <a href="${mehsulURL}" class="btn-view">
+                                                    <i class="fas fa-eye"></i> Ətraflı
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        // Əvvəlki nəticələri gizlədək
+                        const resultsTableWrapper = document.querySelector('.results-table-wrapper');
+                        if (resultsTableWrapper) {
+                            resultsTableWrapper.style.display = 'none';
+                            
+                            // Tək məhsul görünüşünü göstərək
+                            const singleProductContainer = document.createElement('div');
+                            singleProductContainer.id = 'single-product-view';
+                            singleProductContainer.innerHTML = singleProductHTML;
+                            
+                            // Geri qayıtma düyməsi əlavə edək
+                            const backButton = document.createElement('button');
+                            backButton.className = 'back-to-results-btn';
+                            backButton.innerHTML = '<i class="fas fa-arrow-left"></i> Bütün nəticələrə qayıt';
+                            backButton.addEventListener('click', function() {
+                                // Tək məhsul görünüşünü silək
+                                document.getElementById('single-product-view').remove();
+                                this.remove();
+                                // Cədvəl görünüşünə qayıdaq
+                                resultsTableWrapper.style.display = 'block';
+                            });
+                            
+                            // Elementləri əlavə edək
+                            const searchResultsSection = document.getElementById('search-results-section');
+                            searchResultsSection.insertBefore(backButton, resultsTableWrapper);
+                            searchResultsSection.insertBefore(singleProductContainer, resultsTableWrapper);
                         }
                     }
                 });

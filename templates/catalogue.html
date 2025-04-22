@@ -82,6 +82,315 @@
                 </form>
             </div>
 
+            <!-- Axtarış nəticələri bölməsi - birbaşa səhifədə göstərilir -->
+            <div class="search-results-section" id="search-results-section">
+                {% if mehsullar %}
+                <div class="search-summary">
+                    <div class="search-info">
+                        {% if search_query %}
+                            <div class="search-term">
+                                <strong>Axtarış:</strong> "{{ search_query }}"
+                            </div>
+                        {% endif %}
+                        
+                        {% if selected_category or selected_brand %}
+                            <div class="search-filters">
+                                <strong>Filterlər:</strong>
+                                {% if selected_category %}<span class="filter-badge">Kateqoriya: {{ selected_category }}</span>{% endif %}
+                                {% if selected_brand %}<span class="filter-badge">Brend: {{ selected_brand }}</span>{% endif %}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="search-count">
+                            <strong>Tapılan nəticələr:</strong> <span class="highlight">{{ mehsullar|length }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Filter Section -->
+                    <div class="filters-accordion">
+                        <button class="accordion-button" id="filtersToggle">
+                            <i class="fas fa-filter"></i> Filtrləmə
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="accordion-content" id="filtersPanel">
+                            <form action="{% url 'catalogue_search' %}" method="GET" class="filter-form">
+                                <input type="hidden" name="search_type" value="{{ search_type }}">
+                                {% if search_query %}
+                                    <input type="hidden" name="query" value="{{ search_query }}">
+                                {% endif %}
+                                
+                                <div class="filter-row">
+                                    <div class="filter-group">
+                                        <label for="category-filter">Kateqoriya</label>
+                                        <select name="category" id="category-filter" class="form-select">
+                                            <option value="">Bütün kateqoriyalar</option>
+                                            {% for kateqoriya in kateqoriyalar %}
+                                                <option value="{{ kateqoriya.adi }}" {% if selected_category == kateqoriya.adi %}selected{% endif %}>
+                                                    {{ kateqoriya.adi }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="filter-group">
+                                        <label for="brand-filter">Brend</label>
+                                        <select name="brand" id="brand-filter" class="form-select">
+                                            <option value="">Bütün brendlər</option>
+                                            {% for brend in brendler %}
+                                                <option value="{{ brend.adi }}" {% if selected_brand == brend.adi %}selected{% endif %}>
+                                                    {{ brend.adi }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="filter-actions">
+                                    <button type="submit" class="btn-filter-apply">
+                                        <i class="fas fa-check"></i> Tətbiq et
+                                    </button>
+                                    <a href="{% url 'catalogue' %}" class="btn-filter-reset">
+                                        <i class="fas fa-undo"></i> Sıfırla
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Məhsul tək olduqda -->
+                {% if mehsullar|length == 1 %}
+                    {% for mehsul in mehsullar %}
+                    <div class="single-product-result">
+                        <div class="product-detail-card">
+                            <div class="product-detail-grid">
+                                <div class="product-image">
+                                    {% if mehsul.sekil %}
+                                        <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
+                                    {% else %}
+                                        <div class="no-image">
+                                            <i class="fas fa-image"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="product-info">
+                                    <h2 class="product-title">{{ mehsul.adi }}</h2>
+                                    
+                                    <div class="product-specs">
+                                        {% if mehsul.brend %}
+                                            <div class="spec-item">
+                                                <span class="label">Brend:</span>
+                                                <span class="value">{{ mehsul.brend.adi }}</span>
+                                            </div>
+                                        {% endif %}
+                                        
+                                        {% if mehsul.marka %}
+                                            <div class="spec-item">
+                                                <span class="label">Model:</span>
+                                                <span class="value">{{ mehsul.marka.adi }}</span>
+                                            </div>
+                                        {% endif %}
+                                        
+                                        {% if mehsul.oem %}
+                                            <div class="spec-item">
+                                                <span class="label">OEM:</span>
+                                                <span class="value">{{ mehsul.oem }}</span>
+                                            </div>
+                                        {% endif %}
+                                        
+                                        {% if mehsul.as_kodu %}
+                                            <div class="spec-item">
+                                                <span class="label">AS:</span>
+                                                <span class="value">{{ mehsul.as_kodu }}</span>
+                                            </div>
+                                        {% endif %}
+                                        
+                                        {% if mehsul.brend_kod %}
+                                            <div class="spec-item">
+                                                <span class="label">BREND KODU:</span>
+                                                <span class="value">{{ mehsul.brend_kod }}</span>
+                                            </div>
+                                        {% endif %}
+                                        
+                                        {% if mehsul.oem_kodlar.all %}
+                                            <div class="spec-item oem-list">
+                                                <span class="label">Dəyişən OEM Kodlar:</span>
+                                                <div class="value oem-codes">
+                                                    {% for oem in mehsul.oem_kodlar.all %}
+                                                        <span class="oem-code">{{ oem.kod }}</span>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                        <div class="spec-item">
+                                            <span class="label">Qiymət:</span>
+                                            <span class="value price">{{ mehsul.qiymet }} AZN</span>
+                                        </div>
+
+                                        <div class="spec-item">
+                                            <span class="label">Stok:</span>
+                                            <span class="value stock">
+                                                {% if mehsul.stok == 0 %}
+                                                    <span class="stock-badge out">Yoxdur</span>
+                                                {% elif mehsul.stok <= 20 %}
+                                                    <span class="stock-badge low">Az var</span>
+                                                {% else %}
+                                                    <span class="stock-badge in">Var</span>
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="product-actions">
+                                        <a href="/product/{{ mehsul.adi|slugify }}-{{ mehsul.oem }}-{{ mehsul.brend_kod }}/{{ mehsul.id }}/" class="btn-view">
+                                            <i class="fas fa-eye"></i> Ətraflı
+                                        </a>
+                                        
+                                        {% if mehsul.stok > 0 %}
+                                            <a href="{% url 'sebet_ekle' mehsul.id %}?miqdar=1" class="btn-cart add-to-cart" data-id="{{ mehsul.id }}">
+                                                <i class="fas fa-cart-plus"></i> Səbətə əlavə et
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <!-- Çoxlu məhsul cədvəli -->
+                    <div class="results-table-wrapper">
+                        <table class="results-table">
+                            <thead>
+                                <tr>
+                                    <th class="col-image">Şəkil</th>
+                                    <th class="col-name">Məhsul</th>
+                                    <th class="col-brand">Brend/Model</th>
+                                    <th class="col-codes">Kodlar</th>
+                                    <th class="col-price">Qiymət</th>
+                                    <th class="col-stock">Stok</th>
+                                    <th class="col-actions">Əməliyyatlar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for mehsul in mehsullar %}
+                                    <tr>
+                                        <!-- Şəkil -->
+                                        <td class="col-image">
+                                            {% if mehsul.sekil %}
+                                                <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image">
+                                            {% else %}
+                                                <div class="no-image">
+                                                    <i class="fas fa-image"></i>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                        
+                                        <!-- Məhsul adı -->
+                                        <td class="col-name">
+                                            <h3 class="product-name">{{ mehsul.adi }}</h3>
+                                        </td>
+                                        
+                                        <!-- Brend/Model -->
+                                        <td class="col-brand">
+                                            <div class="brand-info">
+                                                {% if mehsul.brend %}
+                                                    <div class="brand"><strong>Brend:</strong> {{ mehsul.brend.adi }}</div>
+                                                {% endif %}
+                                                
+                                                {% if mehsul.marka %}
+                                                    <div class="model"><strong>Model:</strong> {{ mehsul.marka.adi }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        
+                                        <!-- Kodlar -->
+                                        <td class="col-codes">
+                                            <div class="product-codes">
+                                                {% if mehsul.oem %}
+                                                    <div class="code-item"><strong>OEM:</strong> {{ mehsul.oem }}</div>
+                                                {% endif %}
+                                                
+                                                {% if mehsul.as_kodu %}
+                                                    <div class="code-item"><strong>AS:</strong> {{ mehsul.as_kodu }}</div>
+                                                {% endif %}
+                                                
+                                                {% if mehsul.brend_kod %}
+                                                    <div class="code-item"><strong>BREND:</strong> {{ mehsul.brend_kod }}</div>
+                                                {% endif %}
+                                                
+                                                <!-- Əlavə OEM kodları -->
+                                                {% if mehsul.oem_kodlar.all %}
+                                                    <div class="extra-codes">
+                                                        <button class="toggle-codes" data-target="codes-{{ mehsul.id }}">
+                                                            <i class="fas fa-plus-circle"></i> Əlavə OEM Kodlar ({{ mehsul.oem_kodlar.all|length }})
+                                                        </button>
+                                                        <div class="hidden-codes" id="codes-{{ mehsul.id }}">
+                                                            {% for kod in mehsul.oem_kodlar.all %}
+                                                                <div class="code-item extra">{{ kod.kod }}</div>
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        
+                                        <!-- Qiymət -->
+                                        <td class="col-price">
+                                            <div class="product-price">{{ mehsul.qiymet }} AZN</div>
+                                        </td>
+                                        
+                                        <!-- Stok -->
+                                        <td class="col-stock">
+                                            {% if mehsul.stok == 0 %}
+                                                <span class="stock-badge out">Yoxdur</span>
+                                            {% elif mehsul.stok <= 20 %}
+                                                <span class="stock-badge low">Az var</span>
+                                            {% else %}
+                                                <span class="stock-badge in">Var</span>
+                                            {% endif %}
+                                        </td>
+                                        
+                                        <!-- Əməliyyatlar -->
+                                        <td class="col-actions">
+                                            <div class="action-buttons">
+                                                <a href="/product/{{ mehsul.adi|slugify }}-{{ mehsul.oem }}-{{ mehsul.brend_kod }}/{{ mehsul.id }}/" class="btn-view">
+                                                    <i class="fas fa-eye"></i> Ətraflı
+                                                </a>
+                                                
+                                                {% if mehsul.stok > 0 %}
+                                                    <a href="{% url 'sebet_ekle' mehsul.id %}?miqdar=1" class="btn-cart add-to-cart" data-id="{{ mehsul.id }}">
+                                                        <i class="fas fa-cart-plus"></i>
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+                {% elif search_submitted %}
+                    <!-- Nəticə tapılmadı -->
+                    <div class="no-results-msg">
+                        <div class="no-results-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h2>Məhsul tapılmadı</h2>
+                        <p>Axtarışınıza uyğun heç bir məhsul tapılmadı. Zəhmət olmasa, parametrləri dəyişərək yenidən cəhd edin.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Yükləmə indikatoru -->
+            <div class="loading-spinner" id="loading-spinner">
+                <div class="spinner"></div>
+                <p>Nəticələr yüklənir...</p>
+            </div>
+
             <!-- Populyar brendlər -->
             <div class="popular-brands">
                 <h2 class="section-title">Populyar Brendlər</h2>
@@ -97,27 +406,6 @@
             </div>
         </div>
     </main>
-
-    <!-- Search Results Modal -->
-    <div class="search-modal" id="searchResultsModal">
-        <div class="search-modal-content">
-            <div class="search-modal-header">
-                <h3>Axtarış Nəticələri</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="search-modal-body">
-                <div class="loading-spinner" id="loading-spinner">
-                    <div class="spinner"></div>
-                    <p>Nəticələr yüklənir...</p>
-                </div>
-                <div class="search-results" id="search-results"></div>
-                <div class="no-results" id="no-results">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <p>Axtarışınıza uyğun nəticə tapılmadı. Zəhmət olmasa, parametrləri dəyişərək yenidən cəhd edin.</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -182,131 +470,110 @@
     <script src="{% static 'js/anaevim.js' %}"></script>
     <script src="{% static 'js/catalogue.js' %}"></script>
     <script>
-        // AJAX axtarışı
+        // Loading göstəricisi
+        const loadingSpinner = document.getElementById('loading-spinner');
+        
+        // Form submission
         document.getElementById('product-search-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const formData = new FormData(this);
-            const url = this.getAttribute('action');
-            const searchParams = new URLSearchParams(formData);
+            // Yüklənmə indikatorunu göstər
+            loadingSpinner.style.display = 'flex';
             
-            // Modal göstər və yüklənmə indikatorunu aktivləşdir
-            document.getElementById('searchResultsModal').classList.add('active');
-            document.getElementById('loading-spinner').style.display = 'flex';
-            document.getElementById('search-results').style.display = 'none';
-            document.getElementById('no-results').style.display = 'none';
-            
-            // AJAX sorğusu
-            fetch(`${url}?${searchParams.toString()}`, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('loading-spinner').style.display = 'none';
+            // Formu göndər
+            this.submit();
+        });
+        
+        // Filter accordion
+        const filtersToggle = document.getElementById('filtersToggle');
+        if (filtersToggle) {
+            filtersToggle.addEventListener('click', function() {
+                const panel = document.getElementById('filtersPanel');
+                const button = this;
                 
-                if (data.results && data.results.length > 0) {
-                    // Nəticələri göstər
-                    const resultsContainer = document.getElementById('search-results');
-                    
-                    let resultsHTML = '<div class="results-table"><table>';
-                    resultsHTML += '<thead><tr><th>Şəkil</th><th>Məhsul</th><th>Brend/Model</th><th>Kodlar</th><th>Qiymət</th><th></th></tr></thead><tbody>';
-                    
-                    data.results.forEach(item => {
-                        resultsHTML += '<tr>';
-                        
-                        // Şəkil
-                        resultsHTML += `<td class="result-image">
-                            ${item.sekil_url ? `<img src="${item.sekil_url}" alt="${item.adi}">` : '<div class="no-image"><i class="fas fa-image"></i></div>'}
-                        </td>`;
-                        
-                        // Məhsul adı
-                        resultsHTML += `<td class="result-name">${item.adi}</td>`;
-                        
-                        // Brend/Model
-                        resultsHTML += `<td class="result-brand">
-                            <div><strong>Brend:</strong> ${item.brend}</div>
-                            <div><strong>Model:</strong> ${item.marka}</div>
-                        </td>`;
-                        
-                        // Kodlar
-                        let kodlarHTML = '';
-                        if (item.oem) kodlarHTML += `<div><strong>OEM:</strong> ${item.oem}</div>`;
-                        if (item.as_kodu) kodlarHTML += `<div><strong>AS:</strong> ${item.as_kodu}</div>`;
-                        if (item.brend_kod) kodlarHTML += `<div><strong>BREND:</strong> ${item.brend_kod}</div>`;
-                        
-                        if (item.oem_kodlar && item.oem_kodlar.length > 0) {
-                            kodlarHTML += `<div class="extra-codes">
-                                <button class="toggle-codes" data-id="${item.id}">
-                                    Əlavə kodlar (${item.oem_kodlar.length})
-                                </button>
-                                <div class="hidden-codes" id="codes-${item.id}">
-                                    ${item.oem_kodlar.map(kod => `<div>${kod}</div>`).join('')}
-                                </div>
-                            </div>`;
-                        }
-                        
-                        resultsHTML += `<td class="result-codes">${kodlarHTML}</td>`;
-                        
-                        // Qiymət
-                        resultsHTML += `<td class="result-price">${item.qiymet} AZN</td>`;
-                        
-                        // Əməliyyatlar
-                        resultsHTML += `<td class="result-actions">
-                            <a href="${item.url}" class="action-button view-button">
-                                <i class="fas fa-eye"></i> Ətraflı
-                            </a>
-                        </td>`;
-                        
-                        resultsHTML += '</tr>';
-                    });
-                    
-                    resultsHTML += '</tbody></table></div>';
-                    
-                    resultsContainer.innerHTML = resultsHTML;
-                    resultsContainer.style.display = 'block';
-                    
-                    // Əlavə kodlar üçün toggle funksiyası
-                    document.querySelectorAll('.toggle-codes').forEach(button => {
-                        button.addEventListener('click', function() {
-                            const id = this.getAttribute('data-id');
-                            const codesContainer = document.getElementById(`codes-${id}`);
-                            
-                            if (codesContainer.style.display === 'block') {
-                                codesContainer.style.display = 'none';
-                                this.textContent = `Əlavə kodlar (${data.results.find(item => item.id == id).oem_kodlar.length})`;
-                            } else {
-                                codesContainer.style.display = 'block';
-                                this.textContent = 'Gizlət';
-                            }
-                        });
-                    });
-                    
+                if (panel.style.maxHeight) {
+                    panel.style.maxHeight = null;
+                    button.classList.remove('active');
                 } else {
-                    // Nəticə tapılmadı
-                    document.getElementById('no-results').style.display = 'block';
+                    panel.style.maxHeight = panel.scrollHeight + 'px';
+                    button.classList.add('active');
                 }
-            })
-            .catch(error => {
-                document.getElementById('loading-spinner').style.display = 'none';
-                document.getElementById('no-results').style.display = 'block';
-                document.getElementById('no-results').innerHTML = '<p>Xəta baş verdi. Zəhmət olmasa, bir az sonra yenidən cəhd edin.</p>';
             });
-        });
+        }
         
-        // Modal bağlama
-        document.querySelector('.close-modal').addEventListener('click', function() {
-            document.getElementById('searchResultsModal').classList.remove('active');
-        });
+        // Əlavə kodlar toggle
+        const toggleCodeButtons = document.querySelectorAll('.toggle-codes');
+        if (toggleCodeButtons.length > 0) {
+            toggleCodeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const codesContainer = document.getElementById(targetId);
+                    
+                    if (codesContainer.style.display === 'block') {
+                        codesContainer.style.display = 'none';
+                        const codesCount = codesContainer.querySelectorAll('.code-item').length;
+                        this.innerHTML = `<i class="fas fa-plus-circle"></i> Əlavə OEM Kodlar (${codesCount})`;
+                    } else {
+                        codesContainer.style.display = 'block';
+                        this.innerHTML = '<i class="fas fa-minus-circle"></i> Gizlət';
+                    }
+                });
+            });
+        }
         
-        // Modal xaricindən klikləndikdə bağlama
-        window.addEventListener('click', function(event) {
-            const modal = document.getElementById('searchResultsModal');
-            if (event.target === modal) {
-                modal.classList.remove('active');
-            }
+        // Səbətə əlavə etmə
+        const addToCartButtons = document.querySelectorAll('.add-to-cart');
+        if (addToCartButtons.length > 0) {
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const url = this.getAttribute('href');
+                    
+                    // AJAX sorğusu
+                    fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Uğurlu bildiriş
+                            showNotification('success', 'Məhsul səbətə əlavə edildi');
+                        } else {
+                            // Xəta bildirişi
+                            showNotification('error', data.error || 'Xəta baş verdi');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('error', 'Xəta baş verdi. Zəhmət olmasa, yenidən cəhd edin.');
+                    });
+                });
+            });
+        }
+        
+        // Bildiriş göstərmək
+        function showNotification(type, message) {
+            const notification = document.createElement('div');
+            notification.className = `add-cart-notification ${type}`;
+            notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check' : 'times'}-circle"></i> ${message}`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    notification.remove();
+                }, 500);
+            }, 3000);
+        }
+        
+        // Səhifə yükləndiyində yüklənmə indikatorunu gizlət
+        window.addEventListener('load', function() {
+            loadingSpinner.style.display = 'none';
         });
     </script>
 </body>
-</html> 
+</html>

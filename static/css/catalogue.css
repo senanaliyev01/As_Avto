@@ -258,11 +258,15 @@ body {
 }
 
 .loading-spinner {
-    display: flex;
+    display: none;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 50px;
+    padding: 2rem;
+    margin: 2rem 0;
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
 }
 
 .spinner {
@@ -272,7 +276,7 @@ body {
     border-top: 4px solid var(--primary-color);
     border-radius: 50%;
     animation: spin 1s linear infinite;
-    margin-bottom: 20px;
+    margin-bottom: 1rem;
 }
 
 @keyframes spin {
@@ -950,5 +954,272 @@ body {
     
     .search-modal-body {
         padding: 15px;
+    }
+}
+
+/* Search Results Section */
+.search-results-section {
+    margin-top: 2rem;
+    margin-bottom: 3rem;
+}
+
+.search-summary {
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+}
+
+.search-info {
+    margin-bottom: 1.5rem;
+}
+
+.search-term, .search-filters, .search-count {
+    margin-bottom: 0.5rem;
+}
+
+.search-term strong, .search-filters strong, .search-count strong {
+    color: var(--primary-color);
+}
+
+.highlight {
+    color: var(--primary-color);
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.filter-badge {
+    display: inline-block;
+    background-color: var(--item-bg);
+    color: var(--primary-color);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    font-weight: 500;
+    border: 1px solid var(--border-color);
+}
+
+/* Single Product Result */
+.single-product-result {
+    margin-bottom: 2rem;
+}
+
+.product-detail-card {
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+}
+
+.product-detail-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 2rem;
+}
+
+.product-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--item-bg);
+    border-radius: 8px;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    height: 300px;
+}
+
+.product-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.product-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-bottom: 0.75rem;
+}
+
+.product-title:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background-color: var(--accent-color);
+}
+
+.product-specs {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.spec-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background-color: var(--item-bg);
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+.spec-item .label {
+    min-width: 120px;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.spec-item .value {
+    font-weight: 500;
+}
+
+.spec-item .value.price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.spec-item.oem-list {
+    display: block;
+    margin-top: 0;
+    padding: 1rem;
+}
+
+.product-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.btn-view, .btn-cart {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.3s;
+    text-decoration: none;
+}
+
+.btn-view {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-view:hover {
+    background-color: var(--primary-light);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(10, 36, 99, 0.2);
+}
+
+.btn-cart {
+    background-color: #198754;
+    color: white;
+}
+
+.btn-cart:hover {
+    background-color: #157347;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(25, 135, 84, 0.2);
+}
+
+/* Form Select Styles */
+.form-select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 16px;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%230a2463' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 16px;
+    background-color: white;
+    transition: all 0.3s;
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.1);
+}
+
+/* Responsive Styles for Search Results */
+@media (max-width: 992px) {
+    .product-detail-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .product-image {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    
+    .product-title {
+        text-align: center;
+    }
+    
+    .product-title:after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .product-actions {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .search-summary {
+        padding: 1rem;
+    }
+    
+    .product-image {
+        height: 250px;
+    }
+    
+    .spec-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .spec-item .label {
+        min-width: auto;
+        margin-bottom: 0.3rem;
+    }
+    
+    .product-actions {
+        flex-direction: column;
+    }
+    
+    .btn-view, .btn-cart {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .search-term, .search-filters, .search-count {
+        font-size: 0.9rem;
+    }
+    
+    .product-detail-card {
+        padding: 1rem;
+    }
+    
+    .product-title {
+        font-size: 1.5rem;
     }
 } 

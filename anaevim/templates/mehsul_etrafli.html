@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ mehsul.adi }} | {{ mehsul.brend.adi }} |  {{ mehsul.oem }} | {{ mehsul.brend_kod }} | AS AVTO</title>
+    
     <!-- SEO Meta Tags -->
     <meta name="description" content="{{ mehsul.adi }} - {{ mehsul.marka.adi }} üçün {{ mehsul.brend.adi }} markalı orijinal ehtiyat hissəsi. OEM: {{ mehsul.oem }}, Brend Kodu: {{ mehsul.brend_kod }}">
     <meta name="keywords" content="{{ mehsul.adi }}, {{ mehsul.marka.adi }}, {{ mehsul.brend.adi }}, {{ mehsul.oem }}, {{ mehsul.brend_kod }}, avtomobil hissələri">
@@ -160,7 +161,6 @@
             <nav class="header__nav">
                 <ul class="header__menu">
                     <li><a href="{% url 'anaevim' %}#home" class="header__link">Ana Səhifə</a></li>
-                    <li><a href="{% url 'mehsullar' %}" class="header__link">Məhsullar</a></li>
                     <li><a href="{% url 'anaevim' %}#about" class="header__link">Haqqımızda</a></li>
                     <li><a href="{% url 'anaevim' %}#contact" class="header__link">Əlaqə</a></li>
                 </ul>
@@ -201,6 +201,10 @@
                         <div class="info-item">
                             <span class="label">Brend:</span>
                             <span class="value">{{ mehsul.brend.adi }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">№:</span>
+                            <span class="value">{{ mehsul.brend_kod }}</span>
                         </div>
                         <div class="info-item">
                             <span class="label">KOD:</span>
@@ -318,6 +322,5 @@
     <!-- Scripts -->
     <script src="{% static 'js/anaevim.js' %}"></script>
     <script src="{% static 'js/loading.js' %}"></script>
-
 </body>
 </html> 

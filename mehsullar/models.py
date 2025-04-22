@@ -1,5 +1,7 @@
 from pickle import FALSE
-
+import re
+import random
+import string
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -99,6 +101,10 @@ class Model(models.Model):
         verbose_name_plural = 'Modeller'
 
 
+def generate_as_kodu():
+    """Yeni unikal AS kodu yaradır (A + 6 rəqəm + S)"""
+    numbers = ''.join(random.choices(string.digits, k=6))
+    return f"A{numbers}S"
 
 class Mehsul(models.Model):
     adi = models.CharField(max_length=255, null=True, blank=True)
@@ -108,6 +114,7 @@ class Mehsul(models.Model):
     model = models.ManyToManyField(Model,blank=True)  
     brend_kod = models.CharField(max_length=50, null=True, blank=True)
     oem = models.CharField(max_length=255, null=True, blank=True)
+    as_kodu = models.CharField(max_length=10, null=True, blank=True, unique=True, editable=False, help_text="AS-AVTO tərəfindən verilən unikal kod")
     stok = models.IntegerField(null=True, blank=True)
     maya_qiymet = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     qiymet = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
@@ -139,6 +146,33 @@ class Mehsul(models.Model):
         return []
 
     def save(self, *args, **kwargs):
+        # Əgər as_kodu yoxdursa
+        if not self.as_kodu:
+            # OEM kodu təmizlə və normallaşdır (işarələri sil)
+            normalized_oem = None
+            if self.oem:
+                normalized_oem = re.sub(r'[^a-zA-Z0-9]', '', self.oem)
+            
+            # Eyni OEM koduna (normallaşdırılmış) sahib məhsul axtar
+            if normalized_oem:
+                # Başqa məhsullar içində eyni normallaşdırılmış OEM kodu var mı yoxla
+                existing_mehsullar = Mehsul.objects.filter(oem__isnull=False).exclude(id=self.id if self.id else 0)
+                for existing in existing_mehsullar:
+                    existing_norm_oem = re.sub(r'[^a-zA-Z0-9]', '', existing.oem) if existing.oem else None
+                    if existing_norm_oem and existing_norm_oem == normalized_oem and existing.as_kodu:
+                        # Eyni kodu götür
+                        self.as_kodu = existing.as_kodu
+                        break
+            
+            # Əgər uyğun məhsul tapılmadısa, yeni as_kodu yarat
+            if not self.as_kodu:
+                while True:
+                    new_as_kodu = generate_as_kodu()
+                    # Yoxla ki, eyni as kodu ilə məhsul yoxdur
+                    if not Mehsul.objects.filter(as_kodu=new_as_kodu).exists():
+                        self.as_kodu = new_as_kodu
+                        break
+            
         if not self.sekil:
             self.sekil = 'mehsul_sekilleri/noimage.webp'
         super().save(*args, **kwargs)

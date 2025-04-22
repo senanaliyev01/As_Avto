@@ -1,5 +1,6 @@
 from pickle import FALSE
-
+import random
+import string
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -99,6 +100,10 @@ class Model(models.Model):
         verbose_name_plural = 'Modeller'
 
 
+def generate_as_code():
+    """6 rəqəmli təsadüfi kod generasiyası"""
+    return ''.join(random.choices(string.digits, k=6))
+
 
 class Mehsul(models.Model):
     adi = models.CharField(max_length=255, null=True, blank=True)
@@ -108,6 +113,7 @@ class Mehsul(models.Model):
     model = models.ManyToManyField(Model,blank=True)  
     brend_kod = models.CharField(max_length=50, null=True, blank=True)
     oem = models.CharField(max_length=255, null=True, blank=True)
+    as_kodu = models.CharField(max_length=15, null=True, blank=True, editable=False)
     stok = models.IntegerField(null=True, blank=True)
     maya_qiymet = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     qiymet = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
@@ -141,6 +147,23 @@ class Mehsul(models.Model):
     def save(self, *args, **kwargs):
         if not self.sekil:
             self.sekil = 'mehsul_sekilleri/noimage.webp'
+            
+        # OEM kodu əsasında AS kodunu təyin edin
+        if self.oem and not self.as_kodu:
+            # Eyni OEM kodu olan məhsulu tapın
+            existing_product = Mehsul.objects.filter(oem=self.oem).exclude(id=self.id).first()
+            
+            if existing_product and existing_product.as_kodu:
+                # Eyni OEM koduna malik məhsul varsa, onun AS kodunu istifadə edin
+                self.as_kodu = existing_product.as_kodu
+            else:
+                # Yeni bir təkrarsız AS kodu yaradın
+                while True:
+                    new_code = "AS-" + generate_as_code()
+                    if not Mehsul.objects.filter(as_kodu=new_code).exists():
+                        self.as_kodu = new_code
+                        break
+                        
         super().save(*args, **kwargs)
 
 class Sebet(models.Model):

@@ -17,6 +17,17 @@
     <!-- CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/anaevim.css' %}">
+    <link rel="stylesheet" href="{% static 'css/catalogue.css' %}">
+    <style>
+        .results-table tbody tr {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .results-table tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -269,7 +280,7 @@
                             </thead>
                             <tbody>
                                 {% for mehsul in mehsullar %}
-                                    <tr>
+                                    <tr data-url="/product/{{ mehsul.adi|slugify }}-{{ mehsul.oem }}-{{ mehsul.brend_kod }}/{{ mehsul.id }}/" class="product-row">
                                         <!-- Şəkil -->
                                         <td class="col-image">
                                             {% if mehsul.sekil %}
@@ -317,7 +328,7 @@
                                                 <!-- Əlavə OEM kodları -->
                                                 {% if mehsul.oem_kodlar.all %}
                                                     <div class="extra-codes">
-                                                        <button class="toggle-codes" data-target="codes-{{ mehsul.id }}">
+                                                        <button class="toggle-codes stop-propagation" data-target="codes-{{ mehsul.id }}">
                                                             <i class="fas fa-plus-circle"></i> Əlavə OEM Kodlar ({{ mehsul.oem_kodlar.all|length }})
                                                         </button>
                                                         <div class="hidden-codes" id="codes-{{ mehsul.id }}">
@@ -455,6 +466,7 @@
 
     <!-- Scripts -->
     <script src="{% static 'js/anaevim.js' %}"></script>
+    <script src="{% static 'js/catalogue.js' %}"></script>
     <script>
         // Loading göstəricisi
         const loadingSpinner = document.getElementById('loading-spinner');
@@ -492,7 +504,9 @@
         if (toggleCodeButtons.length > 0) {
             toggleCodeButtons.forEach(button => {
                 button.addEventListener('click', function(e) {
-                    e.stopPropagation(); // Tıklamanın yayılmasını dayandırır
+                    // Hədəfə klikləmə event-in yayılmasını dayandırır
+                    e.stopPropagation();
+                    
                     const targetId = this.getAttribute('data-target');
                     const codesContainer = document.getElementById(targetId);
                     
@@ -508,20 +522,18 @@
             });
         }
         
-        // Məhsul sıralarını kliklənən edirik
-        const productRows = document.querySelectorAll('.results-table tbody tr');
+        // Məhsul sırası kliklənmə
+        const productRows = document.querySelectorAll('.product-row');
         if (productRows.length > 0) {
             productRows.forEach(row => {
-                row.style.cursor = 'pointer';
                 row.addEventListener('click', function(e) {
-                    // Əgər tıklama toggle-codes düyməsindən gəlirsə, ignore edirik
-                    if (e.target.closest('.toggle-codes')) {
-                        return;
+                    // Əgər kliklənən element stopPropagation sinfidə deyilsə
+                    if (!e.target.closest('.stop-propagation')) {
+                        const url = this.getAttribute('data-url');
+                        if (url) {
+                            window.location.href = url;
+                        }
                     }
-                    
-                    // URL əldə et
-                    const detailUrl = this.querySelector('.btn-view').getAttribute('href');
-                    window.location.href = detailUrl;
                 });
             });
         }

@@ -1,5 +1,6 @@
 from pickle import FALSE
-
+import random
+import string
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -99,6 +100,10 @@ class Model(models.Model):
         verbose_name_plural = 'Modeller'
 
 
+def generate_as_code():
+    """6 rəqəmli təsadüfi kod generasiyası"""
+    return ''.join(random.choices(string.digits, k=6))
+
 
 class Mehsul(models.Model):
     adi = models.CharField(max_length=255, null=True, blank=True)
@@ -108,7 +113,7 @@ class Mehsul(models.Model):
     model = models.ManyToManyField(Model,blank=True)  
     brend_kod = models.CharField(max_length=50, null=True, blank=True)
     oem = models.CharField(max_length=255, null=True, blank=True)
-    as_kod = models.CharField(max_length=9, null=True, blank=True, unique=True, help_text="AS kodları OEM kodlarına uyğun olaraq avtomatik yaradılır. Format: AS123456")
+    as_kodu = models.CharField(max_length=15, null=True, blank=True, editable=False)
     stok = models.IntegerField(null=True, blank=True)
     maya_qiymet = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     qiymet = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
@@ -143,29 +148,37 @@ class Mehsul(models.Model):
         if not self.sekil:
             self.sekil = 'mehsul_sekilleri/noimage.webp'
             
-        # Əgər as_kod təyin olunmayıbsa, eyni OEM koduna sahib məhsulu axtaraq
-        if not self.as_kod and self.oem:
-            # Əvvəlcə eyni OEM koduna sahib məhsulu axtaraq
-            import random
-            import string
-            eyni_oem = Mehsul.objects.filter(oem=self.oem, as_kod__isnull=False).first()
+        # AS kodunu yaratmadan əvvəlki vəziyyəti saxlayın
+        had_as_code_before = bool(self.as_kodu)
+        as_code_changed = False
             
-            if eyni_oem:
-                # Eyni OEM koduna sahib məhsul varsa, onun AS kodunu istifadə et
-                self.as_kod = eyni_oem.as_kod
+        # OEM kodu əsasında AS kodunu təyin edin
+        if self.oem and not self.as_kodu:
+            # Eyni OEM kodu olan məhsulu tapın
+            existing_product = Mehsul.objects.filter(oem=self.oem).exclude(id=self.id).first()
+            
+            if existing_product and existing_product.as_kodu:
+                # Eyni OEM koduna malik məhsul varsa, onun AS kodunu istifadə edin
+                self.as_kodu = existing_product.as_kodu
+                as_code_changed = True
             else:
-                # Yeni unikal AS kodu yarat
+                # Yeni bir təkrarsız AS kodu yaradın
                 while True:
-                    # 6 rəqəmli bir kod yarat
-                    random_kod = ''.join(random.choices(string.digits, k=6))
-                    yeni_as_kod = f"AS{random_kod}"
-                    
-                    # Yoxla ki, bu kod artıq istifadə olunurmu
-                    if not Mehsul.objects.filter(as_kod=yeni_as_kod).exists():
-                        self.as_kod = yeni_as_kod
+                    new_code = "AS-" + generate_as_code()
+                    if not Mehsul.objects.filter(as_kodu=new_code).exists():
+                        self.as_kodu = new_code
+                        as_code_changed = True
                         break
-        
+                        
         super().save(*args, **kwargs)
+        
+        # AS kodu yaradıldısa, bunu əlavə OEM kodlarına əlavə et
+        if as_code_changed and self.as_kodu and not OEMKod.objects.filter(kod=self.as_kodu, mehsul=self).exists():
+            # AS kodunu əlavə OEM olaraq əlavə et
+            OEMKod.objects.create(
+                kod=self.as_kodu,
+                mehsul=self
+            )
 
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

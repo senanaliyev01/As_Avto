@@ -17,7 +17,6 @@
     <!-- CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/anaevim.css' %}">
-    <link rel="stylesheet" href="{% static 'css/catalogue.css' %}">
 </head>
 <body>
     <!-- Header -->
@@ -247,12 +246,6 @@
                                         <a href="/product/{{ mehsul.adi|slugify }}-{{ mehsul.oem }}-{{ mehsul.brend_kod }}/{{ mehsul.id }}/" class="btn-view">
                                             <i class="fas fa-eye"></i> Ətraflı
                                         </a>
-                                        
-                                        {% if mehsul.stok > 0 %}
-                                            <a href="{% url 'sebet_ekle' mehsul.id %}?miqdar=1" class="btn-cart add-to-cart" data-id="{{ mehsul.id }}">
-                                                <i class="fas fa-cart-plus"></i> Səbətə əlavə et
-                                            </a>
-                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
@@ -359,12 +352,6 @@
                                                 <a href="/product/{{ mehsul.adi|slugify }}-{{ mehsul.oem }}-{{ mehsul.brend_kod }}/{{ mehsul.id }}/" class="btn-view">
                                                     <i class="fas fa-eye"></i> Ətraflı
                                                 </a>
-                                                
-                                                {% if mehsul.stok > 0 %}
-                                                    <a href="{% url 'sebet_ekle' mehsul.id %}?miqdar=1" class="btn-cart add-to-cart" data-id="{{ mehsul.id }}">
-                                                        <i class="fas fa-cart-plus"></i>
-                                                    </a>
-                                                {% endif %}
                                             </div>
                                         </td>
                                     </tr>
@@ -468,7 +455,6 @@
 
     <!-- Scripts -->
     <script src="{% static 'js/anaevim.js' %}"></script>
-    <script src="{% static 'js/catalogue.js' %}"></script>
     <script>
         // Loading göstəricisi
         const loadingSpinner = document.getElementById('loading-spinner');
@@ -505,7 +491,8 @@
         const toggleCodeButtons = document.querySelectorAll('.toggle-codes');
         if (toggleCodeButtons.length > 0) {
             toggleCodeButtons.forEach(button => {
-                button.addEventListener('click', function() {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Tıklamanın yayılmasını dayandırır
                     const targetId = this.getAttribute('data-target');
                     const codesContainer = document.getElementById(targetId);
                     
@@ -521,53 +508,22 @@
             });
         }
         
-        // Səbətə əlavə etmə
-        const addToCartButtons = document.querySelectorAll('.add-to-cart');
-        if (addToCartButtons.length > 0) {
-            addToCartButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
+        // Məhsul sıralarını kliklənən edirik
+        const productRows = document.querySelectorAll('.results-table tbody tr');
+        if (productRows.length > 0) {
+            productRows.forEach(row => {
+                row.style.cursor = 'pointer';
+                row.addEventListener('click', function(e) {
+                    // Əgər tıklama toggle-codes düyməsindən gəlirsə, ignore edirik
+                    if (e.target.closest('.toggle-codes')) {
+                        return;
+                    }
                     
-                    const url = this.getAttribute('href');
-                    
-                    // AJAX sorğusu
-                    fetch(url, {
-                        method: 'GET',
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Uğurlu bildiriş
-                            showNotification('success', 'Məhsul səbətə əlavə edildi');
-                        } else {
-                            // Xəta bildirişi
-                            showNotification('error', data.error || 'Xəta baş verdi');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        showNotification('error', 'Xəta baş verdi. Zəhmət olmasa, yenidən cəhd edin.');
-                    });
+                    // URL əldə et
+                    const detailUrl = this.querySelector('.btn-view').getAttribute('href');
+                    window.location.href = detailUrl;
                 });
             });
-        }
-        
-        // Bildiriş göstərmək
-        function showNotification(type, message) {
-            const notification = document.createElement('div');
-            notification.className = `add-cart-notification ${type}`;
-            notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check' : 'times'}-circle"></i> ${message}`;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                setTimeout(() => {
-                    notification.remove();
-                }, 500);
-            }, 3000);
         }
         
         // Səhifə yükləndiyində yüklənmə indikatorunu gizlət

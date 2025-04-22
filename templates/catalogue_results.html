@@ -80,12 +80,11 @@
                         </div>
                     {% endif %}
                     
-                    {% if selected_category or selected_brand or selected_model %}
+                    {% if selected_category or selected_brand %}
                         <div class="search-filters">
                             <strong>Filterlər:</strong>
                             {% if selected_category %}<span class="filter-badge">Kateqoriya: {{ selected_category }}</span>{% endif %}
                             {% if selected_brand %}<span class="filter-badge">Brend: {{ selected_brand }}</span>{% endif %}
-                            {% if selected_model %}<span class="filter-badge">Model: {{ selected_model }}</span>{% endif %}
                         </div>
                     {% endif %}
                     
@@ -127,18 +126,6 @@
                                         {% for brend in brendler %}
                                             <option value="{{ brend.adi }}" {% if selected_brand == brend.adi %}selected{% endif %}>
                                                 {{ brend.adi }}
-                                            </option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                
-                                <div class="filter-group">
-                                    <label for="model-filter">Model</label>
-                                    <select name="model" id="model-filter" class="form-select">
-                                        <option value="">Bütün modellər</option>
-                                        {% for marka in markalar %}
-                                            <option value="{{ marka.adi }}" {% if selected_model == marka.adi %}selected{% endif %}>
-                                                {{ marka.adi }}
                                             </option>
                                         {% endfor %}
                                     </select>

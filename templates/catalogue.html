@@ -67,100 +67,19 @@
 
             <!-- Axtarış bölməsi -->
             <div class="search-section">
-                <div class="tabs">
-                    <button class="tab-button active" data-tab="product-tab">
-                        <i class="fas fa-barcode"></i> Məhsul Kodu
-                    </button>
-                    <button class="tab-button" data-tab="application-tab">
-                        <i class="fas fa-car"></i> Marka və Model
-                    </button>
-                    <button class="tab-button" data-tab="vin-tab">
-                        <i class="fas fa-key"></i> VIN/Şassi
-                    </button>
-                </div>
-
-                <div class="tab-content">
-                    <!-- Məhsul kodu ilə axtarış -->
-                    <div class="tab-pane active" id="product-tab">
-                        <form id="product-search-form" action="{% url 'catalogue_search' %}" method="GET">
-                            <input type="hidden" name="search_type" value="product_no">
-                            <div class="form-group">
-                                <label for="query">Məhsul Kodu (OEM, AS kod, Brend kod)</label>
-                                <div class="search-input-wrapper">
-                                    <input type="text" id="query" name="query" placeholder="Kod daxil edin..." required>
-                                    <button type="submit" class="search-btn">
-                                        <i class="fas fa-search"></i> Axtar
-                                    </button>
-                                </div>
-                                <small class="form-hint">OEM, AS kodları və brend kodları ilə axtarış edə bilərsiniz</small>
-                            </div>
-                        </form>
+                <form id="product-search-form" action="{% url 'catalogue_search' %}" method="GET">
+                    <input type="hidden" name="search_type" value="product_no">
+                    <div class="form-group">
+                        <label for="query">Məhsul Kodu ilə Axtarış (OEM, AS kod, Brend kod)</label>
+                        <div class="search-input-wrapper">
+                            <input type="text" id="query" name="query" placeholder="Kodu daxil edin..." required>
+                            <button type="submit" class="search-btn">
+                                <i class="fas fa-search"></i> Axtar
+                            </button>
+                        </div>
+                        <small class="form-hint">OEM, AS kodları və brend kodları ilə axtarış edə bilərsiniz</small>
                     </div>
-
-                    <!-- Avtomobil parametrləri ilə axtarış -->
-                    <div class="tab-pane" id="application-tab">
-                        <form id="application-search-form" action="{% url 'catalogue_search' %}" method="GET">
-                            <input type="hidden" name="search_type" value="application">
-                            
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="brand">Brend</label>
-                                    <select id="brand" name="brand" class="form-select">
-                                        <option value="">Seçin...</option>
-                                        {% for brend in brendler %}
-                                            <option value="{{ brend.adi }}">{{ brend.adi }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="model">Model</label>
-                                    <select id="model" name="model" class="form-select">
-                                        <option value="">Seçin...</option>
-                                        {% for marka in markalar %}
-                                            <option value="{{ marka.adi }}">{{ marka.adi }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="category">Kateqoriya</label>
-                                    <select id="category" name="category" class="form-select">
-                                        <option value="">Seçin...</option>
-                                        {% for kateqoriya in kateqoriyalar %}
-                                            <option value="{{ kateqoriya.adi }}">{{ kateqoriya.adi }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <button type="submit" class="search-btn search-btn-full">
-                                    <i class="fas fa-search"></i> Axtar
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- VIN/Şassi ilə axtarış -->
-                    <div class="tab-pane" id="vin-tab">
-                        <form id="vin-search-form" action="{% url 'catalogue_search' %}" method="GET">
-                            <input type="hidden" name="search_type" value="vin">
-                            <div class="form-group">
-                                <label for="vin_number">VIN və ya Şassi Nömrəsi</label>
-                                <div class="search-input-wrapper">
-                                    <input type="text" id="vin_number" name="query" placeholder="VIN və ya şassi nömrəsini daxil edin..." required>
-                                    <button type="submit" class="search-btn">
-                                        <i class="fas fa-search"></i> Axtar
-                                    </button>
-                                </div>
-                                <small class="form-hint">Tam VIN/şassi nömrəsini və ya bir hissəsini daxil edə bilərsiniz</small>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+                </form>
             </div>
 
             <!-- Populyar brendlər -->
@@ -263,135 +182,116 @@
     <script src="{% static 'js/anaevim.js' %}"></script>
     <script src="{% static 'js/catalogue.js' %}"></script>
     <script>
-        // Tab system
-        const tabButtons = document.querySelectorAll('.tab-button');
-        const tabPanes = document.querySelectorAll('.tab-pane');
-
-        tabButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                // Remove active class from all buttons and panes
-                tabButtons.forEach(btn => btn.classList.remove('active'));
-                tabPanes.forEach(pane => pane.classList.remove('active'));
-                
-                // Add active class to clicked button and corresponding pane
-                button.classList.add('active');
-                const tabId = button.getAttribute('data-tab');
-                document.getElementById(tabId).classList.add('active');
-            });
-        });
-
         // AJAX axtarışı
-        document.querySelectorAll('#product-search-form, #application-search-form, #vin-search-form').forEach(form => {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
+        document.getElementById('product-search-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const url = this.getAttribute('action');
+            const searchParams = new URLSearchParams(formData);
+            
+            // Modal göstər və yüklənmə indikatorunu aktivləşdir
+            document.getElementById('searchResultsModal').classList.add('active');
+            document.getElementById('loading-spinner').style.display = 'flex';
+            document.getElementById('search-results').style.display = 'none';
+            document.getElementById('no-results').style.display = 'none';
+            
+            // AJAX sorğusu
+            fetch(`${url}?${searchParams.toString()}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loading-spinner').style.display = 'none';
                 
-                const formData = new FormData(this);
-                const url = this.getAttribute('action');
-                const searchParams = new URLSearchParams(formData);
-                
-                // Modal göstər və yüklənmə indikatorunu aktivləşdir
-                document.getElementById('searchResultsModal').classList.add('active');
-                document.getElementById('loading-spinner').style.display = 'flex';
-                document.getElementById('search-results').style.display = 'none';
-                document.getElementById('no-results').style.display = 'none';
-                
-                // AJAX sorğusu
-                fetch(`${url}?${searchParams.toString()}`, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('loading-spinner').style.display = 'none';
+                if (data.results && data.results.length > 0) {
+                    // Nəticələri göstər
+                    const resultsContainer = document.getElementById('search-results');
                     
-                    if (data.results && data.results.length > 0) {
-                        // Nəticələri göstər
-                        const resultsContainer = document.getElementById('search-results');
+                    let resultsHTML = '<div class="results-table"><table>';
+                    resultsHTML += '<thead><tr><th>Şəkil</th><th>Məhsul</th><th>Brend/Model</th><th>Kodlar</th><th>Qiymət</th><th></th></tr></thead><tbody>';
+                    
+                    data.results.forEach(item => {
+                        resultsHTML += '<tr>';
                         
-                        let resultsHTML = '<div class="results-table"><table>';
-                        resultsHTML += '<thead><tr><th>Şəkil</th><th>Məhsul</th><th>Brend/Model</th><th>Kodlar</th><th>Qiymət</th><th></th></tr></thead><tbody>';
+                        // Şəkil
+                        resultsHTML += `<td class="result-image">
+                            ${item.sekil_url ? `<img src="${item.sekil_url}" alt="${item.adi}">` : '<div class="no-image"><i class="fas fa-image"></i></div>'}
+                        </td>`;
                         
-                        data.results.forEach(item => {
-                            resultsHTML += '<tr>';
+                        // Məhsul adı
+                        resultsHTML += `<td class="result-name">${item.adi}</td>`;
+                        
+                        // Brend/Model
+                        resultsHTML += `<td class="result-brand">
+                            <div><strong>Brend:</strong> ${item.brend}</div>
+                            <div><strong>Model:</strong> ${item.marka}</div>
+                        </td>`;
+                        
+                        // Kodlar
+                        let kodlarHTML = '';
+                        if (item.oem) kodlarHTML += `<div><strong>OEM:</strong> ${item.oem}</div>`;
+                        if (item.as_kodu) kodlarHTML += `<div><strong>AS:</strong> ${item.as_kodu}</div>`;
+                        if (item.brend_kod) kodlarHTML += `<div><strong>BREND:</strong> ${item.brend_kod}</div>`;
+                        
+                        if (item.oem_kodlar && item.oem_kodlar.length > 0) {
+                            kodlarHTML += `<div class="extra-codes">
+                                <button class="toggle-codes" data-id="${item.id}">
+                                    Əlavə kodlar (${item.oem_kodlar.length})
+                                </button>
+                                <div class="hidden-codes" id="codes-${item.id}">
+                                    ${item.oem_kodlar.map(kod => `<div>${kod}</div>`).join('')}
+                                </div>
+                            </div>`;
+                        }
+                        
+                        resultsHTML += `<td class="result-codes">${kodlarHTML}</td>`;
+                        
+                        // Qiymət
+                        resultsHTML += `<td class="result-price">${item.qiymet} AZN</td>`;
+                        
+                        // Əməliyyatlar
+                        resultsHTML += `<td class="result-actions">
+                            <a href="${item.url}" class="action-button view-button">
+                                <i class="fas fa-eye"></i> Ətraflı
+                            </a>
+                        </td>`;
+                        
+                        resultsHTML += '</tr>';
+                    });
+                    
+                    resultsHTML += '</tbody></table></div>';
+                    
+                    resultsContainer.innerHTML = resultsHTML;
+                    resultsContainer.style.display = 'block';
+                    
+                    // Əlavə kodlar üçün toggle funksiyası
+                    document.querySelectorAll('.toggle-codes').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const id = this.getAttribute('data-id');
+                            const codesContainer = document.getElementById(`codes-${id}`);
                             
-                            // Şəkil
-                            resultsHTML += `<td class="result-image">
-                                ${item.sekil_url ? `<img src="${item.sekil_url}" alt="${item.adi}">` : '<div class="no-image"><i class="fas fa-image"></i></div>'}
-                            </td>`;
-                            
-                            // Məhsul adı
-                            resultsHTML += `<td class="result-name">${item.adi}</td>`;
-                            
-                            // Brend/Model
-                            resultsHTML += `<td class="result-brand">
-                                <div><strong>Brend:</strong> ${item.brend}</div>
-                                <div><strong>Model:</strong> ${item.marka}</div>
-                            </td>`;
-                            
-                            // Kodlar
-                            let kodlarHTML = '';
-                            if (item.oem) kodlarHTML += `<div><strong>OEM:</strong> ${item.oem}</div>`;
-                            if (item.as_kodu) kodlarHTML += `<div><strong>AS:</strong> ${item.as_kodu}</div>`;
-                            if (item.brend_kod) kodlarHTML += `<div><strong>BREND:</strong> ${item.brend_kod}</div>`;
-                            
-                            if (item.oem_kodlar && item.oem_kodlar.length > 0) {
-                                kodlarHTML += `<div class="extra-codes">
-                                    <button class="toggle-codes" data-id="${item.id}">
-                                        Əlavə kodlar (${item.oem_kodlar.length})
-                                    </button>
-                                    <div class="hidden-codes" id="codes-${item.id}">
-                                        ${item.oem_kodlar.map(kod => `<div>${kod}</div>`).join('')}
-                                    </div>
-                                </div>`;
+                            if (codesContainer.style.display === 'block') {
+                                codesContainer.style.display = 'none';
+                                this.textContent = `Əlavə kodlar (${data.results.find(item => item.id == id).oem_kodlar.length})`;
+                            } else {
+                                codesContainer.style.display = 'block';
+                                this.textContent = 'Gizlət';
                             }
-                            
-                            resultsHTML += `<td class="result-codes">${kodlarHTML}</td>`;
-                            
-                            // Qiymət
-                            resultsHTML += `<td class="result-price">${item.qiymet} AZN</td>`;
-                            
-                            // Əməliyyatlar
-                            resultsHTML += `<td class="result-actions">
-                                <a href="${item.url}" class="action-button view-button">
-                                    <i class="fas fa-eye"></i> Ətraflı
-                                </a>
-                            </td>`;
-                            
-                            resultsHTML += '</tr>';
                         });
-                        
-                        resultsHTML += '</tbody></table></div>';
-                        
-                        resultsContainer.innerHTML = resultsHTML;
-                        resultsContainer.style.display = 'block';
-                        
-                        // Əlavə kodlar üçün toggle funksiyası
-                        document.querySelectorAll('.toggle-codes').forEach(button => {
-                            button.addEventListener('click', function() {
-                                const id = this.getAttribute('data-id');
-                                const codesContainer = document.getElementById(`codes-${id}`);
-                                
-                                if (codesContainer.style.display === 'block') {
-                                    codesContainer.style.display = 'none';
-                                    this.textContent = `Əlavə kodlar (${data.results.find(item => item.id == id).oem_kodlar.length})`;
-                                } else {
-                                    codesContainer.style.display = 'block';
-                                    this.textContent = 'Gizlət';
-                                }
-                            });
-                        });
-                        
-                    } else {
-                        // Nəticə tapılmadı
-                        document.getElementById('no-results').style.display = 'block';
-                    }
-                })
-                .catch(error => {
-                    document.getElementById('loading-spinner').style.display = 'none';
+                    });
+                    
+                } else {
+                    // Nəticə tapılmadı
                     document.getElementById('no-results').style.display = 'block';
-                    document.getElementById('no-results').innerHTML = '<p>Xəta baş verdi. Zəhmət olmasa, bir az sonra yenidən cəhd edin.</p>';
-                });
+                }
+            })
+            .catch(error => {
+                document.getElementById('loading-spinner').style.display = 'none';
+                document.getElementById('no-results').style.display = 'block';
+                document.getElementById('no-results').innerHTML = '<p>Xəta baş verdi. Zəhmət olmasa, bir az sonra yenidən cəhd edin.</p>';
             });
         });
         

@@ -164,7 +164,7 @@ class Mehsul(models.Model):
             else:
                 # Yeni bir təkrarsız AS kodu yaradın
                 while True:
-                    new_code = "AS-" + generate_as_code()
+                    new_code = "AS" + generate_as_code()
                     if not Mehsul.objects.filter(as_kodu=new_code).exists():
                         self.as_kodu = new_code
                         as_code_changed = True

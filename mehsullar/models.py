@@ -1,10 +1,8 @@
 from pickle import FALSE
 import random
 import string
-
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models import Max
 
 class Kateqoriya(models.Model):
     adi = models.CharField(max_length=100, unique=True)
@@ -102,6 +100,10 @@ class Model(models.Model):
         verbose_name_plural = 'Modeller'
 
 
+def generate_as_code():
+    """6 rəqəmli təsadüfi AS kodu yaradır"""
+    return "AS-" + ''.join(random.choices(string.digits, k=6))
+
 
 class Mehsul(models.Model):
     adi = models.CharField(max_length=255, null=True, blank=True)
@@ -111,18 +113,15 @@ class Mehsul(models.Model):
     model = models.ManyToManyField(Model,blank=True)  
     brend_kod = models.CharField(max_length=50, null=True, blank=True)
     oem = models.CharField(max_length=255, null=True, blank=True)
-    as_kodu = models.CharField(max_length=15, unique=True, null=True, blank=True, 
-                              help_text="AS-XXXXXX formatında avtomatik yaradılacaq")
     stok = models.IntegerField(null=True, blank=True)
     maya_qiymet = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     qiymet = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     sekil = models.ImageField(upload_to='mehsul_sekilleri/', null=True, blank=True, default='mehsul_sekilleri/noimage.webp')
     haqqinda = models.TextField(null=True, blank=True)
     yenidir = models.BooleanField(default=False, null=True, blank=True)
+    as_kodu = models.CharField(max_length=10, default=generate_as_code, unique=True)
 
     def __str__(self):
-        if self.as_kodu:
-            return f"{self.adi} - {self.brend_kod} - {self.oem} - {self.as_kodu}"
         return f"{self.adi} - {self.brend_kod} - {self.oem}"
     
     class Meta:
@@ -145,45 +144,18 @@ class Mehsul(models.Model):
             return self.axtaris_sozleri.sozler.split()
         return []
 
-    @staticmethod
-    def generate_unique_as_code():
-        """6 rəqəmli unikal AS kodu yaradır"""
-        while True:
-            code = ''.join(random.choices(string.digits, k=6))
-            as_code = f"AS-{code}"
-            
-            if not Mehsul.objects.filter(as_kodu=as_code).exists():
-                return as_code
-
     def save(self, *args, **kwargs):
         if not self.sekil:
             self.sekil = 'mehsul_sekilleri/noimage.webp'
-            
-        # AS kodu avtomatik yarat
-        if not self.as_kodu:
-            # Eyni OEM koduna malik mövcud məhsul var?
-            if self.oem:
-                existing_product = Mehsul.objects.filter(oem=self.oem).exclude(id=self.id).first()
-                if existing_product and existing_product.as_kodu:
-                    self.as_kodu = existing_product.as_kodu
-                else:
-                    self.as_kodu = self.generate_unique_as_code()
-            else:
-                self.as_kodu = self.generate_unique_as_code()
+        
+        # Əgər OEM kodu varsa, eyni OEM koduna sahib məhsulu axtaraq
+        if self.oem and not self.pk:  # Yeni məhsul yaradılarkən
+            # Eyni OEM koduna sahib məhsul varsa, onun AS kodunu istifadə edək
+            mehsul_with_same_oem = Mehsul.objects.filter(oem=self.oem).first()
+            if mehsul_with_same_oem:
+                self.as_kodu = mehsul_with_same_oem.as_kodu
         
         super().save(*args, **kwargs)
-        
-        # Əlavə OEM kodlarını yoxlayıb tətbiq etmək
-        try:
-            for oem_kod in self.oem_kodlar.all():
-                # Eyni OEM koduna sahib başqa məhsullar var?
-                same_oem_products = Mehsul.objects.filter(oem=oem_kod.kod).exclude(id=self.id)
-                for product in same_oem_products:
-                    if product.as_kodu != self.as_kodu:
-                        product.as_kodu = self.as_kodu
-                        product.save(update_fields=['as_kodu'])
-        except:
-            pass  # Əgər oem_kodlar əlaqəsi hələ yaradılmayıbsa
 
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -272,37 +244,31 @@ class OEMKod(models.Model):
                 self.kod = kodlar[0]
                 super().save(*args, **kwargs)
                 
-                # Məhsula uyğun AS kodunu tapaq 
-                mehsul = self.mehsul
+                # Əgər bu kodla məhsul varsa, onun AS-kodunu məhsulumuzda tətbiq edək
+                if self.kod:
+                    mehsul_with_same_oem = Mehsul.objects.filter(oem=self.kod).exclude(id=self.mehsul.id).first()
+                    if mehsul_with_same_oem:
+                        self.mehsul.as_kodu = mehsul_with_same_oem.as_kodu
+                        self.mehsul.save()
                 
                 # Qalan kodlar üçün yeni OEMKod obyektləri yaradaq
                 for kod in kodlar[1:]:
-                    OEMKod.objects.create(
+                    new_oem = OEMKod.objects.create(
                         kod=kod,
                         mehsul=self.mehsul
                     )
                     
-                    # Eyni OEM koduna sahib başqa məhsulları tapaq
-                    same_oem_products = Mehsul.objects.filter(oem=kod).exclude(id=mehsul.id)
-                    # Onlara eyni AS kodunu tətbiq edək
-                    for product in same_oem_products:
-                        if product.as_kodu != mehsul.as_kodu:
-                            product.as_kodu = mehsul.as_kodu
-                            product.save(update_fields=['as_kodu'])
-                    
+                    # Eyni şəkildə bu kodla məhsul varsa, onun AS-kodunu məhsulumuzda tətbiq edək
+                    mehsul_with_same_oem = Mehsul.objects.filter(oem=kod).exclude(id=self.mehsul.id).first()
+                    if mehsul_with_same_oem:
+                        self.mehsul.as_kodu = mehsul_with_same_oem.as_kodu
+                        self.mehsul.save()
+                        break
             return
         else:
             # Mövcud kod yenilənərkən də xüsusi simvolları silək
             self.kod = ''.join(char for char in self.kod if char not in string.punctuation)
-            super().save(*args, **kwargs)
-            
-            # Məhsula uyğun AS kodunu tapaq və eyni OEM kodlu məhsullara tətbiq edək
-            mehsul = self.mehsul
-            same_oem_products = Mehsul.objects.filter(oem=self.kod).exclude(id=mehsul.id)
-            for product in same_oem_products:
-                if product.as_kodu != mehsul.as_kodu:
-                    product.as_kodu = mehsul.as_kodu
-                    product.save(update_fields=['as_kodu'])
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'OEM Kod'

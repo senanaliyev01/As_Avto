@@ -10,6 +10,8 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
 import pandas as pd
 import re
+import random
+import string
 
 class MarkaSekilInline(admin.TabularInline):
     model = MarkaSekil
@@ -187,7 +189,7 @@ class MehsulAdmin(admin.ModelAdmin):
     
     change_list_template = 'admin/mehsul_changelist.html'
     
-    actions = ['yenilikden_sil', 'yenidir_et']
+    actions = ['yenilikden_sil', 'yenidir_et', 'renew_as_codes']
     
     def get_urls(self):
         from django.urls import path
@@ -312,6 +314,10 @@ class MehsulAdmin(admin.ModelAdmin):
                                 
                                 if 'oem' in row and pd.notna(row['oem']):
                                     existing_product.oem = row['oem']
+                                    # Eyni OEM koduna sahib məhsulu axtar
+                                    mehsul_with_same_oem = Mehsul.objects.filter(oem=row['oem']).exclude(id=existing_product.id).first()
+                                    if mehsul_with_same_oem:
+                                        existing_product.as_kodu = mehsul_with_same_oem.as_kodu
                                 
                                 existing_product.save()
                                 
@@ -341,6 +347,12 @@ class MehsulAdmin(admin.ModelAdmin):
                                     'yenidir': False,
                                     'haqqinda': str(row['haqqinda']) if 'haqqinda' in row and pd.notna(row['haqqinda']) else None
                                 }
+                                
+                                # OEM kodu varsa, eyni OEM koduna sahib məhsulu axtar
+                                if 'oem' in row and pd.notna(row['oem']):
+                                    mehsul_with_same_oem = Mehsul.objects.filter(oem=row['oem']).first()
+                                    if mehsul_with_same_oem:
+                                        mehsul_data['as_kodu'] = mehsul_with_same_oem.as_kodu
                                 
                                 # Yeni məhsul yarat
                                 yeni_mehsul = Mehsul.objects.create(**mehsul_data)
@@ -413,6 +425,54 @@ class MehsulAdmin(admin.ModelAdmin):
         self.message_user(request, "Seçilmiş məhsullar yenidir olaraq işarələndi.")
     yenidir_et.short_description = "Seçilmiş məhsulları yenidir et"
     
+    def renew_as_codes(self, request, queryset):
+        """
+        Bu funksiya seçilmiş məhsulların AS kodlarını yeniləyir
+        Əgər eyni OEM koduna sahib məhsullar varsa, onlara eyni AS kodu verilir
+        """
+        updated_products = 0
+        updated_codes = {}
+        
+        # Əvvəlcə bütün məhsulları OEM kodlarına görə qruplaşdıraq
+        oem_groups = {}
+        for product in queryset:
+            if product.oem:
+                if product.oem not in oem_groups:
+                    oem_groups[product.oem] = []
+                oem_groups[product.oem].append(product)
+                
+                # Əlavə OEM kodlarını da əlavə et
+                for oem_kod in product.oem_kodlar.all():
+                    if oem_kod.kod not in oem_groups:
+                        oem_groups[oem_kod.kod] = []
+                    oem_groups[oem_kod.kod].append(product)
+        
+        # İndi hər qrup üçün bir AS kodu verək
+        for oem, products in oem_groups.items():
+            if len(products) > 1:
+                # Bu OEM kodu üçün bir AS kodu yaradaq
+                as_code = "AS-" + ''.join(random.choices(string.digits, k=6))
+                updated_codes[oem] = as_code
+                
+                # Bütün məhsullara eyni AS kodunu verək
+                for product in products:
+                    product.as_kodu = as_code
+                    product.save()
+                    updated_products += 1
+        
+        # Bildirim göstərək
+        if updated_products > 0:
+            self.message_user(
+                request, 
+                f"{updated_products} məhsul üçün AS kodları yeniləndi. {len(updated_codes)} fərqli OEM kodu üçün yeni AS kodu yaradıldı."
+            )
+        else:
+            self.message_user(
+                request, 
+                "Seçilmiş məhsullar arasında eyni OEM koduna sahib məhsul tapılmadı."
+            )
+    
+    renew_as_codes.short_description = "Seçilmiş məhsulların AS kodlarını yenilə"
    
 
 # Qeydiyyatları düzəltdik

@@ -132,8 +132,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sitemaps',
-    'django.contrib.sites',
     'rest_framework',
     'channels',
     'anaevim',
@@ -144,10 +142,9 @@ INSTALLED_APPS = [
     'sohbet_otagi',
 ]
 
-SITE_ID = 1
-
-# Sitemap cache müddəti (6 saat = 21600 saniyə)
-SITEMAP_CACHE_TIMEOUT = 21600
+# Sitemap ile elaqedar olan hisseleri sildim
+# SITE_ID = 1
+# SITEMAP_CACHE_TIMEOUT = 21600
 
 # 3. Jazzmin tənzimləmələri
 JAZZMIN_SETTINGS = {
@@ -243,7 +240,6 @@ MIDDLEWARE = [
     'Web.middlewares.Force404Middleware',
     'Web.middlewares.AddSearchDataMiddleware',
     'Web.middlewares.RequestLoggingMiddleware',
-    'Web.middlewares.SearchEnginePingMiddleware',
 ]
 
 ROOT_URLCONF = 'Web.urls'

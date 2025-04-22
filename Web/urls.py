@@ -3,8 +3,6 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import render
-from django.contrib.sitemaps.views import sitemap
-from .sitemaps import sitemaps
 from django.views.generic.base import RedirectView
 
 urlpatterns = [
@@ -18,12 +16,6 @@ urlpatterns = [
     # Köhnə URL-ləri yeni URL-lərə yönləndir (301 Permanent Redirect)
     path('auth/register/', RedirectView.as_view(url='/istifadeciler/register/', permanent=True)),
     path('auth/login/', RedirectView.as_view(url='/istifadeciler/login/', permanent=True)),
-    
-    # Sitemap URL - şəkil dəstəyi ilə
-    path('sitemap.xml', sitemap, {
-        'sitemaps': sitemaps,
-        'template_name': 'sitemap_template.xml'
-    }, name='django.contrib.sitemaps.views.sitemap'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 admin.site.site_title = 'AS-AVTO'

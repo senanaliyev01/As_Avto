@@ -6,188 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AS-AVTO | Avtomobil Ehtiyat Hissələri</title>
     
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="AS-Avto - Azərbaycanın ən böyük avtomobil ehtiyat hissələri mağazası. Orijinal və keyfiyyətli avtomobil hissələri, filterlər, yağlar və digər avtomobil aksesuarları.">
-    <meta name="keywords" content="avtomobil hissələri, ehtiyat hissələri, avto hissələr, as-avto, avtomobil, filter, yağ, yanacaq, Azərbaycan, Bakı">
-    <meta name="author" content="AS-Avto">
-    <meta name="robots" content="index, follow">
-    <meta name="revisit-after" content="1 days">
-    
-    <!-- Structured Data - Organization -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "AutoPartsStore",
-        "name": "AS-AVTO",
-        "image": "https://as-avto.com{% static 'img/Header_Logo.png' %}",
-        "description": "Azərbaycanın ən böyük avtomobil ehtiyat hissələri mağazası",
-        "url": "https://as-avto.com",
-        "telephone": "+994773059585",
-        "email": "senan.eliyev.9997@gmail.com",
-        "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "Binəqədi R. M.Rəsulzadə qəs. As-Avto",
-            "addressLocality": "Bakı",
-            "addressRegion": "Binəqədi",
-            "addressCountry": "AZ"
-        },
-        "geo": {
-            "@type": "GeoCoordinates",
-            "latitude": 40.4385,
-            "longitude": 49.8447
-        },
-        "openingHoursSpecification": {
-            "@type": "OpeningHoursSpecification",
-            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-            "opens": "09:00",
-            "closes": "18:00"
-        },
-        "sameAs": [
-            "https://www.tiktok.com/@a_avto_service",
-            "https://wa.me/994773059585"
-        ]
-    }
-    </script>
-
-    <!-- Structured Data - Products -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "ItemList",
-        "itemListElement": [
-            {% for mehsul in mehsullar %}
-            {
-                "@type": "ListItem",
-                "position": {{ forloop.counter }},
-                "item": {
-                    "@type": "Product",
-                    "name": "{{ mehsul.adi }}",
-                    "image": "https://as-avto.com{{ mehsul.sekil.url }}",
-                    "description": "{{ mehsul.adi }} - {{ mehsul.marka.adi }} üçün {{ mehsul.brend.adi }} markalı orijinal ehtiyat hissəsi",
-                    "brand": {
-                        "@type": "Brand",
-                        "name": "{{ mehsul.brend.adi }}"
-                    },
-                    "sku": "{{ mehsul.brend_kod }}",
-                    "mpn": "{{ mehsul.oem }}",
-                    "category": "Auto Parts",
-                    "aggregateRating": {
-                        "@type": "AggregateRating",
-                        "ratingValue": "4.8",
-                        "reviewCount": "150"
-                    },
-                    "review": {
-                        "@type": "Review",
-                        "reviewRating": {
-                            "@type": "Rating",
-                            "ratingValue": "5",
-                            "bestRating": "5"
-                        },
-                        "author": {
-                            "@type": "Person",
-                            "name": "AS-AVTO Müştəri"
-                        }
-                    },
-                    "offers": {
-                        "@type": "Offer",
-                        "url": "https://as-avto.com{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}",
-                        "priceCurrency": "AZN",
-                        "price": "{{ mehsul.formatted_qiymet }}",
-                        "priceValidUntil": "2025-12-31",
-                        "availability": "https://schema.org/InStock",
-                        "shippingDetails": {
-                            "@type": "OfferShippingDetails",
-                            "shippingRate": {
-                                "@type": "MonetaryAmount",
-                                "value": "0",
-                                "currency": "AZN"
-                            },
-                            "shippingDestination": {
-                                "@type": "DefinedRegion",
-                                "addressCountry": "AZ",
-                                "addressRegion": "Bakı"
-                            },
-                            "deliveryTime": {
-                                "@type": "ShippingDeliveryTime",
-                                "handlingTime": {
-                                    "@type": "QuantitativeValue",
-                                    "minValue": "0",
-                                    "maxValue": "1",
-                                    "unitCode": "DAY"
-                                },
-                                "transitTime": {
-                                    "@type": "QuantitativeValue",
-                                    "minValue": "1",
-                                    "maxValue": "2",
-                                    "unitCode": "DAY"
-                                }
-                            }
-                        },
-                        "hasMerchantReturnPolicy": {
-                            "@type": "MerchantReturnPolicy",
-                            "applicableCountry": "AZ",
-                            "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
-                            "merchantReturnDays": "14",
-                            "returnMethod": ["https://schema.org/ReturnByMail", "https://schema.org/ReturnInStore", "https://schema.org/ReturnAtKiosk"],
-                            "returnFees": "https://schema.org/FreeReturn",
-                            "additionalProperty": [{
-                                "@type": "PropertyValue",
-                                "name": "returnMethods",
-                                "value": "Müştəri özü gətirə bilər, Yeni mal çatdırılanda qaytara bilər, Taksi ilə göndərə bilər"
-                            }]
-                        },
-                        "seller": {
-                            "@type": "Organization",
-                            "name": "AS-AVTO",
-                            "url": "https://as-avto.com",
-                            "address": {
-                                "@type": "PostalAddress",
-                                "streetAddress": "Binəqədi R. M.Rəsulzadə qəs. As-Avto",
-                                "addressLocality": "Bakı",
-                                "addressRegion": "Binəqədi",
-                                "addressCountry": {
-                                    "@type": "Country",
-                                    "name": "AZ"
-                                }
-                            },
-                            "telephone": "+994773059585",
-                            "email": "senan.eliyev.9997@gmail.com"
-                        }
-                    }
-                }
-            }{% if not forloop.last %},{% endif %}
-            {% endfor %}
-        ]
-    }
-    </script>
-
-    <!-- Structured Data - Website -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        "url": "https://as-avto.com",
-        "name": "AS-AVTO",
-        "description": "Azərbaycanın ən böyük avtomobil ehtiyat hissələri mağazası"
-    }
-    </script>
-
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="AS-AVTO | Avtomobil Ehtiyat Hissələri Mağazası">
-    <meta property="og:description" content="Azərbaycanın ən böyük avtomobil ehtiyat hissələri mağazası. B2B platforma ilə topdan və pərakəndə satış.">
-    <meta property="og:image" content="{% static 'img/Header_Logo.png' %}">
-    <meta property="og:url" content="https://as-avto.com">
-    <meta property="og:type" content="website">
-    
-    <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="AS-AVTO | Avtomobil Ehtiyat Hissələri">
-    <meta name="twitter:description" content="Azərbaycanın ən böyük avtomobil ehtiyat hissələri mağazası">
-    <meta name="twitter:image" content="{% static 'img/Header_Logo.png' %}">
-    
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://as-avto.com">
-    
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="128x128" href="{% static 'img/favicon.png' %}">
     
@@ -206,7 +24,6 @@
     <header class="header">
         <div class="header__container container">
             <a href="{% url 'anaevim' %}" class="header__logo">
-                <!-- <img src="{% static 'img/Logo_Winter.png' %}" alt="AS AVTO Logo"> -->
                 <img src="{% static 'img/Header_Logo.png' %}" alt="AS AVTO Logo">
             </a>
             
@@ -250,7 +67,6 @@
                     <div class="hero__content container">
                         <h1 class="hero__title">Premium Mühərrik Yağları</h1>
                         <p class="hero__description">Avtomobiliniz üçün ən yüksək keyfiyyətli mühərrik yağları</p>
-                      
                     </div>
                 </div>
 
@@ -261,7 +77,6 @@
                     <div class="hero__content container">
                         <h1 class="hero__title">Antifriz və Soyuducu Mayelər</h1>
                         <p class="hero__description">Mühərrikinizi hərtərəfli qoruyun</p>
-                      
                     </div>
                 </div>
 
@@ -272,50 +87,39 @@
                     <div class="hero__content container">
                         <h1 class="hero__title">Orijinal Filterlər</h1>
                         <p class="hero__description">Avtomobiliniz üçün yüksək keyfiyyətli filterlər</p>
-                       
+                    </div>
+                </div>
+
+                <div class="hero__slide">
+                    <div class="hero__image" style="background-image: url('{% static 'img/alt_sekil.webp' %}');">
+                        <div class="hero__overlay"></div>
+                    </div>
+                    <div class="hero__content container">
+                        <h1 class="hero__title">Orijinal Alt Hissələr</h1>
+                        <p class="hero__description">Avtomobiliniz üçün yüksək keyfiyyətli Alt Hissələr</p>
+                    </div>
+                </div>
+
+                <div class="hero__slide">
+                    <div class="hero__image" style="background-image: url('{% static 'img/remen_sekil.webp' %}');">
+                        <div class="hero__overlay"></div>
+                    </div>
+                    <div class="hero__content container">
+                        <h1 class="hero__title">Orijinal Remen İç Və Çöl</h1>
+                        <p class="hero__description">Avtomobiliniz üçün yüksək keyfiyyətli Remen İç Və Çöl</p>
+                    </div>
+                </div>
+
+                <div class="hero__slide">
+                    <div class="hero__image" style="background-image: url('{% static 'img/potrubka.webp' %}');">
+                        <div class="hero__overlay"></div>
+                    </div>
+                    <div class="hero__content container">
+                        <h1 class="hero__title">Orijinal Potrubka</h1>
+                        <p class="hero__description">Avtomobiliniz üçün yüksək keyfiyyətli Potrubka</p>
                     </div>
                 </div>
             </div>
-
-            <div class="hero__slide">
-                <div class="hero__image" style="background-image: url('{% static 'img/alt_sekil.webp' %}');">
-                    <div class="hero__overlay"></div>
-                </div>
-                <div class="hero__content container">
-                    <h1 class="hero__title">Orijinal Alt Hissələr</h1>
-                    <p class="hero__description">Avtomobiliniz üçün yüksək keyfiyyətli Alt Hissələr</p>
-                  
-                </div>
-            </div>
-        </div>
-
-
-        <div class="hero__slide">
-            <div class="hero__image" style="background-image: url('{% static 'img/remen_sekil.webp' %}');">
-                <div class="hero__overlay"></div>
-            </div>
-            <div class="hero__content container">
-                <h1 class="hero__title">Orijinal Remen İç Və Çöl </h1>
-                <p class="hero__description">Avtomobiliniz üçün yüksək keyfiyyətli Remen İç Və Çöl</p>
-               
-            </div>
-        </div>
-    </div>
-
-
-
-    <div class="hero__slide">
-        <div class="hero__image" style="background-image: url('{% static 'img/potrubka.webp' %}');">
-            <div class="hero__overlay"></div>
-        </div>
-        <div class="hero__content container">
-            <h1 class="hero__title">Orijinal Potrubka </h1>
-            <p class="hero__description">Avtomobiliniz üçün yüksək keyfiyyətli Potrubka</p>
-           
-        </div>
-    </div>
-</div>
-
 
             <button class="hero__arrow hero__arrow--prev" aria-label="Previous slide">
                 <i class="fas fa-chevron-left"></i>
@@ -434,13 +238,9 @@
                     <h3 class="feature__title">24/7 Dəstək</h3>
                     <p class="feature__text">Peşəkar komandamızla hərtərəfli dəstək</p>
                 </div>
-
-                
             </div>
         </div>
     </section>
-
- 
 
     <!-- About Section1 -->
     <section class="about" id="about">
@@ -461,7 +261,6 @@
                         <li><i class="fas fa-check"></i> Zəmanətli xidmət</li>
                     </ul>
                 </div>
-                
             </div>
         </div>
     </section>
@@ -508,7 +307,6 @@
                 <div class="footer__grid">
                     <div class="footer__brand">
                          <img src="{% static 'img/Header_Logo.png' %}" alt="AS AVTO Logo">
-                        <!-- <img src="{% static 'img/Logo_Winter.png' %}" alt="AS AVTO Logo"> -->
                         <p>Azərbaycanın avtomobil ehtiyat hissələri bazarında 10 ildən artıq təcrübə</p>
                         <div class="footer__social">
                             <a href="https://wa.me/994773059585" target="_blank" rel="noopener" aria-label="WhatsApp">
@@ -517,7 +315,6 @@
                             <a href="https://www.tiktok.com/@a_avto_service" target="_blank" rel="noopener" aria-label="TikTok">
                                 <i class="fab fa-tiktok"></i>
                             </a>
-                         
                         </div>
                     </div>
 
@@ -528,7 +325,6 @@
                             <li><a href="#about">Haqqımızda</a></li>
                             <li><a href="#contact">Əlaqə</a></li>
                             <li><a href="{% url 'login' %}">B4B Giriş</a></li>
-                        
                         </ul>
                     </div>
 
@@ -549,8 +345,6 @@
                             </li>
                         </ul>
                     </div>
-
-                  
                 </div>
             </div>
         </div>
@@ -559,8 +353,6 @@
             <div class="container">
                 <p>&copy; 2024-2025 AS AVTO. Bütün hüquqlar qorunur.</p>
                 <div class="footer__payments">
-                    {% comment %} <img src="{% static 'img/visa.png' %}" alt="Visa">
-                    <img src="{% static 'img/mastercard.png' %}" alt="Mastercard"> {% endcomment %}
                 </div>
             </div>
         </div>

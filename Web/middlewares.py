@@ -8,8 +8,6 @@ import json
 import requests
 from django.core.cache import cache
 from datetime import datetime, timedelta
-from django.contrib.sitemaps.views import sitemap
-from Web.sitemaps import sitemaps
 
 # Ayrı logger-lər yaradırıq
 request_logger = logging.getLogger('django.request')
@@ -113,30 +111,4 @@ class RequestLoggingMiddleware(MiddlewareMixin):
             f"Exception occurred - {json.dumps(log_data)}",
             exc_info=True
         )
-
-class SearchEnginePingMiddleware(MiddlewareMixin):
-    def process_request(self, request):
-        try:
-            # Cache-dən son yenilənmə vaxtını yoxla
-            last_ping = cache.get('sitemap_last_ping')
-            current_time = datetime.now()
-            
-            # Əgər son yenilənmədən 6 saat keçibsə və ya heç yenilənməyibsə
-            if not last_ping or (current_time - last_ping) > timedelta(hours=6):
-                # Sitemap-i yenilə
-                sitemap(request, sitemaps)
-                
-                # Search engine-lərə ping göndər
-                requests.get('https://www.google.com/ping?sitemap=https://as-avto.com/sitemap.xml', timeout=1)
-                requests.get('https://www.bing.com/ping?sitemap=https://as-avto.com/sitemap.xml', timeout=1)
-                
-                # Son yenilənmə vaxtını cache-də saxla
-                cache.set('sitemap_last_ping', current_time)
-                
-                app_logger.info("Sitemap yeniləndi və search engine-lərə ping göndərildi")
-            
-        except Exception as e:
-            error_logger.error(f"Sitemap yeniləmə xətası: {str(e)}", exc_info=True)
-            
-        return None
         

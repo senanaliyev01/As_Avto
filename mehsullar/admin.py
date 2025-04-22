@@ -244,23 +244,27 @@ class MehsulAdmin(admin.ModelAdmin):
                                 temiz_oem = str(row['elave_oem']).replace(',', ' ').replace('/', ' ')
                                 elave_oem_kodlar = [kod.strip() for kod in temiz_oem.split() if kod.strip()]
                                 
-                                # Birinci kodu brend_kod sütununa, ikinci kodu isə oem sütununa yerləşdir
-                                if elave_oem_kodlar:
-                                    # İlk olaraq sütunlardakı mövcud dəyərləri al
-                                    brend_kod = row['brend_kod'] if 'brend_kod' in row and pd.notna(row['brend_kod']) else ''
+                                # OEM sütunu üçün yalnız ilk iki kodu götür
+                                oem_ucun_kodlar = elave_oem_kodlar[:2] if elave_oem_kodlar else []
+                                
+                                # Əlavə OEM kodlarını birləşdirib OEM sütununa da əlavə et
+                                if oem_ucun_kodlar:
+                                    birlesdirilmis_oem = '-'.join(oem_ucun_kodlar)
                                     
-                                    # Birinci kod varsa və brend_kod boşdursa
-                                    if len(elave_oem_kodlar) >= 1 and (not brend_kod or brend_kod.strip() == ''):
-                                        brend_kod = elave_oem_kodlar[0]
-                                        row['brend_kod'] = brend_kod
-                                    
-                                    # İkinci kod varsa, oem sütununa yerləşdir
-                                    if len(elave_oem_kodlar) >= 2:
-                                        # Əgər oem sütunu dolu deyilsə
-                                        if 'oem' not in row or not pd.notna(row['oem']) or not row['oem']:
-                                            row['oem'] = elave_oem_kodlar[1]
+                                    # Əgər oem sütunu dolu deyilsə, birləşdirilmiş kodları əlavə et
+                                    if 'oem' not in row or not pd.notna(row['oem']) or not row['oem']:
+                                        row['oem'] = birlesdirilmis_oem
+                                    # Əgər oem sütunu doluysa və orada bu kodlar yoxdursa, əlavə et
+                                    elif birlesdirilmis_oem not in str(row['oem']):
+                                        yeni_oem = f"{row['oem']}-{birlesdirilmis_oem}"
+                                        # Əgər yeni OEM dəyəri çox uzundursa
+                                        if len(yeni_oem) > 250:
+                                            # Birinci orijinal OEM-i saxlayaq, sahənin limitini aşmasın
+                                            row['oem'] = str(row['oem'])[:250]
+                                        else:
+                                            row['oem'] = yeni_oem
                             
-                            # brend_kod dəyərini təyin et (əgər hələ təyin edilməyibsə)
+                            # brend_kod dəyərini təyin et
                             brend_kod = row['brend_kod'] if 'brend_kod' in row and pd.notna(row['brend_kod']) else ''
                             
                             # Əgər məhsulun adı varsa, boşluqları təmizlə:

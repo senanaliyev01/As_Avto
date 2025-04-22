@@ -1,6 +1,5 @@
 from pickle import FALSE
-import random
-import string
+
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -100,10 +99,6 @@ class Model(models.Model):
         verbose_name_plural = 'Modeller'
 
 
-def generate_as_code():
-    """6 rəqəmli təsadüfi AS kodu yaradır"""
-    return "AS-" + ''.join(random.choices(string.digits, k=6))
-
 
 class Mehsul(models.Model):
     adi = models.CharField(max_length=255, null=True, blank=True)
@@ -119,7 +114,6 @@ class Mehsul(models.Model):
     sekil = models.ImageField(upload_to='mehsul_sekilleri/', null=True, blank=True, default='mehsul_sekilleri/noimage.webp')
     haqqinda = models.TextField(null=True, blank=True)
     yenidir = models.BooleanField(default=False, null=True, blank=True)
-    as_kodu = models.CharField(max_length=10, default=generate_as_code, unique=True)
 
     def __str__(self):
         return f"{self.adi} - {self.brend_kod} - {self.oem}"
@@ -147,14 +141,6 @@ class Mehsul(models.Model):
     def save(self, *args, **kwargs):
         if not self.sekil:
             self.sekil = 'mehsul_sekilleri/noimage.webp'
-        
-        # Əgər OEM kodu varsa, eyni OEM koduna sahib məhsulu axtaraq
-        if self.oem and not self.pk:  # Yeni məhsul yaradılarkən
-            # Eyni OEM koduna sahib məhsul varsa, onun AS kodunu istifadə edək
-            mehsul_with_same_oem = Mehsul.objects.filter(oem=self.oem).first()
-            if mehsul_with_same_oem:
-                self.as_kodu = mehsul_with_same_oem.as_kodu
-        
         super().save(*args, **kwargs)
 
 class Sebet(models.Model):
@@ -243,27 +229,12 @@ class OEMKod(models.Model):
                 # İlk kodu bu obyektdə saxlayaq
                 self.kod = kodlar[0]
                 super().save(*args, **kwargs)
-                
-                # Əgər bu kodla məhsul varsa, onun AS-kodunu məhsulumuzda tətbiq edək
-                if self.kod:
-                    mehsul_with_same_oem = Mehsul.objects.filter(oem=self.kod).exclude(id=self.mehsul.id).first()
-                    if mehsul_with_same_oem:
-                        self.mehsul.as_kodu = mehsul_with_same_oem.as_kodu
-                        self.mehsul.save()
-                
                 # Qalan kodlar üçün yeni OEMKod obyektləri yaradaq
                 for kod in kodlar[1:]:
-                    new_oem = OEMKod.objects.create(
+                    OEMKod.objects.create(
                         kod=kod,
                         mehsul=self.mehsul
                     )
-                    
-                    # Eyni şəkildə bu kodla məhsul varsa, onun AS-kodunu məhsulumuzda tətbiq edək
-                    mehsul_with_same_oem = Mehsul.objects.filter(oem=kod).exclude(id=self.mehsul.id).first()
-                    if mehsul_with_same_oem:
-                        self.mehsul.as_kodu = mehsul_with_same_oem.as_kodu
-                        self.mehsul.save()
-                        break
             return
         else:
             # Mövcud kod yenilənərkən də xüsusi simvolları silək

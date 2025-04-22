@@ -148,10 +148,7 @@ class Mehsul(models.Model):
         if not self.sekil:
             self.sekil = 'mehsul_sekilleri/noimage.webp'
             
-        # AS kodunu yaratmadan əvvəlki vəziyyəti saxlayın
-        had_as_code_before = bool(self.as_kodu)
-        as_code_changed = False
-            
+        is_new_as_code = False
         # OEM kodu əsasında AS kodunu təyin edin
         if self.oem and not self.as_kodu:
             # Eyni OEM kodu olan məhsulu tapın
@@ -160,25 +157,42 @@ class Mehsul(models.Model):
             if existing_product and existing_product.as_kodu:
                 # Eyni OEM koduna malik məhsul varsa, onun AS kodunu istifadə edin
                 self.as_kodu = existing_product.as_kodu
-                as_code_changed = True
             else:
                 # Yeni bir təkrarsız AS kodu yaradın
                 while True:
                     new_code = "AS-" + generate_as_code()
                     if not Mehsul.objects.filter(as_kodu=new_code).exists():
                         self.as_kodu = new_code
-                        as_code_changed = True
+                        is_new_as_code = True
                         break
                         
         super().save(*args, **kwargs)
         
-        # AS kodu yaradıldısa, bunu əlavə OEM kodlarına əlavə et
-        if as_code_changed and self.as_kodu and not OEMKod.objects.filter(kod=self.as_kodu, mehsul=self).exists():
-            # AS kodunu əlavə OEM olaraq əlavə et
-            OEMKod.objects.create(
-                kod=self.as_kodu,
-                mehsul=self
-            )
+        # Yeni AS kodu yaradıldıqda və ya dəyişdikdə, bütün OEM kodlarına bu AS kodunu təyin et
+        if self.as_kodu and (is_new_as_code or 'as_kodu' in kwargs.get('update_fields', [])):
+            # Eyni OEM kodlu məhsulları tapıb onların AS kodlarını yenilə
+            if self.oem:
+                similar_products = Mehsul.objects.filter(oem=self.oem).exclude(id=self.id)
+                for product in similar_products:
+                    if product.as_kodu != self.as_kodu:
+                        product.as_kodu = self.as_kodu
+                        product.save(update_fields=['as_kodu'])
+            
+            # Məhsulun əlavə OEM kodları varsa, onlar üçün də eyni AS kodunu təyin et
+            for oem_kod in self.oem_kodlar.all():
+                # Eyni əlavə OEM koduna malik məhsulları tap
+                similar_oem_products = OEMKod.objects.filter(kod=oem_kod.kod).exclude(mehsul=self)
+                for oem_product in similar_oem_products:
+                    if oem_product.mehsul.as_kodu != self.as_kodu:
+                        oem_product.mehsul.as_kodu = self.as_kodu
+                        oem_product.mehsul.save(update_fields=['as_kodu'])
+                        
+                # Eyni əlavə OEM kodu əsas OEM kodu kimi istifadə edən məhsulları tap
+                main_oem_products = Mehsul.objects.filter(oem=oem_kod.kod).exclude(id=self.id)
+                for main_product in main_oem_products:
+                    if main_product.as_kodu != self.as_kodu:
+                        main_product.as_kodu = self.as_kodu
+                        main_product.save(update_fields=['as_kodu'])
 
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -256,8 +270,10 @@ class OEMKod(models.Model):
 
     def save(self, *args, **kwargs):
         import string
+        was_new = self.pk is None or self._state.adding
+        
         # Əgər yeni yaradılırsa və ya kod dəyişdirilibsə
-        if self.pk is None or self._state.adding:
+        if was_new:
             # Bütün xüsusi simvolları silək
             temiz_kod = ''.join(char for char in self.kod if char not in string.punctuation)
             # Boşluqla ayrılmış kodları ayırıb hər birini ayrı-ayrı yaradaqq
@@ -265,10 +281,44 @@ class OEMKod(models.Model):
             if kodlar:
                 # İlk kodu bu obyektdə saxlayaq
                 self.kod = kodlar[0]
+                
                 super().save(*args, **kwargs)
+                
+                # AS kodunu məhsulla sinxronlaşdır
+                if self.mehsul and self.mehsul.as_kodu:
+                    # Eyni OEM koduna malik məhsulları tapıb onlara da eyni AS kodunu təyin et
+                    similar_products = Mehsul.objects.filter(oem=self.kod).exclude(id=self.mehsul.id)
+                    for product in similar_products:
+                        if product.as_kodu != self.mehsul.as_kodu:
+                            product.as_kodu = self.mehsul.as_kodu
+                            product.save(update_fields=['as_kodu'])
+                
+                # Əgər məhsulun AS kodu yoxdursa və digər məhsullarda eyni OEM kodu ilə AS kodu varsa
+                if self.mehsul and not self.mehsul.as_kodu:
+                    # Eyni OEM koduna malik məhsulu tap
+                    similar_product = Mehsul.objects.filter(oem=self.kod).exclude(id=self.mehsul.id).first()
+                    if similar_product and similar_product.as_kodu:
+                        self.mehsul.as_kodu = similar_product.as_kodu
+                        self.mehsul.save(update_fields=['as_kodu'])
+                    else:
+                        # Digər əlavə OEM kodlarında bu kodu axtaraq
+                        similar_oem = OEMKod.objects.filter(kod=self.kod).exclude(mehsul=self.mehsul).first()
+                        if similar_oem and similar_oem.mehsul.as_kodu:
+                            self.mehsul.as_kodu = similar_oem.mehsul.as_kodu
+                            self.mehsul.save(update_fields=['as_kodu'])
+                        else:
+                            # Heç bir yerdə bu OEM kodu ilə məhsul yoxdursa, yeni AS kodu yarat
+                            if not self.mehsul.as_kodu:
+                                while True:
+                                    new_code = "AS-" + generate_as_code()
+                                    if not Mehsul.objects.filter(as_kodu=new_code).exists():
+                                        self.mehsul.as_kodu = new_code
+                                        self.mehsul.save(update_fields=['as_kodu'])
+                                        break
+                
                 # Qalan kodlar üçün yeni OEMKod obyektləri yaradaq
                 for kod in kodlar[1:]:
-                    OEMKod.objects.create(
+                    new_oem = OEMKod.objects.create(
                         kod=kod,
                         mehsul=self.mehsul
                     )
@@ -276,7 +326,17 @@ class OEMKod(models.Model):
         else:
             # Mövcud kod yenilənərkən də xüsusi simvolları silək
             self.kod = ''.join(char for char in self.kod if char not in string.punctuation)
-        super().save(*args, **kwargs)
+            
+            super().save(*args, **kwargs)
+            
+            # AS kodunu məhsulla sinxronlaşdır
+            if self.mehsul and self.mehsul.as_kodu:
+                # Eyni OEM koduna malik məhsulları tapıb onlara da eyni AS kodunu təyin et
+                similar_products = Mehsul.objects.filter(oem=self.kod).exclude(id=self.mehsul.id)
+                for product in similar_products:
+                    if product.as_kodu != self.mehsul.as_kodu:
+                        product.as_kodu = self.mehsul.as_kodu
+                        product.save(update_fields=['as_kodu'])
 
     class Meta:
         verbose_name = 'OEM Kod'

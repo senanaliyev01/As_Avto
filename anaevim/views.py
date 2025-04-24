@@ -1,9 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from mehsullar.models import Brend, Marka, Mehsul, MarkaSekil, Kateqoriya
+from mehsullar.models import Brend, Marka, Mehsul, MarkaSekil
 from django.template.defaultfilters import slugify
-from django.http import JsonResponse
-import re
 from django.db.models import Q
+import re
 
 def anaevim(request):
     brendler = Brend.objects.all()
@@ -35,103 +34,35 @@ def mehsul_etrafli(request, mehsul_id, mehsul_adi=None, mehsul_oem=None, mehsul_
     return render(request, 'mehsul_etrafli.html', context)
 
 def catalogue(request):
-    """
-    Jikiu.jp tipli kataloq səhifəsi.
-    Məhsulları müxtəlif parametrlərə görə axtarmaq üçün səhifə.
-    """
-    # Kataloqda göstəriləcək məlumatları əldə edirik
-    kateqoriyalar = Kateqoriya.objects.all()
-    brendler = Brend.objects.all()
-    markalar = Marka.objects.all()
+    mehsullar = []
+    is_searched = False
+    search_query = request.GET.get('q', '')
     
-    # Məlumatlar
-    context = {
-        'kateqoriyalar': kateqoriyalar,
-        'brendler': brendler, 
-        'markalar': markalar,
-    }
+    # Filter datalarını hazırla
+    kateqoriyalar = Mehsul.objects.values_list('kateqoriya__adi', flat=True).distinct()
+    brendler = Mehsul.objects.values_list('brend__adi', flat=True).distinct()
+    markalar = Mehsul.objects.values_list('marka__adi', flat=True).distinct()
     
-    return render(request, 'catalogue.html', context)
-
-def catalogue_search(request):
-    """
-    Kataloq axtarışı üçün API. Məhsulları müxtəlif parametrlərə görə axtarır.
-    """
-    search_type = request.GET.get('search_type', 'product_no')
-    query = request.GET.get('query', '').strip()
-    category = request.GET.get('category')
-    brand = request.GET.get('brand')
-    model = request.GET.get('model')
-    year = request.GET.get('year')
-    engine = request.GET.get('engine')
-    
-    # Nəticələr siyahısı
-    mehsullar = Mehsul.objects.all()
-    
-    # Əsas axtarış məntiqi
-    if search_type == 'product_no' and query:
+    if search_query:
+        is_searched = True
         # Xüsusi simvolları təmizlə
-        clean_query = re.sub(r'[^a-zA-Z0-9]', '', query)
+        clean_query = re.sub(r'[^a-zA-Z0-9]', '', search_query)
         
-        # OEM, AS kodu və brend kodu ilə axtarış
-        mehsullar = mehsullar.filter(
+        # OEM kodlarında, AS kodunda və məhsul adında axtarış
+        mehsullar = Mehsul.objects.filter(
             Q(oem_kodlar__kod__icontains=clean_query) | 
-            Q(oem__icontains=clean_query) |
-            Q(as_kodu__icontains=clean_query) |
-            Q(brend_kod__icontains=query)
+            Q(adi__icontains=search_query) |
+            Q(brend_kod__icontains=search_query) |
+            Q(as_kodu__icontains=clean_query)
         ).distinct()
     
-    # Əlavə filterlər
-    if category:
-        mehsullar = mehsullar.filter(kateqoriya__adi=category)
-    
-    if brand:
-        mehsullar = mehsullar.filter(brend__adi=brand)
-    
-    if model:
-        mehsullar = mehsullar.filter(marka__adi=model)
-    
-    if year:
-        # İl filtri model-də il sahəsinə görədir
-        mehsullar = mehsullar.filter(model__il__il=year)
-    
-    if engine:
-        # Motor filtri model-də motor sahəsinə görədir
-        mehsullar = mehsullar.filter(model__motor__motor=engine)
-    
-    # Əgər AJAX sorğusu gəlirsə, JSON formatında nəticələri qaytarırıq
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        results = []
-        for mehsul in mehsullar[:50]:  # Maksimum 50 nəticə qaytarırıq
-            results.append({
-                'id': mehsul.id,
-                'adi': mehsul.adi,
-                'brend': mehsul.brend.adi if mehsul.brend else "",
-                'marka': mehsul.marka.adi if mehsul.marka else "",
-                'oem': mehsul.oem,
-                'as_kodu': mehsul.as_kodu,
-                'brend_kod': mehsul.brend_kod,
-                'qiymet': str(mehsul.qiymet),
-                'stok': mehsul.stok,
-                'sekil_url': mehsul.sekil.url if mehsul.sekil else None,
-                'oem_kodlar': [kod.kod for kod in mehsul.oem_kodlar.all()],
-                'url': f'/product/{slugify(mehsul.adi)}-{mehsul.oem}-{mehsul.brend_kod}/{mehsul.id}/'
-            })
-        
-        return JsonResponse({'results': results})
-    
-    # Normal sorğu üçün səhifəni göstəririk
     context = {
-        'mehsullar': mehsullar[:100],  # Təhlükəsizlik üçün maksimum 100 məhsul
-        'kateqoriyalar': Kateqoriya.objects.all(),
-        'brendler': Brend.objects.all(),
-        'markalar': Marka.objects.all(),
-        'search_query': query,
-        'search_type': search_type,
-        'selected_category': category,
-        'selected_brand': brand,
-        'selected_model': model,
-        'search_submitted': True  # Axtarış nəticələrini göstərmək üçün
+        'mehsullar': mehsullar,
+        'is_searched': is_searched,
+        'search_query': search_query,
+        'kateqoriyalar': kateqoriyalar,
+        'brendler': brendler,
+        'markalar': markalar,
     }
     
     return render(request, 'catalogue.html', context)

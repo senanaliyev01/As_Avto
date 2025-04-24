@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}AS-AVTO | Avtomobil Ehtiyat Hissələri{% endblock %}</title>
+    <title>AS-AVTO | Avtomobil Ehtiyat Hissələri</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="128x128" href="{% static 'img/favicon.png' %}">
@@ -17,7 +17,6 @@
     <!-- CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/anaevim.css' %}">
-    {% block extra_css %}{% endblock %}
     
 </head>
 <body>
@@ -30,10 +29,10 @@
             
             <nav class="header__nav">
                 <ul class="header__menu">
-                    <li><a href="{% url 'anaevim' %}#home" class="header__link">Ana Səhifə</a></li>
+                    <li><a href="#home" class="header__link">Ana Səhifə</a></li>
                     <li><a href="{% url 'catalogue' %}" class="header__link">Kataloq</a></li>
-                    <li><a href="{% url 'anaevim' %}#about" class="header__link">Haqqımızda</a></li>
-                    <li><a href="{% url 'anaevim' %}#contact" class="header__link">Əlaqə</a></li>
+                    <li><a href="#about" class="header__link">Haqqımızda</a></li>
+                    <li><a href="#contact" class="header__link">Əlaqə</a></li>
                 </ul>
                 <div class="header__actions">
                     <a href="{% url 'register' %}" class="btn btn--primary btn--register">
@@ -58,7 +57,6 @@
         </div>
     </header>
 
-    {% block content %}
     <!-- Hero Section -->
     <section class="hero" id="home">
         <div class="hero__slider">
@@ -302,7 +300,6 @@
             </div>
         </div>
     </section>
-    {% endblock %}
 
     <!-- Footer -->
     <footer class="footer">
@@ -325,10 +322,9 @@
                     <div class="footer__links">
                         <h3>Sürətli Keçid</h3>
                         <ul>
-                            <li><a href="{% url 'anaevim' %}#home">Ana Səhifə</a></li>
-                            <li><a href="{% url 'catalogue' %}">Kataloq</a></li>
-                            <li><a href="{% url 'anaevim' %}#about">Haqqımızda</a></li>
-                            <li><a href="{% url 'anaevim' %}#contact">Əlaqə</a></li>
+                            <li><a href="#home">Ana Səhifə</a></li>
+                            <li><a href="#about">Haqqımızda</a></li>
+                            <li><a href="#contact">Əlaqə</a></li>
                             <li><a href="{% url 'login' %}">B4B Giriş</a></li>
                         </ul>
                     </div>
@@ -365,6 +361,7 @@
 
     <!-- Scripts -->
     <script src="{% static 'js/anaevim.js' %}"></script>
-    {% block extra_js %}{% endblock %}
+    <script src="{% static 'js/loading.js' %}"></script>
+    
 </body>
 </html>

@@ -1948,3 +1948,13 @@ tr:hover {
     background-color: var(--color-accent-dark);
     border-color: var(--color-accent-dark);
 }
+
+.mesaj-1{
+    color: red;
+    text-align: center;
+    padding: 15px;
+    margin: 50px;
+    border: 1px solid white;
+    background: white;
+    border-radius: 150px;
+}

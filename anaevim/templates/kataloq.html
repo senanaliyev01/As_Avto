@@ -131,19 +131,10 @@
                 {% endif %}
             {% else %}
                 <div class="search-instructions text-center my-5">
-                    <div class="search-icon-container">
-                        <i class="fas fa-search fa-4x mb-3"></i>
-                    </div>
-                    <h3 class="search-title">Zəhmət olmasa, məhsul axtarışı edin</h3>
-                    <div class="search-description">
-                        <p>Avtomobil hissələrini tapmaq üçün yuxarıdakı axtarış panelindən istifadə edin.</p>
-                        <p>Məhsul adı, OEM kodu və ya brend kodu ilə axtara bilərsiniz.</p>
-                    </div>
-                    <div class="search-examples mt-4">
-                        <span class="search-tag">Nümunə: A4 ventilyator</span>
-                        <span class="search-tag">Nümunə: 8K0121251</span>
-                        <span class="search-tag">Nümunə: 03L115562</span>
-                    </div>
+                    <i class="fas fa-search fa-4x mb-3 text-muted"></i>
+                    <h3 class="mb-3">Zəhmət olmasa, məhsul axtarışı edin</h3>
+                    <p class="text-muted">Avtomobil hissələrini tapmaq üçün yuxarıdakı axtarış panelindən istifadə edin.</p>
+                    <p class="text-muted">Məhsul adı, OEM kodu və ya brend kodu ilə axtara bilərsiniz.</p>
                 </div>
             {% endif %}
         </div>
@@ -223,20 +214,6 @@
             rows.forEach(row => {
                 row.addEventListener('click', function() {
                     window.location.href = this.dataset.href;
-                });
-            });
-        });
-        
-        // Axtarış tag'larını kliklenilə bilən etmək
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchTags = document.querySelectorAll('.search-tag');
-            const searchInput = document.querySelector('input[name="search"]');
-            
-            searchTags.forEach(tag => {
-                tag.addEventListener('click', function() {
-                    const searchText = this.textContent.replace('Nümunə: ', '');
-                    searchInput.value = searchText;
-                    searchInput.focus();
                 });
             });
         });

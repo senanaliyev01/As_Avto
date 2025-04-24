@@ -57,7 +57,6 @@ def kataloq(request):
         mehsullar = mehsullar.filter(
             Q(adi__icontains=search_query) | 
             Q(oem_kodlar__kod__icontains=clean_query) |
-            Q(as_kodu__icontains=clean_query) |
             Q(brend_kod__icontains=search_query)
         ).distinct()
     

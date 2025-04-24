@@ -133,75 +133,7 @@
         </div>
     </section>
 
-    <!-- Products Slider Section -->
-    <section class="products-slider">
-        <div class="full-width-container">
-            <!-- Brendlər -->
-            <div class="slider-section" id="brands-slider">
-                <h2 class="section__title">Brendlərimiz</h2>
-                <div class="slider-container">
-                    <div class="slider-wrapper">
-                        <div class="slider-track">
-                            {% for brend in brendler %}
-                                {% if brend.sekil %}
-                                <div class="slider-item">
-                                    <div class="product-card">
-                                        <div class="product-card__image">
-                                            <img src="{{ brend.sekil.url }}" alt="{{ brend.adi }}">
-                                        </div>
-                                        <div class="product-card__content">
-                                            <h3 class="product-card__title">{{ brend.adi }}</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Məhsullar -->
-            <div class="slider-section" id="products-slider">
-                <h2 class="section__title">Məhsullarımız</h2>
-                <div class="slider-container">
-                    <button class="slider-arrow slider-arrow--prev">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <div class="slider-wrapper">
-                        <div class="slider-track">
-                            {% for mehsul in mehsullar %}
-                                {% if mehsul.sekil %}
-                                <div class="slider-item">
-                                    <div class="product-card">
-                                        <div class="product-card__image">
-                                            <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
-                                        </div>
-                                        <div class="product-card__content">
-                                            <h3 class="product-card__title">{{ mehsul.adi }}</h3>
-                                            <p class="product-card__description">Marka: {{ mehsul.marka.adi }}</p>
-                                            <p class="product-card__description">Brend: {{ mehsul.brend.adi }}</p>
-                                            <p class="product-card__description">Brend Kodu: {{ mehsul.brend_kod }}</p>
-                                            <p class="product-card__description">OEM: {{ mehsul.oem }}</p>
-                                            <p class="product-card__description">Qiymət: {{ mehsul.formatted_qiymet }} ₼</p>
-                                            <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="product-card__button">
-                                                Ətraflı Məlumat
-                                                <i class="fas fa-arrow-right"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <button class="slider-arrow slider-arrow--next">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
+   
 
     <!-- Features Section -->
     <section class="features">
@@ -359,9 +291,6 @@
         </div>
     </footer>
 
-    <!-- Scripts -->
-    <script src="{% static 'js/anaevim.js' %}"></script>
-    <script src="{% static 'js/loading.js' %}"></script>
-    
+
 </body>
 </html>

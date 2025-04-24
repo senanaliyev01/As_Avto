@@ -1749,7 +1749,7 @@ tr:hover {
     cursor: pointer;
 }
 
-/* Cədvəldəki sütunların genişliyi */
+/* Cədvəldəki sütunların genişliyi
 .product-table .image-column {
     width: 80px;
 }
@@ -1774,7 +1774,7 @@ tr:hover {
 
 .product-table .stock-column {
     width: 8%;
-}
+} */
 
 /* Şəkil ölçüsü */
 .product-image {

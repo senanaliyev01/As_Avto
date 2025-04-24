@@ -1,8 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from mehsullar.models import Brend, Marka, Mehsul, MarkaSekil
+from mehsullar.models import Brend, Marka, Mehsul, MarkaSekil, Kateqoriya, OEMKod
 from django.template.defaultfilters import slugify
-import re
 from django.db.models import Q
+import re
 
 def anaevim(request):
     brendler = Brend.objects.all()
@@ -18,35 +18,6 @@ def anaevim(request):
     
     return render(request, 'home.html', context)
 
-def catalogue(request):
-    brendler = Brend.objects.all()
-    markalar = Marka.objects.all()
-    mehsullar = Mehsul.objects.all()[:12]  # İlkin olaraq 12 məhsul göstərək
-    search_query = request.GET.get('q', '')
-    
-    # Əgər axtarış sorğusu varsa
-    if search_query:
-        # Xüsusi simvolları təmizləyirik
-        clean_query = re.sub(r'[^a-zA-Z0-9]', '', search_query)
-        
-        # OEM kodları, AS kodu və məhsul adı üzrə axtarış
-        mehsullar = Mehsul.objects.filter(
-            Q(oem_kodlar__kod__icontains=clean_query) | 
-            Q(adi__icontains=search_query) |
-            Q(oem__icontains=search_query) |
-            Q(brend_kod__icontains=search_query) |
-            Q(as_kodu__icontains=clean_query)
-        ).distinct()
-    
-    context = {
-        'brendler': brendler,
-        'markalar': markalar,
-        'mehsullar': mehsullar,
-        'search_query': search_query
-    }
-    
-    return render(request, 'catalogue.html', context)
-
 def mehsul_etrafli(request, mehsul_id, mehsul_adi=None, mehsul_oem=None, mehsul_brend_kod=None):
     mehsul = get_object_or_404(Mehsul, id=mehsul_id)
     
@@ -61,4 +32,57 @@ def mehsul_etrafli(request, mehsul_id, mehsul_adi=None, mehsul_oem=None, mehsul_
         'mehsul': mehsul
     }
     return render(request, 'mehsul_etrafli.html', context)
+
+def kataloq(request):
+    # Başlanğıc olaraq bütün məhsulları götürürük
+    mehsullar = Mehsul.objects.all()
+    
+    # Filter üçün lazım olan məlumatları çəkirik
+    kateqoriyalar = Kateqoriya.objects.all()
+    brendler = Brend.objects.all()
+    markalar = Marka.objects.all()
+    
+    # Axtarış parametrini alırıq
+    search_query = request.GET.get('search', '')
+    kateqoriya = request.GET.get('kateqoriya')
+    brend = request.GET.get('brend')
+    marka = request.GET.get('marka')
+    
+    # Əgər axtarış mətni varsa, filtrasiya tətbiq edirik
+    if search_query:
+        # Xüsusi simvolları təmizlə
+        clean_query = re.sub(r'[^a-zA-Z0-9]', '', search_query)
+        
+        # Məhsul adı, OEM kodu, AS kodu və brendə görə axtarış
+        mehsullar = mehsullar.filter(
+            Q(adi__icontains=search_query) | 
+            Q(oem_kodlar__kod__icontains=clean_query) |
+            Q(as_kodu__icontains=clean_query) |
+            Q(brend_kod__icontains=search_query)
+        ).distinct()
+    
+    # Əgər kateqoriya seçilibsə
+    if kateqoriya:
+        mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)
+    
+    # Əgər brend seçilibsə
+    if brend:
+        mehsullar = mehsullar.filter(brend__adi=brend)
+    
+    # Əgər marka seçilibsə
+    if marka:
+        mehsullar = mehsullar.filter(marka__adi=marka)
+    
+    context = {
+        'mehsullar': mehsullar,
+        'kateqoriyalar': kateqoriyalar,
+        'brendler': brendler,
+        'markalar': markalar,
+        'search_query': search_query,
+        'selected_kateqoriya': kateqoriya,
+        'selected_brend': brend,
+        'selected_marka': marka
+    }
+    
+    return render(request, 'kataloq.html', context)
 

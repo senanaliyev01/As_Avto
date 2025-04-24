@@ -180,9 +180,9 @@ admin.site.register(Il)
 admin.site.register(Yanacaq)
 
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'maya_qiymet', 'qiymet', 'brend_kod', 'oem', 'as_kodu', 'stok', 'yenidir')
+    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'maya_qiymet', 'qiymet', 'brend_kod', 'oem',  'stok', 'yenidir')
     list_filter = ('kateqoriya', 'brend', 'marka')
-    search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'oem_kodlar__kod', 'yenidir', 'as_kodu')
+    search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'oem_kodlar__kod', 'yenidir',)
     inlines = [OEMKodInline]
     
     change_list_template = 'admin/mehsul_changelist.html'

@@ -34,10 +34,7 @@ def mehsul_etrafli(request, mehsul_id, mehsul_adi=None, mehsul_oem=None, mehsul_
     return render(request, 'mehsul_etrafli.html', context)
 
 def kataloq(request):
-    # Başlanğıc olaraq bütün məhsulları götürürük
-    mehsullar = Mehsul.objects.all()
-    
-    # Filter üçün lazım olan məlumatları çəkirik
+    # Başlanğıc kateqoriya, brend və markaları əldə edirik
     kateqoriyalar = Kateqoriya.objects.all()
     brendler = Brend.objects.all()
     markalar = Marka.objects.all()
@@ -48,29 +45,37 @@ def kataloq(request):
     brend = request.GET.get('brend')
     marka = request.GET.get('marka')
     
-    # Əgər axtarış mətni varsa, filtrasiya tətbiq edirik
-    if search_query:
-        # Xüsusi simvolları təmizlə
-        clean_query = re.sub(r'[^a-zA-Z0-9]', '', search_query)
+    # Əgər axtarış edilibsə, məhsulları əldə edirik
+    if search_query or kateqoriya or brend or marka:
+        # Başlanğıc olaraq bütün məhsulları götürürük
+        mehsullar = Mehsul.objects.all()
         
-        # Məhsul adı, OEM kodu, AS kodu və brendə görə axtarış
-        mehsullar = mehsullar.filter(
-            Q(adi__icontains=search_query) | 
-            Q(oem_kodlar__kod__icontains=clean_query) |
-            Q(brend_kod__icontains=search_query)
-        ).distinct()
-    
-    # Əgər kateqoriya seçilibsə
-    if kateqoriya:
-        mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)
-    
-    # Əgər brend seçilibsə
-    if brend:
-        mehsullar = mehsullar.filter(brend__adi=brend)
-    
-    # Əgər marka seçilibsə
-    if marka:
-        mehsullar = mehsullar.filter(marka__adi=marka)
+        # Əgər axtarış mətni varsa, filtrasiya tətbiq edirik
+        if search_query:
+            # Xüsusi simvolları təmizlə
+            clean_query = re.sub(r'[^a-zA-Z0-9]', '', search_query)
+            
+            # Məhsul adı, OEM kodu və brendə görə axtarış
+            mehsullar = mehsullar.filter(
+                Q(adi__icontains=search_query) | 
+                Q(oem_kodlar__kod__icontains=clean_query) |
+                Q(brend_kod__icontains=search_query)
+            ).distinct()
+        
+        # Əgər kateqoriya seçilibsə
+        if kateqoriya:
+            mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)
+        
+        # Əgər brend seçilibsə
+        if brend:
+            mehsullar = mehsullar.filter(brend__adi=brend)
+        
+        # Əgər marka seçilibsə
+        if marka:
+            mehsullar = mehsullar.filter(marka__adi=marka)
+    else:
+        # Axtarış edilməyibsə, boş QuerySet qaytarırıq
+        mehsullar = Mehsul.objects.none()
     
     context = {
         'mehsullar': mehsullar,

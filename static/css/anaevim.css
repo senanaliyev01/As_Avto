@@ -1749,33 +1749,6 @@ tr:hover {
     cursor: pointer;
 }
 
-/* Cədvəldəki sütunların genişliyi
-.product-table .image-column {
-    width: 80px;
-}
-
-.product-table .name-column {
-    width: 25%;
-}
-
-.product-table .brand-column,
-.product-table .model-column {
-    width: 15%;
-}
-
-.product-table .code-column,
-.product-table .as-code-column {
-    width: 12%;
-}
-
-.product-table .price-column {
-    width: 10%;
-}
-
-.product-table .stock-column {
-    width: 8%;
-} */
-
 /* Şəkil ölçüsü */
 .product-image {
     width: 50px;
@@ -1910,4 +1883,68 @@ tr:hover {
         padding: 4px 8px;
         font-size: 12px;
     }
+}
+
+/* Axtarış təlimatları üçün stilləri */
+.search-instructions {
+    background-color: var(--color-gray-800);
+    border-radius: 10px;
+    padding: 40px 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--color-gray-700);
+    max-width: 700px;
+    margin: 2rem auto;
+}
+
+.search-instructions i {
+    color: var(--color-accent);
+    opacity: 0.8;
+    margin-bottom: 1rem;
+}
+
+.search-instructions h3 {
+    color: var(--color-white);
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.search-instructions p {
+    color: var(--color-gray-400);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+}
+
+/* Axtarış konteynerini yaxşılaşdırırıq */
+.search-container {
+    padding: 2rem;
+    background-color: var(--color-gray-800);
+    margin-bottom: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.search-container .form-control {
+    background-color: var(--color-gray-700);
+    border-color: var(--color-gray-600);
+    color: var(--color-white);
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+}
+
+.search-container .form-control::placeholder {
+    color: var(--color-gray-400);
+}
+
+.search-container .btn-primary {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+    font-weight: 500;
+}
+
+.search-container .btn-primary:hover {
+    background-color: var(--color-accent-dark);
+    border-color: var(--color-accent-dark);
 }

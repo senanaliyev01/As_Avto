@@ -71,49 +71,6 @@
         </div>
         
         <!-- Filter bölməsi -->
-        <div class="filters-section">
-            <h5 class="mb-3">Filterlər</h5>
-            <form action="{% url 'kataloq' %}" method="GET" class="row g-3">
-                {% if search_query %}
-                <input type="hidden" name="search" value="{{ search_query }}">
-                {% endif %}
-                
-                <div class="col-md-4">
-                    <label for="kateqoriya" class="form-label">Kateqoriya</label>
-                    <select name="kateqoriya" id="kateqoriya" class="form-select">
-                        <option value="">Bütün kateqoriyalar</option>
-                        {% for kateqoriya in kateqoriyalar %}
-                        <option value="{{ kateqoriya.adi }}" {% if selected_kateqoriya == kateqoriya.adi %}selected{% endif %}>{{ kateqoriya.adi }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                
-                <div class="col-md-4">
-                    <label for="brend" class="form-label">Brend</label>
-                    <select name="brend" id="brend" class="form-select">
-                        <option value="">Bütün brendlər</option>
-                        {% for brend in brendler %}
-                        <option value="{{ brend.adi }}" {% if selected_brend == brend.adi %}selected{% endif %}>{{ brend.adi }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                
-                <div class="col-md-4">
-                    <label for="marka" class="form-label">Marka</label>
-                    <select name="marka" id="marka" class="form-select">
-                        <option value="">Bütün markalar</option>
-                        {% for marka in markalar %}
-                        <option value="{{ marka.adi }}" {% if selected_marka == marka.adi %}selected{% endif %}>{{ marka.adi }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                
-                <div class="col-12 text-center mt-3">
-                    <button type="submit" class="btn btn-success">Filteri tətbiq et</button>
-                    <a href="{% url 'kataloq' %}" class="btn btn-secondary ms-2">Filterləri sıfırla</a>
-                </div>
-            </form>
-        </div>
         
         <!-- Məhsullar cədvəli -->
         <div class="product-table">
@@ -135,7 +92,7 @@
                     </thead>
                     <tbody>
                         {% for mehsul in mehsullar %}
-                        <tr onclick="window.location='{% url 'mehsul_etrafli' mehsul_adi=mehsul.adi|slugify mehsul_oem=mehsul.oem mehsul_brend_kod=mehsul.brend_kod mehsul_id=mehsul.id %}'">
+                        <tr class="clickable-row" data-href="{% url 'mehsul_etrafli' mehsul_adi=mehsul.adi|slugify mehsul_oem=mehsul.oem mehsul_brend_kod=mehsul.brend_kod mehsul_id=mehsul.id %}">
                             <td>
                                 {% if mehsul.sekil %}
                                 <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image">
@@ -233,5 +190,17 @@
     
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Clickable rows JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const rows = document.querySelectorAll('.clickable-row');
+            rows.forEach(row => {
+                row.addEventListener('click', function() {
+                    window.location.href = this.dataset.href;
+                });
+            });
+        });
+    </script>
 </body>
 </html> 

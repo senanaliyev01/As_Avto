@@ -432,7 +432,7 @@ def mehsul_axtaris(request):
                 'brend__adi', 
                 'marka__adi',
                 'oem', 
-                'brend_kod',
+                'brend_kod', 
                 'as_kodu',  # AS kodunu əlavə edirik 
                 'qiymet',
                 'stok'

@@ -227,7 +227,7 @@
                                 </div>
 
                                 <div class="product-actions">
-                                    <a href="{% url 'mehsul_etrafli' mehsul.id mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify %}" class="btn-view">
+                                    <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="btn-view">
                                         <i class="fas fa-eye"></i> Ətraflı
                                     </a>
                                 </div>
@@ -253,7 +253,7 @@
                         </thead>
                         <tbody>
                             {% for mehsul in mehsullar %}
-                                <tr data-url="{% url 'mehsul_etrafli' mehsul.id mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify %}" class="product-row" data-id="{{ mehsul.id }}">
+                                <tr data-url="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="product-row" data-id="{{ mehsul.id }}">
                                     <!-- Şəkil -->
                                     <td class="col-image">
                                         {% if mehsul.sekil %}
@@ -333,7 +333,7 @@
                                     <!-- Əməliyyatlar -->
                                     <td class="col-actions">
                                         <div class="action-buttons">
-                                            <a href="{% url 'mehsul_etrafli' mehsul.id mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify %}" class="btn-view">
+                                            <a href="{% url 'mehsul_etrafli' mehsul.adi|slugify mehsul.oem|slugify mehsul.brend_kod|slugify mehsul.id %}" class="btn-view">
                                                 <i class="fas fa-eye"></i> Ətraflı
                                             </a>
                                         </div>

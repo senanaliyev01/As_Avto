@@ -1865,3 +1865,49 @@ tr:hover {
         white-space: nowrap;
     }
 }
+
+/* Dəyişən OEM Kodlar Bölməsi CSS Stilləri */
+.oem-list {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.oem-codes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.oem-code {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: var(--color-gray-800);
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent);
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: monospace;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.oem-code:hover {
+    background-color: var(--color-accent);
+    color: var(--color-white);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+    .oem-codes {
+        gap: 6px;
+    }
+    
+    .oem-code {
+        padding: 4px 8px;
+        font-size: 12px;
+    }
+}

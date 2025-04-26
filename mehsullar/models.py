@@ -3,11 +3,12 @@ import random
 import string
 from django.db import models
 from django.contrib.auth.models import User
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
 import sys
 import os
+from django.conf import settings
 
 class Kateqoriya(models.Model):
     adi = models.CharField(max_length=100, unique=True)
@@ -158,6 +159,62 @@ class Mehsul(models.Model):
             if img.width > 1920 or img.height > 1080:
                 output_size = (1920, 1080)
                 img.thumbnail(output_size, Image.LANCZOS)
+                
+            # Şəklin parlaqlığını azaldaq (solğunlaşdıraq)
+            enhancer = ImageEnhance.Brightness(img)
+            img = enhancer.enhance(0.85)  # 15% solğunlaşdırma
+            
+            # Favicon/loqo üçün şəffaf layı əlavə et
+            # Şəklin mərkəzini tapmaq
+            width, height = img.size
+            
+            # Şəffaf arxa fon yaratmaq
+            watermark = Image.new('RGBA', img.size, (0, 0, 0, 0))
+            
+            # Şəffaf şüşə rəngi (açıq mavi tonunda) ilə arxa fon qatı yaradaq
+            overlay = Image.new('RGBA', img.size, (173, 216, 230, 80))  # RGBA - açıq mavi + 30% şəffaflıq
+            
+            # "AS" yazısını əlavə etmək üçün drawing obyekti
+            draw = ImageDraw.Draw(overlay)
+            
+            # Font ölçüsünü şəklin ölçüsünə uyğun seçək
+            font_size = int(min(width, height) * 0.3)  # Şəklin ölçüsünün 30%-i
+            
+            # Əgər Django static fayllar qovluğunda istədiyimiz font varsa onu istifadə edək,
+            # yoxsa default fontu istifadə edək
+            try:
+                font_path = os.path.join(settings.STATIC_ROOT, 'fonts', 'arial_bold.ttf')
+                if os.path.exists(font_path):
+                    font = ImageFont.truetype(font_path, font_size)
+                else:
+                    # Default font istifadə et
+                    font = ImageFont.load_default()
+            except:
+                # Problem olduqda default font istifadə et
+                font = ImageFont.load_default()
+            
+            # "AS" mətni
+            text = "AS"
+            
+            # Mətnin ölçüsünü əldə et (daha dəqiq yerləşdirmək üçün)
+            try:
+                # PIL 9.0.0+ versiyada
+                text_size = draw.textbbox((0, 0), text, font=font)[2:4]
+            except:
+                # Köhnə PIL versiyalarında
+                text_size = draw.textsize(text, font=font)
+                
+            # Mətnin mərkəzdə yerləşdirilməsi
+            text_position = ((width - text_size[0]) // 2, (height - text_size[1]) // 2)
+            
+            # "AS" yazısını əlavə et
+            draw.text(text_position, text, fill=(255, 255, 255, 128), font=font)  # Yarı şəffaf ağ
+            
+            # Overlay layını əsas şəkillə birləşdir
+            img = Image.composite(overlay, img.convert('RGBA'), overlay)
+            
+            # WEBP formatına çevirmək üçün yenidən RGB-yə çevir
+            img = img.convert('RGB')
             
             # Webp formatına çevirmək
             output = BytesIO()

@@ -3,6 +3,10 @@ import random
 import string
 from django.db import models
 from django.contrib.auth.models import User
+import os
+from PIL import Image
+from io import BytesIO
+from django.core.files.base import ContentFile
 
 class Kateqoriya(models.Model):
     adi = models.CharField(max_length=100, unique=True)
@@ -139,9 +143,48 @@ class Mehsul(models.Model):
         return []
 
     def save(self, *args, **kwargs):
+        # Əgər şəkil yoxdursa, standart şəkil təyin et
         if not self.sekil:
-            self.sekil = 'mehsul_sekilleri/noimage.webp'   
-        super().save(*args, **kwargs)
+            self.sekil = 'mehsul_sekilleri/noimage.webp'
+            super().save(*args, **kwargs)
+        # Əgər şəkil varsa və dəyişdirilibsə, arxa planı sil və .webp'yə çevir
+        elif self.sekil and hasattr(self.sekil, 'file'):
+            # Əgər şəkil standart şəkil deyilsə emal et
+            if 'noimage.webp' not in self.sekil.name:
+                img_name, _ = os.path.splitext(self.sekil.name)
+                img_name = os.path.basename(img_name)
+                
+                # Şəkli oxu
+                img = Image.open(self.sekil)
+                
+                # Şəkli RGBA rejimə çevir (əgər deyilsə)
+                if img.mode != 'RGBA':
+                    img = img.convert('RGBA')
+                
+                # Arxa fonu şəffaf et (ağ və bənzər rəngləri)
+                width, height = img.size
+                px = img.load()
+                
+                for y in range(height):
+                    for x in range(width):
+                        r, g, b, a = px[x, y]
+                        # Əgər piksel ağ və ya açıq rəngdirsə, şəffaf et
+                        if r > 240 and g > 240 and b > 240:
+                            px[x, y] = (r, g, b, 0)
+                
+                # WEBP formatında saxla
+                output = BytesIO()
+                img.save(output, format='WEBP', quality=100)
+                output.seek(0)
+                
+                # Köhnə şəkli sil və yerinə yenisini təyin et
+                self.sekil.delete(save=False)
+                new_name = f'mehsul_sekilleri/{img_name}.webp'
+                self.sekil.save(new_name, ContentFile(output.read()), save=False)
+            
+            super().save(*args, **kwargs)
+        else:
+            super().save(*args, **kwargs)
 
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

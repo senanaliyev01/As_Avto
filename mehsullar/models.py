@@ -154,27 +154,43 @@ class Mehsul(models.Model):
             if img.mode == 'RGBA':
                 img = img.convert('RGB')
                 
-            # Şəklin ölçüsünü 1920x1080 Full HD ölçüsünə uyğunlaşdıraq
-            # thumbnail əvəzinə resize istifadə edək ki, keyfiyyət daha yaxşı olsun
-            width, height = img.size
-            max_width, max_height = 1920, 1080
-            
-            # Şəklin nisbətini saxlamaq
-            if width > max_width or height > max_height:
-                ratio = min(max_width/width, max_height/height)
-                new_width = int(width * ratio)
-                new_height = int(height * ratio)
-                img = img.resize((new_width, new_height), Image.LANCZOS)
+            # Şəklin eni və hündürlüyünə baxaq, lazım gələrsə ölçüsünü dəyişək
+            if img.width > 1920 or img.height > 1080:
+                output_size = (1920, 1080)
+                img.thumbnail(output_size, Image.LANCZOS)
             
             # Webp formatına çevirmək
             output = BytesIO()
-            # Yüksək keyfiyyətli webp formatına çevirmə, 95% keyfiyyət ilə
-            img.save(output, format='WEBP', quality=95, method=6, lossless=False)
+            # Yüksək keyfiyyətli webp formatına çevirmə, 90% keyfiyyət
+            img.save(output, format='WEBP', quality=90)
             output.seek(0)
             
-            # Fayl adını dəyişmək - orijinal adı qoruyub formatı .webp etmək
-            original_filename = os.path.splitext(os.path.basename(self.sekil.name))[0]
-            new_filename = f"{original_filename}.webp"
+            # Məhsul məlumatlarından yeni fayl adı yarat
+            brend_adi = self.brend.adi if self.brend else ""
+            marka_adi = self.marka.adi if self.marka else ""
+            mehsul_adi = self.adi if self.adi else ""
+            brend_kodu = self.brend_kod if self.brend_kod else ""
+            oem_kodu = self.oem if self.oem else ""
+            
+            # Simvolları təmizlə və boşluq yerinə alt xətt qoy
+            brend_adi = brend_adi.strip().replace(" ", "_")
+            marka_adi = marka_adi.strip().replace(" ", "_")
+            mehsul_adi = mehsul_adi.strip().replace(" ", "_")
+            brend_kodu = brend_kodu.strip().replace(" ", "_")
+            oem_kodu = oem_kodu.strip().replace(" ", "_")
+            
+            # Fayl adını yarat - qeyri-valid və problemli simvolları təmizlə
+            valid_chars = "-_.() abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+            parts = [mehsul_adi, brend_adi, marka_adi, brend_kodu, oem_kodu]
+            parts = ["".join(c for c in part if c in valid_chars) for part in parts]
+            
+            # Boş olmayan hissələri birləşdir
+            parts = [p for p in parts if p]
+            new_filename = "_".join(parts) + ".webp"
+            
+            # Fayl adı 100 simvoldan uzun olmasın
+            if len(new_filename) > 100:
+                new_filename = new_filename[:95] + ".webp"
             
             # Yeni InMemoryUploadedFile yaratmaq
             self.sekil = InMemoryUploadedFile(output, 'ImageField', 

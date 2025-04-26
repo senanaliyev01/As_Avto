@@ -154,15 +154,22 @@ class Mehsul(models.Model):
             if img.mode == 'RGBA':
                 img = img.convert('RGB')
                 
-            # Şəklin eni və hündürlüyünə baxaq, lazım gələrsə ölçüsünü dəyişək
-            if img.width > 1920 or img.height > 1080:
-                output_size = (1920, 1080)
-                img.thumbnail(output_size, Image.LANCZOS)
+            # Şəklin ölçüsünü 1920x1080 Full HD ölçüsünə uyğunlaşdıraq
+            # thumbnail əvəzinə resize istifadə edək ki, keyfiyyət daha yaxşı olsun
+            width, height = img.size
+            max_width, max_height = 1920, 1080
+            
+            # Şəklin nisbətini saxlamaq
+            if width > max_width or height > max_height:
+                ratio = min(max_width/width, max_height/height)
+                new_width = int(width * ratio)
+                new_height = int(height * ratio)
+                img = img.resize((new_width, new_height), Image.LANCZOS)
             
             # Webp formatına çevirmək
             output = BytesIO()
-            # Yüksək keyfiyyətli webp formatına çevirmə, 90% keyfiyyət
-            img.save(output, format='WEBP', quality=90)
+            # Yüksək keyfiyyətli webp formatına çevirmə, 95% keyfiyyət ilə
+            img.save(output, format='WEBP', quality=95, method=6, lossless=False)
             output.seek(0)
             
             # Fayl adını dəyişmək - orijinal adı qoruyub formatı .webp etmək

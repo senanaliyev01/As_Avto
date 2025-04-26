@@ -151,146 +151,98 @@ class Mehsul(models.Model):
         elif self.sekil and hasattr(self.sekil, 'file'):
             # Əgər şəkil standart şəkil deyilsə emal et
             if 'noimage.webp' not in self.sekil.name:
-                img_name, _ = os.path.splitext(self.sekil.name)
-                img_name = os.path.basename(img_name)
-                
-                # Şəkli oxu
-                img = Image.open(self.sekil)
-                
-                # Rəngli şəkli RGBA formatına çevir
-                if img.mode != 'RGBA':
-                    img = img.convert('RGBA')
-                
-                # Şəklin ölçülərini al
-                width, height = img.size
-                
-                # Arxa planı silinməsi üçün daha ağıllı metod
-                # İlk olaraq şəkli piksel-piksel analiz edərək kənarları tapsın
-                img_data = img.getdata()
-                
-                # Obyekti tapmaq üçün piksel-piksel maskanı hazırla
-                mask = Image.new('L', img.size, 0)
-                mask_data = []
-                
-                # Piksellər arasındakı kəskin dəyişiklikləri aşkarla
-                edges = []
-                threshold = 30  # Kəskin fərq üçün hədd
-                
-                # Pikselləri array olaraq qruplaşdır
-                pixels = list(img_data)
-                img_array = []
-                for i in range(height):
-                    row = []
-                    for j in range(width):
-                        idx = i * width + j
-                        if idx < len(pixels):
-                            row.append(pixels[idx])
-                    img_array.append(row)
-                
-                # Kənarları tap - kəskin rəng dəyişikliyi olan piksellər
-                for y in range(1, height-1):
-                    for x in range(1, width-1):
-                        # Cari piksel və qonşularını müqayisə et
-                        current = img_array[y][x]
-                        
-                        # Əgər piksel tamamilə şəffafdırsa, keç
-                        if len(current) > 3 and current[3] == 0:
-                            continue
-                            
-                        # Qonşu piksellərlə müqayisə
-                        neighbors = [
-                            img_array[y-1][x], img_array[y+1][x],
-                            img_array[y][x-1], img_array[y][x+1]
-                        ]
-                        
-                        is_edge = False
-                        for neighbor in neighbors:
-                            # Əgər qonşu tamamilə şəffafdırsa, bu kənardır
-                            if len(neighbor) > 3 and neighbor[3] == 0:
-                                is_edge = True
-                                break
-                                
-                            # RGB fərqini hesabla
-                            diff_r = abs(current[0] - neighbor[0])
-                            diff_g = abs(current[1] - neighbor[1])
-                            diff_b = abs(current[2] - neighbor[2])
-                            
-                            # Ümumi rəng fərqi
-                            diff = diff_r + diff_g + diff_b
-                            if diff > threshold:
-                                is_edge = True
-                                break
-                                
-                        if is_edge:
-                            edges.append((x, y))
-                
-                # Flood fill algoritmi ilə arxa planı aşkarla və şəffaflaşdır
-                # Şəklin küncləri və kənarlarından başlayaraq flood fill et
-                from collections import deque
-                
-                # Bütün piksellər üçün şəffaflıq maskası
-                alpha_mask = Image.new('L', img.size, 0)
-                
-                # Kənarlardan başlayaraq flood fill (suya doldur) alqoritmi
-                def flood_fill(start_x, start_y):
-                    queue = deque([(start_x, start_y)])
-                    visited = set([(start_x, start_y)])
+                try:
+                    # Original şəkil adını saxla
+                    img_name, _ = os.path.splitext(self.sekil.name)
+                    img_name = os.path.basename(img_name)
                     
-                    while queue:
-                        x, y = queue.popleft()
+                    # Şəkli açırıq
+                    img = Image.open(self.sekil)
+                    
+                    # Şəkil ölçüsünü optimallaşdırırıq (serverə yükü azaltmaq üçün)
+                    max_size = (1920, 1080)  # Full HD
+                    img.thumbnail(max_size, Image.LANCZOS)
+                    
+                    # Şəkli RGBA rejimə çevir (şəffaflıq üçün)
+                    if img.mode != 'RGBA':
+                        img = img.convert('RGBA')
+                    
+                    # Daha dəqiq arxa plan silmə metodunu tətbiq edirik
+                    # Rəng aralığı ilə işləyirik
+                    width, height = img.size
+                    datas = img.getdata()
+                    new_data = []
+                    
+                    # Arxa planı təyin etmək üçün əsas rəng götürürük
+                    # Adətən künclərdə arxa plan olur
+                    edge_colors = []
+                    for y in [0, height-1]:
+                        for x in [0, width-1]:
+                            try:
+                                pixel = img.getpixel((x, y))
+                                edge_colors.append(pixel[:3])  # RGB dəyərlərini götürürük
+                            except:
+                                pass
+                    
+                    # Arxa plan renglərini təyin edirik
+                    bg_colors = set()
+                    for color in edge_colors:
+                        bg_colors.add(color)
+                    
+                    # Hər bir piksel üçün
+                    for item in datas:
+                        # RGB dəyərlərini alırıq
+                        r, g, b = item[:3] if len(item) > 3 else item
                         
-                        # Əgər kənara çatıbsa, dayan
-                        if (x, y) in edges:
-                            continue
-                            
-                        # Bu pikseli arxa plan hesab et
-                        alpha_mask.putpixel((x, y), 0)  # 0 = şəffaf
+                        # Arxa plan rəng aralığını yoxlayırıq
+                        is_bg = False
                         
-                        # Qonşu pikselləri yoxla
-                        neighbors = [
-                            (x+1, y), (x-1, y), (x, y+1), (x, y-1)
-                        ]
+                        # Metod 1: Əsas arxa plan rənglərinə yaxınlıq
+                        for bg_r, bg_g, bg_b in bg_colors:
+                            # Piksel arxa plan rənginə yaxındırmı?
+                            diff = abs(r - bg_r) + abs(g - bg_g) + abs(b - bg_b)
+                            if diff < 50:  # Tolerans dəyəri
+                                is_bg = True
+                                break
                         
-                        for nx, ny in neighbors:
-                            if (0 <= nx < width and 0 <= ny < height and 
-                                (nx, ny) not in visited and (nx, ny) not in edges):
-                                queue.append((nx, ny))
-                                visited.add((nx, ny))
-                
-                # Şəklin kənarlarından flood fill başlat
-                border_points = []
-                # Üst və alt kənarlar
-                for x in range(0, width, 5):  # Hər 5 pikseldən bir nöqtə götür
-                    border_points.append((x, 0))
-                    border_points.append((x, height-1))
-                
-                # Sol və sağ kənarlar
-                for y in range(0, height, 5):  # Hər 5 pikseldən bir nöqtə götür
-                    border_points.append((0, y))
-                    border_points.append((width-1, y))
-                
-                # Kənarlardan başlayaraq arxa planı tap
-                for x, y in border_points:
-                    if (x, y) not in edges:
-                        flood_fill(x, y)
-                
-                # Ön planı (obyekti) saxlayaraq arxa planı şəffaflaşdır
-                for y in range(height):
-                    for x in range(width):
-                        # Əgər piksel arxa plandadırsa, şəffaflaşdır
-                        if alpha_mask.getpixel((x, y)) == 0:
-                            r, g, b, a = img.getpixel((x, y))
-                            img.putpixel((x, y), (r, g, b, 0))
-                
-                # WEBP formatında saxla
-                output = BytesIO()
-                img.save(output, format='WEBP', quality=100)
-                output.seek(0)
-                
-                # Köhnə şəkli sil və yerinə yenisini təyin et
-                self.sekil.delete(save=False)
-                new_name = f'mehsul_sekilleri/{img_name}.webp'
-                self.sekil.save(new_name, ContentFile(output.read()), save=False)
+                        # Metod 2: Açıq rəngləri (ağ və parlaq) yoxlayırıq
+                        if not is_bg:
+                            lightness = (r + g + b) / 3  # Ortalama işıqlıq
+                            if lightness > 230:  # Çox açıq rənglər
+                                is_bg = True
+                            # Çəhrayı/ağ/açıq boz arxa fonlar
+                            elif r > 200 and g > 200 and b > 200:
+                                is_bg = True
+                        
+                        # Arxa planı şəffaf et, əks halda orijinal pikseli saxla
+                        if is_bg:
+                            if len(item) > 3:
+                                new_data.append((r, g, b, 0))  # Şəffaf
+                            else:
+                                new_data.append((r, g, b, 0))
+                        else:
+                            if len(item) > 3:
+                                new_data.append(item)  # Orijinal pikseli saxla
+                            else:
+                                new_data.append((r, g, b, 255))  # Qeyri-şəffaf
+                    
+                    # Yeni şəkil yaradırıq və şəffaflaşdırılmış məlumatları tətbiq edirik
+                    img.putdata(new_data)
+                    
+                    # Şəkli yüksək keyfiyyətli WEBP formatında saxlayırıq
+                    output = BytesIO()
+                    img.save(output, format='WEBP', quality=90, method=6)  # Metod 6 daha keyfiyyətli sıxılma təmin edir
+                    output.seek(0)
+                    
+                    # Köhnə şəkli silirik və yerinə təzəsini əlavə edirik
+                    self.sekil.delete(save=False)
+                    new_name = f'mehsul_sekilleri/{img_name}.webp'
+                    self.sekil.save(new_name, ContentFile(output.read()), save=False)
+                    
+                except Exception as e:
+                    # Xəta baş verərsə, normal olaraq davam edirik
+                    # Xəta jurnalına qeyd edə bilərsiniz
+                    print(f"Şəkil emalında xəta: {e}")
             
             super().save(*args, **kwargs)
         else:

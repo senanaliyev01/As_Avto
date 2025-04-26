@@ -157,20 +157,130 @@ class Mehsul(models.Model):
                 # Şəkli oxu
                 img = Image.open(self.sekil)
                 
-                # Şəkli RGBA rejimə çevir (əgər deyilsə)
+                # Rəngli şəkli RGBA formatına çevir
                 if img.mode != 'RGBA':
                     img = img.convert('RGBA')
                 
-                # Arxa fonu şəffaf et (ağ və bənzər rəngləri)
+                # Şəklin ölçülərini al
                 width, height = img.size
-                px = img.load()
                 
+                # Arxa planı silinməsi üçün daha ağıllı metod
+                # İlk olaraq şəkli piksel-piksel analiz edərək kənarları tapsın
+                img_data = img.getdata()
+                
+                # Obyekti tapmaq üçün piksel-piksel maskanı hazırla
+                mask = Image.new('L', img.size, 0)
+                mask_data = []
+                
+                # Piksellər arasındakı kəskin dəyişiklikləri aşkarla
+                edges = []
+                threshold = 30  # Kəskin fərq üçün hədd
+                
+                # Pikselləri array olaraq qruplaşdır
+                pixels = list(img_data)
+                img_array = []
+                for i in range(height):
+                    row = []
+                    for j in range(width):
+                        idx = i * width + j
+                        if idx < len(pixels):
+                            row.append(pixels[idx])
+                    img_array.append(row)
+                
+                # Kənarları tap - kəskin rəng dəyişikliyi olan piksellər
+                for y in range(1, height-1):
+                    for x in range(1, width-1):
+                        # Cari piksel və qonşularını müqayisə et
+                        current = img_array[y][x]
+                        
+                        # Əgər piksel tamamilə şəffafdırsa, keç
+                        if len(current) > 3 and current[3] == 0:
+                            continue
+                            
+                        # Qonşu piksellərlə müqayisə
+                        neighbors = [
+                            img_array[y-1][x], img_array[y+1][x],
+                            img_array[y][x-1], img_array[y][x+1]
+                        ]
+                        
+                        is_edge = False
+                        for neighbor in neighbors:
+                            # Əgər qonşu tamamilə şəffafdırsa, bu kənardır
+                            if len(neighbor) > 3 and neighbor[3] == 0:
+                                is_edge = True
+                                break
+                                
+                            # RGB fərqini hesabla
+                            diff_r = abs(current[0] - neighbor[0])
+                            diff_g = abs(current[1] - neighbor[1])
+                            diff_b = abs(current[2] - neighbor[2])
+                            
+                            # Ümumi rəng fərqi
+                            diff = diff_r + diff_g + diff_b
+                            if diff > threshold:
+                                is_edge = True
+                                break
+                                
+                        if is_edge:
+                            edges.append((x, y))
+                
+                # Flood fill algoritmi ilə arxa planı aşkarla və şəffaflaşdır
+                # Şəklin küncləri və kənarlarından başlayaraq flood fill et
+                from collections import deque
+                
+                # Bütün piksellər üçün şəffaflıq maskası
+                alpha_mask = Image.new('L', img.size, 0)
+                
+                # Kənarlardan başlayaraq flood fill (suya doldur) alqoritmi
+                def flood_fill(start_x, start_y):
+                    queue = deque([(start_x, start_y)])
+                    visited = set([(start_x, start_y)])
+                    
+                    while queue:
+                        x, y = queue.popleft()
+                        
+                        # Əgər kənara çatıbsa, dayan
+                        if (x, y) in edges:
+                            continue
+                            
+                        # Bu pikseli arxa plan hesab et
+                        alpha_mask.putpixel((x, y), 0)  # 0 = şəffaf
+                        
+                        # Qonşu pikselləri yoxla
+                        neighbors = [
+                            (x+1, y), (x-1, y), (x, y+1), (x, y-1)
+                        ]
+                        
+                        for nx, ny in neighbors:
+                            if (0 <= nx < width and 0 <= ny < height and 
+                                (nx, ny) not in visited and (nx, ny) not in edges):
+                                queue.append((nx, ny))
+                                visited.add((nx, ny))
+                
+                # Şəklin kənarlarından flood fill başlat
+                border_points = []
+                # Üst və alt kənarlar
+                for x in range(0, width, 5):  # Hər 5 pikseldən bir nöqtə götür
+                    border_points.append((x, 0))
+                    border_points.append((x, height-1))
+                
+                # Sol və sağ kənarlar
+                for y in range(0, height, 5):  # Hər 5 pikseldən bir nöqtə götür
+                    border_points.append((0, y))
+                    border_points.append((width-1, y))
+                
+                # Kənarlardan başlayaraq arxa planı tap
+                for x, y in border_points:
+                    if (x, y) not in edges:
+                        flood_fill(x, y)
+                
+                # Ön planı (obyekti) saxlayaraq arxa planı şəffaflaşdır
                 for y in range(height):
                     for x in range(width):
-                        r, g, b, a = px[x, y]
-                        # Əgər piksel ağ və ya açıq rəngdirsə, şəffaf et
-                        if r > 240 and g > 240 and b > 240:
-                            px[x, y] = (r, g, b, 0)
+                        # Əgər piksel arxa plandadırsa, şəffaflaşdır
+                        if alpha_mask.getpixel((x, y)) == 0:
+                            r, g, b, a = img.getpixel((x, y))
+                            img.putpixel((x, y), (r, g, b, 0))
                 
                 # WEBP formatında saxla
                 output = BytesIO()

@@ -3,10 +3,11 @@ import random
 import string
 from django.db import models
 from django.contrib.auth.models import User
-import os
 from PIL import Image
 from io import BytesIO
-from django.core.files.base import ContentFile
+from django.core.files.uploadedfile import InMemoryUploadedFile
+import sys
+import os
 
 class Kateqoriya(models.Model):
     adi = models.CharField(max_length=100, unique=True)
@@ -143,110 +144,39 @@ class Mehsul(models.Model):
         return []
 
     def save(self, *args, **kwargs):
-        # Əgər şəkil yoxdursa, standart şəkil təyin et
         if not self.sekil:
             self.sekil = 'mehsul_sekilleri/noimage.webp'
-            super().save(*args, **kwargs)
-        # Əgər şəkil varsa və dəyişdirilibsə, arxa planı sil və .webp'yə çevir
-        elif self.sekil and hasattr(self.sekil, 'file'):
-            # Əgər şəkil standart şəkil deyilsə emal et
-            if 'noimage.webp' not in self.sekil.name:
-                try:
-                    # Original şəkil adını saxla
-                    img_name, _ = os.path.splitext(self.sekil.name)
-                    img_name = os.path.basename(img_name)
-                    
-                    # Şəkli açırıq
-                    img = Image.open(self.sekil)
-                    
-                    # Şəkil ölçüsünü optimallaşdırırıq (serverə yükü azaltmaq üçün)
-                    max_size = (1920, 1080)  # Full HD
-                    img.thumbnail(max_size, Image.LANCZOS)
-                    
-                    # Şəkli RGBA rejimə çevir (şəffaflıq üçün)
-                    if img.mode != 'RGBA':
-                        img = img.convert('RGBA')
-                    
-                    # Daha dəqiq arxa plan silmə metodunu tətbiq edirik
-                    # Rəng aralığı ilə işləyirik
-                    width, height = img.size
-                    datas = img.getdata()
-                    new_data = []
-                    
-                    # Arxa planı təyin etmək üçün əsas rəng götürürük
-                    # Adətən künclərdə arxa plan olur
-                    edge_colors = []
-                    for y in [0, height-1]:
-                        for x in [0, width-1]:
-                            try:
-                                pixel = img.getpixel((x, y))
-                                edge_colors.append(pixel[:3])  # RGB dəyərlərini götürürük
-                            except:
-                                pass
-                    
-                    # Arxa plan renglərini təyin edirik
-                    bg_colors = set()
-                    for color in edge_colors:
-                        bg_colors.add(color)
-                    
-                    # Hər bir piksel üçün
-                    for item in datas:
-                        # RGB dəyərlərini alırıq
-                        r, g, b = item[:3] if len(item) > 3 else item
-                        
-                        # Arxa plan rəng aralığını yoxlayırıq
-                        is_bg = False
-                        
-                        # Metod 1: Əsas arxa plan rənglərinə yaxınlıq
-                        for bg_r, bg_g, bg_b in bg_colors:
-                            # Piksel arxa plan rənginə yaxındırmı?
-                            diff = abs(r - bg_r) + abs(g - bg_g) + abs(b - bg_b)
-                            if diff < 50:  # Tolerans dəyəri
-                                is_bg = True
-                                break
-                        
-                        # Metod 2: Açıq rəngləri (ağ və parlaq) yoxlayırıq
-                        if not is_bg:
-                            lightness = (r + g + b) / 3  # Ortalama işıqlıq
-                            if lightness > 230:  # Çox açıq rənglər
-                                is_bg = True
-                            # Çəhrayı/ağ/açıq boz arxa fonlar
-                            elif r > 200 and g > 200 and b > 200:
-                                is_bg = True
-                        
-                        # Arxa planı şəffaf et, əks halda orijinal pikseli saxla
-                        if is_bg:
-                            if len(item) > 3:
-                                new_data.append((r, g, b, 0))  # Şəffaf
-                            else:
-                                new_data.append((r, g, b, 0))
-                        else:
-                            if len(item) > 3:
-                                new_data.append(item)  # Orijinal pikseli saxla
-                            else:
-                                new_data.append((r, g, b, 255))  # Qeyri-şəffaf
-                    
-                    # Yeni şəkil yaradırıq və şəffaflaşdırılmış məlumatları tətbiq edirik
-                    img.putdata(new_data)
-                    
-                    # Şəkli yüksək keyfiyyətli WEBP formatında saxlayırıq
-                    output = BytesIO()
-                    img.save(output, format='WEBP', quality=90, method=6)  # Metod 6 daha keyfiyyətli sıxılma təmin edir
-                    output.seek(0)
-                    
-                    # Köhnə şəkli silirik və yerinə təzəsini əlavə edirik
-                    self.sekil.delete(save=False)
-                    new_name = f'mehsul_sekilleri/{img_name}.webp'
-                    self.sekil.save(new_name, ContentFile(output.read()), save=False)
-                    
-                except Exception as e:
-                    # Xəta baş verərsə, normal olaraq davam edirik
-                    # Xəta jurnalına qeyd edə bilərsiniz
-                    print(f"Şəkil emalında xəta: {e}")
+        elif self.sekil and hasattr(self.sekil, 'name') and not self.sekil.name.startswith('mehsul_sekilleri/noimage'):
+            # Şəkil var və default olmayan şəkil əlavə edilib
+            img = Image.open(self.sekil)
             
-            super().save(*args, **kwargs)
-        else:
-            super().save(*args, **kwargs)
+            # Əgər şəkil RGBA modundadırsa (alpha kanalı varsa), RGB-yə çevir
+            if img.mode == 'RGBA':
+                img = img.convert('RGB')
+                
+            # Şəklin eni və hündürlüyünə baxaq, lazım gələrsə ölçüsünü dəyişək
+            if img.width > 1920 or img.height > 1080:
+                output_size = (1920, 1080)
+                img.thumbnail(output_size, Image.LANCZOS)
+            
+            # Webp formatına çevirmək
+            output = BytesIO()
+            # Yüksək keyfiyyətli webp formatına çevirmə, 90% keyfiyyət
+            img.save(output, format='WEBP', quality=90)
+            output.seek(0)
+            
+            # Fayl adını dəyişmək - orijinal adı qoruyub formatı .webp etmək
+            original_filename = os.path.splitext(os.path.basename(self.sekil.name))[0]
+            new_filename = f"{original_filename}.webp"
+            
+            # Yeni InMemoryUploadedFile yaratmaq
+            self.sekil = InMemoryUploadedFile(output, 'ImageField', 
+                                             new_filename, 
+                                             'image/webp', 
+                                             sys.getsizeof(output), 
+                                             None)
+            
+        super().save(*args, **kwargs)
 
 class Sebet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

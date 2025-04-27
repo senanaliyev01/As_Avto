@@ -115,7 +115,6 @@ class Mehsul(models.Model):
     oem = models.CharField(max_length=255, null=True, blank=True)
     stok = models.IntegerField(null=True, blank=True)
     maya_qiymet = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    eur_qiymet = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     qiymet = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     sekil = models.ImageField(upload_to='mehsul_sekilleri/', null=True, blank=True, default='mehsul_sekilleri/noimage.webp')
     haqqinda = models.TextField(null=True, blank=True)

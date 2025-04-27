@@ -225,7 +225,7 @@ class MehsulAdmin(admin.ModelAdmin):
     
     def get_fieldsets(self, request, obj=None):
         fieldsets = super().get_fieldsets(request, obj)
-        # Əgər mövcud bir məhsul redaktə edilirsə, şəkil önizləməsini əlavə et
+        # Əgər mövcud1 bir məhsul redaktə edilirsə, şəkil önizləməsini əlavə et
         if obj:
             fieldsets[0][1]['fields'] = ('get_sekil_preview', 'sekil')
         return fieldsets

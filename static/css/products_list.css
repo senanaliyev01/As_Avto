@@ -431,6 +431,7 @@ body {
 /* Brand Images */
 .marka-pr-image {
     width: 100%;
+    object-fit: contain;
     height: 50px;
     display: block;
     margin: 0 auto;

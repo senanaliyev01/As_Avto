@@ -180,7 +180,7 @@ admin.site.register(Il)
 admin.site.register(Yanacaq)
 
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'maya_qiymet', 'qiymet', 'brend_kod', 'oem', 'stok', 'yenidir', 'get_sekil')
+    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'maya_qiymet', 'eur_qiymet', 'qiymet', 'brend_kod', 'oem', 'stok', 'yenidir', 'get_sekil')
     list_filter = ('kateqoriya', 'brend', 'marka', 'yenidir')
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'oem_kodlar__kod', 'yenidir',)
     inlines = [OEMKodInline]
@@ -201,7 +201,7 @@ class MehsulAdmin(admin.ModelAdmin):
             'classes': ('wide',),
         }),
         ('Qiymət və Stok', {
-            'fields': ('maya_qiymet', 'qiymet', 'stok', 'yenidir'),
+            'fields': ('maya_qiymet', 'eur_qiymet', 'qiymet', 'stok', 'yenidir'),
             'classes': ('wide',),
         }),
         ('Kodlar', {
@@ -348,6 +348,10 @@ class MehsulAdmin(admin.ModelAdmin):
                                     existing_product.maya_qiymet = row['maya_qiymet']
                                 else:
                                     existing_product.maya_qiymet = 0
+                                if 'eur_qiymet' in row and pd.notna(row['eur_qiymet']):
+                                    existing_product.eur_qiymet = row['eur_qiymet']
+                                else:
+                                    existing_product.eur_qiymet = 0
                                 if 'qiymet' in row and pd.notna(row['qiymet']):
                                     existing_product.qiymet = row['qiymet']
                                 else:
@@ -385,6 +389,7 @@ class MehsulAdmin(admin.ModelAdmin):
                                     'oem': row['oem'] if 'oem' in row and pd.notna(row['oem']) else '',
                                     'stok': row['stok'] if 'stok' in row and pd.notna(row['stok']) else 0,
                                     'maya_qiymet': row['maya_qiymet'] if 'maya_qiymet' in row and pd.notna(row['maya_qiymet']) else 0,
+                                    'eur_qiymet': row['eur_qiymet'] if 'eur_qiymet' in row and pd.notna(row['eur_qiymet']) else 0,
                                     'qiymet': row['qiymet'] if 'qiymet' in row and pd.notna(row['qiymet']) else 0,
                                     'yenidir': False,
                                     'haqqinda': str(row['haqqinda']) if 'haqqinda' in row and pd.notna(row['haqqinda']) else None

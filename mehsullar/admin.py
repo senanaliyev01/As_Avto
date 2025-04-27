@@ -180,14 +180,21 @@ admin.site.register(Il)
 admin.site.register(Yanacaq)
 
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'maya_qiymet', 'qiymet', 'brend_kod', 'oem',  'stok', 'yenidir')
-    list_filter = ('kateqoriya', 'brend', 'marka')
+    list_display = ('adi', 'kateqoriya', 'brend', 'marka', 'maya_qiymet', 'qiymet', 'brend_kod', 'oem', 'stok', 'yenidir', 'get_sekil')
+    list_filter = ('kateqoriya', 'brend', 'marka', 'yenidir')
     search_fields = ('adi', 'kateqoriya__adi', 'brend__adi', 'marka__adi', 'brend_kod', 'oem', 'oem_kodlar__kod', 'yenidir',)
     inlines = [OEMKodInline]
     
     change_list_template = 'admin/mehsul_changelist.html'
     
     actions = ['yenilikden_sil', 'yenidir_et']
+    
+    def get_sekil(self, obj):
+        if obj.sekil:
+            return format_html('<img src="{}" width="50" height="50" style="object-fit: cover; border-radius: 5px;" />', obj.sekil.url)
+        return format_html('<span style="color: #999;">Şəkil yoxdur</span>')
+    get_sekil.short_description = 'Şəkil'
+    get_sekil.admin_order_field = 'sekil'
     
     def get_urls(self):
         from django.urls import path

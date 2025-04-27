@@ -189,6 +189,47 @@ class MehsulAdmin(admin.ModelAdmin):
     
     actions = ['yenilikden_sil', 'yenidir_et']
     
+    # Məhsul redaktə/əlavə etmə səhifəsində sahələrin qruplaşdırılması
+    fieldsets = (
+        ('Şəkil', {
+            'fields': ('sekil',),
+            'classes': ('wide', 'extrapretty'),
+            'description': 'Məhsul şəkli yükləyin. Şəkil avtomatik olaraq webp formatına çevriləcək.'
+        }),
+        ('Əsas Məlumatlar', {
+            'fields': ('adi', 'kateqoriya', 'brend', 'marka', 'model'),
+            'classes': ('wide',),
+        }),
+        ('Qiymət və Stok', {
+            'fields': ('maya_qiymet', 'qiymet', 'stok', 'yenidir'),
+            'classes': ('wide',),
+        }),
+        ('Kodlar', {
+            'fields': ('brend_kod', 'oem'),
+            'classes': ('wide',),
+        }),
+        ('Əlavə Məlumatlar', {
+            'fields': ('haqqinda',),
+            'classes': ('collapse',),
+        }),
+    )
+    
+    # Şəkil önizləməsi üçün
+    readonly_fields = ('get_sekil_preview',)
+    
+    def get_sekil_preview(self, obj):
+        if obj.sekil and hasattr(obj.sekil, 'url'):
+            return format_html('<img src="{}" style="max-width: 300px; max-height: 300px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" />', obj.sekil.url)
+        return format_html('<span style="color: #999; font-style: italic;">Şəkil yüklənməyib</span>')
+    get_sekil_preview.short_description = 'Cari şəkil'
+    
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = super().get_fieldsets(request, obj)
+        # Əgər mövcud bir məhsul redaktə edilirsə, şəkil önizləməsini əlavə et
+        if obj:
+            fieldsets[0][1]['fields'] = ('get_sekil_preview', 'sekil')
+        return fieldsets
+    
     def get_sekil(self, obj):
         if obj.sekil:
             return format_html('<img src="{}" width="50" height="50" style="object-fit: cover; border-radius: 5px;" />', obj.sekil.url)

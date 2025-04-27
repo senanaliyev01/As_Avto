@@ -232,7 +232,7 @@ class MehsulAdmin(admin.ModelAdmin):
     
     def get_sekil(self, obj):
         if obj.sekil:
-            return format_html('<img src="{}" width="50" height="50" style="object-fit: cover; border-radius: 5px;" />', obj.sekil.url)
+            return format_html('<img src="{}" width="50" height="50" style="object-fit: contain; border-radius: 5px;" />', obj.sekil.url)
         return format_html('<span style="color: #999;">Şəkil yoxdur</span>')
     get_sekil.short_description = 'Şəkil'
     get_sekil.admin_order_field = 'sekil'

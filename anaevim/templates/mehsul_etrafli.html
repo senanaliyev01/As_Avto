@@ -89,18 +89,7 @@
                             <span class="value price">{{ mehsul.formatted_qiymet }} ₼</span>
                         </div>
                     </div>
-
-                    {% if mehsul.oem_kodlar.all %}
-                    <div class="spec-item oem-list">
-                        <span class="label">Dəyişən OEM Kodlar:</span>
-                        <div class="value oem-codes">
-                            {% for oem in mehsul.oem_kodlar.all %}
-                                <span class="oem-code">{{ oem.kod }}</span>
-                            {% endfor %}
-                        </div>
-                    </div> 
-                    {% endif %}
-                    
+ 
                     {% if mehsul.kodlar %}
                     <div class="spec-item oem-list">
                         <span class="label">Kodlar:</span>

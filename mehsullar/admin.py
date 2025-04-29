@@ -209,7 +209,7 @@ class MehsulAdmin(admin.ModelAdmin):
             'classes': ('wide',),
         }),
         ('Kodlar', {
-            'fields': ('brend_kod', 'oem'),
+            'fields': ('brend_kod', 'oem', 'kodlar'),
             'classes': ('wide',),
         }),
         ('Əlavə Məlumatlar', {
@@ -321,6 +321,10 @@ class MehsulAdmin(admin.ModelAdmin):
                                     
                                     if birlesdirilmis_kod:
                                         elave_oem_kodlar = birlesdirilmis_kod
+                                        
+                                    # Orijinal kodları olduğu kimi kodlar sütununa saxla
+                                    if 'kodlar' not in row or not pd.notna(row['kodlar']):
+                                        row['kodlar'] = ' '.join(kodlar)
                             
                             # Eyni brend_kod ilə məhsul varmı yoxla (əgər brend_kod boş deyilsə)
                             existing_product = None
@@ -361,6 +365,10 @@ class MehsulAdmin(admin.ModelAdmin):
                                 if 'oem' in row and pd.notna(row['oem']):
                                     existing_product.oem = row['oem']
                                 
+                                # Kodlar sahəsini əlavə et
+                                if 'kodlar' in row and pd.notna(row['kodlar']):
+                                    existing_product.kodlar = row['kodlar']
+                                
                                 existing_product.save()
                                 
                                 # Mövcud əlavə OEM kodlarını sil
@@ -383,6 +391,7 @@ class MehsulAdmin(admin.ModelAdmin):
                                     'marka': marka,
                                     'brend_kod': brend_kod,
                                     'oem': row['oem'] if 'oem' in row and pd.notna(row['oem']) else '',
+                                    'kodlar': row['kodlar'] if 'kodlar' in row and pd.notna(row['kodlar']) else '',
                                     'stok': row['stok'] if 'stok' in row and pd.notna(row['stok']) else 0,
                                     'maya_qiymet': row['maya_qiymet'] if 'maya_qiymet' in row and pd.notna(row['maya_qiymet']) else 0,
                                     'qiymet': row['qiymet'] if 'qiymet' in row and pd.notna(row['qiymet']) else 0,

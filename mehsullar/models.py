@@ -113,6 +113,7 @@ class Mehsul(models.Model):
     model = models.ManyToManyField(Model,blank=True)  
     brend_kod = models.CharField(max_length=50, null=True, blank=True)
     oem = models.CharField(max_length=255, null=True, blank=True)
+    kodlar = models.TextField(null=True, blank=True)
     stok = models.IntegerField(null=True, blank=True)
     maya_qiymet = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     qiymet = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)

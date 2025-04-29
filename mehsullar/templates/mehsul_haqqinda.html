@@ -69,6 +69,17 @@
                     </div>
                 </div> 
                 {% endif %}
+                
+                {% if mehsul.kodlar %}
+                <div class="spec-item oem-list">
+                    <span class="label">Kodlar:</span>
+                    <div class="value oem-codes">
+                        {% for kod in mehsul.kodlar.split %}
+                            <span class="oem-code">{{ kod }}</span>
+                        {% endfor %}
+                    </div>
+                </div> 
+                {% endif %}
                 <div class="spec-item stock-item">
                     <span class="label">Mövcudluq:</span>
                     <span class="value stock-status {% if mehsul.stok == 0 %}out-of-stock{% elif mehsul.stok <= 20 %}low-stock{% else %}in-stock{% endif %}">

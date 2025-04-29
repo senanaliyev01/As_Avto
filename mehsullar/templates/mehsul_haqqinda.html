@@ -59,13 +59,12 @@
                     <span class="label">Brend Kod:</span>
                     <span class="value">{{ mehsul.brend_kod }}</span>
                 </div>
-            
-                {% if mehsul.kodlar %}
+                {% if mehsul.oem_kodlar.all %}
                 <div class="spec-item oem-list">
-                    <span class="label">Kodlar:</span>
+                    <span class="label">Dəyişən OEM Kodlar:</span>
                     <div class="value oem-codes">
-                        {% for kod in mehsul.kodlar.split %}
-                            <span class="oem-code">{{ kod }}</span>
+                        {% for oem in mehsul.oem_kodlar.all %}
+                            <span class="oem-code">{{ oem.kod }}</span>
                         {% endfor %}
                     </div>
                 </div> 

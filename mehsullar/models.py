@@ -113,7 +113,6 @@ class Mehsul(models.Model):
     model = models.ManyToManyField(Model,blank=True)  
     brend_kod = models.CharField(max_length=50, null=True, blank=True)
     oem = models.CharField(max_length=255, null=True, blank=True)
-    kodlar = models.TextField(null=True, blank=True)
     stok = models.IntegerField(null=True, blank=True)
     maya_qiymet = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     qiymet = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
@@ -134,18 +133,8 @@ class Mehsul(models.Model):
 
     @property
     def butun_oem_kodlar(self):
-        # Əsas OEM kodu əlavə et
-        if not self.oem:
-            return []
-            
         kodlar = [self.oem]
-        
-        # OEM kodlar obyektlərini əlavə et (artıq hər bir obyekt bütün kodları birləşdirmiş formada saxlayır)
-        oem_obyektleri = self.oem_kodlar.all()
-        for oem_obyekt in oem_obyektleri:
-            if oem_obyekt.kod:
-                kodlar.append(oem_obyekt.kod)
-                
+        kodlar.extend([oem.kod for oem in self.oem_kodlar.all()])
         return kodlar
         
     @property
@@ -280,7 +269,7 @@ class SifarisMehsul(models.Model):
 
 
 class OEMKod(models.Model):
-    kod = models.TextField(help_text="OEM kodlarını daxil edin. Bütün kodlar birləşdirilib bir sətirdə saxlanılacaq.")
+    kod = models.TextField(help_text="OEM kodlarını boşluqla ayırın. Hər bir kod avtomatik olaraq ayrı-ayrı saxlanılacaq.")
     mehsul = models.ForeignKey('Mehsul', on_delete=models.CASCADE, related_name='oem_kodlar')
 
     def __str__(self):
@@ -288,19 +277,26 @@ class OEMKod(models.Model):
 
     def save(self, *args, **kwargs):
         import string
-        import re
-        
-        # Bütün punktuasiyaları və boşluqları təmizləyək
-        # Əvvəlcə xüsusi simvolları silirik
-        temiz_kod = ''.join(char for char in self.kod if char not in string.punctuation)
-        
-        # İndi bütün boşluqları silirik
-        temiz_kod = re.sub(r'\s+', '', temiz_kod)
-        
-        # Təmizlənmiş kodu saxlayırıq
-        self.kod = temiz_kod
-        
-        # Əsas save metodunu çağırırıq
+        # Əgər yeni yaradılırsa və ya kod dəyişdirilibsə
+        if self.pk is None or self._state.adding:
+            # Bütün xüsusi simvolları silək
+            temiz_kod = ''.join(char for char in self.kod if char not in string.punctuation)
+            # Boşluqla ayrılmış kodları ayırıb hər birini ayrı-ayrı yaradaqq
+            kodlar = temiz_kod.split()
+            if kodlar:
+                # İlk kodu bu obyektdə saxlayaq
+                self.kod = kodlar[0]
+                super().save(*args, **kwargs)
+                # Qalan kodlar üçün yeni OEMKod obyektləri yaradaq
+                for kod in kodlar[1:]:
+                    OEMKod.objects.create(
+                        kod=kod,
+                        mehsul=self.mehsul
+                    )
+            return
+        else:
+            # Mövcud kod yenilənərkən də xüsusi simvolları silək
+            self.kod = ''.join(char for char in self.kod if char not in string.punctuation)
         super().save(*args, **kwargs)
 
     class Meta:

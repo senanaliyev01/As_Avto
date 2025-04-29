@@ -10,7 +10,6 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
 import pandas as pd
 import re
-import string
 
 class MarkaSekilInline(admin.TabularInline):
     model = MarkaSekil
@@ -62,11 +61,8 @@ class OEMKodInline(admin.TabularInline):
         models.TextField: {'widget': admin.widgets.AdminTextareaWidget(
             attrs={'rows': 5, 'style': 'width: 100%; font-family: monospace; resize: both;'})},
     }
-    
-    def get_help_text(self, field_name, model_name):
-        if field_name == 'kod':
-            return "Daxil etdiyiniz bütün OEM kodları birləşdiriləcək. Boşluqlar və ayırıcılar silinəcəkdir."
-        return super().get_help_text(field_name, model_name)
+
+
 
 # Sifariş admin paneli
 @admin.register(Sifaris)
@@ -209,7 +205,7 @@ class MehsulAdmin(admin.ModelAdmin):
             'classes': ('wide',),
         }),
         ('Kodlar', {
-            'fields': ('brend_kod', 'oem', 'kodlar'),
+            'fields': ('brend_kod', 'oem'),
             'classes': ('wide',),
         }),
         ('Əlavə Məlumatlar', {
@@ -290,41 +286,41 @@ class MehsulAdmin(admin.ModelAdmin):
                                 marka, _ = Marka.objects.get_or_create(adi=row['marka'])
                             
                             # Əlavə OEM kodlarını hazırla
-                            elave_oem_kodlar = None
+                            elave_oem_kodlar = []
                             if 'elave_oem' in row and pd.notna(row['elave_oem']):
                                 # Vergül, boşluq və / ilə ayrılmış OEM kodlarını ayır
                                 temiz_oem = str(row['elave_oem']).replace(',', ' ').replace('/', ' ')
-                                kodlar = [kod.strip() for kod in temiz_oem.split() if kod.strip()]
+                                elave_oem_kodlar = [kod.strip() for kod in temiz_oem.split() if kod.strip()]
                                 
-                                if kodlar:
+                                # Birinci kodu brend_kod sütununa, ikinci kodu isə oem sütununa yerləşdir
+                                if elave_oem_kodlar:
                                     # İlk olaraq sütunlardakı mövcud dəyərləri al
                                     brend_kod = row['brend_kod'] if 'brend_kod' in row and pd.notna(row['brend_kod']) else ''
                                     
                                     # Birinci kod varsa və brend_kod boşdursa
-                                    if len(kodlar) >= 1 and (not brend_kod or brend_kod.strip() == ''):
-                                        brend_kod = kodlar[0]
+                                    if len(elave_oem_kodlar) >= 1 and (not brend_kod or brend_kod.strip() == ''):
+                                        brend_kod = elave_oem_kodlar[0]
                                         row['brend_kod'] = brend_kod
                                     
                                     # İkinci kod varsa, oem sütununa yerləşdir
-                                    if len(kodlar) >= 2:
+                                    if len(elave_oem_kodlar) >= 2:
                                         # Əgər oem sütunu dolu deyilsə
                                         if 'oem' not in row or not pd.notna(row['oem']) or not row['oem']:
-                                            row['oem'] = kodlar[1]
-                                    
-                                    # Bütün kodları boşluqsuz və simvolsuz birləşdirib OEMKod obyektinə saxla
-                                    import string
-                                    import re
-                                    
-                                    # Xüsusi simvolları və boşluqları sil, bütün kodları birləşdir
-                                    birlesdirilmis_kod = ''.join(''.join(char for char in kod if char not in string.punctuation) for kod in kodlar)
-                                    birlesdirilmis_kod = re.sub(r'\s+', '', birlesdirilmis_kod)
-                                    
-                                    if birlesdirilmis_kod:
-                                        elave_oem_kodlar = birlesdirilmis_kod
-                                        
-                                    # Orijinal kodları olduğu kimi kodlar sütununa saxla
-                                    if 'kodlar' not in row or not pd.notna(row['kodlar']):
-                                        row['kodlar'] = ' '.join(kodlar)
+                                            row['oem'] = elave_oem_kodlar[1]
+                            
+                            # brend_kod dəyərini təyin et (əgər hələ təyin edilməyibsə)
+                            brend_kod = row['brend_kod'] if 'brend_kod' in row and pd.notna(row['brend_kod']) else ''
+                            
+                            # Əgər məhsulun adı varsa, boşluqları təmizlə:
+                            # 1. Əvvəl və sondakı boşluqları sil (strip)
+                            # 2. Sözlər arasındakı çoxlu boşluqları bir boşluğa çevir
+                            if 'adi' in row and pd.notna(row['adi']):
+                                # strip() əvvəl və sondakı boşluqları silir
+                                temiz_ad = row['adi'].strip()
+                                # \s+ bir və ya daha çox boşluq simvolu üçün regex patterndir
+                                # Bu pattern ardıcıl boşluqları bir boşluğa çevirir
+                                temiz_ad = re.sub(r'\s+', ' ', temiz_ad)
+                                row['adi'] = temiz_ad
                             
                             # Eyni brend_kod ilə məhsul varmı yoxla (əgər brend_kod boş deyilsə)
                             existing_product = None
@@ -365,20 +361,16 @@ class MehsulAdmin(admin.ModelAdmin):
                                 if 'oem' in row and pd.notna(row['oem']):
                                     existing_product.oem = row['oem']
                                 
-                                # Kodlar sahəsini əlavə et
-                                if 'kodlar' in row and pd.notna(row['kodlar']):
-                                    existing_product.kodlar = row['kodlar']
-                                
                                 existing_product.save()
                                 
                                 # Mövcud əlavə OEM kodlarını sil
                                 existing_product.oem_kodlar.all().delete()
                                 
-                                # Yeni əlavə OEM kodlarını əlavə et (əgər varsa)
-                                if elave_oem_kodlar:
+                                # Yeni əlavə OEM kodlarını əlavə et
+                                for kod in elave_oem_kodlar:
                                     OEMKod.objects.create(
                                         mehsul=existing_product,
-                                        kod=elave_oem_kodlar
+                                        kod=kod
                                     )
                                 
                                 update_count += 1
@@ -391,7 +383,6 @@ class MehsulAdmin(admin.ModelAdmin):
                                     'marka': marka,
                                     'brend_kod': brend_kod,
                                     'oem': row['oem'] if 'oem' in row and pd.notna(row['oem']) else '',
-                                    'kodlar': row['kodlar'] if 'kodlar' in row and pd.notna(row['kodlar']) else '',
                                     'stok': row['stok'] if 'stok' in row and pd.notna(row['stok']) else 0,
                                     'maya_qiymet': row['maya_qiymet'] if 'maya_qiymet' in row and pd.notna(row['maya_qiymet']) else 0,
                                     'qiymet': row['qiymet'] if 'qiymet' in row and pd.notna(row['qiymet']) else 0,
@@ -402,11 +393,11 @@ class MehsulAdmin(admin.ModelAdmin):
                                 # Yeni məhsul yarat
                                 yeni_mehsul = Mehsul.objects.create(**mehsul_data)
                                 
-                                # Əlavə OEM kodlarını əlavə et (əgər varsa)
-                                if elave_oem_kodlar:
+                                # Əlavə OEM kodlarını əlavə et
+                                for kod in elave_oem_kodlar:
                                     OEMKod.objects.create(
                                         mehsul=yeni_mehsul,
-                                        kod=elave_oem_kodlar
+                                        kod=kod
                                     )
                                 
                                 new_count += 1

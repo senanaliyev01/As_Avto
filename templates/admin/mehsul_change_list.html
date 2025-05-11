@@ -1,0 +1,101 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/admin.css' %}">
+    <script type="text/javascript" src="{% static 'js/admin.js' %}"></script>
+{% endblock %}
+
+{% block object-tools-items %}
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <!-- Excel Import Modal -->
+    <div id="excelImportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Excel Faylından İdxal</h3>
+                <span class="close">&times;</span>
+            </div>
+
+            <!-- Excel Nümunəsi -->
+            <div class="excel-sample">
+                <h4>Excel Faylı Nümunəsi:</h4>
+                <div class="table-responsive">
+                    <table class="sample-table">
+                        <thead>
+                            <tr>
+                                <th>adi</th>
+                                <th>kateqoriya</th>
+                                <th>firma</th>
+                                <th>avtomobil</th>
+                                <th>brend_kod</th>
+                                <th>oem</th>
+                                <th>kodlar</th>
+                                <th>olcu</th>
+                                <th>vitrin</th>
+                                <th>maya_qiymet</th>
+                                <th>qiymet</th>
+                                <th>stok</th>
+                                <th>melumat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Yağ filteri</td>
+                                <td>Filterlər</td>
+                                <td>BOSCH</td>
+                                <td>Mercedes</td>
+                                <td>F026407123</td>
+                                <td>A6421800009</td>
+                                <td>F026407123 A6421800009</td>
+                                <td>90x120x15</td>
+                                <td>A5-B2</td>
+                                <td>15.50</td>
+                                <td>25.00</td>
+                                <td>10</td>
+                                <td>2.0-3.0 CDI mühərriklər üçün</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="notes">
+                    <p><strong>Qeydlər:</strong></p>
+                    <ul>
+                        <li>Bütün başlıqlar kiçik hərflərlə yazılmalıdır</li>
+                        <li>brend_kod və ya kodlar sütunundan ən azı biri dolu olmalıdır</li>
+                        <li>kodlar sütununda birinci kod brend_kod, ikinci kod oem kimi qəbul edilir (Əgər boşdursa)</li>
+                        <li>Qiymətlər nöqtə (. ,) ilə yazılmalıdır (məs: 15.50) və ya (məs: 15,50)</li>
+                        <li>Stok tam ədəd olmalıdır</li>
+                    </ul>
+                </div>
+            </div>
+
+            <form method="post" enctype="multipart/form-data" action="import-excel/">
+                {% csrf_token %}
+                <div class="file-input-container">
+                    <input type="file" name="excel_file" accept=".xlsx" required>
+                </div>
+                <div class="button-container">
+                    <button type="button" class="closeBtn">Bağla</button>
+                    <button type="submit" class="submit-btn">İdxal Et</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Excel Import Button -->
+    <div class="import-button-container">
+        <button id="showExcelImportModal" class="import-btn">
+            <i class="fas fa-file-excel"></i> Excel İdxal Et
+        </button>
+    </div>
+
+    {{ block.super }}
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock %} 

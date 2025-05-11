@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Məhsullar - Qorxmaz Avto{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Məhsullar</h2>
+    
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Şəkil</th>
+                    <th>Məhsul</th>
+                    <th>Brend Kodu</th>
+                    <th>OEM</th>
+                    <th>Qiymət</th>
+                    <th>Stok</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mehsul in mehsullar %}
+                <tr>
+                    <td><img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image"></td>
+                    <td>
+                        {{ mehsul.adi }}
+                        {% if mehsul.yenidir %}
+                        <span class="new-badge">Yeni</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ mehsul.brend_kod }}</td>
+                    <td>{{ mehsul.oem }}</td>
+                    <td>{{ mehsul.qiymet }} ₼</td>
+                    <td>{{ mehsul.stok }} ədəd</td>
+                    <td>
+                        <button type="button" 
+                                class="cart-add-btn" 
+                                {% if mehsul.stok == 0 %}disabled{% endif %}
+                                onclick="openQuantityModal({{ mehsul.id }}, {{ mehsul.stok }})">
+                            <i class="fas fa-shopping-cart"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center">
+                        <div class="empty-message">
+                            <i class="fas fa-box-open"></i>
+                            <p>Heç bir məhsul tapılmadı.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Miqdar Modal -->
+<div id="quantityModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3>Miqdar seçin</h3>
+        <form method="POST" id="addToCartForm">
+            {% csrf_token %}
+            <input type="number" name="quantity" id="quantityInput" value="1" min="1" class="form-control">
+            <div class="modal-buttons">
+                <button type="button" class="btn btn-danger" onclick="closeQuantityModal()">Ləğv et</button>
+                <button type="submit" class="btn btn-primary">Təsdiq et</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

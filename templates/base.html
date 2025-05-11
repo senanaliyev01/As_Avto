@@ -4,162 +4,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}AS-Avto{% endblock %}</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="icon" type="image/png" sizes="128x128" href="{% static 'img/favicon.png' %}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <title>{% block title %}Qorxmaz Avto{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
-
+    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-  
-    
-    <!-- Navbar -->
-    <div class="main-nav">
-        <div class="nav-container">
-            <div class="nav-links">
-                <a href="{% url 'esasevim:main' %}"><i class="fa-solid fa-house"></i> Əsas Səhifə</a>
-                <a href="{% url 'umumi_baxis' %}"><i class="fas fa-box-open"></i> Məhsullar</a>
-                <a href="{% url 'esasevim:yeni_mehsullar' %}"><i class="fa-solid fa-bell"></i> Yeni Məhsullar</a>
-                <a href="{% url 'sifaris_izle' %}"><i class="fas fa-shopping-bag"></i> Sifarişlərim</a>
-                <a href="{% url 'hesabatlar' %}"><i class="fas fa-chart-bar"></i> Hesabatlar</a>
-                <a href="{% url 'car_list' %}"><i class="fas fa-car"></i> Avtomobillər</a>
-                <a href="{% url 'about' %}"><i class="fas fa-info-circle"></i> Məlumat</a>
+    <div class="wrapper">
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo">
+                        <a href="{% url 'base' %}">
+                            <img src="{% static 'images/Header_logo.png' %}" alt="Qorxmaz Avto" class="logo-img">
+                        </a>
+                    </div>
+                    <div class="header-right">
+                        <nav class="main-nav">
+                            <ul>
+                                <li><a href="{% url 'base' %}" class="nav-link {% if request.resolver_match.url_name == 'base' %}active{% endif %}"><i class="fas fa-home"></i> Ana Səhifə</a></li>
+                                <li><a href="{% url 'products' %}" class="nav-link {% if request.resolver_match.url_name == 'products' %}active{% endif %}"><i class="fas fa-box"></i> Məhsullar</a></li>
+                                <li><a href="{% url 'new_products' %}" class="nav-link {% if request.resolver_match.url_name == 'new_products' %}active{% endif %}"><i class="fas fa-star"></i> Yeni Məhsullar</a></li>
+                                <li>
+                                    <a href="{% url 'cart' %}" class="nav-link {% if request.resolver_match.url_name == 'cart' %}active{% endif %}">
+                                        <span class="cart-icon">
+                                            <i class="fas fa-shopping-cart"></i>
+                                            {% if request.session.cart %}
+                                            <span class="cart-count">{{ request.session.cart|length }}</span>
+                                            {% endif %}
+                                        </span>
+                                        Səbət
+                                    </a>
+                                </li>
+                                <li><a href="{% url 'orders' %}" class="nav-link {% if request.resolver_match.url_name == 'orders' %}active{% endif %}"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    
-    <!-- Header r-->
-    <header>
-        <div class="top-header">
-            <div class="logo">
-                <a href="{% url 'esasevim:main' %}"><img src="{% static '/img/Header_Logo.png' %}" alt="Logo"></a>
-            </div>
-            
-            <!-- Search Container -->
-            <div class="search-container">
-                <form id="search-form" method="GET" action="{% url 'products_list' %}">
-                    <div class="search-input-wrapper">
-                        <input type="text" name="search_text" placeholder="OEM kodu daxil edin..." value="{{ request.GET.search_text }}" class="search-input" required>
-                        <i class="fas fa-search search-icon"></i>
-                        <button type="submit" id="search-button">
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
+        </header>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <div class="container">
+                <form method="get" action="{% url 'products' %}" class="search-form">
+                    <div class="search-grid">
+                        <div class="search-item">
+                            <!-- <label for="query">Məhsul Adı</label> -->
+                            <div class="search-container">
+                                <input type="text" id="query" name="search" placeholder="Kodu daxil edin..." value="{{ request.GET.search }}" autocomplete="off">
+                                <div id="search-results" class="search-results"></div>
+                            </div>
+                        </div>
+                        <div class="search-item">
+                            <!-- <label for="category">Kateqoriya</label> -->
+                            <select id="category" name="kateqoriya">
+                                <option value="">Bütün kateqoriyalar</option>
+                                {% for category in request.categories %}
+                                <option value="{{ category.adi }}" {% if request.GET.kateqoriya == category.adi %}selected{% endif %}>{{ category.adi }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="search-item">
+                            <!-- <label for="brand">Marka</label> -->
+                            <select id="brand" name="firma">
+                                <option value="">Bütün markalar</option>
+                                {% for brand in request.brands %}
+                                <option value="{{ brand.adi }}" {% if request.GET.firma == brand.adi %}selected{% endif %}>{{ brand.adi }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="search-item">
+                            <!-- <label for="model">Model</label> -->
+                            <select id="model" name="avtomobil">
+                                <option value="">Bütün modellər</option>
+                                {% for model in request.models %}
+                                <option value="{{ model.adi }}" {% if request.GET.avtomobil == model.adi %}selected{% endif %}>{{ model.adi }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="search-item search-button">
+                            <button type="submit" class="search-icon-button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                            <span class="total-debt">
+                                <i class="fas fa-money-bill-wave"></i>
+                                Borc: {{ request.statistics.umumi_borc }} ₼
+                            </span>
+                        </div>
                     </div>
                 </form>
             </div>
-
-            <div class="header-right">
-                <a href="{% url 'profile' %}" class="header-profile-link">
-                    <img src="{{ user.profile.sekil.url }}" alt="{{ user.username }}" class="header-profile-image">
-                    {{ user.username }}
-                </a>
-                <a href="#" class="cart-link" id="cart-toggle" onclick="toggleCartModal(event)">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span id="cart-count" class="cart-badge">0</span>
-                    <span id="cart-total-badge" class="cart-total-badge">0 ₼</span>
-                </a>
-            </div>
         </div>
-    </header>
 
-    <!-- Xəbərdarlıq Mesajı -->
-    <div class="warning-message">
-        <div class="warning-content">
-            <i class="fas fa-exclamation-circle"></i>
-            <p>Axtarış zamanı diqqətli olun: Brend kod ilə axtarış etməyin, yalnız OEM kodu ilə axtarış edin. Bu, daha dəqiq nəticələr əldə etməyə kömək edəcək.</p>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="main-content">
-        {% block content %}{% endblock %}
-    </div>
-
-    <!-- Footer -->
-    <footer>
-        <div class="footer-content">
-            <div class="footer-left">
-                <img src="{% static '/img/Header_Logo.png' %}" alt="Logo">
-                <p>AS-Avto - Avtomobil ehtiyat hissələri üzrə Azərbaycanda lider şirkət. Keyfiyyətli xidmət və məhsullar təqdim edirik.</p>
-            </div>
-            <div class="footer-center">
-                <h3>Əlaqə</h3>
-                <a href="tel:+994702754499"><i class="fa-solid fa-tty"></i>+994 70 275 44 99</a>
-                <a href="tel:+994773059585"><i class="fas fa-phone-alt"></i>+994 77 305 95 85</a>
-                <a href="mailto:as.avto.2025@gmail.com"><i class="fas fa-envelope"></i>as.avto.2025@gmail.com</a>
-                <a href="https://maps.app.goo.gl/fU5jUAg8veccL3Zq9"><i class="fa-solid fa-location-dot"></i>Binəqədi R. M.Rəsulzadə qəs. As-Avto</a>
-            </div>
-            <div class="footer-right">
-                <h3>Bizi izləyin</h3>
-                <div class="social-links">
-                    <a href="https://wa.me/994773059585" target="_blank"><i class="fab fa-whatsapp"></i></a>
-                    <a href="https://www.tiktok.com/@as_avto_service" target="_blank"><i class="fab fa-tiktok"></i></a>
-                    <a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+        <!-- New Products Carousel - Only show on home page -->
+        {% if request.resolver_match.url_name == 'base' and new_products %}
+        <div class="new-products-section">
+            <div class="container">
+                <h2 class="section-title">Yeni Məhsullar</h2>
+                <div class="swiper new-products-swiper">
+                    <div class="swiper-wrapper">
+                        {% for product in new_products %}
+                        <div class="swiper-slide">
+                            <div class="product-card">
+                                <div class="ribbon-wrapper">
+                                    <div class="ribbon">Yeni</div>
+                                </div>
+                                <div class="product-image">
+                                    {% if product.sekil %}
+                                    <img src="{{ product.sekil.url }}" alt="{{ product.adi }}">
+                                    {% else %}
+                                    <img src="{% static 'images/no_image.jpg' %}" alt="No Image">
+                                    {% endif %}
+                                </div>
+                                <div class="product-info">
+                                    <h3 class="product-title">{{ product.adi }}</h3>
+                                    <p class="product-code">{{ product.brend_kod }}</p>
+                                    <p class="product-price">{{ product.qiymet }} ₼</p>
+                                    <a href="{% url 'products' %}?search={{ product.brend_kod }}" class="view-product">
+                                        Məhsula bax <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="swiper-pagination"></div>
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-button-next"></div>
                 </div>
-                
-                <div class="working-hours-container">
-                    <h4>İş saatları</h4>
-                    <div class="working-hours-list">
-                        <div class="working-hours-item">
-                            <span>Bazar ertəsi - Cümə:</span>
-                            <span>09:00 - 18:00</span>
-                        </div>
-                        <div class="working-hours-item">
-                            <span>Şənbə:</span>
-                            <span>09:00 - 17:00</span>
-                        </div>
-                        <div class="working-hours-item">
-                            <span>Bazar:</span>
-                            <span>İstirahət</span>
-                        </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
+                {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                    <div class="message message-{{ message.tags }}">
+                        <i class="fas fa-info-circle"></i>
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="simple-footer">
+                    <div class="footer-email">
+                        <i class="fas fa-envelope"></i>
+                        info@qorxmazavto.az
+                    </div>
+                    <div class="footer-logo">
+                        <img src="{% static 'images/Header_logo.png' %}" alt="Qorxmaz Avto" class="footer-logo-img">
+                    </div>
+                    <div class="footer-phone">
+                        <i class="fas fa-phone"></i>
+                        +994 50 123 45 67
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; {% now "Y" %} AS-Avto. Bütün hüquqlar qorunur. | Dizayn: <a href="#">AS-Avto</a></p>
-        </div>
-    </footer>
-
-    <!-- Cart Modal -->
-    <div id="cart-modal" class="cart-modal">
-        <div class="cart-modal-content">
-            <div class="cart-modal-header">
-                <h2>Səbətim</h2>
-                <span class="cart-close">&times;</span>
-            </div>
-            <div class="cart-modal-body">
-                <div id="cart-items-container">
-                    <!-- Səbət məlumatları JavaScript ilə doldurulacaq -->
-                    <div class="loading-spinner-container">
-                        <div class="spinner"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="cart-modal-footer">
-                <div class="cart-total">
-                    <span>Ümumi Cəmi:</span>
-                    <span id="cart-modal-total">0 ₼</span>
-                </div>
-                <div class="cart-actions">
-                    <a href="{% url 'view_cart' %}" class="view-cart-btn">Səbətə Keç</a>
-                </div>
-            </div>
-        </div>
+        </footer>
     </div>
 
-    
-  
-
-   
-
-    <!-- Common Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="{% static 'js/base.js' %}"></script>
-
+   
     {% block extra_js %}{% endblock %}
 </body>
 </html>

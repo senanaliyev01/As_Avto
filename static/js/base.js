@@ -183,36 +183,3 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-
-// Cart Panel Functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const cartToggle = document.getElementById('cart-toggle');
-    const cartPanel = document.getElementById('cart-panel');
-    const closeCart = document.getElementById('close-cart');
-    const cartOverlay = document.getElementById('cart-overlay');
-
-    if (cartToggle && cartPanel && closeCart && cartOverlay) {
-        cartToggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            cartPanel.classList.add('active');
-            cartOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        });
-
-        function closeCartPanel() {
-            cartPanel.classList.remove('active');
-            cartOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        closeCart.addEventListener('click', closeCartPanel);
-        cartOverlay.addEventListener('click', closeCartPanel);
-
-        // ESC düyməsi ilə bağlanma
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && cartPanel.classList.contains('active')) {
-                closeCartPanel();
-            }
-        });
-    }
-});

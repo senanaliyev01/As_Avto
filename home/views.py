@@ -125,7 +125,7 @@ def add_to_cart(request, product_id):
         
         response_data.update({
             'status': 'success',
-            'message': f'{product.adi} səbətə əlavə edildi!'
+            'message': f'{product.adi} məhsulundan {quantity} ədəd səbətə əlavə edildi!'
         })
         
         return JsonResponse(response_data)

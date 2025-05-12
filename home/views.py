@@ -8,6 +8,9 @@ from django.contrib import messages
 import re
 from django.http import JsonResponse
 
+def custom_404(request, exception):
+    return render(request, '404.html', status=404)
+
 def login_view(request):
     error_message = None
     if request.method == 'POST':

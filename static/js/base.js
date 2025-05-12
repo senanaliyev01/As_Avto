@@ -184,36 +184,110 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Cart Sidebar Functions
-function toggleCart(event) {
-    event.preventDefault();
-    loadCart();
-}
+// Cart Drawer Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const cartToggle = document.getElementById('cart-toggle');
+    const cartDrawer = document.querySelector('.cart-drawer');
+    const cartDrawerClose = document.querySelector('.cart-drawer-close');
+    const body = document.body;
 
-function loadCart() {
-    fetch('/cart/')
-        .then(response => response.text())
-        .then(html => {
-            document.getElementById('cart-container').innerHTML = html;
-            const cartSidebar = document.querySelector('.cart-sidebar');
-            cartSidebar.classList.add('active');
-        });
-}
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'cart-overlay';
+    body.appendChild(overlay);
 
-function closeCart() {
-    const cartSidebar = document.querySelector('.cart-sidebar');
-    cartSidebar.classList.remove('active');
-}
-
-// Close cart when clicking outside
-document.addEventListener('click', function(event) {
-    const cartSidebar = document.querySelector('.cart-sidebar');
-    const cartContainer = document.getElementById('cart-container');
-    const cartButton = document.querySelector('.cart-icon');
-    
-    if (cartSidebar && cartSidebar.classList.contains('active')) {
-        if (!cartSidebar.contains(event.target) && !cartButton.contains(event.target)) {
-            closeCart();
-        }
+    function openCart() {
+        cartDrawer.classList.add('open');
+        overlay.classList.add('show');
+        body.style.overflow = 'hidden';
+        loadCartContent();
     }
+
+    function closeCart() {
+        cartDrawer.classList.remove('open');
+        overlay.classList.remove('show');
+        body.style.overflow = '';
+    }
+
+    function loadCartContent() {
+        const cartBody = document.querySelector('.cart-drawer-body');
+        fetch('/cart/')
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const cartContent = doc.querySelector('.cart-container');
+                if (cartContent) {
+                    cartBody.innerHTML = cartContent.innerHTML;
+                    initializeCartFunctionality();
+                } else {
+                    cartBody.innerHTML = '<div class="empty-cart"><p>Səbətiniz boşdur.</p><a href="/products/" class="btn btn-primary">Məhsullara bax</a></div>';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading cart content:', error);
+                cartBody.innerHTML = '<p>Səbət yüklənərkən xəta baş verdi.</p>';
+            });
+    }
+
+    function initializeCartFunctionality() {
+        // Update quantity form handling
+        const updateForms = document.querySelectorAll('.cart-drawer-body .update-form');
+        updateForms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(form);
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                }).then(() => {
+                    loadCartContent();
+                });
+            });
+        });
+
+        // Remove item form handling
+        const removeForms = document.querySelectorAll('.cart-drawer-body .remove-form');
+        removeForms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                }).then(() => {
+                    loadCartContent();
+                });
+            });
+        });
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    if (cartToggle) {
+        cartToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            openCart();
+        });
+    }
+
+    if (cartDrawerClose) {
+        cartDrawerClose.addEventListener('click', closeCart);
+    }
+
+    overlay.addEventListener('click', closeCart);
 });

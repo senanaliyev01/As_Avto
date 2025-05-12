@@ -29,7 +29,7 @@
                                 <li><a href="{% url 'products' %}" class="nav-link {% if request.resolver_match.url_name == 'products' %}active{% endif %}"><i class="fas fa-box"></i> Məhsullar</a></li>
                                 <li><a href="{% url 'new_products' %}" class="nav-link {% if request.resolver_match.url_name == 'new_products' %}active{% endif %}"><i class="fas fa-star"></i> Yeni Məhsullar</a></li>
                                 <li>
-                                    <a href="#" class="nav-link {% if request.resolver_match.url_name == 'cart' %}active{% endif %}" onclick="toggleCart(event)">
+                                    <a href="#" class="nav-link {% if request.resolver_match.url_name == 'cart' %}active{% endif %}" id="cart-toggle">
                                         <span class="cart-icon">
                                             <i class="fas fa-shopping-cart"></i>
                                             {% if request.session.cart %}
@@ -178,8 +178,20 @@
         </footer>
     </div>
 
-    <!-- Cart Sidebar Container -->
-    <div id="cart-container"></div>
+    <!-- Cart Drawer -->
+    <div class="cart-drawer">
+        <div class="cart-drawer-content">
+            <div class="cart-drawer-header">
+                <h2>Səbətim</h2>
+                <button class="cart-drawer-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="cart-drawer-body">
+                <!-- Cart content will be loaded here -->
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="{% static 'js/base.js' %}"></script>

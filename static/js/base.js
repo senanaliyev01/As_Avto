@@ -239,6 +239,87 @@ function initializeCartCount() {
         .catch(error => console.error('Error:', error));
 }
 
+// Function to remove item from cart
+function removeFromCart(productId) {
+    fetch(`/cart/remove/${productId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Show success message
+            showMessage('success', data.message);
+            
+            // Update cart count
+            if (data.unique_items_count !== undefined) {
+                updateCartCount(data.unique_items_count);
+            }
+            
+            // Remove the row from the table
+            const row = document.querySelector(`tr[data-product-id="${productId}"]`);
+            if (row) {
+                row.remove();
+            }
+            
+            // Update total if needed
+            updateCartTotal();
+        } else {
+            showMessage('error', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('error', 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+    });
+}
+
+// Function to get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Function to update cart total
+function updateCartTotal() {
+    const subtotalElements = document.querySelectorAll('.subtotal');
+    let total = 0;
+    
+    subtotalElements.forEach(element => {
+        const value = parseFloat(element.textContent.replace(' ₼', '').replace(',', '.'));
+        if (!isNaN(value)) {
+            total += value;
+        }
+    });
+    
+    const totalElement = document.getElementById('cart-total');
+    if (totalElement) {
+        totalElement.textContent = total.toFixed(2).replace('.', ',') + ' ₼';
+    }
+    
+    // If cart is empty, show empty cart message
+    const cartTable = document.querySelector('.table');
+    const emptyCartMessage = document.querySelector('.empty-cart');
+    
+    if (subtotalElements.length === 0) {
+        if (cartTable) cartTable.style.display = 'none';
+        if (emptyCartMessage) emptyCartMessage.style.display = 'block';
+    }
+}
+
 // Modal functions
 window.openQuantityModal = function(productId, maxStock) {
     const modal = document.getElementById('quantityModal');

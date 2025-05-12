@@ -144,12 +144,30 @@ def add_to_cart(request, product_id):
 
 @login_required
 def remove_from_cart(request, product_id):
-    if 'cart' in request.session:
-        cart = request.session['cart']
-        if str(product_id) in cart:
-            del cart[str(product_id)]
-            request.session.modified = True
-    return redirect('cart')
+    if request.method == 'POST':
+        if 'cart' in request.session:
+            cart = request.session['cart']
+            if str(product_id) in cart:
+                del cart[str(product_id)]
+                request.session.modified = True
+                
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'Məhsul səbətdən silindi!',
+                    'unique_items_count': len(cart)
+                })
+    
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Məhsul tapılmadı!',
+            'unique_items_count': len(request.session.get('cart', {}))
+        })
+        
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Invalid request method',
+        'unique_items_count': len(request.session.get('cart', {}))
+    })
 
 @login_required
 def orders_view(request):

@@ -7,6 +7,16 @@
     --light-gray: #f5f6fa;
     --border-color: #dcdde1;
     --container-width: 1200px;
+    
+    /* Status Colors */
+    --status-pending-bg: #ffc107;
+    --status-pending-color: #000;
+    --status-processing-bg: #17a2b8;
+    --status-processing-color: white;
+    --status-completed-bg: #28a745;
+    --status-completed-color: white;
+    --status-cancelled-bg: #dc3545;
+    --status-cancelled-color: white;
 }
 
 * {
@@ -206,25 +216,6 @@ body {
     max-width: 100%;
     height: auto;
     filter: none;
-}
-
-/* Responsive Footer */
-@media (max-width: 768px) {
-    .search-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-
-    .simple-footer {
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
-    }
-
-    .footer-email,
-    .footer-phone {
-        justify-content: center;
-    }
 }
 
 /* Search Section Styles */
@@ -433,23 +424,23 @@ body {
 }
 
 .status-pending {
-    background-color: #fff3cd;
-    color: #856404;
+    background-color: var(--status-pending-bg);
+    color: var(--status-pending-color);
 }
 
 .status-processing {
-    background-color: #cce5ff;
-    color: #004085;
+    background-color: var(--status-processing-bg);
+    color: var(--status-processing-color);
 }
 
 .status-completed {
-    background-color: #d4edda;
-    color: #155724;
+    background-color: var(--status-completed-bg);
+    color: var(--status-completed-color);
 }
 
 .status-cancelled {
-    background-color: #f8d7da;
-    color: #721c24;
+    background-color: var(--status-cancelled-bg);
+    color: var(--status-cancelled-color);
 }
 
 /* Delivery Badge */
@@ -461,25 +452,6 @@ body {
     background-color: #e9ecef;
     color: #2c3e50;
     display: inline-block;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .header-summary {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-    }
-
-    .table thead th,
-    .table td {
-        padding: 8px 12px;
-    }
 }
 
 /* Orders Summary Grid */
@@ -605,27 +577,6 @@ body {
 
 .btn:hover {
     opacity: 0.9;
-}
-
-/* Status badges */
-.status-pending {
-    background-color: #ffc107;
-    color: #000;
-}
-
-.status-processing {
-    background-color: #17a2b8;
-    color: white;
-}
-
-.status-completed {
-    background-color: #28a745;
-    color: white;
-}
-
-.status-cancelled {
-    background-color: #dc3545;
-    color: white;
 }
 
 /* Cart styles */
@@ -1403,5 +1354,101 @@ body {
     }
     100% {
         transform: scale(1);
+    }
+}
+
+/* Media Queries - Consolidated */
+@media (max-width: 768px) {
+    .search-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .simple-footer {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .footer-email,
+    .footer-phone {
+        justify-content: center;
+    }
+
+    .header-summary {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .cart-summary {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .cart-total {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .checkout-form {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .checkout-form button {
+        width: 100%;
+    }
+
+    .quantity-control {
+        flex-direction: column;
+        min-width: auto;
+    }
+
+    .quantity-input {
+        width: 100%;
+    }
+
+    .update-form {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .update-form button {
+        width: 100%;
+    }
+
+    .search-results {
+        width: 95%;
+    }
+    
+    .orders-container {
+        padding: 1rem;
+    }
+    
+    .order-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .new-products-section {
+        padding: 30px 0;
+    }
+
+    .section-title {
+        font-size: 20px;
+    }
+
+    .product-image {
+        height: 150px;
+    }
+
+    .product-title {
+        font-size: 14px;
+        height: 36px;
+    }
+
+    .product-price {
+        font-size: 16px;
     }
 }

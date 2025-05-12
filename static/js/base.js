@@ -1,5 +1,18 @@
-// Axtarış funksionallığı
 document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality
+    initializeSearch();
+    
+    // Cart functionality
+    initializeCart();
+    
+    // Modal functionality
+    initializeModal();
+    
+    // Initialize Swiper
+    initializeSwiper();
+});
+
+function initializeSearch() {
     const searchInput = document.getElementById('query');
     const searchResults = document.getElementById('search-results');
     let searchTimeout;
@@ -48,15 +61,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Axtarış nəticələri xaricində kliklədikdə bağlanır
+        // Close search results when clicking outside
         document.addEventListener('click', function(e) {
             if (!searchResults.contains(e.target) && e.target !== searchInput) {
                 searchResults.style.display = 'none';
             }
         });
     }
+}
 
-    // Səbət funksionallığı
+function initializeCart() {
     const selectAll = document.getElementById('select-all');
     const checkboxes = document.querySelectorAll('.item-checkbox');
     const selectedTotal = document.getElementById('selected-total');
@@ -99,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
 
-        // Yeniləmə formasının təsdiqlənməsi
+        // Update form confirmation
         document.querySelectorAll('.update-form').forEach(form => {
             form.addEventListener('submit', function(e) {
                 if (form.closest('tr').querySelector('.item-checkbox').checked) {
@@ -110,41 +124,40 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+}
 
-    // Quantity Modal Functions
-    window.openQuantityModal = function(productId, maxStock) {
-        const modal = document.getElementById('quantityModal');
-        const form = document.getElementById('addToCartForm');
-        const quantityInput = document.getElementById('quantityInput');
+function initializeModal() {
+    const modal = document.getElementById('quantityModal');
+    const closeBtn = document.querySelector('.close');
+    
+    if (modal && closeBtn) {
+        closeBtn.onclick = () => modal.style.display = 'none';
         
-        // Set max attribute
-        quantityInput.max = maxStock;
-        
-        // Set form action
-        form.action = `/cart/add/${productId}/`;
-        
-        // Show modal
-        modal.style.display = 'block';
-    }
-
-    window.closeQuantityModal = function() {
-        const modal = document.getElementById('quantityModal');
-        modal.style.display = 'none';
-    }
-
-    // Close modal when clicking on X
-    document.querySelector('.close').onclick = closeQuantityModal;
-
-    // Close modal when clicking outside
-    window.onclick = function(event) {
-        const modal = document.getElementById('quantityModal');
-        if (event.target == modal) {
-            modal.style.display = 'none';
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
         }
     }
-});
+}
 
-document.addEventListener('DOMContentLoaded', function() {
+// Modal functions
+window.openQuantityModal = function(productId, maxStock) {
+    const modal = document.getElementById('quantityModal');
+    const form = document.getElementById('addToCartForm');
+    const quantityInput = document.getElementById('quantityInput');
+    
+    quantityInput.max = maxStock;
+    form.action = `/cart/add/${productId}/`;
+    modal.style.display = 'block';
+}
+
+window.closeQuantityModal = function() {
+    const modal = document.getElementById('quantityModal');
+    modal.style.display = 'none';
+}
+
+function initializeSwiper() {
     if (document.querySelector('.new-products-swiper')) {
         new Swiper('.new-products-swiper', {
             slidesPerView: 4,
@@ -182,4 +195,4 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-});
+}

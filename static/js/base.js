@@ -183,3 +183,43 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Cart Sidebar Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const cartToggle = document.getElementById('cart-toggle');
+    const cartSidebar = document.getElementById('cart-sidebar');
+    const closeCart = document.getElementById('close-cart');
+    const cartOverlay = document.getElementById('cart-overlay');
+
+    // Open cart sidebar
+    cartToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        cartSidebar.classList.add('active');
+        cartOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    });
+
+    // Close cart sidebar
+    function closeCartSidebar() {
+        cartSidebar.classList.remove('active');
+        cartOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    closeCart.addEventListener('click', closeCartSidebar);
+    cartOverlay.addEventListener('click', closeCartSidebar);
+
+    // Close cart when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!cartSidebar.contains(e.target) && !cartToggle.contains(e.target)) {
+            if (cartSidebar.classList.contains('active')) {
+                closeCartSidebar();
+            }
+        }
+    });
+
+    // Prevent closing when clicking inside cart
+    cartSidebar.addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+});

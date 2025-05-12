@@ -8,6 +8,20 @@ from django.contrib import messages
 import re
 from django.http import JsonResponse, HttpResponseNotFound
 
+def cart_context_processor(request):
+    cart_total = Decimal('0.00')
+    if 'cart' in request.session:
+        cart = request.session['cart']
+        for product_id, quantity in cart.items():
+            try:
+                product = Mehsul.objects.get(id=product_id)
+                cart_total += product.qiymet * Decimal(str(quantity))
+            except Mehsul.DoesNotExist:
+                continue
+    return {
+        'cart_total': cart_total
+    }
+
 def custom_404(request, exception=None):
     return HttpResponseNotFound(render(request, '404.html').content)
 

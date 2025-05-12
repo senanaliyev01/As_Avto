@@ -6,5 +6,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'middleware.Custom404Middleware',
+    'home.middleware.GlobalDataMiddleware',
+    'home.middleware.Custom404Middleware',
 ] 

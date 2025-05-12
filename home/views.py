@@ -107,11 +107,13 @@ def add_to_cart(request, product_id):
         
         response_data = {
             'status': 'error',
-            'message': ''
+            'message': '',
+            'unique_items_count': 0
         }
         
         if quantity > product.stok:
             response_data['message'] = f'{product.adi} məhsulundan stokda yalnız {product.stok} ədəd var!'
+            response_data['unique_items_count'] = len(request.session.get('cart', {}))
             return JsonResponse(response_data)
         
         if 'cart' not in request.session:
@@ -122,26 +124,23 @@ def add_to_cart(request, product_id):
         new_quantity = current_quantity + quantity
         
         if new_quantity > product.stok:
-            response_data['message'] = f'{product.adi} məhsulundan stokda yalnız {product.stok} ədəd var! Səbətinizdə artıq {current_quantity} ədəd var.'
+            response_data['message'] = f'{product.adi} məhsulundan stokda yalnız {product.stok} ədəd var!'
+            response_data['unique_items_count'] = len(cart)
             return JsonResponse(response_data)
         
         cart[str(product_id)] = new_quantity
+        request.session['cart'] = cart
         request.session.modified = True
         
-        # Calculate total items in cart
-        cart_count = sum(cart.values())
+        response_data.update({
+            'status': 'success',
+            'message': f'{product.adi} səbətə əlavə edildi!',
+            'unique_items_count': len(cart)
+        })
         
-        response_data['status'] = 'success'
-        response_data['message'] = f'{product.adi} məhsulundan {quantity} ədəd səbətə əlavə edildi!'
-        response_data['cart_count'] = cart_count
-        
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse(response_data)
-        
-        messages.success(request, response_data['message'])
-        return redirect(request.META.get('HTTP_REFERER', 'products'))
-        
-    return redirect('products')
+        return JsonResponse(response_data)
+    
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method', 'unique_items_count': len(request.session.get('cart', {}))})
 
 @login_required
 def remove_from_cart(request, product_id):

@@ -163,9 +163,9 @@ function initializeModal() {
                     // Show success message
                     showMessage('success', data.message);
                     
-                    // Update cart count if provided
-                    if (data.cart_count !== undefined) {
-                        updateCartCount(data.cart_count);
+                    // Update cart count with unique items count
+                    if (data.unique_items_count !== undefined) {
+                        updateCartCount(data.unique_items_count);
                     }
                     
                     // Close modal
@@ -187,12 +187,8 @@ function initializeModal() {
 function updateCartCount(count) {
     const cartCountElements = document.querySelectorAll('.cart-count');
     cartCountElements.forEach(element => {
-        if (count > 0) {
-            element.textContent = count;
-            element.style.display = 'flex';
-        } else {
-            element.style.display = 'none';
-        }
+        element.textContent = count;
+        element.style.display = count > 0 ? 'flex' : 'none';
     });
 }
 

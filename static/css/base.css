@@ -1386,109 +1386,67 @@ body {
 
 /* Error Page Styles */
 .error-page {
-    min-height: 70vh;
     display: flex;
-    align-items: center;
     justify-content: center;
-    padding: 2rem;
+    align-items: center;
+    min-height: 70vh;
     background-color: #fff;
     border-radius: 15px;
     margin: 2rem auto;
-    max-width: 800px;
+    max-width: var(--container-width);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .error-content {
     text-align: center;
-    animation: fadeIn 0.5s ease-in-out;
+    padding: 3rem;
 }
 
-.error-icon {
-    font-size: 5rem;
-    color: #ffc107;
-    margin-bottom: 1rem;
-    animation: bounce 2s infinite;
-}
-
-.error-content h1 {
+.error-title {
     font-size: 8rem;
     font-weight: 700;
-    color: #2c3e50;
+    color: var(--primary-color);
     margin: 0;
     line-height: 1;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.error-content h2 {
+.error-subtitle {
     font-size: 2rem;
-    color: #2c3e50;
+    color: var(--secondary-color);
     margin: 1rem 0;
 }
 
-.error-content p {
+.error-description {
     font-size: 1.1rem;
     color: #666;
     margin-bottom: 2rem;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 .error-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
+    margin-top: 2rem;
 }
 
 .error-actions .btn {
-    padding: 0.8rem 1.5rem;
+    padding: 0.8rem 2rem;
     font-size: 1.1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
     transition: all 0.3s ease;
 }
 
-.error-actions .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes bounce {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-10px);
-    }
+.error-actions .btn i {
+    margin-right: 0.5rem;
 }
 
 @media (max-width: 768px) {
-    .error-content h1 {
+    .error-title {
         font-size: 6rem;
     }
     
-    .error-content h2 {
+    .error-subtitle {
         font-size: 1.5rem;
     }
     
-    .error-actions {
-        flex-direction: column;
-    }
-    
-    .error-actions .btn {
-        width: 100%;
-        justify-content: center;
+    .error-description {
+        font-size: 1rem;
     }
 }

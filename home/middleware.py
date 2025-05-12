@@ -1,5 +1,7 @@
-from django.shortcuts import render
 from django.conf import settings
+from django.http import Http404
+from django.template.loader import render_to_string
+from django.http import HttpResponse
 from .models import Sifaris, Kateqoriya, Firma, Avtomobil
 
 class GlobalDataMiddleware:
@@ -27,7 +29,22 @@ class Custom404Middleware:
     def __call__(self, request):
         response = self.get_response(request)
         
-        if response.status_code == 404 and settings.DEBUG:
-            return render(request, '404.html', status=404)
-            
-        return response 
+        if response.status_code == 404 and not settings.DEBUG:
+            try:
+                # 404.html səhifəsini render edirik
+                html = render_to_string('404.html', {}, request)
+                return HttpResponse(html, status=404)
+            except:
+                # Əgər 404.html tapılmazsa, sadə bir mesaj göstəririk
+                return HttpResponse('Səhifə tapılmadı', status=404)
+                
+        return response
+
+    def process_exception(self, request, exception):
+        if isinstance(exception, Http404) and not settings.DEBUG:
+            try:
+                html = render_to_string('404.html', {}, request)
+                return HttpResponse(html, status=404)
+            except:
+                return HttpResponse('Səhifə tapılmadı', status=404)
+        return None 

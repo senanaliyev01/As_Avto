@@ -234,19 +234,50 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update quantity form handling
         const updateForms = document.querySelectorAll('.cart-drawer-body .update-form');
         updateForms.forEach(form => {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const formData = new FormData(form);
-                fetch(form.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken')
-                    }
-                }).then(() => {
-                    loadCartContent();
-                });
+            const quantityInput = form.querySelector('input[name="quantity"]');
+            const originalValue = quantityInput.value;
+
+            // Input change handler
+            quantityInput.addEventListener('change', function(e) {
+                if (this.value !== originalValue) {
+                    const formData = new FormData(form);
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    
+                    // Disable input and button while updating
+                    this.disabled = true;
+                    submitBtn.disabled = true;
+                    
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken')
+                        }
+                    }).then(response => {
+                        if (response.ok) {
+                            loadCartContent();
+                        } else {
+                            // If error, revert to original value
+                            this.value = originalValue;
+                            alert('Yeniləmə zamanı xəta baş verdi');
+                        }
+                    }).catch(error => {
+                        console.error('Error:', error);
+                        this.value = originalValue;
+                        alert('Xəta baş verdi');
+                    }).finally(() => {
+                        // Re-enable input and button
+                        this.disabled = false;
+                        submitBtn.disabled = false;
+                    });
+                }
             });
+
+            // Hide update button as we don't need it anymore
+            const updateButton = form.querySelector('button[type="submit"]');
+            if (updateButton) {
+                updateButton.style.display = 'none';
+            }
         });
 
         // Remove item form handling
@@ -254,13 +285,25 @@ document.addEventListener('DOMContentLoaded', function() {
         removeForms.forEach(form => {
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
+                const button = form.querySelector('button');
+                button.disabled = true;
+                
                 fetch(form.action, {
                     method: 'POST',
                     headers: {
                         'X-CSRFToken': getCookie('csrftoken')
                     }
-                }).then(() => {
-                    loadCartContent();
+                }).then(response => {
+                    if (response.ok) {
+                        loadCartContent();
+                    } else {
+                        alert('Silmə zamanı xəta baş verdi');
+                    }
+                }).catch(error => {
+                    console.error('Error:', error);
+                    alert('Xəta baş verdi');
+                }).finally(() => {
+                    button.disabled = false;
                 });
             });
         });

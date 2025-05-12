@@ -798,8 +798,10 @@ body {
     display: none;
     position: absolute;
     top: calc(100% + 5px);
-    left: 0;
-    width: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    max-width: var(--container-width);
     background: white;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -807,6 +809,7 @@ body {
     z-index: 1000;
     max-height: 400px;
     overflow-y: auto;
+    padding: 0 20px;
 }
 
 .search-results::-webkit-scrollbar {

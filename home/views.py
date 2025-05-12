@@ -21,7 +21,7 @@ def login_view(request):
             login(request, user)
             return redirect('base')
         else:
-            error_message = 'Invalid username or password'
+            error_message = 'İstifadeçi adı və ya şifrə yanlışdır'
     return render(request, 'login.html', {'error_message': error_message})
 
 @login_required

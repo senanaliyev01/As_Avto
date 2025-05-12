@@ -100,8 +100,11 @@ def add_to_cart(request, product_id):
         quantity = int(request.POST.get('quantity', 1))
         
         if quantity > product.stok:
-            messages.error(request, f'{product.adi} məhsulundan stokda yalnız {product.stok} ədəd var!')
-            return redirect(request.META.get('HTTP_REFERER', 'products'))
+            response_data = {
+                'success': False,
+                'message': f'{product.adi} məhsulundan stokda yalnız {product.stok} ədəd var!'
+            }
+            return JsonResponse(response_data)
         
         if 'cart' not in request.session:
             request.session['cart'] = {}
@@ -111,14 +114,26 @@ def add_to_cart(request, product_id):
         new_quantity = current_quantity + quantity
         
         if new_quantity > product.stok:
-            messages.error(request, f'{product.adi} məhsulundan stokda yalnız {product.stok} ədəd var! Səbətinizdə artıq {current_quantity} ədəd var.')
-            return redirect(request.META.get('HTTP_REFERER', 'products'))
+            response_data = {
+                'success': False,
+                'message': f'{product.adi} məhsulundan stokda yalnız {product.stok} ədəd var! Səbətinizdə artıq {current_quantity} ədəd var.'
+            }
+            return JsonResponse(response_data)
         
         cart[str(product_id)] = new_quantity
         request.session.modified = True
-        messages.success(request, f'{product.adi} məhsulundan {quantity} ədəd səbətə əlavə edildi!')
         
-    return redirect(request.META.get('HTTP_REFERER', 'products'))
+        # Calculate total items in cart for badge update
+        cart_count = sum(cart.values())
+        
+        response_data = {
+            'success': True,
+            'message': f'{product.adi} məhsulundan {quantity} ədəd səbətə əlavə edildi!',
+            'cart_count': cart_count
+        }
+        return JsonResponse(response_data)
+        
+    return JsonResponse({'success': False, 'message': 'Yanlış sorğu metodu!'})
 
 @login_required
 def remove_from_cart(request, product_id):

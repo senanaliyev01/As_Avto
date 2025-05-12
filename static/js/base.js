@@ -129,8 +129,9 @@ function initializeCart() {
 function initializeModal() {
     const modal = document.getElementById('quantityModal');
     const closeBtn = document.querySelector('.close');
+    const form = document.getElementById('addToCartForm');
     
-    if (modal && closeBtn) {
+    if (modal && closeBtn && form) {
         closeBtn.onclick = () => modal.style.display = 'none';
         
         window.onclick = function(event) {
@@ -138,6 +139,82 @@ function initializeModal() {
                 modal.style.display = 'none';
             }
         }
+
+        // Form submission handler
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const url = this.action;
+            
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'message message-success';
+                    messageDiv.innerHTML = `<i class="fas fa-check-circle"></i>${data.message}`;
+                    
+                    const messagesContainer = document.querySelector('.messages');
+                    if (messagesContainer) {
+                        messagesContainer.appendChild(messageDiv);
+                        
+                        // Remove message after 3 seconds
+                        setTimeout(() => {
+                            messageDiv.remove();
+                        }, 3000);
+                    }
+                    
+                    // Update cart count if exists
+                    const cartCount = document.querySelector('.cart-count');
+                    if (cartCount && data.cart_count) {
+                        cartCount.textContent = data.cart_count;
+                    }
+                    
+                    // Close modal
+                    modal.style.display = 'none';
+                } else {
+                    // Show error message
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'message message-error';
+                    messageDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i>${data.message}`;
+                    
+                    const messagesContainer = document.querySelector('.messages');
+                    if (messagesContainer) {
+                        messagesContainer.appendChild(messageDiv);
+                        
+                        // Remove message after 3 seconds
+                        setTimeout(() => {
+                            messageDiv.remove();
+                        }, 3000);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Show error message
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message message-error';
+                messageDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i>Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.';
+                
+                const messagesContainer = document.querySelector('.messages');
+                if (messagesContainer) {
+                    messagesContainer.appendChild(messageDiv);
+                    
+                    // Remove message after 3 seconds
+                    setTimeout(() => {
+                        messageDiv.remove();
+                    }, 3000);
+                }
+            });
+        });
     }
 }
 

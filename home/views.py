@@ -8,7 +8,7 @@ from django.contrib import messages
 import re
 from django.http import JsonResponse
 
-def custom_404(request, exception):
+def custom_404(request, exception=None):
     return render(request, '404.html', status=404)
 
 def login_view(request):

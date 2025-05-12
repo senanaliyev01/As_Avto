@@ -19,7 +19,7 @@
                 <div class="header-content">
                     <div class="logo">
                         <a href="{% url 'base' %}">
-                            <img src="{% static 'images/Header_Logo.jpg' %}" alt="As Avto" class="logo-img">
+                            <img src="{% static 'images/Header_Logo.png' %}" alt="As Avto" class="logo-img">
                         </a>
                     </div>
                     <div class="header-right">
@@ -117,7 +117,7 @@
                                     {% if product.sekil %}
                                     <img src="{{ product.sekil.url }}" alt="{{ product.adi }}">
                                     {% else %}
-                                    <img src="{% static 'images/no_image.jpg' %}" alt="No Image">
+                                    <img src="{% static 'images/no_image.webp' %}" alt="No Image">
                                     {% endif %}
                                 </div>
                                 <div class="product-info">
@@ -167,7 +167,7 @@
                         as.avto.2025@gmail.com
                     </div>
                     <div class="footer-logo">
-                        <img src="{% static 'images/Header_Logo.jpg' %}" alt="As Avto" class="footer-logo-img">
+                        <img src="{% static 'images/Header_Logo.png' %}" alt="As Avto" class="footer-logo-img">
                     </div>
                     <div class="footer-phone">
                         <i class="fas fa-phone"></i>

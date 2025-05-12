@@ -6,10 +6,10 @@ from django.db.models import Q
 from decimal import Decimal
 from django.contrib import messages
 import re
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseNotFound
 
 def custom_404(request, exception=None):
-    return render(request, '404.html', status=404)
+    return HttpResponseNotFound(render(request, '404.html').content)
 
 def login_view(request):
     error_message = None

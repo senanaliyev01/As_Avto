@@ -99,11 +99,13 @@ def add_to_cart(request, product_id):
         product = get_object_or_404(Mehsul, id=product_id)
         quantity = int(request.POST.get('quantity', 1))
         
+        response_data = {
+            'status': 'error',
+            'message': ''
+        }
+        
         if quantity > product.stok:
-            response_data = {
-                'success': False,
-                'message': f'{product.adi} məhsulundan stokda yalnız {product.stok} ədəd var!'
-            }
+            response_data['message'] = f'{product.adi} məhsulundan stokda yalnız {product.stok} ədəd var!'
             return JsonResponse(response_data)
         
         if 'cart' not in request.session:
@@ -114,26 +116,26 @@ def add_to_cart(request, product_id):
         new_quantity = current_quantity + quantity
         
         if new_quantity > product.stok:
-            response_data = {
-                'success': False,
-                'message': f'{product.adi} məhsulundan stokda yalnız {product.stok} ədəd var! Səbətinizdə artıq {current_quantity} ədəd var.'
-            }
+            response_data['message'] = f'{product.adi} məhsulundan stokda yalnız {product.stok} ədəd var! Səbətinizdə artıq {current_quantity} ədəd var.'
             return JsonResponse(response_data)
         
         cart[str(product_id)] = new_quantity
         request.session.modified = True
         
-        # Calculate total items in cart for badge update
+        # Calculate total items in cart
         cart_count = sum(cart.values())
         
-        response_data = {
-            'success': True,
-            'message': f'{product.adi} məhsulundan {quantity} ədəd səbətə əlavə edildi!',
-            'cart_count': cart_count
-        }
-        return JsonResponse(response_data)
+        response_data['status'] = 'success'
+        response_data['message'] = f'{product.adi} məhsulundan {quantity} ədəd səbətə əlavə edildi!'
+        response_data['cart_count'] = cart_count
         
-    return JsonResponse({'success': False, 'message': 'Yanlış sorğu metodu!'})
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse(response_data)
+        
+        messages.success(request, response_data['message'])
+        return redirect(request.META.get('HTTP_REFERER', 'products'))
+        
+    return redirect('products')
 
 @login_required
 def remove_from_cart(request, product_id):

@@ -141,6 +141,7 @@ body {
 /* Messages Styles */
 .messages {
     margin-bottom: 20px;
+    transition: opacity 0.3s ease;
 }
 
 .message {
@@ -150,6 +151,18 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 .message i {

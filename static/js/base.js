@@ -140,7 +140,7 @@ function initializeModal() {
             }
         }
 
-        // Form submission handler
+        // Handle form submission
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -156,65 +156,65 @@ function initializeModal() {
             })
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
+                if (data.status === 'success') {
                     // Show success message
-                    const messageDiv = document.createElement('div');
-                    messageDiv.className = 'message message-success';
-                    messageDiv.innerHTML = `<i class="fas fa-check-circle"></i>${data.message}`;
+                    showMessage('success', data.message);
                     
-                    const messagesContainer = document.querySelector('.messages');
-                    if (messagesContainer) {
-                        messagesContainer.appendChild(messageDiv);
-                        
-                        // Remove message after 3 seconds
-                        setTimeout(() => {
-                            messageDiv.remove();
-                        }, 3000);
-                    }
-                    
-                    // Update cart count if exists
-                    const cartCount = document.querySelector('.cart-count');
-                    if (cartCount && data.cart_count) {
-                        cartCount.textContent = data.cart_count;
+                    // Update cart count if provided
+                    if (data.cart_count !== undefined) {
+                        updateCartCount(data.cart_count);
                     }
                     
                     // Close modal
                     modal.style.display = 'none';
                 } else {
                     // Show error message
-                    const messageDiv = document.createElement('div');
-                    messageDiv.className = 'message message-error';
-                    messageDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i>${data.message}`;
-                    
-                    const messagesContainer = document.querySelector('.messages');
-                    if (messagesContainer) {
-                        messagesContainer.appendChild(messageDiv);
-                        
-                        // Remove message after 3 seconds
-                        setTimeout(() => {
-                            messageDiv.remove();
-                        }, 3000);
-                    }
+                    showMessage('error', data.message);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                // Show error message
-                const messageDiv = document.createElement('div');
-                messageDiv.className = 'message message-error';
-                messageDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i>Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.';
-                
-                const messagesContainer = document.querySelector('.messages');
-                if (messagesContainer) {
-                    messagesContainer.appendChild(messageDiv);
-                    
-                    // Remove message after 3 seconds
-                    setTimeout(() => {
-                        messageDiv.remove();
-                    }, 3000);
-                }
+                showMessage('error', 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
             });
         });
+    }
+}
+
+// Helper function to show messages
+function showMessage(type, message) {
+    const messagesContainer = document.createElement('div');
+    messagesContainer.className = 'messages';
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message message-${type}`;
+    
+    const icon = document.createElement('i');
+    icon.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+    
+    messageDiv.appendChild(icon);
+    messageDiv.appendChild(document.createTextNode(' ' + message));
+    messagesContainer.appendChild(messageDiv);
+    
+    // Find existing messages container or create new one
+    let existingMessages = document.querySelector('.messages');
+    if (existingMessages) {
+        existingMessages.replaceWith(messagesContainer);
+    } else {
+        document.querySelector('.container').insertBefore(messagesContainer, document.querySelector('.container').firstChild);
+    }
+    
+    // Auto-hide message after 3 seconds
+    setTimeout(() => {
+        messagesContainer.style.opacity = '0';
+        setTimeout(() => messagesContainer.remove(), 300);
+    }, 3000);
+}
+
+// Helper function to update cart count
+function updateCartCount(count) {
+    const cartCount = document.querySelector('.cart-count');
+    if (cartCount) {
+        cartCount.textContent = count;
     }
 }
 

@@ -8,6 +8,12 @@ from django.contrib import messages
 import re
 from django.http import JsonResponse, HttpResponseNotFound
 
+@login_required
+def get_cart_count(request):
+    cart = request.session.get('cart', {})
+    cart_count = sum(cart.values())
+    return JsonResponse({'cart_count': cart_count})
+
 def custom_404(request, exception=None):
     return HttpResponseNotFound(render(request, '404.html').content)
 

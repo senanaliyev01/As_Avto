@@ -10,6 +10,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize Swiper
     initializeSwiper();
+    
+    // Initialize cart count
+    fetch('/get-cart-count/')
+        .then(response => response.json())
+        .then(data => {
+            if (data.cart_count !== undefined) {
+                updateCartCount(data.cart_count);
+            }
+        })
+        .catch(error => console.error('Error:', error));
 });
 
 function initializeSearch() {
@@ -212,10 +222,15 @@ function showMessage(type, message) {
 
 // Helper function to update cart count
 function updateCartCount(count) {
-    const cartCount = document.querySelector('.cart-count');
-    if (cartCount) {
-        cartCount.textContent = count;
-    }
+    const cartCountElements = document.querySelectorAll('.cart-count');
+    cartCountElements.forEach(element => {
+        if (count > 0) {
+            element.textContent = count;
+            element.style.display = 'flex';
+        } else {
+            element.style.display = 'none';
+        }
+    });
 }
 
 // Modal functions

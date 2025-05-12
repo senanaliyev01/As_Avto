@@ -34,9 +34,6 @@
                                             <i class="fas fa-shopping-cart"></i>
                                         </span>
                                         Səbət
-                                        {% if cart_total > 0 %}
-                                        <div class="cart-total-price">{{ cart_total }} ₼</div>
-                                        {% endif %}
                                     </a>
                                 </li>
                                 <li><a href="{% url 'orders' %}" class="nav-link {% if request.resolver_match.url_name == 'orders' %}active{% endif %}"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a></li>

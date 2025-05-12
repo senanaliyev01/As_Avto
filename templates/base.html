@@ -178,20 +178,19 @@
         </footer>
     </div>
 
-    <!-- Cart Drawer -->
-    <div class="cart-drawer">
-        <div class="cart-drawer-content">
-            <div class="cart-drawer-header">
-                <h2>Səbətim</h2>
-                <button class="cart-drawer-close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="cart-drawer-body">
-                <!-- Cart content will be loaded here -->
-            </div>
+    <!-- Cart Panel -->
+    <div class="cart-panel" id="cart-panel">
+        <div class="cart-panel-header">
+            <h2>Səbətim</h2>
+            <button class="close-cart" id="close-cart">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="cart-panel-content">
+            {% include 'cart.html' %}
         </div>
     </div>
+    <div class="cart-overlay" id="cart-overlay"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="{% static 'js/base.js' %}"></script>

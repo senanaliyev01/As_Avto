@@ -184,229 +184,35 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Cart Drawer Functionality
+// Cart Panel Functionality
 document.addEventListener('DOMContentLoaded', function() {
     const cartToggle = document.getElementById('cart-toggle');
-    const cartDrawer = document.querySelector('.cart-drawer');
-    const cartDrawerClose = document.querySelector('.cart-drawer-close');
-    const body = document.body;
+    const cartPanel = document.getElementById('cart-panel');
+    const closeCart = document.getElementById('close-cart');
+    const cartOverlay = document.getElementById('cart-overlay');
 
-    // Create overlay
-    const overlay = document.createElement('div');
-    overlay.className = 'cart-overlay';
-    body.appendChild(overlay);
-
-    function openCart() {
-        cartDrawer.classList.add('open');
-        overlay.classList.add('show');
-        body.style.overflow = 'hidden';
-        loadCartContent();
-    }
-
-    function closeCart() {
-        cartDrawer.classList.remove('open');
-        overlay.classList.remove('show');
-        body.style.overflow = '';
-    }
-
-    function loadCartContent() {
-        const cartBody = document.querySelector('.cart-drawer-body');
-        fetch('/cart/')
-            .then(response => response.text())
-            .then(html => {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const cartContent = doc.querySelector('.cart-container');
-                if (cartContent) {
-                    cartBody.innerHTML = cartContent.innerHTML;
-                    initializeCartFunctionality();
-                } else {
-                    cartBody.innerHTML = '<div class="empty-cart"><p>Səbətiniz boşdur.</p><a href="/products/" class="btn btn-primary">Məhsullara bax</a></div>';
-                }
-            })
-            .catch(error => {
-                console.error('Error loading cart content:', error);
-                cartBody.innerHTML = '<p>Səbət yüklənərkən xəta baş verdi.</p>';
-            });
-    }
-
-    function initializeCartFunctionality() {
-        // Update quantity form handling
-        const updateForms = document.querySelectorAll('.cart-drawer-body .update-form');
-        updateForms.forEach(form => {
-            const quantityInput = form.querySelector('input[name="quantity"]');
-            const originalValue = quantityInput.value;
-
-            // Input change handler
-            quantityInput.addEventListener('change', function(e) {
-                if (this.value !== originalValue) {
-                    const formData = new FormData(form);
-                    const submitBtn = form.querySelector('button[type="submit"]');
-                    
-                    // Disable input and button while updating
-                    this.disabled = true;
-                    submitBtn.disabled = true;
-                    
-                    fetch(form.action, {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-CSRFToken': getCookie('csrftoken')
-                        }
-                    }).then(response => {
-                        if (response.ok) {
-                            loadCartContent();
-                        } else {
-                            // If error, revert to original value
-                            this.value = originalValue;
-                            alert('Yeniləmə zamanı xəta baş verdi');
-                        }
-                    }).catch(error => {
-                        console.error('Error:', error);
-                        this.value = originalValue;
-                        alert('Xəta baş verdi');
-                    }).finally(() => {
-                        // Re-enable input and button
-                        this.disabled = false;
-                        submitBtn.disabled = false;
-                    });
-                }
-            });
-
-            // Hide update button as we don't need it anymore
-            const updateButton = form.querySelector('button[type="submit"]');
-            if (updateButton) {
-                updateButton.style.display = 'none';
-            }
-        });
-
-        // Remove item form handling
-        const removeForms = document.querySelectorAll('.cart-drawer-body .remove-form');
-        removeForms.forEach(form => {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const button = form.querySelector('button');
-                button.disabled = true;
-                
-                fetch(form.action, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken')
-                    }
-                }).then(response => {
-                    if (response.ok) {
-                        loadCartContent();
-                    } else {
-                        alert('Silmə zamanı xəta baş verdi');
-                    }
-                }).catch(error => {
-                    console.error('Error:', error);
-                    alert('Xəta baş verdi');
-                }).finally(() => {
-                    button.disabled = false;
-                });
-            });
-        });
-
-        // Checkout form handling
-        const checkoutForm = document.getElementById('checkout-form');
-        if (checkoutForm) {
-            checkoutForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Çatdırılma üsulunu yoxla
-                const deliveryMethod = document.querySelector('input[name="catdirilma_usulu"]:checked');
-                if (!deliveryMethod) {
-                    alert('Zəhmət olmasa çatdırılma üsulunu seçin');
-                    return;
-                }
-
-                // Seçilmiş məhsulları yoxla
-                const selectedItems = document.querySelectorAll('.item-checkbox:checked');
-                if (selectedItems.length === 0) {
-                    alert('Zəhmət olmasa ən azı bir məhsul seçin');
-                    return;
-                }
-
-                const formData = new FormData(checkoutForm);
-                fetch(checkoutForm.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken')
-                    }
-                }).then(response => {
-                    if (response.ok) {
-                        window.location.href = '/orders/';
-                    } else {
-                        alert('Sifariş yaradılarkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
-                    }
-                }).catch(error => {
-                    console.error('Error:', error);
-                    alert('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
-                });
-            });
-
-            // Seçilmiş məhsulların ümumi məbləğini hesabla
-            const checkboxes = document.querySelectorAll('.item-checkbox');
-            const selectedTotal = document.getElementById('selected-total');
-            const checkoutButton = document.getElementById('checkout-button');
-
-            function updateSelectedTotal() {
-                let total = 0;
-                checkboxes.forEach(checkbox => {
-                    if (checkbox.checked) {
-                        const row = checkbox.closest('tr');
-                        const subtotalText = row.querySelector('td:nth-last-child(2)').textContent;
-                        const subtotal = parseFloat(subtotalText.replace(' ₼', '').replace(',', '.'));
-                        total += subtotal;
-                    }
-                });
-                selectedTotal.textContent = total.toFixed(2).replace('.', ',') + ' ₼';
-                checkoutButton.disabled = total === 0;
-            }
-
-            checkboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', updateSelectedTotal);
-            });
-
-            const selectAll = document.getElementById('select-all');
-            if (selectAll) {
-                selectAll.addEventListener('change', function() {
-                    checkboxes.forEach(checkbox => {
-                        checkbox.checked = this.checked;
-                    });
-                    updateSelectedTotal();
-                });
-            }
-        }
-    }
-
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
-    if (cartToggle) {
+    if (cartToggle && cartPanel && closeCart && cartOverlay) {
         cartToggle.addEventListener('click', function(e) {
             e.preventDefault();
-            openCart();
+            cartPanel.classList.add('active');
+            cartOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        function closeCartPanel() {
+            cartPanel.classList.remove('active');
+            cartOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        closeCart.addEventListener('click', closeCartPanel);
+        cartOverlay.addEventListener('click', closeCartPanel);
+
+        // ESC düyməsi ilə bağlanma
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && cartPanel.classList.contains('active')) {
+                closeCartPanel();
+            }
         });
     }
-
-    if (cartDrawerClose) {
-        cartDrawerClose.addEventListener('click', closeCart);
-    }
-
-    overlay.addEventListener('click', closeCart);
 });

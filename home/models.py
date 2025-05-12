@@ -1,6 +1,11 @@
 from django.contrib.auth.models import User
 from django.db import models
 import re
+from PIL import Image
+import os
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from io import BytesIO
+import uuid
 
 class Kateqoriya(models.Model):
     adi = models.CharField(max_length=100, null=True, blank=True)
@@ -50,14 +55,57 @@ class Mehsul(models.Model):
     stok = models.IntegerField()
     kodlar = models.TextField(null=True,blank=True)
     melumat = models.TextField(null=True, blank=True)
-    sekil = models.ImageField(upload_to='mehsul_sekilleri', default='mehsul_sekilleri/no_image.jpg',null=True, blank=True)    
+    sekil = models.ImageField(upload_to='mehsul_sekilleri', default='mehsul_sekilleri/no_image.webp',null=True, blank=True)    
     yenidir = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if self.kodlar:
             # Yalnız hərf, rəqəm və boşluq saxla
             self.kodlar = re.sub(r'[^a-zA-Z0-9 ]', '', self.kodlar)
+        
+        # Şəkil emalı
+        if self.sekil and hasattr(self.sekil, 'file'):
+            # Əgər şəkil yenidirsə
+            if isinstance(self.sekil.file, InMemoryUploadedFile):
+                # Şəkli aç
+                image = Image.open(self.sekil)
+                
+                # Şəkli RGBA formatına çevir (webp üçün)
+                if image.mode != 'RGBA':
+                    image = image.convert('RGBA')
+                
+                # Yeni fayl adı yarat
+                new_name = f"{uuid.uuid4().hex[:10]}_{self.brend_kod}.webp"
+                
+                # BytesIO buffer yarat
+                output = BytesIO()
+                
+                # Şəkli webp formatında saxla
+                image.save(output, format='WEBP', quality=85, optimize=True)
+                output.seek(0)
+                
+                # Köhnə şəkli sil (əgər varsa və default deyilsə)
+                if self.pk:
+                    try:
+                        old_instance = Mehsul.objects.get(pk=self.pk)
+                        if old_instance.sekil and old_instance.sekil.name != 'mehsul_sekilleri/no_image.webp':
+                            if os.path.isfile(old_instance.sekil.path):
+                                os.remove(old_instance.sekil.path)
+                    except:
+                        pass
+                
+                # Yeni şəkli təyin et
+                self.sekil = InMemoryUploadedFile(
+                    output,
+                    'ImageField',
+                    new_name,
+                    'image/webp',
+                    output.tell(),
+                    None
+                )
+        
         super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.adi} - {self.brend_kod} - {self.oem}"
     

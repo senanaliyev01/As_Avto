@@ -797,7 +797,7 @@ body {
 .search-results {
     display: none;
     position: fixed;
-    top: 165px;
+    top: 185px;
     left: 50%;
     transform: translateX(-50%);
     width: 100%;

@@ -65,8 +65,8 @@ class Mehsul(models.Model):
         
         # Şəkil emalı
         if self.sekil and hasattr(self.sekil, 'file'):
-            # Əgər şəkil yenidirsə
-            if isinstance(self.sekil.file, InMemoryUploadedFile):
+            # Əgər şəkil yenidirsə və no_image.webp deyilsə
+            if isinstance(self.sekil.file, InMemoryUploadedFile) and 'no_image.webp' not in self.sekil.name:
                 # Şəkli aç
                 image = Image.open(self.sekil)
                 

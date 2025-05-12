@@ -1410,17 +1410,17 @@ body {
 .cart-drawer {
     position: fixed;
     top: 0;
-    right: -400px;
-    width: 400px;
+    left: -50%;
+    width: 50%;
     height: 100vh;
     background-color: #fff;
-    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
     z-index: 1000;
-    transition: right 0.3s ease-in-out;
+    transition: left 0.3s ease-in-out;
 }
 
 .cart-drawer.open {
-    right: 0;
+    left: 0;
 }
 
 .cart-drawer-content {
@@ -1435,6 +1435,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background-color: #f8f9fa;
 }
 
 .cart-drawer-header h2 {
@@ -1462,6 +1463,79 @@ body {
     padding: 20px;
 }
 
+.cart-drawer .table {
+    margin: 0;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.cart-drawer .cart-summary {
+    position: sticky;
+    bottom: 0;
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-top: 1px solid var(--border-color);
+    margin-top: auto;
+}
+
+.cart-drawer .delivery-method {
+    margin: 15px 0;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: white;
+}
+
+.cart-drawer .delivery-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.cart-drawer .delivery-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cart-drawer .delivery-option:hover {
+    background-color: #f8f9fa;
+}
+
+.cart-drawer .delivery-option input[type="radio"] {
+    margin: 0;
+}
+
+.cart-drawer .delivery-option span {
+    font-size: 14px;
+    color: #333;
+}
+
+.cart-drawer .delivery-option input[type="radio"]:checked + span {
+    font-weight: bold;
+    color: #007bff;
+}
+
+.cart-drawer #checkout-button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    margin-top: 15px;
+}
+
+.cart-drawer .cart-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
 .cart-overlay {
     display: none;
     position: fixed;
@@ -1477,7 +1551,7 @@ body {
     display: block;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     .cart-drawer {
         width: 100%;
         right: -100%;

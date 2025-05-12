@@ -239,7 +239,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 const formData = new FormData(form);
                 fetch(form.action, {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
                 }).then(() => {
                     loadCartContent();
                 });
@@ -261,6 +264,79 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
         });
+
+        // Checkout form handling
+        const checkoutForm = document.getElementById('checkout-form');
+        if (checkoutForm) {
+            checkoutForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Çatdırılma üsulunu yoxla
+                const deliveryMethod = document.querySelector('input[name="catdirilma_usulu"]:checked');
+                if (!deliveryMethod) {
+                    alert('Zəhmət olmasa çatdırılma üsulunu seçin');
+                    return;
+                }
+
+                // Seçilmiş məhsulları yoxla
+                const selectedItems = document.querySelectorAll('.item-checkbox:checked');
+                if (selectedItems.length === 0) {
+                    alert('Zəhmət olmasa ən azı bir məhsul seçin');
+                    return;
+                }
+
+                const formData = new FormData(checkoutForm);
+                fetch(checkoutForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        window.location.href = '/orders/';
+                    } else {
+                        alert('Sifariş yaradılarkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+                    }
+                }).catch(error => {
+                    console.error('Error:', error);
+                    alert('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+                });
+            });
+
+            // Seçilmiş məhsulların ümumi məbləğini hesabla
+            const checkboxes = document.querySelectorAll('.item-checkbox');
+            const selectedTotal = document.getElementById('selected-total');
+            const checkoutButton = document.getElementById('checkout-button');
+
+            function updateSelectedTotal() {
+                let total = 0;
+                checkboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        const row = checkbox.closest('tr');
+                        const subtotalText = row.querySelector('td:nth-last-child(2)').textContent;
+                        const subtotal = parseFloat(subtotalText.replace(' ₼', '').replace(',', '.'));
+                        total += subtotal;
+                    }
+                });
+                selectedTotal.textContent = total.toFixed(2).replace('.', ',') + ' ₼';
+                checkoutButton.disabled = total === 0;
+            }
+
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelectedTotal);
+            });
+
+            const selectAll = document.getElementById('select-all');
+            if (selectAll) {
+                selectAll.addEventListener('change', function() {
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = this.checked;
+                    });
+                    updateSelectedTotal();
+                });
+            }
+        }
     }
 
     function getCookie(name) {

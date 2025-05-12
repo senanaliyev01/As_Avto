@@ -1,7 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize cart count
-    initializeCartCount();
-    
     // Search functionality
     initializeSearch();
     
@@ -78,7 +75,6 @@ function initializeCart() {
     const checkboxes = document.querySelectorAll('.item-checkbox');
     const selectedTotal = document.getElementById('selected-total');
     const checkoutButton = document.getElementById('checkout-button');
-    const checkoutForm = document.getElementById('checkout-form');
 
     if (selectAll && checkboxes.length > 0 && selectedTotal && checkoutButton) {
         function updateSelectedTotal() {
@@ -113,17 +109,6 @@ function initializeCart() {
                 const allChecked = Array.from(checkboxes).every(cb => cb.checked);
                 selectAll.checked = allChecked;
                 updateSelectedTotal();
-            });
-        });
-
-        // Update form confirmation
-        document.querySelectorAll('.update-form').forEach(form => {
-            form.addEventListener('submit', function(e) {
-                if (form.closest('tr').querySelector('.item-checkbox').checked) {
-                    if (!confirm('Bu məhsul seçilmiş vəziyyətdədir. Yeniləmək istədiyinizə əminsiniz?')) {
-                        e.preventDefault();
-                    }
-                }
             });
         });
     }
@@ -162,12 +147,6 @@ function initializeModal() {
                 if (data.status === 'success') {
                     // Show success message
                     showMessage('success', data.message);
-                    
-                    // Update cart count with unique items count
-                    if (data.unique_items_count !== undefined) {
-                        updateCartCount(data.unique_items_count);
-                    }
-                    
                     // Close modal
                     modal.style.display = 'none';
                 } else {
@@ -181,62 +160,6 @@ function initializeModal() {
             });
         });
     }
-}
-
-// Helper function to update cart count
-function updateCartCount(count) {
-    const cartCountElements = document.querySelectorAll('.cart-count');
-    cartCountElements.forEach(element => {
-        element.textContent = count;
-        element.style.display = count > 0 ? 'flex' : 'none';
-    });
-}
-
-// Helper function to show messages
-function showMessage(type, message) {
-    const messagesContainer = document.createElement('div');
-    messagesContainer.className = 'messages';
-    messagesContainer.style.position = 'fixed';
-    messagesContainer.style.top = '20px';
-    messagesContainer.style.right = '-300px'; // Start off-screen
-    messagesContainer.style.zIndex = '9999';
-    messagesContainer.style.width = '300px';
-    
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message message-${type}`;
-    
-    const icon = document.createElement('i');
-    icon.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
-    
-    messageDiv.appendChild(icon);
-    messageDiv.appendChild(document.createTextNode(' ' + message));
-    messagesContainer.appendChild(messageDiv);
-    
-    document.body.appendChild(messagesContainer);
-    
-    // Animate in
-    setTimeout(() => {
-        messagesContainer.style.transition = 'right 0.5s ease';
-        messagesContainer.style.right = '20px';
-    }, 100);
-    
-    // Auto-hide message after 3 seconds
-    setTimeout(() => {
-        messagesContainer.style.right = '-300px';
-        setTimeout(() => messagesContainer.remove(), 500);
-    }, 3000);
-}
-
-// Initialize cart count on page load
-function initializeCartCount() {
-    fetch('/get-cart-count/')
-        .then(response => response.json())
-        .then(data => {
-            if (data.cart_count !== undefined) {
-                updateCartCount(data.cart_count);
-            }
-        })
-        .catch(error => console.error('Error:', error));
 }
 
 // Function to remove item from cart
@@ -253,11 +176,6 @@ function removeFromCart(productId) {
         if (data.status === 'success') {
             // Show success message
             showMessage('success', data.message);
-            
-            // Update cart count
-            if (data.unique_items_count !== undefined) {
-                updateCartCount(data.unique_items_count);
-            }
             
             // Remove the row from the table
             const row = document.querySelector(`tr[data-product-id="${productId}"]`);
@@ -318,6 +236,41 @@ function updateCartTotal() {
         if (cartTable) cartTable.style.display = 'none';
         if (emptyCartMessage) emptyCartMessage.style.display = 'block';
     }
+}
+
+// Helper function to show messages
+function showMessage(type, message) {
+    const messagesContainer = document.createElement('div');
+    messagesContainer.className = 'messages';
+    messagesContainer.style.position = 'fixed';
+    messagesContainer.style.top = '20px';
+    messagesContainer.style.right = '-300px'; // Start off-screen
+    messagesContainer.style.zIndex = '9999';
+    messagesContainer.style.width = '300px';
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message message-${type}`;
+    
+    const icon = document.createElement('i');
+    icon.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+    
+    messageDiv.appendChild(icon);
+    messageDiv.appendChild(document.createTextNode(' ' + message));
+    messagesContainer.appendChild(messageDiv);
+    
+    document.body.appendChild(messagesContainer);
+    
+    // Animate in
+    setTimeout(() => {
+        messagesContainer.style.transition = 'right 0.5s ease';
+        messagesContainer.style.right = '20px';
+    }, 100);
+    
+    // Auto-hide message after 3 seconds
+    setTimeout(() => {
+        messagesContainer.style.right = '-300px';
+        setTimeout(() => messagesContainer.remove(), 500);
+    }, 3000);
 }
 
 // Modal functions

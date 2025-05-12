@@ -8,12 +8,6 @@ from django.contrib import messages
 import re
 from django.http import JsonResponse, HttpResponseNotFound
 
-@login_required
-def get_cart_count(request):
-    cart = request.session.get('cart', {})
-    cart_count = sum(cart.values())
-    return JsonResponse({'cart_count': cart_count})
-
 def custom_404(request, exception=None):
     return HttpResponseNotFound(render(request, '404.html').content)
 
@@ -107,13 +101,11 @@ def add_to_cart(request, product_id):
         
         response_data = {
             'status': 'error',
-            'message': '',
-            'unique_items_count': 0
+            'message': ''
         }
         
         if quantity > product.stok:
             response_data['message'] = f'{product.adi} məhsulundan stokda yalnız {product.stok} ədəd var!'
-            response_data['unique_items_count'] = len(request.session.get('cart', {}))
             return JsonResponse(response_data)
         
         if 'cart' not in request.session:
@@ -125,7 +117,6 @@ def add_to_cart(request, product_id):
         
         if new_quantity > product.stok:
             response_data['message'] = f'{product.adi} məhsulundan stokda yalnız {product.stok} ədəd var!'
-            response_data['unique_items_count'] = len(cart)
             return JsonResponse(response_data)
         
         cart[str(product_id)] = new_quantity
@@ -134,13 +125,12 @@ def add_to_cart(request, product_id):
         
         response_data.update({
             'status': 'success',
-            'message': f'{product.adi} səbətə əlavə edildi!',
-            'unique_items_count': len(cart)
+            'message': f'{product.adi} səbətə əlavə edildi!'
         })
         
         return JsonResponse(response_data)
     
-    return JsonResponse({'status': 'error', 'message': 'Invalid request method', 'unique_items_count': len(request.session.get('cart', {}))})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
 
 @login_required
 def remove_from_cart(request, product_id):
@@ -153,20 +143,17 @@ def remove_from_cart(request, product_id):
                 
                 return JsonResponse({
                     'status': 'success',
-                    'message': 'Məhsul səbətdən silindi!',
-                    'unique_items_count': len(cart)
+                    'message': 'Məhsul səbətdən silindi!'
                 })
     
         return JsonResponse({
             'status': 'error',
-            'message': 'Məhsul tapılmadı!',
-            'unique_items_count': len(request.session.get('cart', {}))
+            'message': 'Məhsul tapılmadı!'
         })
         
     return JsonResponse({
         'status': 'error',
-        'message': 'Invalid request method',
-        'unique_items_count': len(request.session.get('cart', {}))
+        'message': 'Invalid request method'
     })
 
 @login_required

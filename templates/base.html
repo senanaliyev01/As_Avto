@@ -32,9 +32,6 @@
                                     <a href="{% url 'cart' %}" class="nav-link {% if request.resolver_match.url_name == 'cart' %}active{% endif %}">
                                         <span class="cart-icon">
                                             <i class="fas fa-shopping-cart"></i>
-                                            {% if request.session.cart %}
-                                            <span class="cart-count">{{ request.session.cart|length }}</span>
-                                            {% endif %}
                                         </span>
                                         Səbət
                                     </a>

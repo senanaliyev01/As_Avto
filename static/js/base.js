@@ -184,42 +184,36 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Cart Sidebar Functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const cartToggle = document.getElementById('cart-toggle');
-    const cartSidebar = document.getElementById('cart-sidebar');
-    const closeCart = document.getElementById('close-cart');
-    const cartOverlay = document.getElementById('cart-overlay');
+// Cart Sidebar Functions
+function toggleCart(event) {
+    event.preventDefault();
+    loadCart();
+}
 
-    // Open cart sidebar
-    cartToggle.addEventListener('click', function(e) {
-        e.preventDefault();
-        cartSidebar.classList.add('active');
-        cartOverlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    });
+function loadCart() {
+    fetch('/cart/')
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('cart-container').innerHTML = html;
+            const cartSidebar = document.querySelector('.cart-sidebar');
+            cartSidebar.classList.add('active');
+        });
+}
 
-    // Close cart sidebar
-    function closeCartSidebar() {
-        cartSidebar.classList.remove('active');
-        cartOverlay.classList.remove('active');
-        document.body.style.overflow = '';
-    }
+function closeCart() {
+    const cartSidebar = document.querySelector('.cart-sidebar');
+    cartSidebar.classList.remove('active');
+}
 
-    closeCart.addEventListener('click', closeCartSidebar);
-    cartOverlay.addEventListener('click', closeCartSidebar);
-
-    // Close cart when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!cartSidebar.contains(e.target) && !cartToggle.contains(e.target)) {
-            if (cartSidebar.classList.contains('active')) {
-                closeCartSidebar();
-            }
+// Close cart when clicking outside
+document.addEventListener('click', function(event) {
+    const cartSidebar = document.querySelector('.cart-sidebar');
+    const cartContainer = document.getElementById('cart-container');
+    const cartButton = document.querySelector('.cart-icon');
+    
+    if (cartSidebar && cartSidebar.classList.contains('active')) {
+        if (!cartSidebar.contains(event.target) && !cartButton.contains(event.target)) {
+            closeCart();
         }
-    });
-
-    // Prevent closing when clicking inside cart
-    cartSidebar.addEventListener('click', function(e) {
-        e.stopPropagation();
-    });
+    }
 });

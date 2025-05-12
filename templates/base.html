@@ -29,7 +29,7 @@
                                 <li><a href="{% url 'products' %}" class="nav-link {% if request.resolver_match.url_name == 'products' %}active{% endif %}"><i class="fas fa-box"></i> Məhsullar</a></li>
                                 <li><a href="{% url 'new_products' %}" class="nav-link {% if request.resolver_match.url_name == 'new_products' %}active{% endif %}"><i class="fas fa-star"></i> Yeni Məhsullar</a></li>
                                 <li>
-                                    <a href="#" class="nav-link {% if request.resolver_match.url_name == 'cart' %}active{% endif %}" id="cart-toggle">
+                                    <a href="#" class="nav-link {% if request.resolver_match.url_name == 'cart' %}active{% endif %}" onclick="toggleCart(event)">
                                         <span class="cart-icon">
                                             <i class="fas fa-shopping-cart"></i>
                                             {% if request.session.cart %}
@@ -178,19 +178,8 @@
         </footer>
     </div>
 
-    <!-- Cart Sidebar -->
-    <div class="cart-sidebar" id="cart-sidebar">
-        <div class="cart-sidebar-header">
-            <h3>Səbətim</h3>
-            <button class="close-cart" id="close-cart">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="cart-sidebar-content">
-            {% include 'cart.html' %}
-        </div>
-    </div>
-    <div class="cart-overlay" id="cart-overlay"></div>
+    <!-- Cart Sidebar Container -->
+    <div id="cart-container"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="{% static 'js/base.js' %}"></script>

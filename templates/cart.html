@@ -8,6 +8,10 @@
 
     {% if cart_items %}
         <div class="cart-container">
+        <div class="quantity-warning" style="display: none; margin-bottom: 15px; padding: 10px; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 4px;">
+            <i class="fas fa-exclamation-triangle"></i>
+            Miqdarı dəyişdikdən sonra "Yenilə" düyməsinə basın!
+        </div>
         <table class="table">
             <thead>
                 <tr>
@@ -43,7 +47,7 @@
                             <div class="quantity-control">
                                 <form method="POST" action="{% url 'update_cart' item.product.id %}" class="update-form">
                                     {% csrf_token %}
-                                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stok }}" class="form-control quantity-input">
+                                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stok }}" class="form-control quantity-input" onchange="showQuantityWarning()">
                                     <button type="submit" class="btn btn-secondary">Yenilə</button>
                                 </form>
                             </div>
@@ -90,4 +94,16 @@
         </div>
     {% endif %}
 </div>
+
+<script>
+function showQuantityWarning() {
+    const warning = document.querySelector('.quantity-warning');
+    warning.style.display = 'block';
+    
+    // 5 saniyə sonra xəbərdarlığı gizlət
+    setTimeout(() => {
+        warning.style.display = 'none';
+    }, 5000);
+}
+</script>
 {% endblock %} 

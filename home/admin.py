@@ -40,10 +40,9 @@ class AvtomobilAdmin(admin.ModelAdmin):
 
 @admin.register(Mehsul)
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ['adi',  'firma',  'brend_kod', 'oem', 'maya_qiymet', 'qiymet', 'stok', 'yenidir']
+    list_display = ['adi',  'firma',  'brend_kod', 'oem', 'olcu', 'vitrin', 'maya_qiymet', 'qiymet', 'stok', 'yenidir']
     list_filter = ['kateqoriya', 'firma', 'avtomobil', 'vitrin', 'yenidir']
-    search_fields = ['adi', 'brend_kod', 'oem', 'kodlar']
-    list_editable = ['qiymet', 'stok']
+    search_fields = ['adi', 'brend_kod', 'oem', 'kodlar', 'olcu']
     change_list_template = 'admin/mehsul_change_list.html'
     actions = ['mark_as_new', 'remove_from_new']
 

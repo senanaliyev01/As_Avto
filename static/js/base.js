@@ -193,14 +193,8 @@ function removeFromCart(productId) {
                 updateCartCounter(data.cart_count);
             }
             
-            // Update total and check if cart is empty
+            // Update total if needed
             updateCartTotal();
-            
-            // If cart is empty now, show empty cart message
-            const tbody = document.querySelector('.table tbody');
-            if (!tbody || tbody.children.length === 0) {
-                showEmptyCartMessage();
-            }
         } else {
             showMessage('error', data.message);
         }
@@ -244,47 +238,13 @@ function updateCartTotal() {
         totalElement.textContent = total.toFixed(2).replace('.', ',') + ' ₼';
     }
     
-    // Reset selected total when updating cart
-    const selectedTotal = document.getElementById('selected-total');
-    if (selectedTotal) {
-        selectedTotal.textContent = '0,00 ₼';
-    }
+    // If cart is empty, show empty cart message
+    const cartTable = document.querySelector('.table');
+    const emptyCartMessage = document.querySelector('.empty-cart');
     
-    // Disable checkout button when updating cart
-    const checkoutButton = document.getElementById('checkout-button');
-    if (checkoutButton) {
-        checkoutButton.disabled = true;
-    }
-    
-    // Uncheck "select all" checkbox
-    const selectAll = document.getElementById('select-all');
-    if (selectAll) {
-        selectAll.checked = false;
-    }
-}
-
-// Function to show empty cart message
-function showEmptyCartMessage() {
-    const cartContainer = document.querySelector('.cart-container');
-    const cartHeader = document.querySelector('.cart-header');
-    
-    if (cartContainer) {
-        cartContainer.remove();
-    }
-    
-    if (cartHeader) {
-        cartHeader.remove();
-    }
-    
-    const container = document.querySelector('.container');
-    if (container) {
-        const emptyCartDiv = document.createElement('div');
-        emptyCartDiv.className = 'empty-cart';
-        emptyCartDiv.innerHTML = `
-            <p>Səbətiniz boşdur.</p>
-            <a href="/products/" class="btn btn-primary">Məhsullara bax</a>
-        `;
-        container.appendChild(emptyCartDiv);
+    if (subtotalElements.length === 0) {
+        if (cartTable) cartTable.style.display = 'none';
+        if (emptyCartMessage) emptyCartMessage.style.display = 'block';
     }
 }
 

@@ -90,12 +90,17 @@ def products_view(request):
     if avtomobil:
         mehsullar = mehsullar.filter(avtomobil__adi=avtomobil)
     
+    # İlk 15 məhsulu götür
+    initial_products = mehsullar[:15]
+    has_more = mehsullar.count() > 15
+    
     kateqoriyalar = Kateqoriya.objects.all()
     firmalar = Firma.objects.all()
     avtomobiller = Avtomobil.objects.all()
     
     return render(request, 'products.html', {
-        'mehsullar': mehsullar,
+        'mehsullar': initial_products,
+        'has_more': has_more,
         'kateqoriyalar': kateqoriyalar,
         'firmalar': firmalar,
         'avtomobiller': avtomobiller,
@@ -104,6 +109,53 @@ def products_view(request):
         'selected_firma': firma,
         'selected_avtomobil': avtomobil,
         'popup_images': popup_images
+    })
+
+@login_required
+def load_more_products(request):
+    offset = int(request.GET.get('offset', 0))
+    limit = 15
+    search_query = request.GET.get('search', '')
+    kateqoriya = request.GET.get('kateqoriya', '')
+    firma = request.GET.get('firma', '')
+    avtomobil = request.GET.get('avtomobil', '')
+    
+    mehsullar = Mehsul.objects.all().order_by('-id')
+    
+    if search_query:
+        # Existing search logic...
+        pass
+    
+    if kateqoriya:
+        mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)
+        
+    if firma:
+        mehsullar = mehsullar.filter(firma__adi=firma)
+        
+    if avtomobil:
+        mehsullar = mehsullar.filter(avtomobil__adi=avtomobil)
+    
+    # Get next batch of products
+    products = mehsullar[offset:offset + limit]
+    has_more = mehsullar.count() > (offset + limit)
+    
+    products_data = []
+    for product in products:
+        products_data.append({
+            'id': product.id,
+            'adi': product.adi,
+            'sekil_url': product.sekil.url if product.sekil else None,
+            'firma': product.firma.adi,
+            'brend_kod': product.brend_kod,
+            'oem': product.oem,
+            'stok': product.stok,
+            'qiymet': str(product.qiymet),
+            'yenidir': product.yenidir,
+        })
+    
+    return JsonResponse({
+        'products': products_data,
+        'has_more': has_more
     })
 
 @login_required

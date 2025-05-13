@@ -196,27 +196,38 @@ function removeFromCart(productId) {
             // Check if cart is empty
             const cartItems = document.querySelectorAll('.cart-item');
             if (cartItems.length === 0) {
-                // Hide cart container
+                // Hide cart container and header
                 const cartContainer = document.querySelector('.cart-container');
+                const cartHeader = document.querySelector('.cart-header');
+                
                 if (cartContainer) {
                     cartContainer.style.display = 'none';
                 }
-                
-                // Show empty cart message
-                const cartHeader = document.querySelector('.cart-header');
                 if (cartHeader) {
                     cartHeader.style.display = 'none';
                 }
                 
-                // Create and show empty cart message
-                const container = document.querySelector('.container');
-                const emptyCartDiv = document.createElement('div');
-                emptyCartDiv.className = 'empty-cart';
-                emptyCartDiv.innerHTML = `
-                    <p>Səbətiniz boşdur.</p>
-                    <a href="/products/" class="btn btn-primary">Məhsullara bax</a>
-                `;
-                container.appendChild(emptyCartDiv);
+                // Find the main content container
+                const mainContent = document.querySelector('.main-content .container');
+                if (mainContent) {
+                    // Create empty cart message
+                    const emptyCartDiv = document.createElement('div');
+                    emptyCartDiv.className = 'empty-cart';
+                    emptyCartDiv.style.marginTop = '2rem';
+                    emptyCartDiv.innerHTML = `
+                        <p>Səbətiniz boşdur.</p>
+                        <a href="/products/" class="btn btn-primary">Məhsullara bax</a>
+                    `;
+                    
+                    // Remove any existing empty cart message
+                    const existingEmptyCart = mainContent.querySelector('.empty-cart');
+                    if (existingEmptyCart) {
+                        existingEmptyCart.remove();
+                    }
+                    
+                    // Add new empty cart message
+                    mainContent.appendChild(emptyCartDiv);
+                }
             }
         } else {
             showMessage('error', data.message);

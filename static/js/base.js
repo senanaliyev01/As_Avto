@@ -20,6 +20,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const closeBtn = document.querySelector('.popup-close');
     
+    // Check if we should show the popup
+    function shouldShowPopup() {
+        const lastShown = localStorage.getItem('lastPopupShown');
+        if (!lastShown) return true;
+        
+        const thirtyMinutesInMs = 30 * 60 * 1000; // 30 minutes in milliseconds
+        const timeSinceLastShown = Date.now() - parseInt(lastShown);
+        
+        return timeSinceLastShown >= thirtyMinutesInMs;
+    }
+    
     // Initialize Swiper for popup
     const popupSwiper = new Swiper('.popup-swiper', {
         loop: true,
@@ -37,8 +48,11 @@ document.addEventListener('DOMContentLoaded', function() {
         },
     });
 
-    // Show modal
-    modal.style.display = 'block';
+    // Show modal only if enough time has passed
+    if (shouldShowPopup()) {
+        modal.style.display = 'block';
+        localStorage.setItem('lastPopupShown', Date.now().toString());
+    }
 
     // Close modal when clicking close button
     closeBtn.onclick = function() {

@@ -2005,36 +2005,32 @@ body {
     position: absolute;
     right: -20px;
     top: -20px;
-    color: white;
-    font-size: 24px;
-    font-weight: normal;
-    cursor: pointer;
-    z-index: 1000;
-    width: 40px;
-    height: 40px;
-    background: rgba(0, 0, 0, 0.8);
-    border: 2px solid rgba(255, 255, 255, 0.8);
+    width: 36px;
+    height: 36px;
+    background: #fff;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-    text-decoration: none;
-    outline: none;
-}
-
-.popup-close:hover {
-    background: #dc3545;
-    border-color: white;
-    transform: rotate(90deg);
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
 }
 
 .popup-close:before {
     content: '×';
-    display: block;
+    color: #333;
+    font-size: 28px;
+    font-weight: 300;
+    line-height: 1;
     margin-top: -2px;
+}
+
+.popup-close:hover {
+    background: #f8f9fa;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .popup-swiper {

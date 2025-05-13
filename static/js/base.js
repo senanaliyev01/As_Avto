@@ -15,7 +15,57 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeUserDropdown();
 
     // Popup Modal
-    initializePopupModal();
+    const modal = document.getElementById('popupModal');
+    if (!modal) return;
+
+    const closeBtn = document.querySelector('.popup-close');
+    
+    // Check if we should show the popup
+    function shouldShowPopup() {
+        const lastShown = localStorage.getItem('lastPopupShown');
+        if (!lastShown) return true;
+        
+        const thirtyMinutesInMs = 30 * 60 * 1000; // 30 minutes in milliseconds
+        const timeSinceLastShown = Date.now() - parseInt(lastShown);
+        
+        return timeSinceLastShown >= thirtyMinutesInMs;
+    }
+    
+    // Initialize Swiper for popup
+    const popupSwiper = new Swiper('.popup-swiper', {
+        loop: true,
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true
+        },
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+        autoplay: {
+            delay: 5000,
+            disableOnInteraction: false,
+        },
+    });
+
+    // Show modal only if enough time has passed
+    if (shouldShowPopup()) {
+        modal.style.display = 'block';
+        localStorage.setItem('lastPopupShown', Date.now().toString());
+    }
+
+    // Close modal when clicking close button
+    closeBtn.onclick = function() {
+        modal.style.display = 'none';
+    }
+
+    // Prevent modal from closing when clicking inside modal content
+    const popupContent = document.querySelector('.popup-content');
+    if (popupContent) {
+        popupContent.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
 });
 
 function initializeSearch() {
@@ -413,64 +463,4 @@ function initializeUserDropdown() {
             }
         });
     }
-}
-
-// Popup Modal functionality
-function initializePopupModal() {
-    const popupModal = document.getElementById('popupModal');
-    const closePopup = document.querySelector('.popup-close');
-    const showPopupBtn = document.getElementById('showPopupBtn');
-    
-    if (!popupModal || !closePopup || !showPopupBtn) return;
-
-    // Initialize Swiper for popup
-    const swiper = new Swiper('.popup-swiper', {
-        loop: true,
-        autoplay: {
-            delay: 3000,
-            disableOnInteraction: false,
-        },
-        pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
-        },
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-    });
-
-    function showPopup() {
-        popupModal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-    }
-
-    function hidePopup() {
-        popupModal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    }
-
-    // Check if popup should be shown automatically
-    const lastShown = localStorage.getItem('lastPopupShown');
-    const currentTime = new Date().getTime();
-    
-    if (!lastShown || (currentTime - lastShown) > 30 * 60 * 1000) { // 30 minutes
-        showPopup();
-        localStorage.setItem('lastPopupShown', currentTime);
-    }
-
-    // Show popup when button is clicked
-    showPopupBtn.addEventListener('click', function() {
-        showPopup();
-    });
-
-    // Close popup when X is clicked
-    closePopup.addEventListener('click', function() {
-        hidePopup();
-    });
-
-    // Prevent closing when clicking inside popup content
-    document.querySelector('.popup-content').addEventListener('click', function(e) {
-        e.stopPropagation();
-    });
 }

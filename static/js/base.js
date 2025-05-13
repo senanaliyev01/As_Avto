@@ -14,8 +14,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // User dropdown functionality
     initializeUserDropdown();
 
-    // Initialize Popup functionality
-    initializePopup();
+    // Popup Modal
+    initializePopupModal();
 });
 
 function initializeSearch() {
@@ -415,15 +415,16 @@ function initializeUserDropdown() {
     }
 }
 
-function initializePopup() {
+// Popup Modal functionality
+function initializePopupModal() {
     const popupModal = document.getElementById('popupModal');
-    if (!popupModal) return; // If no popup exists on page, return early
-
     const closePopup = document.querySelector('.popup-close');
     const showPopupBtn = document.getElementById('showPopupBtn');
     
+    if (!popupModal || !closePopup || !showPopupBtn) return;
+
     // Initialize Swiper for popup
-    const popupSwiper = new Swiper('.popup-swiper', {
+    const swiper = new Swiper('.popup-swiper', {
         loop: true,
         autoplay: {
             delay: 3000,
@@ -459,31 +460,17 @@ function initializePopup() {
     }
 
     // Show popup when button is clicked
-    if (showPopupBtn) {
-        showPopupBtn.addEventListener('click', function() {
-            showPopup();
-        });
-    }
+    showPopupBtn.addEventListener('click', function() {
+        showPopup();
+    });
 
     // Close popup when X is clicked
-    if (closePopup) {
-        closePopup.addEventListener('click', function() {
-            hidePopup();
-        });
-    }
+    closePopup.addEventListener('click', function() {
+        hidePopup();
+    });
 
     // Prevent closing when clicking inside popup content
-    const popupContent = document.querySelector('.popup-content');
-    if (popupContent) {
-        popupContent.addEventListener('click', function(e) {
-            e.stopPropagation();
-        });
-    }
-
-    // Close popup when clicking outside
-    popupModal.addEventListener('click', function(e) {
-        if (e.target === popupModal) {
-            hidePopup();
-        }
+    document.querySelector('.popup-content').addEventListener('click', function(e) {
+        e.stopPropagation();
     });
 }

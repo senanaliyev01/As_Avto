@@ -7,8 +7,8 @@ from decimal import Decimal
 from django.contrib import messages
 import re
 from django.http import JsonResponse, HttpResponseNotFound
-from django.db.models.functions import Lower, Regexp_Replace
-from django.db.models import Value, F
+from django.db.models.functions import Lower
+from django.db.models import Value
 
 def custom_404(request, exception=None):
     return HttpResponseNotFound(render(request, '404.html').content)
@@ -56,19 +56,14 @@ def products_view(request):
             # Ad ilə axtarış üçün annotation əlavə et
             mehsullar = mehsullar.annotate(
                 clean_name=Lower('adi'),
-                clean_name_no_special=Regexp_Replace(
-                    Lower('adi'),
-                    r'[^a-z0-9]',
-                    Value(''),
-                    flags=['g', 'i']
-                )
+                clean_name_no_special=Value('')
             )
             
             # Təmizlənmiş ad ilə axtarış
             name_queries = Q()
             
             # Birləşik axtarış üçün
-            name_queries |= Q(clean_name_no_special__icontains=clean_search)
+            name_queries |= Q(clean_name__icontains=clean_search)
             
             # Bütün sözlərin olması üçün
             if clean_words:
@@ -337,19 +332,14 @@ def search_suggestions(request):
             # Ad ilə axtarış üçün annotation əlavə et
             mehsullar = Mehsul.objects.annotate(
                 clean_name=Lower('adi'),
-                clean_name_no_special=Regexp_Replace(
-                    Lower('adi'),
-                    r'[^a-z0-9]',
-                    Value(''),
-                    flags=['g', 'i']
-                )
+                clean_name_no_special=Value('')
             )
             
             # Təmizlənmiş ad ilə axtarış
             name_queries = Q()
             
             # Birləşik axtarış üçün
-            name_queries |= Q(clean_name_no_special__icontains=clean_search)
+            name_queries |= Q(clean_name__icontains=clean_search)
             
             # Bütün sözlərin olması üçün
             if clean_words:

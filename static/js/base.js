@@ -35,6 +35,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize Swiper for popup
     const popupSwiper = new Swiper('.popup-swiper', {
         loop: true,
+        autoplay: {
+            delay: 3000,
+            disableOnInteraction: false,
+        },
         pagination: {
             el: '.swiper-pagination',
             clickable: true
@@ -43,10 +47,14 @@ document.addEventListener('DOMContentLoaded', function() {
             nextEl: '.swiper-button-next',
             prevEl: '.swiper-button-prev',
         },
-        autoplay: {
-            delay: 5000,
-            disableOnInteraction: false,
-        },
+        on: {
+            init: function() {
+                this.autoplay.start();
+            },
+            slideChange: function() {
+                this.autoplay.start();
+            }
+        }
     });
 
     // Show modal only if enough time has passed

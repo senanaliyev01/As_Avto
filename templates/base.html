@@ -230,63 +230,6 @@
     </div>
     {% endif %}
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const popupModal = document.getElementById('popupModal');
-            const closePopup = document.querySelector('.popup-close');
-            const showPopupBtn = document.getElementById('showPopupBtn');
-            
-            // Initialize Swiper
-            const swiper = new Swiper('.popup-swiper', {
-                loop: true,
-                autoplay: {
-                    delay: 3000,
-                    disableOnInteraction: false,
-                },
-                pagination: {
-                    el: '.swiper-pagination',
-                    clickable: true,
-                },
-                navigation: {
-                    nextEl: '.swiper-button-next',
-                    prevEl: '.swiper-button-prev',
-                },
-            });
 
-            function showPopup() {
-                popupModal.style.display = 'block';
-                document.body.style.overflow = 'hidden';
-            }
-
-            function hidePopup() {
-                popupModal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-            }
-
-            // Check if popup should be shown automatically
-            const lastShown = localStorage.getItem('lastPopupShown');
-            const currentTime = new Date().getTime();
-            
-            if (!lastShown || (currentTime - lastShown) > 30 * 60 * 1000) { // 30 minutes
-                showPopup();
-                localStorage.setItem('lastPopupShown', currentTime);
-            }
-
-            // Show popup when button is clicked
-            showPopupBtn.addEventListener('click', function() {
-                showPopup();
-            });
-
-            // Close popup when X is clicked
-            closePopup.addEventListener('click', function() {
-                hidePopup();
-            });
-
-            // Prevent closing when clicking inside popup content
-            document.querySelector('.popup-content').addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-        });
-    </script>
 </body>
 </html>

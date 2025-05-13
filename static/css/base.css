@@ -1540,3 +1540,172 @@ body {
         font-size: 14px;
     }
 }
+
+/* Cart Table Styles */
+.cart-container {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin: 2rem auto;
+    overflow-x: auto;
+    max-width: 95%;
+    padding: 1rem;
+}
+
+.cart-container .table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 0 auto;
+    text-align: center;
+    table-layout: fixed;
+    min-width: 1200px;
+}
+
+.cart-container .table th,
+.cart-container .table td {
+    padding: 12px 8px;
+    border: 1px solid #e9ecef;
+    vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cart-container .table th {
+    background: #f8f9fa;
+    color: #2c3e50;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Cart Table Column Widths */
+.cart-container .table th:nth-child(1), /* Checkbox */
+.cart-container .table td:nth-child(1) {
+    width: 40px;
+    min-width: 40px;
+}
+
+.cart-container .table th:nth-child(2), /* Şəkil */
+.cart-container .table td:nth-child(2) {
+    width: 80px;
+    min-width: 80px;
+}
+
+.cart-container .table th:nth-child(3), /* Məhsul */
+.cart-container .table td:nth-child(3) {
+    width: 200px;
+    min-width: 200px;
+}
+
+.cart-container .table th:nth-child(4), /* Brend Kodu */
+.cart-container .table td:nth-child(4) {
+    width: 100px;
+    min-width: 100px;
+}
+
+.cart-container .table th:nth-child(5), /* OEM */
+.cart-container .table td:nth-child(5) {
+    width: 100px;
+    min-width: 100px;
+}
+
+.cart-container .table th:nth-child(6), /* Firma */
+.cart-container .table td:nth-child(6) {
+    width: 120px;
+    min-width: 120px;
+}
+
+.cart-container .table th:nth-child(7), /* Avtomobil */
+.cart-container .table td:nth-child(7) {
+    width: 120px;
+    min-width: 120px;
+}
+
+.cart-container .table th:nth-child(8), /* Qiymət */
+.cart-container .table td:nth-child(8) {
+    width: 80px;
+    min-width: 80px;
+}
+
+.cart-container .table th:nth-child(9), /* Stok */
+.cart-container .table td:nth-child(9) {
+    width: 80px;
+    min-width: 80px;
+}
+
+.cart-container .table th:nth-child(10), /* Miqdar */
+.cart-container .table td:nth-child(10) {
+    width: 150px;
+    min-width: 150px;
+}
+
+.cart-container .table th:nth-child(11), /* Cəmi */
+.cart-container .table td:nth-child(11) {
+    width: 100px;
+    min-width: 100px;
+}
+
+.cart-container .table th:nth-child(12), /* Əməliyyat */
+.cart-container .table td:nth-child(12) {
+    width: 80px;
+    min-width: 80px;
+}
+
+/* Cart Product Image */
+.cart-container .table .product-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 6px;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Cart Quantity Control */
+.cart-container .quantity-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.cart-container .quantity-input {
+    width: 60px;
+    text-align: center;
+    padding: 4px;
+}
+
+.cart-container .update-form {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.cart-container .btn {
+    padding: 4px 8px;
+    font-size: 14px;
+}
+
+/* Responsive Cart Table */
+@media (max-width: 768px) {
+    .cart-container {
+        margin: 1rem auto;
+        padding: 0.5rem;
+    }
+    
+    .cart-container .table th,
+    .cart-container .table td {
+        padding: 8px 4px;
+        font-size: 14px;
+    }
+    
+    .cart-container .quantity-control {
+        flex-direction: column;
+    }
+    
+    .cart-container .update-form {
+        flex-direction: column;
+    }
+}

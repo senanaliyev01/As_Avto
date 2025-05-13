@@ -166,7 +166,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # 3. Jazzmin tənzimləmələri
 JAZZMIN_SETTINGS = {
     # Başlıq
-    "site_title": "QORXMAZ-AVTO",
+    "site_title": "AS-AVTO",
     "site_header": "İdarə Etmə",
     "site_brand": "Admin",
     "site_logo": "images/favicon.png",

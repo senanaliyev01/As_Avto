@@ -2104,47 +2104,16 @@ body {
     display: flex;
     align-items: center;
     gap: 5px;
-    position: relative;
-    animation: pulseRed 2s infinite;
 }
 
-@keyframes pulseRed {
-    0% {
-        color: var(--primary-color);
-    }
-    50% {
-        color: #ff3b30;
-    }
-    100% {
-        color: var(--primary-color);
-    }
+.popup-btn:hover {
+    color: #ffc107;
 }
 
 .popup-btn i {
     transition: color 0.3s ease;
-    animation: pulseRed 2s infinite;
-}
-
-.popup-btn:hover {
-    color: #ff3b30;
 }
 
 .popup-btn:hover i {
-    color: #ff3b30;
-}
-
-/* Popup Button Active State */
-.popup-btn::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background-color: transparent;
-    transition: background-color 0.3s ease;
-}
-
-.popup-btn:hover::after {
-    background-color: #ff3b30;
+    color: #ffc107;
 }

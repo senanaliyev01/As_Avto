@@ -10,33 +10,8 @@
 {% block extrahead %}
     {{ block.super }}
     <script src="{% static 'js/admin.js' %}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Cədvəldəki borc məbləğlərini yoxla və sinif əlavə et
-            document.querySelectorAll('.stats-table .debt').forEach(cell => {
-                const amount = parseFloat(cell.textContent.replace('₼', '').trim());
-                if (amount > 0) {
-                    cell.classList.add('positive');
-                } else if (amount < 0) {
-                    cell.classList.add('negative');
-                } else {
-                    cell.classList.add('zero');
-                }
-            });
 
-            // Ümumi statistikadakı borc məbləğini yoxla və sinif əlavə et
-            const totalDebtItem = document.querySelector('.stats-item.debt');
-            const totalDebtAmount = parseFloat(totalDebtItem.querySelector('span').textContent.replace('₼', '').trim());
-            
-            if (totalDebtAmount > 0) {
-                totalDebtItem.classList.add('positive');
-            } else if (totalDebtAmount < 0) {
-                totalDebtItem.classList.add('negative');
-            } else {
-                totalDebtItem.classList.add('zero');
-            }
-        });
-    </script>
+   
 {% endblock %}
 
 {% block content_title %}

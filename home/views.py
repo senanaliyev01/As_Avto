@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .models import Mehsul, Kateqoriya, Sifaris, SifarisItem, Firma, Avtomobil
 from django.db.models import Q
@@ -379,3 +379,9 @@ def new_products_view(request):
         'firmalar': firmalar,
         'avtomobiller': avtomobiller,
     })
+
+def logout_view(request):
+    logout(request)
+    # Clear any session data
+    request.session.flush()
+    return redirect('login')

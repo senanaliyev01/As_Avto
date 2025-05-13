@@ -40,6 +40,21 @@
                                 </li>
                             </ul>
                         </nav>
+                        <div class="user-dropdown">
+                            <button class="user-dropdown-btn">
+                                <i class="fas fa-user"></i>
+                            </button>
+                            <div class="user-dropdown-content">
+                                <div class="user-info">
+                                    <i class="fas fa-user-circle"></i>
+                                    <span>{{ request.user.username }}</span>
+                                </div>
+                                <a href="{% url 'logout' %}" class="logout-link">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Çıxış et
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

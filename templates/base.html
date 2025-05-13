@@ -22,20 +22,16 @@
                             <img src="{% static 'images/Header_Logo.png' %}" alt="As Avto" class="logo-img">
                         </a>
                     </div>
-                    <div class="news-button-container">
-                        {% if popup_images %}
-                        <button class="news-button" onclick="showPopupModal()">
-                            <i class="fas fa-bell"></i>
-                            <span class="pulse-dot"></span>
-                            Yeniliklər
-                        </button>
-                        {% endif %}
-                    </div>
                     <div class="header-right">
                         <nav class="main-nav">
                             <ul>
                                 <!-- <li><a href="{% url 'base' %}" class="nav-link {% if request.resolver_match.url_name == 'base' %}active{% endif %}"><i class="fas fa-home"></i> Ana Səhifə</a></li> -->
                                 <li><a href="{% url 'products' %}" class="nav-link {% if request.resolver_match.url_name == 'products' %}active{% endif %}"><i class="fas fa-box"></i> Məhsullar</a></li>
+                                <li>
+                                    <button id="showPopupBtn" class="nav-link popup-btn">
+                                        <i class="fas fa-bullhorn"></i> Yeniliklər
+                                    </button>
+                                </li>
                                 <li><a href="{% url 'new_products' %}" class="nav-link {% if request.resolver_match.url_name == 'new_products' %}active{% endif %}"><i class="fas fa-star"></i> Yeni Məhsullar</a></li>
                                 <li><a href="{% url 'orders' %}" class="nav-link {% if request.resolver_match.url_name == 'orders' %}active{% endif %}"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a></li>
                                 <li>
@@ -233,5 +229,64 @@
         </div>
     </div>
     {% endif %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const popupModal = document.getElementById('popupModal');
+            const closePopup = document.querySelector('.popup-close');
+            const showPopupBtn = document.getElementById('showPopupBtn');
+            
+            // Initialize Swiper
+            const swiper = new Swiper('.popup-swiper', {
+                loop: true,
+                autoplay: {
+                    delay: 3000,
+                    disableOnInteraction: false,
+                },
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+            });
+
+            function showPopup() {
+                popupModal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
+
+            function hidePopup() {
+                popupModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+
+            // Check if popup should be shown automatically
+            const lastShown = localStorage.getItem('lastPopupShown');
+            const currentTime = new Date().getTime();
+            
+            if (!lastShown || (currentTime - lastShown) > 30 * 60 * 1000) { // 30 minutes
+                showPopup();
+                localStorage.setItem('lastPopupShown', currentTime);
+            }
+
+            // Show popup when button is clicked
+            showPopupBtn.addEventListener('click', function() {
+                showPopup();
+            });
+
+            // Close popup when X is clicked
+            closePopup.addEventListener('click', function() {
+                hidePopup();
+            });
+
+            // Prevent closing when clicking inside popup content
+            document.querySelector('.popup-content').addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        });
+    </script>
 </body>
 </html>

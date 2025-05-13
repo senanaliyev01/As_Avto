@@ -94,6 +94,7 @@ class MehsulAdmin(admin.ModelAdmin):
                             kateqoriya = None
                             firma = None
                             avtomobil = None
+                            vitrin = None
                             
                             if 'kateqoriya' in row and pd.notna(row['kateqoriya']):
                                 kateqoriya, _ = Kateqoriya.objects.get_or_create(adi=str(row['kateqoriya']).strip())
@@ -106,6 +107,10 @@ class MehsulAdmin(admin.ModelAdmin):
                             if 'avtomobil' in row and pd.notna(row['avtomobil']):
                                 avtomobil, _ = Avtomobil.objects.get_or_create(adi=str(row['avtomobil']).strip())
                                 print(f"Avtomobil: {avtomobil}")
+
+                            if 'vitrin' in row and pd.notna(row['vitrin']):
+                                vitrin, _ = Vitrin.objects.get_or_create(nomre=str(row['vitrin']).strip())
+                                print(f"Vitrin: {vitrin}")
 
                             # Məhsulun adını təmizlə
                             if 'adi' not in row or pd.isna(row['adi']):
@@ -159,11 +164,13 @@ class MehsulAdmin(admin.ModelAdmin):
                                         existing_product.firma = firma
                                     if avtomobil:
                                         existing_product.avtomobil = avtomobil
+                                    if vitrin:
+                                        existing_product.vitrin = vitrin
                                     
                                     existing_product.brend_kod = brend_kod
                                     existing_product.oem = oem
                                     existing_product.olcu = str(row['olcu']).strip() if 'olcu' in row and pd.notna(row['olcu']) else ''
-                                    existing_product.vitrin = str(row['vitrin']).strip() if 'vitrin' in row and pd.notna(row['vitrin']) else ''
+                                    existing_product.vitrin = vitrin
                                     existing_product.maya_qiymet = float(row['maya_qiymet']) if 'maya_qiymet' in row and pd.notna(row['maya_qiymet']) else 0
                                     existing_product.qiymet = float(row['qiymet']) if 'qiymet' in row and pd.notna(row['qiymet']) else 0
                                     existing_product.stok = int(row['stok']) if 'stok' in row and pd.notna(row['stok']) else 0
@@ -180,10 +187,10 @@ class MehsulAdmin(admin.ModelAdmin):
                                         'kateqoriya': kateqoriya,
                                         'firma': firma,
                                         'avtomobil': avtomobil,
+                                        'vitrin': vitrin,
                                         'brend_kod': brend_kod,
                                         'oem': oem,
                                         'olcu': str(row['olcu']).strip() if 'olcu' in row and pd.notna(row['olcu']) else '',
-                                        'vitrin': str(row['vitrin']).strip() if 'vitrin' in row and pd.notna(row['vitrin']) else '',
                                         'maya_qiymet': float(row['maya_qiymet']) if 'maya_qiymet' in row and pd.notna(row['maya_qiymet']) else 0,
                                         'qiymet': float(row['qiymet']) if 'qiymet' in row and pd.notna(row['qiymet']) else 0,
                                         'stok': int(row['stok']) if 'stok' in row and pd.notna(row['stok']) else 0,

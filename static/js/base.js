@@ -129,8 +129,8 @@ function initializeModal() {
         }
 
         // Handle form submission
-            form.addEventListener('submit', function(e) {
-                        e.preventDefault();
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
             
             const formData = new FormData(this);
             const url = this.action;
@@ -139,6 +139,7 @@ function initializeModal() {
                 method: 'POST',
                 body: formData,
                 headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             })
@@ -147,6 +148,10 @@ function initializeModal() {
                 if (data.status === 'success') {
                     // Show success message
                     showMessage('success', data.message);
+                    // Update cart counter
+                    if (data.cart_count !== undefined) {
+                        updateCartCounter(data.cart_count);
+                    }
                     // Close modal
                     modal.style.display = 'none';
                 } else {

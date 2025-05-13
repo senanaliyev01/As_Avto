@@ -382,6 +382,8 @@ def new_products_view(request):
 
 def logout_view(request):
     logout(request)
-    # Clear any session data
+    # Sessiya və keşi təmizləyirik
     request.session.flush()
+    
+    # İstifadəçini login səhifəsinə yönləndiririk
     return redirect('login')

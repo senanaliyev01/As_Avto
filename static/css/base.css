@@ -2003,25 +2003,38 @@ body {
 
 .popup-close {
     position: absolute;
-    right: -30px;
-    top: -30px;
+    right: -20px;
+    top: -20px;
     color: white;
-    font-size: 35px;
-    font-weight: bold;
+    font-size: 24px;
+    font-weight: normal;
     cursor: pointer;
     z-index: 1000;
     width: 40px;
     height: 40px;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid rgba(255, 255, 255, 0.8);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    text-decoration: none;
+    outline: none;
 }
 
 .popup-close:hover {
-    background: rgba(0, 0, 0, 0.8);
+    background: #dc3545;
+    border-color: white;
+    transform: rotate(90deg);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+}
+
+.popup-close:before {
+    content: '×';
+    display: block;
+    margin-top: -2px;
 }
 
 .popup-swiper {

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Kateqoriya, Firma, Avtomobil, Mehsul, Sifaris, SifarisItem, Vitrin
+from .models import Kateqoriya, Firma, Avtomobil, Mehsul, Sifaris, SifarisItem, Vitrin, PopupImage
 from django.core.exceptions import ValidationError
 from django.utils.html import format_html
 from django.urls import path
@@ -511,3 +511,15 @@ class SifarisAdmin(admin.ModelAdmin):
         extra_context['total_statistics'] = total_stats
         
         return super().changelist_view(request, extra_context=extra_context)
+
+@admin.register(PopupImage)
+class PopupImageAdmin(admin.ModelAdmin):
+    list_display = ['id', 'basliq', 'aktiv', 'sira', 'yaradilma_tarixi', 'sekil_preview']
+    list_editable = ['aktiv', 'sira']
+    ordering = ['sira', '-yaradilma_tarixi']
+    
+    def sekil_preview(self, obj):
+        if obj.sekil:
+            return format_html('<img src="{}" style="max-height: 50px;"/>', obj.sekil.url)
+        return '-'
+    sekil_preview.short_description = 'Şəkil'

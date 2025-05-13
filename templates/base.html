@@ -194,5 +194,35 @@
     <script src="{% static 'js/base.js' %}"></script>
    
     {% block extra_js %}{% endblock %}
+
+    <!-- Popup Modal -->
+    {% if popup_images %}
+    <div id="popupModal" class="popup-modal">
+        <div class="popup-content">
+            <span class="popup-close">&times;</span>
+            <div class="swiper popup-swiper">
+                <div class="swiper-wrapper">
+                    {% for image in popup_images %}
+                    <div class="swiper-slide">
+                        {% if image.link %}
+                        <a href="{{ image.link }}" target="_blank">
+                        {% endif %}
+                            <img src="{{ image.sekil.url }}" alt="{{ image.basliq|default:'Popup Image' }}">
+                            {% if image.basliq %}
+                            <div class="popup-title">{{ image.basliq }}</div>
+                            {% endif %}
+                        {% if image.link %}
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="swiper-pagination"></div>
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </body>
 </html>

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import Mehsul, Kateqoriya, Sifaris, SifarisItem, Firma, Avtomobil
+from .models import Mehsul, Kateqoriya, Sifaris, SifarisItem, Firma, Avtomobil, PopupImage
 from django.db.models import Q
 from decimal import Decimal
 from django.contrib import messages
@@ -30,7 +30,12 @@ def login_view(request):
 def home_view(request):
     # Yeni məhsulları əldə et
     new_products = Mehsul.objects.filter(yenidir=True)
-    return render(request, 'base.html', {'new_products': new_products})
+    # Aktiv popup şəkilləri əldə et
+    popup_images = PopupImage.objects.filter(aktiv=True)
+    return render(request, 'base.html', {
+        'new_products': new_products,
+        'popup_images': popup_images
+    })
 
 @login_required
 def products_view(request):

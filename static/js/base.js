@@ -13,6 +13,44 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // User dropdown functionality
     initializeUserDropdown();
+
+    // Popup Modal
+    const modal = document.getElementById('popupModal');
+    if (!modal) return;
+
+    const closeBtn = document.querySelector('.popup-close');
+    
+    // Initialize Swiper for popup
+    const popupSwiper = new Swiper('.popup-swiper', {
+        loop: true,
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true
+        },
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+        autoplay: {
+            delay: 5000,
+            disableOnInteraction: false,
+        },
+    });
+
+    // Show modal
+    modal.style.display = 'block';
+
+    // Close modal when clicking close button
+    closeBtn.onclick = function() {
+        modal.style.display = 'none';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
 });
 
 function initializeSearch() {

@@ -193,3 +193,19 @@ class SifarisItem(models.Model):
     class Meta:
         verbose_name = 'Sifariş elementi'
         verbose_name_plural = 'Sifariş elementləri'
+
+class PopupImage(models.Model):
+    sekil = models.ImageField(upload_to='popup_sekilleri', verbose_name='Şəkil')
+    basliq = models.CharField(max_length=100, blank=True, null=True, verbose_name='Başlıq')
+    link = models.URLField(blank=True, null=True, verbose_name='Keçid linki')
+    aktiv = models.BooleanField(default=True, verbose_name='Aktivdir')
+    sira = models.PositiveIntegerField(default=0, verbose_name='Sıra')
+    yaradilma_tarixi = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Popup şəkil {self.id}"
+
+    class Meta:
+        verbose_name = 'Popup Şəkil'
+        verbose_name_plural = 'Popup Şəkillər'
+        ordering = ['sira', '-yaradilma_tarixi']

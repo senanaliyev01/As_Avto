@@ -127,8 +127,8 @@
                                     <div class="ribbon">Yeni</div>
                                 </div>
                                 <div class="product-image">
-                                    {% if product.sekil %}
-                                    <img src="{{ product.sekil.url }}" alt="{{ product.adi }}">
+                                    {% if product.sekil and product.sekil.url != 'mehsul_sekilleri/no_image.webp' %}
+                                    <img src="{{ product.sekil.url }}" alt="{{ product.adi }}" onerror="this.src='{% static 'images/no_image.webp' %}'">
                                     {% else %}
                                     <img src="{% static 'images/no_image.webp' %}" alt="No Image">
                                     {% endif %}

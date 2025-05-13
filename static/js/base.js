@@ -14,6 +14,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // User dropdown functionality
     initializeUserDropdown();
 
+    // Initialize Image Modal
+    initializeImageModal();
+
     // Popup Modal
     const modal = document.getElementById('popupModal');
     if (!modal) return;
@@ -482,4 +485,59 @@ function initializeUserDropdown() {
             }
         });
     }
+}
+
+function initializeImageModal() {
+    // Create modal element if it doesn't exist
+    if (!document.getElementById('imageModal')) {
+        const modalHTML = `
+            <div id="imageModal" class="image-modal">
+                <span class="image-modal-close"></span>
+                <div class="modal-image-content">
+                    <img src="" alt="" class="modal-image">
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+    }
+
+    const modal = document.getElementById('imageModal');
+    const modalImage = modal.querySelector('.modal-image');
+    const closeBtn = modal.querySelector('.image-modal-close');
+
+    // Add click event to all product images
+    document.querySelectorAll('.product-image').forEach(img => {
+        img.style.cursor = 'pointer';
+        img.addEventListener('click', function() {
+            modalImage.src = this.src;
+            modalImage.alt = this.alt;
+            modal.style.display = 'block';
+            setTimeout(() => modal.classList.add('show'), 10);
+        });
+    });
+
+    // Close modal when clicking close button
+    closeBtn.addEventListener('click', closeImageModal);
+
+    // Close modal when clicking outside
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeImageModal();
+        }
+    });
+
+    // Close modal with ESC key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.style.display === 'block') {
+            closeImageModal();
+        }
+    });
+}
+
+function closeImageModal() {
+    const modal = document.getElementById('imageModal');
+    modal.classList.remove('show');
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
 }

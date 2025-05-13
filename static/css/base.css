@@ -2089,3 +2089,38 @@ body {
 .popup-swiper .swiper-pagination-bullet-active {
     opacity: 1;
 }
+
+/* Yeniliklər linki üçün yanıb-sönmə effekti */
+.blink-news {
+    animation: blink-animation 1.5s infinite;
+    color: #ff0000 !important;
+    font-weight: bold !important;
+}
+
+.blink-news i {
+    color: #ff0000 !important;
+}
+
+@keyframes blink-animation {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.1);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.blink-news:hover {
+    animation: none;
+    color: #ff6b6b !important;
+}
+
+.blink-news:hover i {
+    color: #ff6b6b !important;
+}

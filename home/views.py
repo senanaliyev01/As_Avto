@@ -45,6 +45,7 @@ def products_view(request):
     avtomobil = request.GET.get('avtomobil', '')
     
     mehsullar = Mehsul.objects.all().order_by('-id')
+    popup_images = PopupImage.objects.filter(aktiv=True)
     
     if search_query:
         # Xüsusi simvolları və boşluqları təmizlə
@@ -101,7 +102,8 @@ def products_view(request):
         'search_query': search_query,
         'selected_kateqoriya': kateqoriya,
         'selected_firma': firma,
-        'selected_avtomobil': avtomobil
+        'selected_avtomobil': avtomobil,
+        'popup_images': popup_images
     })
 
 @login_required
@@ -112,6 +114,7 @@ def cart_view(request):
     cart = request.session['cart']
     cart_items = []
     total = Decimal('0.00')
+    popup_images = PopupImage.objects.filter(aktiv=True)
     
     for product_id, quantity in cart.items():
         product = get_object_or_404(Mehsul, id=product_id)
@@ -125,7 +128,8 @@ def cart_view(request):
     
     return render(request, 'cart.html', {
         'cart_items': cart_items,
-        'total': total
+        'total': total,
+        'popup_images': popup_images
     })
 
 @login_required
@@ -197,10 +201,12 @@ def remove_from_cart(request, product_id):
 def orders_view(request):
     orders = Sifaris.objects.filter(istifadeci=request.user).order_by('-tarix')
     statistics = Sifaris.get_order_statistics(request.user)
+    popup_images = PopupImage.objects.filter(aktiv=True)
     
     return render(request, 'orders.html', {
         'orders': orders,
-        'statistics': statistics
+        'statistics': statistics,
+        'popup_images': popup_images
     })
 
 @login_required
@@ -315,8 +321,11 @@ def order_detail_view(request, order_id):
         return redirect('login')
     
     order = get_object_or_404(Sifaris, id=order_id, istifadeci=request.user)
+    popup_images = PopupImage.objects.filter(aktiv=True)
+    
     return render(request, 'order_detail.html', {
-        'order': order
+        'order': order,
+        'popup_images': popup_images
     })
 
 def search_suggestions(request):
@@ -377,12 +386,14 @@ def new_products_view(request):
     kateqoriyalar = Kateqoriya.objects.all()
     firmalar = Firma.objects.all()
     avtomobiller = Avtomobil.objects.all()
+    popup_images = PopupImage.objects.filter(aktiv=True)
     
     return render(request, 'new_products.html', {
         'mehsullar': mehsullar,
         'kateqoriyalar': kateqoriyalar,
         'firmalar': firmalar,
         'avtomobiller': avtomobiller,
+        'popup_images': popup_images
     })
 
 def logout_view(request):

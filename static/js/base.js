@@ -68,7 +68,7 @@ function initializeSearch() {
             }
         });
     }
-    }
+}
 
 function initializeCart() {
     const selectAll = document.getElementById('select-all');
@@ -181,6 +181,11 @@ function removeFromCart(productId) {
             const row = document.querySelector(`tr[data-product-id="${productId}"]`);
             if (row) {
                 row.remove();
+            }
+            
+            // Update cart counter
+            if (data.cart_count !== undefined) {
+                updateCartCounter(data.cart_count);
             }
             
             // Update total if needed
@@ -327,4 +332,18 @@ function initializeSwiper() {
             }
         });
     }
+}
+
+// Function to update cart counter
+function updateCartCounter(count) {
+    const counter = document.querySelector('.cart-counter');
+    if (counter) {
+        counter.textContent = count;
+    }
+}
+
+// Function to get current cart count
+function getCartCount() {
+    const cart = JSON.parse(sessionStorage.getItem('cart') || '{}');
+    return Object.keys(cart).length;
 }

@@ -193,8 +193,31 @@ function removeFromCart(productId) {
                 updateCartCounter(data.cart_count);
             }
             
-            // Update total if needed
-            updateCartTotal();
+            // Check if cart is empty
+            const cartItems = document.querySelectorAll('.cart-item');
+            if (cartItems.length === 0) {
+                // Hide cart container
+                const cartContainer = document.querySelector('.cart-container');
+                if (cartContainer) {
+                    cartContainer.style.display = 'none';
+                }
+                
+                // Show empty cart message
+                const cartHeader = document.querySelector('.cart-header');
+                if (cartHeader) {
+                    cartHeader.style.display = 'none';
+                }
+                
+                // Create and show empty cart message
+                const container = document.querySelector('.container');
+                const emptyCartDiv = document.createElement('div');
+                emptyCartDiv.className = 'empty-cart';
+                emptyCartDiv.innerHTML = `
+                    <p>Səbətiniz boşdur.</p>
+                    <a href="/products/" class="btn btn-primary">Məhsullara bax</a>
+                `;
+                container.appendChild(emptyCartDiv);
+            }
         } else {
             showMessage('error', data.message);
         }

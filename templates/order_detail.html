@@ -58,6 +58,7 @@
             <tr>
                 <th>Şəkil</th>
                 <th>Məhsul</th>
+                <th>Firma</th>
                 <th>Brend Kodu</th>
                 <th>OEM</th>
                 <th>Miqdar</th>
@@ -72,6 +73,7 @@
                     <img src="{{ item.mehsul.sekil.url }}" alt="{{ item.mehsul.adi }}" class="product-image">
                 </td>
                 <td>{{ item.mehsul.adi }}</td>
+                <td>{{ item.mehsul.firma.adi }}</td>
                 <td>{{ item.mehsul.brend_kod }}</td>
                 <td>{{ item.mehsul.oem }}</td>
                 <td>{{ item.miqdar }} ədəd</td>

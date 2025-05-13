@@ -206,6 +206,7 @@ JAZZMIN_SETTINGS = {
         "home.Avtomobil": "fa-solid fa-car",
         "home.Mehsul": "fa-solid fa-boxes-stacked",
         "home.Sifaris": "fa-solid fa-clipboard-list",
+        "home.Vitrin": "fa-solid fa-list",
     },
 }
 

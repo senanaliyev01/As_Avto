@@ -349,7 +349,7 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     margin: 2rem auto;
     overflow-x: auto; /* horizontal scroll əlavə edirik */
-    max-width: 95%;
+    width: 100%;
     padding: 1rem;
 }
 
@@ -1704,5 +1704,178 @@ body {
     
     .cart-container .update-form {
         flex-direction: column;
+    }
+}
+
+/* Orders və Order Detail Table Styles */
+.table-container {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin: 2rem auto;
+    overflow-x: auto;
+    width: 100%;
+    padding: 1rem;
+}
+
+/* Orders Table */
+.orders-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 0 auto;
+    text-align: center;
+    table-layout: fixed;
+    min-width: 900px;
+}
+
+.orders-table th,
+.orders-table td {
+    padding: 8px 6px;
+    border: 1px solid #e9ecef;
+    vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Orders Table Column Widths */
+.orders-table th:nth-child(1), /* Sifariş № */
+.orders-table td:nth-child(1) {
+    width: 80px;
+    min-width: 80px;
+}
+
+.orders-table th:nth-child(2), /* Tarix */
+.orders-table td:nth-child(2) {
+    width: 120px;
+    min-width: 120px;
+}
+
+.orders-table th:nth-child(3), /* Status */
+.orders-table td:nth-child(3) {
+    width: 120px;
+    min-width: 120px;
+}
+
+.orders-table th:nth-child(4), /* Çatdırılma */
+.orders-table td:nth-child(4) {
+    width: 140px;
+    min-width: 140px;
+}
+
+.orders-table th:nth-child(5), /* Ümumi Məbləğ */
+.orders-table td:nth-child(5),
+.orders-table th:nth-child(6), /* Ödənilən */
+.orders-table td:nth-child(6),
+.orders-table th:nth-child(7), /* Qalıq Borc */
+.orders-table td:nth-child(7) {
+    width: 100px;
+    min-width: 100px;
+}
+
+/* Order Detail Table */
+.order-items .table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 0 auto;
+    text-align: center;
+    table-layout: fixed;
+    min-width: 1000px;
+}
+
+.order-items .table th,
+.order-items .table td {
+    padding: 8px 6px;
+    border: 1px solid #e9ecef;
+    vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Order Detail Table Column Widths */
+.order-items .table th:nth-child(1), /* Şəkil */
+.order-items .table td:nth-child(1) {
+    width: 60px;
+    min-width: 60px;
+}
+
+.order-items .table th:nth-child(2), /* Məhsul */
+.order-items .table td:nth-child(2) {
+    width: 200px;
+    min-width: 200px;
+}
+
+.order-items .table th:nth-child(3), /* Firma */
+.order-items .table td:nth-child(3) {
+    width: 120px;
+    min-width: 120px;
+}
+
+.order-items .table th:nth-child(4), /* Brend Kodu */
+.order-items .table td:nth-child(4),
+.order-items .table th:nth-child(5), /* OEM */
+.order-items .table td:nth-child(5) {
+    width: 120px;
+    min-width: 120px;
+}
+
+.order-items .table th:nth-child(6), /* Miqdar */
+.order-items .table td:nth-child(6) {
+    width: 80px;
+    min-width: 80px;
+}
+
+.order-items .table th:nth-child(7), /* Qiymət */
+.order-items .table td:nth-child(7),
+.order-items .table th:nth-child(8), /* Cəmi */
+.order-items .table td:nth-child(8) {
+    width: 100px;
+    min-width: 100px;
+}
+
+/* Shared Table Styles */
+.table th {
+    background: #f8f9fa;
+    color: #2c3e50;
+    font-weight: 600;
+    text-align: center;
+    font-size: 14px;
+}
+
+.table .product-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Status və Delivery Badge-lər */
+.status-badge,
+.delivery-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .table-container {
+        margin: 1rem 0;
+        padding: 0.5rem;
+        border-radius: 0;
+    }
+    
+    .table th,
+    .table td {
+        padding: 6px 4px;
+        font-size: 12px;
     }
 }

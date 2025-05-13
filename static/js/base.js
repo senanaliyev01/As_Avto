@@ -399,12 +399,14 @@ function initializeUserDropdown() {
         userButton.addEventListener('click', function(e) {
             e.stopPropagation();
             dropdownContent.classList.toggle('active');
+            userButton.classList.toggle('active'); // Ox işarəsini çevirmək üçün
         });
 
         // Səhifənin istənilən yerinə klik edildikdə dropdown-u bağlayırıq
         document.addEventListener('click', function(e) {
             if (!dropdownContent.contains(e.target)) {
                 dropdownContent.classList.remove('active');
+                userButton.classList.remove('active'); // Ox işarəsini geri qaytarmaq üçün
             }
         });
     }

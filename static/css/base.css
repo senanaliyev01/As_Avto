@@ -1891,16 +1891,18 @@ body {
 }
 
 .user-button {
-    width: 32px;
+    width: auto;
     height: 32px;
     border: 1px solid #dcdde1;
-    border-radius: 50%;
+    border-radius: 16px;
     background-color: white;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
+    padding: 0 12px;
+    gap: 8px;
 }
 
 .user-button i {
@@ -1908,8 +1910,13 @@ body {
     font-size: 14px;
 }
 
-.user-button:hover {
-    background-color: #f8f9fa;
+.user-button .fa-chevron-down {
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.user-button.active .fa-chevron-down {
+    transform: rotate(180deg);
 }
 
 .user-dropdown-content {
@@ -1925,14 +1932,23 @@ body {
     z-index: 1000;
 }
 
-/* Remove hover style */
-/* .user-dropdown:hover .user-dropdown-content {
-    display: block;
-} */
-
 /* Add active class for dropdown */
 .user-dropdown-content.active {
     display: block;
+}
+
+/* Add dropdown arrow */
+.user-dropdown-content::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 15px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid white;
+    filter: drop-shadow(0 -2px 2px rgba(0,0,0,0.1));
 }
 
 .user-name {

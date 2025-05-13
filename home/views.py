@@ -7,6 +7,8 @@ from decimal import Decimal
 from django.contrib import messages
 import re
 from django.http import JsonResponse, HttpResponseNotFound
+from django.db.models.functions import Lower
+from django.db.models import Value
 
 def custom_404(request, exception=None):
     return HttpResponseNotFound(render(request, '404.html').content)
@@ -37,28 +39,41 @@ def products_view(request):
     firma = request.GET.get('firma', '')
     avtomobil = request.GET.get('avtomobil', '')
     
-    mehsullar = Mehsul.objects.all().order_by('-id')  # Ən son əlavə edilən məhsullardan başla
+    mehsullar = Mehsul.objects.all().order_by('-id')
     
     if search_query:
         # Xüsusi simvolları və boşluqları təmizlə
-        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query)
+        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         
         # Axtarış sözlərini ayır və təmizlə
         search_words = search_query.lower().split()
+        clean_words = [re.sub(r'[^a-zA-Z0-9]', '', word) for word in search_words if word]
         
-        if clean_search:  # Əgər təmizlənmiş kod axtarışı mətni boş deyilsə
+        if clean_search:
             # Kod ilə axtarış
             code_query = Q(kodlar__icontains=clean_search)
             
-            # Ad ilə axtarış - bütün sözləri AND ilə birləşdir
-            name_query = Q()
-            if search_words:
-                name_query = Q(adi__icontains=search_words[0])
-                for word in search_words[1:]:
-                    name_query &= Q(adi__icontains=word)
+            # Ad ilə axtarış üçün annotation əlavə et
+            mehsullar = mehsullar.annotate(
+                clean_name=Lower('adi'),
+                clean_name_no_special=Value('')
+            )
+            
+            # Təmizlənmiş ad ilə axtarış
+            name_queries = Q()
+            
+            # Birləşik axtarış üçün
+            name_queries |= Q(clean_name__icontains=clean_search)
+            
+            # Bütün sözlərin olması üçün
+            if clean_words:
+                word_query = Q(clean_name__icontains=clean_words[0])
+                for word in clean_words[1:]:
+                    word_query &= Q(clean_name__icontains=word)
+                name_queries |= word_query
             
             # Kod və ya ad ilə axtarış
-            mehsullar = mehsullar.filter(code_query | name_query).distinct()
+            mehsullar = mehsullar.filter(code_query | name_queries).distinct()
     
     if kateqoriya:
         mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)
@@ -304,24 +319,37 @@ def search_suggestions(request):
     
     if search_query:
         # Xüsusi simvolları və boşluqları təmizlə
-        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query)
+        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         
-        # Axtarış sözlərini ayır
+        # Axtarış sözlərini ayır və təmizlə
         search_words = search_query.lower().split()
+        clean_words = [re.sub(r'[^a-zA-Z0-9]', '', word) for word in search_words if word]
         
-        if clean_search or search_words:
+        if clean_search or clean_words:
             # Kod ilə axtarış
             code_query = Q(kodlar__icontains=clean_search)
             
-            # Ad ilə axtarış - bütün sözləri AND ilə birləşdir
-            name_query = Q()
-            if search_words:
-                name_query = Q(adi__icontains=search_words[0])
-                for word in search_words[1:]:
-                    name_query &= Q(adi__icontains=word)
+            # Ad ilə axtarış üçün annotation əlavə et
+            mehsullar = Mehsul.objects.annotate(
+                clean_name=Lower('adi'),
+                clean_name_no_special=Value('')
+            )
+            
+            # Təmizlənmiş ad ilə axtarış
+            name_queries = Q()
+            
+            # Birləşik axtarış üçün
+            name_queries |= Q(clean_name__icontains=clean_search)
+            
+            # Bütün sözlərin olması üçün
+            if clean_words:
+                word_query = Q(clean_name__icontains=clean_words[0])
+                for word in clean_words[1:]:
+                    word_query &= Q(clean_name__icontains=word)
+                name_queries |= word_query
             
             # Kod və ya ad ilə axtarış
-            mehsullar = Mehsul.objects.filter(code_query | name_query).distinct()[:5]
+            mehsullar = mehsullar.filter(code_query | name_queries).distinct()[:5]
             
             suggestions = []
             for mehsul in mehsullar:

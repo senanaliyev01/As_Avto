@@ -188,41 +188,41 @@ function removeFromCart(productId) {
                 row.remove();
             }
             
-            // Update cart counter
+            // Update cart counter in header
             if (data.cart_count !== undefined) {
                 updateCartCounter(data.cart_count);
                 
-                // Update cart header count
+                // Update cart count in header title
                 const cartHeader = document.querySelector('.cart-header h2');
                 if (cartHeader) {
-                    const warningSpan = cartHeader.querySelector('.update-warning');
-                    cartHeader.textContent = `Səbətim (${data.cart_count}) `;
-                    if (warningSpan) {
-                        cartHeader.appendChild(warningSpan);
-                    }
+                    const newText = cartHeader.innerHTML.replace(/\(\d+\)/, `(${data.cart_count})`);
+                    cartHeader.innerHTML = newText;
                 }
             }
             
             // Update total and check if cart is empty
             const remainingItems = document.querySelectorAll('.cart-item');
             if (remainingItems.length === 0) {
-                // Hide cart container and show empty cart message
+                // Hide cart table and summary
                 const cartContainer = document.querySelector('.cart-container');
-                const emptyCart = document.querySelector('.empty-cart');
-                
                 if (cartContainer) {
                     cartContainer.style.display = 'none';
                 }
-                if (emptyCart) {
-                    emptyCart.style.display = 'block';
-                }
+                
+                // Show empty cart message
+                const emptyCart = document.createElement('div');
+                emptyCart.className = 'empty-cart';
+                emptyCart.innerHTML = `
+                    <p>Səbətiniz boşdur.</p>
+                    <a href="/products/" class="btn btn-primary">Məhsullara bax</a>
+                `;
+                document.querySelector('.container').appendChild(emptyCart);
             } else {
                 // Update selected total
                 updateSelectedTotal();
+                // Update cart total
+                updateCartTotal();
             }
-            
-            // Update cart total
-            updateCartTotal();
         } else {
             showMessage('error', data.message);
         }
@@ -379,4 +379,31 @@ function updateCartCounter(count) {
 function getCartCount() {
     const cart = JSON.parse(sessionStorage.getItem('cart') || '{}');
     return Object.keys(cart).length;
+}
+
+// Function to update selected total
+function updateSelectedTotal() {
+    const checkboxes = document.querySelectorAll('.item-checkbox');
+    const selectedTotal = document.getElementById('selected-total');
+    const checkoutButton = document.getElementById('checkout-button');
+
+    if (checkboxes.length > 0 && selectedTotal && checkoutButton) {
+        let total = 0;
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                const row = checkbox.closest('tr');
+                const subtotalText = row.querySelector('td:nth-last-child(2)').textContent;
+                const subtotal = Number(subtotalText.replace(' ₼', '').replace(',', '.'));
+                total += subtotal;
+                row.classList.add('selected');
+            } else {
+                checkbox.closest('tr').classList.remove('selected');
+            }
+        });
+        const formattedTotal = total.toFixed(2).replace('.', ',');
+        selectedTotal.textContent = formattedTotal + ' ₼';
+        
+        const hasSelectedItems = Array.from(checkboxes).some(checkbox => checkbox.checked);
+        checkoutButton.disabled = !hasSelectedItems;
+    }
 }

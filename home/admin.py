@@ -306,9 +306,21 @@ class SifarisAdmin(admin.ModelAdmin):
         elements.append(Paragraph(f"Sifariş №{sifaris_id}", styles['Title']))
         elements.append(Spacer(1, 20))
 
-        # Sifariş məlumatları
+        # Sifariş məlumatları - Tarixi Azərbaycan formatında göstəririk
         elements.append(Paragraph(f"Müştəri: {sifaris.istifadeci.username}", styles['Normal']))
-        elements.append(Paragraph(f"Tarix: {sifaris.tarix.strftime('%d.%m.%Y %H:%M')}", styles['Normal']))
+        
+        # Tarixi Azərbaycan formatında göstəririk
+        az_months = {
+            1: 'Yanvar', 2: 'Fevral', 3: 'Mart', 4: 'Aprel',
+            5: 'May', 6: 'İyun', 7: 'İyul', 8: 'Avqust',
+            9: 'Sentyabr', 10: 'Oktyabr', 11: 'Noyabr', 12: 'Dekabr'
+        }
+        
+        # Tarixi lokal vaxta çeviririk
+        local_time = timezone.localtime(sifaris.tarix)
+        az_date = f"{local_time.day} {az_months[local_time.month]} {local_time.year}, {local_time.strftime('%H:%M')}"
+        elements.append(Paragraph(f"Tarix: {az_date}", styles['Normal']))
+        
         elements.append(Paragraph(f"Çatdırılma: {sifaris.get_catdirilma_usulu_display()}", styles['Normal']))
         elements.append(Spacer(1, 20))
 

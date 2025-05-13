@@ -65,13 +65,6 @@
                 <form method="get" action="{% url 'products' %}" class="search-form">
                     <div class="search-grid">
                         <div class="search-item">
-                            <!-- <label for="query">Məhsul Adı</label> -->
-                            <div class="search-container">
-                                <input type="text" id="query" name="search" placeholder="Kodu daxil edin..." value="{{ request.GET.search }}" autocomplete="off">
-                                <div id="search-results" class="search-results"></div>
-                            </div>
-                        </div>
-                        <div class="search-item">
                             <!-- <label for="category">Kateqoriya</label> -->
                             <select id="category" name="kateqoriya">
                                 <option value="">Bütün kateqoriyalar</option>
@@ -97,6 +90,13 @@
                                 <option value="{{ model.adi }}" {% if request.GET.avtomobil == model.adi %}selected{% endif %}>{{ model.adi }}</option>
                                 {% endfor %}
                             </select>
+                        </div>
+                        <div class="search-item">
+                            <!-- <label for="query">Məhsul Adı</label> -->
+                            <div class="search-container">
+                                <input type="text" id="query" name="search" placeholder="Kodu daxil edin..." value="{{ request.GET.search }}" autocomplete="off">
+                                <div id="search-results" class="search-results"></div>
+                            </div>
                         </div>
                         <div class="search-item search-button">
                             <button type="submit" class="search-icon-button">

@@ -200,13 +200,13 @@ JAZZMIN_SETTINGS = {
         "auth": "fas fa-users-cog",
         "auth.user": "fas fa-user",
         "auth.Group": "fas fa-users",
-        "istifadeciler.Profile": "fas fa-user",
         "home.Firma": "fas fa-industry icon",
         "home.Kateqoriya": "fa-solid fa-list-check",
         "home.Avtomobil": "fa-solid fa-car",
         "home.Mehsul": "fa-solid fa-boxes-stacked",
         "home.Sifaris": "fa-solid fa-clipboard-list",
         "home.Vitrin": "fa-solid fa-list",
+        "home.PopupImage": "fa-solid fa-image",
     },
 }
 

@@ -42,8 +42,21 @@ def products_view(request):
     if search_query:
         # Xüsusi simvolları və boşluqları təmizlə
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query)
-        if clean_search:  # Əgər təmizlənmiş axtarış mətni boş deyilsə
-            mehsullar = mehsullar.filter(kodlar__icontains=clean_search)
+        
+        # Axtarış sözlərini ayır və təmizlə
+        search_words = search_query.lower().split()
+        
+        if clean_search:  # Əgər təmizlənmiş kod axtarışı mətni boş deyilsə
+            # Kod və ad ilə axtarış üçün Q obyektləri
+            code_query = Q(kodlar__icontains=clean_search)
+            name_query = Q()
+            
+            # Hər bir axtarış sözü üçün ad ilə axtarış şərtini əlavə et
+            for word in search_words:
+                name_query |= Q(adi__icontains=word)
+            
+            # Kod və ya ad ilə axtarış
+            mehsullar = mehsullar.filter(code_query | name_query).distinct()
     
     if kateqoriya:
         mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)
@@ -290,8 +303,22 @@ def search_suggestions(request):
     if search_query:
         # Xüsusi simvolları və boşluqları təmizlə
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query)
-        if clean_search:
-            mehsullar = Mehsul.objects.filter(kodlar__icontains=clean_search)[:5]
+        
+        # Axtarış sözlərini ayır
+        search_words = search_query.lower().split()
+        
+        if clean_search or search_words:
+            # Kod və ad ilə axtarış üçün Q obyektləri
+            code_query = Q(kodlar__icontains=clean_search)
+            name_query = Q()
+            
+            # Hər bir axtarış sözü üçün ad ilə axtarış şərtini əlavə et
+            for word in search_words:
+                name_query |= Q(adi__icontains=word)
+            
+            # Kod və ya ad ilə axtarış
+            mehsullar = Mehsul.objects.filter(code_query | name_query).distinct()[:5]
+            
             suggestions = []
             for mehsul in mehsullar:
                 suggestions.append({

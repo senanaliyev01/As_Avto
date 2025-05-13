@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!modal) return;
 
     const closeBtn = document.querySelector('.popup-close');
+    const yeniliklerLink = document.getElementById('yeniliklerLink');
     
     // Check if we should show the popup
     function shouldShowPopup() {
@@ -52,6 +53,16 @@ document.addEventListener('DOMContentLoaded', function() {
     if (shouldShowPopup()) {
         modal.style.display = 'block';
         localStorage.setItem('lastPopupShown', Date.now().toString());
+    }
+
+    // Yenilikler linkine klik edəndə modalı göstər
+    if (yeniliklerLink) {
+        yeniliklerLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            modal.style.display = 'block';
+            // Popup göstərilmə vaxtını yenilə
+            localStorage.setItem('lastPopupShown', Date.now().toString());
+        });
     }
 
     // Close modal when clicking close button

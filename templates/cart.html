@@ -26,8 +26,8 @@
                     <th>Firma</th>
                     <th>Brend Kodu</th>
                     <th>OEM</th>
-                    <th>Qiymət</th>
                     <th>Stok</th>
+                    <th>Qiymət</th>
                     <th>Miqdar</th>
                     <th>Cəmi</th>
                     <th>Sil</th>
@@ -44,8 +44,8 @@
                         <td>{{ item.product.firma.adi }}</td>
                         <td>{{ item.product.brend_kod }}</td>
                         <td>{{ item.product.oem }}</td>
-                        <td>{{ item.product.qiymet }} ₼</td>
                         <td>{{ item.product.stok }}</td>
+                        <td>{{ item.product.qiymet }} ₼</td>
                         <td>
                             <div class="quantity-control">
                                 <form method="POST" action="{% url 'update_cart' item.product.id %}" class="update-form">

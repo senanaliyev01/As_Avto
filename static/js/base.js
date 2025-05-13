@@ -191,9 +191,37 @@ function removeFromCart(productId) {
             // Update cart counter
             if (data.cart_count !== undefined) {
                 updateCartCounter(data.cart_count);
+                
+                // Update cart header count
+                const cartHeader = document.querySelector('.cart-header h2');
+                if (cartHeader) {
+                    const warningSpan = cartHeader.querySelector('.update-warning');
+                    cartHeader.textContent = `Səbətim (${data.cart_count}) `;
+                    if (warningSpan) {
+                        cartHeader.appendChild(warningSpan);
+                    }
+                }
             }
             
-            // Update total if needed
+            // Update total and check if cart is empty
+            const remainingItems = document.querySelectorAll('.cart-item');
+            if (remainingItems.length === 0) {
+                // Hide cart container and show empty cart message
+                const cartContainer = document.querySelector('.cart-container');
+                const emptyCart = document.querySelector('.empty-cart');
+                
+                if (cartContainer) {
+                    cartContainer.style.display = 'none';
+                }
+                if (emptyCart) {
+                    emptyCart.style.display = 'block';
+                }
+            } else {
+                // Update selected total
+                updateSelectedTotal();
+            }
+            
+            // Update cart total
             updateCartTotal();
         } else {
             showMessage('error', data.message);

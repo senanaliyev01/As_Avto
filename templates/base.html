@@ -22,6 +22,15 @@
                             <img src="{% static 'images/Header_Logo.png' %}" alt="As Avto" class="logo-img">
                         </a>
                     </div>
+                    <div class="news-button-container">
+                        {% if popup_images %}
+                        <button class="news-button" onclick="showPopupModal()">
+                            <i class="fas fa-bell"></i>
+                            <span class="pulse-dot"></span>
+                            Yeniliklər
+                        </button>
+                        {% endif %}
+                    </div>
                     <div class="header-right">
                         <nav class="main-nav">
                             <ul>
@@ -29,13 +38,6 @@
                                 <li><a href="{% url 'products' %}" class="nav-link {% if request.resolver_match.url_name == 'products' %}active{% endif %}"><i class="fas fa-box"></i> Məhsullar</a></li>
                                 <li><a href="{% url 'new_products' %}" class="nav-link {% if request.resolver_match.url_name == 'new_products' %}active{% endif %}"><i class="fas fa-star"></i> Yeni Məhsullar</a></li>
                                 <li><a href="{% url 'orders' %}" class="nav-link {% if request.resolver_match.url_name == 'orders' %}active{% endif %}"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a></li>
-                                <li>
-                                    <a href="javascript:void(0)" class="nav-link news-button" onclick="showPopupModal()">
-                                        <i class="fas fa-bell"></i>
-                                        <span class="pulse-dot"></span>
-                                        Yeniliklər
-                                    </a>
-                                </li>
                                 <li>
                                     <a href="{% url 'cart' %}" class="nav-link {% if request.resolver_match.url_name == 'cart' %}active{% endif %}">
                                         <span class="cart-icon">

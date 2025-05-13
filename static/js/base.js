@@ -469,8 +469,33 @@ function initializeUserDropdown() {
 function showPopupModal() {
     const modal = document.getElementById('popupModal');
     if (modal) {
+        // Initialize Swiper if not already initialized
+        if (!modal.swiper) {
+            modal.swiper = new Swiper('.popup-swiper', {
+                loop: true,
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true
+                },
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+                autoplay: {
+                    delay: 5000,
+                    disableOnInteraction: false,
+                },
+            });
+        }
+        
         modal.style.display = 'block';
         // Update last shown time
         localStorage.setItem('lastPopupShown', Date.now().toString());
+        
+        // Refresh Swiper
+        if (modal.swiper) {
+            modal.swiper.update();
+            modal.swiper.autoplay.start();
+        }
     }
 }

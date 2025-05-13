@@ -464,3 +464,13 @@ function initializeUserDropdown() {
         });
     }
 }
+
+// Function to show popup modal
+function showPopupModal() {
+    const modal = document.getElementById('popupModal');
+    if (modal) {
+        modal.style.display = 'block';
+        // Update last shown time
+        localStorage.setItem('lastPopupShown', Date.now().toString());
+    }
+}

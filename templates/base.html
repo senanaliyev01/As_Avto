@@ -30,6 +30,13 @@
                                 <li><a href="{% url 'new_products' %}" class="nav-link {% if request.resolver_match.url_name == 'new_products' %}active{% endif %}"><i class="fas fa-star"></i> Yeni Məhsullar</a></li>
                                 <li><a href="{% url 'orders' %}" class="nav-link {% if request.resolver_match.url_name == 'orders' %}active{% endif %}"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a></li>
                                 <li>
+                                    <a href="javascript:void(0)" class="nav-link news-button" onclick="showPopupModal()">
+                                        <i class="fas fa-bell"></i>
+                                        <span class="pulse-dot"></span>
+                                        Yeniliklər
+                                    </a>
+                                </li>
+                                <li>
                                     <a href="{% url 'cart' %}" class="nav-link {% if request.resolver_match.url_name == 'cart' %}active{% endif %}">
                                         <span class="cart-icon">
                                             <i class="fas fa-shopping-cart"></i>

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Kateqoriya, Firma, Avtomobil, Mehsul, Sifaris, SifarisItem
+from .models import Kateqoriya, Firma, Avtomobil, Mehsul, Sifaris, SifarisItem, Vitrin
 from django.core.exceptions import ValidationError
 from django.utils.html import format_html
 from django.urls import path
@@ -22,6 +22,11 @@ from django.db import transaction
 class KateqoriyaAdmin(admin.ModelAdmin):
     list_display = ['adi']
     search_fields = ['adi']
+
+@admin.register(Vitrin)
+class VitrinAdmin(admin.ModelAdmin):
+    list_display = ['nomre']
+    search_fields = ['nomre']
 
 @admin.register(Firma)
 class FirmaAdmin(admin.ModelAdmin):

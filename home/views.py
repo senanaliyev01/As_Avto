@@ -47,13 +47,15 @@ def products_view(request):
         search_words = search_query.lower().split()
         
         if clean_search:  # Əgər təmizlənmiş kod axtarışı mətni boş deyilsə
-            # Kod və ad ilə axtarış üçün Q obyektləri
+            # Kod ilə axtarış
             code_query = Q(kodlar__icontains=clean_search)
-            name_query = Q()
             
-            # Hər bir axtarış sözü üçün ad ilə axtarış şərtini əlavə et
-            for word in search_words:
-                name_query |= Q(adi__icontains=word)
+            # Ad ilə axtarış - bütün sözləri AND ilə birləşdir
+            name_query = Q()
+            if search_words:
+                name_query = Q(adi__icontains=search_words[0])
+                for word in search_words[1:]:
+                    name_query &= Q(adi__icontains=word)
             
             # Kod və ya ad ilə axtarış
             mehsullar = mehsullar.filter(code_query | name_query).distinct()
@@ -308,13 +310,15 @@ def search_suggestions(request):
         search_words = search_query.lower().split()
         
         if clean_search or search_words:
-            # Kod və ad ilə axtarış üçün Q obyektləri
+            # Kod ilə axtarış
             code_query = Q(kodlar__icontains=clean_search)
-            name_query = Q()
             
-            # Hər bir axtarış sözü üçün ad ilə axtarış şərtini əlavə et
-            for word in search_words:
-                name_query |= Q(adi__icontains=word)
+            # Ad ilə axtarış - bütün sözləri AND ilə birləşdir
+            name_query = Q()
+            if search_words:
+                name_query = Q(adi__icontains=search_words[0])
+                for word in search_words[1:]:
+                    name_query &= Q(adi__icontains=word)
             
             # Kod və ya ad ilə axtarış
             mehsullar = Mehsul.objects.filter(code_query | name_query).distinct()[:5]

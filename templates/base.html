@@ -26,12 +26,12 @@
                         <nav class="main-nav">
                             <ul>
                                 <!-- <li><a href="{% url 'base' %}" class="nav-link {% if request.resolver_match.url_name == 'base' %}active{% endif %}"><i class="fas fa-home"></i> Ana Səhifə</a></li> -->
-                                <li><a href="{% url 'products' %}" class="nav-link {% if request.resolver_match.url_name == 'products' %}active{% endif %}"><i class="fas fa-box"></i> Məhsullar</a></li>
                                 <li>
                                     <button id="showPopupBtn" class="nav-link popup-btn">
                                         <i class="fas fa-bullhorn"></i> Yeniliklər
                                     </button>
                                 </li>
+                                <li><a href="{% url 'products' %}" class="nav-link {% if request.resolver_match.url_name == 'products' %}active{% endif %}"><i class="fas fa-box"></i> Məhsullar</a></li>
                                 <li><a href="{% url 'new_products' %}" class="nav-link {% if request.resolver_match.url_name == 'new_products' %}active{% endif %}"><i class="fas fa-star"></i> Yeni Məhsullar</a></li>
                                 <li><a href="{% url 'orders' %}" class="nav-link {% if request.resolver_match.url_name == 'orders' %}active{% endif %}"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a></li>
                                 <li>

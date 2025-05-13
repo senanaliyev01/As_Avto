@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize Swiper
     initializeSwiper();
+
+    // User dropdown functionality
+    initializeUserDropdown();
 });
 
 function initializeSearch() {
@@ -385,4 +388,24 @@ function updateCartCounter(count) {
 function getCartCount() {
     const cart = JSON.parse(sessionStorage.getItem('cart') || '{}');
     return Object.keys(cart).length;
+}
+
+function initializeUserDropdown() {
+    const userButton = document.querySelector('.user-button');
+    const dropdownContent = document.querySelector('.user-dropdown-content');
+
+    if (userButton && dropdownContent) {
+        // Düyməyə klik hadisəsini əlavə edirik
+        userButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            dropdownContent.classList.toggle('active');
+        });
+
+        // Səhifənin istənilən yerinə klik edildikdə dropdown-u bağlayırıq
+        document.addEventListener('click', function(e) {
+            if (!dropdownContent.contains(e.target)) {
+                dropdownContent.classList.remove('active');
+            }
+        });
+    }
 }

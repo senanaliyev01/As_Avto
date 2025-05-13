@@ -40,7 +40,17 @@ class Avtomobil(models.Model):
         verbose_name = 'Avtomobil'
         verbose_name_plural = 'Avtomobillər'
 
+class Vitrin(models.Model):
+    nomre = models.CharField(max_length=100, null=True, blank=True)
 
+    def __str__(self):
+        return f"{self.nomre}"
+    
+    class Meta:
+        verbose_name = 'Vitrin'
+        verbose_name_plural = 'Vitrinlər'
+
+    
 class Mehsul(models.Model):
     adi = models.CharField(max_length=100)
     kateqoriya = models.ForeignKey(Kateqoriya,on_delete=models.CASCADE, null=True, blank=True)
@@ -49,7 +59,7 @@ class Mehsul(models.Model):
     brend_kod = models.CharField(max_length=100)
     oem = models.CharField(max_length=100)
     olcu = models.CharField(max_length=50,null=True,blank=True)
-    vitrin = models.CharField(max_length=100,null=True,blank=True)
+    vitrin = models.ForeignKey(Vitrin,on_delete=models.CASCADE,null=True,blank=True)
     maya_qiymet = models.DecimalField(max_digits=10, decimal_places=2)
     qiymet = models.DecimalField(max_digits=10, decimal_places=2)
     stok = models.IntegerField()

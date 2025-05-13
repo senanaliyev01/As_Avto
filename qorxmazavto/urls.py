@@ -22,7 +22,7 @@ from django.conf.urls.static import static
 handler404 = 'home.views.custom_404'
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin-as-avto-1983-2002/', admin.site.urls),
     path('', include('home.urls')),
 ]
 

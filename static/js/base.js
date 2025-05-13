@@ -188,40 +188,18 @@ function removeFromCart(productId) {
                 row.remove();
             }
             
-            // Update cart counter in header
+            // Update cart counter
             if (data.cart_count !== undefined) {
                 updateCartCounter(data.cart_count);
-                
-                // Update cart count in header title
-                const cartHeader = document.querySelector('.cart-header h2');
-                if (cartHeader) {
-                    const newText = cartHeader.innerHTML.replace(/\(\d+\)/, `(${data.cart_count})`);
-                    cartHeader.innerHTML = newText;
-                }
             }
             
             // Update total and check if cart is empty
-            const remainingItems = document.querySelectorAll('.cart-item');
-            if (remainingItems.length === 0) {
-                // Hide cart table and summary
-                const cartContainer = document.querySelector('.cart-container');
-                if (cartContainer) {
-                    cartContainer.style.display = 'none';
-                }
-                
-                // Show empty cart message
-                const emptyCart = document.createElement('div');
-                emptyCart.className = 'empty-cart';
-                emptyCart.innerHTML = `
-                    <p>Səbətiniz boşdur.</p>
-                    <a href="/products/" class="btn btn-primary">Məhsullara bax</a>
-                `;
-                document.querySelector('.container').appendChild(emptyCart);
-            } else {
-                // Update selected total
-                updateSelectedTotal();
-                // Update cart total
-                updateCartTotal();
+            updateCartTotal();
+            
+            // If cart is empty now, show empty cart message
+            const tbody = document.querySelector('.table tbody');
+            if (!tbody || tbody.children.length === 0) {
+                showEmptyCartMessage();
             }
         } else {
             showMessage('error', data.message);
@@ -266,13 +244,47 @@ function updateCartTotal() {
         totalElement.textContent = total.toFixed(2).replace('.', ',') + ' ₼';
     }
     
-    // If cart is empty, show empty cart message
-    const cartTable = document.querySelector('.table');
-    const emptyCartMessage = document.querySelector('.empty-cart');
+    // Reset selected total when updating cart
+    const selectedTotal = document.getElementById('selected-total');
+    if (selectedTotal) {
+        selectedTotal.textContent = '0,00 ₼';
+    }
     
-    if (subtotalElements.length === 0) {
-        if (cartTable) cartTable.style.display = 'none';
-        if (emptyCartMessage) emptyCartMessage.style.display = 'block';
+    // Disable checkout button when updating cart
+    const checkoutButton = document.getElementById('checkout-button');
+    if (checkoutButton) {
+        checkoutButton.disabled = true;
+    }
+    
+    // Uncheck "select all" checkbox
+    const selectAll = document.getElementById('select-all');
+    if (selectAll) {
+        selectAll.checked = false;
+    }
+}
+
+// Function to show empty cart message
+function showEmptyCartMessage() {
+    const cartContainer = document.querySelector('.cart-container');
+    const cartHeader = document.querySelector('.cart-header');
+    
+    if (cartContainer) {
+        cartContainer.remove();
+    }
+    
+    if (cartHeader) {
+        cartHeader.remove();
+    }
+    
+    const container = document.querySelector('.container');
+    if (container) {
+        const emptyCartDiv = document.createElement('div');
+        emptyCartDiv.className = 'empty-cart';
+        emptyCartDiv.innerHTML = `
+            <p>Səbətiniz boşdur.</p>
+            <a href="/products/" class="btn btn-primary">Məhsullara bax</a>
+        `;
+        container.appendChild(emptyCartDiv);
     }
 }
 
@@ -379,31 +391,4 @@ function updateCartCounter(count) {
 function getCartCount() {
     const cart = JSON.parse(sessionStorage.getItem('cart') || '{}');
     return Object.keys(cart).length;
-}
-
-// Function to update selected total
-function updateSelectedTotal() {
-    const checkboxes = document.querySelectorAll('.item-checkbox');
-    const selectedTotal = document.getElementById('selected-total');
-    const checkoutButton = document.getElementById('checkout-button');
-
-    if (checkboxes.length > 0 && selectedTotal && checkoutButton) {
-        let total = 0;
-        checkboxes.forEach(checkbox => {
-            if (checkbox.checked) {
-                const row = checkbox.closest('tr');
-                const subtotalText = row.querySelector('td:nth-last-child(2)').textContent;
-                const subtotal = Number(subtotalText.replace(' ₼', '').replace(',', '.'));
-                total += subtotal;
-                row.classList.add('selected');
-            } else {
-                checkbox.closest('tr').classList.remove('selected');
-            }
-        });
-        const formattedTotal = total.toFixed(2).replace('.', ',');
-        selectedTotal.textContent = formattedTotal + ' ₼';
-        
-        const hasSelectedItems = Array.from(checkboxes).some(checkbox => checkbox.checked);
-        checkoutButton.disabled = !hasSelectedItems;
-    }
 }

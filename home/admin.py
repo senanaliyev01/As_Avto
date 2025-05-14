@@ -284,6 +284,7 @@ class SifarisAdmin(admin.ModelAdmin):
     def export_pdf(self, request, sifaris_id):
         sifaris = Sifaris.objects.get(id=sifaris_id)
         sifaris_items = sifaris.sifarisitem_set.all()
+        statistics = Sifaris.get_order_statistics(sifaris.istifadeci)
 
         # PDF yaratmaq
         response = HttpResponse(content_type='application/pdf')
@@ -430,7 +431,7 @@ class SifarisAdmin(admin.ModelAdmin):
 
         total_data = [
             [Paragraph('Ümumi Cəmi :', totalStyle), Paragraph(f"{total_amount} ₼", amountStyle)],
-            [Paragraph('Ümumi Borc :', totalStyle), Paragraph(f"{sifaris.qaliq_borc} ₼", amountStyle)]
+            [Paragraph('Ümumi Borc :', totalStyle), Paragraph(f"{statistics['umumi_borc']} ₼", amountStyle)]
         ]
 
         total_table = Table(total_data, colWidths=[100, 100])

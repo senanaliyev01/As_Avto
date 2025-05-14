@@ -39,7 +39,7 @@
                         <td>
                             <input type="checkbox" name="selected_items[]" value="{{ item.product.id }}" class="item-checkbox select-checkbox" form="checkout-form">
                         </td>
-                        <td><img src="{{ item.product.sekil.url }}" alt="{{ item.product.adi }}" class="product-image"></td>
+                        <td><img src="{{ item.product.sekil.url }}" alt="{{ item.product.adi }}" class="product-image" onclick="openImageModal('{{ item.product.sekil.url }}')"></td>
                         <td>{{ item.product.adi }}</td>
                         <td>{{ item.product.firma.adi }}</td>
                         <td>{{ item.product.brend_kod }}</td>
@@ -96,6 +96,14 @@
             <a href="{% url 'products' %}" class="btn btn-primary">Məhsullara bax</a>
         </div>
     {% endif %}
+</div>
+
+<!-- Image Modal -->
+<div id="imageModal" class="image-modal">
+    <span class="image-modal-close">&times;</span>
+    <div class="modal-image-content">
+        <img id="modalImage" class="modal-image" src="" alt="Modal Image">
+    </div>
 </div>
 
 {% endblock %} 

@@ -70,7 +70,7 @@
             {% for item in order.sifarisitem_set.all %}
             <tr>
                 <td>
-                    <img src="{{ item.mehsul.sekil.url }}" alt="{{ item.mehsul.adi }}" class="product-image">
+                    <img src="{{ item.mehsul.sekil.url }}" alt="{{ item.mehsul.adi }}" class="product-image" onclick="openImageModal('{{ item.mehsul.sekil.url }}')">
                 </td>
                 <td>{{ item.mehsul.adi }}</td>
                 <td>{{ item.mehsul.firma.adi }}</td>
@@ -86,4 +86,13 @@
         </div>
     </div>
 </div>
+
+<!-- Image Modal -->
+<div id="imageModal" class="image-modal">
+    <span class="image-modal-close">&times;</span>
+    <div class="modal-image-content">
+        <img id="modalImage" class="modal-image" src="" alt="Modal Image">
+    </div>
+</div>
+
 {% endblock %} 

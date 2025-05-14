@@ -128,7 +128,7 @@
                                 </div>
                                 <div class="product-image">
                                     {% if product.sekil and product.sekil.url != 'mehsul_sekilleri/no_image.webp' %}
-                                    <img src="{{ product.sekil.url }}" alt="{{ product.adi }}" onerror="this.src='{% static 'images/no_image.webp' %}'">
+                                    <img src="{{ product.sekil.url }}" alt="{{ product.adi }}" onclick="openImageModal(this.src)" class="clickable-image" onerror="this.src='{% static 'images/no_image.webp' %}'">
                                     {% else %}
                                     <img src="{% static 'images/no_image.webp' %}" alt="No Image">
                                     {% endif %}
@@ -225,5 +225,13 @@
         </div>
     </div>
     {% endif %}
+
+    <!-- Image Modal -->
+    <div id="imageModal" class="image-modal">
+        <span class="image-modal-close">&times;</span>
+        <div class="modal-image-content">
+            <img id="modalImage" class="modal-image" src="" alt="Modal Image">
+        </div>
+    </div>
 </body>
 </html>

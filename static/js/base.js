@@ -541,3 +541,40 @@ function closeImageModal() {
         modal.style.display = 'none';
     }, 300);
 }
+
+function openImageModal(imageSrc) {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    if (modal && modalImg) {
+        modalImg.src = imageSrc;
+        modal.classList.add('show');
+        modal.style.display = 'block';
+    }
+}
+
+function closeImageModal() {
+    const modal = document.getElementById('imageModal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+}
+
+// Modal bağlama üçün click hadisəsini əlavə et
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('imageModal');
+    const closeBtn = document.querySelector('.image-modal-close');
+    
+    if (modal && closeBtn) {
+        closeBtn.onclick = closeImageModal;
+        
+        // Modal xaricində kliklənəndə bağlanması
+        modal.onclick = function(e) {
+            if (e.target === modal) {
+                closeImageModal();
+            }
+        };
+    }
+});

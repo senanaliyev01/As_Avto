@@ -163,8 +163,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Session settings
-SESSION_COOKIE_AGE = 10  # 10 saniyə (saniyə ilə)
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Brauzer bağlandıqda sessiyanın bitmesi
+SESSION_COOKIE_AGE = 2592000  # 30 gün (saniyə ilə: 30 * 24 * 60 * 60 = 2592000)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Brauzer bağlandıqda sessiyanın bitməməsi
 SESSION_SAVE_EVERY_REQUEST = False  # Hər sorğuda sessiyanın yenilənməməsi
 LOGIN_URL = '/'  # Sessiya bitdikdə yönləndiriləcək səhifə
 

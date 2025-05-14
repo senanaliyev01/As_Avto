@@ -18,84 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeImageModal();
 
     // Popup Modal
-    const modal = document.getElementById('popupModal');
-    if (!modal) return;
-
-    const closeBtn = document.querySelector('.popup-close');
-    const yeniliklerLink = document.getElementById('yeniliklerLink');
-    
-    // Check if we should show the popup
-    function shouldShowPopup() {
-        const lastShown = localStorage.getItem('lastPopupShown');
-        if (!lastShown) return true;
-        
-        const thirtyMinutesInMs = 30 * 60 * 1000; // 30 minutes in milliseconds
-        const timeSinceLastShown = Date.now() - parseInt(lastShown);
-        
-        return timeSinceLastShown >= thirtyMinutesInMs;
-    }
-
-    // Function to show popup
-    function showPopup() {
-        if (shouldShowPopup()) {
-            modal.style.display = 'block';
-            localStorage.setItem('lastPopupShown', Date.now().toString());
-        }
-    }
-    
-    // Initialize Swiper for popup
-    const popupSwiper = new Swiper('.popup-swiper', {
-        loop: true,
-        autoplay: {
-            delay: 3000,
-            disableOnInteraction: false,
-        },
-        pagination: {
-            el: '.swiper-pagination',
-            clickable: true
-        },
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-        on: {
-            init: function() {
-                this.autoplay.start();
-            },
-            slideChange: function() {
-                this.autoplay.start();
-            }
-        }
-    });
-
-    // Show modal initially if enough time has passed
-    showPopup();
-
-    // Check every second if we should show the popup
-    setInterval(showPopup, 1000);
-
-    // Yenilikler linkine klik edəndə modalı göstər
-    if (yeniliklerLink) {
-        yeniliklerLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            modal.style.display = 'block';
-            // Popup göstərilmə vaxtını yenilə
-            localStorage.setItem('lastPopupShown', Date.now().toString());
-        });
-    }
-
-    // Close modal when clicking close button
-    closeBtn.onclick = function() {
-        modal.style.display = 'none';
-    }
-
-    // Prevent modal from closing when clicking inside modal content
-    const popupContent = document.querySelector('.popup-content');
-    if (popupContent) {
-        popupContent.addEventListener('click', function(e) {
-            e.stopPropagation();
-        });
-    }
+    initializePopupModal();
 });
 
 function initializeSearch() {
@@ -538,4 +461,102 @@ function closeImageModal() {
             modal.style.display = 'none';
         }, 300);
     }
+}
+
+function initializePopupModal() {
+    const modal = document.getElementById('popupModal');
+    if (!modal) return;
+
+    const closeBtn = document.querySelector('.popup-close');
+    const yeniliklerLink = document.getElementById('yeniliklerLink');
+    
+    // Initialize Swiper for popup
+    const popupSwiper = new Swiper('.popup-swiper', {
+        loop: true,
+        autoplay: {
+            delay: 3000,
+            disableOnInteraction: false,
+        },
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true
+        },
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+        on: {
+            init: function() {
+                this.autoplay.start();
+            },
+            slideChange: function() {
+                this.autoplay.start();
+            }
+        }
+    });
+    
+    // Check if we should show the popup
+    function shouldShowPopup() {
+        const lastShown = localStorage.getItem('lastPopupShown');
+        if (!lastShown) return true;
+        
+        const thirtyMinutesInMs = 30 * 60 * 1000; // 30 minutes in milliseconds
+        const timeSinceLastShown = Date.now() - parseInt(lastShown);
+        
+        return timeSinceLastShown >= thirtyMinutesInMs;
+    }
+
+    // Function to show popup
+    function showPopup() {
+        if (shouldShowPopup()) {
+            modal.style.display = 'block';
+            localStorage.setItem('lastPopupShown', Date.now().toString());
+            // Swiper-i yenidən inisializasiya et
+            popupSwiper.update();
+            popupSwiper.autoplay.start();
+        }
+    }
+
+    // Show modal initially if enough time has passed
+    showPopup();
+
+    // Check every minute if we should show the popup
+    setInterval(showPopup, 60000); // Hər dəqiqə yoxla
+
+    // Yenilikler linkine klik edəndə modalı göstər
+    if (yeniliklerLink) {
+        yeniliklerLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            modal.style.display = 'block';
+            // Popup göstərilmə vaxtını yenilə
+            localStorage.setItem('lastPopupShown', Date.now().toString());
+            // Swiper-i yenidən inisializasiya et
+            popupSwiper.update();
+            popupSwiper.autoplay.start();
+        });
+    }
+
+    // Close modal when clicking close button
+    if (closeBtn) {
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+            popupSwiper.autoplay.stop();
+        }
+    }
+
+    // Prevent modal from closing when clicking inside modal content
+    const popupContent = document.querySelector('.popup-content');
+    if (popupContent) {
+        popupContent.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
+
+    // Close modal when clicking outside
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+            popupSwiper.autoplay.stop();
+        }
+    });
 }

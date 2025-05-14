@@ -172,13 +172,13 @@ def cart_view(request):
     for product_id, quantity in cart.items():
         try:
             product = Mehsul.objects.get(id=product_id)
-        subtotal = product.qiymet * Decimal(str(quantity))
-        cart_items.append({
-            'product': product,
-            'quantity': quantity,
-            'subtotal': subtotal
-        })
-        total += subtotal
+            subtotal = product.qiymet * Decimal(str(quantity))
+            cart_items.append({
+                'product': product,
+                'quantity': quantity,
+                'subtotal': subtotal
+            })
+            total += subtotal
         except Mehsul.DoesNotExist:
             invalid_products.append(product_id)  # Mövcud olmayan məhsulu qeyd et
     

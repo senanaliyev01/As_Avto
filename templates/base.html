@@ -196,31 +196,6 @@
    
     {% block extra_js %}{% endblock %}
 
-    <script>
-        // Sessiya müddətini izlə
-        let sessionTimeout = 10000; // 10 saniyə (millisaniyə ilə)
-        let timeoutId;
-
-        function resetSessionTimer() {
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(function() {
-                // Sessiya müddəti bitdikdə login səhifəsinə yönləndir
-                window.location.href = "{% url 'login' %}";
-            }, sessionTimeout);
-        }
-
-        // Səhifə yükləndikdə timer başlat
-        document.addEventListener('DOMContentLoaded', function() {
-            resetSessionTimer();
-        });
-
-        // İstifadəçi aktivliyi olduqda timer sıfırla
-        document.addEventListener('mousemove', resetSessionTimer);
-        document.addEventListener('keypress', resetSessionTimer);
-        document.addEventListener('click', resetSessionTimer);
-        document.addEventListener('scroll', resetSessionTimer);
-    </script>
-
     <!-- Popup Modal -->
     {% if popup_images %}
     <div id="popupModal" class="popup-modal">

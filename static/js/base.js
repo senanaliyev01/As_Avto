@@ -96,6 +96,27 @@ document.addEventListener('DOMContentLoaded', function() {
             e.stopPropagation();
         });
     }
+
+    // Sessiya müddətini izləmə funksiyaları
+    let sessionTimeout = 10000; // 10 saniyə (millisaniyə ilə)
+    let timeoutId;
+
+    function resetSessionTimer() {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(function() {
+            // Sessiya müddəti bitdikdə login səhifəsinə yönləndir
+            window.location.href = '/';  // login səhifəsinin URL-i
+        }, sessionTimeout);
+    }
+
+    // Səhifə yükləndikdə timer başlat
+    resetSessionTimer();
+
+    // İstifadəçi aktivliyi olduqda timer sıfırla
+    document.addEventListener('mousemove', resetSessionTimer);
+    document.addEventListener('keypress', resetSessionTimer);
+    document.addEventListener('click', resetSessionTimer);
+    document.addEventListener('scroll', resetSessionTimer);
 });
 
 function initializeSearch() {

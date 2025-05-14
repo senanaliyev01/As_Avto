@@ -29,10 +29,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const lastShown = localStorage.getItem('lastPopupShown');
         if (!lastShown) return true;
         
-        const fifteenSecondsInMs = 15 * 1000; // 15 seconds in milliseconds
+        const thirtyMinutesInMs = 30 * 60 * 1000; // 30 minutes in milliseconds
         const timeSinceLastShown = Date.now() - parseInt(lastShown);
         
-        return timeSinceLastShown >= fifteenSecondsInMs;
+        return timeSinceLastShown >= thirtyMinutesInMs;
     }
 
     // Function to show popup

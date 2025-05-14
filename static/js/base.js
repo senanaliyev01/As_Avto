@@ -545,16 +545,4 @@ function initializePopupModal() {
             e.stopPropagation();
         });
     }
-
-    // Close modal when clicking outside
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            modal.style.display = 'none';
-            // Destroy Swiper instance when modal is closed
-            if (popupSwiper) {
-                popupSwiper.destroy();
-                popupSwiper = null;
-            }
-        }
-    });
 }

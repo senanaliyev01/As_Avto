@@ -19,6 +19,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Popup Modal
     initializePopupModal();
+
+    // Mobile Menu Toggle
+    initializeMobileMenu();
+
+    // Touch Event Handlers
+    initializeTouchEvents();
+
+    // Optimize Images for Mobile
+    optimizeImages();
+    
+    // Re-run image optimization on resize
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(optimizeImages, 250);
+    });
 });
 
 function initializeSearch() {
@@ -345,8 +361,8 @@ function showMessage(type, message) {
 function initializeSwiper() {
     if (document.querySelector('.new-products-swiper')) {
         new Swiper('.new-products-swiper', {
-            slidesPerView: 4,
-            spaceBetween: 20,
+            slidesPerView: 'auto',
+            spaceBetween: 10,
             loop: true,
             autoplay: {
                 delay: 3000,
@@ -543,6 +559,77 @@ function initializePopupModal() {
     if (popupContent) {
         popupContent.addEventListener('click', function(e) {
             e.stopPropagation();
+        });
+    }
+}
+
+// Mobile Menu Toggle
+function initializeMobileMenu() {
+    const menuButton = document.createElement('button');
+    menuButton.className = 'mobile-menu-toggle';
+    menuButton.innerHTML = '<i class="fas fa-bars"></i>';
+    
+    const nav = document.querySelector('.main-nav');
+    nav.parentNode.insertBefore(menuButton, nav);
+    
+    menuButton.addEventListener('click', () => {
+        nav.classList.toggle('active');
+        menuButton.classList.toggle('active');
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!nav.contains(e.target) && !menuButton.contains(e.target)) {
+            nav.classList.remove('active');
+            menuButton.classList.remove('active');
+        }
+    });
+}
+
+// Touch Event Handlers
+function initializeTouchEvents() {
+    // Add touch event handlers for swipe gestures
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    const popupModal = document.getElementById('popupModal');
+    if (popupModal) {
+        popupModal.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, false);
+        
+        popupModal.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, false);
+    }
+    
+    function handleSwipe() {
+        const swipeThreshold = 50;
+        const diff = touchEndX - touchStartX;
+        
+        if (Math.abs(diff) > swipeThreshold) {
+            if (diff > 0) {
+                // Swipe right - previous slide
+                const prevBtn = document.querySelector('.swiper-button-prev');
+                if (prevBtn) prevBtn.click();
+            } else {
+                // Swipe left - next slide
+                const nextBtn = document.querySelector('.swiper-button-next');
+                if (nextBtn) nextBtn.click();
+            }
+        }
+    }
+}
+
+// Optimize Images for Mobile
+function optimizeImages() {
+    if (window.innerWidth <= 768) {
+        const images = document.querySelectorAll('img');
+        images.forEach(img => {
+            if (img.dataset.mobileUrl) {
+                img.src = img.dataset.mobileUrl;
+            }
         });
     }
 }

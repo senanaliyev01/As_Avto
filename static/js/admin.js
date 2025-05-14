@@ -208,3 +208,82 @@ document.addEventListener('DOMContentLoaded', function() {
         totalDebtItem.classList.add('zero');
     }
 });
+
+// Mobile Optimizations
+function initializeMobileOptimizations() {
+    // Add touch support for tables
+    const tables = document.querySelectorAll('.stats-table');
+    tables.forEach(table => {
+        let startX;
+        let scrollLeft;
+
+        table.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].pageX - table.offsetLeft;
+            scrollLeft = table.parentElement.scrollLeft;
+        });
+
+        table.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const x = e.touches[0].pageX - table.offsetLeft;
+            const walk = (x - startX) * 2;
+            table.parentElement.scrollLeft = scrollLeft - walk;
+        });
+    });
+
+    // Optimize modal for mobile
+    const modal = document.getElementById('excelImportModal');
+    if (modal) {
+        modal.addEventListener('touchmove', (e) => {
+            if (e.target === modal) {
+                e.preventDefault();
+            }
+        });
+    }
+
+    // Add double tap to zoom prevention
+    document.addEventListener('touchend', (e) => {
+        const now = Date.now();
+        if (now - lastTap < 300) {
+            e.preventDefault();
+        }
+        lastTap = now;
+    });
+}
+
+// Debounce function for search optimization
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Optimize search for mobile
+const optimizedFilterUsers = debounce(filterUsers, 300);
+
+// Initialize mobile features
+document.addEventListener('DOMContentLoaded', function() {
+    initializeMobileOptimizations();
+    
+    // Update search input for mobile
+    const searchInput = document.getElementById('userSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', optimizedFilterUsers);
+        
+        // Add clear button functionality
+        const clearButton = document.querySelector('.clear-search');
+        if (clearButton) {
+            clearButton.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                clearSearch();
+            });
+        }
+    }
+});
+
+let lastTap = 0;

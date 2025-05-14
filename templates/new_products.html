@@ -23,7 +23,7 @@
             <tbody>
                 {% for mehsul in mehsullar %}
                 <tr>
-                    <td><img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image"></td>
+                    <td><img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image" onclick="openImageModal('{{ mehsul.sekil.url }}')"></td>
                     <td>
                         {{ mehsul.adi }}
                         <span class="new-badge">Yeni</span>
@@ -71,4 +71,13 @@
         </form>
     </div>
 </div>
+
+<!-- Image Modal -->
+<div id="imageModal" class="image-modal">
+    <span class="image-modal-close">&times;</span>
+    <div class="modal-image-content">
+        <img id="modalImage" class="modal-image" src="" alt="Modal Image">
+    </div>
+</div>
+
 {% endblock %} 

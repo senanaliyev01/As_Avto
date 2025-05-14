@@ -40,8 +40,8 @@ class AvtomobilAdmin(admin.ModelAdmin):
 
 @admin.register(Mehsul)
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ['sekil_preview', 'adi', 'firma', 'avtomobil', 'brend_kod', 'oem', 'olcu', 'vitrin', 'stok_status', 'maya_qiymet', 'qiymet_display', 'actions_column']
-    list_filter = ['firma', 'avtomobil', 'vitrin', 'yenidir']
+    list_display = ['sekil_preview', 'adi', 'firma', 'brend_kod', 'oem', 'olcu', 'vitrin', 'stok_status', 'maya_qiymet', 'qiymet_display', 'actions_column']
+    list_filter = ['kateqoriya', 'firma', 'avtomobil', 'vitrin', 'yenidir']
     search_fields = ['adi', 'brend_kod', 'oem', 'kodlar', 'olcu']
     list_per_page = 25
     ordering = ['-id']
@@ -50,7 +50,7 @@ class MehsulAdmin(admin.ModelAdmin):
     list_display_links = ['adi']
 
     def get_queryset(self, request):
-        return super().get_queryset(request).select_related('firma', 'avtomobil', 'vitrin')
+        return super().get_queryset(request).select_related('kateqoriya', 'firma', 'avtomobil', 'vitrin')
 
     def sekil_preview(self, obj):
         if obj.sekil:

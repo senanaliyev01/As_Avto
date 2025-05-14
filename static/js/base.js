@@ -34,6 +34,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         return timeSinceLastShown >= fifteenSecondsInMs;
     }
+
+    // Function to show popup
+    function showPopup() {
+        if (shouldShowPopup()) {
+            modal.style.display = 'block';
+            localStorage.setItem('lastPopupShown', Date.now().toString());
+        }
+    }
     
     // Initialize Swiper for popup
     const popupSwiper = new Swiper('.popup-swiper', {
@@ -60,11 +68,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Show modal only if enough time has passed
-    if (shouldShowPopup()) {
-        modal.style.display = 'block';
-        localStorage.setItem('lastPopupShown', Date.now().toString());
-    }
+    // Show modal initially if enough time has passed
+    showPopup();
+
+    // Check every second if we should show the popup
+    setInterval(showPopup, 1000);
 
     // Yenilikler linkine klik edəndə modalı göstər
     if (yeniliklerLink) {

@@ -162,6 +162,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Session settings
+SESSION_COOKIE_AGE = 10  # 10 saniyə (saniyə ilə)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Brauzer bağlandıqda sessiyanın bitmesi
+SESSION_SAVE_EVERY_REQUEST = False  # Hər sorğuda sessiyanın yenilənməməsi
+LOGIN_URL = '/'  # Sessiya bitdikdə yönləndiriləcək səhifə
 
 # 3. Jazzmin tənzimləmələri
 JAZZMIN_SETTINGS = {
@@ -228,8 +233,3 @@ JAZZMIN_UI_TWEAKS = {
     "sidebar_nav_legacy_style": False,
     "sidebar_nav_flat_style": False,
 }
-
-# Session settings
-SESSION_COOKIE_AGE = 10  # 10 saniyə
-SESSION_SAVE_EVERY_REQUEST = True  # Hər sorğuda sessiyanı yenilə
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Brauzer bağlandıqda sessiyanı bitir

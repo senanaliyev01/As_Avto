@@ -108,6 +108,7 @@ class MehsulAdmin(admin.ModelAdmin):
         css = {
             'all': [
                 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css',
+                'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap',
             ]
         }
         js = [
@@ -292,6 +293,97 @@ class MehsulAdmin(admin.ModelAdmin):
                 return HttpResponseRedirect("../")
         
         return HttpResponseRedirect("../")
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['custom_css'] = """
+            <style>
+                #result_list {
+                    border-radius: 8px;
+                    overflow: hidden;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                    border: 1px solid #e5e7eb;
+                }
+                
+                #result_list thead th {
+                    background: #2B5173 !important;
+                    color: white !important;
+                    font-weight: 600;
+                    font-family: 'Inter', sans-serif;
+                    padding: 12px 8px;
+                    font-size: 13px;
+                }
+                
+                #result_list tbody tr {
+                    transition: all 0.2s ease;
+                }
+                
+                #result_list tbody tr:nth-child(odd) {
+                    background-color: #f9fafb;
+                }
+                
+                #result_list tbody tr:hover {
+                    background-color: #f3f4f6;
+                }
+                
+                #result_list tbody td {
+                    padding: 12px 8px;
+                    font-family: 'Inter', sans-serif;
+                    font-size: 13px;
+                    border-bottom: 1px solid #e5e7eb;
+                    vertical-align: middle;
+                }
+                
+                .field-qiymet_display,
+                .field-maya_qiymet {
+                    font-weight: 600;
+                    text-align: right;
+                }
+                
+                .field-stok_status {
+                    text-align: center;
+                }
+                
+                /* Action buttons */
+                .field-actions_column .button {
+                    padding: 6px 12px;
+                    border-radius: 6px;
+                    transition: all 0.2s ease;
+                }
+                
+                .field-actions_column .button:hover {
+                    opacity: 0.9;
+                    transform: translateY(-1px);
+                }
+                
+                /* Pagination */
+                .paginator {
+                    font-family: 'Inter', sans-serif;
+                    margin-top: 20px;
+                }
+                
+                .paginator a, .paginator .this-page {
+                    padding: 6px 12px;
+                    border-radius: 4px;
+                    margin: 0 2px;
+                }
+                
+                .paginator .this-page {
+                    background-color: #2B5173;
+                    color: white;
+                }
+                
+                /* Search bar */
+                #searchbar {
+                    border-radius: 6px;
+                    border: 1px solid #e5e7eb;
+                    padding: 8px 12px;
+                    font-family: 'Inter', sans-serif;
+                    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+                }
+            </style>
+        """
+        return super().changelist_view(request, extra_context=extra_context)
 
 class SifarisItemInline(admin.TabularInline):
     model = SifarisItem

@@ -62,9 +62,9 @@ class MehsulAdmin(admin.ModelAdmin):
         if obj.stok <= 0:
             return format_html('<span style="color: #dc3545; background-color: #ffe0e3; padding: 5px 10px; border-radius: 15px; font-size: 12px;"><i class="fas fa-times-circle"></i> Stokda yoxdur</span>')
         elif obj.stok <= 5:
-            return format_html('<span style="color: #ffc107; background-color: #fff3cd; padding: 5px 10px; border-radius: 15px; font-size: 12px;"><i class="fas fa-exclamation-circle"></i> {} ədəd</span>', obj.stok)
+            return format_html('<span style="color: #ffc107; background-color: #fff3cd; padding: 5px 10px; border-radius: 15px; font-size: 12px;"><i class="fas fa-exclamation-circle"></i> {}</span>', obj.stok)
         else:
-            return format_html('<span style="color: #28a745; background-color: #d4edda; padding: 5px 10px; border-radius: 15px; font-size: 12px;"><i class="fas fa-check-circle"></i> {} ədəd</span>', obj.stok)
+            return format_html('<span style="color: #28a745; background-color: #d4edda; padding: 5px 10px; border-radius: 15px; font-size: 12px;"><i class="fas fa-check-circle"></i> {}</span>', obj.stok)
     stok_status.short_description = 'Stok'
 
     def qiymet_display(self, obj):

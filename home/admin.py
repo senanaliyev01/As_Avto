@@ -430,7 +430,7 @@ class SifarisAdmin(admin.ModelAdmin):
 
         total_data = [
             [Paragraph('Ümumi Cəmi :', totalStyle), Paragraph(f"{total_amount} ₼", amountStyle)],
-            [Paragraph('Qalıq Borc :', totalStyle), Paragraph(f"{sifaris.qaliq_borc} ₼", amountStyle)]
+            [Paragraph('Ümumi Borc :', totalStyle), Paragraph(f"{sifaris.qaliq_borc} ₼", amountStyle)]
         ]
 
         total_table = Table(total_data, colWidths=[100, 100])

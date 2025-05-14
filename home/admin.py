@@ -40,59 +40,11 @@ class AvtomobilAdmin(admin.ModelAdmin):
 
 @admin.register(Mehsul)
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ['sekil_preview', 'adi', 'firma', 'brend_kod', 'oem', 'olcu', 'vitrin', 'stok_status', 'maya_qiymet', 'qiymet_display', 'actions_column']
+    list_display = ['adi',  'firma',  'brend_kod', 'oem', 'olcu', 'vitrin', 'maya_qiymet', 'qiymet', 'stok', 'yenidir']
     list_filter = ['kateqoriya', 'firma', 'avtomobil', 'vitrin', 'yenidir']
     search_fields = ['adi', 'brend_kod', 'oem', 'kodlar', 'olcu']
-    list_per_page = 25
-    ordering = ['-id']
     change_list_template = 'admin/mehsul_change_list.html'
     actions = ['mark_as_new', 'remove_from_new']
-    list_display_links = ['adi']
-
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related('kateqoriya', 'firma', 'avtomobil', 'vitrin')
-
-    def sekil_preview(self, obj):
-        if obj.sekil:
-            return format_html('<img src="{}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);" />', obj.sekil.url)
-        return format_html('<img src="/static/images/no_image.webp" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);" />')
-    sekil_preview.short_description = 'Şəkil'
-
-    def stok_status(self, obj):
-        if obj.stok <= 0:
-            return format_html('<span style="color: #dc3545; background-color: #ffe0e3; padding: 5px 10px; border-radius: 15px; font-size: 12px;"><i class="fas fa-times-circle"></i> Stokda yoxdur</span>')
-        elif obj.stok <= 5:
-            return format_html('<span style="color: #ffc107; background-color: #fff3cd; padding: 5px 10px; border-radius: 15px; font-size: 12px;"><i class="fas fa-exclamation-circle"></i> {}</span>', obj.stok)
-        else:
-            return format_html('<span style="color: #28a745; background-color: #d4edda; padding: 5px 10px; border-radius: 15px; font-size: 12px;"><i class="fas fa-check-circle"></i> {}</span>', obj.stok)
-    stok_status.short_description = 'Stok'
-
-    def qiymet_display(self, obj):
-        if obj.yenidir:
-            return format_html(
-                '<div style="position: relative;">'
-                '<span style="font-weight: bold; color: #2c3e50;">{} ₼</span>'
-                '<span style="position: absolute; top: -8px; right: -8px; background-color: #dc3545; '
-                'color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px;">Yeni</span>'
-                '</div>',
-                obj.qiymet
-            )
-        return format_html('<span style="font-weight: bold; color: #2c3e50;">{} ₼</span>', obj.qiymet)
-    qiymet_display.short_description = 'Qiymət'
-
-    def actions_column(self, obj):
-        return format_html(
-            '<div style="display: flex; gap: 5px;">'
-            '<a href="{}/change/" class="button" style="background-color: #007bff; color: white; '
-            'padding: 5px 10px; border-radius: 4px; text-decoration: none; font-size: 12px;">'
-            '<i class="fas fa-edit"></i></a>'
-            '<a href="{}/delete/" class="button" style="background-color: #dc3545; color: white; '
-            'padding: 5px 10px; border-radius: 4px; text-decoration: none; font-size: 12px;">'
-            '<i class="fas fa-trash"></i></a>'
-            '</div>',
-            obj.id, obj.id
-        )
-    actions_column.short_description = 'Əməliyyatlar'
 
     def mark_as_new(self, request, queryset):
         updated = queryset.update(yenidir=True)
@@ -103,17 +55,6 @@ class MehsulAdmin(admin.ModelAdmin):
         updated = queryset.update(yenidir=False)
         self.message_user(request, f'{updated} məhsul yenilikdən silindi.')
     remove_from_new.short_description = "Seçilmiş məhsulları yenilikdən sil"
-
-    class Media:
-        css = {
-            'all': [
-                'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css',
-                'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap',
-            ]
-        }
-        js = [
-            'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js',
-        ]
 
     def get_urls(self):
         urls = super().get_urls()
@@ -293,97 +234,6 @@ class MehsulAdmin(admin.ModelAdmin):
                 return HttpResponseRedirect("../")
         
         return HttpResponseRedirect("../")
-
-    def changelist_view(self, request, extra_context=None):
-        extra_context = extra_context or {}
-        extra_context['custom_css'] = """
-            <style>
-                #result_list {
-                    border-radius: 8px;
-                    overflow: hidden;
-                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                    border: 1px solid #e5e7eb;
-                }
-                
-                #result_list thead th {
-                    background: #2B5173 !important;
-                    color: white !important;
-                    font-weight: 600;
-                    font-family: 'Inter', sans-serif;
-                    padding: 12px 8px;
-                    font-size: 13px;
-                }
-                
-                #result_list tbody tr {
-                    transition: all 0.2s ease;
-                }
-                
-                #result_list tbody tr:nth-child(odd) {
-                    background-color: #f9fafb;
-                }
-                
-                #result_list tbody tr:hover {
-                    background-color: #f3f4f6;
-                }
-                
-                #result_list tbody td {
-                    padding: 12px 8px;
-                    font-family: 'Inter', sans-serif;
-                    font-size: 13px;
-                    border-bottom: 1px solid #e5e7eb;
-                    vertical-align: middle;
-                }
-                
-                .field-qiymet_display,
-                .field-maya_qiymet {
-                    font-weight: 600;
-                    text-align: right;
-                }
-                
-                .field-stok_status {
-                    text-align: center;
-                }
-                
-                /* Action buttons */
-                .field-actions_column .button {
-                    padding: 6px 12px;
-                    border-radius: 6px;
-                    transition: all 0.2s ease;
-                }
-                
-                .field-actions_column .button:hover {
-                    opacity: 0.9;
-                    transform: translateY(-1px);
-                }
-                
-                /* Pagination */
-                .paginator {
-                    font-family: 'Inter', sans-serif;
-                    margin-top: 20px;
-                }
-                
-                .paginator a, .paginator .this-page {
-                    padding: 6px 12px;
-                    border-radius: 4px;
-                    margin: 0 2px;
-                }
-                
-                .paginator .this-page {
-                    background-color: #2B5173;
-                    color: white;
-                }
-                
-                /* Search bar */
-                #searchbar {
-                    border-radius: 6px;
-                    border: 1px solid #e5e7eb;
-                    padding: 8px 12px;
-                    font-family: 'Inter', sans-serif;
-                    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-                }
-            </style>
-        """
-        return super().changelist_view(request, extra_context=extra_context)
 
 class SifarisItemInline(admin.TabularInline):
     model = SifarisItem

@@ -488,67 +488,37 @@ function initializeUserDropdown() {
 }
 
 function initializeImageModal() {
-    // Create modal element if it doesn't exist
-    if (!document.getElementById('imageModal')) {
-        const modalHTML = `
-            <div id="imageModal" class="image-modal">
-                <span class="image-modal-close"></span>
-                <div class="modal-image-content">
-                    <img src="" alt="" class="modal-image">
-                </div>
-            </div>
-        `;
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
-    }
-
     const modal = document.getElementById('imageModal');
-    const modalImage = modal.querySelector('.modal-image');
-    const closeBtn = modal.querySelector('.image-modal-close');
-
-    // Add click event to all product images
-    document.querySelectorAll('.product-image').forEach(img => {
-        img.style.cursor = 'pointer';
-        img.addEventListener('click', function() {
-            modalImage.src = this.src;
-            modalImage.alt = this.alt;
-            modal.style.display = 'block';
-            setTimeout(() => modal.classList.add('show'), 10);
+    const closeBtn = document.querySelector('.image-modal-close');
+    
+    if (modal && closeBtn) {
+        closeBtn.onclick = closeImageModal;
+        
+        // Modal xaricində kliklədikdə bağla
+        modal.onclick = function(e) {
+            if (e.target === modal) {
+                closeImageModal();
+            }
+        };
+        
+        // ESC düyməsi ilə bağla
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.style.display === 'block') {
+                closeImageModal();
+            }
         });
-    });
-
-    // Close modal when clicking close button
-    closeBtn.addEventListener('click', closeImageModal);
-
-    // Close modal when clicking outside
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            closeImageModal();
-        }
-    });
-
-    // Close modal with ESC key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && modal.style.display === 'block') {
-            closeImageModal();
-        }
-    });
-}
-
-function closeImageModal() {
-    const modal = document.getElementById('imageModal');
-    modal.classList.remove('show');
-    setTimeout(() => {
-        modal.style.display = 'none';
-    }, 300);
+    }
 }
 
 function openImageModal(imageSrc) {
     const modal = document.getElementById('imageModal');
     const modalImg = document.getElementById('modalImage');
-    if (modal && modalImg) {
+    if (modal && modalImg && imageSrc) {
         modalImg.src = imageSrc;
-        modal.classList.add('show');
         modal.style.display = 'block';
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
     }
 }
 
@@ -561,20 +531,3 @@ function closeImageModal() {
         }, 300);
     }
 }
-
-// Modal bağlama üçün click hadisəsini əlavə et
-document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.getElementById('imageModal');
-    const closeBtn = document.querySelector('.image-modal-close');
-    
-    if (modal && closeBtn) {
-        closeBtn.onclick = closeImageModal;
-        
-        // Modal xaricində kliklənəndə bağlanması
-        modal.onclick = function(e) {
-            if (e.target === modal) {
-                closeImageModal();
-            }
-        };
-    }
-});

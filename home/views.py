@@ -48,38 +48,27 @@ def products_view(request):
     popup_images = PopupImage.objects.filter(aktiv=True)
     
     if search_query:
-        # Xüsusi simvolları və boşluqları təmizlə
+        # Axtarış sözlərini ayır
+        search_words = search_query.split()
+        
+        # Əsas axtarış sorğusu
+        query = Q()
+        
+        # Məhsul adında axtarış
+        name_query = Q()
+        for word in search_words:
+            name_query &= Q(adi__icontains=word)
+        query |= name_query
+        
+        # Kodlarda axtarış
+        code_query = Q()
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
-        
-        # Axtarış sözlərini ayır və təmizlə
-        search_words = search_query.lower().split()
-        clean_words = [re.sub(r'[^a-zA-Z0-9]', '', word) for word in search_words if word]
-        
         if clean_search:
-            # Kod ilə axtarış
             code_query = Q(kodlar__icontains=clean_search)
-            
-            # Ad ilə axtarış üçün annotation əlavə et
-            mehsullar = mehsullar.annotate(
-                clean_name=Lower('adi'),
-                clean_name_no_special=Value('')
-            )
-            
-            # Təmizlənmiş ad ilə axtarış
-            name_queries = Q()
-            
-            # Birləşik axtarış üçün
-            name_queries |= Q(clean_name__icontains=clean_search)
-            
-            # Bütün sözlərin olması üçün
-            if clean_words:
-                word_query = Q(clean_name__icontains=clean_words[0])
-                for word in clean_words[1:]:
-                    word_query &= Q(clean_name__icontains=word)
-                name_queries |= word_query
-            
-            # Kod və ya ad ilə axtarış
-            mehsullar = mehsullar.filter(code_query | name_queries).distinct()
+        query |= code_query
+        
+        # Filteri tətbiq et
+        mehsullar = mehsullar.filter(query).distinct()
     
     if kateqoriya:
         mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)
@@ -396,50 +385,39 @@ def search_suggestions(request):
     search_query = request.GET.get('search', '')
     
     if search_query:
-        # Xüsusi simvolları və boşluqları təmizlə
+        # Axtarış sözlərini ayır
+        search_words = search_query.split()
+        
+        # Əsas axtarış sorğusu
+        query = Q()
+        
+        # Məhsul adında axtarış
+        name_query = Q()
+        for word in search_words:
+            name_query &= Q(adi__icontains=word)
+        query |= name_query
+        
+        # Kodlarda axtarış
+        code_query = Q()
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
-        
-        # Axtarış sözlərini ayır və təmizlə
-        search_words = search_query.lower().split()
-        clean_words = [re.sub(r'[^a-zA-Z0-9]', '', word) for word in search_words if word]
-        
-        if clean_search or clean_words:
-            # Kod ilə axtarış
+        if clean_search:
             code_query = Q(kodlar__icontains=clean_search)
-            
-            # Ad ilə axtarış üçün annotation əlavə et
-            mehsullar = Mehsul.objects.annotate(
-                clean_name=Lower('adi'),
-                clean_name_no_special=Value('')
-            )
-            
-            # Təmizlənmiş ad ilə axtarış
-            name_queries = Q()
-            
-            # Birləşik axtarış üçün
-            name_queries |= Q(clean_name__icontains=clean_search)
-            
-            # Bütün sözlərin olması üçün
-            if clean_words:
-                word_query = Q(clean_name__icontains=clean_words[0])
-                for word in clean_words[1:]:
-                    word_query &= Q(clean_name__icontains=word)
-                name_queries |= word_query
-            
-            # Kod və ya ad ilə axtarış
-            mehsullar = mehsullar.filter(code_query | name_queries).distinct()[:5]
-            
-            suggestions = []
-            for mehsul in mehsullar:
-                suggestions.append({
-                    'id': mehsul.id,
-                    'adi': mehsul.adi,
-                    'brend_kod': mehsul.brend_kod,
-                    'oem': mehsul.oem,
-                    'qiymet': str(mehsul.qiymet),
-                    'sekil_url': mehsul.sekil.url if mehsul.sekil else None,
-                })
-            return JsonResponse({'suggestions': suggestions})
+        query |= code_query
+        
+        # Axtarışı yerinə yetir
+        mehsullar = Mehsul.objects.filter(query).distinct()[:5]
+        
+        suggestions = []
+        for mehsul in mehsullar:
+            suggestions.append({
+                'id': mehsul.id,
+                'adi': mehsul.adi,
+                'brend_kod': mehsul.brend_kod,
+                'oem': mehsul.oem,
+                'qiymet': str(mehsul.qiymet),
+                'sekil_url': mehsul.sekil.url if mehsul.sekil else None,
+            })
+        return JsonResponse({'suggestions': suggestions})
     
     return JsonResponse({'suggestions': []})
 

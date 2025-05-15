@@ -54,9 +54,12 @@ def products_view(request):
         # Bütün axtarış kriteriyaları üçün query yaradırıq
         query = Q()
         for word in search_words:
+            # Kodlar üçün təmizlənmiş versiya
+            clean_word = re.sub(r'[^a-zA-Z0-9]', '', word)
+            
             word_query = (
                 Q(adi__icontains=word) |  # ad ilə axtarış
-                Q(kodlar__icontains=word) |  # kod ilə axtarış
+                Q(kodlar__icontains=clean_word) |  # kod ilə axtarış (təmizlənmiş)
                 Q(brend_kod__icontains=word) |  # brend kodu ilə axtarış
                 Q(oem__icontains=word) |  # OEM kodu ilə axtarış
                 Q(firma__adi__icontains=word) |  # firma adı ilə axtarış
@@ -387,11 +390,14 @@ def search_suggestions(request):
         # Bütün axtarış kriteriyaları üçün query yaradırıq
         query = Q()
         for word in search_words:
+            # Kodlar üçün təmizlənmiş versiya
+            clean_word = re.sub(r'[^a-zA-Z0-9]', '', word)
+            
             word_query = (
                 Q(adi__icontains=word) |  # ad ilə axtarış
-                Q(kodlar__icontains=word) |  # kod ilə axtarış
-                Q(brend_kod__icontains=word) |  # brend kodu ilə axtarış
-                Q(oem__icontains=word) |  # OEM kodu ilə axtarış
+                Q(kodlar__icontains=clean_word) |  # kod ilə axtarış (təmizlənmiş)
+                Q(brend_kod__icontains=clean_word) |  # brend kodu ilə axtarış (təmizlənmiş)
+                Q(oem__icontains=clean_word) |  # OEM kodu ilə axtarış (təmizlənmiş)
                 Q(firma__adi__icontains=word) |  # firma adı ilə axtarış
                 Q(kateqoriya__adi__icontains=word)  # kateqoriya adı ilə axtarış
             )

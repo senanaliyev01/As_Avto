@@ -48,12 +48,37 @@ def products_view(request):
     popup_images = PopupImage.objects.filter(aktiv=True)
     
     if search_query:
-        # Xüsusi simvolları və boşluqları təmizlə
+        # Əvvəlcə kodlarla axtarış
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
-        
         if clean_search:
-            # Yalnız kod ilə axtarış
             mehsullar = mehsullar.filter(kodlar__icontains=clean_search)
+        else:
+            # Kodla tapılmadısa, ad ilə axtarış
+            # Axtarış sözünü hazırla (bütün sözləri birləşdir)
+            search_combined = ''.join(search_query.lower().split())
+            
+            # Annotasiya əlavə et - məhsul adlarını eyni formata gətir
+            mehsullar = mehsullar.annotate(
+                clean_name=Lower('adi'),
+                combined_name=Value('')
+            )
+            
+            # Xüsusi simvolları yoxla
+            has_special = bool(re.search(r'[^a-zA-Z0-9\s]', search_query))
+            
+            if has_special:
+                # Xüsusi simvollar varsa, birbaşa axtarış
+                mehsullar = mehsullar.filter(adi__icontains=search_query)
+            else:
+                # Xüsusi simvollar yoxdursa, təmizlənmiş versiya ilə axtarış
+                # Məhsul adlarından xüsusi simvolları və boşluqları sil
+                clean_products = []
+                for mehsul in mehsullar:
+                    clean_product_name = ''.join(re.sub(r'[^a-zA-Z0-9]', '', mehsul.adi.lower()).split())
+                    if search_combined in clean_product_name:
+                        clean_products.append(mehsul.id)
+                
+                mehsullar = mehsullar.filter(id__in=clean_products)
     
     if kateqoriya:
         mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)
@@ -370,24 +395,44 @@ def search_suggestions(request):
     search_query = request.GET.get('search', '')
     
     if search_query:
-        # Xüsusi simvolları və boşluqları təmizlə
+        # Əvvəlcə kodlarla axtarış
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
-        
         if clean_search:
-            # Yalnız kod ilə axtarış
             mehsullar = Mehsul.objects.filter(kodlar__icontains=clean_search)[:5]
+        else:
+            # Kodla tapılmadısa, ad ilə axtarış
+            # Axtarış sözünü hazırla (bütün sözləri birləşdir)
+            search_combined = ''.join(search_query.lower().split())
             
-            suggestions = []
-            for mehsul in mehsullar:
-                suggestions.append({
-                    'id': mehsul.id,
-                    'adi': mehsul.adi,
-                    'brend_kod': mehsul.brend_kod,
-                    'oem': mehsul.oem,
-                    'qiymet': str(mehsul.qiymet),
-                    'sekil_url': mehsul.sekil.url if mehsul.sekil else None,
-                })
-            return JsonResponse({'suggestions': suggestions})
+            mehsullar = Mehsul.objects.all()
+            
+            # Xüsusi simvolları yoxla
+            has_special = bool(re.search(r'[^a-zA-Z0-9\s]', search_query))
+            
+            if has_special:
+                # Xüsusi simvollar varsa, birbaşa axtarış
+                mehsullar = mehsullar.filter(adi__icontains=search_query)[:5]
+            else:
+                # Xüsusi simvollar yoxdursa, təmizlənmiş versiya ilə axtarış
+                clean_products = []
+                for mehsul in mehsullar:
+                    clean_product_name = ''.join(re.sub(r'[^a-zA-Z0-9]', '', mehsul.adi.lower()).split())
+                    if search_combined in clean_product_name:
+                        clean_products.append(mehsul.id)
+                
+                mehsullar = Mehsul.objects.filter(id__in=clean_products)[:5]
+            
+        suggestions = []
+        for mehsul in mehsullar:
+            suggestions.append({
+                'id': mehsul.id,
+                'adi': mehsul.adi,
+                'brend_kod': mehsul.brend_kod,
+                'oem': mehsul.oem,
+                'qiymet': str(mehsul.qiymet),
+                'sekil_url': mehsul.sekil.url if mehsul.sekil else None,
+            })
+        return JsonResponse({'suggestions': suggestions})
     
     return JsonResponse({'suggestions': []})
 

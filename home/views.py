@@ -422,12 +422,34 @@ def search_suggestions(request):
     search_query = request.GET.get('search', '')
     
     if search_query:
-        # Xüsusi simvolları və boşluqları təmizlə
+        # Kodlarla axtarış üçün əvvəlki təmizləmə
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         
         if clean_search:
-            # Yalnız kod ilə axtarış
-            mehsullar = Mehsul.objects.filter(kodlar__icontains=clean_search)[:5]
+            # Kod ilə axtarış
+            kod_filter = Q(kodlar__icontains=clean_search)
+            
+            # Ad ilə təkmilləşdirilmiş axtarış
+            # Çoxlu boşluq və təbləri tək boşluğa çeviririk
+            processed_query = re.sub(r'\s+', ' ', search_query).strip()
+            
+            # Axtarış sözlərini ayırırıq
+            search_words = processed_query.split()
+            
+            if search_words:
+                # Hər bir söz məhsulun adında olmalıdır (sıradan asılı olmayaraq)
+                ad_filters = []
+                for word in search_words:
+                    ad_filters.append(Q(adi__icontains=word))
+                
+                # "AND" operatoru ilə birləşdiririk - bütün sözlər olmalıdır
+                ad_filter = reduce(and_, ad_filters)
+                
+                # Kod və ad filterini "OR" operatoru ilə birləşdiririk
+                mehsullar = Mehsul.objects.filter(kod_filter | ad_filter)[:5]
+            else:
+                # Əgər heç bir söz yoxdursa, yalnız kod ilə axtarış
+                mehsullar = Mehsul.objects.filter(kod_filter)[:5]
             
             suggestions = []
             for mehsul in mehsullar:

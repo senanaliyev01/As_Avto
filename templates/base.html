@@ -68,7 +68,7 @@
                         <div class="search-item">
                             <!-- <label for="category">Kateqoriya</label> -->
                             <select id="category" name="kateqoriya">
-                                <option value="">Bütün kateqoriyalar</option>
+                                <option value="">Bütün Kateqoriyalar</option>
                                 {% for category in request.categories %}
                                 <option value="{{ category.adi }}" {% if request.GET.kateqoriya == category.adi %}selected{% endif %}>{{ category.adi }}</option>
                                 {% endfor %}
@@ -77,7 +77,7 @@
                         <div class="search-item">
                             <!-- <label for="brand">Marka</label> -->
                             <select id="brand" name="firma">
-                                <option value="">Bütün markalar</option>
+                                <option value="">Bütün Firmalar</option>
                                 {% for brand in request.brands %}
                                 <option value="{{ brand.adi }}" {% if request.GET.firma == brand.adi %}selected{% endif %}>{{ brand.adi }}</option>
                                 {% endfor %}
@@ -86,7 +86,7 @@
                         <div class="search-item">
                             <!-- <label for="model">Model</label> -->
                             <select id="model" name="avtomobil">
-                                <option value="">Bütün modellər</option>
+                                <option value="">Bütün Avtomobillər</option>
                                 {% for model in request.models %}
                                 <option value="{{ model.adi }}" {% if request.GET.avtomobil == model.adi %}selected{% endif %}>{{ model.adi }}</option>
                                 {% endfor %}

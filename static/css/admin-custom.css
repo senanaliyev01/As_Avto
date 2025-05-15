@@ -1,0 +1,283 @@
+/* Admin panel üçün xüsusi CSS - Məhsul cədvəli dizaynı */
+
+/* Ümumi cədvəl stilləri */
+#result_list {
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+    border: none !important;
+}
+
+#result_list thead th {
+    background-color: #2c3e50 !important;
+    color: white !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    font-size: 12px !important;
+    letter-spacing: 0.5px !important;
+    padding: 12px 8px !important;
+}
+
+#result_list thead th a {
+    color: white !important;
+}
+
+#result_list tbody tr:nth-child(odd) {
+    background-color: rgba(0, 0, 0, 0.02) !important;
+}
+
+#result_list tbody tr:hover {
+    background-color: rgba(52, 152, 219, 0.08) !important;
+}
+
+#result_list tbody td {
+    padding: 12px 8px !important;
+    vertical-align: middle !important;
+}
+
+/* Məhsul adı sütunu */
+.field-adi {
+    font-weight: 600 !important;
+    color: #2c3e50 !important;
+    max-width: 300px !important;
+    word-break: break-word !important;
+}
+
+/* Status indikatorları */
+.status-pill {
+    display: inline-block !important;
+    padding: 4px 8px !important;
+    border-radius: 20px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+}
+
+/* Stok sayı göstəriciləri */
+.high-stock {
+    background-color: #d4edda !important;
+    color: #155724 !important;
+}
+
+.medium-stock {
+    background-color: #fff3cd !important;
+    color: #856404 !important;
+}
+
+.low-stock {
+    background-color: #f8d7da !important;
+    color: #721c24 !important;
+}
+
+/* Filterlər paneli */
+#changelist-filter {
+    background-color: #f8f9fa !important;
+    border-radius: 8px !important;
+    padding: 15px !important;
+    margin-left: 15px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+}
+
+#changelist-filter h3 {
+    font-size: 16px !important;
+    color: #2c3e50 !important;
+    margin-bottom: 10px !important;
+    border-bottom: 1px solid #e9ecef !important;
+    padding-bottom: 10px !important;
+}
+
+#changelist-filter ul {
+    padding-left: 0 !important;
+}
+
+#changelist-filter li {
+    list-style-type: none !important;
+    margin-bottom: 5px !important;
+}
+
+#changelist-filter a {
+    color: #495057 !important;
+    text-decoration: none !important;
+    display: block !important;
+    padding: 5px 0 !important;
+    transition: all 0.2s !important;
+}
+
+#changelist-filter a:hover {
+    color: #007bff !important;
+    padding-left: 5px !important;
+}
+
+#changelist-filter li.selected a {
+    color: #007bff !important;
+    font-weight: 600 !important;
+}
+
+/* Axtarış forması */
+#searchbar {
+    padding: 10px !important;
+    border-radius: 20px !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid #ced4da !important;
+    width: 100% !important;
+    transition: all 0.3s !important;
+}
+
+#searchbar:focus {
+    border-color: #80bdff !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+    outline: none !important;
+}
+
+/* Əməliyyatlar düymələri */
+.object-tools a {
+    background-color: #007bff !important;
+    padding: 8px 15px !important;
+    border-radius: 4px !important;
+    font-weight: 400 !important;
+    font-size: 12px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3) !important;
+    transition: all 0.2s !important;
+}
+
+.object-tools a:hover {
+    background-color: #0069d9 !important;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.5) !important;
+}
+
+/* Əməliyyatlar siyahısı */
+.actions {
+    background-color: #f8f9fa !important;
+    padding: 10px 15px !important;
+    border-radius: 8px !important;
+    margin-bottom: 20px !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05) !important;
+}
+
+.actions select {
+    border-radius: 4px !important;
+    padding: 5px !important;
+    border: 1px solid #ced4da !important;
+}
+
+.actions .button {
+    background-color: #6c757d !important;
+    color: white !important;
+    border: none !important;
+    padding: 5px 15px !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    transition: all 0.2s !important;
+}
+
+.actions .button:hover {
+    background-color: #5a6268 !important;
+}
+
+/* Səhifəli nömrələmə */
+.paginator {
+    display: flex !important;
+    justify-content: center !important;
+    margin-top: 20px !important;
+    padding: 10px !important;
+}
+
+.paginator a, .paginator .this-page {
+    margin: 0 5px !important;
+    padding: 5px 10px !important;
+    border-radius: 4px !important;
+    text-decoration: none !important;
+}
+
+.paginator a {
+    background-color: #f8f9fa !important;
+    color: #007bff !important;
+    transition: all 0.2s !important;
+}
+
+.paginator a:hover {
+    background-color: #e9ecef !important;
+}
+
+.paginator .this-page {
+    background-color: #007bff !important;
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+/* Yeni əlavə et düyməsi */
+.addlink {
+    display: inline-block !important;
+    background-color: #28a745 !important;
+    color: white !important;
+    padding: 8px 15px !important;
+    border-radius: 4px !important;
+    text-decoration: none !important;
+    margin-bottom: 20px !important;
+    transition: all 0.2s !important;
+    box-shadow: 0 2px 5px rgba(40, 167, 69, 0.3) !important;
+}
+
+.addlink:hover {
+    background-color: #218838 !important;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.5) !important;
+}
+
+/* Firma və Qiymət sütunları */
+.field-get_firma, .field-get_qiymet {
+    font-weight: 600 !important;
+}
+
+/* Stok sütunu */
+.field-get_stok {
+    text-align: center !important;
+}
+
+/* Brend Kod və OEM sütunları */
+.field-get_brend_kod, .field-get_oem {
+    font-family: 'Roboto Mono', monospace !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* Excel idxal et düyməsi */
+.import-btn {
+    background-color: #6610f2 !important;
+    color: white !important;
+    border: none !important;
+    padding: 8px 15px !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    margin-bottom: 20px !important;
+    font-weight: 600 !important;
+    transition: all 0.2s !important;
+    box-shadow: 0 2px 5px rgba(102, 16, 242, 0.3) !important;
+}
+
+.import-btn:hover {
+    background-color: #520dc2 !important;
+    box-shadow: 0 2px 8px rgba(102, 16, 242, 0.5) !important;
+}
+
+/* Responsiv cədvəl */
+@media (max-width: 1200px) {
+    .field-olcu, .field-get_olcu, .field-vitrin, .field-get_vitrin {
+        display: none !important;
+    }
+}
+
+@media (max-width: 992px) {
+    .field-oem, .field-get_oem, .field-avtomobil, .field-get_avtomobil {
+        display: none !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .field-brend_kod, .field-get_brend_kod, .field-maya_qiymet, .field-get_maya_qiymet {
+        display: none !important;
+    }
+}
+
+/* Font import */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono&display=swap'); 

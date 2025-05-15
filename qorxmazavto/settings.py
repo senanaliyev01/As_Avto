@@ -176,7 +176,7 @@ JAZZMIN_SETTINGS = {
     "site_brand": "Admin",
     "site_logo": "images/favicon.png",
     "site_icon": "images/favicon.png",
-     "login_logo": "images/favicon.png",
+    "login_logo": "images/favicon.png",
     
     # Admin panelin rəng sxemi
     "theme": "default",
@@ -189,7 +189,7 @@ JAZZMIN_SETTINGS = {
     "user_avatar": None,
     
     # Top navbarda axtarış
-    "search_model": ["auth.User", "auth.Group"],
+    "search_model": ["auth.User", "auth.Group", "home.Mehsul"],
     
     # Custom linklər
     "custom_links": {
@@ -205,14 +205,47 @@ JAZZMIN_SETTINGS = {
         "auth": "fas fa-users-cog",
         "auth.user": "fas fa-user",
         "auth.Group": "fas fa-users",
-        "home.Firma": "fas fa-industry icon",
-        "home.Kateqoriya": "fa-solid fa-list-check",
-        "home.Avtomobil": "fa-solid fa-car",
-        "home.Mehsul": "fa-solid fa-boxes-stacked",
-        "home.Sifaris": "fa-solid fa-clipboard-list",
-        "home.Vitrin": "fa-solid fa-list",
-        "home.PopupImage": "fa-solid fa-image",
+        "home.Firma": "fas fa-industry",
+        "home.Kateqoriya": "fas fa-tags",
+        "home.Avtomobil": "fas fa-car",
+        "home.Mehsul": "fas fa-boxes-stacked",
+        "home.Sifaris": "fas fa-clipboard-list",
+        "home.Vitrin": "fas fa-warehouse",
+        "home.PopupImage": "fas fa-image",
     },
+    
+    # Modellər üçün xüsusi konfiqurasiya
+    "changeform_format": "horizontal_tabs",
+    "changeform_format_overrides": {
+        "home.Mehsul": "collapsible",
+    },
+    
+    # Admin panelin görünüşü
+    "show_ui_builder": False,
+    "related_modal_active": True,
+    "custom_css": "css/admin-custom.css",
+    "custom_js": "js/admin-custom.js",
+    
+    # Qrup və icazələr səhifəsində hüquqları qruplaşdırır
+    "order_with_respect_to": ["auth", "home"],
+    
+    # Cədvəl görünüşünü yaxşılaşdırmaq
+    "list_per_page": 50,
+    "hide_apps": [],
+    "hide_models": [],
+    
+    # Dashboard tənzimləmələri
+    "welcome_sign": "AS-AVTO İdarəetmə Sistemi",
+    "copyright": "AS-AVTO © 2024",
+    
+    # Avtomatik başlıqlar
+    "topmenu_links": [
+        {"name": "Əsas səhifə", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Sayt", "url": "/", "new_window": True},
+        {"name": "Məhsullar", "url": "admin:home_mehsul_changelist", "permissions": ["home.view_mehsul"]},
+        {"name": "Sifarişlər", "url": "admin:home_sifaris_changelist", "permissions": ["home.view_sifaris"]},
+        {"model": "auth.User"},
+    ],
 }
 
 # 4. Admin interfeysi üçün əlavə tənzimləmələr
@@ -221,7 +254,7 @@ JAZZMIN_UI_TWEAKS = {
     "footer_small_text": False,
     "body_small_text": False,
     "brand_small_text": False,
-    "brand_colour": "navbar-success",
+    "brand_colour": "navbar-primary",
     "accent": "accent-primary",
     "navbar": "navbar-dark",
     "no_navbar_border": False,
@@ -232,4 +265,14 @@ JAZZMIN_UI_TWEAKS = {
     "sidebar_nav_compact_style": False,
     "sidebar_nav_legacy_style": False,
     "sidebar_nav_flat_style": False,
+    "theme": "default",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    }
 }

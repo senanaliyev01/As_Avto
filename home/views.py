@@ -57,17 +57,16 @@ def products_view(request):
             # Kodlar üçün təmizlənmiş versiya
             clean_word = re.sub(r'[^a-zA-Z0-9]', '', word)
             
+            # Hər bir söz üçün axtarış
             word_query = (
                 Q(adi__icontains=word) |  # ad ilə axtarış
                 Q(kodlar__icontains=clean_word) |  # kod ilə axtarış (təmizlənmiş)
                 Q(brend_kod__icontains=word) |  # brend kodu ilə axtarış
-                Q(oem__icontains=word) |  # OEM kodu ilə axtarış
-                Q(firma__adi__icontains=word) |  # firma adı ilə axtarış
-                Q(kateqoriya__adi__icontains=word)  # kateqoriya adı ilə axtarış
+                Q(oem__icontains=word)  # OEM kodu ilə axtarış
             )
-            query &= word_query  # AND operatoru ilə birləşdiririk
+            query |= word_query  # OR operatoru ilə birləşdiririk
         
-        mehsullar = mehsullar.filter(query)
+        mehsullar = mehsullar.filter(query).distinct()
     
     if kateqoriya:
         mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)
@@ -393,17 +392,16 @@ def search_suggestions(request):
             # Kodlar üçün təmizlənmiş versiya
             clean_word = re.sub(r'[^a-zA-Z0-9]', '', word)
             
+            # Hər bir söz üçün axtarış
             word_query = (
                 Q(adi__icontains=word) |  # ad ilə axtarış
                 Q(kodlar__icontains=clean_word) |  # kod ilə axtarış (təmizlənmiş)
-                Q(brend_kod__icontains=clean_word) |  # brend kodu ilə axtarış (təmizlənmiş)
-                Q(oem__icontains=clean_word) |  # OEM kodu ilə axtarış (təmizlənmiş)
-                Q(firma__adi__icontains=word) |  # firma adı ilə axtarış
-                Q(kateqoriya__adi__icontains=word)  # kateqoriya adı ilə axtarış
+                Q(brend_kod__icontains=word) |  # brend kodu ilə axtarış
+                Q(oem__icontains=word)  # OEM kodu ilə axtarış
             )
-            query &= word_query  # AND operatoru ilə birləşdiririk
+            query |= word_query  # OR operatoru ilə birləşdiririk
         
-        mehsullar = Mehsul.objects.filter(query)[:5]
+        mehsullar = Mehsul.objects.filter(query).distinct()[:5]
         
         suggestions = []
         for mehsul in mehsullar:

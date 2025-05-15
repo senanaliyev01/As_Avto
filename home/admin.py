@@ -40,25 +40,33 @@ class AvtomobilAdmin(admin.ModelAdmin):
 
 @admin.register(Mehsul)
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ['adi', 'firma', 'brend_kod', 'oem', 'olcu', 'vitrin', 'maya_qiymet', 'qiymet', 'stok', 'yenidir']
+    list_display = ['adi', 'firma', 'brend_kod', 'oem', 'olcu', 'vitrin', 'maya_qiymet', 'qiymet', 'stok', 'yeni_badge']
     list_filter = ['kateqoriya', 'firma', 'avtomobil', 'vitrin', 'yenidir']
     search_fields = ['adi', 'brend_kod', 'oem', 'kodlar', 'olcu']
+    list_per_page = 50
     change_list_template = 'admin/mehsul_change_list.html'
     actions = ['mark_as_new', 'remove_from_new']
-    
-    # Cədvəl görünüşünü yaxşılaşdırmaq üçün CSS klassları
+
     class Media:
         css = {
-            'all': ('admin/css/custom_admin.css',)
+            'all': ('css/admin.css',)
         }
+        js = ('js/admin.js',)
 
-    list_per_page = 50  # Hər səhifədə 50 məhsul göstər
-    list_display_links = ['adi']  # Məhsul adına klik edəndə detallara keç
-    
-    # Sütunların başlıqlarını Azərbaycan dilində göstər
-    def get_list_display(self, request):
-        self.list_display_links = ('adi',)
-        return self.list_display
+    def yeni_badge(self, obj):
+        if obj.yenidir:
+            return format_html('<span class="yeni-badge">Yeni</span>')
+        return ''
+    yeni_badge.short_description = 'Status'
+    yeni_badge.admin_order_field = 'yenidir'
+
+    def get_list_display_links(self, request, list_display):
+        return ['adi']
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['title'] = 'Məhsullar'
+        return super().changelist_view(request, extra_context=extra_context)
 
     def mark_as_new(self, request, queryset):
         updated = queryset.update(yenidir=True)
@@ -248,12 +256,6 @@ class MehsulAdmin(admin.ModelAdmin):
                 return HttpResponseRedirect("../")
         
         return HttpResponseRedirect("../")
-
-    def changelist_view(self, request, extra_context=None):
-        # Cədvəl başlıqlarını Azərbaycan dilində göstər
-        extra_context = extra_context or {}
-        extra_context['title'] = 'Məhsullar'
-        return super().changelist_view(request, extra_context=extra_context)
 
 class SifarisItemInline(admin.TabularInline):
     model = SifarisItem

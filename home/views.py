@@ -9,6 +9,8 @@ import re
 from django.http import JsonResponse, HttpResponseNotFound
 from django.db.models.functions import Lower
 from django.db.models import Value
+from functools import reduce
+from operator import and_, or_
 
 def custom_404(request, exception=None):
     return HttpResponseNotFound(render(request, '404.html').content)
@@ -48,15 +50,35 @@ def products_view(request):
     popup_images = PopupImage.objects.filter(aktiv=True)
     
     if search_query:
-        # Xüsusi simvolları və boşluqları təmizlə
+        # Kodlarla axtarış üçün əvvəlki təmizləmə
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         
+        # İki ayrı filter tətbiq edək
         if clean_search:
-            # Kodlarla və adla axtarış
-            mehsullar = mehsullar.filter(
-                Q(kodlar__icontains=clean_search) |  # Mövcud kod axtarışı
-                Q(adi__icontains=search_query)  # Yeni ad ilə axtarış
-            )
+            # Kod ilə axtarış
+            kod_filter = Q(kodlar__icontains=clean_search)
+            
+            # Ad ilə təkmilləşdirilmiş axtarış
+            # Çoxlu boşluq və təbləri tək boşluğa çeviririk
+            processed_query = re.sub(r'\s+', ' ', search_query).strip()
+            
+            # Axtarış sözlərini ayırırıq
+            search_words = processed_query.split()
+            
+            if search_words:
+                # Hər bir söz məhsulun adında olmalıdır (sıradan asılı olmayaraq)
+                ad_filters = []
+                for word in search_words:
+                    ad_filters.append(Q(adi__icontains=word))
+                
+                # "AND" operatoru ilə birləşdiririk - bütün sözlər olmalıdır
+                ad_filter = reduce(and_, ad_filters)
+                
+                # Kod və ad filterini "OR" operatoru ilə birləşdiririk
+                mehsullar = mehsullar.filter(kod_filter | ad_filter)
+            else:
+                # Əgər heç bir söz yoxdursa, yalnız kod ilə axtarış
+                mehsullar = mehsullar.filter(kod_filter)
     
     if kateqoriya:
         mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)
@@ -100,15 +122,35 @@ def load_more_products(request):
     mehsullar = Mehsul.objects.all().order_by('-id')
     
     if search_query:
-        # Xüsusi simvolları və boşluqları təmizlə
+        # Kodlarla axtarış üçün əvvəlki təmizləmə
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         
+        # İki ayrı filter tətbiq edək
         if clean_search:
-            # Kodlarla və adla axtarış
-            mehsullar = mehsullar.filter(
-                Q(kodlar__icontains=clean_search) |  # Mövcud kod axtarışı
-                Q(adi__icontains=search_query)  # Yeni ad ilə axtarış
-            )
+            # Kod ilə axtarış
+            kod_filter = Q(kodlar__icontains=clean_search)
+            
+            # Ad ilə təkmilləşdirilmiş axtarış
+            # Çoxlu boşluq və təbləri tək boşluğa çeviririk
+            processed_query = re.sub(r'\s+', ' ', search_query).strip()
+            
+            # Axtarış sözlərini ayırırıq
+            search_words = processed_query.split()
+            
+            if search_words:
+                # Hər bir söz məhsulun adında olmalıdır (sıradan asılı olmayaraq)
+                ad_filters = []
+                for word in search_words:
+                    ad_filters.append(Q(adi__icontains=word))
+                
+                # "AND" operatoru ilə birləşdiririk - bütün sözlər olmalıdır
+                ad_filter = reduce(and_, ad_filters)
+                
+                # Kod və ad filterini "OR" operatoru ilə birləşdiririk
+                mehsullar = mehsullar.filter(kod_filter | ad_filter)
+            else:
+                # Əgər heç bir söz yoxdursa, yalnız kod ilə axtarış
+                mehsullar = mehsullar.filter(kod_filter)
     
     if kateqoriya:
         mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)

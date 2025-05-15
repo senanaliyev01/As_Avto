@@ -51,33 +51,31 @@ def products_view(request):
         # Xüsusi simvolları və boşluqları təmizlə
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         
-        # Axtarış sözlərini ayır
+        # Axtarış sözlərini ayır və təmizlə
         search_words = search_query.lower().split()
-        
-        # İki yanaşma: təmizlənmiş və orijinal sözlər
         clean_words = [re.sub(r'[^a-zA-Z0-9]', '', word) for word in search_words if word]
-        original_words = [word for word in search_words if word]
         
-        if clean_search or search_words:
+        if clean_search:
             # Kod ilə axtarış
             code_query = Q(kodlar__icontains=clean_search)
             
-            # Ad ilə axtarış üçün şərtlər
-            name_queries = Q()
+            # Ad ilə axtarış üçün annotation əlavə et
+            mehsullar = mehsullar.annotate(
+                clean_name=Lower('adi'),
+                clean_name_no_special=Value('')
+            )
             
             # Təmizlənmiş ad ilə axtarış
-            if clean_search:
-                name_queries |= Q(adi__icontains=clean_search)
+            name_queries = Q()
             
-            # Orijinal söz ilə birbaşa axtarış (xüsusi simvolları saxlayaraq)
-            for word in original_words:
-                name_queries |= Q(adi__icontains=word)
+            # Birləşik axtarış üçün
+            name_queries |= Q(clean_name__icontains=clean_search)
             
-            # Təmizlənmiş sözlərlə axtarış
+            # Bütün sözlərin olması üçün
             if clean_words:
-                word_query = Q(adi__icontains=clean_words[0])
+                word_query = Q(clean_name__icontains=clean_words[0])
                 for word in clean_words[1:]:
-                    word_query &= Q(adi__icontains=word)
+                    word_query &= Q(clean_name__icontains=word)
                 name_queries |= word_query
             
             # Kod və ya ad ilə axtarış
@@ -401,37 +399,35 @@ def search_suggestions(request):
         # Xüsusi simvolları və boşluqları təmizlə
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         
-        # Axtarış sözlərini ayır
+        # Axtarış sözlərini ayır və təmizlə
         search_words = search_query.lower().split()
-        
-        # İki yanaşma: təmizlənmiş və orijinal sözlər
         clean_words = [re.sub(r'[^a-zA-Z0-9]', '', word) for word in search_words if word]
-        original_words = [word for word in search_words if word]
         
-        if clean_search or search_words:
+        if clean_search or clean_words:
             # Kod ilə axtarış
             code_query = Q(kodlar__icontains=clean_search)
             
-            # Ad ilə axtarış üçün şərtlər
-            name_queries = Q()
+            # Ad ilə axtarış üçün annotation əlavə et
+            mehsullar = Mehsul.objects.annotate(
+                clean_name=Lower('adi'),
+                clean_name_no_special=Value('')
+            )
             
             # Təmizlənmiş ad ilə axtarış
-            if clean_search:
-                name_queries |= Q(adi__icontains=clean_search)
+            name_queries = Q()
             
-            # Orijinal söz ilə birbaşa axtarış (xüsusi simvolları saxlayaraq)
-            for word in original_words:
-                name_queries |= Q(adi__icontains=word)
+            # Birləşik axtarış üçün
+            name_queries |= Q(clean_name__icontains=clean_search)
             
-            # Təmizlənmiş sözlərlə axtarış
+            # Bütün sözlərin olması üçün
             if clean_words:
-                word_query = Q(adi__icontains=clean_words[0])
+                word_query = Q(clean_name__icontains=clean_words[0])
                 for word in clean_words[1:]:
-                    word_query &= Q(adi__icontains=word)
+                    word_query &= Q(clean_name__icontains=word)
                 name_queries |= word_query
             
             # Kod və ya ad ilə axtarış
-            mehsullar = Mehsul.objects.filter(code_query | name_queries).distinct()[:5]
+            mehsullar = mehsullar.filter(code_query | name_queries).distinct()[:5]
             
             suggestions = []
             for mehsul in mehsullar:

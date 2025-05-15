@@ -48,18 +48,12 @@ def products_view(request):
     popup_images = PopupImage.objects.filter(aktiv=True)
     
     if search_query:
-        # Kodlar üçün təmizləmə
-        clean_search_code = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
+        # Xüsusi simvolları və boşluqları təmizlə
+        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         
-        # Ad üçün təmizləmə (yalnız artıq boşluqları təmizləyir)
-        clean_search_name = ' '.join(search_query.lower().split())
-        
-        if clean_search_code or clean_search_name:
-            # Kod və ya ad ilə axtarış
-            mehsullar = mehsullar.filter(
-                Q(kodlar__icontains=clean_search_code) |
-                Q(adi__iregex=r'\y{}\y'.format(clean_search_name))
-            )
+        if clean_search:
+            # Yalnız kod ilə axtarış
+            mehsullar = mehsullar.filter(kodlar__icontains=clean_search)
     
     if kateqoriya:
         mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)
@@ -376,18 +370,12 @@ def search_suggestions(request):
     search_query = request.GET.get('search', '')
     
     if search_query:
-        # Kodlar üçün təmizləmə
-        clean_search_code = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
+        # Xüsusi simvolları və boşluqları təmizlə
+        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         
-        # Ad üçün təmizləmə (yalnız artıq boşluqları təmizləyir)
-        clean_search_name = ' '.join(search_query.lower().split())
-        
-        if clean_search_code or clean_search_name:
-            # Kod və ya ad ilə axtarış
-            mehsullar = Mehsul.objects.filter(
-                Q(kodlar__icontains=clean_search_code) |
-                Q(adi__iregex=r'\y{}\y'.format(clean_search_name))
-            )[:5]
+        if clean_search:
+            # Yalnız kod ilə axtarış
+            mehsullar = Mehsul.objects.filter(kodlar__icontains=clean_search)[:5]
             
             suggestions = []
             for mehsul in mehsullar:

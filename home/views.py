@@ -49,27 +49,11 @@ def products_view(request):
     
     if search_query:
         # Xüsusi simvolları və boşluqları təmizlə
-        clean_search = re.sub(r'[^a-zA-Z0-9\s]', '', search_query.lower())
+        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         
         if clean_search:
-            # Kod ilə axtarış
-            code_query = Q(kodlar__icontains=clean_search)
-            
-            # Ad ilə axtarış
-            # Orijinal ad ilə axtarış (xüsusi simvollar olan məhsullar üçün)
-            name_query = Q(adi__icontains=search_query)
-            
-            # Təmizlənmiş ad ilə axtarış
-            clean_words = clean_search.split()
-            clean_name_query = Q()
-            
-            if clean_words:
-                # Hər bir təmizlənmiş sözün məhsul adında olmasını yoxla
-                for word in clean_words:
-                    clean_name_query &= Q(adi__iregex=f'\\b{word}\\b')
-            
-            # Bütün axtarışları birləşdir
-            mehsullar = mehsullar.filter(code_query | name_query | clean_name_query)
+            # Yalnız kod ilə axtarış
+            mehsullar = mehsullar.filter(kodlar__icontains=clean_search)
     
     if kateqoriya:
         mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)
@@ -387,27 +371,11 @@ def search_suggestions(request):
     
     if search_query:
         # Xüsusi simvolları və boşluqları təmizlə
-        clean_search = re.sub(r'[^a-zA-Z0-9\s]', '', search_query.lower())
+        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         
         if clean_search:
-            # Kod ilə axtarış
-            code_query = Q(kodlar__icontains=clean_search)
-            
-            # Ad ilə axtarış
-            # Orijinal ad ilə axtarış (xüsusi simvollar olan məhsullar üçün)
-            name_query = Q(adi__icontains=search_query)
-            
-            # Təmizlənmiş ad ilə axtarış
-            clean_words = clean_search.split()
-            clean_name_query = Q()
-            
-            if clean_words:
-                # Hər bir təmizlənmiş sözün məhsul adında olmasını yoxla
-                for word in clean_words:
-                    clean_name_query &= Q(adi__iregex=f'\\b{word}\\b')
-            
-            # Bütün axtarışları birləşdir
-            mehsullar = Mehsul.objects.filter(code_query | name_query | clean_name_query)[:5]
+            # Yalnız kod ilə axtarış
+            mehsullar = Mehsul.objects.filter(kodlar__icontains=clean_search)[:5]
             
             suggestions = []
             for mehsul in mehsullar:

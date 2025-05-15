@@ -52,8 +52,11 @@ def products_view(request):
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         
         if clean_search:
-            # Yalnız kod ilə axtarış
-            mehsullar = mehsullar.filter(kodlar__icontains=clean_search)
+            # Kodlarla və adla axtarış
+            mehsullar = mehsullar.filter(
+                Q(kodlar__icontains=clean_search) |  # Mövcud kod axtarışı
+                Q(adi__icontains=search_query)  # Yeni ad ilə axtarış
+            )
     
     if kateqoriya:
         mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)
@@ -97,8 +100,15 @@ def load_more_products(request):
     mehsullar = Mehsul.objects.all().order_by('-id')
     
     if search_query:
-        # Existing search logic...
-        pass
+        # Xüsusi simvolları və boşluqları təmizlə
+        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
+        
+        if clean_search:
+            # Kodlarla və adla axtarış
+            mehsullar = mehsullar.filter(
+                Q(kodlar__icontains=clean_search) |  # Mövcud kod axtarışı
+                Q(adi__icontains=search_query)  # Yeni ad ilə axtarış
+            )
     
     if kateqoriya:
         mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)

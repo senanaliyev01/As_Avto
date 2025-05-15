@@ -9,6 +9,7 @@ import re
 from django.http import JsonResponse, HttpResponseNotFound
 from django.db.models.functions import Lower
 from django.db.models import Value
+from itertools import permutations
 
 def custom_404(request, exception=None):
     return HttpResponseNotFound(render(request, '404.html').content)
@@ -48,27 +49,28 @@ def products_view(request):
     popup_images = PopupImage.objects.filter(aktiv=True)
     
     if search_query:
-        # Axtarış sözlərini ayır
-        search_words = search_query.split()
+        # Axtarış sözlərini kiçik hərflərə çevir və boşluqları təmizlə
+        search_terms = search_query.lower().strip().split()
         
         # Əsas axtarış sorğusu
         query = Q()
         
-        # Məhsul adında axtarış
-        name_query = Q()
-        for word in search_words:
-            name_query &= Q(adi__icontains=word)
-        query |= name_query
+        # Tam uyğunluq axtarışı
+        exact_match_query = Q(adi__iexact=search_query)
         
-        # Kodlarda axtarış
-        code_query = Q()
-        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
-        if clean_search:
-            code_query = Q(kodlar__icontains=clean_search)
-        query |= code_query
+        # Sözlərin sırasını dəyişərək bütün mümkün kombinasiyaları yoxla
+        all_permutations = list(permutations(search_terms))
         
-        # Filteri tətbiq et
-        mehsullar = mehsullar.filter(query).distinct()
+        for perm in all_permutations:
+            combined_term = ' '.join(perm)
+            query |= Q(adi__icontains=combined_term)
+        
+        # Kodlar üzrə axtarış
+        for term in search_terms:
+            query |= Q(kodlar__icontains=term)
+        
+        # Nəticələri filtrlə
+        mehsullar = mehsullar.filter(exact_match_query | query).distinct()
     
     if kateqoriya:
         mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)
@@ -385,27 +387,28 @@ def search_suggestions(request):
     search_query = request.GET.get('search', '')
     
     if search_query:
-        # Axtarış sözlərini ayır
-        search_words = search_query.split()
+        # Axtarış sözlərini kiçik hərflərə çevir və boşluqları təmizlə
+        search_terms = search_query.lower().strip().split()
         
         # Əsas axtarış sorğusu
         query = Q()
         
-        # Məhsul adında axtarış
-        name_query = Q()
-        for word in search_words:
-            name_query &= Q(adi__icontains=word)
-        query |= name_query
+        # Tam uyğunluq axtarışı
+        exact_match_query = Q(adi__iexact=search_query)
         
-        # Kodlarda axtarış
-        code_query = Q()
-        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
-        if clean_search:
-            code_query = Q(kodlar__icontains=clean_search)
-        query |= code_query
+        # Sözlərin sırasını dəyişərək bütün mümkün kombinasiyaları yoxla
+        all_permutations = list(permutations(search_terms))
         
-        # Axtarışı yerinə yetir
-        mehsullar = Mehsul.objects.filter(query).distinct()[:5]
+        for perm in all_permutations:
+            combined_term = ' '.join(perm)
+            query |= Q(adi__icontains=combined_term)
+        
+        # Kodlar üzrə axtarış
+        for term in search_terms:
+            query |= Q(kodlar__icontains=term)
+        
+        # Nəticələri filtrlə və limitlə
+        mehsullar = Mehsul.objects.filter(exact_match_query | query).distinct()[:5]
         
         suggestions = []
         for mehsul in mehsullar:

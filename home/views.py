@@ -48,37 +48,25 @@ def products_view(request):
     popup_images = PopupImage.objects.filter(aktiv=True)
     
     if search_query:
-        # Əvvəlcə kodlarla axtarış
+        # Xüsusi simvolları və boşluqları təmizlə
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
+        
         if clean_search:
-            mehsullar = mehsullar.filter(kodlar__icontains=clean_search)
-        else:
-            # Kodla tapılmadısa, ad ilə axtarış
-            # Axtarış sözünü hazırla (bütün sözləri birləşdir)
-            search_combined = ''.join(search_query.lower().split())
+            # Kod ilə axtarış
+            code_query = Q(kodlar__icontains=clean_search)
             
-            # Annotasiya əlavə et - məhsul adlarını eyni formata gətir
-            mehsullar = mehsullar.annotate(
-                clean_name=Lower('adi'),
-                combined_name=Value('')
+            # Ad ilə axtarış
+            # Əgər məhsul adında xüsusi simvol varsa, orijinal axtarış sözü ilə
+            name_query = Q(adi__icontains=search_query)
+            
+            # Əgər məhsul adında xüsusi simvol yoxdursa, təmizlənmiş versiya ilə
+            clean_name_query = Q(
+                ~Q(adi__regex=r'[^a-zA-Z0-9\s]') &  # xüsusi simvolu olmayan məhsullar
+                Q(adi__iregex=r'\b' + r'\b.*\b'.join(re.escape(clean_search)) + r'\b')  # sözlərin sırası önəmli deyil
             )
             
-            # Xüsusi simvolları yoxla
-            has_special = bool(re.search(r'[^a-zA-Z0-9\s]', search_query))
-            
-            if has_special:
-                # Xüsusi simvollar varsa, birbaşa axtarış
-                mehsullar = mehsullar.filter(adi__icontains=search_query)
-            else:
-                # Xüsusi simvollar yoxdursa, təmizlənmiş versiya ilə axtarış
-                # Məhsul adlarından xüsusi simvolları və boşluqları sil
-                clean_products = []
-                for mehsul in mehsullar:
-                    clean_product_name = ''.join(re.sub(r'[^a-zA-Z0-9]', '', mehsul.adi.lower()).split())
-                    if search_combined in clean_product_name:
-                        clean_products.append(mehsul.id)
-                
-                mehsullar = mehsullar.filter(id__in=clean_products)
+            # Bütün axtarışları birləşdir
+            mehsullar = mehsullar.filter(code_query | name_query | clean_name_query)
     
     if kateqoriya:
         mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)
@@ -395,44 +383,37 @@ def search_suggestions(request):
     search_query = request.GET.get('search', '')
     
     if search_query:
-        # Əvvəlcə kodlarla axtarış
+        # Xüsusi simvolları və boşluqları təmizlə
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
+        
         if clean_search:
-            mehsullar = Mehsul.objects.filter(kodlar__icontains=clean_search)[:5]
-        else:
-            # Kodla tapılmadısa, ad ilə axtarış
-            # Axtarış sözünü hazırla (bütün sözləri birləşdir)
-            search_combined = ''.join(search_query.lower().split())
+            # Kod ilə axtarış
+            code_query = Q(kodlar__icontains=clean_search)
             
-            mehsullar = Mehsul.objects.all()
+            # Ad ilə axtarış
+            # Əgər məhsul adında xüsusi simvol varsa, orijinal axtarış sözü ilə
+            name_query = Q(adi__icontains=search_query)
             
-            # Xüsusi simvolları yoxla
-            has_special = bool(re.search(r'[^a-zA-Z0-9\s]', search_query))
+            # Əgər məhsul adında xüsusi simvol yoxdursa, təmizlənmiş versiya ilə
+            clean_name_query = Q(
+                ~Q(adi__regex=r'[^a-zA-Z0-9\s]') &  # xüsusi simvolu olmayan məhsullar
+                Q(adi__iregex=r'\b' + r'\b.*\b'.join(re.escape(clean_search)) + r'\b')  # sözlərin sırası önəmli deyil
+            )
             
-            if has_special:
-                # Xüsusi simvollar varsa, birbaşa axtarış
-                mehsullar = mehsullar.filter(adi__icontains=search_query)[:5]
-            else:
-                # Xüsusi simvollar yoxdursa, təmizlənmiş versiya ilə axtarış
-                clean_products = []
-                for mehsul in mehsullar:
-                    clean_product_name = ''.join(re.sub(r'[^a-zA-Z0-9]', '', mehsul.adi.lower()).split())
-                    if search_combined in clean_product_name:
-                        clean_products.append(mehsul.id)
-                
-                mehsullar = Mehsul.objects.filter(id__in=clean_products)[:5]
+            # Bütün axtarışları birləşdir
+            mehsullar = Mehsul.objects.filter(code_query | name_query | clean_name_query)[:5]
             
-        suggestions = []
-        for mehsul in mehsullar:
-            suggestions.append({
-                'id': mehsul.id,
-                'adi': mehsul.adi,
-                'brend_kod': mehsul.brend_kod,
-                'oem': mehsul.oem,
-                'qiymet': str(mehsul.qiymet),
-                'sekil_url': mehsul.sekil.url if mehsul.sekil else None,
-            })
-        return JsonResponse({'suggestions': suggestions})
+            suggestions = []
+            for mehsul in mehsullar:
+                suggestions.append({
+                    'id': mehsul.id,
+                    'adi': mehsul.adi,
+                    'brend_kod': mehsul.brend_kod,
+                    'oem': mehsul.oem,
+                    'qiymet': str(mehsul.qiymet),
+                    'sekil_url': mehsul.sekil.url if mehsul.sekil else None,
+                })
+            return JsonResponse({'suggestions': suggestions})
     
     return JsonResponse({'suggestions': []})
 

@@ -17,7 +17,6 @@ from django.shortcuts import render
 import pandas as pd
 from django.contrib import messages
 from django.db import transaction
-from .admin_mixins import StockStatusFilter, ProfitMarginFilter, EnhancedButtonsAdminMixin, EnhancedProductListMixin
 
 @admin.register(Kateqoriya)
 class KateqoriyaAdmin(admin.ModelAdmin):
@@ -40,116 +39,12 @@ class AvtomobilAdmin(admin.ModelAdmin):
     search_fields = ['adi']
 
 @admin.register(Mehsul)
-class MehsulAdmin(admin.ModelAdmin, EnhancedButtonsAdminMixin, EnhancedProductListMixin):
-    list_display = ['adi', 'get_kategory', 'get_firma', 'get_avtomobil', 'get_brend_kod', 'get_oem', 'get_olcu', 'get_vitrin', 'get_maya_qiymet', 'get_qiymet', 'get_stok', 'get_yeni_status', 'sekil_preview']
-    list_filter = ['kateqoriya', 'firma', 'avtomobil', 'vitrin', 'yenidir', StockStatusFilter, ProfitMarginFilter]
+class MehsulAdmin(admin.ModelAdmin):
+    list_display = ['adi',  'firma',  'brend_kod', 'oem', 'olcu', 'vitrin', 'maya_qiymet', 'qiymet', 'stok', 'yenidir']
+    list_filter = ['kateqoriya', 'firma', 'avtomobil', 'vitrin', 'yenidir']
     search_fields = ['adi', 'brend_kod', 'oem', 'kodlar', 'olcu']
     change_list_template = 'admin/mehsul_change_list.html'
     actions = ['mark_as_new', 'remove_from_new']
-    list_per_page = 50
-    show_full_result_count = False
-    list_select_related = ['kateqoriya', 'firma', 'avtomobil', 'vitrin']
-    date_hierarchy = None
-    save_on_top = True
-    list_display_links = ['adi']
-    
-    fieldsets = [
-        ('Əsas məlumatlar', {
-            'fields': [
-                ('adi', 'firma'),
-                ('kateqoriya', 'avtomobil'),
-                ('brend_kod', 'oem'),
-            ],
-            'classes': ['wide', 'extrapretty'],
-        }),
-        ('Qiymət və stok', {
-            'fields': [
-                ('maya_qiymet', 'qiymet'),
-                ('stok', 'yenidir'),
-                'olcu',
-                'vitrin',
-            ],
-            'classes': ['wide'],
-        }),
-        ('Əlavə məlumatlar', {
-            'fields': [
-                'kodlar',
-                'melumat',
-                'sekil',
-            ],
-            'classes': ['collapse'],
-        }),
-    ]
-    
-    def get_kategory(self, obj):
-        return obj.kateqoriya.adi if obj.kateqoriya else '-'
-    get_kategory.short_description = 'Kateqoriya'
-    get_kategory.admin_order_field = 'kateqoriya__adi'
-    
-    def get_firma(self, obj):
-        return format_html('<span style="font-weight: bold; color: #2b5797;">{}</span>', obj.firma.adi)
-    get_firma.short_description = 'Firma'
-    get_firma.admin_order_field = 'firma__adi'
-    
-    def get_avtomobil(self, obj):
-        return format_html('<span style="color: #444;">{}</span>', obj.avtomobil.adi)
-    get_avtomobil.short_description = 'Avtomobil'
-    get_avtomobil.admin_order_field = 'avtomobil__adi'
-    
-    def get_brend_kod(self, obj):
-        return format_html('<span style="font-family: monospace; background-color: #f8f9fa; padding: 3px 6px; border-radius: 3px;">{}</span>', obj.brend_kod)
-    get_brend_kod.short_description = 'Brend Kod'
-    get_brend_kod.admin_order_field = 'brend_kod'
-    
-    def get_oem(self, obj):
-        return format_html('<span style="font-family: monospace; color: #6c757d;">{}</span>', obj.oem)
-    get_oem.short_description = 'OEM'
-    get_oem.admin_order_field = 'oem'
-    
-    def get_olcu(self, obj):
-        return obj.olcu if obj.olcu else '-'
-    get_olcu.short_description = 'Ölçü'
-    get_olcu.admin_order_field = 'olcu'
-    
-    def get_vitrin(self, obj):
-        if obj.vitrin:
-            return format_html('<span style="background-color: #e2f0d9; color: #2e7d32; padding: 3px 6px; border-radius: 3px;">{}</span>', obj.vitrin.nomre)
-        return '-'
-    get_vitrin.short_description = 'Vitrin'
-    get_vitrin.admin_order_field = 'vitrin__nomre'
-    
-    def get_maya_qiymet(self, obj):
-        return format_html('<span style="font-weight: bold; color: #666;">{:.2f} ₼</span>', obj.maya_qiymet)
-    get_maya_qiymet.short_description = 'Maya Qiyməti'
-    get_maya_qiymet.admin_order_field = 'maya_qiymet'
-    
-    def get_qiymet(self, obj):
-        return format_html('<span style="font-weight: bold; color: #2b5797;">{:.2f} ₼</span>', obj.qiymet)
-    get_qiymet.short_description = 'Qiymət'
-    get_qiymet.admin_order_field = 'qiymet'
-    
-    def get_stok(self, obj):
-        if obj.stok > 10:
-            return format_html('<span style="background-color: #e2f0d9; color: #2e7d32; padding: 3px 6px; border-radius: 3px; font-weight: bold;">{}</span>', obj.stok)
-        elif obj.stok > 0:
-            return format_html('<span style="background-color: #fff2cc; color: #856404; padding: 3px 6px; border-radius: 3px; font-weight: bold;">{}</span>', obj.stok)
-        else:
-            return format_html('<span style="background-color: #f8d7da; color: #721c24; padding: 3px 6px; border-radius: 3px; font-weight: bold;">0</span>')
-    get_stok.short_description = 'Stok'
-    get_stok.admin_order_field = 'stok'
-    
-    def get_yeni_status(self, obj):
-        if obj.yenidir:
-            return format_html('<span style="background-color: #dff0d8; color: #3c763d; padding: 3px 6px; border-radius: 3px;"><i class="fas fa-check"></i> Yeni</span>')
-        return format_html('<span style="color: #6c757d;">-</span>')
-    get_yeni_status.short_description = 'Yeni'
-    get_yeni_status.admin_order_field = 'yenidir'
-    
-    def sekil_preview(self, obj):
-        if obj.sekil and 'no_image.webp' not in obj.sekil.name:
-            return format_html('<img src="{}" style="max-height: 30px; border-radius: 4px;"/>', obj.sekil.url)
-        return format_html('<span style="color: #6c757d;"><i class="fas fa-image"></i></span>')
-    sekil_preview.short_description = 'Şəkil'
 
     def mark_as_new(self, request, queryset):
         updated = queryset.update(yenidir=True)

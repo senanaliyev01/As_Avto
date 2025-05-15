@@ -55,7 +55,10 @@ def products_view(request):
         search_words = search_query.lower().split()
         clean_words = [re.sub(r'[^a-zA-Z0-9]', '', word) for word in search_words if word]
         
-        if clean_search:
+        # Orijinal axtarış sözlərini saxla (təmizləmədən)
+        original_words = [word.lower() for word in search_words if word]
+        
+        if clean_search or original_words:
             # Kod ilə axtarış
             code_query = Q(kodlar__icontains=clean_search)
             
@@ -68,10 +71,17 @@ def products_view(request):
             # Təmizlənmiş ad ilə axtarış
             name_queries = Q()
             
-            # Birləşik axtarış üçün
+            # Birləşik axtarış üçün (təmizlənmiş)
             name_queries |= Q(clean_name__icontains=clean_search)
             
-            # Bütün sözlərin olması üçün
+            # Orijinal simvollarla axtarış
+            if original_words:
+                original_query = Q(adi__icontains=original_words[0])
+                for word in original_words[1:]:
+                    original_query &= Q(adi__icontains=word)
+                name_queries |= original_query
+            
+            # Təmizlənmiş sözlərlə axtarış
             if clean_words:
                 word_query = Q(clean_name__icontains=clean_words[0])
                 for word in clean_words[1:]:
@@ -403,7 +413,10 @@ def search_suggestions(request):
         search_words = search_query.lower().split()
         clean_words = [re.sub(r'[^a-zA-Z0-9]', '', word) for word in search_words if word]
         
-        if clean_search or clean_words:
+        # Orijinal axtarış sözlərini saxla (təmizləmədən)
+        original_words = [word.lower() for word in search_words if word]
+        
+        if clean_search or original_words:
             # Kod ilə axtarış
             code_query = Q(kodlar__icontains=clean_search)
             
@@ -416,10 +429,17 @@ def search_suggestions(request):
             # Təmizlənmiş ad ilə axtarış
             name_queries = Q()
             
-            # Birləşik axtarış üçün
+            # Birləşik axtarış üçün (təmizlənmiş)
             name_queries |= Q(clean_name__icontains=clean_search)
             
-            # Bütün sözlərin olması üçün
+            # Orijinal simvollarla axtarış
+            if original_words:
+                original_query = Q(adi__icontains=original_words[0])
+                for word in original_words[1:]:
+                    original_query &= Q(adi__icontains=word)
+                name_queries |= original_query
+            
+            # Təmizlənmiş sözlərlə axtarış
             if clean_words:
                 word_query = Q(clean_name__icontains=clean_words[0])
                 for word in clean_words[1:]:

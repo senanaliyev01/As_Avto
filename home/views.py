@@ -12,6 +12,32 @@ from django.db.models import Value
 from functools import reduce
 from operator import and_, or_
 
+def normalize_azerbaijani_chars(text):
+    # Azərbaycan hərflərinin qarşılıqlı çevrilməsi
+    char_map = {
+        'ə': 'e', 'e': 'ə',
+        'ö': 'o', 'o': 'ö',
+        'ğ': 'g', 'g': 'ğ',
+        'ı': 'i', 'i': 'ı',
+        'ü': 'u', 'u': 'ü',
+        'ş': 's', 's': 'ş',
+        'ç': 'c', 'c': 'ç'
+    }
+    
+    normalized_text = text.lower()
+    # Həm orijinal həm də çevrilmiş versiyaları əlavə et
+    variations = {normalized_text}
+    
+    # Hər bir hərf üçün mümkün variantları yarat
+    for char in normalized_text:
+        if char in char_map:
+            new_variations = set()
+            for variant in variations:
+                new_variations.add(variant.replace(char, char_map[char]))
+            variations.update(new_variations)
+    
+    return variations
+
 def custom_404(request, exception=None):
     return HttpResponseNotFound(render(request, '404.html').content)
 
@@ -66,10 +92,12 @@ def products_view(request):
             search_words = processed_query.split()
             
             if search_words:
-                # Hər bir söz məhsulun adında olmalıdır (sıradan asılı olmayaraq)
+                # Hər bir söz üçün bütün mümkün variantları yarat
                 ad_filters = []
                 for word in search_words:
-                    ad_filters.append(Q(adi__icontains=word))
+                    word_variations = normalize_azerbaijani_chars(word)
+                    word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
+                    ad_filters.append(word_filter)
                 
                 # "AND" operatoru ilə birləşdiririk - bütün sözlər olmalıdır
                 ad_filter = reduce(and_, ad_filters)
@@ -437,10 +465,12 @@ def search_suggestions(request):
             search_words = processed_query.split()
             
             if search_words:
-                # Hər bir söz məhsulun adında olmalıdır (sıradan asılı olmayaraq)
+                # Hər bir söz üçün bütün mümkün variantları yarat
                 ad_filters = []
                 for word in search_words:
-                    ad_filters.append(Q(adi__icontains=word))
+                    word_variations = normalize_azerbaijani_chars(word)
+                    word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
+                    ad_filters.append(word_filter)
                 
                 # "AND" operatoru ilə birləşdiririk - bütün sözlər olmalıdır
                 ad_filter = reduce(and_, ad_filters)

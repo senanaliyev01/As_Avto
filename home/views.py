@@ -11,7 +11,7 @@ from django.db.models.functions import Lower
 from django.db.models import Value
 from functools import reduce
 from operator import and_, or_
-@login_required
+
 def normalize_azerbaijani_chars(text):
     # Azərbaycan hərflərinin qarşılıqlı çevrilməsi
     char_map = {

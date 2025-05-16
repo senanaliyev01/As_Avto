@@ -15,28 +15,39 @@ from operator import and_, or_
 def normalize_azerbaijani_chars(text):
     # Azərbaycan hərflərinin qarşılıqlı çevrilməsi
     char_map = {
-        'ə': 'e', 'e': 'ə',
-        'ö': 'o', 'o': 'ö',
-        'ğ': 'g', 'g': 'ğ',
-        'ı': 'i', 'i': 'ı',
-        'ü': 'u', 'u': 'ü',
-        'ş': 's', 's': 'ş',
-        'ç': 'c', 'c': 'ç'
+        'ə': 'e', 'e': 'ə', 'Ə': 'E', 'E': 'Ə',
+        'ö': 'o', 'o': 'ö', 'Ö': 'O', 'O': 'Ö',
+        'ğ': 'g', 'g': 'ğ', 'Ğ': 'G', 'G': 'Ğ',
+        'ı': 'i', 'i': 'ı', 'I': 'İ', 'İ': 'I',
+        'ü': 'u', 'u': 'ü', 'Ü': 'U', 'U': 'Ü',
+        'ş': 's', 's': 'ş', 'Ş': 'S', 'S': 'Ş',
+        'ç': 'c', 'c': 'ç', 'Ç': 'C', 'C': 'Ç'
     }
     
-    normalized_text = text.lower()
-    # Həm orijinal həm də çevrilmiş versiyaları əlavə et
-    variations = {normalized_text}
+    # Orijinal mətni saxla
+    variations = {text}
     
-    # Hər bir hərf üçün mümkün variantları yarat
-    for char in normalized_text:
-        if char in char_map:
-            new_variations = set()
-            for variant in variations:
-                new_variations.add(variant.replace(char, char_map[char]))
-            variations.update(new_variations)
+    # Kiçik hərflərlə variant
+    lower_text = text.lower()
+    variations.add(lower_text)
     
-    return variations
+    # Böyük hərflərlə variant
+    upper_text = text.upper()
+    variations.add(upper_text)
+    
+    # Hər bir variant üçün qarşılıqlı çevirmələr
+    all_variations = set()
+    for variant in variations:
+        current_variations = {variant}
+        for char in variant:
+            if char in char_map:
+                new_variations = set()
+                for v in current_variations:
+                    new_variations.add(v.replace(char, char_map[char]))
+                current_variations.update(new_variations)
+        all_variations.update(current_variations)
+    
+    return all_variations
 
 def custom_404(request, exception=None):
     return HttpResponseNotFound(render(request, '404.html').content)

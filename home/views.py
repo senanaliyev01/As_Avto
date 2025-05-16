@@ -11,7 +11,7 @@ from django.db.models.functions import Lower
 from django.db.models import Value
 from functools import reduce
 from operator import and_, or_
-
+@login_required
 def normalize_azerbaijani_chars(text):
     # Azərbaycan hərflərinin qarşılıqlı çevrilməsi
     char_map = {
@@ -445,6 +445,7 @@ def update_cart(request, product_id):
     
     return redirect('cart')
 
+@login_required
 def order_detail_view(request, order_id):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -457,6 +458,7 @@ def order_detail_view(request, order_id):
         'popup_images': popup_images
     })
 
+@login_required
 def search_suggestions(request):
     search_query = request.GET.get('search', '')
     
@@ -523,6 +525,7 @@ def new_products_view(request):
         'popup_images': popup_images
     })
 
+@login_required
 def logout_view(request):
     logout(request)
     # Sessiya və keşi təmizləyirik

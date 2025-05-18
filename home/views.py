@@ -225,10 +225,6 @@ def load_more_products(request):
 
 @login_required
 def cart_view(request):
-    # Check if it's an AJAX request
-    if not request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return redirect('base')
-    
     if 'cart' not in request.session:
         request.session['cart'] = {}
     

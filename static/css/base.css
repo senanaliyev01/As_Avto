@@ -67,7 +67,7 @@ body {
 
 .logo-img {
     max-width: 100%;
-    height: auto;
+    height: 80px;
 }
 
 .header-right {
@@ -217,7 +217,7 @@ body {
 
 .footer-logo-img {
     max-width: 100%;
-    height: auto;
+    height: 80px;
     filter: none;
 }
 

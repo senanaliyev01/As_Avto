@@ -2298,13 +2298,14 @@ body {
     }
 }
 
-/* Action Buttons */
+/* Action Buttons Container */
 .action-buttons {
     display: flex;
-    gap: 8px;
     justify-content: center;
+    gap: 10px;
 }
 
+/* Info Button Styles */
 .info-btn {
     border: 1px solid #000;
     border-radius: 50%;
@@ -2325,117 +2326,93 @@ body {
 
 .info-btn:hover {
     background-color: #f8f9fa;
-    border-color: #17a2b8;
 }
 
-/* Product Info Modal Styles */
-.product-info-modal {
-    width: 90%;
-    max-width: 800px;
-    margin: 5% auto;
-    padding: 0;
-    border-radius: 12px;
-    overflow: hidden;
+/* Info Modal Styles */
+.info-modal .modal-content {
+    width: 80%;
+    max-width: 900px;
+    padding: 25px;
+    margin: 10% auto;
 }
 
-.product-info-content {
-    padding: 0;
-}
-
-.product-info-header {
-    position: relative;
-    background: #f8f9fa;
-    padding: 20px;
+.info-modal-body {
     display: flex;
-    align-items: center;
     gap: 20px;
-    border-bottom: 1px solid #eee;
+    margin-top: 20px;
 }
 
-.product-info-image {
-    width: 120px;
-    height: 120px;
+.info-modal-image {
+    flex: 0 0 300px;
+    text-align: center;
+}
+
+.info-modal-image img {
+    max-width: 100%;
+    max-height: 300px;
     object-fit: contain;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    background: white;
-    padding: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.product-info-title {
+.info-modal-details {
     flex: 1;
 }
 
-.product-info-title h3 {
-    margin: 0 0 10px 0;
-    font-size: 24px;
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.info-table th, 
+.info-table td {
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.info-table th {
+    width: 150px;
+    font-weight: 600;
     color: #2c3e50;
 }
 
-.product-info-details {
-    padding: 20px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 15px;
+.info-modal-description {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
 }
 
-.info-row {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-    padding: 8px 0;
-    border-bottom: 1px dashed #eee;
-}
-
-.info-row.full-width {
-    grid-column: 1 / -1;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.info-label {
-    min-width: 100px;
-    color: #6c757d;
-    font-weight: 500;
-    font-size: 14px;
-}
-
-.info-value {
+.info-modal-description h4 {
+    margin-bottom: 12px;
+    font-size: 18px;
     color: #2c3e50;
-    font-size: 16px;
-    flex: 1;
 }
 
-.full-width .info-value {
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    font-size: 14px;
+.info-modal-description p {
     line-height: 1.6;
+    color: #666;
 }
 
+.info-modal-footer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+/* Responsive styles for info modal */
 @media (max-width: 768px) {
-    .product-info-modal {
+    .info-modal .modal-content {
         width: 95%;
-        margin: 10% auto;
     }
     
-    .product-info-header {
+    .info-modal-body {
         flex-direction: column;
-        text-align: center;
     }
     
-    .product-info-image {
-        width: 100px;
-        height: 100px;
-    }
-    
-    .info-row {
-        flex-direction: column;
-        gap: 5px;
-    }
-    
-    .info-label {
-        min-width: auto;
+    .info-modal-image {
+        flex: 0 0 auto;
     }
 }

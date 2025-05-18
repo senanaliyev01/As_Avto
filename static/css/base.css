@@ -188,7 +188,7 @@ body {
     background-color: #fff;
     border: 1px solid var(--border-color);
     border-radius: 15px;
-    padding: 20px;
+    /* padding: 20px; */
     margin: 30px auto;
     width: 100%;
     max-width: 1200px;

@@ -535,28 +535,31 @@ def logout_view(request):
     return redirect('login')
 
 @login_required
-def cart_content(request):
-    if 'cart' not in request.session:
-        request.session['cart'] = {}
+def get_cart_items(request):
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        cart = request.session.get('cart', {})
+        items = []
+        total = Decimal('0.00')
+        
+        for product_id, quantity in cart.items():
+            try:
+                product = Mehsul.objects.get(id=product_id)
+                subtotal = product.qiymet * Decimal(str(quantity))
+                items.append({
+                    'id': product.id,
+                    'name': product.adi,
+                    'image': product.sekil.url if product.sekil else None,
+                    'price': str(product.qiymet),
+                    'quantity': quantity,
+                    'subtotal': str(subtotal)
+                })
+                total += subtotal
+            except Mehsul.DoesNotExist:
+                continue
+        
+        return JsonResponse({
+            'items': items,
+            'total': str(total)
+        })
     
-    cart = request.session['cart']
-    cart_items = []
-    total = Decimal('0.00')
-    
-    for product_id, quantity in cart.items():
-        try:
-            product = Mehsul.objects.get(id=product_id)
-            subtotal = product.qiymet * Decimal(str(quantity))
-            cart_items.append({
-                'product': product,
-                'quantity': quantity,
-                'subtotal': subtotal
-            })
-            total += subtotal
-        except Mehsul.DoesNotExist:
-            continue
-    
-    return render(request, 'cart_content.html', {
-        'cart_items': cart_items,
-        'total': total
-    })
+    return JsonResponse({'error': 'Invalid request'}, status=400)

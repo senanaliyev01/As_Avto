@@ -550,132 +550,76 @@ function initializePopupModal() {
     }
 }
 
-// Cart Sidebar functionality
 function initializeCartSidebar() {
-    const cartButton = document.getElementById('cartButton');
-    const cartSidebar = document.getElementById('cartSidebar');
-    const cartOverlay = document.getElementById('cartOverlay');
+    const cartToggle = document.querySelector('.cart-toggle');
+    const cartSidebar = document.querySelector('.cart-sidebar');
+    const cartOverlay = document.querySelector('.cart-sidebar-overlay');
     const closeCart = document.querySelector('.close-cart');
-    
-    if (cartButton && cartSidebar && cartOverlay && closeCart) {
-        cartButton.addEventListener('click', function(e) {
+
+    if (cartToggle && cartSidebar && cartOverlay && closeCart) {
+        // Səbəti aç
+        cartToggle.addEventListener('click', function(e) {
             e.preventDefault();
-            openCart();
+            loadCartContent();
+            cartSidebar.classList.add('active');
+            cartOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
         });
-        
-        closeCart.addEventListener('click', closeCart);
-        cartOverlay.addEventListener('click', closeCart);
-        
-        // Close with ESC key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && cartSidebar.classList.contains('active')) {
-                closeCart();
-            }
-        });
+
+        // Səbəti bağla
+        function closeCartSidebar() {
+            cartSidebar.classList.remove('active');
+            cartOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        closeCart.addEventListener('click', closeCartSidebar);
+        cartOverlay.addEventListener('click', closeCartSidebar);
     }
 }
 
-function openCart() {
-    const cartSidebar = document.getElementById('cartSidebar');
-    const cartOverlay = document.getElementById('cartOverlay');
-    const cartContent = document.getElementById('cartContent');
+function loadCartContent() {
+    const cartContent = document.querySelector('.cart-sidebar-content');
     
-    cartSidebar.classList.add('active');
-    cartOverlay.classList.add('active');
-    
-    // Show loading spinner
-    cartContent.innerHTML = `
-        <div class="cart-loading">
-            <div class="spinner"></div>
-        </div>
-    `;
-    
-    // Load cart content
-    fetch('/cart/content/')
-        .then(response => response.text())
-        .then(html => {
-            cartContent.innerHTML = html;
-            initializeCartFunctionality();
-        })
-        .catch(error => {
-            cartContent.innerHTML = '<p class="error">Səbət yüklənərkən xəta baş verdi.</p>';
-            console.error('Error:', error);
-        });
-}
-
-function closeCart() {
-    const cartSidebar = document.getElementById('cartSidebar');
-    const cartOverlay = document.getElementById('cartOverlay');
-    
-    cartSidebar.classList.remove('active');
-    cartOverlay.classList.remove('active');
-}
-
-function initializeCartFunctionality() {
-    // Initialize quantity controls
-    const quantityControls = document.querySelectorAll('.cart-item-quantity');
-    quantityControls.forEach(control => {
-        const input = control.querySelector('input');
-        const updateBtn = control.querySelector('.update-quantity');
-        if (updateBtn) {
-            updateBtn.addEventListener('click', function() {
-                updateCartItemQuantity(input.dataset.productId, input.value);
+    fetch('/cart/get-items/', {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.items && data.items.length > 0) {
+            let html = '<div class="cart-items">';
+            data.items.forEach(item => {
+                html += `
+                    <div class="cart-item" data-id="${item.id}">
+                        <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+                        <div class="cart-item-details">
+                            <div class="cart-item-title">${item.name}</div>
+                            <div class="cart-item-price">${item.price} ₼</div>
+                            <div class="cart-item-quantity">
+                                <button class="quantity-btn minus" onclick="updateQuantity(${item.id}, -1)">-</button>
+                                <span class="quantity">${item.quantity}</span>
+                                <button class="quantity-btn plus" onclick="updateQuantity(${item.id}, 1)">+</button>
+                                <i class="fas fa-trash cart-item-remove" onclick="removeFromCart(${item.id})"></i>
+                            </div>
+                        </div>
+                    </div>
+                `;
             });
-        }
-    });
-    
-    // Initialize remove buttons
-    const removeButtons = document.querySelectorAll('.cart-item-remove');
-    removeButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            removeCartItem(this.dataset.productId);
-        });
-    });
-}
-
-function updateCartItemQuantity(productId, quantity) {
-    fetch(`/cart/update/${productId}/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify({ quantity: quantity })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            openCart(); // Refresh cart content
-            updateCartCounter(data.cart_count);
+            html += `
+                <div class="cart-total">
+                    <div class="total-label">Ümumi məbləğ:</div>
+                    <div class="total-amount">${data.total} ₼</div>
+                </div>
+                <button class="btn btn-primary checkout-btn" onclick="checkout()">Sifarişi tamamla</button>
+            `;
+            cartContent.innerHTML = html;
         } else {
-            showMessage('error', data.message);
+            cartContent.innerHTML = '<div class="empty-cart-message">Səbətiniz boşdur</div>';
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showMessage('error', 'Xəta baş verdi');
-    });
-}
-
-function removeCartItem(productId) {
-    fetch(`/cart/remove/${productId}/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': getCookie('csrftoken')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            openCart(); // Refresh cart content
-            updateCartCounter(data.cart_count);
-            showMessage('success', data.message);
-        } else {
-            showMessage('error', data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showMessage('error', 'Xəta baş verdi');
+        
+        // Səbət sayğacını yenilə
+        document.querySelector('.cart-count').textContent = data.items.length;
     });
 }

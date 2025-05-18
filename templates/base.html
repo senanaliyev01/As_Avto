@@ -31,7 +31,7 @@
                                 <li><a href="{% url 'new_products' %}" class="nav-link {% if request.resolver_match.url_name == 'new_products' %}active{% endif %}"><i class="fas fa-star"></i> Yeni Məhsullar</a></li>
                                 <li><a href="{% url 'orders' %}" class="nav-link {% if request.resolver_match.url_name == 'orders' %}active{% endif %}"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a></li>
                                 <li>
-                                    <a href="#" class="nav-link {% if request.resolver_match.url_name == 'cart' %}active{% endif %}" id="cartButton">
+                                    <a href="#" class="nav-link cart-toggle {% if request.resolver_match.url_name == 'cart' %}active{% endif %}">
                                         <span class="cart-icon">
                                             <i class="fas fa-shopping-cart"></i>
                                             <span class="cart-counter">{{ request.session.cart|length }}</span>
@@ -190,18 +190,6 @@
         </footer>
     </div>
 
-    <!-- Cart Sidebar Modal -->
-    <div id="cartSidebar" class="cart-sidebar">
-        <div class="cart-sidebar-header">
-            <h3>Səbətim</h3>
-            <button class="close-cart">&times;</button>
-        </div>
-        <div id="cartContent" class="cart-sidebar-content">
-            <!-- Cart content will be loaded here -->
-        </div>
-    </div>
-    <div id="cartOverlay" class="cart-overlay"></div>
-
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="{% static 'js/base.js' %}"></script>
    
@@ -244,5 +232,17 @@
             <img id="modalImage" class="modal-image" src="" alt="Modal Image">
         </div>
     </div>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar">
+        <div class="cart-sidebar-header">
+            <h3>Səbətim (<span class="cart-count">{{ request.session.cart|length }}</span>)</h3>
+            <button class="close-cart"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="cart-sidebar-content">
+            <!-- Cart items will be loaded here -->
+        </div>
+    </div>
+    <div class="cart-sidebar-overlay"></div>
 </body>
 </html>

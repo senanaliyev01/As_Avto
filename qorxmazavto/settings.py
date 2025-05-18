@@ -194,15 +194,8 @@ JAZZMIN_SETTINGS = {
     
     # İstifadəçi interfeysi
     "user_avatar": None,
-    "topmenu_links": [
-        {"name": "Ana Səhifə", "url": "admin:index", "permissions": ["auth.view_user"]},
-        {"name": "Sayta Keç", "url": "/"},
-        {"model": "auth.User"},
-        {"app": "home"},
-    ],
     
-    # Top navbarda axtarış
-    "search_model": ["auth.User", "auth.Group", "home.Avtomobil", "home.Mehsul"],
+    # Form formatı
     "changeform_format": "horizontal_tabs",
     "changeform_format_overrides": {
         "auth.user": "collapsible",

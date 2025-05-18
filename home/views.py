@@ -420,30 +420,55 @@ def update_cart(request, product_id):
             product = get_object_or_404(Mehsul, id=product_id)
             quantity = int(request.POST.get('quantity', 1))
             
+            response_data = {
+                'status': 'error',
+                'message': ''
+            }
+            
             if quantity > product.stok:
-                messages.error(request, f'{product.adi} məhsulundan stokda yalnız {product.stok} ədəd var!')
-                return redirect('cart')
+                response_data['message'] = f'{product.adi} məhsulundan stokda yalnız {product.stok} ədəd var!'
+                return JsonResponse(response_data)
             
             if quantity < 1:
-                messages.error(request, 'Miqdar 1-dən az ola bilməz!')
-                return redirect('cart')
+                response_data['message'] = 'Miqdar 1-dən az ola bilməz!'
+                return JsonResponse(response_data)
             
             cart = request.session.get('cart', {})
             cart[str(product_id)] = quantity
             request.session['cart'] = cart
             request.session.modified = True
             
-            messages.success(request, f'{product.adi} məhsulunun miqdarı yeniləndi!')
-            return redirect('cart')
+            # Calculate new subtotal and cart total
+            subtotal = product.qiymet * quantity
+            cart_total = sum(
+                Mehsul.objects.get(id=int(pid)).qiymet * qty
+                for pid, qty in cart.items()
+            )
+            
+            response_data.update({
+                'status': 'success',
+                'message': f'{product.adi} məhsulunun miqdarı yeniləndi!',
+                'subtotal': f'{subtotal} ₼',
+                'cart_total': f'{cart_total} ₼'
+            })
+            
+            return JsonResponse(response_data)
             
         except ValueError:
-            messages.error(request, 'Yanlış miqdar daxil edildi!')
-            return redirect('cart')
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Yanlış miqdar daxil edildi!'
+            })
         except Exception as e:
-            messages.error(request, 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.')
-            return redirect('cart')
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.'
+            })
     
-    return redirect('cart')
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Invalid request method'
+    })
 
 @login_required
 def order_detail_view(request, order_id):

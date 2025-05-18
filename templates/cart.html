@@ -5,12 +5,7 @@
 {% block content %}
 <div class="container">
     <div class="cart-header">
-        <h2>Səbətim ({{ cart_items|length }}) 
-            <span class="update-warning">
-                <i class="fas fa-exclamation-triangle"></i>
-                Miqdarı dəyişdikdən sonra "Yenilə" düyməsinə basın!
-            </span>
-        </h2>
+        <h2>Səbətim ({{ cart_items|length }})</h2>
     </div>
 
     {% if cart_items %}
@@ -50,7 +45,7 @@
                             <div class="quantity-control">
                                 <form method="POST" action="{% url 'update_cart' item.product.id %}" class="update-form">
                                     {% csrf_token %}
-                                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stok }}" class="form-control quantity-input" onchange="showQuantityWarning()">
+                                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stok }}" class="form-control quantity-input">
                                     <button type="submit" class="btn btn-secondary">Yenilə</button>
                                 </form>
                             </div>

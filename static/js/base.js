@@ -87,6 +87,53 @@ function initializeCart() {
     const checkboxes = document.querySelectorAll('.item-checkbox');
     const selectedTotal = document.getElementById('selected-total');
     const checkoutButton = document.getElementById('checkout-button');
+    const updateForms = document.querySelectorAll('.update-form');
+
+    // Add event listener for update forms
+    if (updateForms) {
+        updateForms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                const productId = this.closest('tr').dataset.productId;
+                
+                fetch(`/cart/update/${productId}/`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Update subtotal for this item
+                        const row = this.closest('tr');
+                        const subtotalCell = row.querySelector('.subtotal');
+                        if (subtotalCell) {
+                            subtotalCell.textContent = data.subtotal + ' ₼';
+                        }
+                        
+                        // Update cart total
+                        const cartTotal = document.getElementById('cart-total');
+                        if (cartTotal && data.cart_total) {
+                            cartTotal.textContent = data.cart_total + ' ₼';
+                        }
+                        
+                        // Show success message
+                        showMessage('success', data.message);
+                    } else {
+                        showMessage('error', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showMessage('error', 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+                });
+            });
+        });
+    }
 
     if (selectAll && checkboxes.length > 0 && selectedTotal && checkoutButton) {
         function updateSelectedTotal() {

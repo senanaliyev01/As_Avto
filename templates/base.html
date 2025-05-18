@@ -236,12 +236,7 @@
     <!-- Cart Sidebar -->
     <div id="cartSidebar" class="cart-sidebar">
         <div class="cart-sidebar-header">
-            <h2>Səbətim ({{ request.session.cart|length }})
-                <span class="update-warning">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    Miqdarı dəyişdikdən sonra "Yenilə" düyməsinə basın!
-                </span>
-            </h2>
+            <h2>Səbətim ({{ request.session.cart|length }})</h2>
             <button id="closeSidebar" class="close-sidebar"><i class="fas fa-times"></i></button>
         </div>
         <div class="cart-sidebar-content">

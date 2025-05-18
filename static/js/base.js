@@ -112,13 +112,19 @@ function initializeCart() {
                         const row = this.closest('tr');
                         const subtotalCell = row.querySelector('.subtotal');
                         if (subtotalCell) {
-                            subtotalCell.textContent = data.subtotal + ' ₼';
+                            subtotalCell.textContent = data.subtotal;
                         }
                         
                         // Update cart total
                         const cartTotal = document.getElementById('cart-total');
                         if (cartTotal && data.cart_total) {
-                            cartTotal.textContent = data.cart_total + ' ₼';
+                            cartTotal.textContent = data.cart_total;
+                        }
+
+                        // Update selected total if the item is checked
+                        const checkbox = row.querySelector('.item-checkbox');
+                        if (checkbox && checkbox.checked) {
+                            updateSelectedTotal();
                         }
                         
                         // Show success message
@@ -141,16 +147,20 @@ function initializeCart() {
             checkboxes.forEach(checkbox => {
                 if (checkbox.checked) {
                     const row = checkbox.closest('tr');
-                    const subtotalText = row.querySelector('td:nth-last-child(2)').textContent;
-                    const subtotal = Number(subtotalText.replace(' ₼', '').replace(',', '.'));
-                    total += subtotal;
+                    const subtotalText = row.querySelector('.subtotal').textContent;
+                    // Remove currency symbol and convert to number
+                    const subtotal = parseFloat(subtotalText.replace(' ₼', '').replace(',', '.'));
+                    if (!isNaN(subtotal)) {
+                        total += subtotal;
+                    }
                     row.classList.add('selected');
                 } else {
                     checkbox.closest('tr').classList.remove('selected');
                 }
             });
-            const formattedTotal = total.toFixed(2).replace('.', ',');
-            selectedTotal.textContent = formattedTotal + ' ₼';
+            
+            // Format total with 2 decimal places and proper currency symbol
+            selectedTotal.textContent = total.toFixed(2).replace('.', ',') + ' ₼';
             
             const hasSelectedItems = Array.from(checkboxes).some(checkbox => checkbox.checked);
             checkoutButton.disabled = !hasSelectedItems;

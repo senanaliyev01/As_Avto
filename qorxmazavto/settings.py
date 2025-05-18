@@ -170,13 +170,17 @@ LOGIN_URL = '/'  # Sessiya bitdikdə yönləndiriləcək səhifə
 
 # 3. Jazzmin tənzimləmələri
 JAZZMIN_SETTINGS = {
-    # Başlıq
+    # Başlıq və Loqo
     "site_title": "AS-AVTO",
     "site_header": "İdarə Etmə",
     "site_brand": "Admin",
     "site_logo": "images/favicon.png",
     "site_icon": "images/favicon.png",
-     "login_logo": "images/favicon.png",
+    "login_logo": "images/favicon.png",
+    "login_logo_dark": "images/favicon.png",
+    "site_logo_classes": "img-circle",
+    "welcome_sign": "AS-AVTO Admin Panelinə Xoş Gəldiniz",
+    "copyright": "AS-AVTO © 2024",
     
     # Admin panelin rəng sxemi
     "theme": "default",
@@ -184,19 +188,34 @@ JAZZMIN_SETTINGS = {
     # Sidebar menyu
     "show_sidebar": True,
     "navigation_expanded": True,
+    "hide_apps": [],
+    "hide_models": [],
+    "order_with_respect_to": ["auth", "home"],
     
     # İstifadəçi interfeysi
     "user_avatar": None,
+    "topmenu_links": [
+        {"name": "Ana Səhifə", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Sayta Keç", "url": "/"},
+        {"model": "auth.User"},
+        {"app": "home"},
+    ],
     
     # Top navbarda axtarış
-    "search_model": ["auth.User", "auth.Group"],
+    "search_model": ["auth.User", "auth.Group", "home.Avtomobil", "home.Mehsul"],
+    "changeform_format": "horizontal_tabs",
+    "changeform_format_overrides": {
+        "auth.user": "collapsible",
+        "auth.group": "vertical_tabs",
+    },
     
     # Custom linklər
     "custom_links": {
-        "books": [{
+        "home": [{
             "name": "Statistika", 
             "url": "make_messages", 
-            "icon": "fas fa-comments",
+            "icon": "fas fa-chart-bar",
+            "permissions": ["auth.view_user"]
         }]
     },
     
@@ -213,6 +232,17 @@ JAZZMIN_SETTINGS = {
         "home.Vitrin": "fa-solid fa-list",
         "home.PopupImage": "fa-solid fa-image",
     },
+    
+    # Related Modal
+    "related_modal_active": True,
+    
+    # Custom CSS/JS
+    "custom_css": None,
+    "custom_js": None,
+    
+    # Show/Hide UI Sections
+    "show_ui_builder": True,
+    "language_chooser": True,
 }
 
 # 4. Admin interfeysi üçün əlavə tənzimləmələr
@@ -225,6 +255,10 @@ JAZZMIN_UI_TWEAKS = {
     "accent": "accent-primary",
     "navbar": "navbar-dark",
     "no_navbar_border": False,
+    "navbar_fixed": True,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": True,
     "sidebar": "sidebar-dark-primary",
     "sidebar_nav_small_text": False,
     "sidebar_disable_expand": False,
@@ -232,4 +266,14 @@ JAZZMIN_UI_TWEAKS = {
     "sidebar_nav_compact_style": False,
     "sidebar_nav_legacy_style": False,
     "sidebar_nav_flat_style": False,
+    "theme": "default",
+    "dark_mode_theme": "darkly",
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    }
 }

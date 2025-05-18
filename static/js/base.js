@@ -616,57 +616,36 @@ function initializeCartSidebar() {
     if (cartToggle && cartSidebar && closeSidebar && overlay) {
         // Load cart content when sidebar is opened
         function loadCartContent() {
-            fetch('/cart/')
-                .then(response => response.text())
-                .then(html => {
-                    // Create a temporary container
-                    const temp = document.createElement('div');
-                    temp.innerHTML = html;
-                    
-                    // Find the cart container in the response
-                    const cartContent = temp.querySelector('.cart-container');
-                    const emptyCart = temp.querySelector('.empty-cart');
-                    
-                    // Update the sidebar content
-                    const sidebarContent = document.querySelector('.cart-sidebar-content');
-                    if (cartContent) {
-                        sidebarContent.innerHTML = cartContent.outerHTML;
-                    } else if (emptyCart) {
-                        sidebarContent.innerHTML = emptyCart.outerHTML;
-                    }
-                    
-                    // Reinitialize cart functionality for the loaded content
-                    initializeCart();
-                })
-                .catch(error => {
-                    console.error('Error loading cart content:', error);
-                });
+            fetch('/cart/', {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.text())
+            .then(html => {
+                const cartContent = cartSidebar.querySelector('.cart-sidebar-content');
+                cartContent.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error loading cart content:', error);
+            });
         }
 
-        // Open sidebar
         cartToggle.addEventListener('click', function(e) {
             e.preventDefault();
             cartSidebar.classList.add('active');
             overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            loadCartContent();
+            loadCartContent(); // Load content when sidebar is opened
         });
 
-        // Close sidebar
-        function closeSidebarHandler() {
+        closeSidebar.addEventListener('click', function() {
             cartSidebar.classList.remove('active');
             overlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
+        });
 
-        closeSidebar.addEventListener('click', closeSidebarHandler);
-        overlay.addEventListener('click', closeSidebarHandler);
-
-        // Close on escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && cartSidebar.classList.contains('active')) {
-                closeSidebarHandler();
-            }
+        overlay.addEventListener('click', function() {
+            cartSidebar.classList.remove('active');
+            overlay.classList.remove('active');
         });
     }
 }

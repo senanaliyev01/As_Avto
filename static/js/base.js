@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Popup Modal
     initializePopupModal();
 
-    // Add cart panel initialization
-    initializeCartPanel();
+    // Add cart sidebar initialization
+    initializeCartSidebar();
 });
 
 function initializeSearch() {
@@ -550,38 +550,66 @@ function initializePopupModal() {
     }
 }
 
-function initializeCartPanel() {
-    const cartTrigger = document.querySelector('.cart-panel-trigger');
-    const cartPanel = document.getElementById('cartPanel');
+function initializeCartSidebar() {
+    const cartToggle = document.getElementById('cartSidebarToggle');
+    const cartSidebar = document.getElementById('cartSidebar');
+    const closeSidebar = document.getElementById('closeSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
     
-    if (!cartTrigger || !cartPanel) return;
+    if (cartToggle && cartSidebar && closeSidebar && overlay) {
+        // Load cart content when sidebar is opened
+        function loadCartContent() {
+            fetch('/cart/')
+                .then(response => response.text())
+                .then(html => {
+                    // Create a temporary container
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    
+                    // Find the cart container in the response
+                    const cartContent = temp.querySelector('.cart-container');
+                    const emptyCart = temp.querySelector('.empty-cart');
+                    
+                    // Update the sidebar content
+                    const sidebarContent = document.querySelector('.cart-sidebar-content');
+                    if (cartContent) {
+                        sidebarContent.innerHTML = cartContent.outerHTML;
+                    } else if (emptyCart) {
+                        sidebarContent.innerHTML = emptyCart.outerHTML;
+                    }
+                    
+                    // Reinitialize cart functionality for the loaded content
+                    initializeCart();
+                })
+                .catch(error => {
+                    console.error('Error loading cart content:', error);
+                });
+        }
 
-    // Create overlay
-    const overlay = document.createElement('div');
-    overlay.className = 'cart-panel-overlay';
-    document.body.appendChild(overlay);
+        // Open sidebar
+        cartToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            cartSidebar.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            loadCartContent();
+        });
 
-    // Open cart panel
-    cartTrigger.addEventListener('click', function(e) {
-        e.preventDefault();
-        cartPanel.classList.add('active');
-        overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    });
-
-    // Close cart panel when clicking overlay
-    overlay.addEventListener('click', function() {
-        cartPanel.classList.remove('active');
-        overlay.classList.remove('active');
-        document.body.style.overflow = '';
-    });
-
-    // Close on escape key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && cartPanel.classList.contains('active')) {
-            cartPanel.classList.remove('active');
+        // Close sidebar
+        function closeSidebarHandler() {
+            cartSidebar.classList.remove('active');
             overlay.classList.remove('active');
             document.body.style.overflow = '';
         }
-    });
+
+        closeSidebar.addEventListener('click', closeSidebarHandler);
+        overlay.addEventListener('click', closeSidebarHandler);
+
+        // Close on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && cartSidebar.classList.contains('active')) {
+                closeSidebarHandler();
+            }
+        });
+    }
 }

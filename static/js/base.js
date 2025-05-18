@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Popup Modal
     initializePopupModal();
 
-    // Cart Sidebar functionality
-    initializeCartSidebar();
+    // Add cart panel initialization
+    initializeCartPanel();
 });
 
 function initializeSearch() {
@@ -550,76 +550,38 @@ function initializePopupModal() {
     }
 }
 
-function initializeCartSidebar() {
-    const cartToggle = document.querySelector('.cart-toggle');
-    const cartSidebar = document.querySelector('.cart-sidebar');
-    const cartOverlay = document.querySelector('.cart-sidebar-overlay');
-    const closeCart = document.querySelector('.close-cart');
+function initializeCartPanel() {
+    const cartTrigger = document.querySelector('.cart-panel-trigger');
+    const cartPanel = document.getElementById('cartPanel');
+    
+    if (!cartTrigger || !cartPanel) return;
 
-    if (cartToggle && cartSidebar && cartOverlay && closeCart) {
-        // Səbəti aç
-        cartToggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            loadCartContent();
-            cartSidebar.classList.add('active');
-            cartOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        });
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'cart-panel-overlay';
+    document.body.appendChild(overlay);
 
-        // Səbəti bağla
-        function closeCartSidebar() {
-            cartSidebar.classList.remove('active');
-            cartOverlay.classList.remove('active');
+    // Open cart panel
+    cartTrigger.addEventListener('click', function(e) {
+        e.preventDefault();
+        cartPanel.classList.add('active');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    });
+
+    // Close cart panel when clicking overlay
+    overlay.addEventListener('click', function() {
+        cartPanel.classList.remove('active');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    });
+
+    // Close on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && cartPanel.classList.contains('active')) {
+            cartPanel.classList.remove('active');
+            overlay.classList.remove('active');
             document.body.style.overflow = '';
         }
-
-        closeCart.addEventListener('click', closeCartSidebar);
-        cartOverlay.addEventListener('click', closeCartSidebar);
-    }
-}
-
-function loadCartContent() {
-    const cartContent = document.querySelector('.cart-sidebar-content');
-    
-    fetch('/cart/get-items/', {
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.items && data.items.length > 0) {
-            let html = '<div class="cart-items">';
-            data.items.forEach(item => {
-                html += `
-                    <div class="cart-item" data-id="${item.id}">
-                        <img src="${item.image}" alt="${item.name}" class="cart-item-image">
-                        <div class="cart-item-details">
-                            <div class="cart-item-title">${item.name}</div>
-                            <div class="cart-item-price">${item.price} ₼</div>
-                            <div class="cart-item-quantity">
-                                <button class="quantity-btn minus" onclick="updateQuantity(${item.id}, -1)">-</button>
-                                <span class="quantity">${item.quantity}</span>
-                                <button class="quantity-btn plus" onclick="updateQuantity(${item.id}, 1)">+</button>
-                                <i class="fas fa-trash cart-item-remove" onclick="removeFromCart(${item.id})"></i>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            html += `
-                <div class="cart-total">
-                    <div class="total-label">Ümumi məbləğ:</div>
-                    <div class="total-amount">${data.total} ₼</div>
-                </div>
-                <button class="btn btn-primary checkout-btn" onclick="checkout()">Sifarişi tamamla</button>
-            `;
-            cartContent.innerHTML = html;
-        } else {
-            cartContent.innerHTML = '<div class="empty-cart-message">Səbətiniz boşdur</div>';
-        }
-        
-        // Səbət sayğacını yenilə
-        document.querySelector('.cart-count').textContent = data.items.length;
     });
 }

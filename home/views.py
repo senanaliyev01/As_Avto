@@ -225,10 +225,6 @@ def load_more_products(request):
 
 @login_required
 def cart_view(request):
-    # Əgər birbaşa URL ilə daxil olubsa, base səhifəsinə yönləndir
-    if request.method == 'GET' and not request.headers.get('HX-Request'):
-        return redirect('base')
-    
     if 'cart' not in request.session:
         request.session['cart'] = {}
     

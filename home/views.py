@@ -225,46 +225,45 @@ def load_more_products(request):
 
 @login_required
 def cart_view(request):
-    # Check if the request is AJAX (for cart sidebar)
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        if 'cart' not in request.session:
-            request.session['cart'] = {}
-        
-        cart = request.session['cart']
-        cart_items = []
-        total = Decimal('0.00')
-        popup_images = PopupImage.objects.filter(aktiv=True)
-        invalid_products = []  # Mövcud olmayan məhsulları izləmək üçün
-        
-        for product_id, quantity in cart.items():
-            try:
-                product = Mehsul.objects.get(id=product_id)
-                subtotal = product.qiymet * Decimal(str(quantity))
-                cart_items.append({
-                    'product': product,
-                    'quantity': quantity,
-                    'subtotal': subtotal
-                })
-                total += subtotal
-            except Mehsul.DoesNotExist:
-                invalid_products.append(product_id)  # Mövcud olmayan məhsulu qeyd et
-        
-        # Mövcud olmayan məhsulları səbətdən sil
-        if invalid_products:
-            for product_id in invalid_products:
-                if str(product_id) in cart:
-                    del cart[str(product_id)]
-            request.session.modified = True
-            messages.warning(request, 'Bəzi məhsullar artıq mövcud olmadığı üçün səbətdən silindi.')
-        
-        return render(request, 'cart.html', {
-            'cart_items': cart_items,
-            'total': total,
-            'popup_images': popup_images
-        })
+    # Check if it's an AJAX request
+    if not request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return redirect('base')
     
-    # If not AJAX request, redirect to base page
-    return redirect('base')
+    if 'cart' not in request.session:
+        request.session['cart'] = {}
+    
+    cart = request.session['cart']
+    cart_items = []
+    total = Decimal('0.00')
+    popup_images = PopupImage.objects.filter(aktiv=True)
+    invalid_products = []  # Mövcud olmayan məhsulları izləmək üçün
+    
+    for product_id, quantity in cart.items():
+        try:
+            product = Mehsul.objects.get(id=product_id)
+            subtotal = product.qiymet * Decimal(str(quantity))
+            cart_items.append({
+                'product': product,
+                'quantity': quantity,
+                'subtotal': subtotal
+            })
+            total += subtotal
+        except Mehsul.DoesNotExist:
+            invalid_products.append(product_id)  # Mövcud olmayan məhsulu qeyd et
+    
+    # Mövcud olmayan məhsulları səbətdən sil
+    if invalid_products:
+        for product_id in invalid_products:
+            if str(product_id) in cart:
+                del cart[str(product_id)]
+        request.session.modified = True
+        messages.warning(request, 'Bəzi məhsullar artıq mövcud olmadığı üçün səbətdən silindi.')
+    
+    return render(request, 'cart.html', {
+        'cart_items': cart_items,
+        'total': total,
+        'popup_images': popup_images
+    })
 
 @login_required
 def add_to_cart(request, product_id):

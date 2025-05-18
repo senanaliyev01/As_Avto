@@ -625,9 +625,12 @@ function initializeCartSidebar() {
             .then(html => {
                 const cartContent = cartSidebar.querySelector('.cart-sidebar-content');
                 cartContent.innerHTML = html;
+                
+                // Initialize quantity controls for loaded content
+                initializeQuantityControls();
             })
             .catch(error => {
-                console.error('Error loading cart content:', error);
+                console.error('Error loading cart:', error);
             });
         }
 
@@ -635,7 +638,7 @@ function initializeCartSidebar() {
             e.preventDefault();
             cartSidebar.classList.add('active');
             overlay.classList.add('active');
-            loadCartContent(); // Load content when sidebar is opened
+            loadCartContent();
         });
 
         closeSidebar.addEventListener('click', function() {

@@ -21,7 +21,7 @@
                     <th></th>
                 </tr>
             </thead>
-            <tbody id="products-tbody">
+            <tbody id="products-tbody" data-has-more="{{ has_more|lower }}">
                 {% for mehsul in mehsullar %}
                 <tr>
                     <td><img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image" onclick="openImageModal('{{ mehsul.sekil.url }}')"></td>
@@ -90,7 +90,4 @@
     </div>
 </div>
 
-{% endblock %}
-
-
-
+{% endblock %} 

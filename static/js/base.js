@@ -265,10 +265,26 @@ function removeFromCart(productId) {
             // Check if cart is empty
             const cartItems = document.querySelectorAll('.cart-item');
             if (cartItems.length === 0) {
-                // Hide cart container and header
+                // Handle empty cart in both main page and sidebar
                 const cartContainer = document.querySelector('.cart-container');
                 const cartHeader = document.querySelector('.cart-header');
+                const sidebarContent = document.querySelector('.cart-sidebar-content');
                 
+                // Create empty cart message
+                const emptyCartHTML = `
+                    <div class="empty-cart" style="margin: 20px;">
+                        <i class="fas fa-shopping-cart"></i>
+                        <p>Səbətiniz boşdur.</p>
+                        <a href="/products/" class="btn btn-primary">Məhsullara bax</a>
+                    </div>
+                `;
+                
+                // Update sidebar content if we're in the sidebar
+                if (sidebarContent) {
+                    sidebarContent.innerHTML = emptyCartHTML;
+                }
+                
+                // Update main page content if we're on the cart page
                 if (cartContainer) {
                     cartContainer.style.display = 'none';
                 }
@@ -276,25 +292,19 @@ function removeFromCart(productId) {
                     cartHeader.style.display = 'none';
                 }
                 
-                // Find the main content container
                 const mainContent = document.querySelector('.main-content .container');
-                if (mainContent) {
-                    // Create empty cart message
-                    const emptyCartDiv = document.createElement('div');
-                    emptyCartDiv.className = 'empty-cart';
-                    emptyCartDiv.style.marginTop = '2rem';
-                    emptyCartDiv.innerHTML = `
-                        <p>Səbətiniz boşdur.</p>
-                        <a href="/products/" class="btn btn-primary">Məhsullara bax</a>
-                    `;
-                    
+                if (mainContent && !sidebarContent) {
                     // Remove any existing empty cart message
                     const existingEmptyCart = mainContent.querySelector('.empty-cart');
                     if (existingEmptyCart) {
                         existingEmptyCart.remove();
                     }
                     
-                    // Add new empty cart message
+                    // Add new empty cart message to main page
+                    const emptyCartDiv = document.createElement('div');
+                    emptyCartDiv.className = 'empty-cart';
+                    emptyCartDiv.style.marginTop = '2rem';
+                    emptyCartDiv.innerHTML = emptyCartHTML;
                     mainContent.appendChild(emptyCartDiv);
                 }
             }
@@ -625,14 +635,21 @@ function initializeCartSidebar() {
                     
                     // Find the cart container in the response
                     const cartContent = temp.querySelector('.cart-container');
-                    const emptyCart = temp.querySelector('.empty-cart');
                     
                     // Update the sidebar content
                     const sidebarContent = document.querySelector('.cart-sidebar-content');
+                    
                     if (cartContent) {
                         sidebarContent.innerHTML = cartContent.outerHTML;
-                    } else if (emptyCart) {
-                        sidebarContent.innerHTML = emptyCart.outerHTML;
+                    } else {
+                        // Create empty cart message for sidebar
+                        sidebarContent.innerHTML = `
+                            <div class="empty-cart" style="margin: 20px;">
+                                <i class="fas fa-shopping-cart"></i>
+                                <p>Səbətiniz boşdur.</p>
+                                <a href="/products/" class="btn btn-primary">Məhsullara bax</a>
+                            </div>
+                        `;
                     }
                     
                     // Reinitialize cart functionality for the loaded content

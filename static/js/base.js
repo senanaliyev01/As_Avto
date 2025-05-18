@@ -22,6 +22,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add cart sidebar initialization
     initializeCartSidebar();
+
+    // Initialize Products Page
+    initializeProductsPage();
 });
 
 function initializeSearch() {
@@ -733,3 +736,87 @@ window.addEventListener('click', function(event) {
         closeProductInfoModal();
     }
 });
+
+// Products Page Infinite Scroll
+let offset = 15;
+let loading = false;
+let hasMore = false;
+
+function initializeProductsPage() {
+    const tbody = document.getElementById('products-tbody');
+    const spinner = document.getElementById('loading-spinner');
+    const hasMoreElement = document.querySelector('[data-has-more]');
+    
+    if (hasMoreElement) {
+        hasMore = hasMoreElement.dataset.hasMore === 'true';
+    }
+    
+    if (!tbody || !spinner) return;
+    
+    window.addEventListener('scroll', () => {
+        if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 200) {
+            loadMoreProducts(tbody, spinner);
+        }
+    });
+}
+
+function loadMoreProducts(tbody, spinner) {
+    if (loading || !hasMore) return;
+    
+    loading = true;
+    spinner.style.display = 'flex';
+    
+    const params = new URLSearchParams(window.location.search);
+    params.append('offset', offset);
+    
+    setTimeout(() => {
+        fetch(`/load-more-products/?${params.toString()}`)
+            .then(response => response.json())
+            .then(data => {
+                data.products.forEach(product => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><img src="${product.sekil_url || '/static/images/no_image.webp'}" alt="${product.adi}" class="product-image" onclick="openImageModal('${product.sekil_url}')"></td>
+                        <td>
+                            ${product.adi}
+                            ${product.yenidir ? '<span class="new-badge">Yeni</span>' : ''}
+                        </td>
+                        <td>${product.firma}</td>
+                        <td>${product.brend_kod}</td>
+                        <td>${product.oem}</td>
+                        <td>${product.stok} ədəd</td>
+                        <td>${product.qiymet} ₼</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button type="button" 
+                                        class="cart-add-btn" 
+                                        ${product.stok === 0 ? 'disabled' : ''}
+                                        onclick="openQuantityModal(${product.id}, ${product.stok})">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </button>
+                                <button type="button" 
+                                        class="info-btn"
+                                        onclick="openProductInfoModal(${product.id}, '${product.adi}', '${product.kateqoriya || '--'}', '${product.firma}', '${product.avtomobil}', '${product.brend_kod}', '${product.oem}', '${product.olcu || '--'}', '${product.qiymet}', ${product.stok}, '${product.melumat || '--'}', '${product.sekil_url}', ${product.yenidir})">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                
+                hasMore = data.has_more;
+                offset += 15;
+                loading = false;
+                spinner.style.display = 'none';
+                
+                // Initialize image modal for new images
+                initializeImageModal();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                loading = false;
+                spinner.style.display = 'none';
+            });
+    }, 500);
+}

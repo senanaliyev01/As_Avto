@@ -216,6 +216,15 @@ def load_more_products(request):
             'stok': product.stok,
             'qiymet': str(product.qiymet),
             'yenidir': product.yenidir,
+            'kateqoriya': {
+                'adi': product.kateqoriya.adi if product.kateqoriya else None
+            },
+            'avtomobil': {
+                'adi': product.avtomobil.adi if product.avtomobil else None
+            },
+            'olcu': product.olcu,
+            'kodlar': product.kodlar,
+            'melumat': product.melumat
         })
     
     return JsonResponse({

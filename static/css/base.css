@@ -2297,3 +2297,141 @@ body {
         right: -100%;
     }
 }
+
+/* Product Info Modal Styles */
+.product-info-modal {
+    width: 90%;
+    max-width: 800px;
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.product-info-header {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+}
+
+.product-info-image {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: white;
+    padding: 10px;
+}
+
+.product-info-title {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.product-info-title h3 {
+    margin: 0 0 10px 0;
+    font-size: 24px;
+    color: #2c3e50;
+}
+
+.product-info-price {
+    font-size: 24px;
+    font-weight: bold;
+    color: #417690;
+}
+
+.product-info-body {
+    padding: 20px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.info-item {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.info-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.info-item label {
+    display: block;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.info-item span,
+.info-item p {
+    font-size: 16px;
+    color: #2c3e50;
+    line-height: 1.4;
+}
+
+.product-info-footer {
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-top: 1px solid #eee;
+    text-align: right;
+}
+
+/* Info Button Styles */
+.info-btn {
+    border: 1px solid #000;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    background-color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.info-btn i {
+    color: #417690;
+    font-size: 16px;
+}
+
+.info-btn:hover {
+    background-color: #f8f9fa;
+    transform: scale(1.05);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .product-info-modal {
+        width: 95%;
+        margin: 2% auto;
+    }
+
+    .product-info-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .product-info-image {
+        width: 120px;
+        height: 120px;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+}

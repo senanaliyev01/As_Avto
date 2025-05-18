@@ -236,7 +236,10 @@
     <!-- Cart Sidebar -->
     <div id="cartSidebar" class="cart-sidebar">
         <div class="cart-sidebar-header">
-            <h2>Səbətim ({{ request.session.cart|length }})</h2>
+            <div class="cart-sidebar-title">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Səbətim</span>
+            </div>
             <button id="closeSidebar" class="close-sidebar"><i class="fas fa-times"></i></button>
         </div>
         <div class="cart-sidebar-content">

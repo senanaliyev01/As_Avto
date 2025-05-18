@@ -216,11 +216,6 @@ def load_more_products(request):
             'stok': product.stok,
             'qiymet': str(product.qiymet),
             'yenidir': product.yenidir,
-            # Add additional fields for info modal
-            'kateqoriya': product.kateqoriya.adi if product.kateqoriya else None,
-            'avtomobil': product.avtomobil.adi if product.avtomobil else None,
-            'olcu': product.olcu,
-            'melumat': product.melumat,
         })
     
     return JsonResponse({

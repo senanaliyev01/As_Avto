@@ -687,3 +687,49 @@ function initializeCartSidebar() {
         });
     }
 }
+
+// Product Info Modal functions
+function openProductInfoModal(id, name, category, firm, car, brandCode, oem, size, price, stock, info, imageUrl, isNew) {
+    const modal = document.getElementById('productInfoModal');
+    const newBadge = document.getElementById('productNewBadge');
+    
+    // Set values
+    document.getElementById('productName').textContent = name;
+    document.getElementById('productCategory').textContent = category;
+    document.getElementById('productFirm').textContent = firm;
+    document.getElementById('productCar').textContent = car;
+    document.getElementById('productBrandCode').textContent = brandCode;
+    document.getElementById('productOEM').textContent = oem;
+    document.getElementById('productSize').textContent = size;
+    document.getElementById('productPrice').textContent = price + ' ₼';
+    document.getElementById('productStock').textContent = stock + ' ədəd';
+    document.getElementById('productInfo').textContent = info;
+    document.getElementById('productImage').src = imageUrl;
+    
+    // Show/hide new badge
+    newBadge.style.display = isNew ? 'inline-block' : 'none';
+    
+    // Show modal
+    modal.style.display = 'block';
+    
+    // Add fade-in effect
+    setTimeout(() => {
+        modal.classList.add('show');
+    }, 10);
+}
+
+function closeProductInfoModal() {
+    const modal = document.getElementById('productInfoModal');
+    modal.classList.remove('show');
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
+}
+
+// Close modal when clicking outside
+window.addEventListener('click', function(event) {
+    const modal = document.getElementById('productInfoModal');
+    if (event.target === modal) {
+        closeProductInfoModal();
+    }
+});

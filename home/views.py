@@ -211,20 +211,15 @@ def load_more_products(request):
             'adi': product.adi,
             'sekil_url': product.sekil.url if product.sekil else None,
             'firma': product.firma.adi,
+            'avtomobil': product.avtomobil.adi,
+            'kateqoriya': product.kateqoriya.adi if product.kateqoriya else None,
             'brend_kod': product.brend_kod,
             'oem': product.oem,
+            'olcu': product.olcu,
             'stok': product.stok,
             'qiymet': str(product.qiymet),
+            'melumat': product.melumat,
             'yenidir': product.yenidir,
-            'kateqoriya': {
-                'adi': product.kateqoriya.adi if product.kateqoriya else None
-            },
-            'avtomobil': {
-                'adi': product.avtomobil.adi if product.avtomobil else None
-            },
-            'olcu': product.olcu,
-            'kodlar': product.kodlar,
-            'melumat': product.melumat
         })
     
     return JsonResponse({

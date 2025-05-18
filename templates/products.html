@@ -18,7 +18,7 @@
                     <th>OEM</th>
                     <th>Stok</th>
                     <th>Qiymət</th>
-                    <th colspan="2">Əməliyyatlar</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody id="products-tbody">
@@ -37,24 +37,24 @@
                     <td>{{ mehsul.stok }} ədəd</td>
                     <td>{{ mehsul.qiymet }} ₼</td>
                     <td>
-                        <button type="button" 
-                                class="cart-add-btn" 
-                                {% if mehsul.stok == 0 %}disabled{% endif %}
-                                onclick="openQuantityModal({{ mehsul.id }}, {{ mehsul.stok }})">
-                            <i class="fas fa-shopping-cart"></i>
-                        </button>
-                    </td>
-                    <td>
-                        <button type="button" 
-                                class="info-btn"
-                                onclick="openProductInfoModal({{ mehsul.id }}, '{{ mehsul.adi|escapejs }}', '{{ mehsul.kateqoriya.adi|default:'--'|escapejs }}', '{{ mehsul.firma.adi|escapejs }}', '{{ mehsul.avtomobil.adi|escapejs }}', '{{ mehsul.brend_kod|escapejs }}', '{{ mehsul.oem|escapejs }}', '{{ mehsul.olcu|default:'--'|escapejs }}', {{ mehsul.qiymet }}, {{ mehsul.stok }}, '{{ mehsul.kodlar|default:'--'|escapejs }}', '{{ mehsul.melumat|default:'--'|escapejs }}', '{{ mehsul.sekil.url }}')">
-                            <i class="fas fa-info-circle"></i>
-                        </button>
+                        <div class="action-buttons">
+                            <button type="button" 
+                                    class="cart-add-btn" 
+                                    {% if mehsul.stok == 0 %}disabled{% endif %}
+                                    onclick="openQuantityModal({{ mehsul.id }}, {{ mehsul.stok }})">
+                                <i class="fas fa-shopping-cart"></i>
+                            </button>
+                            <button type="button" 
+                                    class="info-btn"
+                                    onclick="openProductInfoModal({{ mehsul.id }}, '{{ mehsul.adi|escapejs }}', '{{ mehsul.sekil.url }}', '{{ mehsul.firma.adi|escapejs }}', '{{ mehsul.avtomobil.adi|escapejs }}', '{{ mehsul.kateqoriya.adi|default:'Təyin edilməyib'|escapejs }}', '{{ mehsul.brend_kod }}', '{{ mehsul.oem }}', '{{ mehsul.olcu|default:'Təyin edilməyib'|escapejs }}', {{ mehsul.stok }}, {{ mehsul.qiymet }}, '{{ mehsul.melumat|default:'Məlumat yoxdur'|escapejs }}', {{ mehsul.yenidir|yesno:'true,false' }})">
+                                <i class="fas fa-info-circle"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="9" class="text-center">
+                    <td colspan="8" class="text-center">
                         <div class="empty-message">
                             <i class="fas fa-box-open"></i>
                             <p>Heç bir məhsul tapılmadı.</p>
@@ -93,57 +93,52 @@
 <div id="productInfoModal" class="modal">
     <div class="modal-content product-info-modal">
         <span class="close" onclick="closeProductInfoModal()">&times;</span>
-        <div class="product-info-header">
-            <img id="productImage" src="" alt="Məhsul şəkli" class="product-info-image">
-            <div class="product-info-title">
-                <h3 id="productName"></h3>
-                <div class="product-info-price">
-                    <span id="productPrice"></span>
+        <div class="product-info-content">
+            <div class="product-info-header">
+                <img id="productImage" src="" alt="" class="product-info-image">
+                <div class="product-info-title">
+                    <h3 id="productName"></h3>
+                    <span id="productNewBadge" class="new-badge" style="display: none;">Yeni</span>
                 </div>
             </div>
-        </div>
-        <div class="product-info-body">
-            <div class="info-grid">
-                <div class="info-item">
-                    <label>Kateqoriya:</label>
-                    <span id="productCategory"></span>
+            <div class="product-info-details">
+                <div class="info-row">
+                    <div class="info-label">Kateqoriya:</div>
+                    <div id="productCategory" class="info-value"></div>
                 </div>
-                <div class="info-item">
-                    <label>Firma:</label>
-                    <span id="productFirm"></span>
+                <div class="info-row">
+                    <div class="info-label">Firma:</div>
+                    <div id="productFirm" class="info-value"></div>
                 </div>
-                <div class="info-item">
-                    <label>Avtomobil:</label>
-                    <span id="productCar"></span>
+                <div class="info-row">
+                    <div class="info-label">Avtomobil:</div>
+                    <div id="productCar" class="info-value"></div>
                 </div>
-                <div class="info-item">
-                    <label>Brend Kodu:</label>
-                    <span id="productBrandCode"></span>
+                <div class="info-row">
+                    <div class="info-label">Brend Kodu:</div>
+                    <div id="productBrandCode" class="info-value"></div>
                 </div>
-                <div class="info-item">
-                    <label>OEM:</label>
-                    <span id="productOEM"></span>
+                <div class="info-row">
+                    <div class="info-label">OEM:</div>
+                    <div id="productOEM" class="info-value"></div>
                 </div>
-                <div class="info-item">
-                    <label>Ölçü:</label>
-                    <span id="productSize"></span>
+                <div class="info-row">
+                    <div class="info-label">Ölçü:</div>
+                    <div id="productSize" class="info-value"></div>
                 </div>
-                <div class="info-item">
-                    <label>Stok:</label>
-                    <span id="productStock"></span>
+                <div class="info-row">
+                    <div class="info-label">Stok:</div>
+                    <div id="productStock" class="info-value"></div>
                 </div>
-                <div class="info-item full-width">
-                    <label>Kodlar:</label>
-                    <span id="productCodes"></span>
+                <div class="info-row">
+                    <div class="info-label">Qiymət:</div>
+                    <div id="productPrice" class="info-value"></div>
                 </div>
-                <div class="info-item full-width">
-                    <label>Ətraflı məlumat:</label>
-                    <p id="productDescription"></p>
+                <div class="info-row full-width">
+                    <div class="info-label">Məlumat:</div>
+                    <div id="productDescription" class="info-value"></div>
                 </div>
             </div>
-        </div>
-        <div class="product-info-footer">
-            <button type="button" class="btn btn-primary" onclick="closeProductInfoModal()">Bağla</button>
         </div>
     </div>
 </div>
@@ -193,19 +188,19 @@ function loadMoreProducts() {
                         <td>${product.stok} ədəd</td>
                         <td>${product.qiymet} ₼</td>
                         <td>
-                            <button type="button" 
-                                    class="cart-add-btn" 
-                                    ${product.stok === 0 ? 'disabled' : ''}
-                                    onclick="openQuantityModal(${product.id}, ${product.stok})">
-                                <i class="fas fa-shopping-cart"></i>
-                            </button>
-                        </td>
-                        <td>
-                            <button type="button" 
-                                    class="info-btn"
-                                    onclick="openProductInfoModal(${product.id}, '${product.adi}', '${product.kateqoriya.adi || '--' }', '${product.firma}', '${product.avtomobil.adi || '--' }', '${product.brend_kod}', '${product.oem}', '${product.olcu || '--' }', ${product.qiymet}, ${product.stok}, '${product.kodlar || '--' }', '${product.melumat || '--' }', '${product.sekil_url}')">
-                                <i class="fas fa-info-circle"></i>
-                            </button>
+                            <div class="action-buttons">
+                                <button type="button" 
+                                        class="cart-add-btn" 
+                                        ${product.stok === 0 ? 'disabled' : ''}
+                                        onclick="openQuantityModal(${product.id}, ${product.stok})">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </button>
+                                <button type="button" 
+                                        class="info-btn"
+                                        onclick="openProductInfoModal(${product.id}, '${product.adi}', '${product.sekil_url}', '${product.firma}', '${product.avtomobil}', '${product.kateqoriya || 'Təyin edilməyib'}', '${product.brend_kod}', '${product.oem}', '${product.olcu || 'Təyin edilməyib'}', ${product.stok}, ${product.qiymet}, '${product.melumat || 'Məlumat yoxdur'}', ${product.yenidir})">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                            </div>
                         </td>
                     `;
                     tbody.appendChild(row);
@@ -224,7 +219,7 @@ function loadMoreProducts() {
                 loading = false;
                 spinner.style.display = 'none';
             });
-    }, 500); // 0.5 saniyə gözləmə
+    }, 500);
 }
 
 // Scroll event listener
@@ -235,13 +230,13 @@ window.addEventListener('scroll', () => {
 });
 
 // Product Info Modal Functions
-function openProductInfoModal(id, name, category, firm, car, brandCode, oem, size, price, stock, codes, description, imageUrl) {
+function openProductInfoModal(id, name, image, firm, car, category, brandCode, oem, size, stock, price, description, isNew) {
     const modal = document.getElementById('productInfoModal');
     
     // Set values
-    document.getElementById('productImage').src = imageUrl;
+    document.getElementById('productImage').src = image;
     document.getElementById('productName').textContent = name;
-    document.getElementById('productPrice').textContent = price + ' ₼';
+    document.getElementById('productNewBadge').style.display = isNew ? 'inline-block' : 'none';
     document.getElementById('productCategory').textContent = category;
     document.getElementById('productFirm').textContent = firm;
     document.getElementById('productCar').textContent = car;
@@ -249,7 +244,7 @@ function openProductInfoModal(id, name, category, firm, car, brandCode, oem, siz
     document.getElementById('productOEM').textContent = oem;
     document.getElementById('productSize').textContent = size;
     document.getElementById('productStock').textContent = stock + ' ədəd';
-    document.getElementById('productCodes').textContent = codes;
+    document.getElementById('productPrice').textContent = price + ' ₼';
     document.getElementById('productDescription').textContent = description;
     
     modal.style.display = 'block';
@@ -262,14 +257,9 @@ function closeProductInfoModal() {
 
 // Close modal when clicking outside
 window.onclick = function(event) {
-    const quantityModal = document.getElementById('quantityModal');
-    const productInfoModal = document.getElementById('productInfoModal');
-    
-    if (event.target == quantityModal) {
-        quantityModal.style.display = 'none';
-    }
-    if (event.target == productInfoModal) {
-        productInfoModal.style.display = 'none';
+    const modal = document.getElementById('productInfoModal');
+    if (event.target == modal) {
+        closeProductInfoModal();
     }
 }
 </script>

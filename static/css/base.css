@@ -308,40 +308,33 @@ body {
 }
 
 /* Table Styles */
-.table-container {
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    margin: 2rem auto;
-    overflow-x: auto;
-    width: 100%;
-    padding: 1rem;
-}
-
 .table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    margin: 0 auto;
+    margin: 2rem auto;
     text-align: center;
     table-layout: fixed;
+    min-width: 1000px; /* minimum genişlik təyin edirik */
 }
 
 .table thead th {
     background: #f8f9fa;
     color: #2c3e50;
     font-weight: 600;
-    padding: 12px 8px;
+    padding: 15px 10px;
     text-align: center;
     border-bottom: 2px solid #e9ecef;
+    border-right: 1px solid #e9ecef;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .table tbody td {
-    padding: 12px 8px;
+    padding: 15px 10px;
     border-bottom: 1px solid #e9ecef;
+    border-right: 1px solid #e9ecef;
     color: #2d3436;
     vertical-align: middle;
     white-space: nowrap;
@@ -349,45 +342,64 @@ body {
     text-overflow: ellipsis;
 }
 
-/* Column widths */
+/* Table Container */
+.table-container {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin: 2rem auto;
+    overflow-x: auto; /* horizontal scroll əlavə edirik */
+    width: 100%;
+    padding: 1rem;
+}
+
+/* Sütun genişliklərini tənzimləyirik */
 .table th:nth-child(1), /* Şəkil */
 .table td:nth-child(1) {
-    width: 70px;
+    width: 80px;
+    min-width: 80px;
 }
 
 .table th:nth-child(2), /* Məhsul */
 .table td:nth-child(2) {
-    width: 200px;
+    width: 250px;
+    min-width: 250px;
 }
 
 .table th:nth-child(3), /* Firma */
 .table td:nth-child(3) {
-    width: 120px;
+    width: 150px;
+    min-width: 150px;
 }
 
 .table th:nth-child(4), /* Brend Kodu */
 .table td:nth-child(4) {
-    width: 100px;
+    width: 120px;
+    min-width: 120px;
 }
 
 .table th:nth-child(5), /* OEM */
 .table td:nth-child(5) {
-    width: 100px;
+    width: 120px;
+    min-width: 120px;
 }
 
-.table th:nth-child(6), /* Stok */
+.table th:nth-child(6), /* Qiymət */
 .table td:nth-child(6) {
-    width: 80px;
+    width: 100px;
+    min-width: 100px;
 }
 
-.table th:nth-child(7), /* Qiymət */
+.table th:nth-child(7), /* Stok */
 .table td:nth-child(7) {
-    width: 80px;
+    width: 100px;
+    min-width: 100px;
 }
 
 .table th:nth-child(8), /* Əməliyyatlar */
 .table td:nth-child(8) {
-    width: 100px;
+    width: 80px;
+    min-width: 80px;
 }
 
 /* Product Image in Tables */
@@ -2283,160 +2295,5 @@ body {
     .cart-sidebar {
         width: 100%;
         right: -100%;
-    }
-}
-
-/* Action Buttons */
-.action-buttons {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-}
-
-.info-btn {
-    border: 1px solid #000;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    background-color: white;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-}
-
-.info-btn i {
-    color: #17a2b8;
-    font-size: 16px;
-}
-
-.info-btn:hover {
-    background-color: #f8f9fa;
-    transform: scale(1.1);
-}
-
-/* Product Info Modal */
-.product-info-modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.product-info-modal.show {
-    opacity: 1;
-}
-
-.product-info-modal .modal-content {
-    position: relative;
-    width: 90%;
-    max-width: 700px;
-    margin: 0;
-    padding: 0;
-    border-radius: 10px;
-    overflow: hidden;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-}
-
-.product-info-header {
-    background-color: #f8f9fa;
-    padding: 15px 20px;
-    border-bottom: 1px solid #dee2e6;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.product-info-header h3 {
-    margin: 0;
-    color: #2c3e50;
-    font-size: 1.3rem;
-}
-
-.product-info-body {
-    display: flex;
-    gap: 20px;
-    padding: 20px;
-    max-height: calc(90vh - 100px);
-    overflow-y: auto;
-}
-
-.product-info-image {
-    flex: 0 0 250px;
-}
-
-.product-info-image img {
-    width: 100%;
-    height: 250px;
-    object-fit: contain;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-.product-info-details {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.info-row {
-    display: flex;
-    gap: 10px;
-    padding: 8px;
-    border-bottom: 1px solid #eee;
-}
-
-.info-label {
-    flex: 0 0 100px;
-    font-weight: 600;
-    color: #6c757d;
-    font-size: 0.9rem;
-}
-
-.info-value {
-    flex: 1;
-    color: #2c3e50;
-    font-size: 0.9rem;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .product-info-modal .modal-content {
-        width: 95%;
-        margin: 10px;
-    }
-    
-    .product-info-body {
-        flex-direction: column;
-        padding: 15px;
-    }
-    
-    .product-info-image {
-        flex: 0 0 auto;
-    }
-    
-    .product-info-image img {
-        height: 200px;
-    }
-    
-    .info-row {
-        flex-direction: column;
-        gap: 4px;
-    }
-    
-    .info-label {
-        flex: 0 0 auto;
     }
 }

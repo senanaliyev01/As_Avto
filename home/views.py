@@ -533,3 +533,30 @@ def logout_view(request):
     
     # İstifadəçini login səhifəsinə yönləndiririk
     return redirect('login')
+
+@login_required
+def cart_content(request):
+    if 'cart' not in request.session:
+        request.session['cart'] = {}
+    
+    cart = request.session['cart']
+    cart_items = []
+    total = Decimal('0.00')
+    
+    for product_id, quantity in cart.items():
+        try:
+            product = Mehsul.objects.get(id=product_id)
+            subtotal = product.qiymet * Decimal(str(quantity))
+            cart_items.append({
+                'product': product,
+                'quantity': quantity,
+                'subtotal': subtotal
+            })
+            total += subtotal
+        except Mehsul.DoesNotExist:
+            continue
+    
+    return render(request, 'cart_content.html', {
+        'cart_items': cart_items,
+        'total': total
+    })

@@ -19,6 +19,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Popup Modal
     initializePopupModal();
+
+    // Cart Sidebar functionality
+    initializeCartSidebar();
 });
 
 function initializeSearch() {
@@ -545,4 +548,134 @@ function initializePopupModal() {
             e.stopPropagation();
         });
     }
+}
+
+// Cart Sidebar functionality
+function initializeCartSidebar() {
+    const cartButton = document.getElementById('cartButton');
+    const cartSidebar = document.getElementById('cartSidebar');
+    const cartOverlay = document.getElementById('cartOverlay');
+    const closeCart = document.querySelector('.close-cart');
+    
+    if (cartButton && cartSidebar && cartOverlay && closeCart) {
+        cartButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            openCart();
+        });
+        
+        closeCart.addEventListener('click', closeCart);
+        cartOverlay.addEventListener('click', closeCart);
+        
+        // Close with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && cartSidebar.classList.contains('active')) {
+                closeCart();
+            }
+        });
+    }
+}
+
+function openCart() {
+    const cartSidebar = document.getElementById('cartSidebar');
+    const cartOverlay = document.getElementById('cartOverlay');
+    const cartContent = document.getElementById('cartContent');
+    
+    cartSidebar.classList.add('active');
+    cartOverlay.classList.add('active');
+    
+    // Show loading spinner
+    cartContent.innerHTML = `
+        <div class="cart-loading">
+            <div class="spinner"></div>
+        </div>
+    `;
+    
+    // Load cart content
+    fetch('/cart/content/')
+        .then(response => response.text())
+        .then(html => {
+            cartContent.innerHTML = html;
+            initializeCartFunctionality();
+        })
+        .catch(error => {
+            cartContent.innerHTML = '<p class="error">Səbət yüklənərkən xəta baş verdi.</p>';
+            console.error('Error:', error);
+        });
+}
+
+function closeCart() {
+    const cartSidebar = document.getElementById('cartSidebar');
+    const cartOverlay = document.getElementById('cartOverlay');
+    
+    cartSidebar.classList.remove('active');
+    cartOverlay.classList.remove('active');
+}
+
+function initializeCartFunctionality() {
+    // Initialize quantity controls
+    const quantityControls = document.querySelectorAll('.cart-item-quantity');
+    quantityControls.forEach(control => {
+        const input = control.querySelector('input');
+        const updateBtn = control.querySelector('.update-quantity');
+        if (updateBtn) {
+            updateBtn.addEventListener('click', function() {
+                updateCartItemQuantity(input.dataset.productId, input.value);
+            });
+        }
+    });
+    
+    // Initialize remove buttons
+    const removeButtons = document.querySelectorAll('.cart-item-remove');
+    removeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            removeCartItem(this.dataset.productId);
+        });
+    });
+}
+
+function updateCartItemQuantity(productId, quantity) {
+    fetch(`/cart/update/${productId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ quantity: quantity })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            openCart(); // Refresh cart content
+            updateCartCounter(data.cart_count);
+        } else {
+            showMessage('error', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('error', 'Xəta baş verdi');
+    });
+}
+
+function removeCartItem(productId) {
+    fetch(`/cart/remove/${productId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            openCart(); // Refresh cart content
+            updateCartCounter(data.cart_count);
+            showMessage('success', data.message);
+        } else {
+            showMessage('error', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('error', 'Xəta baş verdi');
+    });
 }

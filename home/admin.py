@@ -340,8 +340,8 @@ class SifarisAdmin(admin.ModelAdmin):
         headers = [
             Paragraph('№', headerStyle),
             Paragraph('Məhsul', headerStyle),
-            Paragraph('Brend Kod', headerStyle),
             Paragraph('Firma', headerStyle),
+            Paragraph('Brend Kod', headerStyle),
             Paragraph('OEM', headerStyle),
             Paragraph('Vitrin', headerStyle),
             Paragraph('Qiymət', headerStyle),
@@ -369,8 +369,8 @@ class SifarisAdmin(admin.ModelAdmin):
             row = [
                 Paragraph(str(index), contentStyle),
                 Paragraph(item.mehsul.adi, contentStyle),
-                Paragraph(item.mehsul.brend_kod, contentStyle),
                 Paragraph(item.mehsul.firma.adi, contentStyle),
+                Paragraph(item.mehsul.brend_kod, contentStyle),
                 Paragraph(item.mehsul.oem, contentStyle),
                 Paragraph(str(item.mehsul.vitrin.nomre) if item.mehsul.vitrin else '-', contentStyle),
                 Paragraph(f"{item.qiymet} ₼", contentStyle),

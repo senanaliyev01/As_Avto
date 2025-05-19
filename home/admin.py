@@ -379,7 +379,7 @@ class SifarisAdmin(admin.ModelAdmin):
             total_amount += item.umumi_mebleg
 
         # Cədvəl stilləri
-        table = Table(data, colWidths=[25, 120, 70, 70, 60, 60, 50, 70])
+        table = Table(data, colWidths=[30, 150, 80, 80, 60, 70, 50, 75])
         table.setStyle(TableStyle([
             # Başlıq sətri
             ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2B5173')),  # Tünd mavi

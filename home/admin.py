@@ -379,7 +379,7 @@ class SifarisAdmin(admin.ModelAdmin):
             total_amount += item.umumi_mebleg
 
         # Cədvəl stilləri
-        table = Table(data, colWidths=[30, 150, 80, 80, 60, 70, 50, 75])
+        table = Table(data)
         table.setStyle(TableStyle([
             # Başlıq sətri
             ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2B5173')),  # Tünd mavi
@@ -400,6 +400,11 @@ class SifarisAdmin(admin.ModelAdmin):
             # Cədvəl xətləri
             ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
             ('LINEBELOW', (0, 0), (-1, 0), 1, colors.HexColor('#2B5173')),
+            
+            # Sütun enləri
+            ('COLWIDTHS', (0, 0), (-1, -1), '*'),  # Bütün sütunlar üçün avtomatik en
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),  # Bütün sütunlar üçün mərkəz düzləndirmə
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),  # Şaquli mərkəz düzləndirmə
         ]))
         
         elements.append(table)

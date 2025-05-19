@@ -370,7 +370,7 @@ class SifarisAdmin(admin.ModelAdmin):
                 Paragraph(item.mehsul.adi, contentStyle),
                 Paragraph(item.mehsul.brend_kod, contentStyle),
                 Paragraph(item.mehsul.oem, contentStyle),
-                Paragraph(item.mehsul.vitrin or '-', contentStyle),
+                Paragraph(str(item.mehsul.vitrin.nomre) if item.mehsul.vitrin else '-', contentStyle),
                 Paragraph(f"{item.qiymet} ₼", contentStyle),
                 Paragraph(str(item.miqdar), contentStyle),
                 Paragraph(f"{item.umumi_mebleg} ₼", contentStyle)

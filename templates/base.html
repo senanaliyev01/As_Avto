@@ -248,5 +248,27 @@
     </div>
     <!-- Cart Sidebar Overlay -->
     <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <!-- Chat Interface -->
+    <div id="chatInterface" class="chat-interface">
+        <div class="chat-header">
+            <div class="chat-title">
+                <i class="fas fa-comments"></i>
+                <span>Chat</span>
+            </div>
+            <button id="minimizeChat" class="minimize-chat">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <!-- Messages will be loaded here -->
+        </div>
+        <div class="chat-input">
+            <textarea id="messageInput" placeholder="Mesajınızı yazın..." rows="1"></textarea>
+            <button id="sendMessage" class="send-message">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
 </body>
 </html>

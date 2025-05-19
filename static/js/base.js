@@ -25,6 +25,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize products page functionality
     initializeProductsPage();
+
+    // Chat functionality
+    initializeChat();
 });
 
 function initializeSearch() {
@@ -775,5 +778,170 @@ function initializeProductsPage() {
             }
         });
     }
+}
+
+// Chat Functionality
+function initializeChat() {
+    const chatInterface = document.getElementById('chatInterface');
+    const chatMessages = document.getElementById('chatMessages');
+    const messageInput = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendMessage');
+    const minimizeButton = document.getElementById('minimizeChat');
+    let isMinimized = false;
+    let lastMessageTime = 0;
+
+    // Chat window dragging functionality
+    let isDragging = false;
+    let currentX;
+    let currentY;
+    let initialX;
+    let initialY;
+    let xOffset = 0;
+    let yOffset = 0;
+
+    const chatHeader = document.querySelector('.chat-header');
+
+    chatHeader.addEventListener('mousedown', dragStart);
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', dragEnd);
+
+    function dragStart(e) {
+        initialX = e.clientX - xOffset;
+        initialY = e.clientY - yOffset;
+
+        if (e.target === chatHeader || e.target.parentNode === chatHeader) {
+            isDragging = true;
+        }
+    }
+
+    function drag(e) {
+        if (isDragging) {
+            e.preventDefault();
+            currentX = e.clientX - initialX;
+            currentY = e.clientY - initialY;
+
+            xOffset = currentX;
+            yOffset = currentY;
+
+            setTranslate(currentX, currentY, chatInterface);
+        }
+    }
+
+    function dragEnd() {
+        initialX = currentX;
+        initialY = currentY;
+        isDragging = false;
+    }
+
+    function setTranslate(xPos, yPos, el) {
+        el.style.transform = `translate(${xPos}px, ${yPos}px)`;
+    }
+
+    // Minimize/Maximize chat window
+    minimizeButton.addEventListener('click', () => {
+        isMinimized = !isMinimized;
+        chatInterface.classList.toggle('minimized');
+        minimizeButton.innerHTML = isMinimized ? 
+            '<i class="fas fa-plus"></i>' : 
+            '<i class="fas fa-minus"></i>';
+    });
+
+    // Auto-resize textarea
+    messageInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+    });
+
+    // Send message on Enter (Shift+Enter for new line)
+    messageInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+
+    // Send message on button click
+    sendButton.addEventListener('click', sendMessage);
+
+    function sendMessage() {
+        const message = messageInput.value.trim();
+        if (message) {
+            const now = Date.now();
+            if (now - lastMessageTime < 1000) return; // Prevent spam
+            lastMessageTime = now;
+
+            // Add message to chat
+            addMessage(message, 'sent');
+            
+            // Send message to server
+            fetch('/chat/send/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'error') {
+                    showMessage('error', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('error', 'Mesaj göndərilmədi. Zəhmət olmasa yenidən cəhd edin.');
+            });
+
+            // Clear input
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+        }
+    }
+
+    function addMessage(text, type, isAdmin = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${type} ${isAdmin ? 'admin' : ''}`;
+        
+        const messageText = document.createElement('div');
+        messageText.textContent = text;
+        
+        const messageTime = document.createElement('div');
+        messageTime.className = 'message-time';
+        messageTime.textContent = new Date().toLocaleTimeString('az-AZ', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        messageDiv.appendChild(messageText);
+        messageDiv.appendChild(messageTime);
+        chatMessages.appendChild(messageDiv);
+        
+        // Scroll to bottom
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Load messages periodically
+    function loadMessages() {
+        fetch('/chat/messages/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.messages) {
+                    chatMessages.innerHTML = '';
+                    data.messages.forEach(msg => {
+                        addMessage(
+                            msg.text,
+                            msg.is_sender ? 'sent' : 'received',
+                            msg.is_admin
+                        );
+                    });
+                }
+            })
+            .catch(error => console.error('Error loading messages:', error));
+    }
+
+    // Load messages every 3 seconds
+    loadMessages();
+    setInterval(loadMessages, 3000);
 }
 

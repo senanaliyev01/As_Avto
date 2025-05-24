@@ -95,7 +95,7 @@ def products_view(request):
             # Kod ilə axtarış
             kod_filter = Q(kodlar__icontains=clean_search)
             
-            # Ad və məlumat ilə təkmilləşdirilmiş axtarış
+            # Ad ilə təkmilləşdirilmiş axtarış
             # Çoxlu boşluq və təbləri tək boşluğa çeviririk
             processed_query = re.sub(r'\s+', ' ', search_query).strip()
             
@@ -105,22 +105,16 @@ def products_view(request):
             if search_words:
                 # Hər bir söz üçün bütün mümkün variantları yarat
                 ad_filters = []
-                melumat_filters = []
                 for word in search_words:
                     word_variations = normalize_azerbaijani_chars(word)
-                    # Ad üçün filter
-                    word_filter_ad = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
-                    ad_filters.append(word_filter_ad)
-                    # Məlumat üçün filter
-                    word_filter_melumat = reduce(or_, [Q(melumat__icontains=variation) for variation in word_variations])
-                    melumat_filters.append(word_filter_melumat)
+                    word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
+                    ad_filters.append(word_filter)
                 
                 # "AND" operatoru ilə birləşdiririk - bütün sözlər olmalıdır
                 ad_filter = reduce(and_, ad_filters)
-                melumat_filter = reduce(and_, melumat_filters)
                 
-                # Kod, ad və məlumat filterlərini "OR" operatoru ilə birləşdiririk
-                mehsullar = mehsullar.filter(kod_filter | ad_filter | melumat_filter)
+                # Kod və ad filterini "OR" operatoru ilə birləşdiririk
+                mehsullar = mehsullar.filter(kod_filter | ad_filter)
             else:
                 # Əgər heç bir söz yoxdursa, yalnız kod ilə axtarış
                 mehsullar = mehsullar.filter(kod_filter)
@@ -501,7 +495,7 @@ def search_suggestions(request):
             # Kod ilə axtarış
             kod_filter = Q(kodlar__icontains=clean_search)
             
-            # Ad və məlumat ilə təkmilləşdirilmiş axtarış
+            # Ad ilə təkmilləşdirilmiş axtarış
             # Çoxlu boşluq və təbləri tək boşluğa çeviririk
             processed_query = re.sub(r'\s+', ' ', search_query).strip()
             
@@ -511,22 +505,16 @@ def search_suggestions(request):
             if search_words:
                 # Hər bir söz üçün bütün mümkün variantları yarat
                 ad_filters = []
-                melumat_filters = []
                 for word in search_words:
                     word_variations = normalize_azerbaijani_chars(word)
-                    # Ad üçün filter
-                    word_filter_ad = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
-                    ad_filters.append(word_filter_ad)
-                    # Məlumat üçün filter
-                    word_filter_melumat = reduce(or_, [Q(melumat__icontains=variation) for variation in word_variations])
-                    melumat_filters.append(word_filter_melumat)
+                    word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
+                    ad_filters.append(word_filter)
                 
                 # "AND" operatoru ilə birləşdiririk - bütün sözlər olmalıdır
                 ad_filter = reduce(and_, ad_filters)
-                melumat_filter = reduce(and_, melumat_filters)
                 
-                # Kod, ad və məlumat filterlərini "OR" operatoru ilə birləşdiririk
-                mehsullar = Mehsul.objects.filter(kod_filter | ad_filter | melumat_filter)[:5]
+                # Kod və ad filterini "OR" operatoru ilə birləşdiririk
+                mehsullar = Mehsul.objects.filter(kod_filter | ad_filter)[:5]
             else:
                 # Əgər heç bir söz yoxdursa, yalnız kod ilə axtarış
                 mehsullar = Mehsul.objects.filter(kod_filter)[:5]

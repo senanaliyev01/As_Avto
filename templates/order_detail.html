@@ -68,7 +68,7 @@
         </thead>
         <tbody>
             {% for item in order.sifarisitem_set.all %}
-            <tr>
+            <tr class="product-row" data-product-id="{{ item.mehsul.id }}" style="cursor: pointer;">
                 <td>
                     <img src="{{ item.mehsul.sekil.url }}" alt="{{ item.mehsul.adi }}" class="product-image" onclick="openImageModal('{{ item.mehsul.sekil.url }}')">
                 </td>
@@ -77,8 +77,8 @@
                 <td>{{ item.mehsul.brend_kod }}</td>
                 <td>{{ item.mehsul.oem }}</td>
                 <td>{{ item.miqdar }} ədəd</td>
-                        <td>{{ item.qiymet }} ₼</td>
-                        <td>{{ item.umumi_mebleg }} ₼</td>
+                <td>{{ item.qiymet }} ₼</td>
+                <td>{{ item.umumi_mebleg }} ₼</td>
             </tr>
             {% endfor %}
         </tbody>

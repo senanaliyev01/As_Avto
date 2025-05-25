@@ -22,7 +22,7 @@
             </thead>
             <tbody>
                 {% for mehsul in mehsullar %}
-                <tr>
+                <tr class="product-row" data-product-id="{{ mehsul.id }}" style="cursor: pointer;">
                     <td><img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image" onclick="openImageModal('{{ mehsul.sekil.url }}')"></td>
                     <td>
                         {{ mehsul.adi }}

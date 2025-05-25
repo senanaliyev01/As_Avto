@@ -25,6 +25,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize products page functionality
     initializeProductsPage();
+
+    // Initialize product row click handlers
+    initializeProductRowClicks();
 });
 
 function initializeSearch() {
@@ -850,4 +853,18 @@ document.addEventListener('keydown', function(e) {
         closeProductDetailsModal();
     }
 });
+
+// Initialize product row click handlers for all pages
+function initializeProductRowClicks() {
+    document.addEventListener('click', function(e) {
+        const row = e.target.closest('.product-row');
+        if (row && !e.target.closest('.cart-add-btn') && !e.target.closest('.product-image') && 
+            !e.target.closest('.quantity-control') && !e.target.closest('.btn')) {
+            const productId = row.dataset.productId;
+            if (productId) {
+                openProductDetailsModal(productId);
+            }
+        }
+    });
+}
 

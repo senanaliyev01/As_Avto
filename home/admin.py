@@ -235,6 +235,29 @@ class MehsulAdmin(admin.ModelAdmin):
         
         return HttpResponseRedirect("../")
 
+    def changelist_view(self, request, extra_context=None):
+        # Statistikanı hesablayırıq
+        from django.db.models import Sum, F, ExpressionWrapper, DecimalField
+        
+        total_stats = Mehsul.objects.aggregate(
+            toplam_maya = Sum(ExpressionWrapper(
+                F('stok') * F('maya_qiymet'),
+                output_field=DecimalField()
+            )),
+            toplam_satis = Sum(ExpressionWrapper(
+                F('stok') * F('qiymet'),
+                output_field=DecimalField()
+            ))
+        )
+        
+        # Ümumi xeyiri hesablayırıq
+        total_stats['toplam_xeyir'] = (total_stats['toplam_satis'] or 0) - (total_stats['toplam_maya'] or 0)
+
+        extra_context = extra_context or {}
+        extra_context['total_stats'] = total_stats
+        
+        return super().changelist_view(request, extra_context=extra_context)
+
 class SifarisItemInline(admin.TabularInline):
     model = SifarisItem
     extra = 0

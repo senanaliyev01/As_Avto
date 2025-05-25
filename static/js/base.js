@@ -697,7 +697,8 @@ function initializeProductsPage() {
     let loading = false;
     const tbody = document.getElementById('products-tbody');
     const spinner = document.getElementById('loading-spinner');
-    let hasMore = false; // Bu dəyər HTML-dən gələcək
+    let hasMore = false;
+    let currentProductId = null;
 
     // hasMore dəyərini HTML-dən alırıq
     if (tbody) {
@@ -705,6 +706,15 @@ function initializeProductsPage() {
         if (hasMoreElement) {
             hasMore = hasMoreElement.dataset.hasMore === 'true';
         }
+
+        // Add click event listener to product rows
+        tbody.addEventListener('click', function(e) {
+            const row = e.target.closest('.product-row');
+            if (row && !e.target.closest('.cart-add-btn') && !e.target.closest('.product-image')) {
+                const productId = row.dataset.productId;
+                openProductDetailsModal(productId);
+            }
+        });
     }
 
     function loadMoreProducts() {
@@ -725,6 +735,9 @@ function initializeProductsPage() {
                     if (tbody) {
                         data.products.forEach(product => {
                             const row = document.createElement('tr');
+                            row.className = 'product-row';
+                            row.dataset.productId = product.id;
+                            row.style.cursor = 'pointer';
                             row.innerHTML = `
                                 <td><img src="${product.sekil_url || '/static/images/no_image.webp'}" alt="${product.adi}" class="product-image" onclick="openImageModal('${product.sekil_url}')"></td>
                                 <td>
@@ -764,7 +777,7 @@ function initializeProductsPage() {
                         spinner.style.display = 'none';
                     }
                 });
-        }, 500); // 0.5 saniyə gözləmə
+        }, 500);
     }
 
     // Scroll event listener
@@ -776,4 +789,74 @@ function initializeProductsPage() {
         });
     }
 }
+
+// Product Details Modal Functions
+function openProductDetailsModal(productId) {
+    const modal = document.getElementById('productDetailsModal');
+    if (!modal) return;
+
+    // Fetch product details
+    fetch(`/product-details/${productId}/`)
+        .then(response => response.json())
+        .then(data => {
+            // Update modal content
+            document.getElementById('modalProductImage').src = data.sekil_url || '/static/images/no_image.webp';
+            document.getElementById('modalProductName').textContent = data.adi;
+            document.getElementById('modalNewBadge').style.display = data.yenidir ? 'inline-block' : 'none';
+            document.getElementById('modalProductFirm').textContent = data.firma;
+            document.getElementById('modalProductCategory').textContent = data.kateqoriya || '-';
+            document.getElementById('modalProductCar').textContent = data.avtomobil;
+            document.getElementById('modalProductBrandCode').textContent = data.brend_kod;
+            document.getElementById('modalProductOEM').textContent = data.oem;
+            document.getElementById('modalProductSize').textContent = data.olcu || '-';
+            document.getElementById('modalProductStock').textContent = data.stok + ' ədəd';
+            document.getElementById('modalProductPrice').textContent = data.qiymet + ' ₼';
+            document.getElementById('modalProductInfo').textContent = data.melumat || '-';
+            document.getElementById('modalProductCodes').textContent = data.kodlar || '-';
+
+            // Update add to cart button
+            const addToCartBtn = document.getElementById('modalAddToCartBtn');
+            if (data.stok === 0) {
+                addToCartBtn.disabled = true;
+                addToCartBtn.title = 'Stokda yoxdur';
+            } else {
+                addToCartBtn.disabled = false;
+                addToCartBtn.title = '';
+                addToCartBtn.onclick = () => openQuantityModal(data.id, data.stok);
+            }
+
+            // Store current product ID
+            currentProductId = data.id;
+
+            // Show modal
+            modal.style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('error', 'Məhsul məlumatları yüklənərkən xəta baş verdi');
+        });
+}
+
+function closeProductDetailsModal() {
+    const modal = document.getElementById('productDetailsModal');
+    if (modal) {
+        modal.style.display = 'none';
+        currentProductId = null;
+    }
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('productDetailsModal');
+    if (event.target == modal) {
+        closeProductDetailsModal();
+    }
+}
+
+// Close modal on escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeProductDetailsModal();
+    }
+});
 

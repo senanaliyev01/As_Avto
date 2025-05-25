@@ -23,8 +23,8 @@
             </thead>
             <tbody id="products-tbody" data-has-more="{{ has_more|lower }}">
                 {% for mehsul in mehsullar %}
-                <tr class="product-row" data-product-id="{{ mehsul.id }}" onclick="openProductModal({{ mehsul.id }}, '{{ mehsul.adi|escapejs }}', '{{ mehsul.firma.adi|escapejs }}', '{{ mehsul.brend_kod|escapejs }}', '{{ mehsul.oem|escapejs }}', '{{ mehsul.olcu|default:''|escapejs }}', {{ mehsul.qiymet }}, {{ mehsul.stok }}, '{{ mehsul.melumat|default:''|escapejs }}', '{{ mehsul.sekil.url }}', '{{ mehsul.kateqoriya.adi|default:''|escapejs }}', '{{ mehsul.avtomobil.adi|default:''|escapejs }}', '{{ mehsul.kodlar|default:''|escapejs }}', {{ mehsul.yenidir|lower }})">
-                    <td><img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image"></td>
+                <tr data-product-id="{{ mehsul.id }}" class="product-row">
+                    <td><img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image" onclick="openImageModal('{{ mehsul.sekil.url }}')"></td>
                     <td>
                         {{ mehsul.adi }}
                         {% if mehsul.yenidir %}
@@ -40,7 +40,7 @@
                         <button type="button" 
                                 class="cart-add-btn" 
                                 {% if mehsul.stok == 0 %}disabled{% endif %}
-                                onclick="event.stopPropagation(); openQuantityModal({{ mehsul.id }}, {{ mehsul.stok }})">
+                                onclick="openQuantityModal({{ mehsul.id }}, {{ mehsul.stok }})">
                             <i class="fas fa-shopping-cart"></i>
                         </button>
                     </td>
@@ -82,60 +82,58 @@
     </div>
 </div>
 
-<!-- Məhsul Detalları Modal -->
-<div id="productDetailsModal" class="modal product-details-modal">
-    <div class="modal-content product-details-content">
-        <span class="close" onclick="closeProductModal()">&times;</span>
-        <div class="product-details-grid">
-            <div class="product-image-section">
-                <img id="modalProductImage" src="" alt="Məhsul şəkli" class="modal-product-image">
+<!-- Product Details Modal -->
+<div id="productDetailsModal" class="product-details-modal">
+    <div class="product-modal-content">
+        <span class="product-modal-close">&times;</span>
+        <div class="product-modal-body">
+            <div class="product-modal-image">
+                <img id="modalProductImage" src="" alt="">
             </div>
-            <div class="product-info-section">
+            <div class="product-modal-info">
                 <h3 id="modalProductName"></h3>
-                <div class="product-details-table">
-                    <div class="detail-row">
-                        <div class="detail-label">Kateqoriya:</div>
-                        <div id="modalProductCategory" class="detail-value"></div>
+                <div class="product-info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Firma:</span>
+                        <span id="modalProductFirm"></span>
                     </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Firma:</div>
-                        <div id="modalProductFirm" class="detail-value"></div>
+                    <div class="info-item">
+                        <span class="info-label">Kateqoriya:</span>
+                        <span id="modalProductCategory"></span>
                     </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Avtomobil:</div>
-                        <div id="modalProductCar" class="detail-value"></div>
+                    <div class="info-item">
+                        <span class="info-label">Avtomobil:</span>
+                        <span id="modalProductCar"></span>
                     </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Brend Kodu:</div>
-                        <div id="modalProductBrandCode" class="detail-value"></div>
+                    <div class="info-item">
+                        <span class="info-label">Brend Kodu:</span>
+                        <span id="modalProductBrandCode"></span>
                     </div>
-                    <div class="detail-row">
-                        <div class="detail-label">OEM:</div>
-                        <div id="modalProductOEM" class="detail-value"></div>
+                    <div class="info-item">
+                        <span class="info-label">OEM:</span>
+                        <span id="modalProductOem"></span>
                     </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Ölçü:</div>
-                        <div id="modalProductSize" class="detail-value"></div>
+                    <div class="info-item">
+                        <span class="info-label">Ölçü:</span>
+                        <span id="modalProductSize"></span>
                     </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Kodlar:</div>
-                        <div id="modalProductCodes" class="detail-value"></div>
+                    <div class="info-item">
+                        <span class="info-label">Qiymət:</span>
+                        <span id="modalProductPrice"></span>
                     </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Qiymət:</div>
-                        <div id="modalProductPrice" class="detail-value price-value"></div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Stok:</div>
-                        <div id="modalProductStock" class="detail-value stock-value"></div>
+                    <div class="info-item">
+                        <span class="info-label">Stok:</span>
+                        <span id="modalProductStock"></span>
                     </div>
                 </div>
                 <div class="product-description">
                     <h4>Məlumat:</h4>
-                    <p id="modalProductDescription"></p>
+                    <p id="modalProductInfo"></p>
                 </div>
-                <div class="modal-actions">
-                    <button id="modalAddToCart" class="btn btn-primary" onclick="openQuantityModalFromDetails()">
+                <div class="product-modal-actions">
+                    <button type="button" 
+                            class="btn btn-primary add-to-cart-btn" 
+                            onclick="openQuantityModalFromDetails()">
                         <i class="fas fa-shopping-cart"></i> Səbətə əlavə et
                     </button>
                 </div>
@@ -144,88 +142,12 @@
     </div>
 </div>
 
-{% endblock %}
+<!-- Image Modal -->
+<div id="imageModal" class="image-modal">
+    <span class="image-modal-close">&times;</span>
+    <div class="modal-image-content">
+        <img id="modalImage" class="modal-image" src="" alt="Modal Image">
+    </div>
+</div>
 
-{% block extra_js %}
-<script>
-let currentProductId = null;
-let currentProductStock = null;
-
-function openProductModal(id, name, firm, brandCode, oem, size, price, stock, description, imageUrl, category, car, codes, isNew) {
-    const modal = document.getElementById('productDetailsModal');
-    
-    // Məlumatları doldur
-    document.getElementById('modalProductImage').src = imageUrl;
-    document.getElementById('modalProductName').textContent = name + (isNew ? ' ' : '');
-    if (isNew) {
-        const newBadge = document.createElement('span');
-        newBadge.className = 'new-badge';
-        newBadge.textContent = 'Yeni';
-        document.getElementById('modalProductName').appendChild(newBadge);
-    }
-    document.getElementById('modalProductCategory').textContent = category || '-';
-    document.getElementById('modalProductFirm').textContent = firm;
-    document.getElementById('modalProductCar').textContent = car || '-';
-    document.getElementById('modalProductBrandCode').textContent = brandCode;
-    document.getElementById('modalProductOEM').textContent = oem;
-    document.getElementById('modalProductSize').textContent = size || '-';
-    document.getElementById('modalProductCodes').textContent = codes || '-';
-    document.getElementById('modalProductPrice').textContent = price + ' ₼';
-    document.getElementById('modalProductStock').textContent = stock + ' ədəd';
-    document.getElementById('modalProductDescription').textContent = description || 'Məlumat yoxdur';
-    
-    // Səbət düyməsini yenilə
-    const addToCartBtn = document.getElementById('modalAddToCart');
-    if (stock === 0) {
-        addToCartBtn.disabled = true;
-        addToCartBtn.title = 'Stokda yoxdur';
-    } else {
-        addToCartBtn.disabled = false;
-        addToCartBtn.title = '';
-    }
-    
-    // Cari məhsul məlumatlarını saxla
-    currentProductId = id;
-    currentProductStock = stock;
-    
-    // Modalı göstər
-    modal.style.display = 'block';
-    setTimeout(() => {
-        modal.classList.add('show');
-    }, 10);
-}
-
-function closeProductModal() {
-    const modal = document.getElementById('productDetailsModal');
-    modal.classList.remove('show');
-    setTimeout(() => {
-        modal.style.display = 'none';
-    }, 300);
-}
-
-function openQuantityModalFromDetails() {
-    closeProductModal();
-    openQuantityModal(currentProductId, currentProductStock);
-}
-
-// Modal xaricində kliklədikdə bağla
-window.onclick = function(event) {
-    const productModal = document.getElementById('productDetailsModal');
-    const quantityModal = document.getElementById('quantityModal');
-    
-    if (event.target === productModal) {
-        closeProductModal();
-    } else if (event.target === quantityModal) {
-        closeQuantityModal();
-    }
-}
-
-// ESC düyməsi ilə bağla
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        closeProductModal();
-        closeQuantityModal();
-    }
-});
-</script>
 {% endblock %} 

@@ -25,6 +25,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize products page functionality
     initializeProductsPage();
+
+    // Initialize Product Details Modal
+    initializeProductDetailsModal();
 });
 
 function initializeSearch() {
@@ -775,5 +778,96 @@ function initializeProductsPage() {
             }
         });
     }
+}
+
+// Product Details Modal Functions
+function initializeProductDetailsModal() {
+    const modal = document.getElementById('productDetailsModal');
+    const closeBtn = modal.querySelector('.product-modal-close');
+    let currentProductId = null;
+
+    // Close modal when clicking close button
+    closeBtn.onclick = closeProductModal;
+
+    // Close modal when clicking outside
+    modal.onclick = function(e) {
+        if (e.target === modal) {
+            closeProductModal();
+        }
+    };
+
+    // Close modal with ESC key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.style.display === 'block') {
+            closeProductModal();
+        }
+    });
+
+    // Add click event to product rows
+    document.querySelectorAll('.product-row').forEach(row => {
+        row.addEventListener('click', function(e) {
+            // Don't open modal if clicking on cart button or image
+            if (e.target.closest('.cart-add-btn') || e.target.closest('.product-image')) {
+                return;
+            }
+            
+            const productId = this.dataset.productId;
+            openProductModal(productId);
+        });
+    });
+}
+
+function openProductModal(productId) {
+    fetch(`/api/product/${productId}/`)
+        .then(response => response.json())
+        .then(data => {
+            const modal = document.getElementById('productDetailsModal');
+            
+            // Update modal content
+            document.getElementById('modalProductImage').src = data.sekil_url;
+            document.getElementById('modalProductName').textContent = data.adi;
+            document.getElementById('modalProductFirm').textContent = data.firma;
+            document.getElementById('modalProductCategory').textContent = data.kateqoriya || '-';
+            document.getElementById('modalProductCar').textContent = data.avtomobil;
+            document.getElementById('modalProductBrandCode').textContent = data.brend_kod;
+            document.getElementById('modalProductOem').textContent = data.oem;
+            document.getElementById('modalProductSize').textContent = data.olcu || '-';
+            document.getElementById('modalProductPrice').textContent = `${data.qiymet} ₼`;
+            document.getElementById('modalProductStock').textContent = `${data.stok} ədəd`;
+            document.getElementById('modalProductInfo').textContent = data.melumat || 'Məlumat yoxdur';
+            
+            // Update add to cart button
+            const addToCartBtn = modal.querySelector('.add-to-cart-btn');
+            addToCartBtn.disabled = data.stok === 0;
+            addToCartBtn.dataset.productId = productId;
+            addToCartBtn.dataset.maxStock = data.stok;
+
+            // Show modal with animation
+            modal.style.display = 'block';
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 10);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('error', 'Məlumatları yükləyərkən xəta baş verdi');
+        });
+}
+
+function closeProductModal() {
+    const modal = document.getElementById('productDetailsModal');
+    modal.classList.remove('show');
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
+}
+
+function openQuantityModalFromDetails() {
+    const addToCartBtn = document.querySelector('.add-to-cart-btn');
+    const productId = addToCartBtn.dataset.productId;
+    const maxStock = addToCartBtn.dataset.maxStock;
+    
+    closeProductModal();
+    openQuantityModal(productId, maxStock);
 }
 

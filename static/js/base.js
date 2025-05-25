@@ -172,7 +172,8 @@ function initializeCart() {
             checkoutButton.disabled = !hasSelectedItems;
         }
 
-        selectAll.addEventListener('change', function() {
+        selectAll.addEventListener('change', function(e) {
+            e.stopPropagation(); // Hadisənin yayılmasını dayandır
             checkboxes.forEach(checkbox => {
                 checkbox.checked = this.checked;
             });
@@ -180,7 +181,8 @@ function initializeCart() {
         });
 
         checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
+            checkbox.addEventListener('change', function(e) {
+                e.stopPropagation(); // Hadisənin yayılmasını dayandır
                 const allChecked = Array.from(checkboxes).every(cb => cb.checked);
                 selectAll.checked = allChecked;
                 updateSelectedTotal();
@@ -197,11 +199,12 @@ function initializeModal() {
     if (modal && closeBtn && form) {
         closeBtn.onclick = () => modal.style.display = 'none';
         
-        window.onclick = function(event) {
-            if (event.target == modal) {
+        // Modal xaricində kliklədikdə bağla
+        modal.addEventListener('click', function(event) {
+            if (event.target === modal) {
                 modal.style.display = 'none';
             }
-        }
+        });
 
         // Handle form submission
         form.addEventListener('submit', function(e) {
@@ -502,11 +505,11 @@ function initializeImageModal() {
         closeBtn.onclick = closeImageModal;
         
         // Modal xaricində kliklədikdə bağla
-        modal.onclick = function(e) {
-            if (e.target === modal) {
+        modal.addEventListener('click', function(event) {
+            if (event.target === modal) {
                 closeImageModal();
             }
-        };
+        });
         
         // ESC düyməsi ilə bağla
         document.addEventListener('keydown', function(e) {

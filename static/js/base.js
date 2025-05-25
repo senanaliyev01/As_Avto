@@ -25,9 +25,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize products page functionality
     initializeProductsPage();
-
-    // Initialize product row click handlers
-    initializeProductRowClicks();
 });
 
 function initializeSearch() {
@@ -172,8 +169,7 @@ function initializeCart() {
             checkoutButton.disabled = !hasSelectedItems;
         }
 
-        selectAll.addEventListener('change', function(e) {
-            e.stopPropagation(); // Hadisənin yayılmasını dayandır
+        selectAll.addEventListener('change', function() {
             checkboxes.forEach(checkbox => {
                 checkbox.checked = this.checked;
             });
@@ -181,8 +177,7 @@ function initializeCart() {
         });
 
         checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function(e) {
-                e.stopPropagation(); // Hadisənin yayılmasını dayandır
+            checkbox.addEventListener('change', function() {
                 const allChecked = Array.from(checkboxes).every(cb => cb.checked);
                 selectAll.checked = allChecked;
                 updateSelectedTotal();
@@ -199,12 +194,11 @@ function initializeModal() {
     if (modal && closeBtn && form) {
         closeBtn.onclick = () => modal.style.display = 'none';
         
-        // Modal xaricində kliklədikdə bağla
-        modal.addEventListener('click', function(event) {
-            if (event.target === modal) {
+        window.onclick = function(event) {
+            if (event.target == modal) {
                 modal.style.display = 'none';
             }
-        });
+        }
 
         // Handle form submission
         form.addEventListener('submit', function(e) {
@@ -505,11 +499,11 @@ function initializeImageModal() {
         closeBtn.onclick = closeImageModal;
         
         // Modal xaricində kliklədikdə bağla
-        modal.addEventListener('click', function(event) {
-            if (event.target === modal) {
+        modal.onclick = function(e) {
+            if (e.target === modal) {
                 closeImageModal();
             }
-        });
+        };
         
         // ESC düyməsi ilə bağla
         document.addEventListener('keydown', function(e) {
@@ -856,18 +850,4 @@ document.addEventListener('keydown', function(e) {
         closeProductDetailsModal();
     }
 });
-
-// Initialize product row click handlers for all pages
-function initializeProductRowClicks() {
-    document.addEventListener('click', function(e) {
-        const row = e.target.closest('.product-row');
-        if (row && !e.target.closest('.cart-add-btn') && !e.target.closest('.product-image') && 
-            !e.target.closest('.quantity-control') && !e.target.closest('.btn')) {
-            const productId = row.dataset.productId;
-            if (productId) {
-                openProductDetailsModal(productId);
-            }
-        }
-    });
-}
 

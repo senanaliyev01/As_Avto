@@ -13,29 +13,6 @@
     {{ block.super }}
 {% endblock %}
 
-{% block content_title %}
-    <h1>Məhsullar</h1>
-    <div style="margin: 10px 0; padding: 10px; background-color: #f8f9fa; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-        <h3 style="color: #2B5173; margin-bottom: 15px;">Ümumi Statistika</h3>
-        <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
-            <div style="text-align: center; padding: 10px; min-width: 200px;">
-                <div style="font-weight: bold; color: #666;">Toplam Maya Dəyəri</div>
-                <div style="font-size: 1.2em; color: #2B5173;">{{ total_stats.toplam_maya|default:0|floatformat:2 }} ₼</div>
-            </div>
-            <div style="text-align: center; padding: 10px; min-width: 200px;">
-                <div style="font-weight: bold; color: #666;">Toplam Satış Dəyəri</div>
-                <div style="font-size: 1.2em; color: #2B5173;">{{ total_stats.toplam_satis|default:0|floatformat:2 }} ₼</div>
-            </div>
-            <div style="text-align: center; padding: 10px; min-width: 200px;">
-                <div style="font-weight: bold; color: #666;">Gözlənilən Xeyir</div>
-                <div style="font-size: 1.2em; color: {% if total_stats.toplam_xeyir > 0 %}#28a745{% else %}#dc3545{% endif %}">
-                    {{ total_stats.toplam_xeyir|default:0|floatformat:2 }} ₼
-                </div>
-            </div>
-        </div>
-    </div>
-{% endblock %}
-
 {% block content %}
     <!-- Excel Import Modal -->
     <div id="excelImportModal" class="modal">
@@ -116,6 +93,29 @@
         <button id="showExcelImportModal" class="import-btn">
             <i class="fas fa-file-excel"></i> Excel İdxal Et
         </button>
+    </div>
+
+    <!-- Statistics Section -->
+    <div style="margin: 20px 0; padding: 15px; background-color: #fff; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #ddd;">
+        <h3 style="color: #2B5173; margin-bottom: 15px; font-size: 16px; border-bottom: 2px solid #2B5173; padding-bottom: 8px;">
+            Məhsullar üzrə Ümumi Statistika
+        </h3>
+        <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+            <div style="text-align: center; padding: 10px; min-width: 200px; background-color: #f8f9fa; border-radius: 4px; margin: 5px;">
+                <div style="font-weight: bold; color: #666; margin-bottom: 5px;">Toplam Maya Dəyəri</div>
+                <div style="font-size: 1.2em; color: #2B5173;">{{ total_stats.toplam_maya|default:0|floatformat:2 }} ₼</div>
+            </div>
+            <div style="text-align: center; padding: 10px; min-width: 200px; background-color: #f8f9fa; border-radius: 4px; margin: 5px;">
+                <div style="font-weight: bold; color: #666; margin-bottom: 5px;">Toplam Satış Dəyəri</div>
+                <div style="font-size: 1.2em; color: #2B5173;">{{ total_stats.toplam_satis|default:0|floatformat:2 }} ₼</div>
+            </div>
+            <div style="text-align: center; padding: 10px; min-width: 200px; background-color: #f8f9fa; border-radius: 4px; margin: 5px;">
+                <div style="font-weight: bold; color: #666; margin-bottom: 5px;">Gözlənilən Xeyir</div>
+                <div style="font-size: 1.2em; color: {% if total_stats.toplam_xeyir > 0 %}#28a745{% else %}#dc3545{% endif %}">
+                    {{ total_stats.toplam_xeyir|default:0|floatformat:2 }} ₼
+                </div>
+            </div>
+        </div>
     </div>
 
     {{ block.super }}

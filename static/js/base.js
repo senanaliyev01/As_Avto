@@ -814,22 +814,11 @@ function openProductDetailsModal(productId) {
             document.getElementById('modalProductInfo').textContent = data.melumat || '-';
             document.getElementById('modalProductCodes').textContent = data.kodlar || '-';
 
-            // Update add to cart button
-            const addToCartBtn = document.getElementById('modalAddToCartBtn');
-            if (data.stok === 0) {
-                addToCartBtn.disabled = true;
-                addToCartBtn.title = 'Stokda yoxdur';
-            } else {
-                addToCartBtn.disabled = false;
-                addToCartBtn.title = '';
-                addToCartBtn.onclick = () => openQuantityModal(data.id, data.stok);
-            }
-
-            // Store current product ID
-            currentProductId = data.id;
-
-            // Show modal
+            // Show modal with animation
             modal.style.display = 'block';
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 10);
         })
         .catch(error => {
             console.error('Error:', error);
@@ -840,8 +829,10 @@ function openProductDetailsModal(productId) {
 function closeProductDetailsModal() {
     const modal = document.getElementById('productDetailsModal');
     if (modal) {
-        modal.style.display = 'none';
-        currentProductId = null;
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
     }
 }
 

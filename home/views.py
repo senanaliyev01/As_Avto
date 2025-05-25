@@ -558,3 +558,33 @@ def logout_view(request):
     
     # İstifadəçini login səhifəsinə yönləndiririk
     return redirect('login')
+
+def product_detail_api(request, product_id):
+    try:
+        mehsul = get_object_or_404(Mehsul, id=product_id)
+        
+        product_data = {
+            'id': mehsul.id,
+            'adi': mehsul.adi,
+            'firma': str(mehsul.firma),
+            'kateqoriya': str(mehsul.kateqoriya) if mehsul.kateqoriya else None,
+            'avtomobil': str(mehsul.avtomobil),
+            'brend_kod': mehsul.brend_kod,
+            'oem': mehsul.oem,
+            'olcu': mehsul.olcu,
+            'qiymet': str(mehsul.qiymet),
+            'stok': mehsul.stok,
+            'melumat': mehsul.melumat,
+            'sekil_url': mehsul.sekil.url if mehsul.sekil else None,
+        }
+        
+        return JsonResponse({
+            'status': 'success',
+            'product': product_data
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)

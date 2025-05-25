@@ -558,26 +558,3 @@ def logout_view(request):
     
     # İstifadəçini login səhifəsinə yönləndiririk
     return redirect('login')
-
-@login_required
-def product_details(request, product_id):
-    product = get_object_or_404(Mehsul, id=product_id)
-    
-    data = {
-        'id': product.id,
-        'adi': product.adi,
-        'sekil_url': product.sekil.url if product.sekil else None,
-        'firma': product.firma.adi,
-        'kateqoriya': product.kateqoriya.adi if product.kateqoriya else None,
-        'avtomobil': product.avtomobil.adi,
-        'brend_kod': product.brend_kod,
-        'oem': product.oem,
-        'olcu': product.olcu,
-        'stok': product.stok,
-        'qiymet': str(product.qiymet),
-        'melumat': product.melumat,
-        'kodlar': product.kodlar,
-        'yenidir': product.yenidir,
-    }
-    
-    return JsonResponse(data)

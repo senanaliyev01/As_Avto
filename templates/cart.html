@@ -30,7 +30,7 @@
             </thead>
             <tbody>
                 {% for item in cart_items %}
-                    <tr class="cart-item product-row" data-product-id="{{ item.product.id }}" style="cursor: pointer;">
+                    <tr class="cart-item" data-product-id="{{ item.product.id }}">
                         <td>
                             <input type="checkbox" name="selected_items[]" value="{{ item.product.id }}" class="item-checkbox select-checkbox" form="checkout-form">
                         </td>

@@ -23,7 +23,7 @@
             </thead>
             <tbody id="products-tbody" data-has-more="{{ has_more|lower }}">
                 {% for mehsul in mehsullar %}
-                <tr class="product-row" data-product-id="{{ mehsul.id }}" style="cursor: pointer;">
+                <tr>
                     <td><img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image" onclick="openImageModal('{{ mehsul.sekil.url }}')"></td>
                     <td>
                         {{ mehsul.adi }}
@@ -79,66 +79,6 @@
                 <button type="submit" class="btn btn-primary">Təsdiq et</button>
             </div>
         </form>
-    </div>
-</div>
-
-<!-- Product Details Modal -->
-<div id="productDetailsModal" class="product-details-modal">
-    <div class="product-modal-content">
-        <span class="product-modal-close">&times;</span>
-        <div class="product-modal-body">
-            <div class="product-modal-image">
-                <img id="modalProductImage" src="" alt="">
-            </div>
-            <div class="product-modal-info">
-                <h3 id="modalProductName"></h3>
-                <div class="product-info-grid">
-                    <div class="info-item">
-                        <span class="info-label">Firma:</span>
-                        <span id="modalProductFirma"></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Kateqoriya:</span>
-                        <span id="modalProductKateqoriya"></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Avtomobil:</span>
-                        <span id="modalProductAvtomobil"></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Brend Kodu:</span>
-                        <span id="modalProductBrendKod"></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">OEM:</span>
-                        <span id="modalProductOem"></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Ölçü:</span>
-                        <span id="modalProductOlcu"></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Qiymət:</span>
-                        <span id="modalProductQiymet"></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Stok:</span>
-                        <span id="modalProductStok"></span>
-                    </div>
-                </div>
-                <div class="product-description">
-                    <h4>Məlumat:</h4>
-                    <p id="modalProductMelumat"></p>
-                </div>
-                <div class="product-modal-actions">
-                    <button type="button" 
-                            class="btn btn-primary add-to-cart-btn" 
-                            onclick="openQuantityModal(currentProductId, currentProductStock)">
-                        <i class="fas fa-shopping-cart"></i> Səbətə əlavə et
-                    </button>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 

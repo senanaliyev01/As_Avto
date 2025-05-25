@@ -96,23 +96,25 @@
     </div>
 
     <!-- Statistics Section -->
-    <div style="margin: 20px 0; padding: 15px; background-color: #fff; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #ddd;">
-        <h3 style="color: #2B5173; margin-bottom: 15px; font-size: 16px; border-bottom: 2px solid #2B5173; padding-bottom: 8px;">
-            Məhsullar üzrə Ümumi Statistika
-        </h3>
-        <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
-            <div style="text-align: center; padding: 10px; min-width: 200px; background-color: #f8f9fa; border-radius: 4px; margin: 5px;">
-                <div style="font-weight: bold; color: #666; margin-bottom: 5px;">Toplam Maya Dəyəri</div>
-                <div style="font-size: 1.2em; color: #2B5173;">{{ total_stats.toplam_maya|default:0|floatformat:2 }} ₼</div>
-            </div>
-            <div style="text-align: center; padding: 10px; min-width: 200px; background-color: #f8f9fa; border-radius: 4px; margin: 5px;">
-                <div style="font-weight: bold; color: #666; margin-bottom: 5px;">Toplam Satış Dəyəri</div>
-                <div style="font-size: 1.2em; color: #2B5173;">{{ total_stats.toplam_satis|default:0|floatformat:2 }} ₼</div>
-            </div>
-            <div style="text-align: center; padding: 10px; min-width: 200px; background-color: #f8f9fa; border-radius: 4px; margin: 5px;">
-                <div style="font-weight: bold; color: #666; margin-bottom: 5px;">Gözlənilən Xeyir</div>
-                <div style="font-size: 1.2em; color: {% if total_stats.toplam_xeyir > 0 %}#28a745{% else %}#dc3545{% endif %}">
-                    {{ total_stats.toplam_xeyir|default:0|floatformat:2 }} ₼
+    <div style="display: flex; justify-content: center; margin: 35px 0;">
+        <div style="width: 80%; max-width: 800px; padding: 12px; background-color: #fff; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #ddd;">
+            <h3 style="color: #2B5173; margin-bottom: 12px; font-size: 14px; text-align: center; border-bottom: 1px solid #eee; padding-bottom: 6px;">
+                Məhsullar üzrə Ümumi Statistika
+            </h3>
+            <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+                <div style="text-align: center; padding: 8px; min-width: 160px; background-color: #f8f9fa; border-radius: 4px; margin: 3px;">
+                    <div style="font-weight: bold; color: #666; margin-bottom: 3px; font-size: 12px;">Toplam Maya Dəyəri</div>
+                    <div style="font-size: 14px; color: #2B5173;">{{ total_stats.toplam_maya|default:0|floatformat:2 }} ₼</div>
+                </div>
+                <div style="text-align: center; padding: 8px; min-width: 160px; background-color: #f8f9fa; border-radius: 4px; margin: 3px;">
+                    <div style="font-weight: bold; color: #666; margin-bottom: 3px; font-size: 12px;">Toplam Satış Dəyəri</div>
+                    <div style="font-size: 14px; color: #2B5173;">{{ total_stats.toplam_satis|default:0|floatformat:2 }} ₼</div>
+                </div>
+                <div style="text-align: center; padding: 8px; min-width: 160px; background-color: #f8f9fa; border-radius: 4px; margin: 3px;">
+                    <div style="font-weight: bold; color: #666; margin-bottom: 3px; font-size: 12px;">Gözlənilən Xeyir</div>
+                    <div style="font-size: 14px; color: {% if total_stats.toplam_xeyir > 0 %}#28a745{% else %}#dc3545{% endif %}">
+                        {{ total_stats.toplam_xeyir|default:0|floatformat:2 }} ₼
+                    </div>
                 </div>
             </div>
         </div>

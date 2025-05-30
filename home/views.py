@@ -54,6 +54,10 @@ def custom_404(request, exception=None):
     return HttpResponseNotFound(render(request, '404.html').content)
 
 def login_view(request):
+    # Əgər istifadəçi artıq daxil olubsa, ana səhifəyə yönləndir
+    if request.user.is_authenticated:
+        return redirect('base')
+        
     error_message = None
     if request.method == 'POST':
         username = request.POST['username']
@@ -65,12 +69,16 @@ def login_view(request):
                 error_message = 'Hesabınız hələ təsdiqlənməyib. Zəhmət olmasa gözləyin.'
             else:
                 login(request, user)
+                # next parametrini yoxla
+                next_url = request.GET.get('next')
+                if next_url and next_url.startswith('/'):
+                    return redirect(next_url)
                 return redirect('base')
         else:
             error_message = 'İstifadeçi adı və ya şifrə yanlışdır'
     return render(request, 'login.html', {'error_message': error_message})
 
-@login_required
+@login_required(login_url='login')
 def home_view(request):
     # Yeni məhsulları əldə et
     new_products = Mehsul.objects.filter(yenidir=True)

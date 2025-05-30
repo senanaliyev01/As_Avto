@@ -82,7 +82,13 @@ def login_view(request):
                 return redirect('base')
         else:
             error_message = 'İstifadeçi adı və ya şifrə yanlışdır'
-    return render(request, 'login.html', {'error_message': error_message})
+    
+    # Mesajları saxla və təmizləmə
+    messages_to_show = messages.get_messages(request)
+    return render(request, 'login.html', {
+        'error_message': error_message,
+        'messages': messages_to_show
+    })
 
 @login_required(login_url='login')
 def home_view(request):

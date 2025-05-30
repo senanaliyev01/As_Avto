@@ -6,9 +6,6 @@ import os
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from io import BytesIO
 import uuid
-import requests
-from bs4 import BeautifulSoup
-import time
 
 class Kateqoriya(models.Model):
     adi = models.CharField(max_length=100, null=True, blank=True)
@@ -71,54 +68,7 @@ class Mehsul(models.Model):
     sekil = models.ImageField(upload_to='mehsul_sekilleri', default='mehsul_sekilleri/no_image.webp',null=True, blank=True)    
     yenidir = models.BooleanField(default=False)
 
-    def search_cross_reference_codes(self):
-        found_codes = set()
-        
-        # JS Filter axtarışı
-        try:
-            jsfilter_url = f"https://jsfilter.jp/catalogue?oem={self.oem}"
-            response = requests.get(jsfilter_url, timeout=10)
-            if response.status_code == 200:
-                soup = BeautifulSoup(response.text, 'html.parser')
-                # Burada JS Filter saytından kodları tapmaq üçün müvafiq selektorları əlavə edin
-                # Məsələn:
-                codes = soup.select('.cross-reference-codes')  # Bu selektoru dəyişin
-                found_codes.update([code.text.strip() for code in codes])
-        except Exception as e:
-            print(f"JS Filter xətası: {e}")
-
-        # Jikiu axtarışı
-        try:
-            jikiu_url = f"https://jikiu.jp/catalogue?oem={self.oem}"
-            response = requests.get(jikiu_url, timeout=10)
-            if response.status_code == 200:
-                soup = BeautifulSoup(response.text, 'html.parser')
-                # Burada Jikiu saytından kodları tapmaq üçün müvafiq selektorları əlavə edin
-                codes = soup.select('.cross-reference-codes')  # Bu selektoru dəyişin
-                found_codes.update([code.text.strip() for code in codes])
-        except Exception as e:
-            print(f"Jikiu xətası: {e}")
-
-        # JNBK axtarışı
-        try:
-            jnbk_url = f"https://www.jnbk-brakes.com/catalogue?oem={self.oem}"
-            response = requests.get(jnbk_url, timeout=10)
-            if response.status_code == 200:
-                soup = BeautifulSoup(response.text, 'html.parser')
-                # Burada JNBK saytından kodları tapmaq üçün müvafiq selektorları əlavə edin
-                codes = soup.select('.cross-reference-codes')  # Bu selektoru dəyişin
-                found_codes.update([code.text.strip() for code in codes])
-        except Exception as e:
-            print(f"JNBK xətası: {e}")
-
-        return ' '.join(found_codes)
-
     def save(self, *args, **kwargs):
-        # Əgər oem kodu dəyişibsə və ya yeni məhsuldursa
-        if not self.pk or (self.pk and Mehsul.objects.get(pk=self.pk).oem != self.oem):
-            self.kodlar = self.search_cross_reference_codes()
-            time.sleep(1)  # Saytlara çoxlu sorğu göndərməmək üçün gözləyirik
-
         if self.kodlar:
             # Yalnız hərf, rəqəm və boşluq saxla
             self.kodlar = re.sub(r'[^a-zA-Z0-9 ]', '', self.kodlar)

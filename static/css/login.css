@@ -97,14 +97,6 @@ body {
     color: var(--border-color);
 }
 
-.input-valid-icon {
-    display: none;
-    position: absolute;
-    right: 15px;
-    left: auto;
-    color: #27ae60;
-}
-
 .form-input {
     width: 100%;
     padding: 1rem;
@@ -122,28 +114,6 @@ body {
 
 .form-input::placeholder {
     color: #999;
-}
-
-.form-input.valid + .input-valid-icon {
-    display: block;
-}
-
-.form-input.valid {
-    border-color: #27ae60;
-}
-
-.form-input.valid:focus {
-    border-color: #27ae60;
-    box-shadow: 0 0 0 2px rgba(39, 174, 96, 0.2);
-}
-
-.form-input:invalid {
-    border-color: var(--error-color);
-}
-
-.form-input:invalid:focus {
-    border-color: var(--error-color);
-    box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.2);
 }
 
 .login-button {

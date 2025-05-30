@@ -585,12 +585,21 @@ def logout_view(request):
     return redirect('login')
 
 def register_view(request):
+    # Əgər istifadəçi artıq daxil olubsa, ana səhifəyə yönləndir
+    if request.user.is_authenticated:
+        return redirect('base')
+        
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
         password_confirm = request.POST.get('password_confirm')
         phone = request.POST.get('phone')
         address = request.POST.get('address')
+
+        # İstifadəçi adında boşluq və xüsusi simvolların yoxlanması
+        if ' ' in username or not re.match(r'^[a-zA-Z0-9_]+$', username):
+            messages.error(request, 'İstifadəçi adında yalnız hərf, rəqəm və _ işarəsinə icazə verilir!')
+            return render(request, 'register.html')
 
         # Şifrə uzunluğunu yoxla
         if len(password) < 8:

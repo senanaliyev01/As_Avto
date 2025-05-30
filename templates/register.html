@@ -51,32 +51,27 @@
                     {% endfor %}
                 {% endif %}
 
-                <form method="post" action="{% url 'register' %}" id="registerForm" onsubmit="return validateForm()">
+                <form method="post" action="{% url 'register' %}">
                     {% csrf_token %}
                     <div class="form-group">
                         <i class="fas fa-user"></i>
-                        <input type="text" name="username" class="form-input" placeholder="İstifadəçi adı" pattern="[a-zA-Z0-9_]+" title="Yalnız hərf, rəqəm və _ işarəsinə icazə verilir" required>
-                        <i class="fas fa-check-circle input-valid-icon"></i>
+                        <input type="text" name="username" class="form-input" placeholder="İstifadəçi adı" pattern="[a-zA-Z0-9_]+" title="İstifadəçi adında yalnız hərf, rəqəm və _ işarəsinə icazə verilir" required>
                     </div>
                     <div class="form-group">
                         <i class="fas fa-lock"></i>
                         <input type="password" name="password" class="form-input" placeholder="Şifrə" minlength="8" required>
-                        <i class="fas fa-check-circle input-valid-icon"></i>
                     </div>
                     <div class="form-group">
                         <i class="fas fa-lock"></i>
                         <input type="password" name="password_confirm" class="form-input" placeholder="Şifrəni təsdiqləyin" minlength="8" required>
-                        <i class="fas fa-check-circle input-valid-icon"></i>
                     </div>
                     <div class="form-group">
                         <i class="fas fa-phone"></i>
                         <input type="tel" name="phone" class="form-input" placeholder="Telefon nömrəsi" pattern="^\+994[0-9]{9}$" required>
-                        <i class="fas fa-check-circle input-valid-icon"></i>
                     </div>
                     <div class="form-group">
                         <i class="fas fa-map-marker-alt"></i>
                         <input type="text" name="address" class="form-input" placeholder="Ünvan" required>
-                        <i class="fas fa-check-circle input-valid-icon"></i>
                     </div>
                     <button type="submit" class="login-button">
                         <i class="fas fa-user-plus"></i>
@@ -94,40 +89,5 @@
             </div>
         </div>
     </div>
-
-    <script>
-        // Səhifə yeniləndikdə form-u təmizlə
-        window.onload = function() {
-            if (window.history.replaceState) {
-                window.history.replaceState(null, null, window.location.href);
-            }
-        }
-
-        // Input validasiyası
-        document.querySelectorAll('.form-input').forEach(input => {
-            input.addEventListener('input', function() {
-                if (this.checkValidity()) {
-                    this.classList.add('valid');
-                } else {
-                    this.classList.remove('valid');
-                }
-            });
-        });
-
-        // Form validasiyası
-        function validateForm() {
-            const form = document.getElementById('registerForm');
-            const inputs = form.querySelectorAll('.form-input');
-            let isValid = true;
-
-            inputs.forEach(input => {
-                if (!input.checkValidity()) {
-                    isValid = false;
-                }
-            });
-
-            return isValid;
-        }
-    </script>
 </body>
 </html> 

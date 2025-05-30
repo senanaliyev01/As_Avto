@@ -445,3 +445,39 @@ body {
         font-size: 1.1rem;
     }
 }
+
+/* Register form specific styles */
+.register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.register-form .form-group {
+    margin-bottom: 0;
+}
+
+.register-form .form-input {
+    height: 45px;
+}
+
+.register-form .login-button {
+    margin-top: 0.5rem;
+}
+
+/* Responsive adjustments for register form */
+@media (max-width: 480px) {
+    .register-form {
+        gap: 0.8rem;
+    }
+    
+    .register-form .form-input {
+        height: 40px;
+        font-size: 0.9rem;
+    }
+    
+    .register-form .login-button {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+    }
+}

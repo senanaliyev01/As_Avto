@@ -49,7 +49,7 @@
                     </div>
                 {% endif %}
 
-                <form method="post" action="{% url 'register' %}">
+                <form method="post" action="{% url 'register' %}" class="register-form">
                     {% csrf_token %}
                     <div class="form-group">
                         <i class="fas fa-user"></i>

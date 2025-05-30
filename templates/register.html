@@ -42,11 +42,13 @@
                 </div>
                 <h1 class="login-title">Qeydiyyat</h1>
                 
-                {% if error_message %}
-                    <div class="error-message">
-                        <i class="fas fa-exclamation-circle"></i>
-                        {{ error_message }}
-                    </div>
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="{% if message.tags == 'success' %}success-message{% else %}error-message{% endif %}">
+                            <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
                 {% endif %}
 
                 <form method="post" action="{% url 'register' %}">

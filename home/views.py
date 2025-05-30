@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from .models import Mehsul, Kateqoriya, Sifaris, SifarisItem, Firma, Avtomobil, PopupImage
+from .models import Mehsul, Kateqoriya, Sifaris, SifarisItem, Firma, Avtomobil, PopupImage, UserProfile
 from django.db.models import Q
 from decimal import Decimal
 from django.contrib import messages
@@ -610,6 +610,11 @@ def register_view(request):
         # Telefon nömrəsinin formatını yoxla
         if not re.match(r'^\+994[0-9]{9}$', phone):
             messages.error(request, 'Telefon nömrəsi düzgün formatda deyil! (+994XXXXXXXXX)')
+            return render(request, 'register.html')
+
+        # Telefon nömrəsinin mövcudluğunu yoxla
+        if UserProfile.objects.filter(phone=phone).exists():
+            messages.error(request, 'Bu telefon nömrəsi artıq istifadə olunub!')
             return render(request, 'register.html')
 
         try:

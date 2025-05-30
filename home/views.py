@@ -1,8 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from .models import Mehsul, Kateqoriya, Sifaris, SifarisItem, Firma, Avtomobil, PopupImage, UserProfile
+from .models import Mehsul, Kateqoriya, Sifaris, SifarisItem, Firma, Avtomobil, PopupImage
 from django.db.models import Q
 from decimal import Decimal
 from django.contrib import messages
@@ -54,43 +53,19 @@ def custom_404(request, exception=None):
     return HttpResponseNotFound(render(request, '404.html').content)
 
 def login_view(request):
-    # Əgər istifadəçi artıq daxil olubsa, ana səhifəyə yönləndir
-    if request.user.is_authenticated:
-        return redirect('base')
-        
     error_message = None
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        
-        # Şifrə uzunluğunu yoxla
-        if len(password) < 8:
-            error_message = 'Şifrə minimum 8 simvoldan ibarət olmalıdır'
-            return render(request, 'login.html', {'error_message': error_message})
-            
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            # İstifadəçinin təsdiqlənməsini yoxla
-            if not user.profile.is_verified:
-                error_message = 'Giriş üçün icazəniz yoxdur !'
-            else:
-                login(request, user)
-                # next parametrini yoxla
-                next_url = request.GET.get('next')
-                if next_url and next_url.startswith('/'):
-                    return redirect(next_url)
-                return redirect('base')
+            login(request, user)
+            return redirect('base')
         else:
             error_message = 'İstifadeçi adı və ya şifrə yanlışdır'
-    
-    # Mesajları saxla və təmizləmə
-    messages_to_show = messages.get_messages(request)
-    return render(request, 'login.html', {
-        'error_message': error_message,
-        'messages': messages_to_show
-    })
+    return render(request, 'login.html', {'error_message': error_message})
 
-@login_required(login_url='login')
+@login_required
 def home_view(request):
     # Yeni məhsulları əldə et
     new_products = Mehsul.objects.filter(yenidir=True)
@@ -583,63 +558,3 @@ def logout_view(request):
     
     # İstifadəçini login səhifəsinə yönləndiririk
     return redirect('login')
-
-def register_view(request):
-    # Əgər istifadəçi artıq daxil olubsa, ana səhifəyə yönləndir
-    if request.user.is_authenticated:
-        return redirect('base')
-        
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        password_confirm = request.POST.get('password_confirm')
-        phone = request.POST.get('phone')
-        address = request.POST.get('address')
-
-        # İstifadəçi adında boşluq və xüsusi simvolların yoxlanması
-        if ' ' in username or not re.match(r'^[a-zA-Z0-9_]+$', username):
-            messages.error(request, 'İstifadəçi adında yalnız hərf, rəqəm və _ işarəsinə icazə verilir! Azərbaycanca hərf yazmaq olmaz.')
-            return render(request, 'register.html')
-
-        # Şifrə uzunluğunu yoxla
-        if len(password) < 8:
-            messages.error(request, 'Şifrə minimum 8 simvoldan ibarət olmalıdır!')
-            return render(request, 'register.html')
-
-        # Şifrələrin uyğunluğunu yoxla
-        if password != password_confirm:
-            messages.error(request, 'Şifrələr uyğun gəlmir!')
-            return render(request, 'register.html')
-
-        # İstifadəçi adının mövcudluğunu yoxla
-        if User.objects.filter(username=username).exists():
-            messages.error(request, 'Bu istifadəçi adı artıq mövcuddur!')
-            return render(request, 'register.html')
-
-        # Telefon nömrəsinin formatını yoxla
-        if not re.match(r'^\+994[0-9]{9}$', phone):
-            messages.error(request, 'Telefon nömrəsi düzgün formatda deyil! (+994XXXXXXXXX)')
-            return render(request, 'register.html')
-
-        # Telefon nömrəsinin mövcudluğunu yoxla
-        if UserProfile.objects.filter(phone=phone).exists():
-            messages.error(request, 'Bu telefon nömrəsi artıq istifadə olunub!')
-            return render(request, 'register.html')
-
-        try:
-            # Yeni istifadəçi yarat
-            user = User.objects.create_user(username=username, password=password)
-            
-            # Əlavə məlumatları saxla
-            user.profile.phone = phone
-            user.profile.address = address
-            user.profile.is_verified = False  # Təsdiqlənməmiş vəziyyətdə
-            user.save()
-
-            messages.success(request, 'Qeydiyyat uğurla tamamlandı!')
-            return redirect('login')
-        except Exception as e:
-            messages.error(request, f'Qeydiyyat zamanı xəta baş verdi: {str(e)}')
-            return render(request, 'register.html')
-
-    return render(request, 'register.html')

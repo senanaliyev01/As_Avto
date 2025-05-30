@@ -62,6 +62,12 @@ def login_view(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
+        
+        # Şifrə uzunluğunu yoxla
+        if len(password) < 8:
+            error_message = 'Şifrə minimum 8 simvoldan ibarət olmalıdır'
+            return render(request, 'login.html', {'error_message': error_message})
+            
         user = authenticate(request, username=username, password=password)
         if user is not None:
             # İstifadəçinin təsdiqlənməsini yoxla
@@ -579,6 +585,11 @@ def register_view(request):
         password_confirm = request.POST.get('password_confirm')
         phone = request.POST.get('phone')
         address = request.POST.get('address')
+
+        # Şifrə uzunluğunu yoxla
+        if len(password) < 8:
+            messages.error(request, 'Şifrə minimum 8 simvoldan ibarət olmalıdır!')
+            return render(request, 'register.html')
 
         # Şifrələrin uyğunluğunu yoxla
         if password != password_confirm:

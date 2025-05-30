@@ -55,23 +55,23 @@
                     {% csrf_token %}
                     <div class="form-group">
                         <i class="fas fa-user"></i>
-                        <input type="text" name="username" class="form-input" placeholder="İstifadəçi adı" pattern="[a-zA-Z0-9_]+" title="İstifadəçi adında yalnız hərf, rəqəm və _ işarəsinə icazə verilir" required>
+                        <input type="text" name="username" class="form-input" placeholder="İstifadəçi adı: xxx_123" pattern="[a-zA-Z0-9_]+" title="İstifadəçi adında yalnız hərf, rəqəm və _ işarəsinə icazə verilir" required>
                     </div>
                     <div class="form-group">
                         <i class="fas fa-lock"></i>
-                        <input type="password" name="password" class="form-input" placeholder="Şifrə" minlength="8" required>
+                        <input type="password" name="password" class="form-input" placeholder="Şifrə: 12345678" minlength="8" required>
                     </div>
                     <div class="form-group">
                         <i class="fas fa-lock"></i>
-                        <input type="password" name="password_confirm" class="form-input" placeholder="Şifrəni təsdiqləyin" minlength="8" required>
+                        <input type="password" name="password_confirm" class="form-input" placeholder="Şifrəni təsdiqləyin: 12345678" minlength="8" required>
                     </div>
                     <div class="form-group">
                         <i class="fas fa-phone"></i>
-                        <input type="tel" name="phone" class="form-input" placeholder="Telefon nömrəsi" pattern="^\+994[0-9]{9}$" required>
+                        <input type="tel" name="phone" class="form-input" placeholder="Telefon nömrəsi: +994XXXXXXXXX" pattern="^\+994[0-9]{9}$" required>
                     </div>
                     <div class="form-group">
                         <i class="fas fa-map-marker-alt"></i>
-                        <input type="text" name="address" class="form-input" placeholder="Ünvan" required>
+                        <input type="text" name="address" class="form-input" placeholder="Ünvan: Bakı şəh., Binəqədi ray." required>
                     </div>
                     <button type="submit" class="login-button">
                         <i class="fas fa-user-plus"></i>

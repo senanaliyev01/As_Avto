@@ -72,7 +72,7 @@ def login_view(request):
         if user is not None:
             # İstifadəçinin təsdiqlənməsini yoxla
             if not user.profile.is_verified:
-                error_message = 'Hesabınız hələ təsdiqlənməyib. Zəhmət olmasa gözləyin.'
+                error_message = 'Giriş üçün icazəniz yoxdur !'
             else:
                 login(request, user)
                 # next parametrini yoxla
@@ -598,7 +598,7 @@ def register_view(request):
 
         # İstifadəçi adında boşluq və xüsusi simvolların yoxlanması
         if ' ' in username or not re.match(r'^[a-zA-Z0-9_]+$', username):
-            messages.error(request, 'İstifadəçi adında yalnız hərf, rəqəm və _ işarəsinə icazə verilir!')
+            messages.error(request, 'İstifadəçi adında yalnız hərf, rəqəm və _ işarəsinə icazə verilir! Azərbaycanca hərf yazmaq olmaz.')
             return render(request, 'register.html')
 
         # Şifrə uzunluğunu yoxla
@@ -636,7 +636,7 @@ def register_view(request):
             user.profile.is_verified = False  # Təsdiqlənməmiş vəziyyətdə
             user.save()
 
-            messages.success(request, 'Qeydiyyat uğurla tamamlandı! Hesabınız təsdiqləndikdən sonra daxil ola bilərsiniz.')
+            messages.success(request, 'Qeydiyyat uğurla tamamlandı!')
             return redirect('login')
         except Exception as e:
             messages.error(request, f'Qeydiyyat zamanı xəta baş verdi: {str(e)}')

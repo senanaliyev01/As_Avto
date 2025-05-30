@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>As Avto - Giriş</title>
+    <title>As Avto - Qeydiyyat</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
     <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
@@ -36,11 +36,11 @@
         </div>
 
         <div class="form-container">
-            <div class="form-box login">
+            <div class="form-box register">
                 <div class="login-logo">
                     <img src="{% static 'images/Header_Logo.png' %}" alt="Qorxmaz Avto">
                 </div>
-                <h1 class="login-title">Xoş Gəlmisiniz</h1>
+                <h1 class="login-title">Qeydiyyat</h1>
                 
                 {% if error_message %}
                     <div class="error-message">
@@ -49,7 +49,7 @@
                     </div>
                 {% endif %}
 
-                <form method="post" action="{% url 'login' %}">
+                <form method="post" action="{% url 'register' %}">
                     {% csrf_token %}
                     <div class="form-group">
                         <i class="fas fa-user"></i>
@@ -59,14 +59,26 @@
                         <i class="fas fa-lock"></i>
                         <input type="password" name="password" class="form-input" placeholder="Şifrə" required>
                     </div>
+                    <div class="form-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" name="password_confirm" class="form-input" placeholder="Şifrəni təsdiqləyin" required>
+                    </div>
+                    <div class="form-group">
+                        <i class="fas fa-phone"></i>
+                        <input type="tel" name="phone" class="form-input" placeholder="Telefon nömrəsi" pattern="^\+994[0-9]{9}$" required>
+                    </div>
+                    <div class="form-group">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <input type="text" name="address" class="form-input" placeholder="Ünvan" required>
+                    </div>
                     <button type="submit" class="login-button">
-                        <i class="fas fa-sign-in-alt"></i>
-                        Daxil ol
+                        <i class="fas fa-user-plus"></i>
+                        Qeydiyyatdan keç
                     </button>
                 </form>
 
                 <div class="form-footer">
-                    <p>Hesabınız yoxdur? <a href="{% url 'register' %}" class="switch-form">Qeydiyyatdan keçin</a></p>
+                    <p>Artıq hesabınız var? <a href="{% url 'login' %}" class="switch-form">Daxil olun</a></p>
                 </div>
 
                 <div class="login-footer">
@@ -76,4 +88,4 @@
         </div>
     </div>
 </body>
-</html>
+</html> 

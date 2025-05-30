@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Kateqoriya, Firma, Avtomobil, Mehsul, Sifaris, SifarisItem, Vitrin, PopupImage
+from .models import Kateqoriya, Firma, Avtomobil, Mehsul, Sifaris, SifarisItem, Vitrin, PopupImage, UserProfile
 from django.core.exceptions import ValidationError
 from django.utils.html import format_html
 from django.urls import path
@@ -553,3 +553,10 @@ class PopupImageAdmin(admin.ModelAdmin):
             return format_html('<img src="{}" style="max-height: 50px;"/>', obj.sekil.url)
         return '-'
     sekil_preview.short_description = 'Şəkil'
+
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ['user', 'phone', 'address', 'is_verified']
+    list_editable = ['is_verified']
+    search_fields = ['user__username', 'phone']
+    list_filter = ['user__is_active', 'is_verified']

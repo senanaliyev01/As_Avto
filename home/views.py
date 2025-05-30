@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from .models import Mehsul, Kateqoriya, Sifaris, SifarisItem, Firma, Avtomobil, PopupImage
 from django.db.models import Q
 from decimal import Decimal
@@ -59,8 +60,12 @@ def login_view(request):
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            login(request, user)
-            return redirect('base')
+            # İstifadəçinin təsdiqlənməsini yoxla
+            if not user.profile.is_verified:
+                error_message = 'Hesabınız hələ təsdiqlənməyib. Zəhmət olmasa gözləyin.'
+            else:
+                login(request, user)
+                return redirect('base')
         else:
             error_message = 'İstifadeçi adı və ya şifrə yanlışdır'
     return render(request, 'login.html', {'error_message': error_message})
@@ -558,3 +563,44 @@ def logout_view(request):
     
     # İstifadəçini login səhifəsinə yönləndiririk
     return redirect('login')
+
+def register_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        password_confirm = request.POST.get('password_confirm')
+        phone = request.POST.get('phone')
+        address = request.POST.get('address')
+
+        # Şifrələrin uyğunluğunu yoxla
+        if password != password_confirm:
+            messages.error(request, 'Şifrələr uyğun gəlmir!')
+            return render(request, 'register.html')
+
+        # İstifadəçi adının mövcudluğunu yoxla
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Bu istifadəçi adı artıq mövcuddur!')
+            return render(request, 'register.html')
+
+        # Telefon nömrəsinin formatını yoxla
+        if not re.match(r'^\+994[0-9]{9}$', phone):
+            messages.error(request, 'Telefon nömrəsi düzgün formatda deyil! (+994XXXXXXXXX)')
+            return render(request, 'register.html')
+
+        try:
+            # Yeni istifadəçi yarat
+            user = User.objects.create_user(username=username, password=password)
+            
+            # Əlavə məlumatları saxla
+            user.profile.phone = phone
+            user.profile.address = address
+            user.profile.is_verified = False  # Təsdiqlənməmiş vəziyyətdə
+            user.save()
+
+            messages.success(request, 'Qeydiyyat uğurla tamamlandı! Hesabınız təsdiqləndikdən sonra daxil ola bilərsiniz.')
+            return redirect('login')
+        except Exception as e:
+            messages.error(request, f'Qeydiyyat zamanı xəta baş verdi: {str(e)}')
+            return render(request, 'register.html')
+
+    return render(request, 'register.html')

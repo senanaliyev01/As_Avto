@@ -23,7 +23,7 @@ body {
     justify-content: center;
 }
 
-.login-container {
+.form-container {
     background: white;
     padding: 2.5rem;
     border-radius: 15px;
@@ -34,7 +34,7 @@ body {
     overflow: hidden;
 }
 
-.login-container::before {
+.form-container::before {
     content: '';
     position: absolute;
     top: 0;
@@ -123,38 +123,29 @@ body {
     transform: translateY(-2px);
 }
 
+.form-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: var(--text-color);
+    font-size: 0.9rem;
+}
+
+.form-footer a {
+    color: var(--secondary-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.form-footer a:hover {
+    color: var(--accent-color);
+}
+
 .login-footer {
     text-align: center;
     margin-top: 2rem;
     color: var(--text-color);
     font-size: 0.9rem;
-}
-
-@media (max-width: 480px) {
-    .login-container {
-        margin: 1rem;
-        padding: 1.5rem;
-    }
-
-    .login-title {
-        font-size: 1.5rem;
-    }
-}
-
-/* Animation */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.login-container {
-    animation: fadeIn 0.5s ease-out;
 }
 
 .login-page {
@@ -216,6 +207,7 @@ body {
     color: var(--accent-color);
 }
 
+/* Animations */
 @keyframes slideInLeft {
     from {
         opacity: 0;
@@ -225,6 +217,36 @@ body {
         opacity: 1;
         transform: translateX(0);
     }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-box {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.form-box.register {
+    animation: slideInRight 0.5s ease-out;
 }
 
 /* Responsive design */
@@ -237,5 +259,16 @@ body {
     .contact-section {
         text-align: center;
         max-width: 600px;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+
+    .login-title {
+        font-size: 1.5rem;
     }
 }

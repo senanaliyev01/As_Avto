@@ -36,7 +36,7 @@
         </div>
 
         <div class="form-container">
-            <div class="form-box register active">
+            <div class="form-box register">
                 <div class="login-logo">
                     <img src="{% static 'images/Header_Logo.png' %}" alt="Qorxmaz Avto">
                 </div>
@@ -49,7 +49,7 @@
                     </div>
                 {% endif %}
 
-                <form method="post" action="{% url 'register' %}" class="register-form">
+                <form method="post" action="{% url 'register' %}">
                     {% csrf_token %}
                     <div class="form-group">
                         <i class="fas fa-user"></i>
@@ -87,12 +87,5 @@
             </div>
         </div>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const formBox = document.querySelector('.form-box');
-            formBox.classList.add('active');
-        });
-    </script>
 </body>
 </html> 

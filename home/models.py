@@ -71,75 +71,54 @@ class Mehsul(models.Model):
     sekil = models.ImageField(upload_to='mehsul_sekilleri', default='mehsul_sekilleri/no_image.webp',null=True, blank=True)    
     yenidir = models.BooleanField(default=False)
 
-    def search_alternative_codes(self):
-        if not self.oem:
-            return
-        
+    def search_cross_reference_codes(self):
         found_codes = set()
-        urls = [
-            'https://jsfilter.jp/catalogue',
-            'https://jikiu.jp/catalogue',
-            'https://www.e-sangsin.com/eng/member/login?return_url=%2Feng%2Fcatalogue',
-            'https://www.jnbk-brakes.com/'
-        ]
         
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        }
-        
-        for url in urls:
-            try:
-                response = requests.get(url, headers=headers, timeout=10)
-                if response.status_code == 200:
-                    soup = BeautifulSoup(response.text, 'html.parser')
-                    
-                    # Hər saytda fərqli axtarış məntiqi
-                    if 'jsfilter.jp' in url:
-                        # JS Filter axtarışı
-                        search_results = soup.find_all('div', class_='product-code')
-                        for result in search_results:
-                            code = result.text.strip()
-                            if code and code != self.oem:
-                                found_codes.add(code)
-                    
-                    elif 'jikiu.jp' in url:
-                        # Jikiu axtarışı
-                        search_results = soup.find_all('span', class_='part-number')
-                        for result in search_results:
-                            code = result.text.strip()
-                            if code and code != self.oem:
-                                found_codes.add(code)
-                    
-                    elif 'e-sangsin.com' in url:
-                        # Sangsin axtarışı
-                        search_results = soup.find_all('td', class_='part-number')
-                        for result in search_results:
-                            code = result.text.strip()
-                            if code and code != self.oem:
-                                found_codes.add(code)
-                    
-                    elif 'jnbk-brakes.com' in url:
-                        # JNBK axtarışı
-                        search_results = soup.find_all('div', class_='product-code')
-                        for result in search_results:
-                            code = result.text.strip()
-                            if code and code != self.oem:
-                                found_codes.add(code)
-                
-                time.sleep(2)  # Saytlar arasında gözləmə
-                
-            except Exception as e:
-                print(f"Xəta baş verdi {url}: {str(e)}")
-                continue
-        
-        # Tapılan kodları kodlar sütununa əlavə et
-        if found_codes:
-            self.kodlar = ' '.join(found_codes)
+        # JS Filter axtarışı
+        try:
+            jsfilter_url = f"https://jsfilter.jp/catalogue?oem={self.oem}"
+            response = requests.get(jsfilter_url, timeout=10)
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.text, 'html.parser')
+                # Burada JS Filter saytından kodları tapmaq üçün müvafiq selektorları əlavə edin
+                # Məsələn:
+                codes = soup.select('.cross-reference-codes')  # Bu selektoru dəyişin
+                found_codes.update([code.text.strip() for code in codes])
+        except Exception as e:
+            print(f"JS Filter xətası: {e}")
+
+        # Jikiu axtarışı
+        try:
+            jikiu_url = f"https://jikiu.jp/catalogue?oem={self.oem}"
+            response = requests.get(jikiu_url, timeout=10)
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.text, 'html.parser')
+                # Burada Jikiu saytından kodları tapmaq üçün müvafiq selektorları əlavə edin
+                codes = soup.select('.cross-reference-codes')  # Bu selektoru dəyişin
+                found_codes.update([code.text.strip() for code in codes])
+        except Exception as e:
+            print(f"Jikiu xətası: {e}")
+
+        # JNBK axtarışı
+        try:
+            jnbk_url = f"https://www.jnbk-brakes.com/catalogue?oem={self.oem}"
+            response = requests.get(jnbk_url, timeout=10)
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.text, 'html.parser')
+                # Burada JNBK saytından kodları tapmaq üçün müvafiq selektorları əlavə edin
+                codes = soup.select('.cross-reference-codes')  # Bu selektoru dəyişin
+                found_codes.update([code.text.strip() for code in codes])
+        except Exception as e:
+            print(f"JNBK xətası: {e}")
+
+        return ' '.join(found_codes)
 
     def save(self, *args, **kwargs):
-        # Alternativ kodları axtar
-        self.search_alternative_codes()
-        
+        # Əgər oem kodu dəyişibsə və ya yeni məhsuldursa
+        if not self.pk or (self.pk and Mehsul.objects.get(pk=self.pk).oem != self.oem):
+            self.kodlar = self.search_cross_reference_codes()
+            time.sleep(1)  # Saytlara çoxlu sorğu göndərməmək üçün gözləyirik
+
         if self.kodlar:
             # Yalnız hərf, rəqəm və boşluq saxla
             self.kodlar = re.sub(r'[^a-zA-Z0-9 ]', '', self.kodlar)

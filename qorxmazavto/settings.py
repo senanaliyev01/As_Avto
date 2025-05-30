@@ -202,15 +202,7 @@ JAZZMIN_SETTINGS = {
         "auth.group": "vertical_tabs",
     },
     
-    # Custom linklər
-    "custom_links": {
-        "home": [{
-            "name": "Statistika", 
-            "url": "make_messages", 
-            "icon": "fas fa-chart-bar",
-            "permissions": ["auth.view_user"]
-        }]
-    },
+ 
     
     # İkonlar
     "icons": {

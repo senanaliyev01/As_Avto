@@ -6,6 +6,9 @@ import os
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from io import BytesIO
 import uuid
+import requests
+from bs4 import BeautifulSoup
+import time
 
 class Kateqoriya(models.Model):
     adi = models.CharField(max_length=100, null=True, blank=True)
@@ -68,7 +71,75 @@ class Mehsul(models.Model):
     sekil = models.ImageField(upload_to='mehsul_sekilleri', default='mehsul_sekilleri/no_image.webp',null=True, blank=True)    
     yenidir = models.BooleanField(default=False)
 
+    def search_alternative_codes(self):
+        if not self.oem:
+            return
+        
+        found_codes = set()
+        urls = [
+            'https://jsfilter.jp/catalogue',
+            'https://jikiu.jp/catalogue',
+            'https://www.e-sangsin.com/eng/member/login?return_url=%2Feng%2Fcatalogue',
+            'https://www.jnbk-brakes.com/'
+        ]
+        
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        
+        for url in urls:
+            try:
+                response = requests.get(url, headers=headers, timeout=10)
+                if response.status_code == 200:
+                    soup = BeautifulSoup(response.text, 'html.parser')
+                    
+                    # Hər saytda fərqli axtarış məntiqi
+                    if 'jsfilter.jp' in url:
+                        # JS Filter axtarışı
+                        search_results = soup.find_all('div', class_='product-code')
+                        for result in search_results:
+                            code = result.text.strip()
+                            if code and code != self.oem:
+                                found_codes.add(code)
+                    
+                    elif 'jikiu.jp' in url:
+                        # Jikiu axtarışı
+                        search_results = soup.find_all('span', class_='part-number')
+                        for result in search_results:
+                            code = result.text.strip()
+                            if code and code != self.oem:
+                                found_codes.add(code)
+                    
+                    elif 'e-sangsin.com' in url:
+                        # Sangsin axtarışı
+                        search_results = soup.find_all('td', class_='part-number')
+                        for result in search_results:
+                            code = result.text.strip()
+                            if code and code != self.oem:
+                                found_codes.add(code)
+                    
+                    elif 'jnbk-brakes.com' in url:
+                        # JNBK axtarışı
+                        search_results = soup.find_all('div', class_='product-code')
+                        for result in search_results:
+                            code = result.text.strip()
+                            if code and code != self.oem:
+                                found_codes.add(code)
+                
+                time.sleep(2)  # Saytlar arasında gözləmə
+                
+            except Exception as e:
+                print(f"Xəta baş verdi {url}: {str(e)}")
+                continue
+        
+        # Tapılan kodları kodlar sütununa əlavə et
+        if found_codes:
+            self.kodlar = ' '.join(found_codes)
+
     def save(self, *args, **kwargs):
+        # Alternativ kodları axtar
+        self.search_alternative_codes()
+        
         if self.kodlar:
             # Yalnız hərf, rəqəm və boşluq saxla
             self.kodlar = re.sub(r'[^a-zA-Z0-9 ]', '', self.kodlar)

@@ -11,6 +11,8 @@ from django.db.models.functions import Lower
 from django.db.models import Value
 from functools import reduce
 from operator import and_, or_
+from django.contrib.auth.models import User
+from django.core.validators import RegexValidator
 
 def normalize_azerbaijani_chars(text):
     # Azərbaycan hərflərinin qarşılıqlı çevrilməsi
@@ -558,3 +560,58 @@ def logout_view(request):
     
     # İstifadəçini login səhifəsinə yönləndiririk
     return redirect('login')
+
+def register_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '')
+        phone = request.POST.get('phone', '').strip()
+        address = request.POST.get('address', '').strip()
+        
+        # Username validasiyası
+        if not username:
+            messages.error(request, 'İstifadəçi adı boş ola bilməz!')
+            return render(request, 'register.html')
+            
+        # Username formatı yoxlaması
+        if not re.match(r'^[a-zA-Z0-9_]+$', username):
+            messages.error(request, 'İstifadəçi adı yalnız ingilis hərfləri, rəqəmlər və _ simvolundan ibarət ola bilər!')
+            return render(request, 'register.html')
+            
+        # Telefon nömrəsi validasiyası
+        if not phone.startswith('+994'):
+            messages.error(request, 'Telefon nömrəsi +994 ilə başlamalıdır!')
+            return render(request, 'register.html')
+            
+        # Unvan validasiyası
+        if not address:
+            messages.error(request, 'Ünvan boş ola bilməz!')
+            return render(request, 'register.html')
+            
+        # Username mövcudluğu yoxlaması
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Bu istifadəçi adı artıq mövcuddur!')
+            return render(request, 'register.html')
+            
+        # Telefon nömrəsi mövcudluğu yoxlaması
+        if User.objects.filter(profile__phone=phone).exists():
+            messages.error(request, 'Bu telefon nömrəsi artıq qeydiyyatdan keçirilib!')
+            return render(request, 'register.html')
+            
+        try:
+            # Yeni istifadəçi yaradırıq
+            user = User.objects.create_user(username=username, password=password)
+            
+            # Profil məlumatlarını əlavə edirik
+            user.profile.phone = phone
+            user.profile.address = address
+            user.profile.save()
+            
+            messages.success(request, 'Qeydiyyat uğurla tamamlandı! İndi daxil ola bilərsiniz.')
+            return redirect('login')
+            
+        except Exception as e:
+            messages.error(request, 'Qeydiyyat zamanı xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.')
+            return render(request, 'register.html')
+            
+    return render(request, 'register.html')

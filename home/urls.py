@@ -5,6 +5,7 @@ handler404 = 'home.views.custom_404'
 
 urlpatterns = [
     path('', views.login_view, name='login'),
+    path('register/', views.register_view, name='register'),
     path('base/', views.home_view, name='base'),
     path('products/', views.products_view, name='products'),
     path('new-products/', views.new_products_view, name='new_products'),

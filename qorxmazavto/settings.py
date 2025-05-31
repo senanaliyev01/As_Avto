@@ -216,6 +216,7 @@ JAZZMIN_SETTINGS = {
         "home.Sifaris": "fa-solid fa-clipboard-list",
         "home.Vitrin": "fa-solid fa-list",
         "home.PopupImage": "fa-solid fa-image",
+        "home.Profile": "fa-solid fa-user",
     },
     
     # Related Modal

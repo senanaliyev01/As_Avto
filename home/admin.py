@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Kateqoriya, Firma, Avtomobil, Mehsul, Sifaris, SifarisItem, Vitrin, PopupImage
+from .models import Kateqoriya, Firma, Avtomobil, Mehsul, Sifaris, SifarisItem, Vitrin, PopupImage, Profile
 from django.core.exceptions import ValidationError
 from django.utils.html import format_html
 from django.urls import path
@@ -553,3 +553,30 @@ class PopupImageAdmin(admin.ModelAdmin):
             return format_html('<img src="{}" style="max-height: 50px;"/>', obj.sekil.url)
         return '-'
     sekil_preview.short_description = 'Şəkil'
+
+@admin.register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ['user', 'phone', 'address', 'is_verified', 'verification_button']
+    list_filter = ['is_verified']
+    search_fields = ['user__username', 'phone', 'address']
+    actions = ['verify_profiles', 'unverify_profiles']
+
+    def verification_button(self, obj):
+        if obj.is_verified:
+            return format_html(
+                '<span style="color: green;">✓ Təsdiqlənib</span>'
+            )
+        return format_html(
+            '<span style="color: red;">✗ Təsdiqlənməyib</span>'
+        )
+    verification_button.short_description = 'Status'
+
+    def verify_profiles(self, request, queryset):
+        queryset.update(is_verified=True)
+        self.message_user(request, f'{queryset.count()} profil təsdiqləndi.')
+    verify_profiles.short_description = "Seçilmiş profilləri təsdiqlə"
+
+    def unverify_profiles(self, request, queryset):
+        queryset.update(is_verified=False)
+        self.message_user(request, f'{queryset.count()} profilin təsdiqi ləğv edildi.')
+    unverify_profiles.short_description = "Seçilmiş profillərin təsdiqini ləğv et"

@@ -61,10 +61,15 @@ def login_view(request):
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
         if user is not None:
+            # Profil təsdiqlənmə yoxlaması
+            if not user.profile.is_verified:
+                error_message = 'Giriş üçün icazəniz yoxdur !'
+                return render(request, 'login.html', {'error_message': error_message})
+            
             login(request, user)
             return redirect('base')
         else:
-            error_message = 'İstifadeçi adı və ya şifrə yanlışdır'
+            error_message = 'İstifadəçi adı və ya şifrə yanlışdır'
     return render(request, 'login.html', {'error_message': error_message})
 
 @login_required
@@ -578,6 +583,11 @@ def register_view(request):
             messages.error(request, 'İstifadəçi adı yalnız ingilis hərfləri, rəqəmlər və _ simvolundan ibarət ola bilər!')
             return render(request, 'register.html')
             
+        # Şifrə validasiyası
+        if len(password) < 8:
+            messages.error(request, 'Şifrə minimum 8 simvol olmalıdır!')
+            return render(request, 'register.html')
+            
         # Telefon nömrəsi validasiyası
         if not phone.startswith('+994'):
             messages.error(request, 'Telefon nömrəsi +994 ilə başlamalıdır!')
@@ -605,9 +615,10 @@ def register_view(request):
             # Profil məlumatlarını əlavə edirik
             user.profile.phone = phone
             user.profile.address = address
+            user.profile.is_verified = False  # Profil təsdiqlənməmiş olaraq yaradılır
             user.profile.save()
             
-            messages.success(request, 'Qeydiyyat uğurla tamamlandı! İndi daxil ola bilərsiniz.')
+            messages.success(request, 'Qeydiyyat uğurla tamamlandı!')
             return redirect('register')
             
         except Exception as e:

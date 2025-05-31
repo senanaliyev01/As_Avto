@@ -46,8 +46,10 @@
                                             <i class="fas fa-chevron-down"></i>
                                         </button>
                                         <div class="user-dropdown-content">
-                                            <i class="fa-regular fa-circle-user"></i>
-                                            <span class="user-name">{{ request.user.username }}</span>
+                                            <span class="user-name">
+                                                <i class="fa-regular fa-circle-user"></i>
+                                                {{ request.user.username }}
+                                            </span>
                                             <a href="{% url 'logout' %}" class="logout-link">
                                                 <i class="fas fa-sign-out-alt"></i> Çıxış et
                                             </a>

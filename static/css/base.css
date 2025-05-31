@@ -1928,13 +1928,20 @@ body {
 }
 
 .user-name {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     padding: 8px 15px;
     color: #333;
     font-size: 14px;
     font-weight: 500;
     border-bottom: 1px solid #eee;
     margin-bottom: 5px;
+}
+
+.user-name i {
+    color: #dc3545;
+    font-size: 16px;
 }
 
 .logout-link {

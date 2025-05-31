@@ -86,6 +86,17 @@ body {
     color: var(--border-color);
 }
 
+.toggle-password {
+    left: auto !important;
+    right: 15px !important;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.toggle-password:hover {
+    color: var(--accent-color);
+}
+
 .form-input {
     width: 100%;
     padding: 1rem;

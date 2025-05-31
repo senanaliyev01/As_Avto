@@ -608,7 +608,7 @@ def register_view(request):
             user.profile.save()
             
             messages.success(request, 'Qeydiyyat uğurla tamamlandı! İndi daxil ola bilərsiniz.')
-            return redirect('login')
+            return redirect('register')
             
         except Exception as e:
             messages.error(request, 'Qeydiyyat zamanı xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.')

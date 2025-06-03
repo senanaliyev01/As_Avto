@@ -40,20 +40,17 @@
                                     </a>
                                 </li>
                                 <li class="user-menu">
-                                    <div class="user-dropdown">
-                                        <button class="user-button">
+                                    <div class="dropdown">
+                                        <button class="btn btn-link dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                             <i class="fas fa-user"></i>
-                                            <i class="fas fa-chevron-down"></i>
                                         </button>
-                                        <div class="user-dropdown-content">
-                                            <span class="user-name">
-                                                <i class="fa-regular fa-circle-user"></i>
-                                                {{ request.user.username }}
-                                            </span>
-                                            <a href="{% url 'logout' %}" class="logout-link">
-                                                <i class="fas fa-sign-out-alt"></i> Çıxış et
-                                            </a>
-                                        </div>
+                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                            <li><a class="dropdown-item" href="{% url 'my_products' %}">Məhsullarım</a></li>
+                                            <li><a class="dropdown-item" href="{% url 'incoming_orders' %}">Mənə gələn sifarişlər</a></li>
+                                            <li><a class="dropdown-item" href="{% url 'orders' %}">Sifarişlərim</a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item" href="{% url 'logout' %}">Çıxış</a></li>
+                                        </ul>
                                     </div>
                                 </li>
                             </ul>

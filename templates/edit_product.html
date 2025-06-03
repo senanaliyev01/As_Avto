@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Məhsulu Redaktə Et</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="adi" class="form-label">Məhsulun adı</label>
+                            <input type="text" class="form-control" id="adi" name="adi" value="{{ mehsul.adi }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="kateqoriya" class="form-label">Kateqoriya</label>
+                            <select class="form-select" id="kateqoriya" name="kateqoriya">
+                                <option value="">Seçin</option>
+                                {% for kateqoriya in kateqoriyalar %}
+                                <option value="{{ kateqoriya.id }}" {% if mehsul.kateqoriya.id == kateqoriya.id %}selected{% endif %}>
+                                    {{ kateqoriya.adi }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="firma" class="form-label">Firma</label>
+                            <select class="form-select" id="firma" name="firma" required>
+                                <option value="">Seçin</option>
+                                {% for firma in firmalar %}
+                                <option value="{{ firma.id }}" {% if mehsul.firma.id == firma.id %}selected{% endif %}>
+                                    {{ firma.adi }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="avtomobil" class="form-label">Avtomobil</label>
+                            <select class="form-select" id="avtomobil" name="avtomobil" required>
+                                <option value="">Seçin</option>
+                                {% for avtomobil in avtomobiller %}
+                                <option value="{{ avtomobil.id }}" {% if mehsul.avtomobil.id == avtomobil.id %}selected{% endif %}>
+                                    {{ avtomobil.adi }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="brend_kod" class="form-label">Brend Kod</label>
+                            <input type="text" class="form-control" id="brend_kod" name="brend_kod" value="{{ mehsul.brend_kod }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="oem" class="form-label">OEM</label>
+                            <input type="text" class="form-control" id="oem" name="oem" value="{{ mehsul.oem }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="olcu" class="form-label">Ölçü</label>
+                            <input type="text" class="form-control" id="olcu" name="olcu" value="{{ mehsul.olcu }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="vitrin" class="form-label">Vitrin</label>
+                            <select class="form-select" id="vitrin" name="vitrin">
+                                <option value="">Seçin</option>
+                                {% for vitrin in vitrinler %}
+                                <option value="{{ vitrin.id }}" {% if mehsul.vitrin.id == vitrin.id %}selected{% endif %}>
+                                    {{ vitrin.nomre }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="maya_qiymet" class="form-label">Maya Qiyməti</label>
+                            <input type="number" step="0.01" class="form-control" id="maya_qiymet" name="maya_qiymet" value="{{ mehsul.maya_qiymet }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="qiymet" class="form-label">Satış Qiyməti</label>
+                            <input type="number" step="0.01" class="form-control" id="qiymet" name="qiymet" value="{{ mehsul.qiymet }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="stok" class="form-label">Stok</label>
+                            <input type="number" class="form-control" id="stok" name="stok" value="{{ mehsul.stok }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="kodlar" class="form-label">Kodlar</label>
+                            <textarea class="form-control" id="kodlar" name="kodlar" rows="2">{{ mehsul.kodlar }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="melumat" class="form-label">Məlumat</label>
+                            <textarea class="form-control" id="melumat" name="melumat" rows="3">{{ mehsul.melumat }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="sekil" class="form-label">Şəkil</label>
+                            {% if mehsul.sekil %}
+                            <div class="mb-2">
+                                <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" style="max-width: 200px;">
+                            </div>
+                            {% endif %}
+                            <input type="file" class="form-control" id="sekil" name="sekil" accept="image/*">
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Yadda Saxla</button>
+                            <a href="{% url 'my_products' %}" class="btn btn-secondary">Geri</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

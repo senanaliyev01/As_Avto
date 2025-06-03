@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import Mehsul, Kateqoriya, Sifaris, SifarisItem, Firma, Avtomobil, PopupImage
+from .models import Mehsul, Kateqoriya, Sifaris, SifarisItem, Firma, Avtomobil, PopupImage, Vitrin
 from django.db.models import Q
 from decimal import Decimal
 from django.contrib import messages
@@ -297,6 +297,22 @@ def add_to_cart(request, product_id):
         cart[str(product_id)] = new_quantity
         request.session['cart'] = cart
         request.session.modified = True
+        
+        # Sifariş yaradıldıqda satıcıya məlumat veririk
+        if product.istifadeci:
+            sifaris = Sifaris.objects.create(
+                istifadeci=request.user,
+                satici=product.istifadeci,
+                umumi_mebleg=product.qiymet * quantity,
+                catdirilma_usulu=request.POST.get('catdirilma_usulu')
+            )
+            
+            SifarisItem.objects.create(
+                sifaris=sifaris,
+                mehsul=product,
+                miqdar=quantity,
+                qiymet=product.qiymet
+            )
         
         response_data.update({
             'status': 'success',
@@ -626,3 +642,135 @@ def register_view(request):
             return render(request, 'register.html')
             
     return render(request, 'register.html')
+
+@login_required
+def my_products_view(request):
+    mehsullar = Mehsul.objects.filter(istifadeci=request.user).order_by('-id')
+    popup_images = PopupImage.objects.filter(aktiv=True)
+    return render(request, 'my_products.html', {
+        'mehsullar': mehsullar,
+        'popup_images': popup_images
+    })
+
+@login_required
+def add_product_view(request):
+    if request.method == 'POST':
+        try:
+            mehsul = Mehsul(
+                adi=request.POST['adi'],
+                kateqoriya_id=request.POST.get('kateqoriya'),
+                firma_id=request.POST['firma'],
+                avtomobil_id=request.POST['avtomobil'],
+                brend_kod=request.POST['brend_kod'],
+                oem=request.POST['oem'],
+                olcu=request.POST.get('olcu', ''),
+                vitrin_id=request.POST.get('vitrin'),
+                maya_qiymet=request.POST['maya_qiymet'],
+                qiymet=request.POST['qiymet'],
+                stok=request.POST['stok'],
+                kodlar=request.POST.get('kodlar', ''),
+                melumat=request.POST.get('melumat', ''),
+                istifadeci=request.user
+            )
+            
+            if 'sekil' in request.FILES:
+                mehsul.sekil = request.FILES['sekil']
+                
+            mehsul.save()
+            messages.success(request, 'Məhsul uğurla əlavə edildi!')
+            return redirect('my_products')
+            
+        except Exception as e:
+            messages.error(request, f'Xəta baş verdi: {str(e)}')
+            
+    kateqoriyalar = Kateqoriya.objects.all()
+    firmalar = Firma.objects.all()
+    avtomobiller = Avtomobil.objects.all()
+    vitrinler = Vitrin.objects.all()
+    popup_images = PopupImage.objects.filter(aktiv=True)
+    
+    return render(request, 'add_product.html', {
+        'kateqoriyalar': kateqoriyalar,
+        'firmalar': firmalar,
+        'avtomobiller': avtomobiller,
+        'vitrinler': vitrinler,
+        'popup_images': popup_images
+    })
+
+@login_required
+def edit_product_view(request, product_id):
+    mehsul = get_object_or_404(Mehsul, id=product_id, istifadeci=request.user)
+    
+    if request.method == 'POST':
+        try:
+            mehsul.adi = request.POST['adi']
+            mehsul.kateqoriya_id = request.POST.get('kateqoriya')
+            mehsul.firma_id = request.POST['firma']
+            mehsul.avtomobil_id = request.POST['avtomobil']
+            mehsul.brend_kod = request.POST['brend_kod']
+            mehsul.oem = request.POST['oem']
+            mehsul.olcu = request.POST.get('olcu', '')
+            mehsul.vitrin_id = request.POST.get('vitrin')
+            mehsul.maya_qiymet = request.POST['maya_qiymet']
+            mehsul.qiymet = request.POST['qiymet']
+            mehsul.stok = request.POST['stok']
+            mehsul.kodlar = request.POST.get('kodlar', '')
+            mehsul.melumat = request.POST.get('melumat', '')
+            
+            if 'sekil' in request.FILES:
+                mehsul.sekil = request.FILES['sekil']
+                
+            mehsul.save()
+            messages.success(request, 'Məhsul uğurla yeniləndi!')
+            return redirect('my_products')
+            
+        except Exception as e:
+            messages.error(request, f'Xəta baş verdi: {str(e)}')
+            
+    kateqoriyalar = Kateqoriya.objects.all()
+    firmalar = Firma.objects.all()
+    avtomobiller = Avtomobil.objects.all()
+    vitrinler = Vitrin.objects.all()
+    popup_images = PopupImage.objects.filter(aktiv=True)
+    
+    return render(request, 'edit_product.html', {
+        'mehsul': mehsul,
+        'kateqoriyalar': kateqoriyalar,
+        'firmalar': firmalar,
+        'avtomobiller': avtomobiller,
+        'vitrinler': vitrinler,
+        'popup_images': popup_images
+    })
+
+@login_required
+def incoming_orders_view(request):
+    sifarisler = Sifaris.objects.filter(satici=request.user).order_by('-tarix')
+    statistics = Sifaris.get_order_statistics(request.user)
+    popup_images = PopupImage.objects.filter(aktiv=True)
+    
+    return render(request, 'incoming_orders.html', {
+        'sifarisler': sifarisler,
+        'statistics': statistics,
+        'popup_images': popup_images
+    })
+
+@login_required
+def incoming_order_detail_view(request, order_id):
+    sifaris = get_object_or_404(Sifaris, id=order_id, satici=request.user)
+    popup_images = PopupImage.objects.filter(aktiv=True)
+    
+    if request.method == 'POST':
+        try:
+            sifaris.status = request.POST.get('status')
+            sifaris.odenilen_mebleg = request.POST.get('odenilen_mebleg')
+            sifaris.qeyd = request.POST.get('qeyd')
+            sifaris.save()
+            messages.success(request, 'Sifariş uğurla yeniləndi!')
+            return redirect('incoming_orders')
+        except Exception as e:
+            messages.error(request, f'Xəta baş verdi: {str(e)}')
+    
+    return render(request, 'incoming_order_detail.html', {
+        'sifaris': sifaris,
+        'popup_images': popup_images
+    })

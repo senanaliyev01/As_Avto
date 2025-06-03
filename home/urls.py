@@ -19,8 +19,4 @@ urlpatterns = [
     path('checkout/', views.checkout, name='checkout'),
     path('logout/', views.logout_view, name='logout'),
     path('load-more-products/', views.load_more_products, name='load_more_products'),
-    # Yeni əlavə edilən URL-lər
-    path('my-products/', views.my_products_view, name='my_products'),
-    path('my-orders/', views.my_orders_view, name='my_orders'),
-    path('add-product/', views.add_product_view, name='add_product'),
 ]

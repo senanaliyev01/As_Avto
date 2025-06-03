@@ -54,7 +54,6 @@ class Vitrin(models.Model):
 
     
 class Mehsul(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Əlavə edən')
     adi = models.CharField(max_length=100)
     kateqoriya = models.ForeignKey(Kateqoriya,on_delete=models.CASCADE, null=True, blank=True)
     firma = models.ForeignKey(Firma,on_delete=models.CASCADE)

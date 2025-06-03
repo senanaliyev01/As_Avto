@@ -23,7 +23,6 @@
                     <th>OEM</th>
                     <th>Stok</th>
                     <th>Qiymət</th>
-                    <th>Status</th>
                     <th>Əməliyyatlar</th>
                 </tr>
             </thead>
@@ -43,18 +42,11 @@
                     <td>{{ mehsul.stok }} ədəd</td>
                     <td>{{ mehsul.qiymet }} ₼</td>
                     <td>
-                        {% if mehsul.stok > 0 %}
-                        <span class="status-badge status-active">Aktiv</span>
-                        {% else %}
-                        <span class="status-badge status-inactive">Stokda yoxdur</span>
-                        {% endif %}
-                    </td>
-                    <td>
                         <div class="action-buttons">
-                            <button type="button" class="btn btn-sm btn-info" onclick="editProduct({{ mehsul.id }})">
+                            <a href="{% url 'edit_product' mehsul.id %}" class="btn btn-warning btn-sm">
                                 <i class="fas fa-edit"></i>
-                            </button>
-                            <button type="button" class="btn btn-sm btn-danger" onclick="deleteProduct({{ mehsul.id }})">
+                            </a>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete({{ mehsul.id }})">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -62,11 +54,10 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="9" class="text-center">
+                    <td colspan="8" class="text-center">
                         <div class="empty-message">
                             <i class="fas fa-box-open"></i>
                             <p>Hələ heç bir məhsul əlavə etməmisiniz.</p>
-                            <a href="{% url 'add_product' %}" class="btn btn-primary">İlk məhsulu əlavə et</a>
                         </div>
                     </td>
                 </tr>
@@ -84,48 +75,43 @@
     </div>
 </div>
 
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3>Məhsulu silmək istədiyinizə əminsiniz?</h3>
+        <div class="modal-buttons">
+            <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Ləğv et</button>
+            <a href="#" id="deleteConfirmButton" class="btn btn-danger">Sil</a>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
 <script>
-function editProduct(productId) {
-    // Məhsul redaktəsi üçün funksiya
-    window.location.href = `/edit-product/${productId}/`;
+function confirmDelete(productId) {
+    const modal = document.getElementById('deleteModal');
+    const confirmButton = document.getElementById('deleteConfirmButton');
+    confirmButton.href = `/delete-product/${productId}/`;
+    modal.style.display = "block";
 }
 
-function deleteProduct(productId) {
-    if (confirm('Bu məhsulu silmək istədiyinizə əminsiniz?')) {
-        // Məhsul silmə funksiyası
-        fetch(`/delete-product/${productId}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                location.reload();
-            } else {
-                alert(data.message);
-            }
-        });
-    }
+function closeDeleteModal() {
+    const modal = document.getElementById('deleteModal');
+    modal.style.display = "none";
 }
 
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
+// Close modal when clicking the X
+document.querySelector('.close').onclick = closeDeleteModal;
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('deleteModal');
+    if (event.target == modal) {
+        closeDeleteModal();
     }
-    return cookieValue;
 }
 </script>
 {% endblock %} 

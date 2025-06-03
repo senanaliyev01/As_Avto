@@ -352,7 +352,6 @@ def checkout(request):
             messages.error(request, 'Səbətiniz boşdur.')
             return redirect('cart')
 
-        # Seçilmiş məhsulları al
         selected_items = request.POST.getlist('selected_items[]')
         catdirilma_usulu = request.POST.get('catdirilma_usulu')
         
@@ -367,9 +366,8 @@ def checkout(request):
         cart = request.session['cart']
         total = Decimal('0.00')
         order_items = []
-        remaining_cart = {}  # Seçilməmiş məhsullar üçün
+        remaining_cart = {}
 
-        # Məhsulları və ümumi məbləği hesablayırıq
         for product_id, quantity in cart.items():
             if product_id in selected_items:
                 product = get_object_or_404(Mehsul, id=product_id)
@@ -385,7 +383,6 @@ def checkout(request):
                     'price': product.qiymet
                 })
             else:
-                # Seçilməmiş məhsulları yeni səbətə əlavə et
                 remaining_cart[product_id] = quantity
 
         try:
@@ -405,7 +402,7 @@ def checkout(request):
                     qiymet=item['price']
                 )
 
-            # Səbəti yeniləyirik (yalnız seçilməmiş məhsulları saxlayırıq)
+            # Səbəti yeniləyirik
             request.session['cart'] = remaining_cart
             request.session.modified = True
             
@@ -629,7 +626,6 @@ def register_view(request):
 
 @login_required
 def my_products_view(request):
-    # İstifadəçinin məhsullarını əldə et
     mehsullar = Mehsul.objects.filter(istifadeci=request.user).order_by('-id')
     popup_images = PopupImage.objects.filter(aktiv=True)
     
@@ -639,14 +635,16 @@ def my_products_view(request):
     })
 
 @login_required
-def my_orders_view(request):
-    # İstifadəçinin məhsullarına gələn sifarişləri əldə et
-    my_products = Mehsul.objects.filter(istifadeci=request.user)
-    sifarisler = Sifaris.objects.filter(sifarisitem__mehsul__in=my_products).distinct().order_by('-tarix')
+def incoming_orders_view(request):
+    # İstifadəçinin məhsullarına gələn sifarişləri tapırıq
+    incoming_orders = Sifaris.objects.filter(
+        sifarisitem__mehsul__istifadeci=request.user
+    ).distinct().order_by('-tarix')
+    
     popup_images = PopupImage.objects.filter(aktiv=True)
     
-    return render(request, 'my_orders.html', {
-        'sifarisler': sifarisler,
+    return render(request, 'incoming_orders.html', {
+        'orders': incoming_orders,
         'popup_images': popup_images
     })
 
@@ -654,7 +652,7 @@ def my_orders_view(request):
 def add_product_view(request):
     if request.method == 'POST':
         try:
-            # Məhsul məlumatlarını əldə et
+            # Məhsul məlumatlarını alırıq
             adi = request.POST.get('adi')
             kateqoriya_id = request.POST.get('kateqoriya')
             firma_id = request.POST.get('firma')
@@ -670,8 +668,8 @@ def add_product_view(request):
             melumat = request.POST.get('melumat')
             sekil = request.FILES.get('sekil')
             
-            # Məhsul yarat
-            mehsul = Mehsul(
+            # Məhsulu yaradırıq
+            mehsul = Mehsul.objects.create(
                 adi=adi,
                 kateqoriya_id=kateqoriya_id if kateqoriya_id else None,
                 firma_id=firma_id,
@@ -688,16 +686,13 @@ def add_product_view(request):
                 sekil=sekil,
                 istifadeci=request.user
             )
-            mehsul.save()
             
             messages.success(request, 'Məhsul uğurla əlavə edildi!')
             return redirect('my_products')
             
         except Exception as e:
-            messages.error(request, f'Xəta baş verdi: {str(e)}')
-            return redirect('add_product')
+            messages.error(request, f'Məhsul əlavə edilərkən xəta baş verdi: {str(e)}')
     
-    # GET sorğusu üçün
     kateqoriyalar = Kateqoriya.objects.all()
     firmalar = Firma.objects.all()
     avtomobiller = Avtomobil.objects.all()
@@ -711,3 +706,61 @@ def add_product_view(request):
         'vitrinler': vitrinler,
         'popup_images': popup_images
     })
+
+@login_required
+def edit_product_view(request, product_id):
+    mehsul = get_object_or_404(Mehsul, id=product_id, istifadeci=request.user)
+    
+    if request.method == 'POST':
+        try:
+            # Məhsul məlumatlarını yeniləyirik
+            mehsul.adi = request.POST.get('adi')
+            mehsul.kateqoriya_id = request.POST.get('kateqoriya')
+            mehsul.firma_id = request.POST.get('firma')
+            mehsul.avtomobil_id = request.POST.get('avtomobil')
+            mehsul.brend_kod = request.POST.get('brend_kod')
+            mehsul.oem = request.POST.get('oem')
+            mehsul.olcu = request.POST.get('olcu')
+            mehsul.vitrin_id = request.POST.get('vitrin')
+            mehsul.maya_qiymet = request.POST.get('maya_qiymet')
+            mehsul.qiymet = request.POST.get('qiymet')
+            mehsul.stok = request.POST.get('stok')
+            mehsul.kodlar = request.POST.get('kodlar')
+            mehsul.melumat = request.POST.get('melumat')
+            
+            if 'sekil' in request.FILES:
+                mehsul.sekil = request.FILES['sekil']
+            
+            mehsul.save()
+            messages.success(request, 'Məhsul uğurla yeniləndi!')
+            return redirect('my_products')
+            
+        except Exception as e:
+            messages.error(request, f'Məhsul yenilənərkən xəta baş verdi: {str(e)}')
+    
+    kateqoriyalar = Kateqoriya.objects.all()
+    firmalar = Firma.objects.all()
+    avtomobiller = Avtomobil.objects.all()
+    vitrinler = Vitrin.objects.all()
+    popup_images = PopupImage.objects.filter(aktiv=True)
+    
+    return render(request, 'edit_product.html', {
+        'mehsul': mehsul,
+        'kateqoriyalar': kateqoriyalar,
+        'firmalar': firmalar,
+        'avtomobiller': avtomobiller,
+        'vitrinler': vitrinler,
+        'popup_images': popup_images
+    })
+
+@login_required
+def delete_product_view(request, product_id):
+    mehsul = get_object_or_404(Mehsul, id=product_id, istifadeci=request.user)
+    
+    try:
+        mehsul.delete()
+        messages.success(request, 'Məhsul uğurla silindi!')
+    except Exception as e:
+        messages.error(request, f'Məhsul silinərkən xəta baş verdi: {str(e)}')
+    
+    return redirect('my_products')

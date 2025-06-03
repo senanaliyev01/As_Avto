@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Yeni Məhsul - As Avto{% endblock %}
+{% block title %}Məhsulu Redaktə Et - As Avto{% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="page-header">
-        <h2>Yeni Məhsul</h2>
+        <h2>Məhsulu Redaktə Et</h2>
         <a href="{% url 'my_products' %}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Geri
         </a>
@@ -19,7 +19,7 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label for="adi">Məhsulun adı *</label>
-                    <input type="text" id="adi" name="adi" required>
+                    <input type="text" id="adi" name="adi" value="{{ mehsul.adi }}" required>
                 </div>
                 
                 <div class="form-group">
@@ -27,7 +27,7 @@
                     <select id="kateqoriya" name="kateqoriya">
                         <option value="">Seçin</option>
                         {% for kateqoriya in kateqoriyalar %}
-                        <option value="{{ kateqoriya.id }}">{{ kateqoriya.adi }}</option>
+                        <option value="{{ kateqoriya.id }}" {% if mehsul.kateqoriya_id == kateqoriya.id %}selected{% endif %}>{{ kateqoriya.adi }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -37,7 +37,7 @@
                     <select id="firma" name="firma" required>
                         <option value="">Seçin</option>
                         {% for firma in firmalar %}
-                        <option value="{{ firma.id }}">{{ firma.adi }}</option>
+                        <option value="{{ firma.id }}" {% if mehsul.firma_id == firma.id %}selected{% endif %}>{{ firma.adi }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -47,24 +47,24 @@
                     <select id="avtomobil" name="avtomobil" required>
                         <option value="">Seçin</option>
                         {% for avtomobil in avtomobiller %}
-                        <option value="{{ avtomobil.id }}">{{ avtomobil.adi }}</option>
+                        <option value="{{ avtomobil.id }}" {% if mehsul.avtomobil_id == avtomobil.id %}selected{% endif %}>{{ avtomobil.adi }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 
                 <div class="form-group">
                     <label for="brend_kod">Brend kodu *</label>
-                    <input type="text" id="brend_kod" name="brend_kod" required>
+                    <input type="text" id="brend_kod" name="brend_kod" value="{{ mehsul.brend_kod }}" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="oem">OEM *</label>
-                    <input type="text" id="oem" name="oem" required>
+                    <input type="text" id="oem" name="oem" value="{{ mehsul.oem }}" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="olcu">Ölçü</label>
-                    <input type="text" id="olcu" name="olcu">
+                    <input type="text" id="olcu" name="olcu" value="{{ mehsul.olcu }}">
                 </div>
                 
                 <div class="form-group">
@@ -72,38 +72,44 @@
                     <select id="vitrin" name="vitrin">
                         <option value="">Seçin</option>
                         {% for vitrin in vitrinler %}
-                        <option value="{{ vitrin.id }}">{{ vitrin.nomre }}</option>
+                        <option value="{{ vitrin.id }}" {% if mehsul.vitrin_id == vitrin.id %}selected{% endif %}>{{ vitrin.nomre }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 
                 <div class="form-group">
                     <label for="maya_qiymet">Maya qiyməti *</label>
-                    <input type="number" id="maya_qiymet" name="maya_qiymet" step="0.01" required>
+                    <input type="number" id="maya_qiymet" name="maya_qiymet" step="0.01" value="{{ mehsul.maya_qiymet }}" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="qiymet">Satış qiyməti *</label>
-                    <input type="number" id="qiymet" name="qiymet" step="0.01" required>
+                    <input type="number" id="qiymet" name="qiymet" step="0.01" value="{{ mehsul.qiymet }}" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="stok">Stok *</label>
-                    <input type="number" id="stok" name="stok" required>
+                    <input type="number" id="stok" name="stok" value="{{ mehsul.stok }}" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="kodlar">Kodlar</label>
-                    <textarea id="kodlar" name="kodlar" rows="3"></textarea>
+                    <textarea id="kodlar" name="kodlar" rows="3">{{ mehsul.kodlar }}</textarea>
                 </div>
                 
                 <div class="form-group">
                     <label for="melumat">Məlumat</label>
-                    <textarea id="melumat" name="melumat" rows="3"></textarea>
+                    <textarea id="melumat" name="melumat" rows="3">{{ mehsul.melumat }}</textarea>
                 </div>
                 
                 <div class="form-group">
                     <label for="sekil">Şəkil</label>
+                    {% if mehsul.sekil %}
+                    <div class="current-image">
+                        <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image" onclick="openImageModal('{{ mehsul.sekil.url }}')">
+                        <p>Mövcud şəkil</p>
+                    </div>
+                    {% endif %}
                     <input type="file" id="sekil" name="sekil" accept="image/*">
                 </div>
             </div>
@@ -114,6 +120,14 @@
                 </button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- Image Modal -->
+<div id="imageModal" class="image-modal">
+    <span class="image-modal-close">&times;</span>
+    <div class="modal-image-content">
+        <img id="modalImage" class="modal-image" src="" alt="Modal Image">
     </div>
 </div>
 {% endblock %} 

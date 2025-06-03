@@ -705,48 +705,45 @@ def add_product_view(request):
 
 @login_required
 def edit_product_view(request, product_id):
-    mehsul = get_object_or_404(Mehsul, id=product_id, elave_eden=request.user)
-    
-    if request.method == 'POST':
-        try:
-            mehsul.adi = request.POST['adi']
-            mehsul.kateqoriya_id = request.POST.get('kateqoriya')
-            mehsul.firma_id = request.POST['firma']
-            mehsul.avtomobil_id = request.POST['avtomobil']
-            mehsul.brend_kod = request.POST['brend_kod']
-            mehsul.oem = request.POST['oem']
-            mehsul.olcu = request.POST.get('olcu')
-            mehsul.vitrin_id = request.POST.get('vitrin')
-            mehsul.maya_qiymet = request.POST['maya_qiymet']
-            mehsul.qiymet = request.POST['qiymet']
-            mehsul.stok = request.POST['stok']
-            mehsul.kodlar = request.POST.get('kodlar')
-            mehsul.melumat = request.POST.get('melumat')
+    try:
+        mehsul = Mehsul.objects.get(id=product_id, elave_eden=request.user)
+        if request.method == 'POST':
+            form_data = request.POST.copy()
+            form_data['maya_qiymet'] = form_data.get('maya_qiymet', mehsul.maya_qiymet)
+            form_data['qiymet'] = form_data.get('qiymet', mehsul.qiymet)
             
             if 'sekil' in request.FILES:
                 mehsul.sekil = request.FILES['sekil']
-                
+            
+            mehsul.adi = form_data['adi']
+            mehsul.kateqoriya_id = form_data['kateqoriya'] if form_data['kateqoriya'] else None
+            mehsul.firma_id = form_data['firma']
+            mehsul.avtomobil_id = form_data['avtomobil']
+            mehsul.vitrin_id = form_data['vitrin'] if form_data['vitrin'] else None
+            mehsul.brend_kod = form_data['brend_kod']
+            mehsul.oem = form_data['oem']
+            mehsul.olcu = form_data['olcu']
+            mehsul.stok = form_data['stok']
+            mehsul.maya_qiymet = form_data['maya_qiymet']
+            mehsul.qiymet = form_data['qiymet']
+            mehsul.kodlar = form_data['kodlar']
+            mehsul.melumat = form_data['melumat']
+            
             mehsul.save()
             messages.success(request, 'Məhsul uğurla yeniləndi.')
             return redirect('my_products')
-            
-        except Exception as e:
-            messages.error(request, f'Məhsul yenilənərkən xəta baş verdi: {str(e)}')
-    
-    kateqoriyalar = Kateqoriya.objects.all()
-    firmalar = Firma.objects.all()
-    avtomobiller = Avtomobil.objects.all()
-    vitrinler = Vitrin.objects.all()
-    popup_images = PopupImage.objects.filter(aktiv=True)
-    
-    return render(request, 'edit_product.html', {
-        'mehsul': mehsul,
-        'kateqoriyalar': kateqoriyalar,
-        'firmalar': firmalar,
-        'avtomobiller': avtomobiller,
-        'vitrinler': vitrinler,
-        'popup_images': popup_images
-    })
+        
+        context = {
+            'mehsul': mehsul,
+            'kateqoriyalar': Kateqoriya.objects.all(),
+            'firmalar': Firma.objects.all(),
+            'avtomobiller': Avtomobil.objects.all(),
+            'vitrinler': Vitrin.objects.all(),
+        }
+        return render(request, 'edit_product.html', context)
+    except Mehsul.DoesNotExist:
+        messages.error(request, 'Məhsul tapılmadı.')
+        return redirect('my_products')
 
 @login_required
 def delete_product_view(request, product_id):
@@ -760,3 +757,23 @@ def delete_product_view(request, product_id):
             messages.error(request, f'Məhsul silinərkən xəta baş verdi: {str(e)}')
     
     return redirect('my_products')
+
+@login_required
+def update_order_status(request, order_id):
+    if request.method == 'POST':
+        try:
+            order = Sifaris.objects.get(id=order_id)
+            # Yalnız məhsulun sahibi statusu dəyişdirə bilər
+            if order.mehsul.elave_eden == request.user:
+                new_status = request.POST.get('status')
+                if new_status in dict(Sifaris.STATUS_CHOICES):
+                    order.status = new_status
+                    order.save()
+                    messages.success(request, 'Sifariş statusu uğurla yeniləndi.')
+                else:
+                    messages.error(request, 'Yanlış status seçimi.')
+            else:
+                messages.error(request, 'Bu əməliyyatı yerinə yetirmək üçün icazəniz yoxdur.')
+        except Sifaris.DoesNotExist:
+            messages.error(request, 'Sifariş tapılmadı.')
+    return redirect('received_orders')

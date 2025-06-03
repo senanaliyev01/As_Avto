@@ -69,7 +69,6 @@ class Mehsul(models.Model):
     melumat = models.TextField(null=True, blank=True)
     sekil = models.ImageField(upload_to='mehsul_sekilleri', default='mehsul_sekilleri/no_image.webp',null=True, blank=True)    
     yenidir = models.BooleanField(default=False)
-    istifadeci = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='mehsullar')
 
     def save(self, *args, **kwargs):
         if self.kodlar:
@@ -140,8 +139,7 @@ class Sifaris(models.Model):
         ('PICKUP', 'Özüm götürəcəm'),
     ]
 
-    istifadeci = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sifarisler')
-    satici = models.ForeignKey(User, on_delete=models.CASCADE, related_name='gelen_sifarisler', null=True, blank=True)
+    istifadeci = models.ForeignKey(User, on_delete=models.CASCADE)
     tarix = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     catdirilma_usulu = models.CharField(max_length=20, choices=DELIVERY_CHOICES, null=True, blank=True, verbose_name='Çatdırılma üsulu')

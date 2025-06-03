@@ -1,11 +1,16 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Məhsullar - Qorxmaz Avto{% endblock %}
+{% block title %}Məhsullarım - As Avto{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h2>Məhsullar</h2>
+    <div class="page-header">
+        <h2>Məhsullarım</h2>
+        <a href="{% url 'add_product' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Yeni Məhsul
+        </a>
+    </div>
     
     <div class="table-container">
         <table class="table">
@@ -18,11 +23,10 @@
                     <th>OEM</th>
                     <th>Stok</th>
                     <th>Qiymət</th>
-                    <th>Əlavə edən</th>
-                    <th></th>
+                    <th>Əməliyyatlar</th>
                 </tr>
             </thead>
-            <tbody id="products-tbody" data-has-more="{{ has_more|lower }}">
+            <tbody>
                 {% for mehsul in mehsullar %}
                 <tr>
                     <td><img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image" onclick="openImageModal('{{ mehsul.sekil.url }}')"></td>
@@ -37,14 +41,15 @@
                     <td>{{ mehsul.oem }}</td>
                     <td>{{ mehsul.stok }} ədəd</td>
                     <td>{{ mehsul.qiymet }} ₼</td>
-                    <td>{{ mehsul.elave_eden.username }}</td>
                     <td>
-                        <button type="button" 
-                                class="cart-add-btn" 
-                                {% if mehsul.stok == 0 %}disabled{% endif %}
-                                onclick="openQuantityModal({{ mehsul.id }}, {{ mehsul.stok }})">
-                            <i class="fas fa-shopping-cart"></i>
-                        </button>
+                        <div class="action-buttons">
+                            <a href="{% url 'edit_product' mehsul.id %}" class="btn btn-warning btn-sm">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete({{ mehsul.id }})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>
                 {% empty %}
@@ -52,33 +57,26 @@
                     <td colspan="8" class="text-center">
                         <div class="empty-message">
                             <i class="fas fa-box-open"></i>
-                            <p>Heç bir məhsul tapılmadı.</p>
+                            <p>Hələ heç bir məhsul əlavə etməmisiniz.</p>
                         </div>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        
-        {% if has_more %}
-        <div id="loading-spinner" class="loading-spinner" style="display: none;">
-            <div class="spinner"></div>
-        </div>
-        {% endif %}
     </div>
 </div>
 
-<!-- Miqdar Modal -->
-<div id="quantityModal" class="modal">
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
-        <h3>Miqdar seçin</h3>
-        <form method="POST" id="addToCartForm">
+        <h3>Məhsulu silmək istədiyinizə əminsiniz?</h3>
+        <form method="POST" id="deleteForm">
             {% csrf_token %}
-            <input type="number" name="quantity" id="quantityInput" value="1" min="1" class="form-control">
             <div class="modal-buttons">
-                <button type="button" class="btn btn-danger" onclick="closeQuantityModal()">Ləğv et</button>
-                <button type="submit" class="btn btn-primary">Təsdiq et</button>
+                <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Ləğv et</button>
+                <button type="submit" class="btn btn-danger">Sil</button>
             </div>
         </form>
     </div>
@@ -92,4 +90,31 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmDelete(productId) {
+    const modal = document.getElementById('deleteModal');
+    const form = document.getElementById('deleteForm');
+    form.action = `/delete-product/${productId}/`;
+    modal.style.display = 'block';
+}
+
+function closeDeleteModal() {
+    const modal = document.getElementById('deleteModal');
+    modal.style.display = 'none';
+}
+
+// Close modal when clicking the X
+document.querySelector('.close').onclick = closeDeleteModal;
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('deleteModal');
+    if (event.target == modal) {
+        closeDeleteModal();
+    }
+}
+</script>
 {% endblock %} 

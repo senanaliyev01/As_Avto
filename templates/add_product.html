@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Yeni Məhsul - As Avto{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h2>Yeni Məhsul Əlavə Et</h2>
+        <a href="{% url 'my_products' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Geri
+        </a>
+    </div>
+    
+    <div class="form-container">
+        <form method="POST" enctype="multipart/form-data" class="product-form">
+            {% csrf_token %}
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="adi">Məhsul Adı *</label>
+                    <input type="text" name="adi" id="adi" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="kateqoriya">Kateqoriya</label>
+                    <select name="kateqoriya" id="kateqoriya" class="form-control">
+                        <option value="">Seçin...</option>
+                        {% for kateqoriya in kateqoriyalar %}
+                        <option value="{{ kateqoriya.id }}">{{ kateqoriya.adi }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="firma">Firma *</label>
+                    <select name="firma" id="firma" class="form-control" required>
+                        <option value="">Seçin...</option>
+                        {% for firma in firmalar %}
+                        <option value="{{ firma.id }}">{{ firma.adi }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="avtomobil">Avtomobil *</label>
+                    <select name="avtomobil" id="avtomobil" class="form-control" required>
+                        <option value="">Seçin...</option>
+                        {% for avtomobil in avtomobiller %}
+                        <option value="{{ avtomobil.id }}">{{ avtomobil.adi }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="brend_kod">Brend Kodu *</label>
+                    <input type="text" name="brend_kod" id="brend_kod" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="oem">OEM *</label>
+                    <input type="text" name="oem" id="oem" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="olcu">Ölçü</label>
+                    <input type="text" name="olcu" id="olcu" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label for="vitrin">Vitrin</label>
+                    <select name="vitrin" id="vitrin" class="form-control">
+                        <option value="">Seçin...</option>
+                        {% for vitrin in vitrinler %}
+                        <option value="{{ vitrin.id }}">{{ vitrin.nomre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="maya_qiymet">Maya Qiyməti *</label>
+                    <input type="number" name="maya_qiymet" id="maya_qiymet" class="form-control" step="0.01" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="qiymet">Satış Qiyməti *</label>
+                    <input type="number" name="qiymet" id="qiymet" class="form-control" step="0.01" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="stok">Stok *</label>
+                    <input type="number" name="stok" id="stok" class="form-control" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="kodlar">Kodlar</label>
+                    <textarea name="kodlar" id="kodlar" class="form-control" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="melumat">Məlumat</label>
+                    <textarea name="melumat" id="melumat" class="form-control" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sekil">Şəkil</label>
+                    <input type="file" name="sekil" id="sekil" class="form-control" accept="image/*">
+                </div>
+            </div>
+            
+            <div class="form-buttons">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Yadda Saxla
+                </button>
+                <a href="{% url 'my_products' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Ləğv Et
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.form-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-control:focus {
+    border-color: #2B5173;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(43, 81, 115, 0.2);
+}
+
+.form-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-primary {
+    background: #2B5173;
+    color: white;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.page-header h2 {
+    margin: 0;
+}
+</style>
+{% endblock %} 

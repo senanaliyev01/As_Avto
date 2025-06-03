@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import Mehsul, Kateqoriya, Sifaris, SifarisItem, Firma, Avtomobil, PopupImage
+from .models import Mehsul, Kateqoriya, Sifaris, SifarisItem, Firma, Avtomobil, PopupImage, Vitrin
 from django.db.models import Q
 from decimal import Decimal
 from django.contrib import messages
@@ -626,3 +626,88 @@ def register_view(request):
             return render(request, 'register.html')
             
     return render(request, 'register.html')
+
+@login_required
+def my_products_view(request):
+    # İstifadəçinin məhsullarını əldə et
+    mehsullar = Mehsul.objects.filter(istifadeci=request.user).order_by('-id')
+    popup_images = PopupImage.objects.filter(aktiv=True)
+    
+    return render(request, 'my_products.html', {
+        'mehsullar': mehsullar,
+        'popup_images': popup_images
+    })
+
+@login_required
+def my_orders_view(request):
+    # İstifadəçinin məhsullarına gələn sifarişləri əldə et
+    my_products = Mehsul.objects.filter(istifadeci=request.user)
+    sifarisler = Sifaris.objects.filter(sifarisitem__mehsul__in=my_products).distinct().order_by('-tarix')
+    popup_images = PopupImage.objects.filter(aktiv=True)
+    
+    return render(request, 'my_orders.html', {
+        'sifarisler': sifarisler,
+        'popup_images': popup_images
+    })
+
+@login_required
+def add_product_view(request):
+    if request.method == 'POST':
+        try:
+            # Məhsul məlumatlarını əldə et
+            adi = request.POST.get('adi')
+            kateqoriya_id = request.POST.get('kateqoriya')
+            firma_id = request.POST.get('firma')
+            avtomobil_id = request.POST.get('avtomobil')
+            brend_kod = request.POST.get('brend_kod')
+            oem = request.POST.get('oem')
+            olcu = request.POST.get('olcu')
+            vitrin_id = request.POST.get('vitrin')
+            maya_qiymet = request.POST.get('maya_qiymet')
+            qiymet = request.POST.get('qiymet')
+            stok = request.POST.get('stok')
+            kodlar = request.POST.get('kodlar')
+            melumat = request.POST.get('melumat')
+            sekil = request.FILES.get('sekil')
+            
+            # Məhsul yarat
+            mehsul = Mehsul(
+                adi=adi,
+                kateqoriya_id=kateqoriya_id if kateqoriya_id else None,
+                firma_id=firma_id,
+                avtomobil_id=avtomobil_id,
+                brend_kod=brend_kod,
+                oem=oem,
+                olcu=olcu,
+                vitrin_id=vitrin_id if vitrin_id else None,
+                maya_qiymet=maya_qiymet,
+                qiymet=qiymet,
+                stok=stok,
+                kodlar=kodlar,
+                melumat=melumat,
+                sekil=sekil,
+                istifadeci=request.user
+            )
+            mehsul.save()
+            
+            messages.success(request, 'Məhsul uğurla əlavə edildi!')
+            return redirect('my_products')
+            
+        except Exception as e:
+            messages.error(request, f'Xəta baş verdi: {str(e)}')
+            return redirect('add_product')
+    
+    # GET sorğusu üçün
+    kateqoriyalar = Kateqoriya.objects.all()
+    firmalar = Firma.objects.all()
+    avtomobiller = Avtomobil.objects.all()
+    vitrinler = Vitrin.objects.all()
+    popup_images = PopupImage.objects.filter(aktiv=True)
+    
+    return render(request, 'add_product.html', {
+        'kateqoriyalar': kateqoriyalar,
+        'firmalar': firmalar,
+        'avtomobiller': avtomobiller,
+        'vitrinler': vitrinler,
+        'popup_images': popup_images
+    })

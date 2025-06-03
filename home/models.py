@@ -69,6 +69,7 @@ class Mehsul(models.Model):
     melumat = models.TextField(null=True, blank=True)
     sekil = models.ImageField(upload_to='mehsul_sekilleri', default='mehsul_sekilleri/no_image.webp',null=True, blank=True)    
     yenidir = models.BooleanField(default=False)
+    istifadeci = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='mehsullar')
 
     def save(self, *args, **kwargs):
         if self.kodlar:

@@ -1,126 +1,112 @@
 {% extends 'base.html' %}
-{% load static %}
 
 {% block title %}Yeni Məhsul - As Avto{% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="page-header">
-        <h2>Yeni Məhsul</h2>
-        <a href="{% url 'my_products' %}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Geri
-        </a>
+        <h2>Yeni Məhsul Əlavə Et</h2>
     </div>
-    
+
     <div class="form-container">
         <form method="POST" enctype="multipart/form-data" class="product-form">
             {% csrf_token %}
             
-            <div class="form-group">
-                <label for="adi">Məhsulun adı *</label>
-                <input type="text" id="adi" name="adi" class="form-control" required>
-            </div>
-            
-            <div class="form-row">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="adi">Məhsulun adı *</label>
+                    <input type="text" id="adi" name="adi" required>
+                </div>
+
                 <div class="form-group">
                     <label for="kateqoriya">Kateqoriya</label>
-                    <select id="kateqoriya" name="kateqoriya" class="form-control">
-                        <option value="">Seçin...</option>
+                    <select id="kateqoriya" name="kateqoriya">
+                        <option value="">Seçin</option>
                         {% for kateqoriya in kateqoriyalar %}
                         <option value="{{ kateqoriya.id }}">{{ kateqoriya.adi }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="firma">Firma *</label>
-                    <select id="firma" name="firma" class="form-control" required>
-                        <option value="">Seçin...</option>
+                    <select id="firma" name="firma" required>
+                        <option value="">Seçin</option>
                         {% for firma in firmalar %}
                         <option value="{{ firma.id }}">{{ firma.adi }}</option>
                         {% endfor %}
                     </select>
                 </div>
-            </div>
-            
-            <div class="form-row">
+
                 <div class="form-group">
                     <label for="avtomobil">Avtomobil *</label>
-                    <select id="avtomobil" name="avtomobil" class="form-control" required>
-                        <option value="">Seçin...</option>
+                    <select id="avtomobil" name="avtomobil" required>
+                        <option value="">Seçin</option>
                         {% for avtomobil in avtomobiller %}
                         <option value="{{ avtomobil.id }}">{{ avtomobil.adi }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                
+
+                <div class="form-group">
+                    <label for="brend_kod">Brend kodu *</label>
+                    <input type="text" id="brend_kod" name="brend_kod" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="oem">OEM *</label>
+                    <input type="text" id="oem" name="oem" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="olcu">Ölçü</label>
+                    <input type="text" id="olcu" name="olcu">
+                </div>
+
                 <div class="form-group">
                     <label for="vitrin">Vitrin</label>
-                    <select id="vitrin" name="vitrin" class="form-control">
-                        <option value="">Seçin...</option>
+                    <select id="vitrin" name="vitrin">
+                        <option value="">Seçin</option>
                         {% for vitrin in vitrinler %}
                         <option value="{{ vitrin.id }}">{{ vitrin.nomre }}</option>
                         {% endfor %}
                     </select>
                 </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="brend_kod">Brend kodu *</label>
-                    <input type="text" id="brend_kod" name="brend_kod" class="form-control" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="oem">OEM *</label>
-                    <input type="text" id="oem" name="oem" class="form-control" required>
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="olcu">Ölçü</label>
-                    <input type="text" id="olcu" name="olcu" class="form-control">
-                </div>
-                
-                <div class="form-group">
-                    <label for="stok">Stok *</label>
-                    <input type="number" id="stok" name="stok" class="form-control" min="0" required>
-                </div>
-            </div>
-            
-            <div class="form-row">
+
                 <div class="form-group">
                     <label for="maya_qiymet">Maya qiyməti *</label>
-                    <input type="number" id="maya_qiymet" name="maya_qiymet" class="form-control" step="0.01" min="0" required>
+                    <input type="number" id="maya_qiymet" name="maya_qiymet" step="0.01" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="qiymet">Satış qiyməti *</label>
-                    <input type="number" id="qiymet" name="qiymet" class="form-control" step="0.01" min="0" required>
+                    <input type="number" id="qiymet" name="qiymet" step="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="stok">Stok *</label>
+                    <input type="number" id="stok" name="stok" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="kodlar">Kodlar</label>
+                    <textarea id="kodlar" name="kodlar" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="melumat">Məlumat</label>
+                    <textarea id="melumat" name="melumat" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="sekil">Şəkil</label>
+                    <input type="file" id="sekil" name="sekil" accept="image/*">
                 </div>
             </div>
-            
-            <div class="form-group">
-                <label for="kodlar">Kodlar</label>
-                <textarea id="kodlar" name="kodlar" class="form-control" rows="2"></textarea>
-                <small class="form-text text-muted">Kodları boşluqla ayırın</small>
-            </div>
-            
-            <div class="form-group">
-                <label for="melumat">Məlumat</label>
-                <textarea id="melumat" name="melumat" class="form-control" rows="3"></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label for="sekil">Şəkil</label>
-                <input type="file" id="sekil" name="sekil" class="form-control" accept="image/*">
-            </div>
-            
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Yadda saxla
-                </button>
+
+            <div class="form-buttons">
+                <a href="{% url 'my_products' %}" class="btn btn-secondary">Ləğv et</a>
+                <button type="submit" class="btn btn-primary">Əlavə et</button>
             </div>
         </form>
     </div>

@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load static %}
 
 {% block title %}Məhsullarım - As Avto{% endblock %}
 
@@ -11,36 +10,37 @@
             <i class="fas fa-plus"></i> Yeni Məhsul
         </a>
     </div>
-    
+
     <div class="table-container">
         <table class="table">
             <thead>
                 <tr>
                     <th>Şəkil</th>
                     <th>Məhsul</th>
+                    <th>Kateqoriya</th>
                     <th>Firma</th>
+                    <th>Avtomobil</th>
                     <th>Brend Kodu</th>
                     <th>OEM</th>
-                    <th>Stok</th>
                     <th>Qiymət</th>
+                    <th>Stok</th>
                     <th>Əməliyyatlar</th>
                 </tr>
             </thead>
             <tbody>
                 {% for mehsul in mehsullar %}
                 <tr>
-                    <td><img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image" onclick="openImageModal('{{ mehsul.sekil.url }}')"></td>
                     <td>
-                        {{ mehsul.adi }}
-                        {% if mehsul.yenidir %}
-                        <span class="new-badge">Yeni</span>
-                        {% endif %}
+                        <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image" onclick="openImageModal('{{ mehsul.sekil.url }}')">
                     </td>
+                    <td>{{ mehsul.adi }}</td>
+                    <td>{{ mehsul.kateqoriya.adi }}</td>
                     <td>{{ mehsul.firma.adi }}</td>
+                    <td>{{ mehsul.avtomobil.adi }}</td>
                     <td>{{ mehsul.brend_kod }}</td>
                     <td>{{ mehsul.oem }}</td>
-                    <td>{{ mehsul.stok }} ədəd</td>
                     <td>{{ mehsul.qiymet }} ₼</td>
+                    <td>{{ mehsul.stok }} ədəd</td>
                     <td>
                         <div class="action-buttons">
                             <a href="{% url 'edit_product' mehsul.id %}" class="btn btn-warning btn-sm">
@@ -54,10 +54,11 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="8" class="text-center">
+                    <td colspan="10" class="text-center">
                         <div class="empty-message">
                             <i class="fas fa-box-open"></i>
-                            <p>Hələ heç bir məhsul əlavə etməmisiniz.</p>
+                            <p>Hələ məhsul əlavə etməmisiniz.</p>
+                            <a href="{% url 'add_product' %}" class="btn btn-primary">İlk məhsulu əlavə et</a>
                         </div>
                     </td>
                 </tr>
@@ -67,26 +68,19 @@
     </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
+<!-- Silmə təsdiq modalı -->
 <div id="deleteModal" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
         <h3>Məhsulu silmək istədiyinizə əminsiniz?</h3>
-        <form method="POST" id="deleteForm">
+        <p>Bu əməliyyat geri alına bilməz.</p>
+        <form id="deleteForm" method="POST">
             {% csrf_token %}
             <div class="modal-buttons">
                 <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Ləğv et</button>
                 <button type="submit" class="btn btn-danger">Sil</button>
             </div>
         </form>
-    </div>
-</div>
-
-<!-- Image Modal -->
-<div id="imageModal" class="image-modal">
-    <span class="image-modal-close">&times;</span>
-    <div class="modal-image-content">
-        <img id="modalImage" class="modal-image" src="" alt="Modal Image">
     </div>
 </div>
 
@@ -98,18 +92,18 @@ function confirmDelete(productId) {
     const modal = document.getElementById('deleteModal');
     const form = document.getElementById('deleteForm');
     form.action = `/delete-product/${productId}/`;
-    modal.style.display = 'block';
+    modal.style.display = "block";
 }
 
 function closeDeleteModal() {
     const modal = document.getElementById('deleteModal');
-    modal.style.display = 'none';
+    modal.style.display = "none";
 }
 
-// Close modal when clicking the X
+// Modalı bağlamaq üçün X düyməsi
 document.querySelector('.close').onclick = closeDeleteModal;
 
-// Close modal when clicking outside
+// Modal xaricində klikləmə ilə bağlamaq
 window.onclick = function(event) {
     const modal = document.getElementById('deleteModal');
     if (event.target == modal) {

@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Yeni Məhsul Əlavə Et</h2>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="adi">Məhsul Adı</label>
+                    <input type="text" class="form-control" id="adi" name="adi" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="kateqoriya">Kateqoriya</label>
+                    <select class="form-control" id="kateqoriya" name="kateqoriya">
+                        <option value="">Seçin...</option>
+                        {% for kateqoriya in kateqoriyalar %}
+                        <option value="{{ kateqoriya.id }}">{{ kateqoriya.adi }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="firma">Firma</label>
+                    <select class="form-control" id="firma" name="firma" required>
+                        <option value="">Seçin...</option>
+                        {% for firma in firmalar %}
+                        <option value="{{ firma.id }}">{{ firma.adi }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="avtomobil">Avtomobil</label>
+                    <select class="form-control" id="avtomobil" name="avtomobil" required>
+                        <option value="">Seçin...</option>
+                        {% for avtomobil in avtomobiller %}
+                        <option value="{{ avtomobil.id }}">{{ avtomobil.adi }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="brend_kod">Brend Kod</label>
+                    <input type="text" class="form-control" id="brend_kod" name="brend_kod" required>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="oem">OEM</label>
+                    <input type="text" class="form-control" id="oem" name="oem" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="olcu">Ölçü</label>
+                    <input type="text" class="form-control" id="olcu" name="olcu">
+                </div>
+                
+                <div class="form-group">
+                    <label for="vitrin">Vitrin</label>
+                    <select class="form-control" id="vitrin" name="vitrin">
+                        <option value="">Seçin...</option>
+                        {% for vitrin in vitrinler %}
+                        <option value="{{ vitrin.id }}">{{ vitrin.nomre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="maya_qiymet">Maya Qiyməti</label>
+                    <input type="number" step="0.01" class="form-control" id="maya_qiymet" name="maya_qiymet" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="qiymet">Satış Qiyməti</label>
+                    <input type="number" step="0.01" class="form-control" id="qiymet" name="qiymet" required>
+                </div>
+            </div>
+            
+            <div class="col-12">
+                <div class="form-group">
+                    <label for="stok">Stok Miqdarı</label>
+                    <input type="number" class="form-control" id="stok" name="stok" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="kodlar">Kodlar</label>
+                    <textarea class="form-control" id="kodlar" name="kodlar" rows="2"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="melumat">Əlavə Məlumat</label>
+                    <textarea class="form-control" id="melumat" name="melumat" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sekil">Şəkil</label>
+                    <input type="file" class="form-control-file" id="sekil" name="sekil">
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Məhsul Əlavə Et</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

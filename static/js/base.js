@@ -721,8 +721,12 @@ function initializeProductsPage() {
         const params = new URLSearchParams(window.location.search);
         params.append('offset', offset);
         
+        // Determine if we're on the new products page
+        const isNewProductsPage = window.location.pathname.includes('new-products');
+        const endpoint = isNewProductsPage ? '/load-more-new-products/' : '/load-more-products/';
+        
         setTimeout(() => {
-            fetch(`/load-more-products/?${params.toString()}`)
+            fetch(`${endpoint}?${params.toString()}`)
                 .then(response => response.json())
                 .then(data => {
                     if (tbody) {

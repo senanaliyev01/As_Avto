@@ -545,17 +545,53 @@ def search_suggestions(request):
 def new_products_view(request):
     # Yeni məhsulları əldə et
     mehsullar = Mehsul.objects.filter(yenidir=True).order_by('-id')  # Ən son əlavə edilən yeni məhsullardan başla
+    
+    # İlk 15 məhsulu götür
+    initial_products = mehsullar[:15]
+    has_more = mehsullar.count() > 15
+    
     kateqoriyalar = Kateqoriya.objects.all()
     firmalar = Firma.objects.all()
     avtomobiller = Avtomobil.objects.all()
     popup_images = PopupImage.objects.filter(aktiv=True)
     
     return render(request, 'new_products.html', {
-        'mehsullar': mehsullar,
+        'mehsullar': initial_products,
+        'has_more': has_more,
         'kateqoriyalar': kateqoriyalar,
         'firmalar': firmalar,
         'avtomobiller': avtomobiller,
         'popup_images': popup_images
+    })
+
+@login_required
+def load_more_new_products(request):
+    offset = int(request.GET.get('offset', 0))
+    limit = 15
+    
+    mehsullar = Mehsul.objects.filter(yenidir=True).order_by('-id')
+    
+    # Get next batch of products
+    products = mehsullar[offset:offset + limit]
+    has_more = mehsullar.count() > (offset + limit)
+    
+    products_data = []
+    for product in products:
+        products_data.append({
+            'id': product.id,
+            'adi': product.adi,
+            'sekil_url': product.sekil.url if product.sekil else None,
+            'firma': product.firma.adi,
+            'brend_kod': product.brend_kod,
+            'oem': product.oem,
+            'stok': product.stok,
+            'qiymet': str(product.qiymet),
+            'yenidir': product.yenidir,
+        })
+    
+    return JsonResponse({
+        'products': products_data,
+        'has_more': has_more
     })
 
 @login_required

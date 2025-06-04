@@ -132,7 +132,6 @@ class Sifaris(models.Model):
         ('PROCESSING', 'İşlənir'),
         ('COMPLETED', 'Tamamlandı'),
         ('CANCELLED', 'Ləğv edildi'),
-        ('SOLD', 'Satıldı'),
     ]
     
     DELIVERY_CHOICES = [

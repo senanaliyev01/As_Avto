@@ -25,6 +25,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize products page functionality
     initializeProductsPage();
+
+    // Info Modal Event Listeners
+    const infoModal = document.getElementById('infoModal');
+    const closeBtn = document.querySelector('.info-modal-close');
+    
+    if (infoModal && closeBtn) {
+        closeBtn.onclick = closeInfoModal;
+        
+        // Modal xaricində kliklədikdə bağla
+        infoModal.onclick = function(e) {
+            if (e.target === infoModal) {
+                closeInfoModal();
+            }
+        };
+        
+        // ESC düyməsi ilə bağla
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && infoModal.style.display === 'block') {
+                closeInfoModal();
+            }
+        });
+    }
 });
 
 function initializeSearch() {
@@ -777,91 +799,83 @@ function initializeProductsPage() {
     }
 }
 
-// Məhsul məlumatlarını göstərmək üçün funksiya
+// Info Modal Functions
 function openInfoModal(productId) {
     const modal = document.getElementById('infoModal');
     const productInfo = document.getElementById('productInfo');
     
-    // Məlumatları yüklə
+    // Məhsul məlumatlarını yüklə
     fetch(`/product-info/${productId}/`)
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                const info = data.product;
+                const product = data.product;
                 productInfo.innerHTML = `
-                    <div class="info-item">
-                        <div class="info-label">Məhsul adı:</div>
-                        <div class="info-value">${info.adi}</div>
+                    <div class="product-info-item">
+                        <div class="product-info-label">Məhsul Adı:</div>
+                        <div class="product-info-value">${product.adi}</div>
                     </div>
-                    <div class="info-item">
-                        <div class="info-label">Kateqoriya:</div>
-                        <div class="info-value">${info.kateqoriya || '-'}</div>
+                    <div class="product-info-item">
+                        <div class="product-info-label">Kateqoriya:</div>
+                        <div class="product-info-value">${product.kateqoriya || '-'}</div>
                     </div>
-                    <div class="info-item">
-                        <div class="info-label">Firma:</div>
-                        <div class="info-value">${info.firma}</div>
+                    <div class="product-info-item">
+                        <div class="product-info-label">Firma:</div>
+                        <div class="product-info-value">${product.firma}</div>
                     </div>
-                    <div class="info-item">
-                        <div class="info-label">Avtomobil:</div>
-                        <div class="info-value">${info.avtomobil}</div>
+                    <div class="product-info-item">
+                        <div class="product-info-label">Avtomobil:</div>
+                        <div class="product-info-value">${product.avtomobil}</div>
                     </div>
-                    <div class="info-item">
-                        <div class="info-label">Brend Kodu:</div>
-                        <div class="info-value">${info.brend_kod}</div>
+                    <div class="product-info-item">
+                        <div class="product-info-label">Brend Kodu:</div>
+                        <div class="product-info-value">${product.brend_kod}</div>
                     </div>
-                    <div class="info-item">
-                        <div class="info-label">OEM:</div>
-                        <div class="info-value">${info.oem}</div>
+                    <div class="product-info-item">
+                        <div class="product-info-label">OEM:</div>
+                        <div class="product-info-value">${product.oem}</div>
                     </div>
-                    <div class="info-item">
-                        <div class="info-label">Ölçü:</div>
-                        <div class="info-value">${info.olcu || '-'}</div>
+                    <div class="product-info-item">
+                        <div class="product-info-label">Ölçü:</div>
+                        <div class="product-info-value">${product.olcu || '-'}</div>
                     </div>
-                    <div class="info-item">
-                        <div class="info-label">Vitrin:</div>
-                        <div class="info-value">${info.vitrin || '-'}</div>
+                    <div class="product-info-item">
+                        <div class="product-info-label">Vitrin:</div>
+                        <div class="product-info-value">${product.vitrin || '-'}</div>
                     </div>
-                    <div class="info-item">
-                        <div class="info-label">Qiymət:</div>
-                        <div class="info-value">${info.qiymet} ₼</div>
+                    <div class="product-info-item">
+                        <div class="product-info-label">Qiymət:</div>
+                        <div class="product-info-value">${product.qiymet} ₼</div>
                     </div>
-                    <div class="info-item">
-                        <div class="info-label">Stok:</div>
-                        <div class="info-value">${info.stok} ədəd</div>
+                    <div class="product-info-item">
+                        <div class="product-info-label">Stok:</div>
+                        <div class="product-info-value">${product.stok} ədəd</div>
                     </div>
-                    <div class="info-item">
-                        <div class="info-label">Məlumat:</div>
-                        <div class="info-value">${info.melumat || '-'}</div>
+                    <div class="product-info-item">
+                        <div class="product-info-label">Məlumat:</div>
+                        <div class="product-info-value">${product.melumat || '-'}</div>
                     </div>
                 `;
+                
                 modal.style.display = 'block';
+                setTimeout(() => {
+                    modal.classList.add('show');
+                }, 10);
             } else {
                 showMessage('error', 'Məhsul məlumatları yüklənərkən xəta baş verdi.');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            showMessage('error', 'Məhsul məlumatları yüklənərkən xəta baş verdi.');
+            showMessage('error', 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
         });
 }
 
-// Modalı bağlamaq üçün funksiya
 function closeInfoModal() {
     const modal = document.getElementById('infoModal');
-    modal.style.display = 'none';
+    modal.classList.remove('show');
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
 }
-
-// Modal bağlama düyməsinə klik hadisəsi
-document.addEventListener('DOMContentLoaded', function() {
-    const infoModal = document.getElementById('infoModal');
-    const closeBtn = infoModal.querySelector('.close');
-    
-    closeBtn.onclick = closeInfoModal;
-    
-    window.onclick = function(event) {
-        if (event.target == infoModal) {
-            closeInfoModal();
-        }
-    }
-});
 

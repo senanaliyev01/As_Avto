@@ -280,7 +280,7 @@ class SifarisItemInline(admin.TabularInline):
 
 @admin.register(Sifaris)
 class SifarisAdmin(admin.ModelAdmin):
-    list_display = ['id', 'istifadeci', 'tarix', 'status', 'catdirilma_usulu', 'umumi_mebleg', 'odenilen_mebleg', 'qaliq_borc', 'pdf_button', 'caspos_button']
+    list_display = ['id', 'istifadeci', 'tarix', 'status', 'catdirilma_usulu', 'umumi_mebleg', 'odenilen_mebleg', 'qaliq_borc', 'pdf_button']
     list_filter = ['status', 'catdirilma_usulu', 'tarix', 'istifadeci']
     search_fields = ['istifadeci__username']
     readonly_fields = ['istifadeci', 'tarix', 'umumi_mebleg', 'qaliq_borc']
@@ -297,20 +297,10 @@ class SifarisAdmin(admin.ModelAdmin):
     pdf_button.short_description = 'PDF'
     pdf_button.allow_tags = True
 
-    def caspos_button(self, obj):
-        return format_html(
-            '<a class="button" href="send-to-caspos/{}" style="background-color: #28a745; color: white; '
-            'padding: 5px 10px; border-radius: 4px; text-decoration: none; margin-left: 5px;">Satış et</a>',
-            obj.id
-        )
-    caspos_button.short_description = 'CASPOS'
-    caspos_button.allow_tags = True
-
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
             path('export-pdf/<int:sifaris_id>/', self.export_pdf, name='export-pdf'),
-            path('send-to-caspos/<int:sifaris_id>/', self.send_to_caspos, name='send-to-caspos'),
         ]
         return custom_urls + urls
 
@@ -515,51 +505,6 @@ class SifarisAdmin(admin.ModelAdmin):
         response.write(pdf)
 
         return response
-
-    def send_to_caspos(self, request, sifaris_id):
-        import socket
-        import json
-        
-        try:
-            sifaris = Sifaris.objects.get(id=sifaris_id)
-            sifaris_items = sifaris.sifarisitem_set.all()
-            
-            # CASPOS üçün məlumatları hazırlayırıq
-            caspos_data = {
-                "type": "sale",
-                "items": [],
-                "total": float(sifaris.umumi_mebleg),
-                "customer": sifaris.istifadeci.username
-            }
-            
-            for item in sifaris_items:
-                caspos_data["items"].append({
-                    "name": item.mehsul.adi,
-                    "price": float(item.qiymet),
-                    "quantity": item.miqdar,
-                    "total": float(item.umumi_mebleg)
-                })
-            
-            # CASPOS inteqrasiya servisinə məlumatları göndəririk
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.connect(('192.168.1.67', 80))
-            
-            # Məlumatları JSON formatında göndəririk
-            sock.send(json.dumps(caspos_data).encode())
-            
-            # Cavabı gözləyirik
-            response = sock.recv(1024).decode()
-            sock.close()
-            
-            if response == "success":
-                self.message_user(request, "Məlumatlar CASPOS-a uğurla göndərildi.", level=messages.SUCCESS)
-            else:
-                self.message_user(request, "CASPOS-a məlumat göndərilərkən xəta baş verdi.", level=messages.ERROR)
-                
-        except Exception as e:
-            self.message_user(request, f"Xəta baş verdi: {str(e)}", level=messages.ERROR)
-            
-        return HttpResponseRedirect("../")
 
     def has_add_permission(self, request):
         return False  # Sifarişlər yalnız saytdan əlavə edilə bilər

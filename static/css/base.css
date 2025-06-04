@@ -307,6 +307,18 @@ body {
     color: #333;
 }
 
+/* Table Container */
+.table-container {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin: 2rem auto;
+    overflow-x: auto;
+    width: 100%;
+    padding: 1rem;
+    min-width: 1000px; /* Minimum genişlik əlavə edirik */
+}
+
 /* Table Styles */
 .table {
     width: 100%;
@@ -315,42 +327,7 @@ body {
     margin: 2rem auto;
     text-align: center;
     table-layout: fixed;
-    min-width: 1000px; /* minimum genişlik təyin edirik */
-}
-
-.table thead th {
-    background: #f8f9fa;
-    color: #2c3e50;
-    font-weight: 600;
-    padding: 15px 10px;
-    text-align: center;
-    border-bottom: 2px solid #e9ecef;
-    border-right: 1px solid #e9ecef;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.table tbody td {
-    padding: 15px 10px;
-    border-bottom: 1px solid #e9ecef;
-    border-right: 1px solid #e9ecef;
-    color: #2d3436;
-    vertical-align: middle;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Table Container */
-.table-container {
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    margin: 2rem auto;
-    overflow-x: auto; /* horizontal scroll əlavə edirik */
-    width: 100%;
-    padding: 1rem;
+    min-width: 1000px; /* Minimum genişlik əlavə edirik */
 }
 
 /* Sütun genişliklərini tənzimləyirik */
@@ -384,13 +361,13 @@ body {
     min-width: 120px;
 }
 
-.table th:nth-child(6), /* Qiymət */
+.table th:nth-child(6), /* Stok */
 .table td:nth-child(6) {
     width: 100px;
     min-width: 100px;
 }
 
-.table th:nth-child(7), /* Stok */
+.table th:nth-child(7), /* Qiymət */
 .table td:nth-child(7) {
     width: 100px;
     min-width: 100px;
@@ -398,6 +375,12 @@ body {
 
 .table th:nth-child(8), /* Əməliyyatlar */
 .table td:nth-child(8) {
+    width: 80px;
+    min-width: 80px;
+}
+
+.table th:nth-child(9), /* Əməliyyatlar */
+.table td:nth-child(9) {
     width: 80px;
     min-width: 80px;
 }

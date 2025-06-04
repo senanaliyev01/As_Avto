@@ -522,7 +522,11 @@ class SifarisAdmin(admin.ModelAdmin):
         return response
 
     def sell_order(self, request, sifaris_id):
-        sifaris = Sifaris.objects.get(id=sifaris_id)
+        try:
+            sifaris = Sifaris.objects.get(id=sifaris_id)
+        except Sifaris.DoesNotExist:
+            messages.error(request, f'"{sell-order}" ID nömrəli Sifariş mövcud deyil. Bəlkə silinib?')
+            return HttpResponseRedirect("../")
         
         # CASPOS inteqrasiya serverinə məlumatları göndər
         try:
@@ -547,7 +551,8 @@ class SifarisAdmin(admin.ModelAdmin):
             response = requests.post(
                 'http://192.168.1.67:80/api/sell',
                 json=order_data,
-                timeout=5
+                timeout=10,  # Timeout müddətini artırdım
+                verify=False  # SSL sertifikatını yoxlamırıq
             )
             
             if response.status_code == 200:
@@ -556,12 +561,16 @@ class SifarisAdmin(admin.ModelAdmin):
                 sifaris.save()
                 messages.success(request, 'Sifariş uğurla satıldı!')
             else:
-                messages.error(request, 'CASPOS serverindən xəta cavabı alındı!')
+                messages.error(request, f'CASPOS serverindən xəta cavabı alındı! Status kodu: {response.status_code}')
                 
+        except requests.exceptions.ConnectTimeout:
+            messages.error(request, 'CASPOS serverinə qoşulma zamanı gözləmə müddəti bitdi. Zəhmət olmasa yenidən cəhd edin.')
+        except requests.exceptions.ConnectionError:
+            messages.error(request, 'CASPOS serverinə qoşulma xətası. Server əlçatan deyil.')
         except requests.exceptions.RequestException as e:
             messages.error(request, f'CASPOS serverinə qoşulma xətası: {str(e)}')
         except Exception as e:
-            messages.error(request, f'Xəta baş verdi: {str(e)}')
+            messages.error(request, f'Gözlənilməz xəta baş verdi: {str(e)}')
             
         return HttpResponseRedirect("../")
 

@@ -13,6 +13,7 @@ from functools import reduce
 from operator import and_, or_
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
+from django.views.decorators.http import require_http_methods
 
 def normalize_azerbaijani_chars(text):
     # Azərbaycan hərflərinin qarşılıqlı çevrilməsi
@@ -627,34 +628,36 @@ def register_view(request):
             
     return render(request, 'register.html')
 
-def product_info(request, product_id):
+@require_http_methods(["GET"])
+def product_details(request, product_id):
     try:
-        mehsul = Mehsul.objects.get(id=product_id)
+        product = Mehsul.objects.get(id=product_id)
         data = {
             'status': 'success',
             'product': {
-                'adi': mehsul.adi,
-                'kateqoriya': mehsul.kateqoriya.adi if mehsul.kateqoriya else None,
-                'firma': mehsul.firma.adi,
-                'avtomobil': mehsul.avtomobil.adi,
-                'brend_kod': mehsul.brend_kod,
-                'oem': mehsul.oem,
-                'olcu': mehsul.olcu,
-                'vitrin': mehsul.vitrin.nomre if mehsul.vitrin else None,
-                'qiymet': str(mehsul.qiymet),
-                'stok': mehsul.stok,
-                'melumat': mehsul.melumat
+                'id': product.id,
+                'adi': product.adi,
+                'kateqoriya': product.kateqoriya.adi if product.kateqoriya else None,
+                'firma': product.firma.adi,
+                'avtomobil': product.avtomobil.adi,
+                'brend_kod': product.brend_kod,
+                'oem': product.oem,
+                'olcu': product.olcu,
+                'qiymet': str(product.qiymet),
+                'stok': product.stok,
+                'melumat': product.melumat,
+                'sekil_url': product.sekil.url if product.sekil else None,
             }
         }
     except Mehsul.DoesNotExist:
         data = {
             'status': 'error',
-            'message': 'Məhsul tapılmadı'
+            'message': 'Məhsul tapılmadı.'
         }
     except Exception as e:
         data = {
             'status': 'error',
-            'message': str(e)
+            'message': 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.'
         }
     
     return JsonResponse(data)

@@ -42,7 +42,9 @@
                         </button>
                     </td>
                     <td>
-                        <button type="button" class="info-btn" onclick="openInfoModal({{ mehsul.id }})">
+                        <button type="button" 
+                                class="details-btn" 
+                                onclick="openDetailsModal({{ mehsul.id }})">
                             <i class="fas fa-info-circle"></i>
                         </button>
                     </td>
@@ -86,13 +88,61 @@
     </div>
 </div>
 
-<!-- Məhsul Məlumat Modal -->
-<div id="infoModal" class="info-modal">
-    <div class="info-modal-content">
-        <span class="info-modal-close">&times;</span>
-        <h3>Məhsul Məlumatı</h3>
-        <div id="productInfo" class="product-info-content">
-            <!-- Məlumatlar JavaScript ilə doldurulacaq -->
+<!-- Details Modal -->
+<div id="detailsModal" class="details-modal">
+    <div class="details-modal-content">
+        <span class="details-modal-close">&times;</span>
+        <div class="details-content">
+            <div class="details-header">
+                <h3>Məhsul Məlumatları</h3>
+            </div>
+            <div class="details-body">
+                <div class="details-image">
+                    <img id="detailsImage" src="" alt="Məhsul şəkli">
+                </div>
+                <div class="details-info">
+                    <div class="info-row">
+                        <span class="info-label">Məhsul adı:</span>
+                        <span id="detailsName" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Kateqoriya:</span>
+                        <span id="detailsCategory" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Firma:</span>
+                        <span id="detailsFirma" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Avtomobil:</span>
+                        <span id="detailsAvtomobil" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Brend Kodu:</span>
+                        <span id="detailsBrendKod" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">OEM:</span>
+                        <span id="detailsOEM" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Ölçü:</span>
+                        <span id="detailsOlcu" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Qiymət:</span>
+                        <span id="detailsQiymet" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Stok:</span>
+                        <span id="detailsStok" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Məlumat:</span>
+                        <span id="detailsMelumat" class="info-value"></span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

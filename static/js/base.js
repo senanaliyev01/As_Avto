@@ -26,27 +26,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize products page functionality
     initializeProductsPage();
 
-    // Info Modal Event Listeners
-    const infoModal = document.getElementById('infoModal');
-    const closeBtn = document.querySelector('.info-modal-close');
-    
-    if (infoModal && closeBtn) {
-        closeBtn.onclick = closeInfoModal;
-        
-        // Modal xaricində kliklədikdə bağla
-        infoModal.onclick = function(e) {
-            if (e.target === infoModal) {
-                closeInfoModal();
-            }
-        };
-        
-        // ESC düyməsi ilə bağla
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && infoModal.style.display === 'block') {
-                closeInfoModal();
-            }
-        });
-    }
+    // Initialize Details Modal
+    initializeDetailsModal();
 });
 
 function initializeSearch() {
@@ -799,70 +780,36 @@ function initializeProductsPage() {
     }
 }
 
-// Info Modal Functions
-function openInfoModal(productId) {
-    const modal = document.getElementById('infoModal');
-    const productInfo = document.getElementById('productInfo');
-    
-    // Məhsul məlumatlarını yüklə
-    fetch(`/product-info/${productId}/`)
+// Details Modal Functions
+function openDetailsModal(productId) {
+    const modal = document.getElementById('detailsModal');
+    if (!modal) return;
+
+    // Fetch product details
+    fetch(`/product-details/${productId}/`)
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                const product = data.product;
-                productInfo.innerHTML = `
-                    <div class="product-info-item">
-                        <div class="product-info-label">Məhsul Adı:</div>
-                        <div class="product-info-value">${product.adi}</div>
-                    </div>
-                    <div class="product-info-item">
-                        <div class="product-info-label">Kateqoriya:</div>
-                        <div class="product-info-value">${product.kateqoriya || '-'}</div>
-                    </div>
-                    <div class="product-info-item">
-                        <div class="product-info-label">Firma:</div>
-                        <div class="product-info-value">${product.firma}</div>
-                    </div>
-                    <div class="product-info-item">
-                        <div class="product-info-label">Avtomobil:</div>
-                        <div class="product-info-value">${product.avtomobil}</div>
-                    </div>
-                    <div class="product-info-item">
-                        <div class="product-info-label">Brend Kodu:</div>
-                        <div class="product-info-value">${product.brend_kod}</div>
-                    </div>
-                    <div class="product-info-item">
-                        <div class="product-info-label">OEM:</div>
-                        <div class="product-info-value">${product.oem}</div>
-                    </div>
-                    <div class="product-info-item">
-                        <div class="product-info-label">Ölçü:</div>
-                        <div class="product-info-value">${product.olcu || '-'}</div>
-                    </div>
-                    <div class="product-info-item">
-                        <div class="product-info-label">Vitrin:</div>
-                        <div class="product-info-value">${product.vitrin || '-'}</div>
-                    </div>
-                    <div class="product-info-item">
-                        <div class="product-info-label">Qiymət:</div>
-                        <div class="product-info-value">${product.qiymet} ₼</div>
-                    </div>
-                    <div class="product-info-item">
-                        <div class="product-info-label">Stok:</div>
-                        <div class="product-info-value">${product.stok} ədəd</div>
-                    </div>
-                    <div class="product-info-item">
-                        <div class="product-info-label">Məlumat:</div>
-                        <div class="product-info-value">${product.melumat || '-'}</div>
-                    </div>
-                `;
-                
+                // Update modal content
+                document.getElementById('detailsImage').src = data.product.sekil_url;
+                document.getElementById('detailsName').textContent = data.product.adi;
+                document.getElementById('detailsCategory').textContent = data.product.kateqoriya || '-';
+                document.getElementById('detailsFirma').textContent = data.product.firma;
+                document.getElementById('detailsAvtomobil').textContent = data.product.avtomobil;
+                document.getElementById('detailsBrendKod').textContent = data.product.brend_kod;
+                document.getElementById('detailsOEM').textContent = data.product.oem;
+                document.getElementById('detailsOlcu').textContent = data.product.olcu || '-';
+                document.getElementById('detailsQiymet').textContent = data.product.qiymet + ' ₼';
+                document.getElementById('detailsStok').textContent = data.product.stok + ' ədəd';
+                document.getElementById('detailsMelumat').textContent = data.product.melumat || '-';
+
+                // Show modal with animation
                 modal.style.display = 'block';
                 setTimeout(() => {
                     modal.classList.add('show');
                 }, 10);
             } else {
-                showMessage('error', 'Məhsul məlumatları yüklənərkən xəta baş verdi.');
+                showMessage('error', data.message);
             }
         })
         .catch(error => {
@@ -871,11 +818,37 @@ function openInfoModal(productId) {
         });
 }
 
-function closeInfoModal() {
-    const modal = document.getElementById('infoModal');
+function closeDetailsModal() {
+    const modal = document.getElementById('detailsModal');
+    if (!modal) return;
+
     modal.classList.remove('show');
     setTimeout(() => {
         modal.style.display = 'none';
     }, 300);
+}
+
+// Initialize Details Modal
+function initializeDetailsModal() {
+    const modal = document.getElementById('detailsModal');
+    const closeBtn = document.querySelector('.details-modal-close');
+    
+    if (modal && closeBtn) {
+        closeBtn.onclick = closeDetailsModal;
+        
+        // Close modal when clicking outside
+        modal.onclick = function(e) {
+            if (e.target === modal) {
+                closeDetailsModal();
+            }
+        };
+        
+        // Close modal with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.style.display === 'block') {
+                closeDetailsModal();
+            }
+        });
+    }
 }
 

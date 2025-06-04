@@ -17,6 +17,7 @@ from django.shortcuts import render
 import pandas as pd
 from django.contrib import messages
 from django.db import transaction
+import requests
 
 @admin.register(Kateqoriya)
 class KateqoriyaAdmin(admin.ModelAdmin):
@@ -280,7 +281,7 @@ class SifarisItemInline(admin.TabularInline):
 
 @admin.register(Sifaris)
 class SifarisAdmin(admin.ModelAdmin):
-    list_display = ['id', 'istifadeci', 'tarix', 'status', 'catdirilma_usulu', 'umumi_mebleg', 'odenilen_mebleg', 'qaliq_borc', 'pdf_button']
+    list_display = ['id', 'istifadeci', 'tarix', 'status', 'catdirilma_usulu', 'umumi_mebleg', 'odenilen_mebleg', 'qaliq_borc', 'pdf_button', 'sell_button']
     list_filter = ['status', 'catdirilma_usulu', 'tarix', 'istifadeci']
     search_fields = ['istifadeci__username']
     readonly_fields = ['istifadeci', 'tarix', 'umumi_mebleg', 'qaliq_borc']
@@ -297,10 +298,24 @@ class SifarisAdmin(admin.ModelAdmin):
     pdf_button.short_description = 'PDF'
     pdf_button.allow_tags = True
 
+    def sell_button(self, obj):
+        if obj.status != 'SOLD':
+            return format_html(
+                '<a class="button" href="sell-order/{}" style="background-color: #28a745; color: white; '
+                'padding: 5px 10px; border-radius: 4px; text-decoration: none;">Satış Et</a>',
+                obj.id
+            )
+        return format_html(
+            '<span style="color: #28a745;">✓ Satıldı</span>'
+        )
+    sell_button.short_description = 'Satış'
+    sell_button.allow_tags = True
+
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
             path('export-pdf/<int:sifaris_id>/', self.export_pdf, name='export-pdf'),
+            path('sell-order/<int:sifaris_id>/', self.sell_order, name='sell-order'),
         ]
         return custom_urls + urls
 
@@ -505,6 +520,50 @@ class SifarisAdmin(admin.ModelAdmin):
         response.write(pdf)
 
         return response
+
+    def sell_order(self, request, sifaris_id):
+        sifaris = Sifaris.objects.get(id=sifaris_id)
+        
+        # CASPOS inteqrasiya serverinə məlumatları göndər
+        try:
+            # Sifariş məlumatlarını hazırla
+            order_data = {
+                'order_id': sifaris.id,
+                'customer': sifaris.istifadeci.username,
+                'total_amount': float(sifaris.umumi_mebleg),
+                'items': []
+            }
+            
+            # Sifariş elementlərini əlavə et
+            for item in sifaris.sifarisitem_set.all():
+                order_data['items'].append({
+                    'name': item.mehsul.adi,
+                    'quantity': item.miqdar,
+                    'price': float(item.qiymet),
+                    'total': float(item.umumi_mebleg)
+                })
+            
+            # CASPOS serverinə göndər
+            response = requests.post(
+                'http://192.168.1.67:80/api/sell',
+                json=order_data,
+                timeout=5
+            )
+            
+            if response.status_code == 200:
+                # Sifarişi satıldı olaraq işarələ
+                sifaris.status = 'SOLD'
+                sifaris.save()
+                messages.success(request, 'Sifariş uğurla satıldı!')
+            else:
+                messages.error(request, 'CASPOS serverindən xəta cavabı alındı!')
+                
+        except requests.exceptions.RequestException as e:
+            messages.error(request, f'CASPOS serverinə qoşulma xətası: {str(e)}')
+        except Exception as e:
+            messages.error(request, f'Xəta baş verdi: {str(e)}')
+            
+        return HttpResponseRedirect("../")
 
     def has_add_permission(self, request):
         return False  # Sifarişlər yalnız saytdan əlavə edilə bilər

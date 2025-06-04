@@ -747,6 +747,13 @@ function initializeProductsPage() {
                                         <i class="fas fa-shopping-cart"></i>
                                     </button>
                                 </td>
+                                <td>
+                                    <button type="button" 
+                                            class="details-btn" 
+                                            onclick="openDetailsModal(${product.id})">
+                                        <i class="fas fa-info-circle"></i>
+                                    </button>
+                                </td>
                             `;
                             tbody.appendChild(row);
                         });

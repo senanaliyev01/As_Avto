@@ -17,6 +17,7 @@
                     <th>OEM</th>
                     <th>Qiymət</th>
                     <th>Stok</th>
+                    <th>Məlumat</th>
                     <th></th>
                 </tr>
             </thead>
@@ -33,6 +34,11 @@
                     <td>{{ mehsul.qiymet }} ₼</td>
                     <td>{{ mehsul.stok }} ədəd</td>
                     <td>
+                        <button type="button" class="info-btn" onclick="openInfoModal({{ mehsul.id }})">
+                            <i class="fas fa-info-circle"></i>
+                        </button>
+                    </td>
+                    <td>
                         <button type="button" 
                                 class="cart-add-btn" 
                                 {% if mehsul.stok == 0 %}disabled{% endif %}
@@ -43,7 +49,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="7" class="text-center">
+                    <td colspan="8" class="text-center">
                         <div class="empty-message">
                             <i class="fas fa-box-open"></i>
                             <p>Hal-hazırda yeni məhsul yoxdur.</p>
@@ -77,6 +83,17 @@
     <span class="image-modal-close">&times;</span>
     <div class="modal-image-content">
         <img id="modalImage" class="modal-image" src="" alt="Modal Image">
+    </div>
+</div>
+
+<!-- Məhsul Məlumat Modal -->
+<div id="infoModal" class="modal">
+    <div class="modal-content info-modal-content">
+        <span class="close">&times;</span>
+        <h3>Məhsul Məlumatı</h3>
+        <div id="productInfo" class="product-info-content">
+            <!-- Məlumatlar JavaScript ilə doldurulacaq -->
+        </div>
     </div>
 </div>
 

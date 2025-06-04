@@ -777,3 +777,91 @@ function initializeProductsPage() {
     }
 }
 
+// Məhsul məlumatlarını göstərmək üçün funksiya
+function openInfoModal(productId) {
+    const modal = document.getElementById('infoModal');
+    const productInfo = document.getElementById('productInfo');
+    
+    // Məlumatları yüklə
+    fetch(`/product-info/${productId}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const info = data.product;
+                productInfo.innerHTML = `
+                    <div class="info-item">
+                        <div class="info-label">Məhsul adı:</div>
+                        <div class="info-value">${info.adi}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Kateqoriya:</div>
+                        <div class="info-value">${info.kateqoriya || '-'}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Firma:</div>
+                        <div class="info-value">${info.firma}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Avtomobil:</div>
+                        <div class="info-value">${info.avtomobil}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Brend Kodu:</div>
+                        <div class="info-value">${info.brend_kod}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">OEM:</div>
+                        <div class="info-value">${info.oem}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Ölçü:</div>
+                        <div class="info-value">${info.olcu || '-'}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Vitrin:</div>
+                        <div class="info-value">${info.vitrin || '-'}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Qiymət:</div>
+                        <div class="info-value">${info.qiymet} ₼</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Stok:</div>
+                        <div class="info-value">${info.stok} ədəd</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Məlumat:</div>
+                        <div class="info-value">${info.melumat || '-'}</div>
+                    </div>
+                `;
+                modal.style.display = 'block';
+            } else {
+                showMessage('error', 'Məhsul məlumatları yüklənərkən xəta baş verdi.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('error', 'Məhsul məlumatları yüklənərkən xəta baş verdi.');
+        });
+}
+
+// Modalı bağlamaq üçün funksiya
+function closeInfoModal() {
+    const modal = document.getElementById('infoModal');
+    modal.style.display = 'none';
+}
+
+// Modal bağlama düyməsinə klik hadisəsi
+document.addEventListener('DOMContentLoaded', function() {
+    const infoModal = document.getElementById('infoModal');
+    const closeBtn = infoModal.querySelector('.close');
+    
+    closeBtn.onclick = closeInfoModal;
+    
+    window.onclick = function(event) {
+        if (event.target == infoModal) {
+            closeInfoModal();
+        }
+    }
+});
+

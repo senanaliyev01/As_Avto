@@ -626,3 +626,35 @@ def register_view(request):
             return render(request, 'register.html')
             
     return render(request, 'register.html')
+
+def product_info(request, product_id):
+    try:
+        mehsul = Mehsul.objects.get(id=product_id)
+        data = {
+            'status': 'success',
+            'product': {
+                'adi': mehsul.adi,
+                'kateqoriya': mehsul.kateqoriya.adi if mehsul.kateqoriya else None,
+                'firma': mehsul.firma.adi,
+                'avtomobil': mehsul.avtomobil.adi,
+                'brend_kod': mehsul.brend_kod,
+                'oem': mehsul.oem,
+                'olcu': mehsul.olcu,
+                'vitrin': mehsul.vitrin.nomre if mehsul.vitrin else None,
+                'qiymet': str(mehsul.qiymet),
+                'stok': mehsul.stok,
+                'melumat': mehsul.melumat
+            }
+        }
+    except Mehsul.DoesNotExist:
+        data = {
+            'status': 'error',
+            'message': 'Məhsul tapılmadı'
+        }
+    except Exception as e:
+        data = {
+            'status': 'error',
+            'message': str(e)
+        }
+    
+    return JsonResponse(data)

@@ -325,7 +325,7 @@ class SifarisAdmin(admin.ModelAdmin):
         # Logo əlavə et
         logo_path = 'static/images/Header_Logo.png'
         try:
-            logo = Image(logo_path, width=250, height=250)  # Logo ölçülərini tənzimləyə bilərsiniz
+            logo = Image(logo_path, width=200, height=200)  # Logo ölçülərini tənzimləyə bilərsiniz
             # Logo-nu mərkəzə düzləndirmək üçün cədvəl istifadə edirik
             logo_table = Table([[logo]], colWidths=[doc.width])
             logo_table.setStyle(TableStyle([

@@ -325,9 +325,15 @@ class SifarisAdmin(admin.ModelAdmin):
         # Logo əlavə et
         logo_path = 'static/images/Header_Logo.png'
         try:
-            logo = Image(logo_path, width=200, height=100)  # Logo ölçülərini tənzimləyə bilərsiniz
-            elements.append(logo)
-            elements.append(Spacer(1, 20))
+            logo = Image(logo_path, width=250, height=250)  # Logo ölçülərini tənzimləyə bilərsiniz
+            # Logo-nu mərkəzə düzləndirmək üçün cədvəl istifadə edirik
+            logo_table = Table([[logo]], colWidths=[doc.width])
+            logo_table.setStyle(TableStyle([
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ]))
+            elements.append(logo_table)
+            elements.append(Spacer(1, 10))
         except Exception as e:
             print(f"Logo əlavə edilərkən xəta: {e}")
 

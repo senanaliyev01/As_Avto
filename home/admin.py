@@ -18,8 +18,6 @@ import pandas as pd
 from django.contrib import messages
 from django.db import transaction
 import math
-import os
-from django.conf import settings
 
 @admin.register(Header_Message)
 class Header_MessageAdmin(admin.ModelAdmin):
@@ -324,47 +322,40 @@ class SifarisAdmin(admin.ModelAdmin):
         # Universal font qeydiyyatı
         pdfmetrics.registerFont(TTFont('NotoSans', 'static/fonts/NotoSans-Regular.ttf'))
 
+        # Logo əlavə et
+        logo_path = 'static/images/Header_Logo.png'
+        try:
+            logo = Image(logo_path, width=200, height=100)  # Logo ölçülərini tənzimləyə bilərsiniz
+            elements.append(logo)
+            elements.append(Spacer(1, 20))
+        except Exception as e:
+            print(f"Logo əlavə edilərkən xəta: {e}")
+
         # Stillər
         styles = getSampleStyleSheet()
         styles['Title'].fontName = 'NotoSans'
         styles['Normal'].fontName = 'NotoSans'
-
-        # Logo və başlıq cədvəli
-        logo_path = os.path.join(settings.STATIC_ROOT, 'images', 'Header_Logo.png')
-        if os.path.exists(logo_path):
-            img = Image(logo_path, width=100, height=50)  # Logo ölçülərini tənzimləyin
-        else:
-            img = None
-
-        # Başlıq və logo cədvəli
-        header_data = [
-            [
-                Paragraph(f"Sifariş №{sifaris_id}", styles['Title']),
-                img if img else ''
-            ]
-        ]
-        header_table = Table(header_data, colWidths=[400, 100])
-        header_table.setStyle(TableStyle([
-            ('ALIGN', (0, 0), (0, 0), 'LEFT'),
-            ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ]))
-        elements.append(header_table)
+        
+        # Başlıq
+        elements.append(Paragraph(f"Sifariş №{sifaris_id}", styles['Title']))
         elements.append(Spacer(1, 20))
 
-        # Müştəri məlumatları
-        customer_info = [
-            [Paragraph(f"Müştəri: {sifaris.istifadeci.username}", styles['Normal'])],
-            [Paragraph(f"Tarix: {timezone.localtime(sifaris.tarix).strftime('%d.%m.%Y %H:%M')}", styles['Normal'])],
-            [Paragraph(f"Çatdırılma: {sifaris.get_catdirilma_usulu_display()}", styles['Normal'])]
-        ]
-        customer_table = Table(customer_info, colWidths=[500])
-        customer_table.setStyle(TableStyle([
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('TOPPADDING', (0, 0), (-1, -1), 3),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
-        ]))
-        elements.append(customer_table)
+        # Sifariş məlumatları - Tarixi Azərbaycan formatında göstəririk
+        elements.append(Paragraph(f"Müştəri: {sifaris.istifadeci.username}", styles['Normal']))
+        
+        # Tarixi Azərbaycan formatında göstəririk
+        az_months = {
+            1: 'Yanvar', 2: 'Fevral', 3: 'Mart', 4: 'Aprel',
+            5: 'May', 6: 'İyun', 7: 'İyul', 8: 'Avqust',
+            9: 'Sentyabr', 10: 'Oktyabr', 11: 'Noyabr', 12: 'Dekabr'
+        }
+        
+        # Tarixi lokal vaxta çeviririk
+        local_time = timezone.localtime(sifaris.tarix)
+        az_date = f"{local_time.day} {az_months[local_time.month]} {local_time.year}, {local_time.strftime('%H:%M')}"
+        elements.append(Paragraph(f"Tarix: {az_date}", styles['Normal']))
+        
+        elements.append(Paragraph(f"Çatdırılma: {sifaris.get_catdirilma_usulu_display()}", styles['Normal']))
         elements.append(Spacer(1, 20))
 
         # Məhsullar cədvəli - başlıqları mərkəzləşdirmək üçün Paragraph istifadə edirik

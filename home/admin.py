@@ -3,7 +3,7 @@ from .models import Kateqoriya, Firma, Avtomobil, Mehsul, Sifaris, SifarisItem, 
 from django.core.exceptions import ValidationError
 from django.utils.html import format_html
 from django.urls import path
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
@@ -18,6 +18,7 @@ import pandas as pd
 from django.contrib import messages
 from django.db import transaction
 import math
+from datetime import timedelta
 
 @admin.register(Header_Message)
 class Header_MessageAdmin(admin.ModelAdmin):
@@ -303,6 +304,7 @@ class SifarisAdmin(admin.ModelAdmin):
         urls = super().get_urls()
         custom_urls = [
             path('export-pdf/<int:sifaris_id>/', self.export_pdf, name='export-pdf'),
+            path('get-new-orders-count/', self.get_new_orders_count, name='get-new-orders-count'),
         ]
         return custom_urls + urls
 
@@ -541,6 +543,12 @@ class SifarisAdmin(admin.ModelAdmin):
         extra_context['total_statistics'] = total_stats
         
         return super().changelist_view(request, extra_context=extra_context)
+
+    def get_new_orders_count(self, request):
+        # Son 24 saat ərzində yeni gələn sifarişlərin sayını qaytarır
+        last_24_hours = timezone.now() - timedelta(hours=24)
+        count = Sifaris.objects.filter(tarix__gte=last_24_hours).count()
+        return JsonResponse({'count': count})
 
 @admin.register(PopupImage)
 class PopupImageAdmin(admin.ModelAdmin):

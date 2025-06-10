@@ -333,7 +333,6 @@ class SifarisAdmin(admin.ModelAdmin):
                 ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ]))
             elements.append(logo_table)
-            elements.append(Spacer(1, 10))
         except Exception as e:
             print(f"Logo əlavə edilərkən xəta: {e}")
 
@@ -342,9 +341,7 @@ class SifarisAdmin(admin.ModelAdmin):
         styles['Title'].fontName = 'NotoSans'
         styles['Normal'].fontName = 'NotoSans'
         
-        # Başlıq
-        elements.append(Paragraph(f"Sifariş №{sifaris_id}", styles['Title']))
-        elements.append(Spacer(1, 20))
+        
 
         # Sifariş məlumatları - Tarixi Azərbaycan formatında göstəririk
         elements.append(Paragraph(f"Müştəri: {sifaris.istifadeci.username}", styles['Normal']))
@@ -362,6 +359,7 @@ class SifarisAdmin(admin.ModelAdmin):
         elements.append(Paragraph(f"Tarix: {az_date}", styles['Normal']))
         
         elements.append(Paragraph(f"Çatdırılma: {sifaris.get_catdirilma_usulu_display()}", styles['Normal']))
+        elements.append(Paragraph(f"Sifariş №{sifaris_id}", styles['Normal']))
         elements.append(Spacer(1, 20))
 
         # Məhsullar cədvəli - başlıqları mərkəzləşdirmək üçün Paragraph istifadə edirik

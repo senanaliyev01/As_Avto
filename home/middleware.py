@@ -1,4 +1,4 @@
-from .models import Sifaris, Kateqoriya, Firma, Avtomobil
+from .models import Sifaris, Kateqoriya, Firma, Avtomobil, Header_Message
 from django.http import Http404
 from django.conf import settings
 from .views import custom_404
@@ -8,6 +8,10 @@ class GlobalDataMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        # Header mesajını əldə et
+        header_message = Header_Message.objects.first()
+        request.header_message = header_message
+
         if request.user.is_authenticated:
             # Ümumi borcu əldə edirik
             statistics = Sifaris.get_order_statistics(request.user)

@@ -9,6 +9,16 @@ import uuid
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+class Header_Message(models.Model):
+    mesaj = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.mesaj}"
+    
+    class Meta:
+        verbose_name = 'Header Mesajı'
+        verbose_name_plural = 'Header Mesajları'
+
 class Kateqoriya(models.Model):
     adi = models.CharField(max_length=100, null=True, blank=True)
 
@@ -22,7 +32,7 @@ class Kateqoriya(models.Model):
 
 class Firma(models.Model):
     adi = models.CharField(max_length=100, null=True, blank=True)
-    logo = models.ImageField(null=True, blank=True)
+    logo = models.ImageField(upload_to='firma_sekilleri',null=True, blank=True)    
 
     def __str__(self):
         return f"{self.adi}"
@@ -59,7 +69,7 @@ class Mehsul(models.Model):
     firma = models.ForeignKey(Firma,on_delete=models.CASCADE)
     avtomobil = models.ForeignKey(Avtomobil,on_delete=models.CASCADE)
     brend_kod = models.CharField(max_length=100)
-    oem = models.CharField(max_length=100)
+    oem = models.CharField(max_length=100, null=True,blank=True)
     olcu = models.CharField(max_length=50,null=True,blank=True)
     vitrin = models.ForeignKey(Vitrin,on_delete=models.CASCADE,null=True,blank=True)
     maya_qiymet = models.DecimalField(max_digits=10, decimal_places=2)
@@ -233,3 +243,5 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
+
+

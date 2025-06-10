@@ -217,10 +217,11 @@ JAZZMIN_SETTINGS = {
         "home.Vitrin": "fa-solid fa-list",
         "home.PopupImage": "fa-solid fa-image",
         "home.Profile": "fa-regular fa-circle-user",
+        "home.Header_Message": "fa-solid fa-comment",
     },
     
     # Related Modal
-    "related_modal_active": True,
+    "related_modal_active": False,
     
     # Custom CSS/JS
     "custom_css": None,

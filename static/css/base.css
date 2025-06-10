@@ -225,9 +225,9 @@ body {
 .search-section {
     background-color: #fff;
     border: 1px solid var(--border-color);
-    border-radius: 15px;
+    border-radius: 15px 15px 0 0;
     padding: 15px;
-    margin: 0 auto 30px auto;
+    margin: 3px auto 0 auto;
     width: 100%;
     max-width: 1200px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -356,50 +356,50 @@ body {
 /* Sütun genişliklərini tənzimləyirik */
 .table th:nth-child(1), /* Şəkil */
 .table td:nth-child(1) {
-    width: 80px;
-    min-width: 80px;
+    width: 30px;
+    min-width: 30px;
 }
 
 .table th:nth-child(2), /* Məhsul */
 .table td:nth-child(2) {
-    width: 200px;
-    min-width: 200px;
+    width: 120px;
+    min-width: 120px;
 }
 
 .table th:nth-child(3), /* Firma */
 .table td:nth-child(3) {
-    width: 120px;
-    min-width: 120px;
+    width: 100px;
+    min-width: 100px;
 }
 
 .table th:nth-child(4), /* Brend Kodu */
 .table td:nth-child(4) {
-    width: 120px;
-    min-width: 120px;
+    width: 200px;
+    min-width: 200px;
 }
 
-.table th:nth-child(5), /* OEM */
+.table th:nth-child(5), /* Stok */
 .table td:nth-child(5) {
-    width: 120px;
-    min-width: 120px;
+    width: 50px;
+    min-width: 50px;
 }
 
-.table th:nth-child(6), /* Stok */
+.table th:nth-child(6), /* Qiymət */
 .table td:nth-child(6) {
-    width: 100px;
-    min-width: 100px;
+    width: 60px;
+    min-width: 60px;
 }
 
-.table th:nth-child(7), /* Qiymət */
+.table th:nth-child(7), /* Cart button */
 .table td:nth-child(7) {
-    width: 100px;
-    min-width: 100px;
+    width: 30px;
+    min-width: 30px;
 }
 
 .table th:nth-child(8), /* Cart button */
 .table td:nth-child(8) {
-    width: 80px;
-    min-width: 80px;
+    width: 30px;
+    min-width: 30px;
 }
 
 .table th:nth-child(9), /* Details button */
@@ -630,7 +630,7 @@ body {
 /* Cart styles */
 .cart-summary {
     background-color: #f8f9fa;
-    padding: 1.5rem;
+    padding: 0.7rem;
     border-radius: 8px;
     margin-top: 2rem;
     display: flex;
@@ -980,51 +980,61 @@ body {
 }
 
 .delivery-method {
-    margin: 20px 0;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    margin: 15px 0;
+    padding: 12px;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
     background-color: #f8f9fa;
 }
 
 .delivery-method h4 {
-    margin-bottom: 15px;
-    color: #333;
+    margin-bottom: 10px;
+    color: #2c3e50;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
 }
 
 .delivery-options {
     display: flex;
-    flex-direction: column;
     gap: 10px;
 }
 
 .delivery-option {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     cursor: pointer;
-    padding: 10px;
-    border: 1px solid #ddd;
+    padding: 8px 12px;
+    border: 1px solid #e9ecef;
     border-radius: 4px;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
+    background-color: white;
 }
 
 .delivery-option:hover {
-    background-color: #e9ecef;
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
 }
 
 .delivery-option input[type="radio"] {
     margin: 0;
+    width: 16px;
+    height: 16px;
 }
 
 .delivery-option span {
     font-size: 14px;
-    color: #333;
+    color: #495057;
 }
 
 .delivery-option input[type="radio"]:checked + span {
-    font-weight: bold;
+    font-weight: 500;
     color: #007bff;
+}
+
+.delivery-option input[type="radio"]:checked {
+    accent-color: #007bff;
 }
 
 /* Empty State Messages */
@@ -1571,14 +1581,14 @@ body {
 
 .cart-container .table th:nth-child(2), /* Şəkil */
 .cart-container .table td:nth-child(2) {
-    width: 60px;
-    min-width: 60px;
+    width: 30px;
+    min-width: 30px;
 }
 
 .cart-container .table th:nth-child(3), /* Məhsul */
 .cart-container .table td:nth-child(3) {
-    width: 180px;
-    min-width: 180px;
+    width: 120px;
+    min-width: 120px;
 }
 
 .cart-container .table th:nth-child(4), /* Brend Kodu */
@@ -1589,45 +1599,41 @@ body {
 
 .cart-container .table th:nth-child(5), /* OEM */
 .cart-container .table td:nth-child(5) {
-    width: 100px;
-    min-width: 100px;
+    width: 150px;
+    min-width: 150px;
 }
 
 .cart-container .table th:nth-child(6), /* Firma */
 .cart-container .table td:nth-child(6) {
-    width: 100px;
-    min-width: 100px;
+    width: 50px;
+    min-width: 50px;
 }
 
 .cart-container .table th:nth-child(7), /* Qiymət */
 .cart-container .table td:nth-child(7) {
-    width: 80px;
-    min-width: 80px;
+    width: 70px;
+    min-width: 70px;
 }
 
 .cart-container .table th:nth-child(8), /* Stok */
 .cart-container .table td:nth-child(8) {
-    width: 60px;
-    min-width: 60px;
-}
-
-.cart-container .table th:nth-child(9), /* Miqdar */
-.cart-container .table td:nth-child(9) {
-    width: 140px;
-    min-width: 140px;
-}
-
-.cart-container .table th:nth-child(10), /* Cəmi */
-.cart-container .table td:nth-child(10) {
     width: 80px;
     min-width: 80px;
 }
 
-.cart-container .table th:nth-child(11), /* Əməliyyat */
-.cart-container .table td:nth-child(11) {
-    width: 70px;
-    min-width: 70px;
+.cart-container .table th:nth-child(9), /* Miqdar */
+.cart-container .table td:nth-child(9) {
+    width: 90px;
+    min-width: 90px;
 }
+
+.cart-container .table th:nth-child(10), /* Cəmi */
+.cart-container .table td:nth-child(10) {
+    width: 40px;
+    min-width: 40px;
+}
+
+
 
 /* Şəkil stilləri */
 .cart-container .table .product-image {
@@ -1780,14 +1786,14 @@ body {
 /* Order Detail Table Column Widths */
 .order-items .table th:nth-child(1), /* Şəkil */
 .order-items .table td:nth-child(1) {
-    width: 60px;
-    min-width: 60px;
+    width: 30px;
+    min-width: 30px;
 }
 
 .order-items .table th:nth-child(2), /* Məhsul */
 .order-items .table td:nth-child(2) {
-    width: 200px;
-    min-width: 200px;
+    width: 100px;
+    min-width: 100px;
 }
 
 .order-items .table th:nth-child(3), /* Firma */
@@ -1797,17 +1803,21 @@ body {
 }
 
 .order-items .table th:nth-child(4), /* Brend Kodu */
-.order-items .table td:nth-child(4),
+.order-items .table td:nth-child(4) {
+    width: 200px;
+    min-width: 200px;
+}
+
 .order-items .table th:nth-child(5), /* OEM */
 .order-items .table td:nth-child(5) {
-    width: 120px;
-    min-width: 120px;
+    width: 50px;
+    min-width: 50px;
 }
 
 .order-items .table th:nth-child(6), /* Miqdar */
 .order-items .table td:nth-child(6) {
-    width: 80px;
-    min-width: 80px;
+    width: 60px;
+    min-width: 60px;
 }
 
 .order-items .table th:nth-child(7), /* Qiymət */
@@ -1984,8 +1994,8 @@ body {
 .popup-content {
     position: relative;
     margin: auto;
-    width: 90%;
-    max-width: 800px;
+    width: 600px;
+    height: 600px;
     top: 50%;
     transform: translateY(-50%);
 }
@@ -2028,17 +2038,21 @@ body {
 
 .popup-swiper {
     width: 100%;
+    height: 100%;
     border-radius: 10px;
     overflow: hidden;
 }
 
 .popup-swiper .swiper-slide {
     text-align: center;
+    width: 100%;
+    height: 100%;
 }
 
 .popup-swiper .swiper-slide img {
-    max-width: 100%;
-    height: auto;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
     display: block;
     margin: 0 auto;
 }
@@ -2081,6 +2095,90 @@ body {
 
 .popup-swiper .swiper-pagination-bullet-active {
     opacity: 1;
+}
+
+/* Mobile Responsive Popup Modal */
+@media (max-width: 768px) {
+    .popup-content {
+        width: 95%;
+        height: 80vh;
+        margin: 10vh auto;
+        transform: none;
+        top: 0;
+    }
+
+    .popup-close {
+        right: 0;
+        top: -40px;
+        width: 32px;
+        height: 32px;
+    }
+
+    .popup-close:before {
+        font-size: 18px;
+    }
+
+    .popup-swiper .swiper-button-next,
+    .popup-swiper .swiper-button-prev {
+        width: 32px;
+        height: 32px;
+    }
+
+    .popup-swiper .swiper-button-next:after,
+    .popup-swiper .swiper-button-prev:after {
+        font-size: 16px;
+    }
+
+    .popup-title {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    .popup-swiper .swiper-pagination-bullet {
+        width: 8px;
+        height: 8px;
+    }
+}
+
+/* Small Mobile Devices */
+@media (max-width: 480px) {
+    .popup-content {
+        width: 100%;
+        height: 90vh;
+        margin: 5vh auto;
+    }
+
+    .popup-close {
+        right: 10px;
+        top: -35px;
+        width: 28px;
+        height: 28px;
+    }
+
+    .popup-close:before {
+        font-size: 16px;
+    }
+
+    .popup-swiper .swiper-button-next,
+    .popup-swiper .swiper-button-prev {
+        width: 28px;
+        height: 28px;
+    }
+
+    .popup-swiper .swiper-button-next:after,
+    .popup-swiper .swiper-button-prev:after {
+        font-size: 14px;
+    }
+
+    .popup-title {
+        font-size: 12px;
+        padding: 6px;
+    }
+
+    .popup-swiper .swiper-pagination-bullet {
+        width: 6px;
+        height: 6px;
+    }
 }
 
 /* Yeniliklər linki üçün yanıb-sönmə effekti */
@@ -2217,12 +2315,12 @@ body {
     100% { transform: rotate(360deg); }
 }
 
-/* Cart Sidebar Styles */
+/* Cart Sidebar Styles 12*/
 .cart-sidebar {
     position: fixed;
     top: 0;
-    right: -80%;
-    width: 80%;
+    right: -95%;
+    width: 95%;
     height: 100%;
     background-color: #fff;
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
@@ -2484,5 +2582,309 @@ body {
 
     .info-label {
         flex: none;
+    }
+}
+
+.header-message {
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 0 0 15px 15px;
+    margin: 4px auto 30px auto;
+    width: fit-content;
+    min-width: 300px;
+    max-width: 1200px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.header-message-content {
+    padding: 15px 25px;
+    text-align: left;
+}
+
+.header-message-content p {
+    color: red;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0;
+    line-height: 0.5;
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+@media (max-width: 768px) {
+    .header-message {
+        margin: -1px auto 20px auto;
+        width: 95%;
+        min-width: auto;
+    }
+    
+    .search-section {
+        width: 95%;
+    }
+    
+    .header-message-content {
+        padding: 12px 20px;
+    }
+    
+    .header-message-content p {
+        font-size: 1rem;
+    }
+}
+
+/* Logo Slider Styles */
+.logo-slider-section {
+    background-color: #fff;
+    padding: 20px 0;
+    border-top: 1px solid #eee;
+}
+
+.logo-swiper {
+    width: 100%;
+    height: 80px;
+}
+
+.logo-slide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.firma-logo {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .logo-swiper {
+        height: 60px;
+    }
+    
+    .firma-logo {
+        height: 100%;
+    }
+}
+
+/* WhatsApp Chat Bot Styles */
+.whatsapp-chat {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background-color: #25D366;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.whatsapp-chat i {
+    font-size: 35px;
+}
+
+.whatsapp-chat:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 768px) {
+    .whatsapp-chat {
+        width: 50px;
+        height: 50px;
+        bottom: 20px;
+        right: 20px;
+    }
+
+    .whatsapp-chat i {
+        font-size: 30px;
+    }
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    .header {
+        margin: 10px auto;
+        padding: 10px;
+    }
+
+    .header-content {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .logo {
+        max-width: 150px;
+    }
+
+    .logo-img {
+        height: 60px;
+    }
+
+    .header-right {
+        width: 100%;
+    }
+
+    .main-nav ul {
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .nav-link {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        width: 100%;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background-color: #f8f9fa;
+    }
+
+    .nav-link i {
+        width: 24px;
+        text-align: center;
+    }
+
+    .search-section {
+        margin: 0 auto;
+        padding: 10px;
+        border-radius: 0;
+    }
+
+    .search-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .search-item {
+        margin-bottom: 10px;
+    }
+
+    .search-button {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .search-icon-button {
+        width: 100%;
+        height: 45px;
+    }
+
+    .total-debt {
+        width: 100%;
+        justify-content: center;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    .user-menu {
+        width: 100%;
+    }
+
+    .user-button {
+        width: 100%;
+        justify-content: space-between;
+        padding: 12px;
+    }
+
+    .user-dropdown-content {
+        width: 100%;
+        right: 0;
+    }
+
+    .cart-sidebar {
+        width: 100%;
+        right: -100%;
+    }
+
+    .cart-sidebar.active {
+        right: 0;
+    }
+
+    .whatsapp-chat {
+        width: 50px;
+        height: 50px;
+        bottom: 20px;
+        right: 20px;
+    }
+
+    .whatsapp-chat i {
+        font-size: 30px;
+    }
+
+    .header-message {
+        margin: 0 auto 15px auto;
+        width: 95%;
+    }
+
+    .header-message-content {
+        padding: 10px 15px;
+    }
+
+    .header-message-content p {
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+
+    .logo-slider-section {
+        padding: 10px 0;
+    }
+
+    .logo-swiper {
+        height: 50px;
+    }
+
+    .firma-logo {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+/* Small Mobile Devices */
+@media (max-width: 480px) {
+    .header {
+        margin: 5px auto;
+    }
+
+    .logo-img {
+        height: 50px;
+    }
+
+    .nav-link {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+
+    .search-item input,
+    .search-item select {
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+
+    .total-debt {
+        font-size: 0.9rem;
+    }
+
+    .whatsapp-chat {
+        width: 45px;
+        height: 45px;
+        bottom: 15px;
+        right: 15px;
+    }
+
+    .whatsapp-chat i {
+        font-size: 25px;
     }
 }

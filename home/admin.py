@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Kateqoriya, Firma, Avtomobil, Mehsul, Sifaris, SifarisItem, Vitrin, PopupImage, Profile
+from .models import Kateqoriya, Firma, Avtomobil, Mehsul, Sifaris, SifarisItem, Vitrin, PopupImage, Profile, Header_Message
 from django.core.exceptions import ValidationError
 from django.utils.html import format_html
 from django.urls import path
@@ -17,6 +17,12 @@ from django.shortcuts import render
 import pandas as pd
 from django.contrib import messages
 from django.db import transaction
+import math
+
+@admin.register(Header_Message)
+class Header_MessageAdmin(admin.ModelAdmin):
+    list_display = ['mesaj']
+    search_fields = ['mesaj']
 
 @admin.register(Kateqoriya)
 class KateqoriyaAdmin(admin.ModelAdmin):
@@ -40,7 +46,7 @@ class AvtomobilAdmin(admin.ModelAdmin):
 
 @admin.register(Mehsul)
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ['adi',  'firma',  'brend_kod', 'oem', 'olcu', 'vitrin', 'maya_qiymet', 'qiymet', 'stok', 'yenidir']
+    list_display = ['brend_kod', 'firma', 'adi',  'olcu', 'vitrin', 'stok', 'maya_qiymet', 'qiymet',  'yenidir']
     list_filter = ['kateqoriya', 'firma', 'avtomobil', 'vitrin', 'yenidir']
     search_fields = ['adi', 'brend_kod', 'oem', 'kodlar', 'olcu']
     change_list_template = 'admin/mehsul_change_list.html'
@@ -89,6 +95,9 @@ class MehsulAdmin(admin.ModelAdmin):
                             print(f"\nSətir {index + 1} emal edilir:")
                             print(f"Məlumatlar: {dict(row)}")
                             
+                            # Sətirin bütün sütun adlarını təmizləyirik
+                            row = {str(k).strip().lower(): v for k, v in row.items()}
+                            
                             # Kateqoriya, firma və avtomobili tap və ya yarat
                             kateqoriya = None
                             firma = None
@@ -122,34 +131,26 @@ class MehsulAdmin(admin.ModelAdmin):
                             temiz_ad = ' '.join(temiz_ad.split())
                             print(f"Təmizlənmiş ad: {temiz_ad}")
 
-                            # Əvvəlcə kodlar sütunundan brend_kod və oem-i almağa çalışaq
-                            kodlar_list = []
-                            if 'kodlar' in row and pd.notna(row['kodlar']):
-                                kodlar_list = str(row['kodlar']).strip().split()
-
-                            # brend_kod-u təyin et
+                            # brend_kod-u təyin et (yalnız brend_kod sütunundan)
                             brend_kod = None
                             if 'brend_kod' in row and pd.notna(row['brend_kod']):
-                                brend_kod = str(row['brend_kod']).strip()
-                            elif kodlar_list and len(kodlar_list) >= 1:
-                                brend_kod = kodlar_list[0]
+                                value = row['brend_kod']
+                                # Əgər dəyər float və ya int-dirsə, onu stringə çevir
+                                if isinstance(value, float) and math.isnan(value):
+                                    brend_kod = None
+                                else:
+                                    brend_kod = str(value).strip()
+                                    # Bəzən 'nan' stringi ola bilər, onu da yoxla
+                                    if brend_kod.lower() == 'nan' or brend_kod == '':
+                                        brend_kod = None
 
                             if not brend_kod:
-                                print("XƏTA: Brend kodu və kodlar sütunu boşdur")
-                                self.message_user(request, f'Sətir {index + 1}: Brend kodu və kodlar sütunu boşdur', level=messages.ERROR)
+                                print("XƏTA: Brend kodu boşdur")
+                                self.message_user(request, f'Sətir {index + 1}: Brend kodu boşdur', level=messages.ERROR)
                                 error_count += 1
                                 continue
 
                             print(f"Brend kod: {brend_kod}")
-
-                            # oem-i təyin et
-                            oem = None
-                            if 'oem' in row and pd.notna(row['oem']):
-                                oem = str(row['oem']).strip()
-                            elif kodlar_list and len(kodlar_list) >= 2:
-                                oem = kodlar_list[1]
-                            else:
-                                oem = ''
 
                             existing_product = Mehsul.objects.filter(brend_kod=brend_kod).first()
 
@@ -167,9 +168,7 @@ class MehsulAdmin(admin.ModelAdmin):
                                         existing_product.vitrin = vitrin
                                     
                                     existing_product.brend_kod = brend_kod
-                                    existing_product.oem = oem
                                     existing_product.olcu = str(row['olcu']).strip() if 'olcu' in row and pd.notna(row['olcu']) else ''
-                                    existing_product.vitrin = vitrin
                                     existing_product.maya_qiymet = float(row['maya_qiymet']) if 'maya_qiymet' in row and pd.notna(row['maya_qiymet']) else 0
                                     existing_product.qiymet = float(row['qiymet']) if 'qiymet' in row and pd.notna(row['qiymet']) else 0
                                     existing_product.stok = int(row['stok']) if 'stok' in row and pd.notna(row['stok']) else 0
@@ -188,7 +187,7 @@ class MehsulAdmin(admin.ModelAdmin):
                                         'avtomobil': avtomobil,
                                         'vitrin': vitrin,
                                         'brend_kod': brend_kod,
-                                        'oem': oem,
+                                        'oem': '',  # oem-i boş saxla
                                         'olcu': str(row['olcu']).strip() if 'olcu' in row and pd.notna(row['olcu']) else '',
                                         'maya_qiymet': float(row['maya_qiymet']) if 'maya_qiymet' in row and pd.notna(row['maya_qiymet']) else 0,
                                         'qiymet': float(row['qiymet']) if 'qiymet' in row and pd.notna(row['qiymet']) else 0,
@@ -203,37 +202,40 @@ class MehsulAdmin(admin.ModelAdmin):
                                     new_count += 1
 
                             except Exception as e:
-                                print(f"Məhsul yaradılarkən/yenilənərkən xəta: {str(e)}")
-                                error_count += 1
+                                print(f"Məhsul əlavə edilərkən xəta: {e}")
                                 self.message_user(request, f'Sətir {index + 1}: {str(e)}', level=messages.ERROR)
+                                error_count += 1
                                 continue
 
                         except Exception as e:
-                            print(f"Sətir emal edilərkən xəta: {str(e)}")
-                            error_count += 1
+                            print(f"Sətir {index + 1} emal edilərkən xəta: {e}")
                             self.message_user(request, f'Sətir {index + 1}: {str(e)}', level=messages.ERROR)
+                            error_count += 1
                             continue
 
-                print(f"\nNəticələr:")
-                print(f"Yeni məhsullar: {new_count}")
-                print(f"Yenilənən məhsullar: {update_count}")
-                print(f"Xətalar: {error_count}")
-
-                if new_count > 0:
-                    self.message_user(request, f'{new_count} yeni məhsul əlavə edildi.', level=messages.SUCCESS)
-                if update_count > 0:
-                    self.message_user(request, f'{update_count} mövcud məhsul yeniləndi.', level=messages.INFO)
-                if error_count > 0:
-                    self.message_user(request, f'{error_count} məhsulun əlavə/yenilənməsində xəta baş verdi.', level=messages.WARNING)
+                    # Nəticəni göstər
+                    success_message = f"Excel faylı uğurla import edildi! "
+                    if new_count > 0:
+                        success_message += f"{new_count} yeni məhsul əlavə edildi. "
+                    if update_count > 0:
+                        success_message += f"{update_count} məhsul yeniləndi. "
+                    if error_count > 0:
+                        success_message += f"{error_count} xəta baş verdi."
                     
-                return HttpResponseRedirect("../")
-                
+                    self.message_user(request, success_message, level=messages.SUCCESS)
+                    return HttpResponseRedirect("../")
+
             except Exception as e:
-                print(f"Ümumi xəta: {str(e)}")
-                self.message_user(request, f'Excel faylını oxuyarkən xəta baş verdi: {str(e)}', level=messages.ERROR)
+                print(f"Excel faylı oxunarkən xəta: {e}")
+                self.message_user(request, f'Excel faylı oxunarkən xəta: {str(e)}', level=messages.ERROR)
                 return HttpResponseRedirect("../")
-        
-        return HttpResponseRedirect("../")
+
+        # GET request üçün
+        context = {
+            'title': 'Excel faylı import et',
+            'has_permission': True,
+        }
+        return render(request, 'admin/import_excel.html', context)
 
     def changelist_view(self, request, extra_context=None):
         # Statistikanı hesablayırıq
@@ -365,7 +367,6 @@ class SifarisAdmin(admin.ModelAdmin):
             Paragraph('Məhsul', headerStyle),
             Paragraph('Firma', headerStyle),
             Paragraph('Brend Kod', headerStyle),
-            Paragraph('OEM', headerStyle),
             Paragraph('Vitrin', headerStyle),
             Paragraph('Qiymət', headerStyle),
             Paragraph('Miqdar', headerStyle),
@@ -394,7 +395,6 @@ class SifarisAdmin(admin.ModelAdmin):
                 Paragraph(item.mehsul.adi, contentStyle),
                 Paragraph(item.mehsul.firma.adi, contentStyle),
                 Paragraph(item.mehsul.brend_kod, contentStyle),
-                Paragraph(item.mehsul.oem, contentStyle),
                 Paragraph(str(item.mehsul.vitrin.nomre) if item.mehsul.vitrin else '-', contentStyle),
                 Paragraph(f"{item.qiymet} ₼", contentStyle),
                 Paragraph(str(item.miqdar), contentStyle),

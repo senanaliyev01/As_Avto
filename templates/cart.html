@@ -17,10 +17,10 @@
                         <input type="checkbox" id="select-all" class="select-checkbox">
                     </th>
                     <th>Şəkil</th>
-                    <th>Məhsul</th>
-                    <th>Firma</th>
-                    <th>Brend Kodu</th>
-                    <th>OEM</th>
+                    <th>Firma Kodu</th>
+                    <th>Firma Adı</th>
+                    <th>Məhsul Adı</th>
+                    <!-- <th>OEM</th> -->
                     <th>Stok</th>
                     <th>Qiymət</th>
                     <th>Miqdar</th>
@@ -35,10 +35,10 @@
                             <input type="checkbox" name="selected_items[]" value="{{ item.product.id }}" class="item-checkbox select-checkbox" form="checkout-form">
                         </td>
                         <td><img src="{{ item.product.sekil.url }}" alt="{{ item.product.adi }}" class="product-image" onclick="openImageModal('{{ item.product.sekil.url }}')"></td>
-                        <td>{{ item.product.adi }}</td>
-                        <td>{{ item.product.firma.adi }}</td>
                         <td>{{ item.product.brend_kod }}</td>
-                        <td>{{ item.product.oem }}</td>
+                        <td>{{ item.product.firma.adi }}</td>
+                        <td>{{ item.product.adi }}</td>
+                        <!-- <td>{{ item.product.oem }}</td> -->
                         <td>{{ item.product.stok }}</td>
                         <td>{{ item.product.qiymet }} ₼</td>
                         <td>
@@ -46,13 +46,13 @@
                                 <form method="POST" action="{% url 'update_cart' item.product.id %}" class="update-form">
                                     {% csrf_token %}
                                     <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stok }}" class="form-control quantity-input">
-                                    <button type="submit" class="btn btn-secondary">Yenilə</button>
+                                    <button type="submit" class="btn btn-secondary"><i class="fas fa-sync-alt"></i></button>
                                 </form>
                             </div>
                         </td>
                         <td class="subtotal">{{ item.subtotal }} ₼</td>
                         <td>
-                            <button type="button" class="btn btn-danger" onclick="removeFromCart({{ item.product.id }})">Sil</button>
+                            <button type="button" class="btn btn-danger" onclick="removeFromCart({{ item.product.id }})"><i class="fas fa-trash-alt"></i></button>
                         </td>
                     </tr>
                 {% endfor %}
@@ -67,7 +67,7 @@
                     <span class="total-value" id="selected-total">0.00 ₼</span>
                 </div>
                 <div class="delivery-method">
-                    <h4>Çatdırılma üsulu:</h4>
+                    <h4>Çatdırılma üsulu</h4>
                     <div class="delivery-options">
                         <label class="delivery-option">
                             <input type="radio" name="catdirilma_usulu" value="TAXI" required>
@@ -80,7 +80,7 @@
                     </div>
                 </div>
                 <div class="checkout-form">
-                    <button type="submit" class="btn btn-primary" id="checkout-button" disabled>Sifarişi tamamla</button>
+                    <button type="submit" class="btn btn-primary" id="checkout-button" disabled>Sifarişi göndər</button>
                 </div>
             </div>
         </form>

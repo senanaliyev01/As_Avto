@@ -28,6 +28,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize Details Modal
     initializeDetailsModal();
+
+    // Initialize Logo Slider
+    initializeLogoSlider();
 });
 
 function initializeSearch() {
@@ -56,7 +59,8 @@ function initializeSearch() {
                                             <div class="search-result-title">${item.adi}</div>
                                             <div class="search-result-details">
                                                 Brend Kodu: ${item.brend_kod}<br>
-                                                OEM: ${item.oem}
+                                                OEM: ${item.oem}<br>
+                                                ${item.olcu ? `Ölçü: ${item.olcu}` : ''}
                                             </div>
                                         </div>
                                         <div class="search-result-price">${item.qiymet} ₼</div>
@@ -734,14 +738,13 @@ function initializeProductsPage() {
                             const row = document.createElement('tr');
                             row.innerHTML = `
                                 <td><img src="${product.sekil_url || '/static/images/no_image.webp'}" alt="${product.adi}" class="product-image" onclick="openImageModal('${product.sekil_url}')"></td>
+                                <td>${product.brend_kod}</td>
+                                <td>${product.firma}</td>
                                 <td>
                                     ${product.adi}
                                     ${product.yenidir ? '<span class="new-badge">Yeni</span>' : ''}
                                 </td>
-                                <td>${product.firma}</td>
-                                <td>${product.brend_kod}</td>
-                                <td>${product.oem}</td>
-                                <td>${product.stok} ədəd</td>
+                                <td>${product.stok}</td>
                                 <td>${product.qiymet} ₼</td>
                                 <td>
                                     <button type="button" 
@@ -861,5 +864,36 @@ function initializeDetailsModal() {
             }
         });
     }
+}
+
+// Initialize Logo Slider
+function initializeLogoSlider() {
+    const logoSwiper = new Swiper('.logo-swiper', {
+        slidesPerView: 'auto',
+        spaceBetween: 3,
+        loop: true,
+        autoplay: {
+            delay: 2000,
+            disableOnInteraction: false,
+        },
+        breakpoints: {
+            320: {
+                slidesPerView: 4,
+                spaceBetween: 0
+            },
+            480: {
+                slidesPerView: 6,
+                spaceBetween: 0
+            },
+            768: {
+                slidesPerView: 8,
+                spaceBetween: 0
+            },
+            1024: {
+                slidesPerView: 10,
+                spaceBetween: 0
+            }
+        }
+    });
 }
 

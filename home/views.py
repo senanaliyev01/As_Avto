@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import Mehsul, Kateqoriya, Sifaris, SifarisItem, Firma, Avtomobil, PopupImage
+from .models import Mehsul, Kateqoriya, Sifaris, SifarisItem, Firma, Avtomobil, PopupImage, Header_Message
 from django.db.models import Q
 from decimal import Decimal
 from django.contrib import messages
@@ -100,8 +100,9 @@ def products_view(request):
         
         # İki ayrı filter tətbiq edək
         if clean_search:
-            # Kod ilə axtarış
+            # Kod və ölçü ilə axtarış
             kod_filter = Q(kodlar__icontains=clean_search)
+            olcu_filter = Q(olcu__icontains=clean_search)
             
             # Ad ilə təkmilləşdirilmiş axtarış
             # Çoxlu boşluq və təbləri tək boşluğa çeviririk
@@ -121,11 +122,11 @@ def products_view(request):
                 # "AND" operatoru ilə birləşdiririk - bütün sözlər olmalıdır
                 ad_filter = reduce(and_, ad_filters)
                 
-                # Kod və ad filterini "OR" operatoru ilə birləşdiririk
-                mehsullar = mehsullar.filter(kod_filter | ad_filter)
+                # Kod, ölçü və ad filterini "OR" operatoru ilə birləşdiririk
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | ad_filter)
             else:
-                # Əgər heç bir söz yoxdursa, yalnız kod ilə axtarış
-                mehsullar = mehsullar.filter(kod_filter)
+                # Əgər heç bir söz yoxdursa, yalnız kod və ölçü ilə axtarış
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter)
     
     if kateqoriya:
         mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)
@@ -500,8 +501,9 @@ def search_suggestions(request):
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         
         if clean_search:
-            # Kod ilə axtarış
+            # Kod və ölçü ilə axtarış
             kod_filter = Q(kodlar__icontains=clean_search)
+            olcu_filter = Q(olcu__icontains=clean_search)
             
             # Ad ilə təkmilləşdirilmiş axtarış
             # Çoxlu boşluq və təbləri tək boşluğa çeviririk
@@ -521,11 +523,11 @@ def search_suggestions(request):
                 # "AND" operatoru ilə birləşdiririk - bütün sözlər olmalıdır
                 ad_filter = reduce(and_, ad_filters)
                 
-                # Kod və ad filterini "OR" operatoru ilə birləşdiririk
-                mehsullar = Mehsul.objects.filter(kod_filter | ad_filter)[:5]
+                # Kod, ölçü və ad filterini "OR" operatoru ilə birləşdiririk
+                mehsullar = Mehsul.objects.filter(kod_filter | olcu_filter | ad_filter)[:5]
             else:
-                # Əgər heç bir söz yoxdursa, yalnız kod ilə axtarış
-                mehsullar = Mehsul.objects.filter(kod_filter)[:5]
+                # Əgər heç bir söz yoxdursa, yalnız kod və ölçü ilə axtarış
+                mehsullar = Mehsul.objects.filter(kod_filter | olcu_filter)[:5]
             
             suggestions = []
             for mehsul in mehsullar:
@@ -534,6 +536,7 @@ def search_suggestions(request):
                     'adi': mehsul.adi,
                     'brend_kod': mehsul.brend_kod,
                     'oem': mehsul.oem,
+                    'olcu': mehsul.olcu,
                     'qiymet': str(mehsul.qiymet),
                     'sekil_url': mehsul.sekil.url if mehsul.sekil else None,
                 })

@@ -57,10 +57,10 @@
         <thead>
             <tr>
                 <th>Şəkil</th>
-                <th>Məhsul</th>
-                <th>Firma</th>
-                <th>Brend Kodu</th>
-                <th>OEM</th>
+                <th>Firma Kodu</th>
+                <th>Firma Adı</th>
+                <th>Məhsul Adı</th>
+                <!-- <th>OEM</th> -->
                 <th>Miqdar</th>
                 <th>Qiymət</th>
                 <th>Cəmi</th>
@@ -72,11 +72,11 @@
                 <td>
                     <img src="{{ item.mehsul.sekil.url }}" alt="{{ item.mehsul.adi }}" class="product-image" onclick="openImageModal('{{ item.mehsul.sekil.url }}')">
                 </td>
-                <td>{{ item.mehsul.adi }}</td>
-                <td>{{ item.mehsul.firma.adi }}</td>
                 <td>{{ item.mehsul.brend_kod }}</td>
-                <td>{{ item.mehsul.oem }}</td>
-                <td>{{ item.miqdar }} ədəd</td>
+                <td>{{ item.mehsul.firma.adi }}</td>
+                <td>{{ item.mehsul.adi }}</td>
+                <!-- <td>{{ item.mehsul.oem }}</td> -->
+                <td>{{ item.miqdar }}</td>
                         <td>{{ item.qiymet }} ₼</td>
                         <td>{{ item.umumi_mebleg }} ₼</td>
             </tr>

@@ -333,6 +333,9 @@ class SifarisAdmin(admin.ModelAdmin):
                 ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
                 ('TOPPADDING', (0, 0), (-1, -1), 0),
                 ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+                ('LEFTPADDING', (0, 0), (-1, -1), 0),
+                ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+                ('SPAN', (0, 0), (-1, -1)),
             ]))
             elements.append(logo_table)
         except Exception as e:
@@ -342,6 +345,8 @@ class SifarisAdmin(admin.ModelAdmin):
         styles = getSampleStyleSheet()
         styles['Title'].fontName = 'NotoSans'
         styles['Normal'].fontName = 'NotoSans'
+        styles['Normal'].spaceBefore = 0
+        styles['Normal'].spaceAfter = 0
         
         
 

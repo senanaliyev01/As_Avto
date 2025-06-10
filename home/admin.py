@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, Spacer
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, Spacer, Image
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -326,27 +326,30 @@ class SifarisAdmin(admin.ModelAdmin):
         styles = getSampleStyleSheet()
         styles['Title'].fontName = 'NotoSans'
         styles['Normal'].fontName = 'NotoSans'
-        
-        # Başlıq
-        elements.append(Paragraph(f"Sifariş №{sifaris_id}", styles['Title']))
-        elements.append(Spacer(1, 20))
 
-        # Sifariş məlumatları - Tarixi Azərbaycan formatında göstəririk
-        elements.append(Paragraph(f"Müştəri: {sifaris.istifadeci.username}", styles['Normal']))
-        
-        # Tarixi Azərbaycan formatında göstəririk
-        az_months = {
-            1: 'Yanvar', 2: 'Fevral', 3: 'Mart', 4: 'Aprel',
-            5: 'May', 6: 'İyun', 7: 'İyul', 8: 'Avqust',
-            9: 'Sentyabr', 10: 'Oktyabr', 11: 'Noyabr', 12: 'Dekabr'
-        }
-        
-        # Tarixi lokal vaxta çeviririk
-        local_time = timezone.localtime(sifaris.tarix)
-        az_date = f"{local_time.day} {az_months[local_time.month]} {local_time.year}, {local_time.strftime('%H:%M')}"
-        elements.append(Paragraph(f"Tarix: {az_date}", styles['Normal']))
-        
-        elements.append(Paragraph(f"Çatdırılma: {sifaris.get_catdirilma_usulu_display()}", styles['Normal']))
+        # Logo və məlumatlar cədvəli
+        logo_path = 'static/images/Header_Logo.png'
+        logo = Image(logo_path, width=100, height=50)  # Logo ölçülərini tənzimləyin
+
+        # Müştəri məlumatları
+        customer_info = [
+            [Paragraph(f"Müştəri: {sifaris.istifadeci.username}", styles['Normal'])],
+            [Paragraph(f"Tarix: {timezone.localtime(sifaris.tarix).strftime('%d.%m.%Y %H:%M')}", styles['Normal'])],
+            [Paragraph(f"Çatdırılma: {sifaris.get_catdirilma_usulu_display()}", styles['Normal'])]
+        ]
+
+        # Logo və məlumatları yerləşdirmək üçün cədvəl
+        header_table = Table([
+            [Table(customer_info, colWidths=[300]), logo]
+        ], colWidths=[400, 100])
+
+        header_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+            ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ]))
+
+        elements.append(header_table)
         elements.append(Spacer(1, 20))
 
         # Məhsullar cədvəli - başlıqları mərkəzləşdirmək üçün Paragraph istifadə edirik
@@ -363,7 +366,7 @@ class SifarisAdmin(admin.ModelAdmin):
         )
 
         headers = [
-            Paragraph('№', headerStyle),
+            Paragraph(f'Sifariş №{sifaris_id}', headerStyle),
             Paragraph('Məhsul', headerStyle),
             Paragraph('Firma', headerStyle),
             Paragraph('Brend Kod', headerStyle),

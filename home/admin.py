@@ -316,7 +316,7 @@ class SifarisAdmin(admin.ModelAdmin):
         response['Content-Disposition'] = f'attachment; filename="sifaris_{sifaris_id}.pdf"'
 
         buffer = io.BytesIO()
-        doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=20, leftMargin=20, topMargin=20, bottomMargin=20)
+        doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=20, leftMargin=20, topMargin=0, bottomMargin=20)
         elements = []
 
         # Universal font qeydiyyatı
@@ -325,12 +325,14 @@ class SifarisAdmin(admin.ModelAdmin):
         # Logo əlavə et
         logo_path = 'static/images/Header_Logo.png'
         try:
-            logo = Image(logo_path, width=200, height=200)  # Logo ölçülərini tənzimləyə bilərsiniz
+            logo = Image(logo_path, width=200, height=200)
             # Logo-nu mərkəzə düzləndirmək üçün cədvəl istifadə edirik
             logo_table = Table([[logo]], colWidths=[doc.width])
             logo_table.setStyle(TableStyle([
                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                 ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('TOPPADDING', (0, 0), (-1, -1), 0),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
             ]))
             elements.append(logo_table)
         except Exception as e:

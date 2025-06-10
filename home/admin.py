@@ -18,6 +18,8 @@ import pandas as pd
 from django.contrib import messages
 from django.db import transaction
 import math
+import os
+from django.conf import settings
 
 @admin.register(Header_Message)
 class Header_MessageAdmin(admin.ModelAdmin):
@@ -327,9 +329,28 @@ class SifarisAdmin(admin.ModelAdmin):
         styles['Title'].fontName = 'NotoSans'
         styles['Normal'].fontName = 'NotoSans'
 
-        # Logo və məlumatlar cədvəli
-        logo_path = 'static/images/Header_Logo.png'
-        logo = Image(logo_path, width=100, height=50)  # Logo ölçülərini tənzimləyin
+        # Logo və başlıq cədvəli
+        logo_path = os.path.join(settings.STATIC_ROOT, 'images', 'Header_Logo.png')
+        if os.path.exists(logo_path):
+            img = Image(logo_path, width=100, height=50)  # Logo ölçülərini tənzimləyin
+        else:
+            img = None
+
+        # Başlıq və logo cədvəli
+        header_data = [
+            [
+                Paragraph(f"Sifariş №{sifaris_id}", styles['Title']),
+                img if img else ''
+            ]
+        ]
+        header_table = Table(header_data, colWidths=[400, 100])
+        header_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+            ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ]))
+        elements.append(header_table)
+        elements.append(Spacer(1, 20))
 
         # Müştəri məlumatları
         customer_info = [
@@ -337,19 +358,13 @@ class SifarisAdmin(admin.ModelAdmin):
             [Paragraph(f"Tarix: {timezone.localtime(sifaris.tarix).strftime('%d.%m.%Y %H:%M')}", styles['Normal'])],
             [Paragraph(f"Çatdırılma: {sifaris.get_catdirilma_usulu_display()}", styles['Normal'])]
         ]
-
-        # Logo və məlumatları yerləşdirmək üçün cədvəl
-        header_table = Table([
-            [Table(customer_info, colWidths=[300]), logo]
-        ], colWidths=[400, 100])
-
-        header_table.setStyle(TableStyle([
-            ('ALIGN', (0, 0), (0, 0), 'LEFT'),
-            ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
-            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        customer_table = Table(customer_info, colWidths=[500])
+        customer_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('TOPPADDING', (0, 0), (-1, -1), 3),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
         ]))
-
-        elements.append(header_table)
+        elements.append(customer_table)
         elements.append(Spacer(1, 20))
 
         # Məhsullar cədvəli - başlıqları mərkəzləşdirmək üçün Paragraph istifadə edirik
@@ -366,7 +381,7 @@ class SifarisAdmin(admin.ModelAdmin):
         )
 
         headers = [
-            Paragraph(f'Sifariş №{sifaris_id}', headerStyle),
+            Paragraph('№', headerStyle),
             Paragraph('Məhsul', headerStyle),
             Paragraph('Firma', headerStyle),
             Paragraph('Brend Kod', headerStyle),

@@ -290,13 +290,6 @@ class SifarisAdmin(admin.ModelAdmin):
     inlines = [SifarisItemInline]
     change_list_template = 'admin/sifaris_change_list.html'
 
-    def get_new_orders_count(self):
-        # Son 24 saat ərzində yeni sifarişləri sayırıq
-        from django.utils import timezone
-        from datetime import timedelta
-        last_24_hours = timezone.now() - timedelta(hours=24)
-        return Sifaris.objects.filter(tarix__gte=last_24_hours).count()
-
     def pdf_button(self, obj):
         return format_html(
             '<a class="button" href="export-pdf/{}" style="background-color: #417690; color: white; '
@@ -524,9 +517,6 @@ class SifarisAdmin(admin.ModelAdmin):
         form.instance.update_total()
 
     def changelist_view(self, request, extra_context=None):
-        # Yeni sifarişlərin sayını hesablayırıq
-        new_orders_count = self.get_new_orders_count()
-        
         # İstifadəçilər üzrə statistikanı hesablayırıq
         from django.db.models import Count, Sum, F
         from django.contrib.auth.models import User
@@ -549,7 +539,6 @@ class SifarisAdmin(admin.ModelAdmin):
         extra_context = extra_context or {}
         extra_context['user_statistics'] = user_stats
         extra_context['total_statistics'] = total_stats
-        extra_context['new_orders_count'] = new_orders_count
         
         return super().changelist_view(request, extra_context=extra_context)
 

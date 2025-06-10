@@ -107,31 +107,4 @@
 
     <!-- Standart Sifariş Siyahısı -->
     {{ block.super }}
-{% endblock %}
-
-{% block object-tools-items %}
-    {{ block.super }}
-    {% if new_orders_count > 0 %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Sifarişlər linkini tapırıq
-            var orderLinks = document.querySelectorAll('a[href*="sifaris"]');
-            orderLinks.forEach(function(link) {
-                // Linkin mətnini yeniləyirik və sayğac əlavə edirik
-                var originalText = link.textContent;
-                link.innerHTML = originalText + ' <span style="background-color: #ff4444; color: white; padding: 2px 6px; border-radius: 10px; font-size: 12px;">{{ new_orders_count }}</span>';
-                
-                // Linki yanıb-sönən edirik
-                link.style.animation = 'blink 1s infinite';
-            });
-        });
-    </script>
-    <style>
-        @keyframes blink {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-    </style>
-    {% endif %}
 {% endblock %} 

@@ -386,7 +386,7 @@ class SifarisAdmin(admin.ModelAdmin):
             Paragraph('№', headerStyle),
             Paragraph('Məhsul', headerStyle),
             Paragraph('Firma', headerStyle),
-            Paragraph('Brend Kod', headerStyle),
+            Paragraph('Kod', headerStyle),
             Paragraph('Vitrin', headerStyle),
             Paragraph('Qiymət', headerStyle),
             Paragraph('Miqdar', headerStyle),
@@ -508,8 +508,8 @@ class SifarisAdmin(admin.ModelAdmin):
         
         # İmzalar
         signature_data = [[
-            Paragraph("İmza: _________________", styles['Normal']),
-            Paragraph("Möhür: _________________", styles['Normal'])
+            Paragraph("Təhvil Verdi: _________________", styles['Normal']),
+            Paragraph(f"Təhvil Aldı: {sifaris.istifadeci.username} _________________", styles['Normal'])
         ]]
         signature_table = Table(signature_data, colWidths=[250, 250])
         signature_table.setStyle(TableStyle([

@@ -506,7 +506,7 @@ class SifarisAdmin(admin.ModelAdmin):
         elements.append(Paragraph(payment_text, styles['Normal']))
         elements.append(Spacer(1, 20))
         
-        # İmzalar
+        # İmzalarr
         signature_data = [[
             Paragraph("Təhvil Verdi: _________________", styles['Normal']),
             Paragraph(f"Təhvil Aldı: {sifaris.istifadeci.username} _________________", styles['Normal'])

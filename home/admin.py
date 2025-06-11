@@ -91,7 +91,7 @@ class MehsulAdmin(admin.ModelAdmin):
         # Cədvəl başlıqları
         headers = ['№', 'Kod', 'Firma', 'Məhsul', 'Vitrin', 'Stok',  'Qiymət']
         
-        # Məhsul məlumatları
+        # Məhsul məlumatları1
         data = [headers]
         for index, mehsul in enumerate(Mehsul.objects.all(), 1):
             row = [

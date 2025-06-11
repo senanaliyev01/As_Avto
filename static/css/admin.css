@@ -490,13 +490,13 @@ button:hover {
     margin-left: 10px;
     height: auto;
     line-height: normal;
+    list-style: none;
+}
+
+.object-tools a.pdf-export-btn::before {
+    display: none !important;
 }
 
 .object-tools a.pdf-export-btn:hover {
     background-color: #1e3c5a;
-}
-
-/* Remove bullet point from list item */
-.object-tools li {
-    list-style: none;
 }

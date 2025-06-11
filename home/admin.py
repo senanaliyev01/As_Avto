@@ -151,7 +151,7 @@ class MehsulAdmin(admin.ModelAdmin):
             ]
             data.append(row)
 
-        # Cədvəl stilləri
+        # Cədvəl stilləri1
         table = Table(data)
         table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2B5173')),

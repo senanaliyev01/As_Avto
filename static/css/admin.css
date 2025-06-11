@@ -450,3 +450,48 @@ button:hover {
 .import-btn i {
     margin-right: 5px;
 }
+
+/* PDF Export Button Styles */
+.pdf-export-btn {
+    display: inline-flex;
+    align-items: center;
+    background-color: #2B5173;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 1px solid #1e3c5a;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.pdf-export-btn:hover {
+    background-color: #1e3c5a;
+    color: white;
+    text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+}
+
+.pdf-export-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.pdf-export-btn i {
+    margin-right: 8px;
+    font-size: 14px;
+}
+
+/* PDF Export Button in Admin List */
+.object-tools a.pdf-export-btn {
+    margin-left: 10px;
+    height: auto;
+    line-height: normal;
+}
+
+.object-tools a.pdf-export-btn:hover {
+    background-color: #1e3c5a;
+}

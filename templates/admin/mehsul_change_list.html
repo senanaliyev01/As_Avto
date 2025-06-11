@@ -12,7 +12,8 @@
 {% block object-tools-items %}
     {{ block.super }}
     <li>
-        <a href="{% url 'admin:export_pdf' %}" class="btn" style="background-color: #2B5173; color: white; padding: 5px 10px; border-radius: 4px; text-decoration: none;">
+        <a href="{% url 'admin:export_pdf' %}" class="pdf-export-btn">
+            <i class="fas fa-file-pdf"></i>
             PDF-ə Çıxart
         </a>
     </li>

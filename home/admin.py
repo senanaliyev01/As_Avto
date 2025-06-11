@@ -216,16 +216,14 @@ class MehsulAdmin(admin.ModelAdmin):
                             temiz_ad = ' '.join(temiz_ad.split())
                             print(f"Təmizlənmiş ad: {temiz_ad}")
 
-                            # brend_kod-u təyin et (yalnız brend_kod sütunundan)
+                            # brend_kod-u təyin et
                             brend_kod = None
                             if 'brend_kod' in row and pd.notna(row['brend_kod']):
                                 value = row['brend_kod']
-                                # Əgər dəyər float və ya int-dirsə, onu stringə çevir
                                 if isinstance(value, float) and math.isnan(value):
                                     brend_kod = None
                                 else:
                                     brend_kod = str(value).strip()
-                                    # Bəzən 'nan' stringi ola bilər, onu da yoxla
                                     if brend_kod.lower() == 'nan' or brend_kod == '':
                                         brend_kod = None
 
@@ -243,15 +241,14 @@ class MehsulAdmin(admin.ModelAdmin):
                                 if existing_product:
                                     # Mövcud məhsulu yenilə
                                     existing_product.adi = temiz_ad
-                                    if kateqoriya:
-                                        existing_product.kateqoriya = kateqoriya
-                                    if firma:
-                                        existing_product.firma = firma
-                                    if avtomobil:
-                                        existing_product.avtomobil = avtomobil
-                                    if vitrin:
-                                        existing_product.vitrin = vitrin
                                     
+                                    # Excel-də olan məlumatları yenilə, olmayanları None et
+                                    existing_product.kateqoriya = kateqoriya
+                                    existing_product.firma = firma
+                                    existing_product.avtomobil = avtomobil
+                                    existing_product.vitrin = vitrin
+                                    
+                                    # Digər məlumatları yenilə
                                     existing_product.brend_kod = brend_kod
                                     existing_product.olcu = str(row['olcu']).strip() if 'olcu' in row and pd.notna(row['olcu']) else ''
                                     existing_product.maya_qiymet = float(row['maya_qiymet']) if 'maya_qiymet' in row and pd.notna(row['maya_qiymet']) else 0

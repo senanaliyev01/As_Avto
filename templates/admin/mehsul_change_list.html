@@ -10,6 +10,12 @@
 {% endblock %}
 
 {% block object-tools-items %}
+    <li>
+        <a href="{% url 'admin:export_pdf' %}" class="btn btn-high btn-success">PDF-ə çıxart</a>
+    </li>
+    <li>
+        <a href="{% url 'admin:import_excel' %}" class="btn btn-high btn-success">Excel idxal et</a>
+    </li>
     {{ block.super }}
 {% endblock %}
 

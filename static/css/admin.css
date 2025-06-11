@@ -495,3 +495,8 @@ button:hover {
 .object-tools a.pdf-export-btn:hover {
     background-color: #1e3c5a;
 }
+
+/* Remove bullet point from list item */
+.object-tools li {
+    list-style: none;
+}

@@ -456,7 +456,7 @@ button:hover {
     display: inline-flex;
     align-items: center;
     background-color: #2B5173;
-    color: #ffffff;
+    color: #ffffff !important;
     padding: 8px 15px;
     border-radius: 4px;
     text-decoration: none;
@@ -469,10 +469,11 @@ button:hover {
 }
 
 .pdf-export-btn:hover {
-    color: #ffffff;
+    color: #ffffff !important;
     text-decoration: none;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    background-color: #2B5173;
 }
 
 .pdf-export-btn:active {

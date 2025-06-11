@@ -84,7 +84,7 @@ class MehsulAdmin(admin.ModelAdmin):
         # Başlıq
         styles = getSampleStyleSheet()
         styles['Title'].fontName = 'NotoSans'
-        title = Paragraph("Məhsullar Siyahısı  AS-AVTO", styles['Title'])
+        title = Paragraph("Məhsullar Siyahısı  AS-AVTO +994 77 305 95 85", styles['Title'])
         elements.append(title)
         elements.append(Spacer(1, 20))
 

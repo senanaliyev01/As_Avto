@@ -1,5 +1,5 @@
 {% extends "admin/change_list.html" %}
-{% load i18n admin_list static %}
+{% load i18n admin_list static admin_urls %}
 
 {% block extrastyle %}
     {{ block.super }}
@@ -107,4 +107,52 @@
 
     <!-- Standart Sifariş Siyahısı -->
     {{ block.super }}
+{% endblock %}
+
+{% block object-tools-items %}
+    {{ block.super }}
+    {% if yeni_sifaris_sayi > 0 %}
+    <div class="alert alert-warning" style="margin: 10px 0;">
+        <strong>Yeni Sifarişlər!</strong> Son 24 saat ərzində {{ yeni_sifaris_sayi }} yeni sifariş var.
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Son Sifarişlər</h3>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>İstifadəçi</th>
+                        <th>Tarix</th>
+                        <th>Məbləğ</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sifaris in yeni_sifarisler %}
+                    <tr>
+                        <td>{{ sifaris.id }}</td>
+                        <td>{{ sifaris.istifadeci.username }}</td>
+                        <td>{{ sifaris.tarix|date:"d.m.Y H:i" }}</td>
+                        <td>{{ sifaris.umumi_mebleg }} ₼</td>
+                        <td>
+                            {% if sifaris.status == 'pending' %}
+                                <span class="badge badge-warning">Gözləyir</span>
+                            {% elif sifaris.status == 'processing' %}
+                                <span class="badge badge-info">İşlənir</span>
+                            {% elif sifaris.status == 'completed' %}
+                                <span class="badge badge-success">Tamamlandı</span>
+                            {% elif sifaris.status == 'cancelled' %}
+                                <span class="badge badge-danger">Ləğv edildi</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
 {% endblock %} 

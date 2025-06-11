@@ -202,7 +202,62 @@ JAZZMIN_SETTINGS = {
         "auth.group": "vertical_tabs",
     },
     
- 
+    # Bildirişlər
+    "topmenu_links": [
+        {"name": "Ana Səhifə", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Sifarişlər", "url": "admin:home_sifaris_changelist", "permissions": ["home.view_sifaris"]},
+    ],
+    
+    # Yeni sifariş bildirişləri
+    "notifications": {
+        "sifaris": {
+            "model": "home.Sifaris",
+            "icon": "fas fa-shopping-cart",
+            "badge": "danger",
+            "badge_text": "Yeni",
+            "badge_bg": "danger",
+            "badge_fg": "white",
+            "badge_style": "danger",
+            "badge_animation": "pulse",
+            "badge_position": "top-right",
+            "badge_radius": "50%",
+            "badge_padding": "5px",
+            "badge_font_size": "10px",
+            "badge_font_weight": "bold",
+            "badge_font_style": "normal",
+            "badge_text_transform": "uppercase",
+            "badge_text_align": "center",
+            "badge_text_decoration": "none",
+            "badge_text_shadow": "none",
+            "badge_box_shadow": "none",
+            "badge_border": "none",
+            "badge_border_radius": "50%",
+            "badge_border_style": "solid",
+            "badge_border_width": "0",
+            "badge_border_color": "transparent",
+            "badge_border_color_hover": "transparent",
+            "badge_bg_hover": "danger",
+            "badge_fg_hover": "white",
+            "badge_style_hover": "danger",
+            "badge_animation_hover": "pulse",
+            "badge_position_hover": "top-right",
+            "badge_radius_hover": "50%",
+            "badge_padding_hover": "5px",
+            "badge_font_size_hover": "10px",
+            "badge_font_weight_hover": "bold",
+            "badge_font_style_hover": "normal",
+            "badge_text_transform_hover": "uppercase",
+            "badge_text_align_hover": "center",
+            "badge_text_decoration_hover": "none",
+            "badge_text_shadow_hover": "none",
+            "badge_box_shadow_hover": "none",
+            "badge_border_hover": "none",
+            "badge_border_radius_hover": "50%",
+            "badge_border_style_hover": "solid",
+            "badge_border_width_hover": "0",
+            "badge_border_color_hover": "transparent",
+        }
+    },
     
     # İkonlar
     "icons": {

@@ -18,6 +18,7 @@ import pandas as pd
 from django.contrib import messages
 from django.db import transaction
 import math
+from datetime import timedelta
 
 @admin.register(Header_Message)
 class Header_MessageAdmin(admin.ModelAdmin):
@@ -289,6 +290,26 @@ class SifarisAdmin(admin.ModelAdmin):
     fields = ['istifadeci', 'tarix', 'status', 'catdirilma_usulu', 'umumi_mebleg', 'odenilen_mebleg', 'qaliq_borc', 'qeyd']
     inlines = [SifarisItemInline]
     change_list_template = 'admin/sifaris_change_list.html'
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # Son 24 saat ərzində yeni gələn sifarişləri qırmızı rəngdə göstər
+        yeni_sifarisler = qs.filter(tarix__gte=timezone.now() - timedelta(hours=24))
+        return qs
+
+    def changelist_view(self, request, extra_context=None):
+        # Yeni sifarişlərin sayını hesabla
+        yeni_sifaris_sayi = Sifaris.objects.filter(
+            tarix__gte=timezone.now() - timedelta(hours=24)
+        ).count()
+
+        extra_context = extra_context or {}
+        extra_context['yeni_sifaris_sayi'] = yeni_sifaris_sayi
+        extra_context['yeni_sifarisler'] = Sifaris.objects.filter(
+            tarix__gte=timezone.now() - timedelta(hours=24)
+        ).order_by('-tarix')[:5]  # Son 5 yeni sifarişi göstər
+
+        return super().changelist_view(request, extra_context=extra_context)
 
     def pdf_button(self, obj):
         return format_html(

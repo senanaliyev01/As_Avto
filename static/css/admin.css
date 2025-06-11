@@ -465,6 +465,7 @@ button:hover {
     transition: all 0.3s ease;
     border: 1px solid #1e3c5a;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-right: 10px;
 }
 
 .pdf-export-btn:hover {
@@ -483,6 +484,11 @@ button:hover {
 .pdf-export-btn i {
     margin-right: 8px;
     font-size: 14px;
+}
+
+.object-tools-items {
+    display: inline-block;
+    margin-right: 10px;
 }
 
 /* PDF Export Button in Admin List */

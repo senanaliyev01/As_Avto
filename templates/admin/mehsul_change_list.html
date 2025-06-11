@@ -9,14 +9,14 @@
     <script type="text/javascript" src="{% static 'js/admin.js' %}"></script>
 {% endblock %}
 
-{% block object-tools-items %}
-    {{ block.super }}
-    <li>
+{% block object-tools %}
+    <div class="object-tools-items">
         <a href="{% url 'admin:export_pdf' %}" class="pdf-export-btn">
             <i class="fas fa-file-pdf"></i>
             PDF-ə Çıxart
         </a>
-    </li>
+    </div>
+    {{ block.super }}
 {% endblock %}
 
 {% block content %}

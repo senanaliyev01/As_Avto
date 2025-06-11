@@ -84,12 +84,12 @@ class MehsulAdmin(admin.ModelAdmin):
         # Başlıq
         styles = getSampleStyleSheet()
         styles['Title'].fontName = 'NotoSans'
-        title = Paragraph("Məhsullar Siyahısı", styles['Title'])
+        title = Paragraph("Məhsullar Siyahısı  AS-AVTO", styles['Title'])
         elements.append(title)
         elements.append(Spacer(1, 20))
 
         # Cədvəl başlıqları
-        headers = ['№', 'Brend Kod', 'Firma', 'Ad', 'Ölçü', 'Vitrin', 'Stok', 'Maya Qiymət', 'Qiymət']
+        headers = ['№', 'Kod', 'Firma', 'Məhsul', 'Vitrin', 'Stok',  'Qiymət']
         
         # Məhsul məlumatları
         data = [headers]
@@ -99,10 +99,8 @@ class MehsulAdmin(admin.ModelAdmin):
                 mehsul.brend_kod,
                 mehsul.firma.adi if mehsul.firma else '-',
                 mehsul.adi,
-                mehsul.olcu,
                 str(mehsul.vitrin.nomre) if mehsul.vitrin else '-',
                 str(mehsul.stok),
-                f"{mehsul.maya_qiymet} ₼",
                 f"{mehsul.qiymet} ₼"
             ]
             data.append(row)

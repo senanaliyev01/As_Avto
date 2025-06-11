@@ -10,12 +10,12 @@
 {% endblock %}
 
 {% block object-tools-items %}
+    {{ block.super }}
     <li>
-        <a href="{{ export_all_pdf_url }}" class="btn" style="background-color: #417690; color: white; padding: 5px 10px; border-radius: 4px; text-decoration: none;">
-            Bütün Məhsulları PDF-ə Çıxart
+        <a href="{% url 'admin:export_pdf' %}" class="btn" style="background-color: #2B5173; color: white; padding: 5px 10px; border-radius: 4px; text-decoration: none;">
+            PDF-ə Çıxart
         </a>
     </li>
-    {{ block.super }}
 {% endblock %}
 
 {% block content %}

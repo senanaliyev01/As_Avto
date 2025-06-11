@@ -46,11 +46,105 @@ class AvtomobilAdmin(admin.ModelAdmin):
 
 @admin.register(Mehsul)
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ['brend_kod', 'firma', 'adi',  'olcu', 'vitrin', 'stok', 'maya_qiymet', 'qiymet',  'yenidir', 'pdf_button']
+    list_display = ['brend_kod', 'firma', 'adi',  'olcu', 'vitrin', 'stok', 'maya_qiymet', 'qiymet',  'yenidir']
     list_filter = ['kateqoriya', 'firma', 'avtomobil', 'vitrin', 'yenidir']
     search_fields = ['adi', 'brend_kod', 'oem', 'kodlar', 'olcu']
     change_list_template = 'admin/mehsul_change_list.html'
     actions = ['mark_as_new', 'remove_from_new']
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('import-excel/', self.import_excel_view, name='import_excel'),
+            path('export-pdf/', self.export_pdf, name='export_pdf'),
+        ]
+        return custom_urls + urls
+
+    def export_pdf(self, request):
+        from reportlab.lib.pagesizes import A4
+        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+        from reportlab.lib import colors
+        from reportlab.lib.styles import getSampleStyleSheet
+        from reportlab.pdfbase import pdfmetrics
+        from reportlab.pdfbase.ttfonts import TTFont
+        import io
+        from django.http import HttpResponse
+
+        # Font qeydiyyatı
+        pdfmetrics.registerFont(TTFont('NotoSans', 'static/fonts/NotoSans-Regular.ttf'))
+
+        # PDF yaratmaq
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="mehsullar.pdf"'
+
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=20, leftMargin=20, topMargin=20, bottomMargin=20)
+        elements = []
+
+        # Başlıq
+        styles = getSampleStyleSheet()
+        styles['Title'].fontName = 'NotoSans'
+        title = Paragraph("Məhsullar Siyahısı", styles['Title'])
+        elements.append(title)
+        elements.append(Spacer(1, 20))
+
+        # Cədvəl başlıqları
+        headers = ['№', 'Brend Kod', 'Firma', 'Ad', 'Ölçü', 'Vitrin', 'Stok', 'Maya Qiymət', 'Qiymət']
+        
+        # Məhsul məlumatları
+        data = [headers]
+        for index, mehsul in enumerate(Mehsul.objects.all(), 1):
+            row = [
+                str(index),
+                mehsul.brend_kod,
+                mehsul.firma.adi if mehsul.firma else '-',
+                mehsul.adi,
+                mehsul.olcu,
+                str(mehsul.vitrin.nomre) if mehsul.vitrin else '-',
+                str(mehsul.stok),
+                f"{mehsul.maya_qiymet} ₼",
+                f"{mehsul.qiymet} ₼"
+            ]
+            data.append(row)
+
+        # Cədvəl yaratmaq
+        table = Table(data)
+        table.setStyle(TableStyle([
+            # Başlıq sətri
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2B5173')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('FONTNAME', (0, 0), (-1, 0), 'NotoSans'),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('TOPPADDING', (0, 0), (-1, 0), 5),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 5),
+            
+            # Məhsul sətirləri
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+            ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+            ('FONTNAME', (0, 1), (-1, -1), 'NotoSans'),
+            ('FONTSIZE', (0, 1), (-1, -1), 9),
+            ('TOPPADDING', (0, 1), (-1, -1), 3),
+            ('BOTTOMPADDING', (0, 1), (-1, -1), 3),
+            
+            # Cədvəl xətləri
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+            ('LINEBELOW', (0, 0), (-1, 0), 1, colors.HexColor('#2B5173')),
+            
+            # Sütun enləri
+            ('COLWIDTHS', (0, 0), (-1, -1), '*'),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ]))
+        
+        elements.append(table)
+
+        # PDF-i yarat
+        doc.build(elements)
+        pdf = buffer.getvalue()
+        buffer.close()
+        response.write(pdf)
+
+        return response
 
     def mark_as_new(self, request, queryset):
         updated = queryset.update(yenidir=True)
@@ -61,24 +155,6 @@ class MehsulAdmin(admin.ModelAdmin):
         updated = queryset.update(yenidir=False)
         self.message_user(request, f'{updated} məhsul yenilikdən silindi.')
     remove_from_new.short_description = "Seçilmiş məhsulları yenilikdən sil"
-
-    def pdf_button(self, obj):
-        return format_html(
-            '<a class="button" href="export-pdf/{}" style="background-color: #417690; color: white; '
-            'padding: 5px 10px; border-radius: 4px; text-decoration: none;">PDF</a>',
-            obj.id
-        )
-    pdf_button.short_description = 'PDF'
-    pdf_button.allow_tags = True
-
-    def get_urls(self):
-        urls = super().get_urls()
-        custom_urls = [
-            path('import-excel/', self.import_excel_view, name='import_excel'),
-            path('export-pdf/<int:mehsul_id>/', self.export_pdf, name='export-pdf'),
-            path('export-all-pdf/', self.export_all_pdf, name='export-all-pdf'),
-        ]
-        return custom_urls + urls
 
     def import_excel_view(self, request):
         if request.method == 'POST':
@@ -248,169 +324,27 @@ class MehsulAdmin(admin.ModelAdmin):
         }
         return render(request, 'admin/import_excel.html', context)
 
-    def export_pdf(self, request, mehsul_id):
-        mehsul = Mehsul.objects.get(id=mehsul_id)
-        
-        # PDF yaratmaq
-        response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="mehsul_{mehsul_id}.pdf"'
-
-        buffer = io.BytesIO()
-        doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=20, leftMargin=20, topMargin=0, bottomMargin=20)
-        elements = []
-
-        # Universal font qeydiyyatı
-        pdfmetrics.registerFont(TTFont('NotoSans', 'static/fonts/NotoSans-Regular.ttf'))
-
-        # Logo əlavə et
-        logo_path = 'static/images/Header_Logo.png'
-        try:
-            logo = Image(logo_path, width=200, height=200)
-            logo_table = Table([[logo]], colWidths=[doc.width])
-            logo_table.setStyle(TableStyle([
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                ('TOPPADDING', (0, 0), (-1, -1), 0),
-                ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
-                ('LEFTPADDING', (0, 0), (-1, -1), 0),
-                ('RIGHTPADDING', (0, 0), (-1, -1), 0),
-                ('SPAN', (0, 0), (-1, -1)),
-            ]))
-            elements.append(logo_table)
-        except Exception as e:
-            print(f"Logo əlavə edilərkən xəta: {e}")
-
-        # Stillər
-        styles = getSampleStyleSheet()
-        styles['Title'].fontName = 'NotoSans'
-        styles['Normal'].fontName = 'NotoSans'
-        styles['Normal'].spaceBefore = 0
-        styles['Normal'].spaceAfter = 0
-
-        # Məhsul məlumatları
-        elements.append(Paragraph(f"Məhsul: {mehsul.adi}", styles['Normal']))
-        elements.append(Paragraph(f"Brend Kodu: {mehsul.brend_kod}", styles['Normal']))
-        elements.append(Paragraph(f"Firma: {mehsul.firma.adi}", styles['Normal']))
-        elements.append(Paragraph(f"Kateqoriya: {mehsul.kateqoriya.adi}", styles['Normal']))
-        elements.append(Paragraph(f"Avtomobil: {mehsul.avtomobil.adi if mehsul.avtomobil else '-'}", styles['Normal']))
-        elements.append(Paragraph(f"Ölçü: {mehsul.olcu}", styles['Normal']))
-        elements.append(Paragraph(f"Vitrin: {mehsul.vitrin.nomre if mehsul.vitrin else '-'}", styles['Normal']))
-        elements.append(Paragraph(f"Stok: {mehsul.stok}", styles['Normal']))
-        elements.append(Paragraph(f"Maya Qiyməti: {mehsul.maya_qiymet} ₼", styles['Normal']))
-        elements.append(Paragraph(f"Qiymət: {mehsul.qiymet} ₼", styles['Normal']))
-        elements.append(Paragraph(f"Kodlar: {mehsul.kodlar}", styles['Normal']))
-        elements.append(Paragraph(f"Məlumat: {mehsul.melumat}", styles['Normal']))
-
-        # PDF-i yarat
-        doc.build(elements)
-        pdf = buffer.getvalue()
-        buffer.close()
-        response.write(pdf)
-
-        return response
-
-    def export_all_pdf(self, request):
-        mehsullar = Mehsul.objects.all()
-        
-        # PDF yaratmaq
-        response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="butun_mehsullar.pdf"'
-
-        buffer = io.BytesIO()
-        doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=20, leftMargin=20, topMargin=0, bottomMargin=20)
-        elements = []
-
-        # Universal font qeydiyyatı
-        pdfmetrics.registerFont(TTFont('NotoSans', 'static/fonts/NotoSans-Regular.ttf'))
-
-        # Logo əlavə et
-        logo_path = 'static/images/Header_Logo.png'
-        try:
-            logo = Image(logo_path, width=200, height=200)
-            logo_table = Table([[logo]], colWidths=[doc.width])
-            logo_table.setStyle(TableStyle([
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                ('TOPPADDING', (0, 0), (-1, -1), 0),
-                ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
-                ('LEFTPADDING', (0, 0), (-1, -1), 0),
-                ('RIGHTPADDING', (0, 0), (-1, -1), 0),
-                ('SPAN', (0, 0), (-1, -1)),
-            ]))
-            elements.append(logo_table)
-        except Exception as e:
-            print(f"Logo əlavə edilərkən xəta: {e}")
-
-        # Stillər
-        styles = getSampleStyleSheet()
-        styles['Title'].fontName = 'NotoSans'
-        styles['Normal'].fontName = 'NotoSans'
-        styles['Normal'].spaceBefore = 0
-        styles['Normal'].spaceAfter = 0
-
-        # Başlıq
-        elements.append(Paragraph("Bütün Məhsullar", styles['Title']))
-        elements.append(Spacer(1, 20))
-
-        # Məhsullar cədvəli
-        headers = ['№', 'Məhsul', 'Brend Kodu', 'Firma', 'Kateqoriya', 'Ölçü', 'Stok', 'Qiymət']
-        data = [headers]
-
-        for index, mehsul in enumerate(mehsullar, 1):
-            row = [
-                str(index),
-                mehsul.adi,
-                mehsul.brend_kod,
-                mehsul.firma.adi,
-                mehsul.kateqoriya.adi,
-                mehsul.olcu,
-                str(mehsul.stok),
-                f"{mehsul.qiymet} ₼"
-            ]
-            data.append(row)
-
-        # Cədvəl stilləri
-        table = Table(data)
-        table.setStyle(TableStyle([
-            # Başlıq sətri
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2B5173')),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('FONTNAME', (0, 0), (-1, 0), 'NotoSans'),
-            ('FONTSIZE', (0, 0), (-1, 0), 9),
-            ('TOPPADDING', (0, 0), (-1, 0), 5),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 5),
-            
-            # Məhsul sətirləri
-            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-            ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
-            ('FONTNAME', (0, 1), (-1, -1), 'NotoSans'),
-            ('FONTSIZE', (0, 1), (-1, -1), 8),
-            ('TOPPADDING', (0, 1), (-1, -1), 3),
-            ('BOTTOMPADDING', (0, 1), (-1, -1), 3),
-            
-            # Cədvəl xətləri
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-            ('LINEBELOW', (0, 0), (-1, 0), 1, colors.HexColor('#2B5173')),
-            
-            # Sütun enləri
-            ('COLWIDTHS', (0, 0), (-1, -1), '*'),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ]))
-        
-        elements.append(table)
-
-        # PDF-i yarat
-        doc.build(elements)
-        pdf = buffer.getvalue()
-        buffer.close()
-        response.write(pdf)
-
-        return response
-
     def changelist_view(self, request, extra_context=None):
+        # Statistikanı hesablayırıq
+        from django.db.models import Sum, F, ExpressionWrapper, DecimalField
+        
+        total_stats = Mehsul.objects.aggregate(
+            toplam_maya = Sum(ExpressionWrapper(
+                F('stok') * F('maya_qiymet'),
+                output_field=DecimalField()
+            )),
+            toplam_satis = Sum(ExpressionWrapper(
+                F('stok') * F('qiymet'),
+                output_field=DecimalField()
+            ))
+        )
+        
+        # Ümumi xeyiri hesablayırıq
+        total_stats['toplam_xeyir'] = (total_stats['toplam_satis'] or 0) - (total_stats['toplam_maya'] or 0)
+
         extra_context = extra_context or {}
-        extra_context['export_all_pdf_url'] = 'export-all-pdf/'
+        extra_context['total_stats'] = total_stats
+        
         return super().changelist_view(request, extra_context=extra_context)
 
 class SifarisItemInline(admin.TabularInline):

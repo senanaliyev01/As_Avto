@@ -84,7 +84,7 @@ class MehsulAdmin(admin.ModelAdmin):
         # Başlıq
         styles = getSampleStyleSheet()
         styles['Title'].fontName = 'NotoSans'
-        title = Paragraph("AS-AVTO +994 77 305 95 85", styles['Title'])
+        title = Paragraph("QORXMAZ AVTO +994 55 236 90 09", styles['Title'])
         elements.append(title)
         elements.append(Spacer(1, 20))
 
@@ -404,52 +404,65 @@ class SifarisAdmin(admin.ModelAdmin):
         # Universal font qeydiyyatı
         pdfmetrics.registerFont(TTFont('NotoSans', 'static/fonts/NotoSans-Regular.ttf'))
 
-        # Logo əlavə et
+        # Logo və sifariş məlumatları üçün cədvəl yaradırıq
         logo_path = 'static/images/Header_Logo.png'
         try:
-            logo = Image(logo_path, width=200, height=200)
-            # Logo-nu mərkəzə düzləndirmək üçün cədvəl istifadə edirik
-            logo_table = Table([[logo]], colWidths=[doc.width])
-            logo_table.setStyle(TableStyle([
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            logo = Image(logo_path, width=150, height=100)
+            
+            # Sifariş məlumatlarını hazırlayırıq
+            styles = getSampleStyleSheet()
+            styles['Title'].fontName = 'NotoSans'
+            styles['Normal'].fontName = 'NotoSans'
+            styles['Normal'].spaceBefore = 0
+            styles['Normal'].spaceAfter = 0
+            
+            # Tarixi Azərbaycan formatında göstəririk
+            az_months = {
+                1: 'Yanvar', 2: 'Fevral', 3: 'Mart', 4: 'Aprel',
+                5: 'May', 6: 'İyun', 7: 'İyul', 8: 'Avqust',
+                9: 'Sentyabr', 10: 'Oktyabr', 11: 'Noyabr', 12: 'Dekabr'
+            }
+            
+            local_time = timezone.localtime(sifaris.tarix)
+            az_date = f"{local_time.day} {az_months[local_time.month]} {local_time.year}, {local_time.strftime('%H:%M')}"
+            
+            # Sifariş məlumatlarını sağ tərəfə yerləşdiririk
+            order_info_table = Table([
+                [Paragraph(f"Müştəri: {sifaris.istifadeci.username}", styles['Normal'])],
+                [Paragraph(f"Tarix: {az_date}", styles['Normal'])],
+                [Paragraph(f"Çatdırılma: {sifaris.get_catdirilma_usulu_display()}", styles['Normal'])],
+                [Paragraph(f"Sifariş №{sifaris_id}", styles['Normal'])]
+            ], colWidths=[200])  # Sabit genişlik təyin edirik
+            
+            order_info_table.setStyle(TableStyle([
+                ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('TOPPADDING', (0, 0), (-1, -1), 2),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+                ('LEFTPADDING', (0, 0), (-1, -1), 0),
+                ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+            ]))
+            
+            # İki sütunlu cədvəl yaradırıq
+            header_table = Table([
+                [logo, order_info_table]
+            ], colWidths=[doc.width-220, 220])  # Sağ tərəfə daha çox yer ayırırıq
+            
+            header_table.setStyle(TableStyle([
+                ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+                ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
                 ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
                 ('TOPPADDING', (0, 0), (-1, -1), 0),
                 ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
                 ('LEFTPADDING', (0, 0), (-1, -1), 0),
                 ('RIGHTPADDING', (0, 0), (-1, -1), 0),
-                ('SPAN', (0, 0), (-1, -1)),
             ]))
-            elements.append(logo_table)
+            
+            elements.append(header_table)
+            elements.append(Spacer(1, 20))
+            
         except Exception as e:
             print(f"Logo əlavə edilərkən xəta: {e}")
-
-        # Stillər
-        styles = getSampleStyleSheet()
-        styles['Title'].fontName = 'NotoSans'
-        styles['Normal'].fontName = 'NotoSans'
-        styles['Normal'].spaceBefore = 0
-        styles['Normal'].spaceAfter = 0
-        
-        
-
-        # Sifariş məlumatları - Tarixi Azərbaycan formatında göstəririk
-        elements.append(Paragraph(f"Müştəri: {sifaris.istifadeci.username}", styles['Normal']))
-        
-        # Tarixi Azərbaycan formatında göstəririk
-        az_months = {
-            1: 'Yanvar', 2: 'Fevral', 3: 'Mart', 4: 'Aprel',
-            5: 'May', 6: 'İyun', 7: 'İyul', 8: 'Avqust',
-            9: 'Sentyabr', 10: 'Oktyabr', 11: 'Noyabr', 12: 'Dekabr'
-        }
-        
-        # Tarixi lokal vaxta çeviririk
-        local_time = timezone.localtime(sifaris.tarix)
-        az_date = f"{local_time.day} {az_months[local_time.month]} {local_time.year}, {local_time.strftime('%H:%M')}"
-        elements.append(Paragraph(f"Tarix: {az_date}", styles['Normal']))
-        
-        elements.append(Paragraph(f"Çatdırılma: {sifaris.get_catdirilma_usulu_display()}", styles['Normal']))
-        elements.append(Paragraph(f"Sifariş №{sifaris_id}", styles['Normal']))
-        elements.append(Spacer(1, 20))
 
         # Məhsullar cədvəli - başlıqları mərkəzləşdirmək üçün Paragraph istifadə edirik
         headerStyle = ParagraphStyle(

@@ -483,8 +483,8 @@ class SifarisAdmin(admin.ModelAdmin):
             Paragraph('Firma', headerStyle),
             Paragraph('Kod', headerStyle),
             Paragraph('Vitrin', headerStyle),
-            Paragraph('Qiymət', headerStyle),
             Paragraph('Miqdar', headerStyle),
+            Paragraph('Qiymət', headerStyle),
             Paragraph('Cəmi', headerStyle)
         ]
 
@@ -511,8 +511,8 @@ class SifarisAdmin(admin.ModelAdmin):
                 Paragraph(item.mehsul.firma.adi, contentStyle),
                 Paragraph(item.mehsul.brend_kod, contentStyle),
                 Paragraph(str(item.mehsul.vitrin.nomre) if item.mehsul.vitrin else '-', contentStyle),
-                Paragraph(f"{item.qiymet} ₼", contentStyle),
                 Paragraph(str(item.miqdar), contentStyle),
+                Paragraph(f"{item.qiymet} ₼", contentStyle),
                 Paragraph(f"{item.umumi_mebleg} ₼", contentStyle)
             ]
             data.append(row)

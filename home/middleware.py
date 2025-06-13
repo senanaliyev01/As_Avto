@@ -2,15 +2,15 @@ from .models import Sifaris, Kateqoriya, Firma, Avtomobil, Header_Message
 from django.http import Http404
 from django.conf import settings
 from .views import custom_404
+from django.shortcuts import render
 
 class GlobalDataMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        # Header mesajını əldə et
-        header_message = Header_Message.objects.first()
-        request.header_message = header_message
+        # Bütün aktiv mesajları əldə et
+        request.header_messages = Header_Message.objects.filter(aktiv=True).order_by('id')
 
         if request.user.is_authenticated:
             # Ümumi borcu əldə edirik

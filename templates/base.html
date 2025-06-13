@@ -121,10 +121,12 @@
             </div>
         </div>
 
-        {% if request.header_message %}
+        {% if request.header_messages %}
         <div class="header-message">
             <div class="header-message-content">
-                <p>{{ request.header_message.mesaj }}</p>
+                {% for message in request.header_messages %}
+                    <p class="message-slide" {% if not forloop.first %}style="display: none;"{% endif %}>{{ message.mesaj }}</p>
+                {% endfor %}
             </div>
         </div>
         {% endif %}

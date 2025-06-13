@@ -31,6 +31,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize Logo Slider
     initializeLogoSlider();
+
+    // Initialize Header Messages
+    initializeHeaderMessages();
 });
 
 function initializeSearch() {
@@ -895,5 +898,36 @@ function initializeLogoSlider() {
             }
         }
     });
+}
+
+function initializeHeaderMessages() {
+    const messages = document.querySelectorAll('.message-slide');
+    if (messages.length <= 1) return;
+
+    let currentIndex = 0;
+    const interval = 3000; // 3 saniyə
+
+    function showMessage(index) {
+        messages.forEach(msg => {
+            msg.classList.remove('active');
+            msg.style.display = 'none';
+        });
+        
+        messages[index].style.display = 'block';
+        // Force reflow
+        messages[index].offsetHeight;
+        messages[index].classList.add('active');
+    }
+
+    function nextMessage() {
+        currentIndex = (currentIndex + 1) % messages.length;
+        showMessage(currentIndex);
+    }
+
+    // İlk mesajı göstər
+    showMessage(0);
+
+    // Hər 3 saniyədən bir növbəti mesaja keç
+    setInterval(nextMessage, interval);
 }
 

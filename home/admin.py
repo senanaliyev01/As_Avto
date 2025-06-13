@@ -262,10 +262,10 @@ class MehsulAdmin(admin.ModelAdmin):
                                     existing_product.adi = temiz_ad
                                     
                                     # Excel-də olan məlumatları yenilə, olmayanları None et
-                                    existing_product.kateqoriya = kateqoriya
-                                    existing_product.firma = firma
-                                    existing_product.avtomobil = avtomobil
-                                    existing_product.vitrin = vitrin
+                                        existing_product.kateqoriya = kateqoriya
+                                        existing_product.firma = firma
+                                        existing_product.avtomobil = avtomobil
+                                        existing_product.vitrin = vitrin
                                     
                                     # Digər məlumatları yenilə
                                     existing_product.brend_kod = brend_kod
@@ -431,21 +431,21 @@ class SifarisAdmin(admin.ModelAdmin):
             logo = Image(logo_path, width=150, height=100)
             
             # Sifariş məlumatlarını hazırlayırıq
-            styles = getSampleStyleSheet()
-            styles['Title'].fontName = 'NotoSans'
-            styles['Normal'].fontName = 'NotoSans'
-            styles['Normal'].spaceBefore = 0
-            styles['Normal'].spaceAfter = 0
-            
-            # Tarixi Azərbaycan formatında göstəririk
-            az_months = {
-                1: 'Yanvar', 2: 'Fevral', 3: 'Mart', 4: 'Aprel',
-                5: 'May', 6: 'İyun', 7: 'İyul', 8: 'Avqust',
-                9: 'Sentyabr', 10: 'Oktyabr', 11: 'Noyabr', 12: 'Dekabr'
-            }
-            
-            local_time = timezone.localtime(sifaris.tarix)
-            az_date = f"{local_time.day} {az_months[local_time.month]} {local_time.year}, {local_time.strftime('%H:%M')}"
+        styles = getSampleStyleSheet()
+        styles['Title'].fontName = 'NotoSans'
+        styles['Normal'].fontName = 'NotoSans'
+        styles['Normal'].spaceBefore = 0
+        styles['Normal'].spaceAfter = 0
+        
+        # Tarixi Azərbaycan formatında göstəririk
+        az_months = {
+            1: 'Yanvar', 2: 'Fevral', 3: 'Mart', 4: 'Aprel',
+            5: 'May', 6: 'İyun', 7: 'İyul', 8: 'Avqust',
+            9: 'Sentyabr', 10: 'Oktyabr', 11: 'Noyabr', 12: 'Dekabr'
+        }
+        
+        local_time = timezone.localtime(sifaris.tarix)
+        az_date = f"{local_time.day} {az_months[local_time.month]} {local_time.year}, {local_time.strftime('%H:%M')}"
             
             # Sifariş məlumatlarını sağ tərəfə yerləşdiririk
             order_info_table = Table([
@@ -480,7 +480,7 @@ class SifarisAdmin(admin.ModelAdmin):
             ]))
             
             elements.append(header_table)
-            elements.append(Spacer(1, 20))
+        elements.append(Spacer(1, 20))
             
         except Exception as e:
             print(f"Logo əlavə edilərkən xəta: {e}")

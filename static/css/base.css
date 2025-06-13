@@ -2600,16 +2600,28 @@ body {
 .header-message-content {
     padding: 15px 25px;
     text-align: left;
+    position: relative;
+    min-height: 30px;
 }
 
-.header-message-content p {
+.message-slide {
     color: red;
     font-size: 1.1rem;
     font-weight: 500;
     margin: 0;
-    line-height: 0.5;
+    line-height: 1.2;
     white-space: normal;
     word-wrap: break-word;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    padding: 0 25px;
+}
+
+.message-slide.active {
+    opacity: 1;
 }
 
 @media (max-width: 768px) {
@@ -2619,16 +2631,14 @@ body {
         min-width: auto;
     }
     
-    .search-section {
-        width: 95%;
-    }
-    
     .header-message-content {
         padding: 12px 20px;
+        min-height: 25px;
     }
     
-    .header-message-content p {
+    .message-slide {
         font-size: 1rem;
+        padding: 0 20px;
     }
 }
 

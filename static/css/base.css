@@ -2586,40 +2586,40 @@ body {
 }
 
 .header-message {
-    background-color: #fff;
-    border: 1px solid var(--border-color);
-    border-radius: 0 0 15px 15px;
-    margin: 4px auto 30px auto;
-    width: fit-content;
-    min-width: 300px;
-    max-width: 1200px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    margin: 10px auto;
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    min-height: 40px;
+    display: flex;
+    align-items: center;
 }
 
 .header-message-content {
-    padding: 15px 25px;
+    padding: 5px 25px;
     text-align: center;
     position: relative;
+    width: 100%;
     min-height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .message-slide {
-    color: red;
-    font-size: 1.1rem;
-    font-weight: 500;
-    margin: 0;
-    line-height: 1.2;
-    white-space: normal;
-    word-wrap: break-word;
+    color: #333;
+    font-size: 14px;
     opacity: 0;
     visibility: hidden;
+    transition: opacity 1s ease, visibility 1s ease, transform 1s ease;
     transform: translateY(20px);
-    transition: opacity 1s ease-in-out, visibility 1s ease-in-out, transform 1s ease-in-out;
     position: absolute;
     width: 100%;
-    left: 0;
-    padding: 0 25px;
+    padding: 0 15px;
+    margin: 0;
+    line-height: 1.5;
 }
 
 .message-slide.active {
@@ -2630,19 +2630,18 @@ body {
 
 @media (max-width: 768px) {
     .header-message {
-        margin: -1px auto 20px auto;
-        width: 95%;
-        min-width: auto;
+        margin: 5px auto;
+        min-height: 35px;
     }
     
     .header-message-content {
-        padding: 12px 20px;
+        padding: 5px 15px;
         min-height: 25px;
     }
     
     .message-slide {
-        font-size: 1rem;
-        padding: 0 20px;
+        font-size: 12px;
+        padding: 0 10px;
     }
 }
 

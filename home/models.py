@@ -11,6 +11,7 @@ from django.dispatch import receiver
 
 class Header_Message(models.Model):
     mesaj = models.CharField(max_length=100)
+    aktiv = models.BooleanField(default=True, verbose_name='Aktivdir')
 
     def __str__(self):
         return f"{self.mesaj}"

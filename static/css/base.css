@@ -2586,62 +2586,49 @@ body {
 }
 
 .header-message {
-    background-color: #f8f9fa;
-    border: 1px solid #e9ecef;
-    border-radius: 4px;
-    margin: 10px auto;
-    width: 100%;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    min-height: 40px;
-    display: flex;
-    align-items: center;
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 0 0 15px 15px;
+    margin: 4px auto 30px auto;
+    width: fit-content;
+    min-width: 300px;
+    max-width: 1200px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
 
 .header-message-content {
     padding: 5px 25px;
     text-align: center;
     position: relative;
-    width: 100%;
-    min-height: 30px;
+    min-height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .message-slide {
-    color: #333;
-    font-size: 14px;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 1s ease, visibility 1s ease, transform 1s ease;
-    transform: translateY(20px);
-    position: absolute;
-    width: 100%;
-    padding: 0 15px;
+    color: #fff;
+    font-size: 16px;
     margin: 0;
-    line-height: 1.5;
+    opacity: 0;
+    transition: opacity 1s ease;
+    width: 100%;
+    line-height: 1.4;
 }
 
 .message-slide.active {
     opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
 }
 
 @media (max-width: 768px) {
-    .header-message {
-        margin: 5px auto;
+    .header-message-content {
+        padding: 5px 15px;
         min-height: 35px;
     }
     
-    .header-message-content {
-        padding: 5px 15px;
-        min-height: 25px;
-    }
-    
     .message-slide {
-        font-size: 12px;
-        padding: 0 10px;
+        font-size: 14px;
     }
 }
 

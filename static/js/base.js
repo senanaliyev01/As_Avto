@@ -915,7 +915,7 @@ function initializeHeaderMessages() {
         
         messages[index].style.display = 'block';
         // Force reflow
-        messages[index].offsetHeight;
+        void messages[index].offsetHeight;
         messages[index].classList.add('active');
     }
 

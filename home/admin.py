@@ -173,6 +173,25 @@ class MehsulAdmin(admin.ModelAdmin):
                 new_count = 0
                 update_count = 0
                 error_count = 0
+                delete_count = 0
+                
+                # Excel-dəki bütün brend_kod-ları toplayırıq
+                excel_brend_kods = set()
+                for index, row in df.iterrows():
+                    if 'brend_kod' in row and pd.notna(row['brend_kod']):
+                        value = row['brend_kod']
+                        if not (isinstance(value, float) and math.isnan(value)):
+                            brend_kod = str(value).strip()
+                            if brend_kod.lower() != 'nan' and brend_kod != '':
+                                excel_brend_kods.add(brend_kod)
+                
+                # Excel-də olmayan məhsulları silirik
+                existing_products = Mehsul.objects.all()
+                for product in existing_products:
+                    if product.brend_kod not in excel_brend_kods:
+                        product.delete()
+                        delete_count += 1
+                        print(f"Məhsul silindi: {product.brend_kod}")
                 
                 with transaction.atomic():
                     for index, row in df.iterrows():
@@ -301,6 +320,8 @@ class MehsulAdmin(admin.ModelAdmin):
                         success_message += f"{new_count} yeni məhsul əlavə edildi. "
                     if update_count > 0:
                         success_message += f"{update_count} məhsul yeniləndi. "
+                    if delete_count > 0:
+                        success_message += f"{delete_count} məhsul silindi. "
                     if error_count > 0:
                         success_message += f"{error_count} xəta baş verdi."
                     

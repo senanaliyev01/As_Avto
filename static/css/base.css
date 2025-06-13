@@ -2599,7 +2599,7 @@ body {
 
 .header-message-content {
     padding: 15px 25px;
-    text-align: left;
+    text-align: center;
     position: relative;
     min-height: 30px;
 }
@@ -2614,7 +2614,8 @@ body {
     word-wrap: break-word;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+    transform: translateY(20px);
+    transition: opacity 1s ease-in-out, visibility 1s ease-in-out, transform 1s ease-in-out;
     position: absolute;
     width: 100%;
     left: 0;
@@ -2624,6 +2625,7 @@ body {
 .message-slide.active {
     opacity: 1;
     visibility: visible;
+    transform: translateY(0);
 }
 
 @media (max-width: 768px) {

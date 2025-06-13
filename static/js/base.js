@@ -905,7 +905,8 @@ function initializeHeaderMessages() {
     if (messages.length <= 1) return;
 
     let currentIndex = 0;
-    const interval = 3000; // 3 saniyə
+    const interval = 5000; // 5 saniyə
+    const transitionDelay = 1000; // 1 saniyə keçid vaxtı
 
     function showMessage(index) {
         messages.forEach(msg => {
@@ -927,7 +928,7 @@ function initializeHeaderMessages() {
     // İlk mesajı göstər
     showMessage(0);
 
-    // Hər 3 saniyədən bir növbəti mesaja keç
+    // Hər 5 saniyədən bir növbəti mesaja keç
     setInterval(nextMessage, interval);
 }
 

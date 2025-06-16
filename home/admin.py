@@ -46,11 +46,17 @@ class AvtomobilAdmin(admin.ModelAdmin):
 
 @admin.register(Mehsul)
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ['brend_kod', 'firma', 'adi',  'olcu', 'vitrin', 'stok', 'maya_qiymet', 'qiymet',  'yenidir']
+    list_display = ['brend_kod', 'firma', 'adi',  'olcu', 'vitrin', 'stok', 'maya_qiymet', 'qiymet',  'yenidir', 'sekil_preview']
     list_filter = ['kateqoriya', 'firma', 'avtomobil', 'vitrin', 'yenidir']
     search_fields = ['adi', 'brend_kod', 'oem', 'kodlar', 'olcu']
     change_list_template = 'admin/mehsul_change_list.html'
     actions = ['mark_as_new', 'remove_from_new']
+
+    def sekil_preview(self, obj):
+        if obj.sekil:
+            return format_html('<img src="{}" style="max-height: 50px;"/>', obj.sekil.url)
+        return '-'
+    sekil_preview.short_description = 'Şəkil'
 
     def get_urls(self):
         urls = super().get_urls()

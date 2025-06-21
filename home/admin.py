@@ -485,9 +485,9 @@ class SifarisAdmin(admin.ModelAdmin):
 
         headers = [
             Paragraph('№', headerStyle),
-            Paragraph('Məhsul', headerStyle),
-            Paragraph('Firma', headerStyle),
             Paragraph('Kod', headerStyle),
+            Paragraph('Firma', headerStyle),
+            Paragraph('Məhsul', headerStyle),
             Paragraph('Vitrin', headerStyle),
             Paragraph('Miqdar', headerStyle),
             Paragraph('Qiymət', headerStyle),
@@ -513,9 +513,9 @@ class SifarisAdmin(admin.ModelAdmin):
         for index, item in enumerate(sifaris_items, 1):
             row = [
                 Paragraph(str(index), contentStyle),
-                Paragraph(item.mehsul.adi, contentStyle),
-                Paragraph(item.mehsul.firma.adi, contentStyle),
                 Paragraph(item.mehsul.brend_kod, contentStyle),
+                Paragraph(item.mehsul.firma.adi, contentStyle),
+                Paragraph(item.mehsul.adi, contentStyle),
                 Paragraph(str(item.mehsul.vitrin.nomre) if item.mehsul.vitrin else '-', contentStyle),
                 Paragraph(str(item.miqdar), contentStyle),
                 Paragraph(f"{item.qiymet} ₼", contentStyle),

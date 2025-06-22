@@ -25,7 +25,6 @@
                                 <th>Satıcı</th>
                                 <th style="width: 100px;">Miqdar</th>
                                 <th style="width: 120px;">Qiymət</th>
-                                <th style="width: 140px;">Status</th>
                                 <th style="width: 120px;">Cəm</th>
                             </tr>
                         </thead>
@@ -46,7 +45,6 @@
                                                 {{ form.id }}
                                                 <td>{{ form.miqdar }}</td>
                                                 <td>{{ form.qiymet }}</td>
-                                                <td>{% if item.mehsul.sahib == request.user %}{{ form.status }}{% else %}{{ item.get_status_display }}{% endif %}</td>
                                             {% endif %}
                                         {% endfor %}
                                     {% endwith %}
@@ -54,7 +52,6 @@
                                     {% if item.mehsul.sahib != request.user %}
                                         <td>{{ item.miqdar }}</td>
                                         <td>{{ item.qiymet|floatformat:2 }} ₼</td>
-                                        <td>{{ item.get_status_display }}</td>
                                     {% endif %}
                                     
                                     <td class="row-total">{{ item.umumi_mebleg|floatformat:2 }} ₼</td>

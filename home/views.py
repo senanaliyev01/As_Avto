@@ -14,11 +14,11 @@ from operator import and_, or_
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.views.decorators.http import require_http_methods
-from .forms import MehsulForm, SifarisEditForm, SifarisItemForm
+from .forms import MehsulForm, SifarisEditForm, SifarisItemEditForm
 import pandas as pd
 from django.db import transaction
 import math
-from django.forms import inlineformset_factory, BaseInlineFormSet
+from django.forms import inlineformset_factory
 
 def normalize_azerbaijani_chars(text):
     # Azərbaycan hərflərinin qarşılıqlı çevrilməsi
@@ -370,21 +370,24 @@ def checkout(request):
             return redirect('cart')
 
         cart = request.session['cart']
-        total = Decimal('0.00')
-        order_items = []
         remaining_cart = {}  # Seçilməmiş məhsullar üçün
+        order_items_by_seller = {}
+        errors = []
 
-        # Məhsulları və ümumi məbləği hesablayırıq
+        # Məhsulları satıcıya görə qruplaşdırırıq
         for product_id, quantity in cart.items():
             if product_id in selected_items:
                 product = get_object_or_404(Mehsul, id=product_id)
                 if product.stok < quantity:
-                    messages.error(request, f'{product.adi} məhsulundan kifayət qədər stok yoxdur.')
-                    return redirect('cart')
-                
-                subtotal = product.qiymet * Decimal(str(quantity))
-                total += subtotal
-                order_items.append({
+                    errors.append(f'{product.adi} məhsulundan kifayət qədər stok yoxdur.')
+                    continue
+                seller_id = product.sahib.id if product.sahib else 'asavto'
+                if seller_id not in order_items_by_seller:
+                    order_items_by_seller[seller_id] = {
+                        'seller': product.sahib,
+                        'items': []
+                    }
+                order_items_by_seller[seller_id]['items'].append({
                     'product': product,
                     'quantity': quantity,
                     'price': product.qiymet
@@ -393,32 +396,44 @@ def checkout(request):
                 # Seçilməmiş məhsulları yeni səbətə əlavə et
                 remaining_cart[product_id] = quantity
 
-        try:
-            # Sifariş yaradırıq
-            order = Sifaris.objects.create(
-                istifadeci=request.user,
-                umumi_mebleg=total,
-                catdirilma_usulu=catdirilma_usulu
-            )
+        if errors:
+            for err in errors:
+                messages.error(request, err)
+            return redirect('cart')
 
-            # Sifariş elementlərini yaradırıq
-            for item in order_items:
-                SifarisItem.objects.create(
-                    sifaris=order,
-                    mehsul=item['product'],
-                    miqdar=item['quantity'],
-                    qiymet=item['price']
+        created_orders = []
+        try:
+            for seller_id, data in order_items_by_seller.items():
+                items = data['items']
+                total = sum(item['price'] * item['quantity'] for item in items)
+                order = Sifaris.objects.create(
+                    istifadeci=request.user,
+                    umumi_mebleg=total,
+                    catdirilma_usulu=catdirilma_usulu
                 )
+                for item in items:
+                    SifarisItem.objects.create(
+                        sifaris=order,
+                        mehsul=item['product'],
+                        miqdar=item['quantity'],
+                        qiymet=item['price']
+                    )
+                created_orders.append(order)
 
             # Səbəti yeniləyirik (yalnız seçilməmiş məhsulları saxlayırıq)
             request.session['cart'] = remaining_cart
             request.session.modified = True
-            
-            messages.success(request, 'Sifarişiniz uğurla yaradıldı.')
+
+            if len(created_orders) == 1:
+                messages.success(request, 'Sifarişiniz uğurla yaradıldı.')
+            elif len(created_orders) > 1:
+                messages.success(request, f'{len(created_orders)} ayrı sifariş yaradıldı (fərqli satıcılar üçün).')
+            else:
+                messages.error(request, 'Sifariş yaradılmadı.')
             return redirect('orders')
-            
         except Exception as e:
-            if 'order' in locals():
+            # Əgər hər hansı bir order yaradılıbsa, onları sil
+            for order in created_orders:
                 order.delete()
             messages.error(request, 'Sifariş yaradılarkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.')
             return redirect('cart')
@@ -821,28 +836,24 @@ def edit_my_sale_view(request, order_id):
         return redirect('my_sales')
 
     order = get_object_or_404(Sifaris, id=order_id)
+    # Yalnız həmin satıcıya aid məhsulları olan sifarişlərə baxmaq üçün yoxlama
     if not SifarisItem.objects.filter(sifaris=order, mehsul__sahib=request.user).exists():
         messages.error(request, 'Bu sifarişi redaktə etmək üçün icazəniz yoxdur.')
         return redirect('my_sales')
 
-    class SellerSifarisItemFormSet(BaseInlineFormSet):
-        def __init__(self, *args, **kwargs):
-            self.user = kwargs.pop('user', None)
-            super().__init__(*args, **kwargs)
-        def _construct_form(self, i, **kwargs):
-            kwargs['user'] = self.user
-            return super()._construct_form(i, **kwargs)
-
+    # Sifarişin öz məhsulları üçün formset yarat
     SifarisItemFormSet = inlineformset_factory(
-        Sifaris,
-        SifarisItem,
-        form=SifarisItemForm,
-        formset=SellerSifarisItemFormSet,
-        extra=0,
+        Sifaris, 
+        SifarisItem, 
+        form=SifarisItemEditForm, 
+        extra=0, 
         can_delete=False
     )
-
+    
+    # Formset-ə yalnız satıcının öz məhsullarını daxil et
     queryset = order.sifarisitem_set.filter(mehsul__sahib=request.user)
+
+    # Yalnız bu istifadəçiyə aid məhsulların cəmini tap
     order_items = queryset
     total_amount = sum(item.umumi_mebleg for item in order_items)
     paid_share = 0
@@ -852,18 +863,20 @@ def edit_my_sale_view(request, order_id):
 
     if request.method == 'POST':
         form = SifarisEditForm(request.POST, instance=order)
-        formset = SifarisItemFormSet(request.POST, instance=order, queryset=queryset, user=request.user)
+        formset = SifarisItemFormSet(request.POST, instance=order, queryset=queryset)
+        
         if form.is_valid() and formset.is_valid():
             form.save()
             formset.save()
-            order.update_total()
+            order.update_total() # Formset save olanda onsuz da total update olur, amma zəmanət üçün
             messages.success(request, f"Sifariş #{order.id} uğurla yeniləndi.")
             return redirect('edit_my_sale', order_id=order.id)
         else:
             messages.error(request, "Zəhmət olmasa xətaları düzəldin.")
+
     else:
         form = SifarisEditForm(instance=order)
-        formset = SifarisItemFormSet(instance=order, queryset=queryset, user=request.user)
+        formset = SifarisItemFormSet(instance=order, queryset=queryset)
 
     context = {
         'order': order,

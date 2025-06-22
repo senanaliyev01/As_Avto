@@ -45,11 +45,6 @@
                                                 {{ form.id }}
                                                 <td>{{ form.miqdar }}</td>
                                                 <td>{{ form.qiymet }}</td>
-                                                {% if item.mehsul.sahib == request.user %}
-                                                    <td>
-                                                        {{ form.seller_status }}
-                                                    </td>
-                                                {% endif %}
                                             {% endif %}
                                         {% endfor %}
                                     {% endwith %}

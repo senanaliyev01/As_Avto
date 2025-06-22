@@ -351,8 +351,8 @@ class MehsulAdmin(admin.ModelAdmin):
 class SifarisItemInline(admin.TabularInline):
     model = SifarisItem
     extra = 0
-    readonly_fields = ['mehsul', 'mehsul_sahibi', 'seller_status']
-    fields = ['mehsul', 'mehsul_sahibi', 'miqdar', 'qiymet', 'seller_status']
+    readonly_fields = ['mehsul', 'mehsul_sahibi']
+    fields = ['mehsul', 'mehsul_sahibi', 'miqdar', 'qiymet']
 
     def mehsul_sahibi(self, obj):
         if obj.mehsul and obj.mehsul.sahib:

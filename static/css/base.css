@@ -2762,3 +2762,48 @@ body {
         font-size: 25px;
     }
 }
+
+/* My Products Header Custom Styles */
+.my-products-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.my-products-header form {
+    margin-bottom: 0;
+}
+.my-products-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.btn-excel {
+    background-color: #1d6f42;
+    color: #fff;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+}
+.btn-excel i {
+    font-size: 1.1em;
+    margin-right: 4px;
+}
+.btn-excel:hover, .btn-excel:focus {
+    background-color: #218838;
+    color: #fff;
+}
+@media (max-width: 600px) {
+    .my-products-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    .my-products-actions {
+        margin-left: 0;
+        justify-content: flex-end;
+    }
+}

@@ -782,7 +782,7 @@ def my_sales_view(request):
         messages.error(request, 'Bu səhifəyə giriş üçün icazəniz yoxdur.')
         return redirect('base')
 
-    # Bütün sifarişlərdən yalnız istifadəçiyə aid məhsulu olanları seç
+    # Yalnız bütün məhsulları istifadəçiyə məxsus olan sifarişləri seç
     all_orders = Sifaris.objects.all().order_by('-tarix')
     filtered_orders = []
     total_orders = 0
@@ -790,24 +790,17 @@ def my_sales_view(request):
     total_paid = 0
     total_debt = 0
     for order in all_orders:
-        # Yalnız bu istifadəçiyə aid məhsulların cəmini tap
-        items = order.sifarisitem_set.filter(mehsul__sahib=request.user)
-        order_total = sum(item.umumi_mebleg for item in items)
-        if order_total > 0:
-            # Ödənilən məbləği proporsional böl (əgər sifarişdə birdən çox satıcı varsa)
-            if order.umumi_mebleg > 0:
-                paid_share = (order.odenilen_mebleg or 0) * (order_total / order.umumi_mebleg)
-            else:
-                paid_share = 0
-            debt_share = order_total - paid_share
+        items = order.sifarisitem_set.all()
+        # Əgər bütün məhsullar bu user-ə məxsusdursa
+        if all(item.mehsul.sahib == request.user for item in items):
             total_orders += 1
-            total_amount += order_total
-            total_paid += paid_share
-            total_debt += debt_share
-            # Alt xətsiz atributlar
-            order.seller_total = order_total
-            order.seller_paid = paid_share
-            order.seller_debt = debt_share
+            total_amount += order.umumi_mebleg
+            total_paid += order.odenilen_mebleg
+            total_debt += order.qaliq_borc
+            # Template üçün order-ə bu dəyərləri əlavə et
+            order.seller_total = order.umumi_mebleg
+            order.seller_paid = order.odenilen_mebleg
+            order.seller_debt = order.qaliq_borc
             filtered_orders.append(order)
 
     stats = {

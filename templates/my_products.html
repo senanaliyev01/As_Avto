@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mənim Məhsullarım - AS-AVTO{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Mənim Məhsullarım</h2>
+        <a href="{% url 'add_product' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Yeni Məhsul Əlavə Et
+        </a>
+    </div>
+    
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Şəkil</th>
+                    <th>Kodu</th>
+                    <th>Firma Adı</th>
+                    <th>Məhsul Adı</th>
+                    <th>Stok</th>
+                    <th>Qiymət</th>
+                    <th>Əməliyyatlar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mehsul in mehsullar %}
+                <tr>
+                    <td><img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image"></td>
+                    <td>{{ mehsul.brend_kod }}</td>
+                    <td>{{ mehsul.firma.adi }}</td>
+                    <td>
+                        {{ mehsul.adi }}
+                        {% if mehsul.yenidir %}
+                        <span class="new-badge">Yeni</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ mehsul.stok }}</td>
+                    <td>{{ mehsul.qiymet }} ₼</td>
+                    <td>
+                        <a href="{% url 'edit_product' mehsul.id %}" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{% url 'delete_product' mehsul.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Bu məhsulu silmək istədiyinizə əminsiniz?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center">
+                        <div class="empty-message">
+                            <i class="fas fa-box-open"></i>
+                            <p>Heç bir məhsul əlavə etməmisiniz.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Məhsulu Redaktə Et{% else %}Yeni Məhsul Əlavə Et{% endif %} - AS-AVTO{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>{% if form.instance.pk %}Məhsulu Redaktə Et{% else %}Yeni Məhsul Əlavə Et{% endif %}</h2>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+            {% for field in form %}
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="alert alert-danger mt-1">
+                            {{ field.errors.as_text }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary">
+            {% if form.instance.pk %}Yadda Saxla{% else %}Əlavə Et{% endif %}
+        </button>
+        <a href="{% url 'my_products' %}" class="btn btn-secondary">Ləğv Et</a>
+    </form>
+</div>
+{% endblock %} 

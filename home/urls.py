@@ -21,4 +21,10 @@ urlpatterns = [
     path('load-more-products/', views.load_more_products, name='load_more_products'),
     path('load-more-new-products/', views.load_more_new_products, name='load_more_new_products'),
     path('product-details/<int:product_id>/', views.product_details, name='product_details'),
+    path('my-products/', views.my_products_view, name='my_products'),
+    path('my-sales/', views.my_sales_view, name='my_sales'),
+    path('user-details/<int:user_id>/', views.user_details_view, name='user_details'),
+    path('my-products/add/', views.add_edit_product_view, name='add_product'),
+    path('my-products/edit/<int:product_id>/', views.add_edit_product_view, name='edit_product'),
+    path('my-products/delete/<int:product_id>/', views.delete_product_view, name='delete_product'),
 ]

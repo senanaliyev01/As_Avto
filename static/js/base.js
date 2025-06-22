@@ -29,6 +29,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize Details Modal
     initializeDetailsModal();
 
+    // Initialize User Details Modal
+    initializeUserDetailsModal();
+
     // Initialize Logo Slider
     initializeLogoSlider();
 
@@ -757,6 +760,9 @@ function initializeProductsPage() {
                                     ${product.adi}
                                     ${product.yenidir ? '<span class="new-badge">Yeni</span>' : ''}
                                 </td>
+                                <td>
+                                    ${product.sahib_id ? `<a href="#" onclick="openUserDetailsModal(${product.sahib_id})">${product.sahib_username}</a>` : 'AS-AVTO'}
+                                </td>
                                 <td>${product.stok}</td>
                                 <td>${product.qiymet} ₼</td>
                                 <td>
@@ -802,6 +808,69 @@ function initializeProductsPage() {
         window.addEventListener('scroll', () => {
             if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 200) {
                 loadMoreProducts();
+            }
+        });
+    }
+}
+
+// User Details Modal Functions
+function openUserDetailsModal(userId) {
+    const modal = document.getElementById('userDetailsModal');
+    if (!modal) return;
+
+    // Fetch user details
+    fetch(`/user-details/${userId}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Update modal content
+                document.getElementById('userDetailsUsername').textContent = data.user.username;
+                document.getElementById('userDetailsPhone').textContent = data.user.phone || '-';
+                document.getElementById('userDetailsAddress').textContent = data.user.address || '-';
+
+                // Show modal with animation
+                modal.style.display = 'block';
+                setTimeout(() => {
+                    modal.classList.add('show');
+                }, 10);
+            } else {
+                showMessage('error', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('error', 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+        });
+}
+
+function closeUserDetailsModal() {
+    const modal = document.getElementById('userDetailsModal');
+    if (!modal) return;
+
+    modal.classList.remove('show');
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
+}
+
+function initializeUserDetailsModal() {
+    const modal = document.getElementById('userDetailsModal');
+    const closeBtn = document.querySelector('.user-details-modal-close');
+    
+    if (modal && closeBtn) {
+        closeBtn.onclick = closeUserDetailsModal;
+        
+        // Close modal when clicking outside
+        modal.onclick = function(e) {
+            if (e.target === modal) {
+                closeUserDetailsModal();
+            }
+        };
+        
+        // Close modal with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.style.display === 'block') {
+                closeUserDetailsModal();
             }
         });
     }

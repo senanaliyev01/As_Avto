@@ -14,6 +14,7 @@ from operator import and_, or_
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.views.decorators.http import require_http_methods
+from .forms import MehsulForm
 
 def normalize_azerbaijani_chars(text):
     # Azərbaycan hərflərinin qarşılıqlı çevrilməsi
@@ -225,6 +226,8 @@ def load_more_products(request):
             'stok': product.stok,
             'qiymet': str(product.qiymet),
             'yenidir': product.yenidir,
+            'sahib_id': product.sahib.id if product.sahib else None,
+            'sahib_username': product.sahib.username if product.sahib else 'AS-AVTO',
         })
     
     return JsonResponse({
@@ -590,6 +593,8 @@ def load_more_new_products(request):
             'stok': product.stok,
             'qiymet': str(product.qiymet),
             'yenidir': product.yenidir,
+            'sahib_id': product.sahib.id if product.sahib else None,
+            'sahib_username': product.sahib.username if product.sahib else 'AS-AVTO',
         })
     
     return JsonResponse({
@@ -692,6 +697,108 @@ def product_details(request, product_id):
         data = {
             'status': 'error',
             'message': 'Məhsul tapılmadı.'
+        }
+    except Exception as e:
+        data = {
+            'status': 'error',
+            'message': 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.'
+        }
+    
+    return JsonResponse(data)
+
+@login_required
+def my_products_view(request):
+    if not request.user.profile.is_verified:
+        messages.error(request, 'Bu səhifəyə giriş üçün icazəniz yoxdur.')
+        return redirect('base')
+    
+    mehsullar = Mehsul.objects.filter(sahib=request.user).order_by('-id')
+    return render(request, 'my_products.html', {'mehsullar': mehsullar})
+
+@login_required
+def my_sales_view(request):
+    if not request.user.profile.is_verified:
+        messages.error(request, 'Bu səhifəyə giriş üçün icazəniz yoxdur.')
+        return redirect('base')
+
+    # Fetch all order items for the current user's products
+    user_sales_items = SifarisItem.objects.filter(mehsul__sahib=request.user).select_related(
+        'sifaris', 
+        'sifaris__istifadeci', 
+        'mehsul'
+    ).order_by('-sifaris__tarix')
+
+    # Group items by order
+    sales_by_order = {}
+    for item in user_sales_items:
+        if item.sifaris not in sales_by_order:
+            sales_by_order[item.sifaris] = []
+        sales_by_order[item.sifaris].append(item)
+
+    context = {
+        'sales_by_order': sales_by_order
+    }
+    return render(request, 'my_sales.html', context)
+
+@login_required
+def add_edit_product_view(request, product_id=None):
+    if not request.user.profile.is_verified:
+        messages.error(request, 'Bu əməliyyatı etmək üçün icazəniz yoxdur.')
+        return redirect('my_products')
+
+    if product_id:
+        mehsul = get_object_or_404(Mehsul, id=product_id)
+        if mehsul.sahib != request.user:
+            messages.error(request, 'Bu məhsulu redaktə etmək üçün icazəniz yoxdur.')
+            return redirect('my_products')
+    else:
+        mehsul = None
+
+    if request.method == 'POST':
+        form = MehsulForm(request.POST, request.FILES, instance=mehsul)
+        if form.is_valid():
+            yeni_mehsul = form.save(commit=False)
+            yeni_mehsul.sahib = request.user
+            yeni_mehsul.save()
+            messages.success(request, f'Məhsul uğurla {"yeniləndi" if mehsul else "əlavə edildi"}.')
+            return redirect('my_products')
+    else:
+        form = MehsulForm(instance=mehsul)
+
+    return render(request, 'add_edit_product.html', {'form': form})
+
+@login_required
+def delete_product_view(request, product_id):
+    if not request.user.profile.is_verified:
+        messages.error(request, 'Bu əməliyyatı etmək üçün icazəniz yoxdur.')
+        return redirect('my_products')
+
+    mehsul = get_object_or_404(Mehsul, id=product_id)
+    if mehsul.sahib != request.user:
+        messages.error(request, 'Bu məhsulu silmək üçün icazəniz yoxdur.')
+        return redirect('my_products')
+    
+    mehsul.delete()
+    messages.success(request, 'Məhsul uğurla silindi.')
+    return redirect('my_products')
+
+@require_http_methods(["GET"])
+def user_details_view(request, user_id):
+    try:
+        user = User.objects.select_related('profile').get(id=user_id)
+        data = {
+            'status': 'success',
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'phone': user.profile.phone,
+                'address': user.profile.address,
+            }
+        }
+    except User.DoesNotExist:
+        data = {
+            'status': 'error',
+            'message': 'İstifadəçi tapılmadı.'
         }
     except Exception as e:
         data = {

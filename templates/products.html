@@ -15,6 +15,7 @@
                     <th>Kodu</th>
                     <th>Firma Adı</th>
                     <th>Məhsul Adı</th>
+                    <th>Satıcı</th>
                     <!-- <th>OEM</th> -->
                     <th>Stok</th>
                     <th>Qiymət</th>
@@ -32,6 +33,13 @@
                         {{ mehsul.adi }}
                         {% if mehsul.yenidir %}
                         <span class="new-badge">Yeni</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if mehsul.sahib %}
+                            <a href="#" onclick="openUserDetailsModal({{ mehsul.sahib.id }})">{{ mehsul.sahib.username }}</a>
+                        {% else %}
+                            AS-AVTO
                         {% endif %}
                     </td>
                     <!-- <td>{{ mehsul.oem }}</td> -->
@@ -55,7 +63,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="9" class="text-center">
+                    <td colspan="10" class="text-center">
                         <div class="empty-message">
                             <i class="fas fa-box-open"></i>
                             <p>Heç bir məhsul tapılmadı.</p>
@@ -150,6 +158,34 @@
                     <div class="info-row">
                         <span class="info-label">Məlumat:</span>
                         <span id="detailsMelumat" class="info-value"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Details Modal -->
+<div id="userDetailsModal" class="details-modal">
+    <div class="details-modal-content">
+        <span class="user-details-modal-close">&times;</span>
+        <div class="details-content">
+            <div class="details-header">
+                <h3>Satıcı Məlumatları</h3>
+            </div>
+            <div class="details-body">
+                <div class="details-info">
+                    <div class="info-row">
+                        <span class="info-label">İstifadəçi adı:</span>
+                        <span id="userDetailsUsername" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Telefon:</span>
+                        <span id="userDetailsPhone" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Ünvan:</span>
+                        <span id="userDetailsAddress" class="info-value"></span>
                     </div>
                 </div>
             </div>

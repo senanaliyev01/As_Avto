@@ -55,6 +55,14 @@
                                                 <i class="fa-regular fa-circle-user"></i>
                                                 {{ request.user.username }}
                                             </span>
+                                            {% if user.is_authenticated and user.profile.is_verified %}
+                                            <a href="{% url 'my_products' %}" class="logout-link">
+                                                <i class="fas fa-box"></i> Mənim Məhsullarım
+                                            </a>
+                                            <a href="{% url 'my_sales' %}" class="logout-link">
+                                                <i class="fas fa-receipt"></i> Mənə gələn sifarişlər
+                                            </a>
+                                            {% endif %}
                                             <a href="{% url 'logout' %}" class="logout-link">
                                                 <i class="fas fa-sign-out-alt"></i> Çıxış et
                                             </a>

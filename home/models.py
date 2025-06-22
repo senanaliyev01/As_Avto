@@ -192,6 +192,15 @@ class SifarisItem(models.Model):
     mehsul = models.ForeignKey(Mehsul, on_delete=models.CASCADE)
     miqdar = models.PositiveIntegerField()
     qiymet = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    # Satıcı statusu
+    SELLER_STATUS_CHOICES = [
+        ('PENDING', 'Gözləyir'),
+        ('PROCESSING', 'İşlənir'),
+        ('COMPLETED', 'Tamamlandı'),
+        ('CANCELLED', 'Ləğv edildi'),
+    ]
+    seller_status = models.CharField(max_length=20, choices=SELLER_STATUS_CHOICES, default='PENDING', verbose_name='Satıcı Statusu')
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

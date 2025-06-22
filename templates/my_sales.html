@@ -34,6 +34,7 @@
                         <th>Alıcı</th>
                         <th>Tarix</th>
                         <th>Status</th>
+                        <th>Satıcı Statusu</th>
                         <th>Ümumi Məbləğ</th>
                         <th>Ödənilən</th>
                         <th>Qalıq Borc</th>
@@ -50,6 +51,16 @@
                             <span class="status-badge status-{{ order.status|lower }}">
                                 {{ order.get_status_display }}
                             </span>
+                        </td>
+                        <td>
+                            {% for item in order.sifarisitem_set.all %}
+                                {% if item.mehsul.sahib == request.user %}
+                                    <span class="status-badge status-{{ item.seller_status|lower }}">
+                                        {{ item.get_seller_status_display }}
+                                    </span>
+                                    {% break %}
+                                {% endif %}
+                            {% endfor %}
                         </td>
                         <td>{{ order.seller_total|floatformat:2 }} ₼</td>
                         <td>{{ order.seller_paid|floatformat:2 }} ₼</td>

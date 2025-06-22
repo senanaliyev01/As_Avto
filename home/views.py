@@ -14,11 +14,11 @@ from operator import and_, or_
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.views.decorators.http import require_http_methods
-from .forms import MehsulForm, SifarisEditForm, SifarisItemEditForm
+from .forms import MehsulForm, SifarisEditForm, SifarisItemForm
 import pandas as pd
 from django.db import transaction
 import math
-from django.forms import inlineformset_factory
+from django.forms import inlineformset_factory, BaseInlineFormSet
 
 def normalize_azerbaijani_chars(text):
     # Azərbaycan hərflərinin qarşılıqlı çevrilməsi
@@ -821,24 +821,28 @@ def edit_my_sale_view(request, order_id):
         return redirect('my_sales')
 
     order = get_object_or_404(Sifaris, id=order_id)
-    # Yalnız həmin satıcıya aid məhsulları olan sifarişlərə baxmaq üçün yoxlama
     if not SifarisItem.objects.filter(sifaris=order, mehsul__sahib=request.user).exists():
         messages.error(request, 'Bu sifarişi redaktə etmək üçün icazəniz yoxdur.')
         return redirect('my_sales')
 
-    # Sifarişin öz məhsulları üçün formset yarat
+    class SellerSifarisItemFormSet(BaseInlineFormSet):
+        def __init__(self, *args, **kwargs):
+            self.user = kwargs.pop('user', None)
+            super().__init__(*args, **kwargs)
+        def _construct_form(self, i, **kwargs):
+            kwargs['user'] = self.user
+            return super()._construct_form(i, **kwargs)
+
     SifarisItemFormSet = inlineformset_factory(
-        Sifaris, 
-        SifarisItem, 
-        form=SifarisItemEditForm, 
-        extra=0, 
+        Sifaris,
+        SifarisItem,
+        form=SifarisItemForm,
+        formset=SellerSifarisItemFormSet,
+        extra=0,
         can_delete=False
     )
-    
-    # Formset-ə yalnız satıcının öz məhsullarını daxil et
-    queryset = order.sifarisitem_set.filter(mehsul__sahib=request.user)
 
-    # Yalnız bu istifadəçiyə aid məhsulların cəmini tap
+    queryset = order.sifarisitem_set.filter(mehsul__sahib=request.user)
     order_items = queryset
     total_amount = sum(item.umumi_mebleg for item in order_items)
     paid_share = 0
@@ -848,20 +852,18 @@ def edit_my_sale_view(request, order_id):
 
     if request.method == 'POST':
         form = SifarisEditForm(request.POST, instance=order)
-        formset = SifarisItemFormSet(request.POST, instance=order, queryset=queryset)
-        
+        formset = SifarisItemFormSet(request.POST, instance=order, queryset=queryset, user=request.user)
         if form.is_valid() and formset.is_valid():
             form.save()
             formset.save()
-            order.update_total() # Formset save olanda onsuz da total update olur, amma zəmanət üçün
+            order.update_total()
             messages.success(request, f"Sifariş #{order.id} uğurla yeniləndi.")
             return redirect('edit_my_sale', order_id=order.id)
         else:
             messages.error(request, "Zəhmət olmasa xətaları düzəldin.")
-
     else:
         form = SifarisEditForm(instance=order)
-        formset = SifarisItemFormSet(instance=order, queryset=queryset)
+        formset = SifarisItemFormSet(instance=order, queryset=queryset, user=request.user)
 
     context = {
         'order': order,

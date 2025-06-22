@@ -36,11 +36,14 @@ class SifarisEditForm(forms.ModelForm):
             'qeyd': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         } 
 
-class SifarisItemEditForm(forms.ModelForm):
+class SifarisItemForm(forms.ModelForm):
     class Meta:
         model = SifarisItem
-        fields = ['miqdar', 'qiymet']
-        widgets = {
-            'miqdar': forms.NumberInput(attrs={'class': 'form-control form-control-sm item-input', 'min': '1', 'data-field': 'quantity'}),
-            'qiymet': forms.NumberInput(attrs={'class': 'form-control form-control-sm item-input', 'step': '0.01', 'data-field': 'price'}),
-        } 
+        fields = ['miqdar', 'qiymet', 'seller_status']
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.mehsul and user:
+            if self.instance.mehsul.sahib != user:
+                self.fields['seller_status'].disabled = True 

@@ -18,9 +18,9 @@
                     <table class="table table-bordered">
                         <thead class="thead-light">
                             <tr>
+                                <th>Kodu</th>
+                                <th>Firma Adı</th>
                                 <th>Məhsul Adı</th>
-                                <th>Brend Kodu</th>
-                                <th>Firma</th>
                                 <th>Satıcı</th>
                                 <th style="width: 100px;">Miqdar</th>
                                 <th style="width: 120px;">Qiymət</th>
@@ -32,9 +32,9 @@
                             
                             {% for item in order_items %}
                                 <tr class="{% if item.mehsul.sahib == request.user %}editable-row{% else %}non-editable-row{% endif %}">
-                                    <td>{{ item.mehsul.adi }}</td>
                                     <td>{{ item.mehsul.brend_kod }}</td>
                                     <td>{{ item.mehsul.firma.adi }}</td>
+                                    <td>{{ item.mehsul.adi }}</td>
                                     <td>{{ item.mehsul.sahib.username|default:"AS-AVTO" }}</td>
                                     
                                     {% with item_form=formset.forms|first %}

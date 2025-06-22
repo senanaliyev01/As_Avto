@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .models import Mehsul, Kateqoriya, Sifaris, SifarisItem, Firma, Avtomobil, PopupImage, Header_Message
-from django.db.models import Q
+from django.db.models import Q, Sum, F, Case, When, DecimalField
 from decimal import Decimal
 from django.contrib import messages
 import re
@@ -721,24 +721,99 @@ def my_sales_view(request):
         messages.error(request, 'Bu səhifəyə giriş üçün icazəniz yoxdur.')
         return redirect('base')
 
-    # Fetch all order items for the current user's products
-    user_sales_items = SifarisItem.objects.filter(mehsul__sahib=request.user).select_related(
-        'sifaris', 
-        'sifaris__istifadeci', 
-        'mehsul'
-    ).order_by('-sifaris__tarix')
+    # İstifadəçinin məhsullarının olduğu sifarişləri tap
+    orders_with_user_products = Sifaris.objects.filter(sifarisitem__mehsul__sahib=request.user).distinct()
 
-    # Group items by order
-    sales_by_order = {}
-    for item in user_sales_items:
-        if item.sifaris not in sales_by_order:
-            sales_by_order[item.sifaris] = []
-        sales_by_order[item.sifaris].append(item)
+    # Hər sifariş üçün statistikaları hesablayın
+    orders_with_stats = orders_with_user_products.annotate(
+        # Bu sifarişdəki yalnız bu istifadəçiyə aid məhsulların ümumi məbləği
+        amount=Sum(
+            Case(
+                When(sifarisitem__mehsul__sahib=request.user, then=F('sifarisitem__qiymet') * F('sifarisitem__miqdar')),
+                default=0,
+                output_field=DecimalField()
+            )
+        ),
+        # Bu sifarişdəki yalnız bu istifadəçiyə aid və ödənilmiş məhsulların ümumi məbləği
+        paid=Sum(
+            Case(
+                When(sifarisitem__mehsul__sahib=request.user, sifarisitem__status='PAID', then=F('sifarisitem__qiymet') * F('sifarisitem__miqdar')),
+                default=0,
+                output_field=DecimalField()
+            )
+        )
+    ).values(
+        'id', 'istifadeci__username', 'tarix', 'amount', 'paid'
+    ).order_by('-tarix')
 
+    # Qalıq borcları və digər məlumatları əlavə et
+    processed_stats = []
+    total_amount = Decimal('0.0')
+    total_paid = Decimal('0.0')
+
+    for stat in orders_with_stats:
+        debt = stat['amount'] - stat['paid']
+        processed_stats.append({
+            'order_id': stat['id'],
+            'customer': stat['istifadeci__username'],
+            'order_date': stat['tarix'],
+            'amount': stat['amount'],
+            'paid': stat['paid'],
+            'debt': debt
+        })
+        total_amount += stat['amount']
+        total_paid += stat['paid']
+
+    total_stats = {
+        'total_orders': len(processed_stats),
+        'total_amount': total_amount,
+        'total_paid': total_paid,
+        'total_debt': total_amount - total_paid
+    }
+    
     context = {
-        'sales_by_order': sales_by_order
+        'orders_with_stats': processed_stats,
+        'total_stats': total_stats
     }
     return render(request, 'my_sales.html', context)
+
+@login_required
+def my_sale_detail_view(request, order_id):
+    if not request.user.profile.is_verified:
+        messages.error(request, 'Bu səhifəyə giriş üçün icazəniz yoxdur.')
+        return redirect('base')
+
+    order = get_object_or_404(Sifaris, id=order_id)
+    items = SifarisItem.objects.filter(sifaris=order, mehsul__sahib=request.user).select_related('mehsul')
+
+    if not items.exists():
+        messages.error(request, 'Bu sifarişdə sizə aid məhsul tapılmadı.')
+        return redirect('my_sales')
+
+    context = {
+        'order': order,
+        'items': items
+    }
+    return render(request, 'my_sale_detail.html', context)
+
+@login_required
+@require_http_methods(["POST"])
+def mark_item_as_paid_view(request, item_id):
+    if not request.user.profile.is_verified:
+        messages.error(request, 'Bu əməliyyatı etmək üçün icazəniz yoxdur.')
+        return redirect('base')
+
+    item = get_object_or_404(SifarisItem, id=item_id)
+
+    # Check if the user is the owner of the product
+    if item.mehsul.sahib != request.user:
+        messages.error(request, 'Bu əməliyyatı etmək üçün icazəniz yoxdur.')
+        return redirect('my_sale_detail', order_id=item.sifaris.id)
+
+    item.status = 'PAID'
+    item.save()
+    messages.success(request, f'"{item.mehsul.adi}" üçün ödəniş qeyd edildi.')
+    return redirect('my_sale_detail', order_id=item.sifaris.id)
 
 @login_required
 def add_edit_product_view(request, product_id=None):

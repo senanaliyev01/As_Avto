@@ -46,9 +46,9 @@ class AvtomobilAdmin(admin.ModelAdmin):
 
 @admin.register(Mehsul)
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ['brend_kod', 'firma', 'adi',  'olcu', 'vitrin', 'stok', 'maya_qiymet', 'qiymet',  'yenidir', 'sekil_preview']
-    list_filter = ['kateqoriya', 'firma', 'avtomobil', 'vitrin', 'yenidir']
-    search_fields = ['adi', 'brend_kod', 'oem', 'kodlar', 'olcu']
+    list_display = ['sahib', 'brend_kod', 'firma', 'adi',  'olcu', 'vitrin', 'stok', 'maya_qiymet', 'qiymet',  'yenidir', 'sekil_preview']
+    list_filter = ['sahib', 'kateqoriya', 'firma', 'avtomobil', 'vitrin', 'yenidir']
+    search_fields = ['adi', 'brend_kod', 'oem', 'kodlar', 'olcu', 'sahib__username']
     change_list_template = 'admin/mehsul_change_list.html'
     actions = ['mark_as_new', 'remove_from_new']
 
@@ -351,8 +351,14 @@ class MehsulAdmin(admin.ModelAdmin):
 class SifarisItemInline(admin.TabularInline):
     model = SifarisItem
     extra = 0
-    readonly_fields = ['mehsul']
-    fields = ['mehsul', 'miqdar', 'qiymet']
+    readonly_fields = ['mehsul', 'mehsul_sahibi']
+    fields = ['mehsul', 'mehsul_sahibi', 'miqdar', 'qiymet']
+
+    def mehsul_sahibi(self, obj):
+        if obj.mehsul and obj.mehsul.sahib:
+            return obj.mehsul.sahib.username
+        return "AS-AVTO"
+    mehsul_sahibi.short_description = 'Satıcı'
 
     def get_max_num(self, request, obj=None, **kwargs):
         if obj:

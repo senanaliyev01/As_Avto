@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Satış Detalları - Sifariş #{{ order.id }} - AS-AVTO{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Satış Detalları: Sifariş #{{ order.id }}</h2>
+        <a href="{% url 'my_sales' %}" class="btn btn-secondary">Geri Qayıt</a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>Sifariş Məlumatları</h4>
+        </div>
+        <div class="card-body">
+            <p><strong>Alıcı:</strong> {{ order.istifadeci.username }}</p>
+            <p><strong>Tarix:</strong> {{ order.tarix|date:"d M Y, H:i" }}</p>
+            <p><strong>Sifarişin Ümumi Statusu:</strong> {{ order.get_status_display }}</p>
+        </div>
+    </div>
+
+    <h4>Bu Sifarişdəki Məhsullarım</h4>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Şəkil</th>
+                    <th>Məhsul Adı</th>
+                    <th>Miqdar</th>
+                    <th>Qiymət</th>
+                    <th>Cəm</th>
+                    <th>Ödəniş Statusu</th>
+                    <th>Əməliyyat</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td><img src="{{ item.mehsul.sekil.url }}" alt="{{ item.mehsul.adi }}" class="product-image" style="width: 50px; height: 50px;"></td>
+                    <td>{{ item.mehsul.adi }}</td>
+                    <td>{{ item.miqdar }}</td>
+                    <td>{{ item.qiymet }} ₼</td>
+                    <td>{{ item.umumi_mebleg }} ₼</td>
+                    <td>
+                        <span class="status-badge status-{{ item.status|lower }}">
+                            {{ item.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if item.status == 'PENDING' %}
+                        <form action="{% url 'mark_item_as_paid' item.id %}" method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success btn-sm">Ödənildi</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %} 

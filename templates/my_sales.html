@@ -7,45 +7,63 @@
 <div class="container">
     <h2>Mənə Gələn Sifarişlər</h2>
 
-    {% if sales_by_order %}
-        {% for order, items in sales_by_order.items %}
-        <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <span>Sifariş #{{ order.id }} - {{ order.istifadeci.username }}</span>
-                <span>{{ order.tarix|date:"d M Y, H:i" }}</span>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th>Şəkil</th>
-                                <th>Məhsul Adı</th>
-                                <th>Brend Kodu</th>
-                                <th>Miqdar</th>
-                                <th>Qiymət</th>
-                                <th>Cəm</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in items %}
-                            <tr>
-                                <td><img src="{{ item.mehsul.sekil.url }}" alt="{{ item.mehsul.adi }}" class="product-image" style="width: 40px; height: 40px;"></td>
-                                <td>{{ item.mehsul.adi }}</td>
-                                <td>{{ item.mehsul.brend_kod }}</td>
-                                <td>{{ item.miqdar }}</td>
-                                <td>{{ item.qiymet }} ₼</td>
-                                <td>{{ item.umumi_mebleg }} ₼</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+    {% if orders_with_stats %}
+        <div class="table-container">
+            <div class="table-header">
+                <div class="header-summary">
+                    <div class="summary-item">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="summary-label">Ümumi Satış (Sifariş sayı):</span>
+                        <span class="summary-value">{{ total_stats.total_orders }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span class="summary-label">Ümumi Satış Məbləği:</span>
+                        <span class="summary-value">{{ total_stats.total_amount }} ₼</span>
+                    </div>
+                    <div class="summary-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span class="summary-label">Ödənilən:</span>
+                        <span class="summary-value">{{ total_stats.total_paid }} ₼</span>
+                    </div>
+                    <div class="summary-item">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span class="summary-label">Qalıq Borc:</span>
+                        <span class="summary-value">{{ total_stats.total_debt }} ₼</span>
+                    </div>
                 </div>
             </div>
+            <table class="table orders-table">
+                <thead>
+                    <tr>
+                        <th>Sifariş №</th>
+                        <th>Alıcı</th>
+                        <th>Tarix</th>
+                        <th>Məbləğ (bu sifarişdən)</th>
+                        <th>Ödənilən (bu sifarişdən)</th>
+                        <th>Qalıq (bu sifarişdən)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stat in orders_with_stats %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'my_sale_detail' stat.order_id %}" class="order-link">
+                                #{{ stat.order_id }}
+                            </a>
+                        </td>
+                        <td>{{ stat.customer }}</td>
+                        <td>{{ stat.order_date|date:"d.m.Y H:i" }}</td>
+                        <td>{{ stat.amount }} ₼</td>
+                        <td>{{ stat.paid }} ₼</td>
+                        <td>{{ stat.debt }} ₼</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-        {% endfor %}
     {% else %}
-        <div class="empty-message">
+        <div class="empty-orders">
             <i class="fas fa-receipt"></i>
             <p>Sizə gələn heç bir sifariş yoxdur.</p>
         </div>

@@ -788,32 +788,33 @@ def my_sales_view(request):
     total_orders = 0
     total_amount = 0
     total_paid = 0
+    total_debt = 0
     for order in all_orders:
         # Yalnız bu istifadəçiyə aid məhsulların cəmini tap
         items = order.sifarisitem_set.filter(mehsul__sahib=request.user)
         order_total = sum(item.umumi_mebleg for item in items)
         if order_total > 0:
-            # Ödənilən məbləği: tam ödənişdə tam, qismən ödənişdə proporsional böl
-            if order.odenilen_mebleg >= order.umumi_mebleg:
-                paid_share = order_total
-            elif order.umumi_mebleg > 0:
+            # Ödənilən məbləği proporsional böl (əgər sifarişdə birdən çox satıcı varsa)
+            if order.umumi_mebleg > 0:
                 paid_share = (order.odenilen_mebleg or 0) * (order_total / order.umumi_mebleg)
             else:
                 paid_share = 0
+            debt_share = order_total - paid_share
             total_orders += 1
             total_amount += order_total
             total_paid += paid_share
+            total_debt += debt_share
             # Alt xətsiz atributlar
             order.seller_total = order_total
             order.seller_paid = paid_share
-            order.seller_debt = order_total - paid_share
+            order.seller_debt = debt_share
             filtered_orders.append(order)
 
     stats = {
         'total_orders': total_orders,
         'total_amount': total_amount,
         'total_paid': total_paid,
-        'total_debt': total_amount - total_paid
+        'total_debt': total_debt
     }
 
     context = {

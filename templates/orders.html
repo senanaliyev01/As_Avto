@@ -70,7 +70,7 @@
                         <td>
                             {% with first_item=order.sifarisitem_set.first %}
                                 {% if first_item and first_item.mehsul.sahib %}
-                                    {{ first_item.mehsul.sahib.username }}
+                                    <a href="#" class="seller-link" onclick="openUserDetailsModal({{ first_item.mehsul.sahib.id }}); return false;"><i class="fas fa-user"></i> {{ first_item.mehsul.sahib.username }}</a>
                                 {% else %}
                                     AS-AVTO
                                 {% endif %}

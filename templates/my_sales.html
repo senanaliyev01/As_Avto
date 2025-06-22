@@ -51,9 +51,9 @@
                                 {{ order.get_status_display }}
                             </span>
                         </td>
-                        <td>{{ order.umumi_mebleg }} ₼</td>
-                        <td>{{ order.odenilen_mebleg }} ₼</td>
-                        <td>{{ order.qaliq_borc }} ₼</td>
+                        <td>{{ order._seller_total|floatformat:2 }} ₼</td>
+                        <td>{{ order._seller_paid|floatformat:2 }} ₼</td>
+                        <td>{{ order._seller_debt|floatformat:2 }} ₼</td>
                         <td>
                             <a href="{% url 'edit_my_sale' order.id %}" class="btn btn-primary btn-sm">Redaktə Et</a>
                         </td>

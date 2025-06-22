@@ -188,10 +188,17 @@ class Sifaris(models.Model):
 
 
 class SifarisItem(models.Model):
+    STATUS_CHOICES = [
+        ('PENDING', 'Gözləyir'),
+        ('PROCESSING', 'İşlənir'),
+        ('COMPLETED', 'Tamamlandı'),
+        ('CANCELLED', 'Ləğv edildi'),
+    ]
     sifaris = models.ForeignKey(Sifaris, on_delete=models.CASCADE)
     mehsul = models.ForeignKey(Mehsul, on_delete=models.CASCADE)
     miqdar = models.PositiveIntegerField()
     qiymet = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

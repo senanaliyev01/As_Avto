@@ -25,6 +25,7 @@
                     <th>Qiymət</th>
                     <th>Miqdar</th>
                     <th>Cəmi</th>
+                    <th>Satıcı</th>
                     <th>Sil</th>
                 </tr>
             </thead>
@@ -51,6 +52,13 @@
                             </div>
                         </td>
                         <td class="subtotal">{{ item.subtotal }} ₼</td>
+                        <td>
+                            {% if item.product.sahib %}
+                                <a href="#" class="seller-link" onclick="openUserDetailsModal({{ item.product.sahib.id }}); return false;"><i class="fas fa-user"></i> {{ item.product.sahib.username }}</a>
+                            {% else %}
+                                AS-AVTO
+                            {% endif %}
+                        </td>
                         <td>
                             <button type="button" class="btn btn-danger" onclick="removeFromCart({{ item.product.id }})"><i class="fas fa-trash-alt"></i></button>
                         </td>

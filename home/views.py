@@ -140,7 +140,10 @@ def products_view(request):
         mehsullar = mehsullar.filter(avtomobil__adi=avtomobil)
     
     if satici:
-        mehsullar = mehsullar.filter(sahib_id=satici)
+        if satici == '0':
+            mehsullar = mehsullar.filter(sahib=None)
+        else:
+            mehsullar = mehsullar.filter(sahib_id=satici)
     
     # İlk 5 məhsulu götür
     initial_products = mehsullar[:5]
@@ -217,7 +220,10 @@ def load_more_products(request):
         mehsullar = mehsullar.filter(avtomobil__adi=avtomobil)
     
     if satici:
-        mehsullar = mehsullar.filter(sahib_id=satici)
+        if satici == '0':
+            mehsullar = mehsullar.filter(sahib=None)
+        else:
+            mehsullar = mehsullar.filter(sahib_id=satici)
     
     # Get next batch of products
     products = mehsullar[offset:offset + limit]

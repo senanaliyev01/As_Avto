@@ -26,7 +26,14 @@ class GlobalDataMiddleware:
 
             # Bütün unikal satıcıları əlavə et
             seller_ids = Mehsul.objects.exclude(sahib=None).values_list('sahib', flat=True).distinct()
-            request.sellers = User.objects.filter(id__in=seller_ids)
+            sellers = list(User.objects.filter(id__in=seller_ids))
+            # AS-AVTO üçün pseudo-user əlavə et
+            class PseudoUser:
+                def __init__(self, id, username):
+                    self.id = id
+                    self.username = username
+            sellers.insert(0, PseudoUser(0, 'AS-AVTO'))
+            request.sellers = sellers
 
         response = self.get_response(request)
         return response 

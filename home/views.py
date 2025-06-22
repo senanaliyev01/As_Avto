@@ -782,30 +782,30 @@ def my_sales_view(request):
         messages.error(request, 'Bu səhifəyə giriş üçün icazəniz yoxdur.')
         return redirect('base')
 
-    # İstifadəçinin məhsullarının olduğu sifarişləri tap və təkrarlanmanın qarşısını al
-    orders = Sifaris.objects.filter(sifarisitem__mehsul__sahib=request.user).distinct().order_by('-tarix')
-
-    # Statistikaları yalnız bu istifadəçiyə aid məhsullar üzrə hesablayaq
+    # Bütün sifarişlərdən yalnız istifadəçiyə aid məhsulu olanları seç
+    all_orders = Sifaris.objects.all().order_by('-tarix')
+    filtered_orders = []
     total_orders = 0
     total_amount = 0
     total_paid = 0
-    for order in orders:
+    for order in all_orders:
         # Yalnız bu istifadəçiyə aid məhsulların cəmini tap
         items = order.sifarisitem_set.filter(mehsul__sahib=request.user)
         order_total = sum(item.umumi_mebleg for item in items)
-        # Ödənilən məbləği proporsional böl (əgər sifarişdə birdən çox satıcı varsa)
-        if order.umumi_mebleg > 0:
-            paid_share = (order.odenilen_mebleg or 0) * (order_total / order.umumi_mebleg)
-        else:
-            paid_share = 0
         if order_total > 0:
+            # Ödənilən məbləği proporsional böl (əgər sifarişdə birdən çox satıcı varsa)
+            if order.umumi_mebleg > 0:
+                paid_share = (order.odenilen_mebleg or 0) * (order_total / order.umumi_mebleg)
+            else:
+                paid_share = 0
             total_orders += 1
             total_amount += order_total
             total_paid += paid_share
-        # Alt xətsiz atributlar
-        order.seller_total = order_total
-        order.seller_paid = paid_share
-        order.seller_debt = order_total - paid_share
+            # Alt xətsiz atributlar
+            order.seller_total = order_total
+            order.seller_paid = paid_share
+            order.seller_debt = order_total - paid_share
+            filtered_orders.append(order)
 
     stats = {
         'total_orders': total_orders,
@@ -815,7 +815,7 @@ def my_sales_view(request):
     }
 
     context = {
-        'orders': orders,
+        'orders': filtered_orders,
         'stats': stats
     }
     return render(request, 'my_sales.html', context)

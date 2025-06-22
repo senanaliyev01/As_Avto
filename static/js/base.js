@@ -940,19 +940,9 @@ function openOrderConfirmationModal() {
     const modal = document.getElementById('orderConfirmationModal');
     const selectedTotal = document.getElementById('selected-total').textContent;
     const modalSelectedTotal = document.getElementById('modal-selected-total');
-    const modalDeliveryMethod = document.getElementById('modal-delivery-method');
     
     // Seçilmiş məbləği modal-a köçür
     modalSelectedTotal.textContent = selectedTotal;
-    
-    // Çatdırılma üsulunu tap və modal-a köçür
-    const selectedDeliveryMethod = document.querySelector('input[name="catdirilma_usulu"]:checked');
-    if (selectedDeliveryMethod) {
-        const deliveryText = selectedDeliveryMethod.value === 'TAXI' ? 'Taksi ilə çatdırılma' : 'Özüm götürəcəm';
-        modalDeliveryMethod.textContent = deliveryText;
-    } else {
-        modalDeliveryMethod.textContent = 'Seçilməyib';
-    }
     
     // Modal-ı göstər
     modal.style.display = 'block';
@@ -974,6 +964,13 @@ function confirmOrder() {
     const modalContent = modal.querySelector('.order-confirmation-content');
     const confirmButton = modal.querySelector('.btn-primary');
     
+    // Çatdırılma üsulunu yoxla
+    const selectedDeliveryMethod = modal.querySelector('input[name="catdirilma_usulu"]:checked');
+    if (!selectedDeliveryMethod) {
+        showMessage('error', 'Zəhmət olmasa çatdırılma üsulunu seçin.');
+        return;
+    }
+    
     // Loading animasiyasını başlat
     modalContent.classList.add('loading');
     confirmButton.disabled = true;
@@ -981,6 +978,9 @@ function confirmOrder() {
     // Form məlumatlarını al
     const form = document.getElementById('checkout-form');
     const formData = new FormData(form);
+    
+    // Çatdırılma üsulunu form-a əlavə et
+    formData.append('catdirilma_usulu', selectedDeliveryMethod.value);
     
     // Sifarişi göndər
     fetch(form.action, {
@@ -1035,6 +1035,18 @@ function initializeOrderConfirmationModal() {
             if (e.key === 'Escape' && modal.style.display === 'block') {
                 closeOrderConfirmationModal();
             }
+        });
+        
+        // Çatdırılma üsulu seçimi üçün event listener
+        const deliveryOptions = modal.querySelectorAll('input[name="catdirilma_usulu"]');
+        deliveryOptions.forEach(option => {
+            option.addEventListener('change', function() {
+                // Seçilmiş option-ı vurğula
+                deliveryOptions.forEach(opt => {
+                    opt.closest('.delivery-option-modal').classList.remove('selected');
+                });
+                this.closest('.delivery-option-modal').classList.add('selected');
+            });
         });
     }
 }

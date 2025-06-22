@@ -2831,112 +2831,105 @@ body {
     }
 }
 
-/* Excel Import Modal Professional Styles */
-.excel-modal-content {
-    border-radius: 12px;
-    box-shadow: 0 6px 32px rgba(44, 62, 80, 0.18);
-    border: 1px solid #e9ecef;
-    background: #f9fbfd;
-    padding: 0;
+/* Excel Sample Styles */
+.excel-sample {
+    background: #f8fafc;
+    border: 1.5px solid #d1e7dd;
+    border-radius: 10px;
+    padding: 24px 18px 18px 18px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.06);
+    max-width: 100%;
 }
-.excel-modal-header {
-    background: #2B5173;
-    color: #fff;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-    padding: 18px 24px 12px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid #e9ecef;
-}
-.excel-modal-header .modal-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
-.excel-modal-close {
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 1.5rem;
-    opacity: 0.8;
-    transition: opacity 0.2s;
-    margin-left: 10px;
-}
-.excel-modal-close:hover {
-    opacity: 1;
-    color: #ffc107;
-}
-.excel-modal-body {
-    padding: 28px 28px 18px 28px;
-    background: #f9fbfd;
-    border-bottom-left-radius: 12px;
-    border-bottom-right-radius: 12px;
-}
-.excel-sample-title {
+.excel-sample h6 {
     font-size: 1.1rem;
     font-weight: 600;
-    color: #2B5173;
-    margin-bottom: 10px;
+    color: #1d6f42;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
-.excel-sample-table-wrapper {
+.excel-sample h6:before {
+    content: '\f1c3';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    color: #1d6f42;
+    font-size: 1.2em;
+}
+.sample-table {
     background: #fff;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(44,62,80,0.06);
-    padding: 10px;
-    margin-bottom: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(44, 62, 80, 0.04);
+    margin-bottom: 12px;
 }
-.excel-sample-table th, .excel-sample-table td {
-    font-size: 0.95rem;
-    padding: 7px 10px;
-    text-align: center;
-    border: 1px solid #e9ecef;
-}
-.excel-sample-table th {
-    background: #f1f5fa;
-    color: #2B5173;
+.sample-table th {
+    background: #e9f7ef;
+    color: #1d6f42;
     font-weight: 600;
+    font-size: 0.98rem;
+    border-bottom: 2px solid #b7e4c7;
+    padding: 8px 10px;
+    text-align: center;
 }
-.excel-sample-table td {
+.sample-table td {
     background: #fff;
     color: #333;
+    font-size: 0.97rem;
+    padding: 8px 10px;
+    text-align: center;
+    border-bottom: 1px solid #e9ecef;
 }
-.excel-sample-notes {
-    background: #f8f9fa;
-    border-radius: 6px;
-    padding: 12px 18px;
+.sample-table tr:last-child td {
+    border-bottom: none;
+}
+.notes {
+    background: #e9f7ef;
+    border-left: 4px solid #1d6f42;
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
     margin-top: 10px;
-    box-shadow: 0 1px 3px rgba(44,62,80,0.04);
+    color: #1d6f42;
+    font-size: 0.97rem;
+    box-shadow: 0 1px 4px rgba(44, 62, 80, 0.03);
 }
-.excel-sample-notes-title {
-    color: #2B5173;
-    font-size: 1rem;
+.notes p {
     font-weight: 600;
     margin-bottom: 6px;
+    color: #1d6f42;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
-.excel-sample-notes-list {
-    margin: 0;
-    padding-left: 18px;
-    color: #444;
-    font-size: 0.97rem;
+.notes p:before {
+    content: '\f05a';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    color: #1d6f42;
+    font-size: 1em;
 }
-.excel-sample-notes-list li {
+.notes ul {
+    margin: 0 0 0 18px;
+    padding: 0;
+    list-style: disc inside;
+}
+.notes li {
     margin-bottom: 4px;
-    line-height: 1.5;
+    font-size: 0.97rem;
+    color: #14532d;
+    padding-left: 2px;
 }
 @media (max-width: 600px) {
-    .excel-modal-content {
-        padding: 0;
+    .excel-sample {
+        padding: 12px 4px 8px 4px;
     }
-    .excel-modal-header, .excel-modal-body {
-        padding: 12px 8px;
+    .sample-table th, .sample-table td {
+        font-size: 0.90rem;
+        padding: 6px 4px;
     }
-    .excel-sample-table th, .excel-sample-table td {
-        font-size: 0.85rem;
-        padding: 5px 4px;
-    }
-    .excel-sample-notes {
-        padding: 8px 6px;
+    .notes {
+        padding: 8px 8px;
+        font-size: 0.93rem;
     }
 }

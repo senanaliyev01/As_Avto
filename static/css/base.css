@@ -3070,11 +3070,19 @@ body {
 .custom-quantity-modal-content {
     background-color: #fff;
     margin: 0 auto;
-    padding: 20px;
-    border-radius: 8px;
+    padding: 24px 18px 18px 18px;
+    border-radius: 12px;
     width: 100%;
-    height: auto;
-    position: relative;
+    max-width: 300px;
+    min-width: 220px;
+    box-shadow: 0 4px 24px rgba(44, 62, 80, 0.13);
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 /* Kilid ikonu üçün */

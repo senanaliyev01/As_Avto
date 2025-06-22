@@ -786,6 +786,7 @@ def my_sales_view(request):
     orders = Sifaris.objects.filter(sifarisitem__mehsul__sahib=request.user).distinct().order_by('-tarix')
 
     # Statistikaları yalnız bu istifadəçiyə aid məhsullar üzrə hesablayaq
+    total_orders = 0
     total_amount = 0
     total_paid = 0
     for order in orders:
@@ -797,15 +798,17 @@ def my_sales_view(request):
             paid_share = (order.odenilen_mebleg or 0) * (order_total / order.umumi_mebleg)
         else:
             paid_share = 0
-        total_amount += order_total
-        total_paid += paid_share
+        if order_total > 0:
+            total_orders += 1
+            total_amount += order_total
+            total_paid += paid_share
         # Alt xətsiz atributlar
         order.seller_total = order_total
         order.seller_paid = paid_share
         order.seller_debt = order_total - paid_share
 
     stats = {
-        'total_orders': orders.count(),
+        'total_orders': total_orders,
         'total_amount': total_amount,
         'total_paid': total_paid,
         'total_debt': total_amount - total_paid

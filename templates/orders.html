@@ -66,18 +66,12 @@
                         <td>{{ order.odenilen_mebleg }} ₼</td>
                         <td>{{ order.qaliq_borc }} ₼</td>
                         <td>
-                            {% with sellers=order.sifarisitem_set.all|map:'mehsul.sahib' %}
-                                {% with seller_names=sellers|map:'username' %}
-                                    {% with seller_names_list=seller_names|default_if_none:'' %}
-                                        {% if seller_names_list %}
-                                            {% for s in sellers|dictsort:'username'|unique %}
-                                                {% if s %}{{ s.username }}{% else %}AS-AVTO{% endif %}{% if not forloop.last %}, {% endif %}
-                                            {% endfor %}
-                                        {% else %}
-                                            AS-AVTO
-                                        {% endif %}
-                                    {% endwith %}
-                                {% endwith %}
+                            {% with first_item=order.sifarisitem_set.first %}
+                                {% if first_item and first_item.mehsul.sahib %}
+                                    {{ first_item.mehsul.sahib.username }}
+                                {% else %}
+                                    AS-AVTO
+                                {% endif %}
                             {% endwith %}
                         </td>
                     </tr>

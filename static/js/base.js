@@ -761,7 +761,7 @@ function initializeProductsPage() {
                                     ${product.yenidir ? '<span class="new-badge">Yeni</span>' : ''}
                                 </td>
                                 <td>
-                                    ${product.sahib_id ? `<a href="#" onclick="openUserDetailsModal(${product.sahib_id})">${product.sahib_username}</a>` : 'AS-AVTO'}
+                                    ${product.sahib_id ? `<a href="#" class=\"seller-link\" onclick=\"openUserDetailsModal(${product.sahib_id}); return false;\"><i class=\"fas fa-user\"></i> ${product.sahib_username}</a>` : 'AS-AVTO'}
                                 </td>
                                 <td>${product.stok}</td>
                                 <td>${product.qiymet} ₼</td>

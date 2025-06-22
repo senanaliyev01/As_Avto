@@ -37,9 +37,7 @@
                     </td>
                     <td>
                         {% if mehsul.sahib %}
-                            <a href="#" class="seller-link" onclick="openUserDetailsModal({{ mehsul.sahib.id }})">
-                                <i class="fas fa-user-circle"></i> {{ mehsul.sahib.username }}
-                            </a>
+                            <a href="#" class="seller-link" onclick="openUserDetailsModal({{ mehsul.sahib.id }}); return false;"><i class="fas fa-user"></i> {{ mehsul.sahib.username }}</a>
                         {% else %}
                             AS-AVTO
                         {% endif %}

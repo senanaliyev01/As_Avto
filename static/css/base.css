@@ -3027,30 +3027,41 @@ body {
     }
 }
 
-/* Sahib (satıcı) linki dizaynı */
+/* Seller Link Styles */
 .seller-link {
     color: #1d6f42;
     font-weight: 600;
-    text-decoration: underline dotted;
-    border-radius: 12px;
-    padding: 2px 10px 2px 6px;
+    text-decoration: none;
+    border-radius: 6px;
+    padding: 2px 10px 2px 8px;
     background: #e9f7ef;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    font-size: 0.98rem;
+    gap: 6px;
     transition: background 0.2s, color 0.2s, box-shadow 0.2s;
     box-shadow: 0 1px 4px rgba(44, 62, 80, 0.04);
-    cursor: pointer;
+    font-size: 0.98rem;
+    position: relative;
 }
 .seller-link i {
-    color: #1d6f42;
+    color: #218838;
     font-size: 1em;
     margin-right: 2px;
 }
 .seller-link:hover, .seller-link:focus {
-    background: #b7e4c7;
-    color: #14532d;
-    text-decoration: underline solid;
+    color: #fff;
+    background: linear-gradient(90deg, #1d6f42 0%, #218838 100%);
+    text-decoration: underline;
     box-shadow: 0 2px 8px rgba(44, 62, 80, 0.10);
+    outline: none;
+}
+.seller-link:active {
+    background: #14532d;
+    color: #fff;
+}
+@media (max-width: 600px) {
+    .seller-link {
+        font-size: 0.93rem;
+        padding: 2px 6px;
+    }
 }

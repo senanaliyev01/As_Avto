@@ -1835,6 +1835,47 @@ body {
     font-size: 16px;
 }
 
+.mr-sls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    color: #07d91c;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.mr-sls:hover {
+    background-color: #f8f9fa;
+}
+
+.mr-sls i {
+    font-size: 14px;
+}
+
+.my-pr {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    color: #3326eb;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.my-pr:hover {
+    background-color: #f8f9fa;
+}
+
+.my-pr i {
+    font-size: 14px;
+}
+
+
+
+
 .logout-link {
     display: flex;
     align-items: center;

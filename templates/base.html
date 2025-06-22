@@ -56,14 +56,14 @@
                                                 {{ request.user.username }}
                                             </span>
                                             {% if user.is_authenticated %}
-                                                <a href="{% url 'my_products' %}" class="logout-link">
+                                                <a href="{% url 'my_products' %}" class="my-pr">
                                                     {% if not user.profile.is_verified %}
                                                         <i class="fas fa-lock icon-locked"></i> Mənim Məhsullarım
                                                     {% else %}
                                                         <i class="fas fa-box"></i> Mənim Məhsullarım
                                                     {% endif %}
                                                 </a>
-                                                <a href="{% url 'my_sales' %}" class="logout-link">
+                                                <a href="{% url 'my_sales' %}" class="mr-sls">
                                                     {% if not user.profile.is_verified %}
                                                         <i class="fas fa-lock icon-locked"></i> Mənə gələn sifarişlər
                                                     {% else %}

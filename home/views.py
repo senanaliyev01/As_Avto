@@ -803,10 +803,10 @@ def my_sales_view(request):
             paid_share = 0
         total_amount += order_total
         total_paid += paid_share
-        # Hər order üçün ayrıca seller dəyərləri əlavə et
-        order._seller_total = order_total
-        order._seller_paid = paid_share
-        order._seller_debt = order_total - paid_share
+        # Alt xətsiz atributlar
+        order.seller_total = order_total
+        order.seller_paid = paid_share
+        order.seller_debt = order_total - paid_share
 
     stats = {
         'total_orders': orders.count(),

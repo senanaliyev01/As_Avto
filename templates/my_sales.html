@@ -4,7 +4,26 @@
 
 {% block content %}
 <div class="container">
-    <h2>Mənə Gələn Sifarişlər</h2>
+    <h2 class="mb-4">Mənə Gələn Sifarişlər</h2>
+
+    <div class="orders-summary">
+        <div class="summary-item">
+            <span class="summary-label">Ümumi Sifariş Sayı</span>
+            <span class="summary-value">{{ stats.total_orders }}</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Ümumi Məbləğ</span>
+            <span class="summary-value">{{ stats.total_amount|floatformat:2 }} ₼</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Ödənilən Məbləğ</span>
+            <span class="summary-value">{{ stats.total_paid|floatformat:2 }} ₼</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Qalıq Borc</span>
+            <span class="summary-value">{{ stats.total_debt|floatformat:2 }} ₼</span>
+        </div>
+    </div>
 
     {% if orders %}
         <div class="table-responsive">

@@ -727,8 +727,25 @@ def my_sales_view(request):
     # İstifadəçinin məhsullarının olduğu sifarişləri tap və təkrarlanmanın qarşısını al
     orders = Sifaris.objects.filter(sifarisitem__mehsul__sahib=request.user).distinct().order_by('-tarix')
 
+    # Bu sifarişlər əsasında statistikaları hesabla
+    stats_data = orders.aggregate(
+        total_amount=Sum('umumi_mebleg'),
+        total_paid=Sum('odenilen_mebleg')
+    )
+    
+    total_amount = stats_data.get('total_amount') or 0
+    total_paid = stats_data.get('total_paid') or 0
+
+    stats = {
+        'total_orders': orders.count(),
+        'total_amount': total_amount,
+        'total_paid': total_paid,
+        'total_debt': total_amount - total_paid
+    }
+
     context = {
-        'orders': orders
+        'orders': orders,
+        'stats': stats
     }
     return render(request, 'my_sales.html', context)
 

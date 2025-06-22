@@ -1,12 +1,12 @@
 from django import forms
-from .models import Mehsul, Kateqoriya, Firma, Avtomobil, Vitrin, Sifaris
+from .models import Mehsul, Kateqoriya, Firma, Avtomobil, Vitrin, Sifaris, SifarisItem
 
 class MehsulForm(forms.ModelForm):
     class Meta:
         model = Mehsul
         fields = [
             'adi', 'kateqoriya', 'firma', 'avtomobil', 'vitrin',
-            'brend_kod', 'oem', 'olcu', 'maya_qiymet', 'qiymet', 
+            'brend_kod', 'olcu', 'maya_qiymet', 'qiymet', 
             'stok', 'kodlar', 'melumat', 'sekil', 'yenidir'
         ]
         widgets = {
@@ -16,7 +16,6 @@ class MehsulForm(forms.ModelForm):
             'avtomobil': forms.Select(attrs={'class': 'form-control'}),
             'vitrin': forms.Select(attrs={'class': 'form-control'}),
             'brend_kod': forms.TextInput(attrs={'class': 'form-control'}),
-            'oem': forms.TextInput(attrs={'class': 'form-control'}),
             'olcu': forms.TextInput(attrs={'class': 'form-control'}),
             'maya_qiymet': forms.NumberInput(attrs={'class': 'form-control'}),
             'qiymet': forms.NumberInput(attrs={'class': 'form-control'}),
@@ -35,4 +34,13 @@ class SifarisEditForm(forms.ModelForm):
             'status': forms.Select(attrs={'class': 'form-control'}),
             'odenilen_mebleg': forms.NumberInput(attrs={'class': 'form-control'}),
             'qeyd': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        } 
+
+class SifarisItemEditForm(forms.ModelForm):
+    class Meta:
+        model = SifarisItem
+        fields = ['miqdar', 'qiymet']
+        widgets = {
+            'miqdar': forms.NumberInput(attrs={'class': 'form-control form-control-sm item-input', 'min': '1', 'data-field': 'quantity'}),
+            'qiymet': forms.NumberInput(attrs={'class': 'form-control form-control-sm item-input', 'step': '0.01', 'data-field': 'price'}),
         } 

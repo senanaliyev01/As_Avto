@@ -3065,3 +3065,56 @@ body {
         padding: 2px 6px;
     }
 }
+
+/* Quantity Modal Styles */
+.quantity-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+.quantity-modal .modal-content {
+    background-color: #fff;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 100%;
+    height: auto;
+    position: relative;
+}
+.quantity-modal .close {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    font-size: 24px;
+    cursor: pointer;
+}
+.quantity-modal .modal-content h3 {
+    margin-bottom: 20px;
+}
+.quantity-modal .modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.quantity-modal .modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+.quantity-modal .modal-buttons button {
+    flex: 1;
+    padding: 8px 15px;
+}
+
+/* Lock icon for user dropdown links */
+.lock-icon {
+    color: #dc3545;
+    margin-right: 6px;
+    font-size: 1.1em;
+    vertical-align: middle;
+}

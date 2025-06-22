@@ -216,20 +216,16 @@ function initializeModal() {
     
     if (modal && closeBtn && form) {
         closeBtn.onclick = () => modal.style.display = 'none';
-        
         window.onclick = function(event) {
             if (event.target == modal) {
                 modal.style.display = 'none';
             }
         }
-
         // Handle form submission
         form.addEventListener('submit', function(e) {
             e.preventDefault();
-            
             const formData = new FormData(this);
             const url = this.action;
-            
             fetch(url, {
                 method: 'POST',
                 body: formData,
@@ -241,16 +237,12 @@ function initializeModal() {
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    // Show success message
                     showMessage('success', data.message);
-                    // Update cart counter
                     if (data.cart_count !== undefined) {
                         updateCartCounter(data.cart_count);
                     }
-                    // Close modal
                     modal.style.display = 'none';
                 } else {
-                    // Show error message
                     showMessage('error', data.message);
                 }
             })
@@ -423,20 +415,19 @@ function showMessage(type, message) {
 }
 
 // Modal functions
-    window.openQuantityModal = function(productId, maxStock) {
-        const modal = document.getElementById('quantityModal');
-        const form = document.getElementById('addToCartForm');
-        const quantityInput = document.getElementById('quantityInput');
-        
-        quantityInput.max = maxStock;
-        form.action = `/cart/add/${productId}/`;
-        modal.style.display = 'block';
-    }
+window.openQuantityModal = function(productId, maxStock) {
+    const modal = document.getElementById('quantityModal');
+    const form = document.getElementById('addToCartForm');
+    const quantityInput = document.getElementById('quantityInput');
+    quantityInput.max = maxStock;
+    form.action = `/cart/add/${productId}/`;
+    modal.style.display = 'block';
+}
 
-    window.closeQuantityModal = function() {
-        const modal = document.getElementById('quantityModal');
-        modal.style.display = 'none';
-    }
+window.closeQuantityModal = function() {
+    const modal = document.getElementById('quantityModal');
+    modal.style.display = 'none';
+}
 
 function initializeSwiper() {
     if (document.querySelector('.new-products-swiper')) {

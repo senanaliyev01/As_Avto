@@ -137,9 +137,9 @@ def products_view(request):
     if avtomobil:
         mehsullar = mehsullar.filter(avtomobil__adi=avtomobil)
     
-    # İlk 15 məhsulu götür
-    initial_products = mehsullar[:15]
-    has_more = mehsullar.count() > 15
+    # İlk 5 məhsulu götür
+    initial_products = mehsullar[:5]
+    has_more = mehsullar.count() > 5
     
     kateqoriyalar = Kateqoriya.objects.all()
     firmalar = Firma.objects.all()
@@ -161,7 +161,7 @@ def products_view(request):
 @login_required
 def load_more_products(request):
     offset = int(request.GET.get('offset', 0))
-    limit = 15
+    limit = 5
     search_query = request.GET.get('search', '')
     kateqoriya = request.GET.get('kateqoriya', '')
     firma = request.GET.get('firma', '')
@@ -549,9 +549,9 @@ def new_products_view(request):
     # Yeni məhsulları əldə et
     mehsullar = Mehsul.objects.filter(yenidir=True).order_by('-id')  # Ən son əlavə edilən yeni məhsullardan başla
     
-    # İlk 15 məhsulu götür
-    initial_products = mehsullar[:15]
-    has_more = mehsullar.count() > 15
+    # İlk 5 məhsulu götür
+    initial_products = mehsullar[:5]
+    has_more = mehsullar.count() > 5
     
     kateqoriyalar = Kateqoriya.objects.all()
     firmalar = Firma.objects.all()
@@ -570,7 +570,7 @@ def new_products_view(request):
 @login_required
 def load_more_new_products(request):
     offset = int(request.GET.get('offset', 0))
-    limit = 15
+    limit = 5
     
     mehsullar = Mehsul.objects.filter(yenidir=True).order_by('-id')
     

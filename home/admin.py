@@ -241,7 +241,7 @@ class MehsulAdmin(admin.ModelAdmin):
 
                             print(f"Brend kod: {brend_kod}")
 
-                            existing_product = Mehsul.objects.filter(brend_kod=brend_kod).first()
+                            existing_product = Mehsul.objects.filter(brend_kod=brend_kod, sahib=None).first()
 
                             try:
                                 if existing_product:

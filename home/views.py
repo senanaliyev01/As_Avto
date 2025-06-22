@@ -935,16 +935,12 @@ def import_user_products_view(request):
                         error_count += 1
                         continue
 
-                    existing_product = Mehsul.objects.filter(brend_kod=brend_kod).first()
+                    existing_product = Mehsul.objects.filter(brend_kod=brend_kod, sahib=request.user).first()
 
                     if existing_product:
-                        if existing_product.sahib and existing_product.sahib != request.user:
-                            messages.error(request, f'Sətir {index + 2}: "{brend_kod}" kodlu məhsul başqa satıcıya aiddir. Onu yeniləyə bilməzsiniz.', level=messages.ERROR)
-                            error_count += 1
-                            continue
-
+                        # Sahib onsuz da request.user olduğu üçün bu yoxlamaya ehtiyac yoxdur.
+                        # Mövcud məhsulu yeniləyirik.
                         existing_product.adi = temiz_ad
-                        existing_product.sahib = request.user
                         existing_product.kateqoriya = kateqoriya
                         existing_product.firma = firma
                         existing_product.avtomobil = avtomobil
@@ -955,9 +951,11 @@ def import_user_products_view(request):
                         existing_product.stok = int(row['stok']) if 'stok' in row and pd.notna(row['stok']) else 0
                         existing_product.kodlar = str(row['kodlar']) if 'kodlar' in row and pd.notna(row['kodlar']) else ''
                         existing_product.melumat = str(row['melumat']) if 'melumat' in row and pd.notna(row['melumat']) else ''
+                        
                         existing_product.save()
                         update_count += 1
                     else:
+                        # Yeni məhsul yaradırıq
                         mehsul_data = {
                             'adi': temiz_ad,
                             'sahib': request.user,

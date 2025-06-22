@@ -6,14 +6,7 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Sifariş #{{ order.id }} Redaktə Et</h2>
-        <div>
-            <span class="status-badge status-{{ seller_status|lower }}">
-                {% if seller_status %}
-                    {% if seller_status == 'PENDING' %}Gözləyir{% elif seller_status == 'PROCESSING' %}İşlənir{% elif seller_status == 'COMPLETED' %}Tamamlandı{% elif seller_status == 'CANCELLED' %}Ləğv edildi{% else %}{{ seller_status }}{% endif %}
-                {% else %}-{% endif %}
-            </span>
-            <a href="{% url 'my_sales' %}" class="btn btn-secondary ms-3">Geri Qayıt</a>
-        </div>
+        <a href="{% url 'my_sales' %}" class="btn btn-secondary">Geri Qayıt</a>
     </div>
 
     <form method="post">

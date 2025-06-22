@@ -47,10 +47,8 @@
                         <td>{{ order.istifadeci.username }}</td>
                         <td>{{ order.tarix|date:"d M Y, H:i" }}</td>
                         <td>
-                            <span class="status-badge status-{{ order.seller_status|lower }}">
-                                {% if order.seller_status %}
-                                    {% if order.seller_status == 'PENDING' %}Gözləyir{% elif order.seller_status == 'PROCESSING' %}İşlənir{% elif order.seller_status == 'COMPLETED' %}Tamamlandı{% elif order.seller_status == 'CANCELLED' %}Ləğv edildi{% else %}{{ order.seller_status }}{% endif %}
-                                {% else %}-{% endif %}
+                            <span class="status-badge status-{{ order.status|lower }}">
+                                {{ order.get_status_display }}
                             </span>
                         </td>
                         <td>{{ order.seller_total|floatformat:2 }} ₼</td>

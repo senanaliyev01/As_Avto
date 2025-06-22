@@ -42,8 +42,15 @@
         </div>
     </div>
 
+    <form method="get" class="mb-3" id="search-form">
+        <div class="input-group">
+            <input type="text" class="form-control" name="search" placeholder="Axtarış..." value="{{ search_query }}">
+            <button class="btn btn-outline-secondary" type="submit">Axtar</button>
+        </div>
+    </form>
+
     <div class="table-container">
-        <table class="table">
+        <table class="table" id="products-table">
             <thead>
                 <tr>
                     <th>Şəkil</th>
@@ -55,7 +62,7 @@
                     <th>Əməliyyatlar</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="products-tbody">
                 {% for mehsul in mehsullar %}
                 <tr>
                     <td><img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image"></td>
@@ -90,6 +97,57 @@
                 {% endfor %}
             </tbody>
         </table>
+        <div class="text-center my-3">
+            {% if has_more %}
+            <button id="load-more-btn" class="btn btn-outline-primary" data-offset="5" data-search="{{ search_query }}">Daha çox göstər</button>
+            {% endif %}
+        </div>
     </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const loadMoreBtn = document.getElementById('load-more-btn');
+        if (loadMoreBtn) {
+            loadMoreBtn.addEventListener('click', function() {
+                const offset = parseInt(this.getAttribute('data-offset'));
+                const search = this.getAttribute('data-search') || '';
+                this.disabled = true;
+                this.textContent = 'Yüklənir...';
+                fetch(`/my-products/load-more/?offset=${offset}&search=${encodeURIComponent(search)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const tbody = document.getElementById('products-tbody');
+                        data.products.forEach(function(product) {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${product.sekil_url ? `<img src="${product.sekil_url}" alt="${product.adi}" class="product-image">` : ''}</td>
+                                <td>${product.brend_kod}</td>
+                                <td>${product.firma}</td>
+                                <td>${product.adi} ${product.yenidir ? '<span class="new-badge">Yeni</span>' : ''}</td>
+                                <td>${product.stok}</td>
+                                <td>${product.qiymet} ₼</td>
+                                <td>
+                                    <a href="/my-products/edit/${product.id}/" class="btn btn-secondary btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="/my-products/delete/${product.id}/" class="btn btn-danger btn-sm" onclick="return confirm('Bu məhsulu silmək istədiyinizə əminsiniz?')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            `;
+                            tbody.appendChild(row);
+                        });
+                        if (data.has_more) {
+                            loadMoreBtn.setAttribute('data-offset', offset + data.products.length);
+                            loadMoreBtn.disabled = false;
+                            loadMoreBtn.textContent = 'Daha çox göstər';
+                        } else {
+                            loadMoreBtn.remove();
+                        }
+                    });
+            });
+        }
+    });
+    </script>
 </div>
 {% endblock %} 

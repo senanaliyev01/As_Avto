@@ -716,8 +716,69 @@ def my_products_view(request):
         messages.error(request, 'Bu səhifəyə giriş üçün icazəniz yoxdur.')
         return redirect('base')
     
+    search_query = request.GET.get('search', '')
     mehsullar = Mehsul.objects.filter(sahib=request.user).order_by('-id')
-    return render(request, 'my_products.html', {'mehsullar': mehsullar})
+    if search_query:
+        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
+        if clean_search:
+            kod_filter = Q(kodlar__icontains=clean_search)
+            olcu_filter = Q(olcu__icontains=clean_search)
+            processed_query = re.sub(r'\s+', ' ', search_query).strip()
+            search_words = processed_query.split()
+            if search_words:
+                ad_filters = []
+                for word in search_words:
+                    ad_filters.append(Q(adi__icontains=word))
+                ad_filter = reduce(and_, ad_filters)
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | ad_filter)
+            else:
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter)
+    initial_products = mehsullar[:5]
+    has_more = mehsullar.count() > 5
+    return render(request, 'my_products.html', {
+        'mehsullar': initial_products,
+        'has_more': has_more,
+        'search_query': search_query,
+    })
+
+@login_required
+def load_more_my_products(request):
+    if not request.user.profile.is_verified:
+        return JsonResponse({'products': [], 'has_more': False})
+    offset = int(request.GET.get('offset', 0))
+    limit = 5
+    search_query = request.GET.get('search', '')
+    mehsullar = Mehsul.objects.filter(sahib=request.user).order_by('-id')
+    if search_query:
+        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
+        if clean_search:
+            kod_filter = Q(kodlar__icontains=clean_search)
+            olcu_filter = Q(olcu__icontains=clean_search)
+            processed_query = re.sub(r'\s+', ' ', search_query).strip()
+            search_words = processed_query.split()
+            if search_words:
+                ad_filters = []
+                for word in search_words:
+                    ad_filters.append(Q(adi__icontains=word))
+                ad_filter = reduce(and_, ad_filters)
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | ad_filter)
+            else:
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter)
+    products = mehsullar[offset:offset+limit]
+    has_more = mehsullar.count() > (offset + limit)
+    products_data = []
+    for product in products:
+        products_data.append({
+            'id': product.id,
+            'adi': product.adi,
+            'sekil_url': product.sekil.url if product.sekil else None,
+            'firma': product.firma.adi if product.firma else '',
+            'brend_kod': product.brend_kod,
+            'stok': product.stok,
+            'qiymet': str(product.qiymet),
+            'yenidir': product.yenidir,
+        })
+    return JsonResponse({'products': products_data, 'has_more': has_more})
 
 @login_required
 def my_sales_view(request):

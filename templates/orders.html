@@ -68,18 +68,14 @@
                         <td>{{ order.odenilen_mebleg }} ₼</td>
                         <td>{{ order.qaliq_borc }} ₼</td>
                         <td>
-                            {% with sellers_list=[] %}
-                                {% for item in order.sifarisitem_set.all %}
-                                    {% if item.mehsul.sahib %}
-                                        {% if item.mehsul.sahib.username not in sellers_list %}
-                                            {% if not forloop.first %}, {% endif %}{{ item.mehsul.sahib.username }}{% set sellers_list=sellers_list|add:item.mehsul.sahib.username %}
-                                        {% endif %}
-                                    {% else %}
-                                        {% if 'AS-AVTO' not in sellers_list %}
-                                            {% if not forloop.first %}, {% endif %}AS-AVTO{% set sellers_list=sellers_list|add:'AS-AVTO' %}
-                                        {% endif %}
-                                    {% endif %}
-                                {% endfor %}
+                            {% with sellers=order.sifarisitem_set.all|values_list:'mehsul__sahib__username' %}
+                                {% if sellers %}
+                                    {% for s in sellers|dictsort:""|unique %}
+                                        {% if s %}{{ s }}{% else %}AS-AVTO{% endif %}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    AS-AVTO
+                                {% endif %}
                             {% endwith %}
                         </td>
                     </tr>

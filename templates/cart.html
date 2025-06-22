@@ -80,7 +80,7 @@
                     </div>
                 </div>
                 <div class="checkout-form">
-                    <button type="submit" class="btn btn-primary" id="checkout-button" disabled>Sifarişi göndər</button>
+                    <button type="button" class="btn btn-primary" id="checkout-button" disabled onclick="openOrderConfirmationModal()">Sifarişi göndər</button>
                 </div>
             </div>
         </form>
@@ -98,6 +98,42 @@
     <span class="image-modal-close">&times;</span>
     <div class="modal-image-content">
         <img id="modalImage" class="modal-image" src="" alt="Modal Image">
+    </div>
+</div>
+
+<!-- Order Confirmation Modal -->
+<div id="orderConfirmationModal" class="order-confirmation-modal">
+    <div class="order-confirmation-content">
+        <div class="order-confirmation-header">
+            <h3>Sifariş Təsdiqi</h3>
+            <span class="order-confirmation-close" onclick="closeOrderConfirmationModal()">&times;</span>
+        </div>
+        <div class="order-confirmation-body">
+            <div class="confirmation-icon">
+                <i class="fas fa-question-circle"></i>
+            </div>
+            <p class="confirmation-message">Sifarişi təsdiq etmək istədiyinizə əminsiniz?</p>
+            <div class="confirmation-details">
+                <div class="detail-item">
+                    <span class="detail-label">Seçilmiş məbləğ:</span>
+                    <span class="detail-value" id="modal-selected-total">0.00 ₼</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Çatdırılma üsulu:</span>
+                    <span class="detail-value" id="modal-delivery-method">-</span>
+                </div>
+            </div>
+        </div>
+        <div class="order-confirmation-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeOrderConfirmationModal()">
+                <i class="fas fa-times"></i>
+                Xeyr
+            </button>
+            <button type="button" class="btn btn-primary" onclick="confirmOrder()">
+                <i class="fas fa-check"></i>
+                Bəli
+            </button>
+        </div>
     </div>
 </div>
 

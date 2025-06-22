@@ -27,12 +27,6 @@ class MehsulForm(forms.ModelForm):
         } 
 
 class SifarisEditForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Yalnız 'COMPLETED' statusunu seçmək mümkün olsun
-        self.fields['status'].choices = [
-            ('COMPLETED', 'Tamamlandı')
-        ]
     class Meta:
         model = Sifaris
         fields = ['status', 'odenilen_mebleg', 'qeyd']
@@ -49,4 +43,13 @@ class SifarisItemEditForm(forms.ModelForm):
         widgets = {
             'miqdar': forms.NumberInput(attrs={'class': 'form-control form-control-sm item-input', 'min': '1', 'data-field': 'quantity'}),
             'qiymet': forms.NumberInput(attrs={'class': 'form-control form-control-sm item-input', 'step': '0.01', 'data-field': 'price'}),
+        }
+
+# New form for seller status
+class SellerStatusForm(forms.ModelForm):
+    class Meta:
+        model = SifarisItem
+        fields = ['seller_status']
+        widgets = {
+            'seller_status': forms.Select(attrs={'class': 'form-control'}),
         } 

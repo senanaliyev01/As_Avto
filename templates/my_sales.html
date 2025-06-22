@@ -47,7 +47,13 @@
                         <td>{{ order.istifadeci.username }}</td>
                         <td>{{ order.tarix|date:"d M Y, H:i" }}</td>
                         <td>
-                            <span class="badge bg-success">{{ order.get_status_display }}</span>
+                            <span class="status-badge status-{{ order.seller_status|lower }}">
+                                {% if order.seller_status == 'COMPLETED' %}
+                                    Tamamlandı
+                                {% else %}
+                                    Gözləyir
+                                {% endif %}
+                            </span>
                         </td>
                         <td>{{ order.seller_total|floatformat:2 }} ₼</td>
                         <td>{{ order.seller_paid|floatformat:2 }} ₼</td>

@@ -14,7 +14,7 @@ from operator import and_, or_
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.views.decorators.http import require_http_methods
-from .forms import MehsulForm, SifarisEditForm, SifarisItemEditForm
+from .forms import MehsulForm, SifarisEditForm, SifarisItemEditForm, SellerStatusForm
 import pandas as pd
 from django.db import transaction
 import math
@@ -791,7 +791,6 @@ def my_sales_view(request):
         items = order.sifarisitem_set.filter(mehsul__sahib=request.user)
         order_total = sum(item.umumi_mebleg for item in items)
         if order_total > 0:
-            # İstifadəçiyə aid məhsullar üçün ödənilən məbləğ (yalnız öz məhsullarına görə)
             seller_paid = min(order.odenilen_mebleg, order_total)
             total_orders += 1
             total_amount += order_total
@@ -799,6 +798,12 @@ def my_sales_view(request):
             order.seller_total = order_total
             order.seller_paid = seller_paid
             order.seller_debt = order_total - seller_paid
+            # Add seller_status summary for this order (if all items completed, show completed)
+            seller_statuses = list(items.values_list('seller_status', flat=True))
+            if seller_statuses and all(s == 'COMPLETED' for s in seller_statuses):
+                order.seller_status = 'COMPLETED'
+            else:
+                order.seller_status = 'PENDING'
             filtered_orders.append(order)
 
     stats = {
@@ -821,24 +826,11 @@ def edit_my_sale_view(request, order_id):
         return redirect('my_sales')
 
     order = get_object_or_404(Sifaris, id=order_id)
-    # Yalnız həmin satıcıya aid məhsulları olan sifarişlərə baxmaq üçün yoxlama
     if not SifarisItem.objects.filter(sifaris=order, mehsul__sahib=request.user).exists():
         messages.error(request, 'Bu sifarişi redaktə etmək üçün icazəniz yoxdur.')
         return redirect('my_sales')
 
-    # Sifarişin öz məhsulları üçün formset yarat
-    SifarisItemFormSet = inlineformset_factory(
-        Sifaris, 
-        SifarisItem, 
-        form=SifarisItemEditForm, 
-        extra=0, 
-        can_delete=False
-    )
-    
-    # Formset-ə yalnız satıcının öz məhsullarını daxil et
     queryset = order.sifarisitem_set.filter(mehsul__sahib=request.user)
-
-    # Yalnız bu istifadəçiyə aid məhsulların cəmini tap
     order_items = queryset
     total_amount = sum(item.umumi_mebleg for item in order_items)
     paid_share = 0
@@ -846,31 +838,27 @@ def edit_my_sale_view(request, order_id):
         paid_share = (order.odenilen_mebleg or 0) * (total_amount / order.umumi_mebleg)
     qaliq_borc = total_amount - paid_share
 
+    # Handle seller status update
     if request.method == 'POST':
-        form = SifarisEditForm(request.POST, instance=order)
-        formset = SifarisItemFormSet(request.POST, instance=order, queryset=queryset)
-        
-        if form.is_valid() and formset.is_valid():
-            form.save()
-            formset.save()
-            order.update_total() # Formset save olanda onsuz da total update olur, amma zəmanət üçün
-            messages.success(request, f"Sifariş #{order.id} uğurla yeniləndi.")
+        status_forms = [SellerStatusForm(request.POST, prefix=str(item.id), instance=item) for item in order_items]
+        valid = all(f.is_valid() for f in status_forms)
+        if valid:
+            for f in status_forms:
+                f.save()
+            messages.success(request, f"Status(lar) uğurla yeniləndi.")
             return redirect('edit_my_sale', order_id=order.id)
         else:
             messages.error(request, "Zəhmət olmasa xətaları düzəldin.")
-
     else:
-        form = SifarisEditForm(instance=order)
-        formset = SifarisItemFormSet(instance=order, queryset=queryset)
+        status_forms = [SellerStatusForm(prefix=str(item.id), instance=item) for item in order_items]
 
     context = {
         'order': order,
-        'form': form,
-        'formset': formset,
         'order_items': order_items,
         'total_amount': total_amount,
         'paid_share': paid_share,
         'qaliq_borc': qaliq_borc,
+        'status_forms': status_forms,
     }
     return render(request, 'edit_my_sale.html', context)
 

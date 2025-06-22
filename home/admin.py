@@ -351,8 +351,8 @@ class MehsulAdmin(admin.ModelAdmin):
 class SifarisItemInline(admin.TabularInline):
     model = SifarisItem
     extra = 0
-    readonly_fields = ['mehsul', 'mehsul_sahibi']
-    fields = ['mehsul', 'mehsul_sahibi', 'miqdar', 'qiymet']
+    readonly_fields = ['mehsul', 'mehsul_sahibi', 'seller_status']
+    fields = ['mehsul', 'mehsul_sahibi', 'miqdar', 'qiymet', 'seller_status']
 
     def mehsul_sahibi(self, obj):
         if obj.mehsul and obj.mehsul.sahib:
@@ -377,7 +377,7 @@ class SifarisItemInline(admin.TabularInline):
 @admin.register(Sifaris)
 class SifarisAdmin(admin.ModelAdmin):
     list_display = ['id', 'istifadeci', 'saticilar', 'tarix', 'status', 'catdirilma_usulu', 'umumi_mebleg', 'odenilen_mebleg', 'qaliq_borc', 'pdf_button']
-    list_filter = ['status', 'catdirilma_usulu', 'tarix', 'istifadeci']
+    list_filter = ['status', 'catdirilma_usulu', 'tarix', 'istifadeci', 'sifarisitem__seller_status']
     search_fields = ['istifadeci__username']
     readonly_fields = ['istifadeci', 'tarix', 'umumi_mebleg', 'qaliq_borc']
     fields = ['istifadeci', 'tarix', 'status', 'catdirilma_usulu', 'umumi_mebleg', 'odenilen_mebleg', 'qaliq_borc', 'qeyd']

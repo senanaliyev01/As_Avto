@@ -2794,6 +2794,8 @@ body {
     justify-content: center;
 }
 .my-products-actions {
+    top: 20px;
+    position: relative;
     margin-left: auto;
     display: flex;
     align-items: center;

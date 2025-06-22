@@ -795,7 +795,7 @@ def edit_my_sale_view(request, order_id):
         'order': order,
         'form': form,
         'formset': formset,
-        'order_items': order.sifarisitem_set.all() # Bütün məhsulları göstərmək üçün
+        'order_items': order.sifarisitem_set.filter(mehsul__sahib=request.user) # Yalnız bu istifadəçiyə aid məhsullar
     }
     return render(request, 'edit_my_sale.html', context)
 

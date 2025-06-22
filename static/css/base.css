@@ -541,14 +541,6 @@ body {
     border-radius: 4px;
 }
 
-/* Override for Bootstrap's input group to ensure side-by-side layout */
-.input-group > .form-control {
-    position: relative;
-    flex: 1 1 auto;
-    width: 1%;
-    min-width: 0;
-}
-
 .btn {
     display: inline-block;
     padding: 0.5rem 1rem;
@@ -2779,6 +2771,25 @@ body {
 }
 .my-products-header form {
     margin-bottom: 0;
+}
+.my-products-header .input-group-sm > .form-control,
+.my-products-header .input-group-sm > .btn {
+    height: 32px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    font-size: 0.95rem;
+    border-radius: 6px;
+}
+.my-products-header .input-group-sm > .form-control {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.my-products-header .input-group-sm > .btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .my-products-actions {
     margin-left: auto;

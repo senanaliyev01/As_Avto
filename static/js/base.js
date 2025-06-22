@@ -34,9 +34,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize Header Messages
     initializeHeaderMessages();
-
-    // Initialize Order Confirmation Modal
-    initializeOrderConfirmationModal();
 });
 
 function initializeSearch() {
@@ -104,6 +101,16 @@ function initializeCart() {
     const selectedTotal = document.getElementById('selected-total');
     const checkoutButton = document.getElementById('checkout-button');
     const updateForms = document.querySelectorAll('.update-form');
+    const checkoutForm = document.getElementById('checkout-form');
+
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', function(e) {
+            // Sifarişi göndərmədən öncə təsdiq istə
+            if (!confirm('Sifariş etmək istədiyinizə əminsiniz?')) {
+                e.preventDefault(); // Əgər istifadəçi "Cancel" basarsa, formanın göndərilməsini dayandır
+            }
+        });
+    }
 
     // Add event listener for update forms
     if (updateForms) {
@@ -933,121 +940,5 @@ function initializeHeaderMessages() {
 
     // Hər 5 saniyədən bir növbəti mesaja keç
     setInterval(nextMessage, interval);
-}
-
-// Order Confirmation Modal Functions
-function openOrderConfirmationModal() {
-    const modal = document.getElementById('orderConfirmationModal');
-    const selectedTotal = document.getElementById('selected-total').textContent;
-    const modalSelectedTotal = document.getElementById('modal-selected-total');
-    
-    // Seçilmiş məbləği modal-a köçür
-    modalSelectedTotal.textContent = selectedTotal;
-    
-    // Modal-ı göstər
-    modal.style.display = 'block';
-    setTimeout(() => {
-        modal.classList.add('show');
-    }, 10);
-}
-
-function closeOrderConfirmationModal() {
-    const modal = document.getElementById('orderConfirmationModal');
-    modal.classList.remove('show');
-    setTimeout(() => {
-        modal.style.display = 'none';
-    }, 300);
-}
-
-function confirmOrder() {
-    const modal = document.getElementById('orderConfirmationModal');
-    const modalContent = modal.querySelector('.order-confirmation-content');
-    const confirmButton = modal.querySelector('.btn-primary');
-    
-    // Çatdırılma üsulunu yoxla
-    const selectedDeliveryMethod = modal.querySelector('input[name="catdirilma_usulu"]:checked');
-    if (!selectedDeliveryMethod) {
-        showMessage('error', 'Zəhmət olmasa çatdırılma üsulunu seçin.');
-        return;
-    }
-    
-    // Loading animasiyasını başlat
-    modalContent.classList.add('loading');
-    confirmButton.disabled = true;
-    
-    // Form məlumatlarını al
-    const form = document.getElementById('checkout-form');
-    const formData = new FormData(form);
-    
-    // Çatdırılma üsulunu form-a əlavə et
-    formData.append('catdirilma_usulu', selectedDeliveryMethod.value);
-    
-    // Sifarişi göndər
-    fetch(form.action, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRFToken': getCookie('csrftoken'),
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => {
-        if (response.redirected) {
-            // Uğurlu sifariş - səhifəni yönləndir
-            window.location.href = response.url;
-        } else {
-            return response.text();
-        }
-    })
-    .then(html => {
-        if (html) {
-            // Xəta baş verdi
-            showMessage('error', 'Sifariş göndərilərkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
-            closeOrderConfirmationModal();
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showMessage('error', 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
-        closeOrderConfirmationModal();
-    })
-    .finally(() => {
-        // Loading animasiyasını dayandır
-        modalContent.classList.remove('loading');
-        confirmButton.disabled = false;
-    });
-}
-
-// Initialize Order Confirmation Modal
-function initializeOrderConfirmationModal() {
-    const modal = document.getElementById('orderConfirmationModal');
-    
-    if (modal) {
-        // Modal xaricində kliklədikdə bağla
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
-                closeOrderConfirmationModal();
-            }
-        });
-        
-        // ESC düyməsi ilə bağla
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && modal.style.display === 'block') {
-                closeOrderConfirmationModal();
-            }
-        });
-        
-        // Çatdırılma üsulu seçimi üçün event listener
-        const deliveryOptions = modal.querySelectorAll('input[name="catdirilma_usulu"]');
-        deliveryOptions.forEach(option => {
-            option.addEventListener('change', function() {
-                // Seçilmiş option-ı vurğula
-                deliveryOptions.forEach(opt => {
-                    opt.closest('.delivery-option-modal').classList.remove('selected');
-                });
-                this.closest('.delivery-option-modal').classList.add('selected');
-            });
-        });
-    }
 }
 

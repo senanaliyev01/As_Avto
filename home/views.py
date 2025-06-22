@@ -728,14 +728,20 @@ def my_sales_view(request):
     # İstifadəçinin məhsullarının olduğu sifarişləri tap və təkrarlanmanın qarşısını al
     orders = Sifaris.objects.filter(sifarisitem__mehsul__sahib=request.user).distinct().order_by('-tarix')
 
-    # Bu sifarişlər əsasında statistikaları hesabla
-    stats_data = orders.aggregate(
-        total_amount=Sum('umumi_mebleg'),
-        total_paid=Sum('odenilen_mebleg')
-    )
-    
-    total_amount = stats_data.get('total_amount') or 0
-    total_paid = stats_data.get('total_paid') or 0
+    # Statistikaları yalnız bu istifadəçiyə aid məhsullar üzrə hesablayaq
+    total_amount = 0
+    total_paid = 0
+    for order in orders:
+        # Yalnız bu istifadəçiyə aid məhsulların cəmini tap
+        items = order.sifarisitem_set.filter(mehsul__sahib=request.user)
+        order_total = sum(item.umumi_mebleg for item in items)
+        # Ödənilən məbləği proporsional böl (əgər sifarişdə birdən çox satıcı varsa)
+        if order.umumi_mebleg > 0:
+            paid_share = (order.odenilen_mebleg or 0) * (order_total / order.umumi_mebleg)
+        else:
+            paid_share = 0
+        total_amount += order_total
+        total_paid += paid_share
 
     stats = {
         'total_orders': orders.count(),
@@ -774,6 +780,14 @@ def edit_my_sale_view(request, order_id):
     # Formset-ə yalnız satıcının öz məhsullarını daxil et
     queryset = order.sifarisitem_set.filter(mehsul__sahib=request.user)
 
+    # Yalnız bu istifadəçiyə aid məhsulların cəmini tap
+    order_items = queryset
+    total_amount = sum(item.umumi_mebleg for item in order_items)
+    paid_share = 0
+    if order.umumi_mebleg > 0:
+        paid_share = (order.odenilen_mebleg or 0) * (total_amount / order.umumi_mebleg)
+    qaliq_borc = total_amount - paid_share
+
     if request.method == 'POST':
         form = SifarisEditForm(request.POST, instance=order)
         formset = SifarisItemFormSet(request.POST, instance=order, queryset=queryset)
@@ -795,7 +809,10 @@ def edit_my_sale_view(request, order_id):
         'order': order,
         'form': form,
         'formset': formset,
-        'order_items': order.sifarisitem_set.filter(mehsul__sahib=request.user) # Yalnız bu istifadəçiyə aid məhsullar
+        'order_items': order_items,
+        'total_amount': total_amount,
+        'paid_share': paid_share,
+        'qaliq_borc': qaliq_borc,
     }
     return render(request, 'edit_my_sale.html', context)
 

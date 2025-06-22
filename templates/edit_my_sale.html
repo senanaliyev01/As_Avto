@@ -65,7 +65,11 @@
                     <div class="card-body">
                         <div class="mb-3">
                             <label class="form-label">Ümumi Məbləğ</label>
-                            <input type="text" id="total-amount-display" class="form-control" value="{{ order.umumi_mebleg|floatformat:2 }} ₼" readonly>
+                            <input type="text" id="total-amount-display" class="form-control" value="{{ total_amount|floatformat:2 }} ₼" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Qalıq Borc</label>
+                            <input type="text" id="qaliq-borc-display" class="form-control" value="{{ qaliq_borc|floatformat:2 }} ₼" readonly>
                         </div>
                         {{ form.as_p }}
                         <button type="submit" class="btn btn-primary w-100">Dəyişiklikləri Yadda Saxla</button>

@@ -89,4 +89,32 @@
         </div>
     {% endif %}
 </div>
+
+<!-- User Details Modal -->
+<div id="userDetailsModal" class="details-modal">
+    <div class="details-modal-content">
+        <span class="user-details-modal-close">&times;</span>
+        <div class="details-content">
+            <div class="details-header">
+                <h3>Satıcı Məlumatları</h3>
+            </div>
+            <div class="details-body">
+                <div class="details-info">
+                    <div class="info-row">
+                        <span class="info-label">İstifadəçi adı:</span>
+                        <span id="userDetailsUsername" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Telefon:</span>
+                        <span id="userDetailsPhone" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Ünvan:</span>
+                        <span id="userDetailsAddress" class="info-value"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %} 

@@ -25,14 +25,14 @@
     </div>
     
     <!-- Excel Import Modal -->
-    <div class="modal fade" id="importExcelModal" tabindex="-1" aria-labelledby="importExcelModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
+    <div class="modal fade custom-modal" id="importExcelModal" tabindex="-1" aria-labelledby="importExcelModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content excel-modal-content">
+                <button type="button" class="modal-close-x" data-bs-dismiss="modal" aria-label="Close">&times;</button>
+                <div class="modal-header border-0 pb-0">
                     <h5 class="modal-title" id="importExcelModalLabel">Excel Faylından Məhsul Import Et</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body pt-0">
                     <!-- Excel Nümunəsi -->
                     <div class="excel-sample mb-3">
                         <h6>Excel Faylı Nümunəsi:</h6>

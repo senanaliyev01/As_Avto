@@ -2933,3 +2933,61 @@ body {
         font-size: 0.93rem;
     }
 }
+
+/* Custom Modal for Excel Import */
+.custom-modal .modal-dialog {
+    max-width: 650px;
+    margin: 2.5rem auto;
+}
+.excel-modal-content {
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(44,62,80,0.18);
+    padding: 0 0 0 0;
+    position: relative;
+    width: 100%;
+    max-width: 650px;
+}
+.excel-modal-content .modal-header {
+    border-bottom: none;
+    padding: 24px 32px 0 32px;
+    background: transparent;
+}
+.excel-modal-content .modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1d6f42;
+}
+.excel-modal-content .modal-body {
+    padding: 16px 32px 32px 32px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+.modal-close-x {
+    position: absolute;
+    top: 18px;
+    right: 24px;
+    font-size: 2rem;
+    color: #888;
+    background: none;
+    border: none;
+    z-index: 10;
+    cursor: pointer;
+    transition: color 0.2s;
+    line-height: 1;
+    font-weight: 700;
+}
+.modal-close-x:hover {
+    color: #e74c3c;
+}
+@media (max-width: 700px) {
+    .custom-modal .modal-dialog,
+    .excel-modal-content {
+        max-width: 98vw;
+        width: 98vw;
+    }
+    .excel-modal-content .modal-header,
+    .excel-modal-content .modal-body {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}

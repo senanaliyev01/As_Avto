@@ -2830,3 +2830,113 @@ body {
         justify-content: flex-end;
     }
 }
+
+/* Excel Import Modal Professional Styles */
+.excel-modal-content {
+    border-radius: 12px;
+    box-shadow: 0 6px 32px rgba(44, 62, 80, 0.18);
+    border: 1px solid #e9ecef;
+    background: #f9fbfd;
+    padding: 0;
+}
+.excel-modal-header {
+    background: #2B5173;
+    color: #fff;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    padding: 18px 24px 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #e9ecef;
+}
+.excel-modal-header .modal-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+.excel-modal-close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+    margin-left: 10px;
+}
+.excel-modal-close:hover {
+    opacity: 1;
+    color: #ffc107;
+}
+.excel-modal-body {
+    padding: 28px 28px 18px 28px;
+    background: #f9fbfd;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+.excel-sample-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2B5173;
+    margin-bottom: 10px;
+}
+.excel-sample-table-wrapper {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(44,62,80,0.06);
+    padding: 10px;
+    margin-bottom: 10px;
+}
+.excel-sample-table th, .excel-sample-table td {
+    font-size: 0.95rem;
+    padding: 7px 10px;
+    text-align: center;
+    border: 1px solid #e9ecef;
+}
+.excel-sample-table th {
+    background: #f1f5fa;
+    color: #2B5173;
+    font-weight: 600;
+}
+.excel-sample-table td {
+    background: #fff;
+    color: #333;
+}
+.excel-sample-notes {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 12px 18px;
+    margin-top: 10px;
+    box-shadow: 0 1px 3px rgba(44,62,80,0.04);
+}
+.excel-sample-notes-title {
+    color: #2B5173;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+.excel-sample-notes-list {
+    margin: 0;
+    padding-left: 18px;
+    color: #444;
+    font-size: 0.97rem;
+}
+.excel-sample-notes-list li {
+    margin-bottom: 4px;
+    line-height: 1.5;
+}
+@media (max-width: 600px) {
+    .excel-modal-content {
+        padding: 0;
+    }
+    .excel-modal-header, .excel-modal-body {
+        padding: 12px 8px;
+    }
+    .excel-sample-table th, .excel-sample-table td {
+        font-size: 0.85rem;
+        padding: 5px 4px;
+    }
+    .excel-sample-notes {
+        padding: 8px 6px;
+    }
+}

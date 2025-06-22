@@ -27,17 +27,17 @@
     <!-- Excel Import Modal -->
     <div class="modal fade" id="importExcelModal" tabindex="-1" aria-labelledby="importExcelModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
+            <div class="modal-content excel-modal-content">
+                <div class="modal-header excel-modal-header">
                     <h5 class="modal-title" id="importExcelModalLabel">Excel Faylından Məhsul Import Et</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close excel-modal-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body excel-modal-body">
                     <!-- Excel Nümunəsi -->
                     <div class="excel-sample mb-3">
-                        <h6>Excel Faylı Nümunəsi:</h6>
-                        <div class="table-responsive">
-                            <table class="sample-table table table-bordered table-sm">
+                        <h6 class="excel-sample-title">Excel Faylı Nümunəsi:</h6>
+                        <div class="table-responsive excel-sample-table-wrapper">
+                            <table class="sample-table table table-bordered table-sm excel-sample-table">
                                 <thead>
                                     <tr>
                                         <th>adi</th>
@@ -72,9 +72,9 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="notes mt-2">
-                            <p><strong>Qeydlər:</strong></p>
-                            <ul>
+                        <div class="notes mt-2 excel-sample-notes">
+                            <p class="excel-sample-notes-title"><strong>Qeydlər:</strong></p>
+                            <ul class="excel-sample-notes-list">
                                 <li>Bütün başlıqlar kiçik hərflərlə yazılmalıdır</li>
                                 <li>brend_kod və ya kodlar sütunundan ən azı biri dolu olmalıdır</li>
                                 <li>kodlar sütununda birinci kod brend_kod, ikinci kod oem kimi qəbul edilir (Əgər boşdursa)</li>
@@ -93,7 +93,10 @@
                         <p class="small text-muted">
                             <b>Vacib:</b> Excel faylınızda `brend_kod`, `adi`, `firma`, `avtomobil`, `qiymet`, `stok` kimi sütunlar olmalıdır. Mövcud `brend_kod`-a malik məhsullar yenilənəcək, digərləri yeni yaradılacaq.
                         </p>
-                        <button type="submit" class="btn btn-success">Import Et</button>
+                        <div class="d-flex justify-content-between gap-2 mt-3">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bağla</button>
+                            <button type="submit" class="btn btn-success">Import Et</button>
+                        </div>
                     </form>
                 </div>
             </div>

@@ -55,13 +55,23 @@
                                                 <i class="fa-regular fa-circle-user"></i>
                                                 {{ request.user.username }}
                                             </span>
-                                            {% if user.is_authenticated and user.profile.is_verified %}
-                                            <a href="{% url 'my_products' %}" class="logout-link">
-                                                <i class="fas fa-box"></i> Mənim Məhsullarım
-                                            </a>
-                                            <a href="{% url 'my_sales' %}" class="logout-link">
-                                                <i class="fas fa-receipt"></i> Mənə gələn sifarişlər
-                                            </a>
+                                            {% if user.is_authenticated %}
+                                                <a href="{% url 'my_products' %}" class="logout-link">
+                                                    {% if not user.profile.is_verified %}
+                                                        <i class="fas fa-lock"></i>
+                                                    {% else %}
+                                                        <i class="fas fa-box"></i>
+                                                    {% endif %}
+                                                    Mənim Məhsullarım
+                                                </a>
+                                                <a href="{% url 'my_sales' %}" class="logout-link">
+                                                    {% if not user.profile.is_verified %}
+                                                        <i class="fas fa-lock"></i>
+                                                    {% else %}
+                                                        <i class="fas fa-receipt"></i>
+                                                    {% endif %}
+                                                    Mənə gələn sifarişlər
+                                                </a>
                                             {% endif %}
                                             <a href="{% url 'logout' %}" class="logout-link">
                                                 <i class="fas fa-sign-out-alt"></i> Çıxış et

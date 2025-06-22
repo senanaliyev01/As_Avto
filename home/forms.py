@@ -27,6 +27,12 @@ class MehsulForm(forms.ModelForm):
         } 
 
 class SifarisEditForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Yalnız 'COMPLETED' statusunu seçmək mümkün olsun
+        self.fields['status'].choices = [
+            ('COMPLETED', 'Tamamlandı')
+        ]
     class Meta:
         model = Sifaris
         fields = ['status', 'odenilen_mebleg', 'qeyd']

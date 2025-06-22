@@ -117,6 +117,15 @@
                             </select>
                         </div>
                         <div class="search-item">
+                            <!-- <label for="seller">Satıcı</label> -->
+                            <select id="seller" name="satici">
+                                <option value="">Bütün Satıcılar</option>
+                                {% for seller in request.sellers %}
+                                <option value="{{ seller.id }}" {% if request.GET.satici == seller.id|stringformat:'s' %}selected{% endif %}>{{ seller.username }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="search-item">
                             <!-- <label for="query">Məhsul Adı</label> -->
                             <div class="search-container">
                                 <input type="text" id="query" name="search" placeholder="Kodu daxil edin..." value="{{ request.GET.search }}" autocomplete="off">

@@ -91,6 +91,7 @@ def products_view(request):
     kateqoriya = request.GET.get('kateqoriya', '')
     firma = request.GET.get('firma', '')
     avtomobil = request.GET.get('avtomobil', '')
+    satici = request.GET.get('satici', '')
     
     mehsullar = Mehsul.objects.all().order_by('-id')
     popup_images = PopupImage.objects.filter(aktiv=True)
@@ -138,6 +139,9 @@ def products_view(request):
     if avtomobil:
         mehsullar = mehsullar.filter(avtomobil__adi=avtomobil)
     
+    if satici:
+        mehsullar = mehsullar.filter(sahib_id=satici)
+    
     # İlk 5 məhsulu götür
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
@@ -156,6 +160,7 @@ def products_view(request):
         'selected_kateqoriya': kateqoriya,
         'selected_firma': firma,
         'selected_avtomobil': avtomobil,
+        'selected_satici': satici,
         'popup_images': popup_images
     })
 
@@ -167,6 +172,7 @@ def load_more_products(request):
     kateqoriya = request.GET.get('kateqoriya', '')
     firma = request.GET.get('firma', '')
     avtomobil = request.GET.get('avtomobil', '')
+    satici = request.GET.get('satici', '')
     
     mehsullar = Mehsul.objects.all().order_by('-id')
     
@@ -209,6 +215,9 @@ def load_more_products(request):
         
     if avtomobil:
         mehsullar = mehsullar.filter(avtomobil__adi=avtomobil)
+    
+    if satici:
+        mehsullar = mehsullar.filter(sahib_id=satici)
     
     # Get next batch of products
     products = mehsullar[offset:offset + limit]

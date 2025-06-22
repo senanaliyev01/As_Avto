@@ -67,11 +67,7 @@ def login_view(request):
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            # Profil təsdiqlənmə yoxlaması
-            if not user.profile.is_verified:
-                error_message = 'Giriş üçün icazəniz yoxdur !'
-                return render(request, 'login.html', {'error_message': error_message})
-            
+            # Profil təsdiqlənmə yoxlaması silindi
             login(request, user)
             return redirect('base')
         else:

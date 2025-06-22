@@ -2967,9 +2967,10 @@ body {
     line-height: 1;
     color: inherit;
     display: block;
+    cursor: pointer;
 }
 
-/* Modal Animation */
+/* Modal Animation (open/close) */
 .modal.fade .modal-dialog {
     transform: translateY(-40px) scale(0.97);
     opacity: 0;
@@ -2978,6 +2979,11 @@ body {
 .modal.show .modal-dialog {
     transform: translateY(0) scale(1);
     opacity: 1;
+}
+.modal:not(.show) .modal-dialog {
+    transform: translateY(40px) scale(0.97);
+    opacity: 0;
+    transition: all 0.35s cubic-bezier(.4,2,.6,1);
 }
 
 /* Daha çox göstər butonu */

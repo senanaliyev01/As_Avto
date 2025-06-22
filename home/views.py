@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import Mehsul, Kateqoriya, Sifaris, SifarisItem, Firma, Avtomobil, PopupImage, Header_Message
+from .models import Mehsul, Kateqoriya, Sifaris, SifarisItem, Firma, Avtomobil, PopupImage, Header_Message, Vitrin
 from django.db.models import Q, Sum, F, Case, When, DecimalField
 from decimal import Decimal
 from django.contrib import messages
@@ -842,111 +842,138 @@ def user_details_view(request, user_id):
     return JsonResponse(data)
 
 @login_required
+@transaction.atomic
 def import_user_products_view(request):
     if not request.user.profile.is_verified:
-        messages.error(request, 'Bu əməliyyatı etmək üçün icazəniz yoxdur.')
+        messages.error(request, "Bu əməliyyatı etmək üçün icazəniz yoxdur.")
         return redirect('my_products')
 
     if request.method == 'POST':
         excel_file = request.FILES.get("excel_file")
-        if not excel_file or not excel_file.name.endswith('.xlsx'):
-            messages.error(request, 'Zəhmət olmasa düzgün Excel (.xlsx) faylı seçin.')
+        if not excel_file:
+            messages.error(request, 'Zəhmət olmasa Excel faylı seçin')
             return redirect('my_products')
-
+        
+        if not excel_file.name.endswith('.xlsx'):
+            messages.error(request, 'Yalnız .xlsx faylları qəbul edilir')
+            return redirect('my_products')
+            
         try:
             df = pd.read_excel(excel_file)
-            new_count, update_count, error_count, skipped_count = 0, 0, 0, 0
+            
+            new_count = 0
+            update_count = 0
+            error_count = 0
+            
+            for index, row in df.iterrows():
+                try:
+                    row = {str(k).strip().lower(): v for k, v in row.items()}
+                    
+                    kateqoriya = None
+                    firma = None
+                    avtomobil = None
+                    vitrin = None
+                    
+                    if 'kateqoriya' in row and pd.notna(row['kateqoriya']):
+                        kateqoriya, _ = Kateqoriya.objects.get_or_create(adi=str(row['kateqoriya']).strip())
+                    
+                    if 'firma' in row and pd.notna(row['firma']):
+                        firma, _ = Firma.objects.get_or_create(adi=str(row['firma']).strip())
+                    
+                    if 'avtomobil' in row and pd.notna(row['avtomobil']):
+                        avtomobil, _ = Avtomobil.objects.get_or_create(adi=str(row['avtomobil']).strip())
 
-            with transaction.atomic():
-                for index, row in df.iterrows():
-                    try:
-                        row_data = {str(k).strip().lower(): v for k, v in row.items()}
+                    if 'vitrin' in row and pd.notna(row['vitrin']):
+                        vitrin, _ = Vitrin.objects.get_or_create(nomre=str(row['vitrin']).strip())
 
-                        # Essential fields check
-                        brend_kod = str(row_data.get('brend_kod', '')).strip()
-                        if not brend_kod:
-                            messages.error(request, f'Sətir {index + 2}: Brend kodu boşdur. Sətir пропущен.')
-                            error_count += 1
-                            continue
-                        
-                        # Find existing product
-                        existing_product = Mehsul.objects.filter(brend_kod=brend_kod).first()
-
-                        # Prepare data for creation/update
-                        firma_adi = str(row_data.get('firma', '')).strip()
-                        if firma_adi:
-                            firma, _ = Firma.objects.get_or_create(adi=firma_adi)
-                        else:
-                            messages.error(request, f"Sətir {index + 2} ({brend_kod}): Firma adı boşdur. Sətir пропущен.")
-                            error_count += 1
-                            continue
-
-                        avtomobil_adi = str(row_data.get('avtomobil', '')).strip()
-                        if avtomobil_adi:
-                            avtomobil, _ = Avtomobil.objects.get_or_create(adi=avtomobil_adi)
-                        else:
-                            messages.error(request, f"Sətir {index + 2} ({brend_kod}): Avtomobil adı boşdur. Sətir пропущен.")
-                            error_count += 1
-                            continue
-                        
-                        kateqoriya_adi = str(row_data.get('kateqoriya', '')).strip()
-                        kateqoriya = None
-                        if kateqoriya_adi:
-                            kateqoriya, _ = Kateqoriya.objects.get_or_create(adi=kateqoriya_adi)
-
-                        vitrin_nomresi = str(row_data.get('vitrin', '')).strip()
-                        vitrin = None
-                        if vitrin_nomresi:
-                            vitrin, _ = Vitrin.objects.get_or_create(nomre=vitrin_nomresi)
-
-                        mehsul_data = {
-                            'adi': str(row_data.get('adi', '')).strip(),
-                            'firma': firma,
-                            'avtomobil': avtomobil,
-                            'kateqoriya': kateqoriya,
-                            'vitrin': vitrin,
-                            'oem': str(row_data.get('oem', '')).strip(),
-                            'olcu': str(row_data.get('olcu', '')).strip(),
-                            'maya_qiymet': float(row_data.get('maya_qiymet', 0)),
-                            'qiymet': float(row_data.get('qiymet', 0)),
-                            'stok': int(row_data.get('stok', 0)),
-                            'kodlar': str(row_data.get('kodlar', '')).strip(),
-                            'melumat': str(row_data.get('melumat', '')).strip(),
-                        }
-                        
-                        if existing_product:
-                            # Update only if the user is the owner
-                            if existing_product.sahib == request.user:
-                                for key, value in mehsul_data.items():
-                                    setattr(existing_product, key, value)
-                                existing_product.save()
-                                update_count += 1
-                            else:
-                                # Skip if product belongs to another user
-                                skipped_count += 1
-                                continue
-                        else:
-                            # Create new product and assign owner
-                            mehsul_data['sahib'] = request.user
-                            mehsul_data['brend_kod'] = brend_kod
-                            Mehsul.objects.create(**mehsul_data)
-                            new_count += 1
-
-                    except Exception as e:
-                        messages.error(request, f'Sətir {index + 2} ({brend_kod}) emal edilərkən xəta baş verdi: {str(e)}')
+                    if 'adi' not in row or pd.isna(row['adi']):
+                        messages.error(request, f'Sətir {index + 2}: Məhsulun adı boşdur.', level=messages.ERROR)
                         error_count += 1
                         continue
 
-            success_message = f"Import tamamlandı! {new_count} yeni məhsul əlavə edildi, {update_count} məhsul yeniləndi."
+                    temiz_ad = str(row['adi']).strip()
+                    temiz_ad = ' '.join(temiz_ad.split())
+
+                    brend_kod = None
+                    if 'brend_kod' in row and pd.notna(row['brend_kod']):
+                        value = row['brend_kod']
+                        if isinstance(value, float) and math.isnan(value):
+                            brend_kod = None
+                        else:
+                            brend_kod = str(value).strip()
+                            if brend_kod.lower() == 'nan' or brend_kod == '':
+                                brend_kod = None
+
+                    if not brend_kod:
+                        messages.error(request, f'Sətir {index + 2}: Brend kodu boşdur.', level=messages.ERROR)
+                        error_count += 1
+                        continue
+
+                    existing_product = Mehsul.objects.filter(brend_kod=brend_kod).first()
+
+                    if existing_product:
+                        if existing_product.sahib and existing_product.sahib != request.user:
+                            messages.error(request, f'Sətir {index + 2}: "{brend_kod}" kodlu məhsul başqa satıcıya aiddir. Onu yeniləyə bilməzsiniz.', level=messages.ERROR)
+                            error_count += 1
+                            continue
+
+                        existing_product.adi = temiz_ad
+                        existing_product.sahib = request.user
+                        existing_product.kateqoriya = kateqoriya
+                        existing_product.firma = firma
+                        existing_product.avtomobil = avtomobil
+                        existing_product.vitrin = vitrin
+                        existing_product.olcu = str(row['olcu']).strip() if 'olcu' in row and pd.notna(row['olcu']) else ''
+                        existing_product.maya_qiymet = float(row['maya_qiymet']) if 'maya_qiymet' in row and pd.notna(row['maya_qiymet']) else 0
+                        existing_product.qiymet = float(row['qiymet']) if 'qiymet' in row and pd.notna(row['qiymet']) else 0
+                        existing_product.stok = int(row['stok']) if 'stok' in row and pd.notna(row['stok']) else 0
+                        existing_product.kodlar = str(row['kodlar']) if 'kodlar' in row and pd.notna(row['kodlar']) else ''
+                        existing_product.melumat = str(row['melumat']) if 'melumat' in row and pd.notna(row['melumat']) else ''
+                        existing_product.save()
+                        update_count += 1
+                    else:
+                        mehsul_data = {
+                            'adi': temiz_ad,
+                            'sahib': request.user,
+                            'kateqoriya': kateqoriya,
+                            'firma': firma,
+                            'avtomobil': avtomobil,
+                            'vitrin': vitrin,
+                            'brend_kod': brend_kod,
+                            'oem': '',
+                            'olcu': str(row['olcu']).strip() if 'olcu' in row and pd.notna(row['olcu']) else '',
+                            'maya_qiymet': float(row['maya_qiymet']) if 'maya_qiymet' in row and pd.notna(row['maya_qiymet']) else 0,
+                            'qiymet': float(row['qiymet']) if 'qiymet' in row and pd.notna(row['qiymet']) else 0,
+                            'stok': int(row['stok']) if 'stok' in row and pd.notna(row['stok']) else 0,
+                            'kodlar': str(row['kodlar']) if 'kodlar' in row and pd.notna(row['kodlar']) else '',
+                            'melumat': str(row['melumat']) if 'melumat' in row and pd.notna(row['melumat']) else '',
+                            'yenidir': False
+                        }
+                        Mehsul.objects.create(**mehsul_data)
+                        new_count += 1
+
+                except Exception as e:
+                    messages.error(request, f'Sətir {index + 2} emal edilərkən xəta baş verdi: {e}', level=messages.ERROR)
+                    error_count += 1
+                    continue
+            
+            success_message = f"Excel faylı uğurla import edildi! "
+            if new_count > 0:
+                success_message += f"{new_count} yeni məhsul əlavə edildi. "
+            if update_count > 0:
+                success_message += f"{update_count} məhsul yeniləndi. "
+            
             if error_count > 0:
-                success_message += f" {error_count} sətirdə xəta oldu."
-            if skipped_count > 0:
-                success_message += f" {skipped_count} məhsul başqasına aid olduğu üçün пропущен."
-            messages.success(request, success_message)
+                messages.warning(request, f"{error_count} sətirdə xəta baş verdi.")
+            
+            if new_count > 0 or update_count > 0:
+                messages.success(request, success_message)
+            elif error_count == 0:
+                messages.info(request, "Faylda heç bir dəyişiklik edilmədi.")
 
         except Exception as e:
-            messages.error(request, f'Excel faylı oxunarkən xəta: {str(e)}')
+            messages.error(request, f'Excel faylı oxunarkən xəta: {e}', level=messages.ERROR)
         
         return redirect('my_products')
-
+    
     return redirect('my_products')

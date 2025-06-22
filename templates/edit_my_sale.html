@@ -32,7 +32,7 @@
                         <tbody>
                             {{ formset.management_form }}
                             
-                            {% for item in order_items %}
+                            {% for item, status_form in order_items_forms %}
                                 <tr>
                                     <td><img src="{{ item.mehsul.sekil.url }}" alt="{{ item.mehsul.adi }}" class="product-image" onclick="openImageModal('{{ item.mehsul.sekil.url }}')"></td>
                                     <td>{{ item.mehsul.brend_kod }}</td>
@@ -44,7 +44,7 @@
                                     <td class="row-total">{{ item.umumi_mebleg|floatformat:2 }} ₼</td>
                                     <td>
                                         {% if item.mehsul.sahib == request.user %}
-                                            {{ status_forms|index:forloop.counter0 }}
+                                            {{ status_form }}
                                         {% else %}
                                             <span class="status-badge status-{{ item.seller_status|lower }}">
                                                 {% if item.seller_status == 'COMPLETED' %}Tamamlandı{% else %}Gözləyir{% endif %}

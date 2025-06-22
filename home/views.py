@@ -854,11 +854,10 @@ def edit_my_sale_view(request, order_id):
 
     context = {
         'order': order,
-        'order_items': order_items,
+        'order_items_forms': zip(order_items, status_forms),
         'total_amount': total_amount,
         'paid_share': paid_share,
         'qaliq_borc': qaliq_borc,
-        'status_forms': status_forms,
     }
     return render(request, 'edit_my_sale.html', context)
 

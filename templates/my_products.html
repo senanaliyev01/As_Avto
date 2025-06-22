@@ -15,9 +15,9 @@
             </div>
         </form>
         <div class="my-products-actions ms-auto d-flex align-items-center gap-2">
-            <a href="#" class="btn btn-excel btn-sm" data-bs-toggle="modal" data-bs-target="#importExcelModal">
+            <button id="showExcelImportModal" class="btn btn-excel btn-sm">
                 <i class="fas fa-file-excel"></i> Excel-dən Import Et
-            </a>
+            </button>
             <a href="{% url 'add_product' %}" class="btn btn-primary btn-sm">
                 <i class="fas fa-plus"></i> Yeni Məhsul Əlavə Et
             </a>
@@ -25,27 +25,62 @@
     </div>
     
     <!-- Excel Import Modal -->
-    <div class="modal fade" id="importExcelModal" tabindex="-1" aria-labelledby="importExcelModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="importExcelModalLabel">Excel Faylından Məhsul Import Et</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div id="excelImportModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Excel Faylından İdxal</h3>
+                <span class="close">&times;</span>
+            </div>
+
+            <!-- Excel Nümunəsi -->
+            <div class="excel-sample">
+                <h4>Excel Faylı Nümunəsi:</h4>
+                <div class="table-responsive">
+                    <table class="sample-table">
+                        <thead>
+                            <tr>
+                                <th>brend_kod</th>
+                                <th>adi</th>
+                                <th>firma</th>
+                                <th>avtomobil</th>
+                                <th>qiymet</th>
+                                <th>stok</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>BOSCH123</td>
+                                <td>Əyləc Diski</td>
+                                <td>BOSCH</td>
+                                <td>Mercedes</td>
+                                <td>75.00</td>
+                                <td>15</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="modal-body">
-                    <form action="{% url 'import_user_products' %}" method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label for="excel_file" class="form-label">Excel Faylı (.xlsx)</label>
-                            <input class="form-control" type="file" name="excel_file" id="excel_file" accept=".xlsx" required>
-                        </div>
-                        <p class="small text-muted">
-                            <b>Vacib:</b> Excel faylınızda `brend_kod`, `adi`, `firma`, `avtomobil`, `qiymet`, `stok` kimi sütunlar olmalıdır. Mövcud `brend_kod`-a malik məhsullar yenilənəcək, digərləri yeni yaradılacaq.
-                        </p>
-                        <button type="submit" class="btn btn-success">Import Et</button>
-                    </form>
+                <div class="notes">
+                    <p><strong>Qeydlər:</strong></p>
+                    <ul>
+                        <li>Bütün başlıqlar kiçik hərflərlə yazılmalıdır.</li>
+                        <li><b>brend_kod, adi, firma, avtomobil, qiymet, stok</b> sütunları mütləq doldurulmalıdır.</li>
+                        <li>Qiymətlər nöqtə (.) və ya vergül (,) ilə yazıla bilər (məs: 75.00 və ya 75,00).</li>
+                        <li>Stok tam ədəd olmalıdır.</li>
+                        <li>Mövcud `brend_kod`-a malik məhsullar yenilənəcək, digərləri yeni yaradılacaq.</li>
+                    </ul>
                 </div>
             </div>
+
+            <form action="{% url 'import_user_products' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="file-input-container">
+                    <input type="file" name="excel_file" accept=".xlsx" required>
+                </div>
+                <div class="button-container">
+                    <button type="button" class="closeBtn">Bağla</button>
+                    <button type="submit" class="submit-btn">İdxal Et</button>
+                </div>
+            </form>
         </div>
     </div>
 

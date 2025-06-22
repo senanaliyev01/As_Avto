@@ -8,6 +8,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Modal functionality
     initializeModal();
     
+    // Excel Import Modal
+    initializeExcelModal();
+    
     // Initialize Swiper
     initializeSwiper();
 
@@ -1009,5 +1012,45 @@ function initializeHeaderMessages() {
 
     // Hər 5 saniyədən bir növbəti mesaja keç
     setInterval(nextMessage, interval);
+}
+
+function initializeExcelModal() {
+    var modal = document.getElementById('excelImportModal');
+    // The button ID was changed in my_products.html to not conflict with other modals
+    var btn = document.getElementById('showExcelImportModal');
+    // Ensure we are selecting the close buttons for this specific modal
+    var span = modal ? modal.querySelector('.close') : null;
+    var closeBtn = modal ? modal.querySelector('.closeBtn') : null;
+
+    if (!modal || !btn) {
+        // Don't log an error, as this modal might not be on every page
+        return;
+    }
+
+    // Modal açma düyməsi
+    btn.addEventListener('click', function() {
+        modal.style.display = "block";
+    });
+
+    // X düyməsi ilə bağlama
+    if (span) {
+        span.addEventListener('click', function() {
+            modal.style.display = "none";
+        });
+    }
+
+    // Bağla düyməsi ilə bağlama
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+            modal.style.display = "none";
+        });
+    }
+
+    // Modal xaricində kliklə bağlama
+    window.addEventListener('click', function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    });
 }
 

@@ -2774,6 +2774,8 @@ body {
 }
 .my-products-header .input-group-sm > .form-control,
 .my-products-header .input-group-sm > .btn {
+    top: 20px;
+    position: relative;
     height: 32px;
     padding-top: 4px;
     padding-bottom: 4px;
@@ -2787,7 +2789,7 @@ body {
 .my-products-header .input-group-sm > .btn {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
-    display: flex;
+    /* display: flex; */
     align-items: center;
     justify-content: center;
 }

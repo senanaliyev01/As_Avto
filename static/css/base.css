@@ -314,8 +314,6 @@ body {
     border-spacing: 0;
     margin: 2rem auto;
     text-align: center;
-    table-layout: fixed;
-    min-width: 1000px; /* minimum genişlik təyin edirik */
 }
 
 .table thead th {
@@ -351,61 +349,6 @@ body {
     overflow-x: auto; /* horizontal scroll əlavə edirik */
     width: 100%;
     padding: 1rem;
-}
-
-/* Sütun genişliklərini tənzimləyirik */
-.table th:nth-child(1), /* Şəkil */
-.table td:nth-child(1) {
-    width: 30px;
-    min-width: 30px;
-}
-
-.table th:nth-child(2), /* Məhsul */
-.table td:nth-child(2) {
-    width: 120px;
-    min-width: 120px;
-}
-
-.table th:nth-child(3), /* Firma */
-.table td:nth-child(3) {
-    width: 100px;
-    min-width: 100px;
-}
-
-.table th:nth-child(4), /* Brend Kodu */
-.table td:nth-child(4) {
-    width: 200px;
-    min-width: 200px;
-}
-
-.table th:nth-child(5), /* Stok */
-.table td:nth-child(5) {
-    width: 50px;
-    min-width: 50px;
-}
-
-.table th:nth-child(6), /* Qiymət */
-.table td:nth-child(6) {
-    width: 60px;
-    min-width: 60px;
-}
-
-.table th:nth-child(7), /* Cart button */
-.table td:nth-child(7) {
-    width: 30px;
-    min-width: 30px;
-}
-
-.table th:nth-child(8), /* Cart button */
-.table td:nth-child(8) {
-    width: 30px;
-    min-width: 30px;
-}
-
-.table th:nth-child(9), /* Details button */
-.table td:nth-child(9) {
-    width: 80px;
-    min-width: 80px;
 }
 
 /* Product Image in Tables */
@@ -1550,8 +1493,6 @@ body {
     border-spacing: 0;
     margin: 0 auto;
     text-align: center;
-    table-layout: fixed;
-    min-width: 1000px; /* Minimum genişliyi azaltdıq */
 }
 
 .cart-container .table th,
@@ -1571,69 +1512,6 @@ body {
     text-align: center;
     font-size: 14px;
 }
-
-/* Sütun genişliklərini yenidən tənzimləyirik */
-.cart-container .table th:nth-child(1), /* Checkbox */
-.cart-container .table td:nth-child(1) {
-    width: 30px;
-    min-width: 30px;
-}
-
-.cart-container .table th:nth-child(2), /* Şəkil */
-.cart-container .table td:nth-child(2) {
-    width: 30px;
-    min-width: 30px;
-}
-
-.cart-container .table th:nth-child(3), /* Məhsul */
-.cart-container .table td:nth-child(3) {
-    width: 120px;
-    min-width: 120px;
-}
-
-.cart-container .table th:nth-child(4), /* Brend Kodu */
-.cart-container .table td:nth-child(4) {
-    width: 100px;
-    min-width: 100px;
-}
-
-.cart-container .table th:nth-child(5), /* OEM */
-.cart-container .table td:nth-child(5) {
-    width: 150px;
-    min-width: 150px;
-}
-
-.cart-container .table th:nth-child(6), /* Firma */
-.cart-container .table td:nth-child(6) {
-    width: 50px;
-    min-width: 50px;
-}
-
-.cart-container .table th:nth-child(7), /* Qiymət */
-.cart-container .table td:nth-child(7) {
-    width: 70px;
-    min-width: 70px;
-}
-
-.cart-container .table th:nth-child(8), /* Stok */
-.cart-container .table td:nth-child(8) {
-    width: 80px;
-    min-width: 80px;
-}
-
-.cart-container .table th:nth-child(9), /* Miqdar */
-.cart-container .table td:nth-child(9) {
-    width: 90px;
-    min-width: 90px;
-}
-
-.cart-container .table th:nth-child(10), /* Cəmi */
-.cart-container .table td:nth-child(10) {
-    width: 40px;
-    min-width: 40px;
-}
-
-
 
 /* Şəkil stilləri */
 .cart-container .table .product-image {
@@ -1713,8 +1591,6 @@ body {
     border-spacing: 0;
     margin: 0 auto;
     text-align: center;
-    table-layout: fixed;
-    min-width: 900px;
 }
 
 .orders-table th,
@@ -1769,8 +1645,6 @@ body {
     border-spacing: 0;
     margin: 0 auto;
     text-align: center;
-    table-layout: fixed;
-    min-width: 1000px;
 }
 
 .order-items .table th,

@@ -351,8 +351,8 @@ class MehsulAdmin(admin.ModelAdmin):
 class SifarisItemInline(admin.TabularInline):
     model = SifarisItem
     extra = 0
-    readonly_fields = ['mehsul', 'mehsul_sahibi', 'seller_status']
-    fields = ['mehsul', 'mehsul_sahibi', 'miqdar', 'qiymet', 'seller_status']
+    readonly_fields = ['mehsul', 'mehsul_sahibi']
+    fields = ['mehsul', 'mehsul_sahibi', 'miqdar', 'qiymet']
 
     def mehsul_sahibi(self, obj):
         if obj.mehsul and obj.mehsul.sahib:
@@ -376,7 +376,7 @@ class SifarisItemInline(admin.TabularInline):
 
 @admin.register(Sifaris)
 class SifarisAdmin(admin.ModelAdmin):
-    list_display = ['id', 'istifadeci', 'saticilar', 'tarix', 'status', 'catdirilma_usulu', 'umumi_mebleg', 'odenilen_mebleg', 'qaliq_borc', 'pdf_button']
+    list_display = ['id', 'istifadeci', 'saticilar', 'tarix', 'status', 'catdirilma_usulu', 'umumi_mebleg', 'odenilen_mebleg', 'qaliq_borc', 'seller_statuses', 'pdf_button']
     list_filter = ['status', 'catdirilma_usulu', 'tarix', 'istifadeci']
     search_fields = ['istifadeci__username']
     readonly_fields = ['istifadeci', 'tarix', 'umumi_mebleg', 'qaliq_borc']
@@ -679,6 +679,28 @@ class SifarisAdmin(admin.ModelAdmin):
         extra_context['total_statistics'] = total_stats
         
         return super().changelist_view(request, extra_context=extra_context)
+
+    def seller_statuses(self, obj):
+        # Get all unique sellers for this order
+        sellers = set()
+        for item in obj.sifarisitem_set.all():
+            if item.mehsul and item.mehsul.sahib:
+                sellers.add(item.mehsul.sahib)
+        if not sellers:
+            return '-'
+        status_map = {
+            'PENDING': 'Gözləyir',
+            'PROCESSING': 'İşlənir',
+            'COMPLETED': 'Tamamlandı',
+            'CANCELLED': 'Ləğv edildi',
+        }
+        result = []
+        for seller in sellers:
+            status = obj.get_seller_status(seller)
+            status_display = status_map.get(status, status)
+            result.append(f"{seller.username}: {status_display}")
+        return ", ".join(result)
+    seller_statuses.short_description = 'Satıcı Statusları'
 
 @admin.register(PopupImage)
 class PopupImageAdmin(admin.ModelAdmin):

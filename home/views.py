@@ -799,12 +799,7 @@ def my_sales_view(request):
             order.seller_total = order_total
             order.seller_paid = seller_paid
             order.seller_debt = order_total - seller_paid
-            # Satıcı statusunu tap
-            statuses = set(item.seller_status for item in items)
-            if len(statuses) == 1:
-                order.seller_status = statuses.pop()
-            else:
-                order.seller_status = 'BİRDƏN ÇOX'
+            order.seller_status = order.get_seller_status(request.user)
             filtered_orders.append(order)
 
     stats = {
@@ -877,6 +872,7 @@ def edit_my_sale_view(request, order_id):
         'total_amount': total_amount,
         'paid_share': paid_share,
         'qaliq_borc': qaliq_borc,
+        'seller_status': order.get_seller_status(request.user),
     }
     return render(request, 'edit_my_sale.html', context)
 

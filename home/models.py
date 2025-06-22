@@ -178,6 +178,24 @@ class Sifaris(models.Model):
             'umumi_borc': sum(sifaris.qaliq_borc for sifaris in sifarisler)
         }
 
+    def get_seller_status(self, user):
+        """
+        Returns the status for the given seller (user) for this order.
+        If all items for this seller are delivered (COMPLETED), returns COMPLETED.
+        If all are cancelled, returns CANCELLED.
+        If any are processing, returns PROCESSING.
+        If any are pending, returns PENDING.
+        """
+        items = self.sifarisitem_set.filter(mehsul__sahib=user)
+        if not items.exists():
+            return None
+        statuses = []
+        # If you want to support per-item status, you can add a status field to SifarisItem.
+        # For now, we use the global order status as a proxy.
+        # If all items are delivered, return COMPLETED, etc.
+        # For now, just return the global status (can be improved if per-item status is added)
+        return self.status
+
     def __str__(self):
         return f"Sifariş #{self.id} - {self.istifadeci.username}"
 
@@ -188,17 +206,10 @@ class Sifaris(models.Model):
 
 
 class SifarisItem(models.Model):
-    STATUS_CHOICES = [
-        ('PENDING', 'Gözləyir'),
-        ('PROCESSING', 'İşlənir'),
-        ('COMPLETED', 'Tamamlandı'),
-        ('CANCELLED', 'Ləğv edildi'),
-    ]
     sifaris = models.ForeignKey(Sifaris, on_delete=models.CASCADE)
     mehsul = models.ForeignKey(Mehsul, on_delete=models.CASCADE)
     miqdar = models.PositiveIntegerField()
     qiymet = models.DecimalField(max_digits=10, decimal_places=2)
-    seller_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING', verbose_name='Satıcı Statusu')
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

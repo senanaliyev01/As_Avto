@@ -6,7 +6,7 @@ from django.db.models import Q, Sum, F, Case, When, DecimalField
 from decimal import Decimal
 from django.contrib import messages
 import re
-from django.http import JsonResponse, HttpResponseNotFound
+from django.http import JsonResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.db.models.functions import Lower
 from django.db.models import Value
 from functools import reduce
@@ -14,7 +14,10 @@ from operator import and_, or_
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.views.decorators.http import require_http_methods
-from .forms import MehsulForm
+from .forms import MehsulForm, SifarisEditForm
+import pandas as pd
+from django.db import transaction
+import math
 
 def normalize_azerbaijani_chars(text):
     # Azərbaycan hərflərinin qarşılıqlı çevrilməsi
@@ -721,99 +724,37 @@ def my_sales_view(request):
         messages.error(request, 'Bu səhifəyə giriş üçün icazəniz yoxdur.')
         return redirect('base')
 
-    # İstifadəçinin məhsullarının olduğu sifarişləri tap
-    orders_with_user_products = Sifaris.objects.filter(sifarisitem__mehsul__sahib=request.user).distinct()
+    # İstifadəçinin məhsullarının olduğu sifarişləri tap və təkrarlanmanın qarşısını al
+    orders = Sifaris.objects.filter(sifarisitem__mehsul__sahib=request.user).distinct().order_by('-tarix')
 
-    # Hər sifariş üçün statistikaları hesablayın
-    orders_with_stats = orders_with_user_products.annotate(
-        # Bu sifarişdəki yalnız bu istifadəçiyə aid məhsulların ümumi məbləği
-        amount=Sum(
-            Case(
-                When(sifarisitem__mehsul__sahib=request.user, then=F('sifarisitem__qiymet') * F('sifarisitem__miqdar')),
-                default=0,
-                output_field=DecimalField()
-            )
-        ),
-        # Bu sifarişdəki yalnız bu istifadəçiyə aid və ödənilmiş məhsulların ümumi məbləği
-        paid=Sum(
-            Case(
-                When(sifarisitem__mehsul__sahib=request.user, sifarisitem__status='PAID', then=F('sifarisitem__qiymet') * F('sifarisitem__miqdar')),
-                default=0,
-                output_field=DecimalField()
-            )
-        )
-    ).values(
-        'id', 'istifadeci__username', 'tarix', 'amount', 'paid'
-    ).order_by('-tarix')
-
-    # Qalıq borcları və digər məlumatları əlavə et
-    processed_stats = []
-    total_amount = Decimal('0.0')
-    total_paid = Decimal('0.0')
-
-    for stat in orders_with_stats:
-        debt = stat['amount'] - stat['paid']
-        processed_stats.append({
-            'order_id': stat['id'],
-            'customer': stat['istifadeci__username'],
-            'order_date': stat['tarix'],
-            'amount': stat['amount'],
-            'paid': stat['paid'],
-            'debt': debt
-        })
-        total_amount += stat['amount']
-        total_paid += stat['paid']
-
-    total_stats = {
-        'total_orders': len(processed_stats),
-        'total_amount': total_amount,
-        'total_paid': total_paid,
-        'total_debt': total_amount - total_paid
-    }
-    
     context = {
-        'orders_with_stats': processed_stats,
-        'total_stats': total_stats
+        'orders': orders
     }
     return render(request, 'my_sales.html', context)
 
 @login_required
-def my_sale_detail_view(request, order_id):
+def edit_my_sale_view(request, order_id):
     if not request.user.profile.is_verified:
         messages.error(request, 'Bu səhifəyə giriş üçün icazəniz yoxdur.')
-        return redirect('base')
-
-    order = get_object_or_404(Sifaris, id=order_id)
-    items = SifarisItem.objects.filter(sifaris=order, mehsul__sahib=request.user).select_related('mehsul')
-
-    if not items.exists():
-        messages.error(request, 'Bu sifarişdə sizə aid məhsul tapılmadı.')
         return redirect('my_sales')
 
+    # Yalnız istifadəçinin məhsulu olan sifarişləri redaktə edə bilməsini təmin et
+    order = get_object_or_404(Sifaris.objects.filter(sifarisitem__mehsul__sahib=request.user).distinct(), id=order_id)
+
+    if request.method == 'POST':
+        form = SifarisEditForm(request.POST, instance=order)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Sifariş #{order.id} uğurla yeniləndi.')
+            return redirect('my_sales')
+    else:
+        form = SifarisEditForm(instance=order)
+
     context = {
-        'order': order,
-        'items': items
+        'form': form,
+        'order': order
     }
-    return render(request, 'my_sale_detail.html', context)
-
-@login_required
-@require_http_methods(["POST"])
-def mark_item_as_paid_view(request, item_id):
-    if not request.user.profile.is_verified:
-        messages.error(request, 'Bu əməliyyatı etmək üçün icazəniz yoxdur.')
-        return redirect('base')
-
-    item = get_object_or_404(SifarisItem, id=item_id)
-
-    # Check if the user is the owner of the product
-    if item.mehsul.sahib != request.user:
-        messages.error(request, 'Bu əməliyyatı etmək üçün icazəniz yoxdur.')
-        return redirect('my_sale_detail', order_id=item.sifaris.id)
-
-    item.status = 'PAID'
-    item.save()
-    messages.success(request, f'"{item.mehsul.adi}" üçün ödəniş qeyd edildi.')
-    return redirect('my_sale_detail', order_id=item.sifaris.id)
+    return render(request, 'edit_my_sale.html', context)
 
 @login_required
 def add_edit_product_view(request, product_id=None):
@@ -882,3 +823,113 @@ def user_details_view(request, user_id):
         }
     
     return JsonResponse(data)
+
+@login_required
+def import_user_products_view(request):
+    if not request.user.profile.is_verified:
+        messages.error(request, 'Bu əməliyyatı etmək üçün icazəniz yoxdur.')
+        return redirect('my_products')
+
+    if request.method == 'POST':
+        excel_file = request.FILES.get("excel_file")
+        if not excel_file or not excel_file.name.endswith('.xlsx'):
+            messages.error(request, 'Zəhmət olmasa düzgün Excel (.xlsx) faylı seçin.')
+            return redirect('my_products')
+
+        try:
+            df = pd.read_excel(excel_file)
+            new_count, update_count, error_count, skipped_count = 0, 0, 0, 0
+
+            with transaction.atomic():
+                for index, row in df.iterrows():
+                    try:
+                        row_data = {str(k).strip().lower(): v for k, v in row.items()}
+
+                        # Essential fields check
+                        brend_kod = str(row_data.get('brend_kod', '')).strip()
+                        if not brend_kod:
+                            messages.error(request, f'Sətir {index + 2}: Brend kodu boşdur. Sətir пропущен.')
+                            error_count += 1
+                            continue
+                        
+                        # Find existing product
+                        existing_product = Mehsul.objects.filter(brend_kod=brend_kod).first()
+
+                        # Prepare data for creation/update
+                        firma_adi = str(row_data.get('firma', '')).strip()
+                        if firma_adi:
+                            firma, _ = Firma.objects.get_or_create(adi=firma_adi)
+                        else:
+                            messages.error(request, f"Sətir {index + 2} ({brend_kod}): Firma adı boşdur. Sətir пропущен.")
+                            error_count += 1
+                            continue
+
+                        avtomobil_adi = str(row_data.get('avtomobil', '')).strip()
+                        if avtomobil_adi:
+                            avtomobil, _ = Avtomobil.objects.get_or_create(adi=avtomobil_adi)
+                        else:
+                            messages.error(request, f"Sətir {index + 2} ({brend_kod}): Avtomobil adı boşdur. Sətir пропущен.")
+                            error_count += 1
+                            continue
+                        
+                        kateqoriya_adi = str(row_data.get('kateqoriya', '')).strip()
+                        kateqoriya = None
+                        if kateqoriya_adi:
+                            kateqoriya, _ = Kateqoriya.objects.get_or_create(adi=kateqoriya_adi)
+
+                        vitrin_nomresi = str(row_data.get('vitrin', '')).strip()
+                        vitrin = None
+                        if vitrin_nomresi:
+                            vitrin, _ = Vitrin.objects.get_or_create(nomre=vitrin_nomresi)
+
+                        mehsul_data = {
+                            'adi': str(row_data.get('adi', '')).strip(),
+                            'firma': firma,
+                            'avtomobil': avtomobil,
+                            'kateqoriya': kateqoriya,
+                            'vitrin': vitrin,
+                            'oem': str(row_data.get('oem', '')).strip(),
+                            'olcu': str(row_data.get('olcu', '')).strip(),
+                            'maya_qiymet': float(row_data.get('maya_qiymet', 0)),
+                            'qiymet': float(row_data.get('qiymet', 0)),
+                            'stok': int(row_data.get('stok', 0)),
+                            'kodlar': str(row_data.get('kodlar', '')).strip(),
+                            'melumat': str(row_data.get('melumat', '')).strip(),
+                        }
+                        
+                        if existing_product:
+                            # Update only if the user is the owner
+                            if existing_product.sahib == request.user:
+                                for key, value in mehsul_data.items():
+                                    setattr(existing_product, key, value)
+                                existing_product.save()
+                                update_count += 1
+                            else:
+                                # Skip if product belongs to another user
+                                skipped_count += 1
+                                continue
+                        else:
+                            # Create new product and assign owner
+                            mehsul_data['sahib'] = request.user
+                            mehsul_data['brend_kod'] = brend_kod
+                            Mehsul.objects.create(**mehsul_data)
+                            new_count += 1
+
+                    except Exception as e:
+                        messages.error(request, f'Sətir {index + 2} ({brend_kod}) emal edilərkən xəta baş verdi: {str(e)}')
+                        error_count += 1
+                        continue
+
+            success_message = f"Import tamamlandı! {new_count} yeni məhsul əlavə edildi, {update_count} məhsul yeniləndi."
+            if error_count > 0:
+                success_message += f" {error_count} sətirdə xəta oldu."
+            if skipped_count > 0:
+                success_message += f" {skipped_count} məhsul başqasına aid olduğu üçün пропущен."
+            messages.success(request, success_message)
+
+        except Exception as e:
+            messages.error(request, f'Excel faylı oxunarkən xəta: {str(e)}')
+        
+        return redirect('my_products')
+
+    return redirect('my_products')

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Mehsul, Kateqoriya, Firma, Avtomobil, Vitrin
+from .models import Mehsul, Kateqoriya, Firma, Avtomobil, Vitrin, Sifaris
 
 class MehsulForm(forms.ModelForm):
     class Meta:
@@ -25,4 +25,14 @@ class MehsulForm(forms.ModelForm):
             'melumat': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'sekil': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'yenidir': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        } 
+
+class SifarisEditForm(forms.ModelForm):
+    class Meta:
+        model = Sifaris
+        fields = ['status', 'odenilen_mebleg', 'qeyd']
+        widgets = {
+            'status': forms.Select(attrs={'class': 'form-control'}),
+            'odenilen_mebleg': forms.NumberInput(attrs={'class': 'form-control'}),
+            'qeyd': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         } 

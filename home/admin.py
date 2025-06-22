@@ -377,7 +377,7 @@ class SifarisItemInline(admin.TabularInline):
 @admin.register(Sifaris)
 class SifarisAdmin(admin.ModelAdmin):
     list_display = ['id', 'istifadeci', 'saticilar', 'tarix', 'status', 'catdirilma_usulu', 'umumi_mebleg', 'odenilen_mebleg', 'qaliq_borc', 'pdf_button']
-    list_filter = ['status', 'catdirilma_usulu', 'tarix', 'istifadeci', 'sifarisitem__seller_status']
+    list_filter = ['status', 'catdirilma_usulu', 'tarix', 'istifadeci']
     search_fields = ['istifadeci__username']
     readonly_fields = ['istifadeci', 'tarix', 'umumi_mebleg', 'qaliq_borc']
     fields = ['istifadeci', 'tarix', 'status', 'catdirilma_usulu', 'umumi_mebleg', 'odenilen_mebleg', 'qaliq_borc', 'qeyd']

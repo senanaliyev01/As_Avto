@@ -26,31 +26,35 @@
                                 <th style="width: 100px;">Miqdar</th>
                                 <th style="width: 120px;">Qiymət</th>
                                 <th style="width: 120px;">Cəm</th>
-                                <th style="width: 120px;">Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             {{ formset.management_form }}
                             
-                            {% for item, status_form in order_items_forms %}
-                                <tr>
+                            {% for item in order_items %}
+                                <tr class="{% if item.mehsul.sahib == request.user %}editable-row{% else %}non-editable-row{% endif %}">
                                     <td><img src="{{ item.mehsul.sekil.url }}" alt="{{ item.mehsul.adi }}" class="product-image" onclick="openImageModal('{{ item.mehsul.sekil.url }}')"></td>
                                     <td>{{ item.mehsul.brend_kod }}</td>
                                     <td>{{ item.mehsul.firma.adi }}</td>
                                     <td>{{ item.mehsul.adi }}</td>
                                     <td>{{ item.mehsul.sahib.username|default:"AS-AVTO" }}</td>
-                                    <td>{{ item.miqdar }}</td>
-                                    <td>{{ item.qiymet|floatformat:2 }} ₼</td>
+                                    
+                                    {% with item_form=formset.forms|first %}
+                                        {% for form in formset %}
+                                            {% if form.instance.id == item.id %}
+                                                {{ form.id }}
+                                                <td>{{ form.miqdar }}</td>
+                                                <td>{{ form.qiymet }}</td>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endwith %}
+
+                                    {% if item.mehsul.sahib != request.user %}
+                                        <td>{{ item.miqdar }}</td>
+                                        <td>{{ item.qiymet|floatformat:2 }} ₼</td>
+                                    {% endif %}
+                                    
                                     <td class="row-total">{{ item.umumi_mebleg|floatformat:2 }} ₼</td>
-                                    <td>
-                                        {% if item.mehsul.sahib == request.user %}
-                                            {{ status_form }}
-                                        {% else %}
-                                            <span class="status-badge status-{{ item.seller_status|lower }}">
-                                                {% if item.seller_status == 'COMPLETED' %}Tamamlandı{% else %}Gözləyir{% endif %}
-                                            </span>
-                                        {% endif %}
-                                    </td>
                                 </tr>
                             {% endfor %}
                         </tbody>

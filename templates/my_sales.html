@@ -47,13 +47,13 @@
                         <td>{{ order.istifadeci.username }}</td>
                         <td>{{ order.tarix|date:"d M Y, H:i" }}</td>
                         <td>
-                            <span class="status-badge status-{{ order.seller_status|lower }}">
-                                {% if order.seller_status == 'COMPLETED' %}
-                                    Tamamlandı
-                                {% else %}
-                                    Gözləyir
-                                {% endif %}
-                            </span>
+                            {% if order.seller_status == 'BİRDƏN ÇOX' %}
+                                <span class="status-badge status-mixed">BİRDƏN ÇOX</span>
+                            {% else %}
+                                <span class="status-badge status-{{ order.seller_status|lower }}">
+                                    {% if order.seller_status == 'PENDING' %}Gözləyir{% elif order.seller_status == 'PROCESSING' %}İşlənir{% elif order.seller_status == 'COMPLETED' %}Tamamlandı{% elif order.seller_status == 'CANCELLED' %}Ləğv edildi{% else %}{{ order.seller_status }}{% endif %}
+                                </span>
+                            {% endif %}
                         </td>
                         <td>{{ order.seller_total|floatformat:2 }} ₼</td>
                         <td>{{ order.seller_paid|floatformat:2 }} ₼</td>

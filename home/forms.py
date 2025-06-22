@@ -43,13 +43,4 @@ class SifarisItemEditForm(forms.ModelForm):
         widgets = {
             'miqdar': forms.NumberInput(attrs={'class': 'form-control form-control-sm item-input', 'min': '1', 'data-field': 'quantity'}),
             'qiymet': forms.NumberInput(attrs={'class': 'form-control form-control-sm item-input', 'step': '0.01', 'data-field': 'price'}),
-        }
-
-# New form for seller status
-class SellerStatusForm(forms.ModelForm):
-    class Meta:
-        model = SifarisItem
-        fields = ['seller_status']
-        widgets = {
-            'seller_status': forms.Select(attrs={'class': 'form-control'}),
         } 

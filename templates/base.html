@@ -118,8 +118,8 @@
                         </div>
                         <div class="search-item">
                             <select id="seller" name="satici">
-                                <option value="0" {% if request.GET.satici == '0' %}selected{% endif %}>AS-AVTO</option>
                                 <option value="">Bütün Satıcılar</option>
+                                <option value="0" {% if request.GET.satici == '0' %}selected{% endif %}>AS-AVTO</option>
                                 {% for seller in request.sellers|slice:'1:' %}
                                 <option value="{{ seller.id }}" {% if request.GET.satici == seller.id|stringformat:'s' %}selected{% endif %}>{{ seller.username }}</option>
                                 {% endfor %}

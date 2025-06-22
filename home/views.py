@@ -343,23 +343,11 @@ def orders_view(request):
     orders = Sifaris.objects.filter(istifadeci=request.user).order_by('-tarix')
     statistics = Sifaris.get_order_statistics(request.user)
     popup_images = PopupImage.objects.filter(aktiv=True)
-
-    # Satıcıları topla
-    order_sellers = {}
-    for order in orders:
-        sellers = set()
-        for item in order.sifarisitem_set.all():
-            if item.mehsul.sahib and item.mehsul.sahib.username:
-                sellers.add(item.mehsul.sahib.username)
-            else:
-                sellers.add('AS-AVTO')
-        order_sellers[order.id] = list(sellers)
-
+    
     return render(request, 'orders.html', {
         'orders': orders,
         'statistics': statistics,
-        'popup_images': popup_images,
-        'order_sellers': order_sellers,
+        'popup_images': popup_images
     })
 
 @login_required

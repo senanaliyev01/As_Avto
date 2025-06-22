@@ -9,27 +9,25 @@
     {% if orders %}
         <div class="table-container">
             <div class="table-header">
-                <div class="header-summary">
-                    <div class="summary-item">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="summary-label">Ümumi Sifarişlər:</span>
-                        <span class="summary-value">{{ statistics.umumi_sifaris_sayi }}</span>
-                    </div>
-                    <div class="summary-item">
-                        <i class="fas fa-money-bill-wave"></i>
-                        <span class="summary-label">Ümumi Məbləğ:</span>
-                        <span class="summary-value">{{ statistics.umumi_mebleg }} ₼</span>
-                    </div>
-                    <div class="summary-item">
-                        <i class="fas fa-check-circle"></i>
-                        <span class="summary-label">Ödənilən:</span>
-                        <span class="summary-value">{{ statistics.umumi_odenilen }} ₼</span>
-                    </div>
-                    <div class="summary-item">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <span class="summary-label">Qalıq Borc:</span>
-                        <span class="summary-value">{{ statistics.umumi_borc }} ₼</span>
-                    </div>
+                <div class="summary-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="summary-label">Ümumi Sifarişlər:</span>
+                    <span class="summary-value">{{ statistics.umumi_sifaris_sayi }}</span>
+                </div>
+                <div class="summary-item">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span class="summary-label">Ümumi Məbləğ:</span>
+                    <span class="summary-value">{{ statistics.umumi_mebleg }} ₼</span>
+                </div>
+                <div class="summary-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span class="summary-label">Ödənilən:</span>
+                    <span class="summary-value">{{ statistics.umumi_odenilen }} ₼</span>
+                </div>
+                <div class="summary-item">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span class="summary-label">Qalıq Borc:</span>
+                    <span class="summary-value">{{ statistics.umumi_borc }} ₼</span>
                 </div>
             </div>
             <table class="table orders-table">
@@ -68,13 +66,19 @@
                         <td>{{ order.odenilen_mebleg }} ₼</td>
                         <td>{{ order.qaliq_borc }} ₼</td>
                         <td>
-                            {% if order.id in order_sellers %}
-                                {% for s in order_sellers[order.id] %}
-                                    {{ s }}{% if not forloop.last %}, {% endif %}
-                                {% endfor %}
-                            {% else %}
-                                AS-AVTO
-                            {% endif %}
+                            {% with sellers=order.sifarisitem_set.all|map:'mehsul.sahib' %}
+                                {% with seller_names=sellers|map:'username' %}
+                                    {% with seller_names_list=seller_names|default_if_none:'' %}
+                                        {% if seller_names_list %}
+                                            {% for s in sellers|dictsort:'username'|unique %}
+                                                {% if s %}{{ s.username }}{% else %}AS-AVTO{% endif %}{% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            AS-AVTO
+                                        {% endif %}
+                                    {% endwith %}
+                                {% endwith %}
+                            {% endwith %}
                         </td>
                     </tr>
                     {% endfor %}

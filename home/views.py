@@ -793,8 +793,10 @@ def my_sales_view(request):
         items = order.sifarisitem_set.filter(mehsul__sahib=request.user)
         order_total = sum(item.umumi_mebleg for item in items)
         if order_total > 0:
-            # Ödənilən məbləği proporsional böl (əgər sifarişdə birdən çox satıcı varsa)
-            if order.umumi_mebleg > 0:
+            # Ödənilən məbləği: tam ödənişdə tam, qismən ödənişdə proporsional böl
+            if order.odenilen_mebleg >= order.umumi_mebleg:
+                paid_share = order_total
+            elif order.umumi_mebleg > 0:
                 paid_share = (order.odenilen_mebleg or 0) * (order_total / order.umumi_mebleg)
             else:
                 paid_share = 0

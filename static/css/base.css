@@ -2934,3 +2934,89 @@ body {
         font-size: 0.93rem;
     }
 }
+
+/* Custom Modal Close (X) Button */
+.modal-header .btn-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #dc3545;
+    opacity: 0.8;
+    transition: color 0.2s, transform 0.2s;
+    box-shadow: none;
+    outline: none;
+    position: absolute;
+    right: 18px;
+    top: 16px;
+    z-index: 10;
+    padding: 0 8px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.modal-header .btn-close:hover,
+.modal-header .btn-close:focus {
+    color: #b71c1c;
+    transform: scale(1.15) rotate(90deg);
+    opacity: 1;
+}
+.modal-header .btn-close span {
+    font-size: 2rem;
+    font-weight: bold;
+    line-height: 1;
+    color: inherit;
+    display: block;
+}
+
+/* Modal Animation */
+.modal.fade .modal-dialog {
+    transform: translateY(-40px) scale(0.97);
+    opacity: 0;
+    transition: all 0.35s cubic-bezier(.4,2,.6,1);
+}
+.modal.show .modal-dialog {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+/* Daha çox göstər butonu */
+#load-more-btn {
+    background: linear-gradient(90deg, #1d6f42 0%, #218838 100%);
+    color: #fff;
+    border: none;
+    border-radius: 24px;
+    padding: 10px 32px;
+    font-size: 1.08rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    margin: 0 auto;
+    display: inline-block;
+    letter-spacing: 0.5px;
+}
+#load-more-btn:hover, #load-more-btn:focus {
+    background: linear-gradient(90deg, #218838 0%, #1d6f42 100%);
+    color: #fff;
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 4px 16px rgba(44, 62, 80, 0.13);
+}
+#load-more-btn:disabled {
+    background: #b7e4c7;
+    color: #fff;
+    opacity: 0.7;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+@media (max-width: 600px) {
+    .modal-header .btn-close {
+        font-size: 1.5rem;
+        right: 10px;
+        top: 10px;
+    }
+    #load-more-btn {
+        padding: 8px 18px;
+        font-size: 1rem;
+    }
+}

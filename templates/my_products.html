@@ -5,16 +5,16 @@
 
 {% block content %}
 <div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
-        <form method="get" class="search-bar-form d-flex align-items-center" id="search-form" style="min-width: 220px;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <form method="get" class="search-bar-form" id="search-form">
             <div class="input-group input-group-sm">
-                <input type="text" class="form-control" name="search" placeholder="Axtar..." value="{{ search_query }}" style="max-width: 140px; min-width: 80px;">
+                <input type="text" class="form-control" name="search" placeholder="Axtar..." value="{{ search_query }}">
                 <button class="btn btn-outline-secondary" type="submit" title="Axtar">
                     <i class="fas fa-search"></i>
                 </button>
             </div>
         </form>
-        <div class="d-flex align-items-center gap-2 ms-auto">
+        <div class="d-flex align-items-center gap-2">
             <a href="#" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#importExcelModal">
                 <i class="fas fa-file-excel"></i> Excel-dən Import Et
             </a>

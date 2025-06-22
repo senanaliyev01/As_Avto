@@ -782,32 +782,30 @@ def my_sales_view(request):
         messages.error(request, 'Bu səhifəyə giriş üçün icazəniz yoxdur.')
         return redirect('base')
 
-    # Yalnız bütün məhsulları istifadəçiyə məxsus olan sifarişləri seç
     all_orders = Sifaris.objects.all().order_by('-tarix')
     filtered_orders = []
     total_orders = 0
     total_amount = 0
     total_paid = 0
-    total_debt = 0
     for order in all_orders:
-        items = order.sifarisitem_set.all()
-        # Əgər bütün məhsullar bu user-ə məxsusdursa
-        if all(item.mehsul.sahib == request.user for item in items):
+        items = order.sifarisitem_set.filter(mehsul__sahib=request.user)
+        order_total = sum(item.umumi_mebleg for item in items)
+        if order_total > 0:
+            # İstifadəçiyə aid məhsullar üçün ödənilən məbləğ (yalnız öz məhsullarına görə)
+            seller_paid = min(order.odenilen_mebleg, order_total)
             total_orders += 1
-            total_amount += order.umumi_mebleg
-            total_paid += order.odenilen_mebleg
-            total_debt += order.qaliq_borc
-            # Template üçün order-ə bu dəyərləri əlavə et
-            order.seller_total = order.umumi_mebleg
-            order.seller_paid = order.odenilen_mebleg
-            order.seller_debt = order.qaliq_borc
+            total_amount += order_total
+            total_paid += seller_paid
+            order.seller_total = order_total
+            order.seller_paid = seller_paid
+            order.seller_debt = order_total - seller_paid
             filtered_orders.append(order)
 
     stats = {
         'total_orders': total_orders,
         'total_amount': total_amount,
         'total_paid': total_paid,
-        'total_debt': total_debt
+        'total_debt': total_amount - total_paid
     }
 
     context = {

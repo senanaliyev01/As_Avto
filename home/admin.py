@@ -376,13 +376,24 @@ class SifarisItemInline(admin.TabularInline):
 
 @admin.register(Sifaris)
 class SifarisAdmin(admin.ModelAdmin):
-    list_display = ['id', 'istifadeci', 'tarix', 'status', 'catdirilma_usulu', 'umumi_mebleg', 'odenilen_mebleg', 'qaliq_borc', 'pdf_button']
+    list_display = ['id', 'istifadeci', 'saticilar', 'tarix', 'status', 'catdirilma_usulu', 'umumi_mebleg', 'odenilen_mebleg', 'qaliq_borc', 'pdf_button']
     list_filter = ['status', 'catdirilma_usulu', 'tarix', 'istifadeci']
     search_fields = ['istifadeci__username']
     readonly_fields = ['istifadeci', 'tarix', 'umumi_mebleg', 'qaliq_borc']
     fields = ['istifadeci', 'tarix', 'status', 'catdirilma_usulu', 'umumi_mebleg', 'odenilen_mebleg', 'qaliq_borc', 'qeyd']
     inlines = [SifarisItemInline]
     change_list_template = 'admin/sifaris_change_list.html'
+
+    def saticilar(self, obj):
+        # Sifarişdə olan bütün məhsulların sahiblərini tapırıq
+        satici_set = set()
+        for item in obj.sifarisitem_set.all():
+            if item.mehsul and item.mehsul.sahib:
+                satici_set.add(item.mehsul.sahib.username)
+            else:
+                satici_set.add('AS-AVTO')
+        return ', '.join(satici_set)
+    saticilar.short_description = 'Satıcı(lar)'
 
     def pdf_button(self, obj):
         return format_html(

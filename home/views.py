@@ -1082,6 +1082,8 @@ def import_user_products_view(request):
                     if existing_product:
                         # Sahib onsuz da request.user olduğu üçün bu yoxlamaya ehtiyac yoxdur.
                         # Mövcud məhsulu yeniləyirik.
+                        if not existing_product.sahib:
+                            existing_product.sahib = request.user
                         existing_product.adi = temiz_ad
                         existing_product.kateqoriya = kateqoriya
                         existing_product.firma = firma

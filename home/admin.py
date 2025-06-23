@@ -247,6 +247,8 @@ class MehsulAdmin(admin.ModelAdmin):
                             try:
                                 if existing_product:
                                     # Mövcud məhsulu yenilə
+                                    if not existing_product.sahib:
+                                        existing_product.sahib = request.user
                                     existing_product.adi = temiz_ad
                                     
                                     # Excel-də olan məlumatları yenilə, olmayanları None et
@@ -283,7 +285,8 @@ class MehsulAdmin(admin.ModelAdmin):
                                         'stok': int(row['stok']) if 'stok' in row and pd.notna(row['stok']) else 0,
                                         'kodlar': str(row['kodlar']) if 'kodlar' in row and pd.notna(row['kodlar']) else '',
                                         'melumat': str(row['melumat']) if 'melumat' in row and pd.notna(row['melumat']) else '',
-                                        'yenidir': False
+                                        'yenidir': False,
+                                        'sahib': request.user,
                                     }
                                     
                                     yeni_mehsul = Mehsul.objects.create(**mehsul_data)
@@ -348,6 +351,19 @@ class MehsulAdmin(admin.ModelAdmin):
         extra_context['total_stats'] = total_stats
         
         return super().changelist_view(request, extra_context=extra_context)
+
+    def save_model(self, request, obj, form, change):
+        if not obj.sahib:
+            obj.sahib = request.user
+        super().save_model(request, obj, form, change)
+
+    def save_formset(self, request, form, formset, change):
+        instances = formset.save(commit=False)
+        for instance in instances:
+            if hasattr(instance, 'sahib') and not instance.sahib:
+                instance.sahib = request.user
+            instance.save()
+        formset.save_m2m()
 
 class SifarisItemInline(admin.TabularInline):
     model = SifarisItem

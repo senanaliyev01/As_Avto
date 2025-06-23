@@ -102,11 +102,43 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- Real-time buyer search for my_sales.html ---
+    // --- Buyer live dropdown for my_sales.html ---
     const buyerSearch = document.getElementById('buyerLiveSearch');
-    if (buyerSearch) {
+    const buyerDropdown = document.getElementById('buyerLiveDropdown');
+    if (buyerSearch && buyerDropdown) {
+        // Açmaq üçün inputa klik
+        buyerSearch.addEventListener('focus', function() {
+            buyerDropdown.style.display = 'block';
+            filterBuyerDropdown(this.value);
+        });
+        // Yazdıqca filtrlə və aç
         buyerSearch.addEventListener('input', function() {
-            const val = this.value.toLowerCase();
+            buyerDropdown.style.display = 'block';
+            filterBuyerDropdown(this.value);
+            filterOrdersByBuyerInput(this.value);
+        });
+        // Seçimə klik
+        buyerDropdown.addEventListener('click', function(e) {
+            if (e.target.classList.contains('buyer-live-option')) {
+                buyerSearch.value = e.target.textContent;
+                buyerDropdown.style.display = 'none';
+                filterOrdersByBuyerInput(e.target.textContent);
+            }
+        });
+        // Çöldə kliklədikdə bağla
+        document.addEventListener('click', function(e) {
+            if (!buyerDropdown.contains(e.target) && e.target !== buyerSearch) {
+                buyerDropdown.style.display = 'none';
+            }
+        });
+        function filterBuyerDropdown(query) {
+            const val = query.toLowerCase();
+            buyerDropdown.querySelectorAll('.buyer-live-option').forEach(opt => {
+                opt.style.display = opt.dataset.username.includes(val) ? '' : 'none';
+            });
+        }
+        function filterOrdersByBuyerInput(query) {
+            const val = query.toLowerCase();
             const rows = document.querySelectorAll('table.table tbody tr');
             rows.forEach(row => {
                 const buyerCell = row.querySelector('td:nth-child(2) a');
@@ -114,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const username = buyerCell.textContent.toLowerCase();
                 row.style.display = username.includes(val) ? '' : 'none';
             });
-        });
+        }
     }
 });
 

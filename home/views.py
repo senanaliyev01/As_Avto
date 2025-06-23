@@ -426,7 +426,7 @@ def checkout(request):
                 umumi_mebleg=total,
                 catdirilma_usulu=catdirilma_usulu
             )
-                for item in items:
+            for item in items:
                 SifarisItem.objects.create(
                     sifaris=order,
                     mehsul=item['product'],
@@ -440,7 +440,7 @@ def checkout(request):
             request.session.modified = True
             
             if len(created_orders) == 1:
-            messages.success(request, 'Sifarişiniz uğurla yaradıldı.')
+             messages.success(request, 'Sifarişiniz uğurla yaradıldı.')
             elif len(created_orders) > 1:
                 messages.success(request, f'{len(created_orders)} ayrı sifariş yaradıldı (fərqli satıcılar üçün).')
             else:

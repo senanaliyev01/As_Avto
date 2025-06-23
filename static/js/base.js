@@ -38,64 +38,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize Header Messages
     initializeHeaderMessages();
 
-    // Custom Searchable Dropdown for Category
-    (function() {
-        const dropdown = document.getElementById('categoryDropdown');
-        if (!dropdown) return;
-        const input = document.getElementById('categoryInput');
-        const hiddenInput = document.getElementById('categoryHiddenInput');
-        const list = document.getElementById('categoryDropdownList');
-        const options = Array.from(list.querySelectorAll('.dropdown-option'));
-
-        // Show dropdown
-        function openDropdown() {
-            dropdown.classList.add('open');
-            input.select();
-        }
-        // Hide dropdown
-        function closeDropdown() {
-            dropdown.classList.remove('open');
-        }
-        // Filter options
-        function filterOptions() {
-            const val = input.value.toLowerCase();
-            let anyVisible = false;
-            options.forEach(opt => {
-                if (opt.textContent.toLowerCase().includes(val)) {
-                    opt.style.display = '';
-                    anyVisible = true;
-                } else {
-                    opt.style.display = 'none';
-                }
-            });
-            if (!anyVisible) list.style.display = 'none';
-            else list.style.display = 'block';
-        }
-        // Option click
-        options.forEach(opt => {
-            opt.addEventListener('mousedown', function(e) {
-                e.preventDefault();
-                input.value = this.textContent;
-                hiddenInput.value = this.getAttribute('data-value');
-                closeDropdown();
-            });
-        });
-        // Input events
-        input.addEventListener('focus', openDropdown);
-        input.addEventListener('click', openDropdown);
-        input.addEventListener('input', function() {
-            filterOptions();
-            openDropdown();
-        });
-        // Click outside
-        document.addEventListener('mousedown', function(e) {
-            if (!dropdown.contains(e.target)) closeDropdown();
-        });
-        // On form submit, use hidden input value
-        input.form && input.form.addEventListener('submit', function() {
-            hiddenInput.value = input.value;
-        });
-    })();
+    setupCustomDropdown('category-dropdown', 'category');
+    setupCustomDropdown('brand-dropdown', 'brand');
+    setupCustomDropdown('model-dropdown', 'model');
+    setupCustomDropdown('seller-dropdown', 'seller');
 });
 
 function initializeSearch() {
@@ -1079,5 +1025,52 @@ function initializeHeaderMessages() {
 
     // Hər 5 saniyədən bir növbəti mesaja keç
     setInterval(nextMessage, interval);
+}
+
+function setupCustomDropdown(dropdownId, selectId) {
+    const dropdown = document.getElementById(dropdownId);
+    const select = document.getElementById(selectId);
+    if (!dropdown || !select) return;
+    const input = dropdown.querySelector('.dropdown-search-input');
+    const optionsContainer = dropdown.querySelector('.dropdown-options');
+    const options = Array.from(optionsContainer.querySelectorAll('.dropdown-option'));
+
+    // Show/hide dropdown
+    dropdown.addEventListener('click', function(e) {
+        e.stopPropagation();
+        optionsContainer.style.display = 'block';
+        input.focus();
+    });
+    // Filter options
+    input.addEventListener('input', function() {
+        const val = input.value.toLowerCase();
+        options.forEach(opt => {
+            if (opt.textContent.toLowerCase().includes(val)) {
+                opt.style.display = '';
+            } else {
+                opt.style.display = 'none';
+            }
+        });
+    });
+    // Option click
+    options.forEach(opt => {
+        opt.addEventListener('click', function(e) {
+            e.stopPropagation();
+            // Set value in select
+            select.value = opt.getAttribute('data-value');
+            // Update input value
+            input.value = opt.textContent;
+            optionsContainer.style.display = 'none';
+        });
+    });
+    // Click outside closes
+    document.addEventListener('click', function() {
+        optionsContainer.style.display = 'none';
+    });
+    // On page load, set input value to selected
+    const selected = select.querySelector('option:checked');
+    if (selected) {
+        input.value = selected.textContent;
+    }
 }
 

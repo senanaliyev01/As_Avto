@@ -90,20 +90,33 @@
                 <form method="get" action="{% url 'products' %}" class="search-form">
                     <div class="search-grid">
                         <div class="search-item">
-                            <div class="custom-dropdown" id="categoryDropdown">
-                                <input type="text" id="categoryInput" class="dropdown-input" placeholder="Kateqoriya seçin..." autocomplete="off" value="{{ request.GET.kateqoriya|default:'' }}">
-                                <input type="hidden" name="kateqoriya" id="categoryHiddenInput" value="{{ request.GET.kateqoriya|default:'' }}">
-                                <div class="dropdown-list" id="categoryDropdownList">
+                            <div class="custom-dropdown" id="category-dropdown">
+                                <input type="text" class="dropdown-search-input" placeholder="Kateqoriya axtar...">
+                                <div class="dropdown-options">
                                     <div class="dropdown-option" data-value="">Bütün Kateqoriyalar</div>
                                     {% for category in request.categories %}
                                     <div class="dropdown-option" data-value="{{ category.adi }}">{{ category.adi }}</div>
                                     {% endfor %}
                                 </div>
                             </div>
+                            <select id="category" name="kateqoriya" style="display:none;">
+                                <option value="">Bütün Kateqoriyalar</option>
+                                {% for category in request.categories %}
+                                <option value="{{ category.adi }}" {% if request.GET.kateqoriya == category.adi %}selected{% endif %}>{{ category.adi }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
                         <div class="search-item">
-                            <!-- <label for="brand">Marka</label> -->
-                            <select id="brand" name="firma">
+                            <div class="custom-dropdown" id="brand-dropdown">
+                                <input type="text" class="dropdown-search-input" placeholder="Firma axtar...">
+                                <div class="dropdown-options">
+                                    <div class="dropdown-option" data-value="">Bütün Firmalar</div>
+                                    {% for brand in request.brands %}
+                                    <div class="dropdown-option" data-value="{{ brand.adi }}">{{ brand.adi }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <select id="brand" name="firma" style="display:none;">
                                 <option value="">Bütün Firmalar</option>
                                 {% for brand in request.brands %}
                                 <option value="{{ brand.adi }}" {% if request.GET.firma == brand.adi %}selected{% endif %}>{{ brand.adi }}</option>
@@ -111,8 +124,16 @@
                             </select>
                         </div>
                         <div class="search-item">
-                            <!-- <label for="model">Model</label> -->
-                            <select id="model" name="avtomobil">
+                            <div class="custom-dropdown" id="model-dropdown">
+                                <input type="text" class="dropdown-search-input" placeholder="Model axtar...">
+                                <div class="dropdown-options">
+                                    <div class="dropdown-option" data-value="">Bütün Avtomobillər</div>
+                                    {% for model in request.models %}
+                                    <div class="dropdown-option" data-value="{{ model.adi }}">{{ model.adi }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <select id="model" name="avtomobil" style="display:none;">
                                 <option value="">Bütün Avtomobillər</option>
                                 {% for model in request.models %}
                                 <option value="{{ model.adi }}" {% if request.GET.avtomobil == model.adi %}selected{% endif %}>{{ model.adi }}</option>
@@ -120,7 +141,17 @@
                             </select>
                         </div>
                         <div class="search-item">
-                            <select id="seller" name="satici">
+                            <div class="custom-dropdown" id="seller-dropdown">
+                                <input type="text" class="dropdown-search-input" placeholder="Satıcı axtar...">
+                                <div class="dropdown-options">
+                                    <div class="dropdown-option" data-value="">Bütün Satıcılar</div>
+                                    <div class="dropdown-option" data-value="0">AS-AVTO</div>
+                                    {% for seller in request.sellers|slice:'1:' %}
+                                    <div class="dropdown-option" data-value="{{ seller.id }}">{{ seller.username }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <select id="seller" name="satici" style="display:none;">
                                 <option value="">Bütün Satıcılar</option>
                                 <option value="0" {% if request.GET.satici == '0' %}selected{% endif %}>AS-AVTO</option>
                                 {% for seller in request.sellers|slice:'1:' %}
@@ -129,7 +160,6 @@
                             </select>
                         </div>
                         <div class="search-item">
-                            <!-- <label for="query">Məhsul Adı</label> -->
                             <div class="search-container">
                                 <input type="text" id="query" name="search" placeholder="Kodu daxil edin..." value="{{ request.GET.search }}" autocomplete="off">
                                 <div id="search-results" class="search-results"></div>

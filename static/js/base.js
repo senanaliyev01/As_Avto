@@ -104,6 +104,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Buyer Filter for my_sales.html (ən sağda yerləşən filter üçün)
     initializeBuyerFilterDropdown();
+
+    // Buyer Filter for my_sales.html (ən sağda yerləşən yeni filter üçün)
+    initializeBuyerSearchFilter();
 });
 
 function initializeSearch() {
@@ -1293,6 +1296,48 @@ function initializeBuyerFilterDropdown() {
     // Click outside closes
     document.addEventListener('click', function(e) {
         if (!dropdown.contains(e.target)) {
+            optionsContainer.style.display = 'none';
+        }
+    });
+}
+
+// Yeni buyer-search-filter üçün real-time filter funksiyası
+function initializeBuyerSearchFilter() {
+    const filter = document.getElementById('buyer-search-filter');
+    if (!filter) return;
+    const input = filter.querySelector('.buyer-search-input');
+    const optionsContainer = filter.querySelector('.buyer-search-options');
+    const options = Array.from(optionsContainer.querySelectorAll('.buyer-search-option'));
+    // Dropdown açılıb/bağlanma
+    input.addEventListener('focus', function() {
+        optionsContainer.style.display = 'block';
+    });
+    input.addEventListener('blur', function() {
+        setTimeout(() => { optionsContainer.style.display = 'none'; }, 150);
+    });
+    // Filter options
+    input.addEventListener('input', function() {
+        const val = input.value.toLowerCase();
+        options.forEach(opt => {
+            if (opt.textContent.toLowerCase().includes(val)) {
+                opt.style.display = '';
+            } else {
+                opt.style.display = 'none';
+            }
+        });
+    });
+    // Option click
+    options.forEach(opt => {
+        opt.addEventListener('click', function(e) {
+            e.stopPropagation();
+            input.value = opt.textContent;
+            optionsContainer.style.display = 'none';
+            filterOrdersByBuyer(opt.getAttribute('data-value'));
+        });
+    });
+    // Click outside closes
+    document.addEventListener('click', function(e) {
+        if (!filter.contains(e.target)) {
             optionsContainer.style.display = 'none';
         }
     });

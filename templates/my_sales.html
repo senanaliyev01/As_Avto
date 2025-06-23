@@ -4,18 +4,18 @@
 
 {% block content %}
 <div class="container">
-    <h2 class="mb-4">Mənə Gələn Sifarişlər</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Mənə Gələn Sifarişlər</h2>
+    </div>
     <div class="d-flex justify-content-end align-items-center mb-2">
-        <!-- Statistik xülasənin üstündə, ən sağda yeni alıcı filteri -->
-        <div class="sales-buyer-filter-dropdown" style="min-width:220px;max-width:260px;">
-            <div class="custom-dropdown" id="sales-buyer-filter-dropdown">
-                <input type="text" class="dropdown-search-input" placeholder="Alıcı axtar...">
-                <div class="dropdown-options">
-                    <div class="dropdown-option" data-value="">Bütün Alıcılar</div>
-                    {% for buyer in buyer_stats %}
-                    <div class="dropdown-option" data-value="{{ buyer.user_id }}">{{ buyer.username }}</div>
-                    {% endfor %}
-                </div>
+        <!-- Statistikaların üstündə, ən sağda fərqli class ilə alıcı filteri -->
+        <div class="buyer-search-filter" id="buyer-search-filter">
+            <input type="text" class="buyer-search-input" placeholder="Alıcı axtar...">
+            <div class="buyer-search-options">
+                <div class="buyer-search-option" data-value="">Bütün Alıcılar</div>
+                {% for buyer in buyer_stats %}
+                <div class="buyer-search-option" data-value="{{ buyer.user_id }}">{{ buyer.username }}</div>
+                {% endfor %}
             </div>
         </div>
     </div>

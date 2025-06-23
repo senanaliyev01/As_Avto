@@ -19,6 +19,7 @@ import pandas as pd
 from django.db import transaction
 import math
 from django.forms import inlineformset_factory
+from collections import defaultdict
 
 def normalize_azerbaijani_chars(text):
     # Azərbaycan hərflərinin qarşılıqlı çevrilməsi
@@ -839,9 +840,25 @@ def my_sales_view(request):
         'total_debt': total_amount - total_paid
     }
 
+    buyer_stats_dict = defaultdict(lambda: {'username': '', 'order_count': 0, 'total_amount': 0, 'total_paid': 0, 'total_debt': 0, 'user_id': None})
+    for order in all_orders:
+        items = order.sifarisitem_set.filter(mehsul__sahib=request.user)
+        order_total = sum(item.umumi_mebleg for item in items)
+        if order_total > 0:
+            buyer = order.istifadeci
+            buyer_stats = buyer_stats_dict[buyer.id]
+            buyer_stats['username'] = buyer.username
+            buyer_stats['user_id'] = buyer.id
+            buyer_stats['order_count'] += 1
+            buyer_stats['total_amount'] += order_total
+            buyer_stats['total_paid'] += order.odenilen_mebleg or 0
+            buyer_stats['total_debt'] += order_total - (order.odenilen_mebleg or 0)
+    buyer_stats = list(buyer_stats_dict.values())
+
     context = {
         'orders': filtered_orders,
-        'stats': stats
+        'stats': stats,
+        'buyer_stats': buyer_stats,
     }
     return render(request, 'my_sales.html', context)
 

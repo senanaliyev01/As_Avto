@@ -6,6 +6,8 @@
 <div class="container">
     <h2 class="mb-4">Mənə Gələn Sifarişlər</h2>
 
+    <button id="openStatsModal" class="btn btn-secondary mb-3">Statistikanı bax</button>
+
     <div class="orders-summary">
         <div class="summary-item">
             <span class="summary-label">Ümumi Sifariş Sayı</span>
@@ -109,6 +111,53 @@
                         <span id="userDetailsAddress" class="info-value"></span>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Buyer Stats Modal -->
+<div id="buyerStatsModal" class="details-modal">
+    <div class="details-modal-content" style="max-width: 700px;">
+        <span class="buyer-stats-modal-close" style="position:absolute;right:20px;top:20px;cursor:pointer;font-size:24px;">&times;</span>
+        <div class="details-content">
+            <div class="details-header">
+                <h3>Alıcılar üzrə Statistika</h3>
+                <input type="text" id="buyerStatsSearch" class="form-control" placeholder="Alıcı axtar..." style="margin: 15px 0;">
+            </div>
+            <div class="details-body" style="overflow-x:auto;">
+                <table class="table table-striped" id="buyerStatsTable">
+                    <thead>
+                        <tr>
+                            <th>Alıcı</th>
+                            <th>Sifariş sayı</th>
+                            <th>Ümumi Məbləğ</th>
+                            <th>Ödənilən</th>
+                            <th>Qalıq Borc</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for buyer in buyer_stats %}
+                        <tr>
+                            <td>
+                                <a href="#" class="seller-link" onclick="openUserDetailsModal({{ buyer.user_id }}); return false;">
+                                    <i class="fas fa-user"></i> {{ buyer.username }}
+                                </a>
+                            </td>
+                            <td>{{ buyer.order_count }}</td>
+                            <td>{{ buyer.total_amount|floatformat:2 }} ₼</td>
+                            <td>{{ buyer.total_paid|floatformat:2 }} ₼</td>
+                            <td>
+                                {% if buyer.total_debt < 0 %}
+                                    <span style="color: #28a745; font-weight: bold;">+{{ buyer.total_debt|floatformat:2|slice:'1:' }} ₼</span>
+                                {% else %}
+                                    {{ buyer.total_debt|floatformat:2 }} ₼
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

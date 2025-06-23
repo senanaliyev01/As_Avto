@@ -42,6 +42,9 @@ document.addEventListener('DOMContentLoaded', function() {
     setupCustomDropdown('brand-dropdown', 'brand');
     setupCustomDropdown('model-dropdown', 'model');
     setupCustomDropdown('seller-dropdown', 'seller');
+
+    // Buyer Stats Modal logic for my_sales.html
+    initializeBuyerStatsModal();
 });
 
 function initializeSearch() {
@@ -1071,6 +1074,46 @@ function setupCustomDropdown(dropdownId, selectId) {
     const selected = select.querySelector('option:checked');
     if (selected) {
         input.value = selected.textContent;
+    }
+}
+
+// Buyer Stats Modal logic for my_sales.html
+function initializeBuyerStatsModal() {
+    const openBtn = document.getElementById('openStatsModal');
+    const modal = document.getElementById('buyerStatsModal');
+    const closeBtn = document.querySelector('.buyer-stats-modal-close');
+    const searchInput = document.getElementById('buyerStatsSearch');
+    const table = document.getElementById('buyerStatsTable');
+    if (!openBtn || !modal || !closeBtn || !searchInput || !table) return;
+
+    openBtn.addEventListener('click', function() {
+        modal.style.display = 'block';
+        setTimeout(() => modal.classList.add('show'), 10);
+        searchInput.value = '';
+        filterBuyerStatsTable('');
+        searchInput.focus();
+    });
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.style.display === 'block') closeModal();
+    });
+    function closeModal() {
+        modal.classList.remove('show');
+        setTimeout(() => { modal.style.display = 'none'; }, 300);
+    }
+    searchInput.addEventListener('input', function() {
+        filterBuyerStatsTable(this.value);
+    });
+    function filterBuyerStatsTable(query) {
+        const rows = table.querySelectorAll('tbody tr');
+        const val = query.toLowerCase();
+        rows.forEach(row => {
+            const username = row.querySelector('td').innerText.toLowerCase();
+            row.style.display = username.includes(val) ? '' : 'none';
+        });
     }
 }
 

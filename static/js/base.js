@@ -102,11 +102,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Buyer Filter for my_sales.html (ən sağda yerləşən filter üçün)
-    initializeBuyerFilterDropdown();
-
-    // Buyer Filter for my_sales.html (ən sağda yerləşən yeni filter üçün)
-    initializeBuyerSearchFilter();
+    // --- Real-time buyer search for my_sales.html ---
+    const buyerSearch = document.getElementById('buyerLiveSearch');
+    if (buyerSearch) {
+        buyerSearch.addEventListener('input', function() {
+            const val = this.value.toLowerCase();
+            const rows = document.querySelectorAll('table.table tbody tr');
+            rows.forEach(row => {
+                const buyerCell = row.querySelector('td:nth-child(2) a');
+                if (!buyerCell) return;
+                const username = buyerCell.textContent.toLowerCase();
+                row.style.display = username.includes(val) ? '' : 'none';
+            });
+        });
+    }
 });
 
 function initializeSearch() {
@@ -1256,90 +1265,6 @@ function initializeProfileModal() {
         .catch(() => {
             alert('Xəta baş verdi!');
         });
-    });
-}
-
-// Yeni buyer filter dropdown üçün real-time filter funksiyası
-function initializeBuyerFilterDropdown() {
-    const dropdown = document.getElementById('buyer-filter-dropdown');
-    if (!dropdown) return;
-    const input = dropdown.querySelector('.dropdown-search-input');
-    const optionsContainer = dropdown.querySelector('.dropdown-options');
-    const options = Array.from(optionsContainer.querySelectorAll('.dropdown-option'));
-    // Dropdown açılıb/bağlanma
-    input.addEventListener('focus', function() {
-        optionsContainer.style.display = 'block';
-    });
-    input.addEventListener('blur', function() {
-        setTimeout(() => { optionsContainer.style.display = 'none'; }, 150);
-    });
-    // Filter options
-    input.addEventListener('input', function() {
-        const val = input.value.toLowerCase();
-        options.forEach(opt => {
-            if (opt.textContent.toLowerCase().includes(val)) {
-                opt.style.display = '';
-            } else {
-                opt.style.display = 'none';
-            }
-        });
-    });
-    // Option click
-    options.forEach(opt => {
-        opt.addEventListener('click', function(e) {
-            e.stopPropagation();
-            input.value = opt.textContent;
-            optionsContainer.style.display = 'none';
-            filterOrdersByBuyer(opt.getAttribute('data-value'));
-        });
-    });
-    // Click outside closes
-    document.addEventListener('click', function(e) {
-        if (!dropdown.contains(e.target)) {
-            optionsContainer.style.display = 'none';
-        }
-    });
-}
-
-// Yeni buyer-search-filter üçün real-time filter funksiyası
-function initializeBuyerSearchFilter() {
-    const filter = document.getElementById('buyer-search-filter');
-    if (!filter) return;
-    const input = filter.querySelector('.buyer-search-input');
-    const optionsContainer = filter.querySelector('.buyer-search-options');
-    const options = Array.from(optionsContainer.querySelectorAll('.buyer-search-option'));
-    // Dropdown açılıb/bağlanma
-    input.addEventListener('focus', function() {
-        optionsContainer.style.display = 'block';
-    });
-    input.addEventListener('blur', function() {
-        setTimeout(() => { optionsContainer.style.display = 'none'; }, 150);
-    });
-    // Filter options
-    input.addEventListener('input', function() {
-        const val = input.value.toLowerCase();
-        options.forEach(opt => {
-            if (opt.textContent.toLowerCase().includes(val)) {
-                opt.style.display = '';
-            } else {
-                opt.style.display = 'none';
-            }
-        });
-    });
-    // Option click
-    options.forEach(opt => {
-        opt.addEventListener('click', function(e) {
-            e.stopPropagation();
-            input.value = opt.textContent;
-            optionsContainer.style.display = 'none';
-            filterOrdersByBuyer(opt.getAttribute('data-value'));
-        });
-    });
-    // Click outside closes
-    document.addEventListener('click', function(e) {
-        if (!filter.contains(e.target)) {
-            optionsContainer.style.display = 'none';
-        }
     });
 }
 

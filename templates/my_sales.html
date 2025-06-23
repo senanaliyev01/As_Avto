@@ -6,16 +6,8 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">Mənə Gələn Sifarişlər</h2>
-    </div>
-    <div style="display: flex; justify-content: flex-end; margin-bottom: 12px;">
-        <div class="buyer-search-filter" id="buyer-search-filter">
-            <input type="text" class="buyer-search-input" placeholder="Alıcı axtar...">
-            <div class="buyer-search-options">
-                <div class="buyer-search-option" data-value="">Bütün Alıcılar</div>
-                {% for buyer in buyer_stats %}
-                <div class="buyer-search-option" data-value="{{ buyer.user_id }}">{{ buyer.username }}</div>
-                {% endfor %}
-            </div>
+        <div class="buyer-filter-container" style="min-width:260px;max-width:320px;">
+            <input type="text" id="buyerLiveSearch" class="form-control" placeholder="Alıcı axtar..." style="width:100%;">
         </div>
     </div>
 

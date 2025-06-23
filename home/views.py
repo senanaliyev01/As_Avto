@@ -1285,7 +1285,7 @@ def my_sale_pdf(request, order_id):
     ]))
     elements.append(table)
     elements.append(Spacer(1, 15))
-    # Ümumi məbləğ və Qalıq borc cədvəli
+    # Ümumi məbləğ və Ümumi borc cədvəli (yalnız iki sətr: Ümumi Cəmi və Ümumi Borc)
     totalStyle = ParagraphStyle(
         'TotalStyle',
         parent=styles['Normal'],
@@ -1311,8 +1311,7 @@ def my_sale_pdf(request, order_id):
     debt = total_amount - paid
     total_data = [
         [Paragraph('Ümumi Cəmi :', totalStyle), Paragraph(f"{total_amount} ₼", amountStyle)],
-        [Paragraph('Ödənilən :', totalStyle), Paragraph(f"{paid} ₼", amountStyle)],
-        [Paragraph('Qalıq Borc :', totalStyle), Paragraph(f"{debt} ₼", amountStyle)]
+        [Paragraph('Ümumi Borc :', totalStyle), Paragraph(f"{debt} ₼", amountStyle)]
     ]
     total_table = Table(total_data, colWidths=[100, 100])
     total_table.setStyle(TableStyle([

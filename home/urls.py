@@ -28,6 +28,7 @@ urlpatterns = [
     path('my-products/delete/<int:product_id>/', views.delete_product_view, name='delete_product_my'),
     path('my-sales/', views.my_sales_view, name='my_sales'),
     path('my-sales/<int:order_id>/edit/', views.edit_my_sale_view, name='edit_my_sale'),
+    path('my-sales/<int:order_id>/pdf/', views.my_sale_pdf, name='my_sale_pdf'),
     path('user-details/<int:user_id>/', views.user_details_view, name='user_details'),
     path('products/add/', views.add_edit_product_view, name='add_product'),
     path('products/<int:product_id>/edit/', views.add_edit_product_view, name='edit_product'),

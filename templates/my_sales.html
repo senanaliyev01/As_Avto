@@ -74,6 +74,9 @@
                         </td>
                         <td>
                             <a href="{% url 'edit_my_sale' order.id %}" class="btn btn-primary btn-sm">Redaktə Et</a>
+                            <a href="{% url 'my_sale_pdf' order.id %}" class="btn btn-primary btn-sm" title="PDF-ə çıxar" style="margin-left: 5px;" target="_blank">
+                                <i class="fas fa-file-pdf"></i>
+                            </a>
                         </td>
                     </tr>
                     {% endfor %}

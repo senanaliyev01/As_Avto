@@ -6,7 +6,7 @@ from django.db.models import Q, Sum, F, Case, When, DecimalField
 from decimal import Decimal
 from django.contrib import messages
 import re
-from django.http import JsonResponse, HttpResponseNotFound, HttpResponseRedirect
+from django.http import JsonResponse, HttpResponseNotFound, HttpResponseRedirect, FileResponse, Http404
 from django.db.models.functions import Lower
 from django.db.models import Value
 from functools import reduce
@@ -20,6 +20,14 @@ from django.db import transaction
 import math
 from django.forms import inlineformset_factory
 from collections import defaultdict
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+import io
 
 def normalize_azerbaijani_chars(text):
     # Azərbaycan hərflərinin qarşılıqlı çevrilməsi
@@ -1124,3 +1132,121 @@ def import_user_products_view(request):
         return redirect('my_products')
     
     return redirect('my_products')
+
+def my_sale_pdf(request, order_id):
+    from home.models import Sifaris, SifarisItem, Profile
+    from django.contrib.auth.models import User
+    try:
+        order = Sifaris.objects.get(id=order_id)
+    except Sifaris.DoesNotExist:
+        raise Http404("Sifariş tapılmadı")
+    # Yalnız bu satıcıya aid məhsullar
+    items = order.sifarisitem_set.filter(mehsul__sahib=request.user)
+    if not items.exists():
+        raise Http404("Bu sifarişdə sizin məhsul yoxdur")
+    # Satıcı profil məlumatları
+    profile = getattr(request.user, 'profile', None)
+    profile_image_path = None
+    if profile and profile.phone:
+        phone = profile.phone
+    else:
+        phone = ''
+    if profile and profile.user and profile.user.profile and profile.user.profile.user:
+        # Profil şəkli varsa
+        if profile.user.profile and hasattr(profile.user.profile, 'sekil') and profile.user.profile.sekil:
+            profile_image_path = profile.user.profile.sekil.path
+    # PDF yaratmaq
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=20, leftMargin=20, topMargin=20, bottomMargin=20)
+    elements = []
+    pdfmetrics.registerFont(TTFont('NotoSans', 'static/fonts/NotoSans-Regular.ttf'))
+    styles = getSampleStyleSheet()
+    styles['Title'].fontName = 'NotoSans'
+    styles['Normal'].fontName = 'NotoSans'
+    # Başlıq: profil şəkli, username, telefon
+    from reportlab.platypus import Table, TableStyle, Image, Paragraph, Spacer
+    profile_data = []
+    if profile and hasattr(profile, 'sekil') and profile.sekil:
+        try:
+            img = Image(profile.sekil.path, width=60, height=60)
+            profile_data.append([img, Paragraph(f"<b>{request.user.username}</b><br/>{phone}", styles['Normal'])])
+        except Exception:
+            profile_data.append(['', Paragraph(f"<b>{request.user.username}</b><br/>{phone}", styles['Normal'])])
+    else:
+        profile_data.append(['', Paragraph(f"<b>{request.user.username}</b><br/>{phone}", styles['Normal'])])
+    profile_table = Table(profile_data, colWidths=[70, 200])
+    profile_table.setStyle(TableStyle([
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+        ('ALIGN', (1, 0), (1, 0), 'LEFT'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 0),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+        ('TOPPADDING', (0, 0), (-1, -1), 0),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+    ]))
+    elements.append(profile_table)
+    elements.append(Spacer(1, 20))
+    # Sifariş məlumatları
+    elements.append(Paragraph(f"Sifariş №{order.id}", styles['Title']))
+    elements.append(Paragraph(f"Alıcı: {order.istifadeci.username}", styles['Normal']))
+    elements.append(Paragraph(f"Tarix: {order.tarix.strftime('%d.%m.%Y %H:%M')}", styles['Normal']))
+    elements.append(Paragraph(f"Çatdırılma: {order.get_catdirilma_usulu_display()}", styles['Normal']))
+    elements.append(Spacer(1, 10))
+    # Məhsullar cədvəli
+    headers = ['№', 'Kod', 'Məhsul', 'Miqdar', 'Qiymət', 'Cəmi']
+    data = [headers]
+    total_amount = 0
+    for idx, item in enumerate(items, 1):
+        row = [
+            str(idx),
+            item.mehsul.brend_kod,
+            item.mehsul.adi,
+            str(item.miqdar),
+            f"{item.qiymet} ₼",
+            f"{item.umumi_mebleg} ₼"
+        ]
+        data.append(row)
+        total_amount += item.umumi_mebleg
+    table = Table(data)
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2B5173')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('FONTNAME', (0, 0), (-1, 0), 'NotoSans'),
+        ('FONTSIZE', (0, 0), (-1, 0), 10),
+        ('TOPPADDING', (0, 0), (-1, 0), 5),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 5),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+        ('FONTNAME', (0, 1), (-1, -1), 'NotoSans'),
+        ('FONTSIZE', (0, 1), (-1, -1), 9),
+        ('TOPPADDING', (0, 1), (-1, -1), 3),
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 3),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ]))
+    elements.append(table)
+    elements.append(Spacer(1, 15))
+    # Ümumi məbləğ və borc
+    paid = order.odenilen_mebleg
+    debt = total_amount - paid
+    total_data = [
+        ['Ümumi Cəmi :', f"{total_amount} ₼"],
+        ['Ödənilən :', f"{paid} ₼"],
+        ['Qalıq Borc :', f"{debt} ₼"]
+    ]
+    total_table = Table(total_data, colWidths=[120, 120])
+    total_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
+        ('TOPPADDING', (0, 0), (-1, -1), 3),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+        ('RIGHTPADDING', (0, 0), (0, -1), 20),
+    ]))
+    elements.append(total_table)
+    elements.append(Spacer(1, 30))
+    # PDF-i yarat
+    doc.build(elements)
+    pdf = buffer.getvalue()
+    buffer.close()
+    response = FileResponse(io.BytesIO(pdf), as_attachment=True, filename=f'sifaris_{order.id}_satici.pdf')
+    return response

@@ -229,6 +229,7 @@ class Profile(models.Model):
     phone = models.CharField(max_length=15, unique=True, null=True, blank=True)
     address = models.TextField(null=True, blank=True)
     is_verified = models.BooleanField(default=False, verbose_name='Təsdiqlənib')
+    sekil = models.ImageField(upload_to='profile_pics', default='profile_pics/no_image.webp', null=True, blank=True, verbose_name='Profil şəkli')
 
     def __str__(self):
         return f"{self.user.username} profili"

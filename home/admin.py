@@ -18,6 +18,7 @@ import pandas as pd
 from django.contrib import messages
 from django.db import transaction
 import math
+from django.contrib.admin import SimpleListFilter
 
 @admin.register(Header_Message)
 class Header_MessageAdmin(admin.ModelAdmin):
@@ -374,10 +375,34 @@ class SifarisItemInline(admin.TabularInline):
         super().save_model(request, obj, form, change)
         obj.sifaris.update_total()
 
+class SellerFilter(SimpleListFilter):
+    title = 'Satıcı'
+    parameter_name = 'satici'
+
+    def lookups(self, request, model_admin):
+        from django.contrib.auth.models import User
+        sellers = set()
+        for item in SifarisItem.objects.select_related('mehsul__sahib').all():
+            if item.mehsul and item.mehsul.sahib:
+                sellers.add((item.mehsul.sahib.id, item.mehsul.sahib.username))
+            else:
+                sellers.add((0, 'AS-AVTO'))
+        return sorted(sellers, key=lambda x: (x[0] != 0, x[1]))
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value is not None:
+            if value == '0':
+                # Only orders with at least one item with no seller
+                return queryset.filter(sifarisitem__mehsul__sahib__isnull=True).distinct()
+            else:
+                return queryset.filter(sifarisitem__mehsul__sahib__id=value).distinct()
+        return queryset
+
 @admin.register(Sifaris)
 class SifarisAdmin(admin.ModelAdmin):
     list_display = ['id', 'istifadeci', 'saticilar', 'tarix', 'status', 'catdirilma_usulu', 'umumi_mebleg', 'odenilen_mebleg', 'qaliq_borc', 'pdf_button']
-    list_filter = ['status', 'catdirilma_usulu', 'tarix', 'istifadeci']
+    list_filter = ['status', 'catdirilma_usulu', 'tarix', 'istifadeci', SellerFilter]
     search_fields = ['istifadeci__username']
     readonly_fields = ['istifadeci', 'tarix', 'umumi_mebleg', 'qaliq_borc']
     fields = ['istifadeci', 'tarix', 'status', 'catdirilma_usulu', 'umumi_mebleg', 'odenilen_mebleg', 'qaliq_borc', 'qeyd']

@@ -458,7 +458,7 @@ def checkout(request):
             # Səbəti yeniləyirik (yalnız seçilməmiş məhsulları saxlayırıq)
             request.session['cart'] = remaining_cart
             request.session.modified = True
-            
+
             if len(created_orders) == 1:
                 messages.success(request, 'Sifarişiniz uğurla yaradıldı.')
             elif len(created_orders) > 1:

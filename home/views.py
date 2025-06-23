@@ -1307,12 +1307,14 @@ def my_sale_pdf(request, order_id):
         leading=12,
         textColor=colors.HexColor('#2B5173')
     )
+    # Hər sifariş yalnız bir satıcıya aiddir, ona görə birbaşa order sahələrindən istifadə et
+    order_total = order.umumi_mebleg
     paid = order.odenilen_mebleg
-    debt = total_amount - paid
+    debt = order_total - paid
     total_data = [
-        [Paragraph('Toplam Sifarişlər :', totalStyle), Paragraph(f"{total_amount} ₼", amountStyle)],
-        [Paragraph('Toplam Ödənişlər :', totalStyle), Paragraph(f"{paid} ₼", amountStyle)],
-        [Paragraph('Yerdə qalan borc :', totalStyle), Paragraph(f"{debt} ₼", amountStyle)]
+        [Paragraph('Toplam Sifarişlər :', totalStyle), Paragraph(f"{order_total:.2f} ₼", amountStyle)],
+        [Paragraph('Toplam Ödənişlər :', totalStyle), Paragraph(f"{paid:.2f} ₼", amountStyle)],
+        [Paragraph('Yerdə qalan borc :', totalStyle), Paragraph(f"{debt:.2f} ₼", amountStyle)]
     ]
     total_table = Table(total_data, colWidths=[150, 120])
     total_table.setStyle(TableStyle([

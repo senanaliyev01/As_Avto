@@ -51,10 +51,9 @@
                                             <i class="fas fa-chevron-down"></i>
                                         </button>
                                         <div class="user-dropdown-content">
-                                            <span class="user-name">
-                                                <i class="fa-regular fa-circle-user"></i>
-                                                {{ request.user.username }}
-                                            </span>
+                                            <a href="#" id="openProfileModal" class="user-name">
+                                                <i class="fas fa-user"></i> {{ request.user.username }}
+                                            </a>
                                             {% if user.is_authenticated %}
                                                 <a href="{% url 'my_products' %}" class="my-pr">
                                                     {% if not user.profile.is_verified %}
@@ -333,5 +332,36 @@
     <a href="https://wa.me/+994773059585" target="_blank" class="whatsapp-chat">
         <i class="fab fa-whatsapp"></i>
     </a>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="details-modal">
+        <div class="details-modal-content" style="max-width: 400px;">
+            <span class="profile-modal-close" style="position:absolute;right:20px;top:20px;cursor:pointer;font-size:24px;">&times;</span>
+            <div class="details-content">
+                <div class="details-header">
+                    <h3>Profil Məlumatları</h3>
+                </div>
+                <form id="profileForm" enctype="multipart/form-data">
+                    <div class="form-group text-center">
+                        <img id="profileImagePreview" src="{{ request.user.profile.sekil.url }}" alt="Profil şəkli" style="width:80px;height:80px;border-radius:50%;object-fit:cover;">
+                        <input type="file" id="profileImageInput" name="sekil" accept="image/*" style="display:block;margin:10px auto 0 auto;">
+                    </div>
+                    <div class="form-group">
+                        <label for="profileUsername">İstifadəçi adı</label>
+                        <input type="text" id="profileUsername" name="username" class="form-control" value="{{ request.user.username }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="profilePhone">Telefon</label>
+                        <input type="text" id="profilePhone" name="phone" class="form-control" value="{{ request.user.profile.phone }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="profileAddress">Ünvan</label>
+                        <textarea id="profileAddress" name="address" class="form-control" required>{{ request.user.profile.address }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Yadda saxla</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

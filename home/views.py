@@ -29,6 +29,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 import io
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
 
 def normalize_azerbaijani_chars(text):
     # Azərbaycan hərflərinin qarşılıqlı çevrilməsi
@@ -1346,3 +1347,53 @@ def my_sale_pdf(request, order_id):
     buffer.close()
     response = FileResponse(io.BytesIO(pdf), as_attachment=True, filename=f'sifaris_{order.id}_satici.pdf')
     return response
+
+@csrf_exempt
+@login_required
+def update_profile(request):
+    user = request.user
+    profile = getattr(user, 'profile', None)
+    if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        phone = request.POST.get('phone', '').strip()
+        address = request.POST.get('address', '').strip()
+        sekil = request.FILES.get('sekil')
+        # Username yoxlaması
+        if not username:
+            return JsonResponse({'status': 'error', 'message': 'İstifadəçi adı boş ola bilməz!'}, status=400)
+        if username != user.username and User.objects.filter(username=username).exclude(id=user.id).exists():
+            return JsonResponse({'status': 'error', 'message': 'Bu istifadəçi adı artıq mövcuddur!'}, status=400)
+        # Telefon yoxlaması
+        if not phone:
+            return JsonResponse({'status': 'error', 'message': 'Telefon boş ola bilməz!'}, status=400)
+        if profile and phone != profile.phone and User.objects.filter(profile__phone=phone).exclude(id=user.id).exists():
+            return JsonResponse({'status': 'error', 'message': 'Bu telefon nömrəsi artıq istifadə olunur!'}, status=400)
+        # Ünvan yoxlaması
+        if not address:
+            return JsonResponse({'status': 'error', 'message': 'Ünvan boş ola bilməz!'}, status=400)
+        # Yenilə
+        user.username = username
+        user.save()
+        if profile:
+            profile.phone = phone
+            profile.address = address
+            if sekil:
+                profile.sekil = sekil
+            profile.save()
+        return JsonResponse({
+            'status': 'success',
+            'username': user.username,
+            'phone': profile.phone if profile else '',
+            'address': profile.address if profile else '',
+            'sekil_url': profile.sekil.url if profile and profile.sekil else ''
+        })
+    # GET üçün profil məlumatı qaytar
+    if request.method == 'GET':
+        return JsonResponse({
+            'status': 'success',
+            'username': user.username,
+            'phone': profile.phone if profile else '',
+            'address': profile.address if profile else '',
+            'sekil_url': profile.sekil.url if profile and profile.sekil else ''
+        })
+    return JsonResponse({'status': 'error', 'message': 'Yalnız POST və GET dəstəklənir.'}, status=405)

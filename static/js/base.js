@@ -45,6 +45,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Buyer Stats Modal logic for my_sales.html
     initializeBuyerStatsModal();
+
+    // Profile Modal logic
+    initializeProfileModal();
 });
 
 function initializeSearch() {
@@ -1115,5 +1118,79 @@ function initializeBuyerStatsModal() {
             row.style.display = username.includes(val) ? '' : 'none';
         });
     }
+}
+
+// Profile Modal logic
+function initializeProfileModal() {
+    const openBtn = document.getElementById('openProfileModal');
+    const modal = document.getElementById('profileModal');
+    const closeBtn = document.querySelector('.profile-modal-close');
+    const form = document.getElementById('profileForm');
+    const imageInput = document.getElementById('profileImageInput');
+    const imagePreview = document.getElementById('profileImagePreview');
+    if (!openBtn || !modal || !closeBtn || !form) return;
+
+    // Open modal
+    openBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        modal.style.display = 'block';
+        setTimeout(() => modal.classList.add('show'), 10);
+    });
+    // Close modal
+    function closeModal() {
+        modal.classList.remove('show');
+        setTimeout(() => { modal.style.display = 'none'; }, 300);
+    }
+    closeBtn.addEventListener('click', closeModal);
+    window.addEventListener('click', function(e) {
+        if (e.target === modal) closeModal();
+    });
+    window.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeModal();
+    });
+    // Image preview
+    if (imageInput && imagePreview) {
+        imageInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    }
+    // AJAX submit
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(form);
+        fetch('/update-profile/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': (document.querySelector('[name=csrfmiddlewaretoken]') || {}).value || ''
+            },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Update dropdown username, phone, address, image
+                document.querySelectorAll('.user-name').forEach(el => {
+                    el.innerHTML = '<i class="fas fa-user"></i> ' + data.username;
+                });
+                if (data.sekil_url) {
+                    imagePreview.src = data.sekil_url;
+                }
+                // Optionally update phone/address elsewhere if needed
+                closeModal();
+                alert('Profil məlumatları yeniləndi!');
+            } else {
+                alert(data.message || 'Xəta baş verdi!');
+            }
+        })
+        .catch(() => {
+            alert('Xəta baş verdi!');
+        });
+    });
 }
 

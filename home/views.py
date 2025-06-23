@@ -721,6 +721,8 @@ def product_details(request, product_id):
                 'stok': product.stok,
                 'melumat': product.melumat,
                 'sekil_url': product.sekil.url if product.sekil else None,
+                'sahib_id': product.sahib.id if product.sahib else None,
+                'sahib_username': product.sahib.username if product.sahib else None,
             }
         }
     except Mehsul.DoesNotExist:
@@ -733,7 +735,6 @@ def product_details(request, product_id):
             'status': 'error',
             'message': 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.'
         }
-    
     return JsonResponse(data)
 
 @login_required

@@ -1413,7 +1413,10 @@ def my_products_pdf(request):
     elements = []
     styles = getSampleStyleSheet()
     styles['Title'].fontName = 'NotoSans'
-    title = Paragraph(f"{user.username} Məhsulları", styles['Title'])
+    # Profil nömrəsini əlavə et
+    phone = user.profile.phone if hasattr(user, 'profile') and user.profile.phone else ''
+    title_text = f"{user.username} ({phone}) Məhsulları" if phone else f"{user.username} Məhsulları"
+    title = Paragraph(title_text, styles['Title'])
     elements.append(title)
     elements.append(Spacer(1, 20))
     headers = ['№', 'Kod', 'Firma', 'Məhsul', 'Vitrin', 'Stok', 'Qiymət']

@@ -1310,10 +1310,11 @@ def my_sale_pdf(request, order_id):
     paid = order.odenilen_mebleg
     debt = total_amount - paid
     total_data = [
-        [Paragraph('Ümumi Cəmi :', totalStyle), Paragraph(f"{total_amount} ₼", amountStyle)],
-        [Paragraph('Ümumi Borc :', totalStyle), Paragraph(f"{debt} ₼", amountStyle)]
+        [Paragraph('Toplam Sifarişlər :', totalStyle), Paragraph(f"{total_amount} ₼", amountStyle)],
+        [Paragraph('Toplam Ödənişlər :', totalStyle), Paragraph(f"{paid} ₼", amountStyle)],
+        [Paragraph('Yerdə qalan borc :', totalStyle), Paragraph(f"{debt} ₼", amountStyle)]
     ]
-    total_table = Table(total_data, colWidths=[100, 100])
+    total_table = Table(total_data, colWidths=[150, 120])
     total_table.setStyle(TableStyle([
         ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
         ('TOPPADDING', (0, 0), (-1, -1), 3),

@@ -28,6 +28,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 import io
+from django.utils import timezone
 
 def normalize_azerbaijani_chars(text):
     # Azərbaycan hərflərinin qarşılıqlı çevrilməsi
@@ -1136,46 +1137,51 @@ def import_user_products_view(request):
 def my_sale_pdf(request, order_id):
     from home.models import Sifaris, SifarisItem, Profile
     from django.contrib.auth.models import User
+    from reportlab.platypus import Table, TableStyle, Image, Paragraph, Spacer
+    from reportlab.lib.styles import ParagraphStyle
     try:
         order = Sifaris.objects.get(id=order_id)
     except Sifaris.DoesNotExist:
         raise Http404("Sifariş tapılmadı")
-    # Yalnız bu satıcıya aid məhsullar
     items = order.sifarisitem_set.filter(mehsul__sahib=request.user)
     if not items.exists():
         raise Http404("Bu sifarişdə sizin məhsul yoxdur")
-    # Satıcı profil məlumatları
     profile = getattr(request.user, 'profile', None)
+    phone = profile.phone if profile and profile.phone else ''
+    # Profil şəkli (default varsa onu göstər)
     profile_image_path = None
-    if profile and profile.phone:
-        phone = profile.phone
-    else:
-        phone = ''
-    if profile and profile.user and profile.user.profile and profile.user.profile.user:
-        # Profil şəkli varsa
-        if profile.user.profile and hasattr(profile.user.profile, 'sekil') and profile.user.profile.sekil:
-            profile_image_path = profile.user.profile.sekil.path
+    if profile and profile.sekil:
+        profile_image_path = profile.sekil.path
     # PDF yaratmaq
     buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=20, leftMargin=20, topMargin=20, bottomMargin=20)
+    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=20, leftMargin=20, topMargin=0, bottomMargin=20)
     elements = []
     pdfmetrics.registerFont(TTFont('NotoSans', 'static/fonts/NotoSans-Regular.ttf'))
     styles = getSampleStyleSheet()
     styles['Title'].fontName = 'NotoSans'
     styles['Normal'].fontName = 'NotoSans'
-    # Başlıq: profil şəkli, username, telefon
-    from reportlab.platypus import Table, TableStyle, Image, Paragraph, Spacer
-    profile_data = []
-    if profile and hasattr(profile, 'sekil') and profile.sekil:
+    styles['Normal'].spaceBefore = 0
+    styles['Normal'].spaceAfter = 0
+    # Tarixi Azərbaycan formatında göstər
+    az_months = {
+        1: 'Yanvar', 2: 'Fevral', 3: 'Mart', 4: 'Aprel',
+        5: 'May', 6: 'İyun', 7: 'İyul', 8: 'Avqust',
+        9: 'Sentyabr', 10: 'Oktyabr', 11: 'Noyabr', 12: 'Dekabr'
+    }
+    local_time = timezone.localtime(order.tarix)
+    az_date = f"{local_time.day} {az_months[local_time.month]} {local_time.year}, {local_time.strftime('%H:%M')}"
+    # Profil və order info header (iki sütunlu cədvəl)
+    seller_info = []
+    if profile_image_path:
         try:
-            img = Image(profile.sekil.path, width=60, height=60)
-            profile_data.append([img, Paragraph(f"<b>{request.user.username}</b><br/>{phone}", styles['Normal'])])
+            img = Image(profile_image_path, width=80, height=80)
+            seller_info.append([img, Paragraph(f"<b>{request.user.username}</b><br/>{phone}", styles['Normal'])])
         except Exception:
-            profile_data.append(['', Paragraph(f"<b>{request.user.username}</b><br/>{phone}", styles['Normal'])])
+            seller_info.append(['', Paragraph(f"<b>{request.user.username}</b><br/>{phone}", styles['Normal'])])
     else:
-        profile_data.append(['', Paragraph(f"<b>{request.user.username}</b><br/>{phone}", styles['Normal'])])
-    profile_table = Table(profile_data, colWidths=[70, 200])
-    profile_table.setStyle(TableStyle([
+        seller_info.append(['', Paragraph(f"<b>{request.user.username}</b><br/>{phone}", styles['Normal'])])
+    seller_table = Table(seller_info, colWidths=[90, 180])
+    seller_table.setStyle(TableStyle([
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
         ('ALIGN', (0, 0), (0, 0), 'LEFT'),
         ('ALIGN', (1, 0), (1, 0), 'LEFT'),
@@ -1184,26 +1190,78 @@ def my_sale_pdf(request, order_id):
         ('TOPPADDING', (0, 0), (-1, -1), 0),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
     ]))
-    elements.append(profile_table)
+    order_info_table = Table([
+        [Paragraph(f"Müştəri: {order.istifadeci.username}", styles['Normal'])],
+        [Paragraph(f"Tarix: {az_date}", styles['Normal'])],
+        [Paragraph(f"Çatdırılma: {order.get_catdirilma_usulu_display()}", styles['Normal'])],
+        [Paragraph(f"Sifariş №{order.id}", styles['Normal'])]
+    ], colWidths=[200])
+    order_info_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('TOPPADDING', (0, 0), (-1, -1), 2),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+        ('LEFTPADDING', (0, 0), (-1, -1), 0),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+    ]))
+    header_table = Table([
+        [seller_table, order_info_table]
+    ], colWidths=[doc.width-220, 220])
+    header_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+        ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('TOPPADDING', (0, 0), (-1, -1), 0),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+        ('LEFTPADDING', (0, 0), (-1, -1), 0),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+    ]))
+    elements.append(header_table)
     elements.append(Spacer(1, 20))
-    # Sifariş məlumatları
-    elements.append(Paragraph(f"Sifariş №{order.id}", styles['Title']))
-    elements.append(Paragraph(f"Alıcı: {order.istifadeci.username}", styles['Normal']))
-    elements.append(Paragraph(f"Tarix: {order.tarix.strftime('%d.%m.%Y %H:%M')}", styles['Normal']))
-    elements.append(Paragraph(f"Çatdırılma: {order.get_catdirilma_usulu_display()}", styles['Normal']))
-    elements.append(Spacer(1, 10))
-    # Məhsullar cədvəli
-    headers = ['№', 'Kod', 'Məhsul', 'Miqdar', 'Qiymət', 'Cəmi']
+    # Cədvəl başlıqları və stillər
+    headerStyle = ParagraphStyle(
+        'HeaderStyle',
+        parent=styles['Normal'],
+        fontName='NotoSans',
+        fontSize=9,
+        textColor=colors.whitesmoke,
+        alignment=1,
+        spaceAfter=0,
+        spaceBefore=0,
+        leading=10
+    )
+    contentStyle = ParagraphStyle(
+        'ContentStyle',
+        parent=styles['Normal'],
+        fontName='NotoSans',
+        fontSize=8,
+        alignment=1,
+        spaceAfter=0,
+        spaceBefore=0,
+        leading=10
+    )
+    headers = [
+        Paragraph('№', headerStyle),
+        Paragraph('Kod', headerStyle),
+        Paragraph('Firma', headerStyle),
+        Paragraph('Məhsul', headerStyle),
+        Paragraph('Vitrin', headerStyle),
+        Paragraph('Miqdar', headerStyle),
+        Paragraph('Qiymət', headerStyle),
+        Paragraph('Cəmi', headerStyle)
+    ]
     data = [headers]
     total_amount = 0
     for idx, item in enumerate(items, 1):
         row = [
-            str(idx),
-            item.mehsul.brend_kod,
-            item.mehsul.adi,
-            str(item.miqdar),
-            f"{item.qiymet} ₼",
-            f"{item.umumi_mebleg} ₼"
+            Paragraph(str(idx), contentStyle),
+            Paragraph(item.mehsul.brend_kod, contentStyle),
+            Paragraph(item.mehsul.firma.adi if item.mehsul.firma else '-', contentStyle),
+            Paragraph(item.mehsul.adi, contentStyle),
+            Paragraph(str(item.mehsul.vitrin.nomre) if item.mehsul.vitrin else '-', contentStyle),
+            Paragraph(str(item.miqdar), contentStyle),
+            Paragraph(f"{item.qiymet} ₼", contentStyle),
+            Paragraph(f"{item.umumi_mebleg} ₼", contentStyle)
         ]
         data.append(row)
         total_amount += item.umumi_mebleg
@@ -1212,13 +1270,13 @@ def my_sale_pdf(request, order_id):
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2B5173')),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
         ('FONTNAME', (0, 0), (-1, 0), 'NotoSans'),
-        ('FONTSIZE', (0, 0), (-1, 0), 10),
+        ('FONTSIZE', (0, 0), (-1, 0), 9),
         ('TOPPADDING', (0, 0), (-1, 0), 5),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 5),
         ('BACKGROUND', (0, 1), (-1, -1), colors.white),
         ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
         ('FONTNAME', (0, 1), (-1, -1), 'NotoSans'),
-        ('FONTSIZE', (0, 1), (-1, -1), 9),
+        ('FONTSIZE', (0, 1), (-1, -1), 8),
         ('TOPPADDING', (0, 1), (-1, -1), 3),
         ('BOTTOMPADDING', (0, 1), (-1, -1), 3),
         ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
@@ -1227,24 +1285,63 @@ def my_sale_pdf(request, order_id):
     ]))
     elements.append(table)
     elements.append(Spacer(1, 15))
-    # Ümumi məbləğ və borc
+    # Ümumi məbləğ və Qalıq borc cədvəli
+    totalStyle = ParagraphStyle(
+        'TotalStyle',
+        parent=styles['Normal'],
+        fontName='NotoSans',
+        fontSize=10,
+        alignment=0,
+        spaceAfter=0,
+        spaceBefore=0,
+        leading=12
+    )
+    amountStyle = ParagraphStyle(
+        'AmountStyle',
+        parent=styles['Normal'],
+        fontName='NotoSans',
+        fontSize=10,
+        alignment=2,
+        spaceAfter=0,
+        spaceBefore=0,
+        leading=12,
+        textColor=colors.HexColor('#2B5173')
+    )
     paid = order.odenilen_mebleg
     debt = total_amount - paid
     total_data = [
-        ['Ümumi Cəmi :', f"{total_amount} ₼"],
-        ['Ödənilən :', f"{paid} ₼"],
-        ['Qalıq Borc :', f"{debt} ₼"]
+        [Paragraph('Ümumi Cəmi :', totalStyle), Paragraph(f"{total_amount} ₼", amountStyle)],
+        [Paragraph('Ödənilən :', totalStyle), Paragraph(f"{paid} ₼", amountStyle)],
+        [Paragraph('Qalıq Borc :', totalStyle), Paragraph(f"{debt} ₼", amountStyle)]
     ]
-    total_table = Table(total_data, colWidths=[120, 120])
+    total_table = Table(total_data, colWidths=[100, 100])
     total_table.setStyle(TableStyle([
         ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
         ('TOPPADDING', (0, 0), (-1, -1), 3),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
         ('RIGHTPADDING', (0, 0), (0, -1), 20),
     ]))
-    elements.append(total_table)
+    align_table = Table([[total_table]], colWidths=[525])
+    align_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
+    ]))
+    elements.append(align_table)
     elements.append(Spacer(1, 30))
-    # PDF-i yarat
+    # Ödəniş bölməsi
+    payment_text = f"Ödənilən Məbləğ: ___________________________ ₼"
+    elements.append(Paragraph(payment_text, styles['Normal']))
+    elements.append(Spacer(1, 20))
+    # İmza bölməsi
+    signature_data = [[
+        Paragraph("Təhvil Verdi: _________________", styles['Normal']),
+        Paragraph(f"Təhvil Aldı: {order.istifadeci.username} _________________", styles['Normal'])
+    ]]
+    signature_table = Table(signature_data, colWidths=[250, 250])
+    signature_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+    ]))
+    elements.append(signature_table)
     doc.build(elements)
     pdf = buffer.getvalue()
     buffer.close()

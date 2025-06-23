@@ -1022,3 +1022,20 @@ function initializeHeaderMessages() {
     setInterval(nextMessage, interval);
 }
 
+function filterSelectOptions(input, selectId) {
+    const filter = input.value.toLowerCase();
+    const select = document.getElementById(selectId);
+    if (!select) return;
+    const options = select.options;
+    let startIdx = 1;
+    if (selectId === 'seller') startIdx = 2; // Keep first two options for seller
+    for (let i = 0; i < options.length; i++) {
+        if (i < startIdx) {
+            options[i].style.display = '';
+            continue;
+        }
+        const txt = options[i].text.toLowerCase();
+        options[i].style.display = txt.includes(filter) ? '' : 'none';
+    }
+}
+

@@ -90,8 +90,8 @@
                 <form method="get" action="{% url 'products' %}" class="search-form">
                     <div class="search-grid">
                         <div class="search-item">
-                            <!-- <label for="category">Kateqoriya</label> -->
-                            <select id="category" name="kateqoriya">
+                            <input type="text" class="searchable-input" placeholder="Kateqoriya axtar..." onkeyup="filterSelectOptions(this, 'category')">
+                            <select id="category" name="kateqoriya" class="searchable-select">
                                 <option value="">Bütün Kateqoriyalar</option>
                                 {% for category in request.categories %}
                                 <option value="{{ category.adi }}" {% if request.GET.kateqoriya == category.adi %}selected{% endif %}>{{ category.adi }}</option>
@@ -99,8 +99,8 @@
                             </select>
                         </div>
                         <div class="search-item">
-                            <!-- <label for="brand">Marka</label> -->
-                            <select id="brand" name="firma">
+                            <input type="text" class="searchable-input" placeholder="Firma axtar..." onkeyup="filterSelectOptions(this, 'brand')">
+                            <select id="brand" name="firma" class="searchable-select">
                                 <option value="">Bütün Firmalar</option>
                                 {% for brand in request.brands %}
                                 <option value="{{ brand.adi }}" {% if request.GET.firma == brand.adi %}selected{% endif %}>{{ brand.adi }}</option>
@@ -108,8 +108,8 @@
                             </select>
                         </div>
                         <div class="search-item">
-                            <!-- <label for="model">Model</label> -->
-                            <select id="model" name="avtomobil">
+                            <input type="text" class="searchable-input" placeholder="Avtomobil axtar..." onkeyup="filterSelectOptions(this, 'model')">
+                            <select id="model" name="avtomobil" class="searchable-select">
                                 <option value="">Bütün Avtomobillər</option>
                                 {% for model in request.models %}
                                 <option value="{{ model.adi }}" {% if request.GET.avtomobil == model.adi %}selected{% endif %}>{{ model.adi }}</option>
@@ -117,7 +117,8 @@
                             </select>
                         </div>
                         <div class="search-item">
-                            <select id="seller" name="satici">
+                            <input type="text" class="searchable-input" placeholder="Satıcı axtar..." onkeyup="filterSelectOptions(this, 'seller')">
+                            <select id="seller" name="satici" class="searchable-select">
                                 <option value="">Bütün Satıcılar</option>
                                 <option value="0" {% if request.GET.satici == '0' %}selected{% endif %}>AS-AVTO</option>
                                 {% for seller in request.sellers|slice:'1:' %}

@@ -21,7 +21,13 @@
         </div>
         <div class="summary-item">
             <span class="summary-label">Qalıq Borc</span>
-            <span class="summary-value">{{ stats.total_debt|floatformat:2 }} ₼</span>
+            <span class="summary-value">
+                {% if stats.total_debt < 0 %}
+                    <span style="color: #28a745; font-weight: bold;">+{{ stats.total_debt|floatformat:2|slice:'1:' }} ₼</span>
+                {% else %}
+                    {{ stats.total_debt|floatformat:2 }} ₼
+                {% endif %}
+            </span>
         </div>
     </div>
 
@@ -53,7 +59,13 @@
                         </td>
                         <td>{{ order.seller_total|floatformat:2 }} ₼</td>
                         <td>{{ order.seller_paid|floatformat:2 }} ₼</td>
-                        <td>{{ order.seller_debt|floatformat:2 }} ₼</td>
+                        <td>
+                            {% if order.seller_debt < 0 %}
+                                <span style="color: #28a745; font-weight: bold;">+{{ order.seller_debt|floatformat:2|slice:'1:' }} ₼</span>
+                            {% else %}
+                                {{ order.seller_debt|floatformat:2 }} ₼
+                            {% endif %}
+                        </td>
                         <td>
                             <a href="{% url 'edit_my_sale' order.id %}" class="btn btn-primary btn-sm">Redaktə Et</a>
                         </td>

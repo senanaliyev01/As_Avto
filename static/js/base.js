@@ -839,7 +839,10 @@ function openUserDetailsModal(userId) {
                 document.getElementById('userDetailsUsername').textContent = data.user.username;
                 document.getElementById('userDetailsPhone').textContent = data.user.phone || '-';
                 document.getElementById('userDetailsAddress').textContent = data.user.address || '-';
-
+                var profileImage = document.getElementById('userDetailsProfileImage');
+                if (profileImage) {
+                    profileImage.src = data.user.profile_image_url || '/static/images/no_image.webp';
+                }
                 // Show modal with animation
                 modal.style.display = 'block';
                 setTimeout(() => {

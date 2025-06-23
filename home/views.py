@@ -978,6 +978,7 @@ def delete_product_view(request, product_id):
 def user_details_view(request, user_id):
     try:
         user = User.objects.select_related('profile').get(id=user_id)
+        profile_image_url = user.profile.sekil.url if user.profile.sekil else None
         data = {
             'status': 'success',
             'user': {
@@ -985,6 +986,7 @@ def user_details_view(request, user_id):
                 'username': user.username,
                 'phone': user.profile.phone,
                 'address': user.profile.address,
+                'profile_image_url': profile_image_url,
             }
         }
     except User.DoesNotExist:

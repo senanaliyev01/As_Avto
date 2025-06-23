@@ -1039,3 +1039,38 @@ function filterSelectOptions(input, selectId) {
     }
 }
 
+function toggleDropdown(type) {
+    const dropdown = document.getElementById(type + 'DropdownList');
+    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+}
+
+function filterDropdown(type) {
+    const input = document.getElementById(type + 'Input');
+    const filter = input.value.toLowerCase();
+    const dropdown = document.getElementById(type + 'DropdownList');
+    const items = dropdown.getElementsByClassName('dropdown-item');
+    for (let i = 0; i < items.length; i++) {
+        const txt = items[i].textContent.toLowerCase();
+        items[i].style.display = txt.includes(filter) ? '' : 'none';
+    }
+}
+
+function selectDropdownItem(type, value) {
+    const input = document.getElementById(type + 'Input');
+    const hidden = document.getElementById(type + 'Hidden');
+    input.value = value;
+    hidden.value = value;
+    document.getElementById(type + 'DropdownList').style.display = 'none';
+}
+
+// Close dropdown if clicked outside
+window.addEventListener('click', function(e) {
+    ['category', 'brand', 'model', 'seller'].forEach(function(type) {
+        const dropdown = document.getElementById(type + 'DropdownList');
+        const input = document.getElementById(type + 'Input');
+        if (dropdown && input && !dropdown.contains(e.target) && e.target !== input) {
+            dropdown.style.display = 'none';
+        }
+    });
+});
+

@@ -4,35 +4,11 @@
 
 {% block content %}
 <div class="container">
-    <button id="openStatsModal" class="btn btn-secondary mb-3">Statistikanı bax</button>
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div class="orders-summary mb-0" style="margin-bottom:0;">
-            <div class="summary-item">
-                <span class="summary-label">Ümumi Sifariş Sayı</span>
-                <span class="summary-value">{{ stats.total_orders }}</span>
-            </div>
-            <div class="summary-item">
-                <span class="summary-label">Ümumi Məbləğ</span>
-                <span class="summary-value">{{ stats.total_amount|floatformat:2 }} ₼</span>
-            </div>
-            <div class="summary-item">
-                <span class="summary-label">Ödənilən Məbləğ</span>
-                <span class="summary-value">{{ stats.total_paid|floatformat:2 }} ₼</span>
-            </div>
-            <div class="summary-item">
-                <span class="summary-label">Qalıq Borc</span>
-                <span class="summary-value">
-                    {% if stats.total_debt < 0 %}
-                        <span style="color: #28a745; font-weight: bold;">+{{ stats.total_debt|floatformat:2|slice:'1:' }} ₼</span>
-                    {% else %}
-                        {{ stats.total_debt|floatformat:2 }} ₼
-                    {% endif %}
-                </span>
-            </div>
-        </div>
-        <!-- Ən sağda yeni alıcı filteri -->
-        <div style="min-width:220px;max-width:260px;">
-            <div class="custom-dropdown" id="buyer-filter-dropdown">
+    <h2 class="mb-4">Mənə Gələn Sifarişlər</h2>
+    <div class="d-flex justify-content-end align-items-center mb-2">
+        <!-- Statistik xülasənin üstündə, ən sağda yeni alıcı filteri -->
+        <div class="sales-buyer-filter-dropdown" style="min-width:220px;max-width:260px;">
+            <div class="custom-dropdown" id="sales-buyer-filter-dropdown">
                 <input type="text" class="dropdown-search-input" placeholder="Alıcı axtar...">
                 <div class="dropdown-options">
                     <div class="dropdown-option" data-value="">Bütün Alıcılar</div>
@@ -41,6 +17,33 @@
                     {% endfor %}
                 </div>
             </div>
+        </div>
+    </div>
+
+    <button id="openStatsModal" class="btn btn-secondary mb-3">Statistikanı bax</button>
+
+    <div class="orders-summary">
+        <div class="summary-item">
+            <span class="summary-label">Ümumi Sifariş Sayı</span>
+            <span class="summary-value">{{ stats.total_orders }}</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Ümumi Məbləğ</span>
+            <span class="summary-value">{{ stats.total_amount|floatformat:2 }} ₼</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Ödənilən Məbləğ</span>
+            <span class="summary-value">{{ stats.total_paid|floatformat:2 }} ₼</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Qalıq Borc</span>
+            <span class="summary-value">
+                {% if stats.total_debt < 0 %}
+                    <span style="color: #28a745; font-weight: bold;">+{{ stats.total_debt|floatformat:2|slice:'1:' }} ₼</span>
+                {% else %}
+                    {{ stats.total_debt|floatformat:2 }} ₼
+                {% endif %}
+            </span>
         </div>
     </div>
 

@@ -3187,3 +3187,27 @@ body {
         padding: 7px 8px;
     }
 }
+
+.sales-buyer-filter-dropdown {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 0;
+    margin-left: auto;
+    margin-right: 0;
+    background: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(44, 62, 80, 0.04);
+    padding: 8px 12px;
+    min-width: 220px;
+    max-width: 260px;
+}
+
+@media (max-width: 600px) {
+    .sales-buyer-filter-dropdown {
+        min-width: 100%;
+        max-width: 100%;
+        margin-bottom: 10px;
+        padding: 6px 4px;
+    }
+}

@@ -33,6 +33,10 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.5rem; opacity: 0.8;"><span aria-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">
+                    <!-- PDF Export Button -->
+                    <a href="{% url 'my_products_pdf' %}" class="btn btn-danger mb-3" target="_blank">
+                        <i class="fas fa-file-pdf"></i> Məhsulları PDF-ə çıxar
+                    </a>
                     <!-- Excel Nümunəsi -->
                     <div class="excel-sample mb-3">
                         <h6>Excel Faylı Nümunəsi:</h6>

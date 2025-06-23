@@ -6,7 +6,7 @@ from django.db.models import Q, Sum, F, Case, When, DecimalField
 from decimal import Decimal
 from django.contrib import messages
 import re
-from django.http import JsonResponse, HttpResponseNotFound, HttpResponseRedirect, FileResponse, Http404
+from django.http import JsonResponse, HttpResponseNotFound, HttpResponseRedirect, FileResponse, Http404, HttpResponse
 from django.db.models.functions import Lower
 from django.db.models import Value
 from functools import reduce
@@ -1277,6 +1277,8 @@ def my_sale_pdf(request, order_id):
         ('TOPPADDING', (0, 1), (-1, -1), 3),
         ('BOTTOMPADDING', (0, 1), (-1, -1), 3),
         ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('LINEBELOW', (0, 0), (-1, 0), 1, colors.HexColor('#2B5173')),
+        ('COLWIDTHS', (0, 0), (-1, -1), '*'),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
     ]))
@@ -1398,3 +1400,58 @@ def update_profile(request):
             'sekil_url': profile.sekil.url if profile and profile.sekil else ''
         })
     return JsonResponse({'status': 'error', 'message': 'Yalnız POST və GET dəstəklənir.'}, status=405)
+
+@login_required
+def my_products_pdf(request):
+    user = request.user
+    mehsullar = Mehsul.objects.filter(sahib=user)
+    pdfmetrics.registerFont(TTFont('NotoSans', 'static/fonts/NotoSans-Regular.ttf'))
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="mehsullar.pdf"'
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=20, leftMargin=20, topMargin=20, bottomMargin=20)
+    elements = []
+    styles = getSampleStyleSheet()
+    styles['Title'].fontName = 'NotoSans'
+    title = Paragraph(f"{user.username} Məhsulları", styles['Title'])
+    elements.append(title)
+    elements.append(Spacer(1, 20))
+    headers = ['№', 'Kod', 'Firma', 'Məhsul', 'Vitrin', 'Stok', 'Qiymət']
+    data = [headers]
+    for index, mehsul in enumerate(mehsullar, 1):
+        row = [
+            str(index),
+            mehsul.brend_kod,
+            mehsul.firma.adi if mehsul.firma else '-',
+            mehsul.adi,
+            str(mehsul.vitrin.nomre) if mehsul.vitrin else '-',
+            str(mehsul.stok),
+            f"{mehsul.qiymet} ₼"
+        ]
+        data.append(row)
+    table = Table(data)
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2B5173')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('FONTNAME', (0, 0), (-1, 0), 'NotoSans'),
+        ('FONTSIZE', (0, 0), (-1, 0), 10),
+        ('TOPPADDING', (0, 0), (-1, 0), 5),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 5),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+        ('FONTNAME', (0, 1), (-1, -1), 'NotoSans'),
+        ('FONTSIZE', (0, 1), (-1, -1), 9),
+        ('TOPPADDING', (0, 1), (-1, -1), 3),
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 3),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('LINEBELOW', (0, 0), (-1, 0), 1, colors.HexColor('#2B5173')),
+        ('COLWIDTHS', (0, 0), (-1, -1), '*'),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ]))
+    elements.append(table)
+    doc.build(elements)
+    pdf = buffer.getvalue()
+    buffer.close()
+    response.write(pdf)
+    return response

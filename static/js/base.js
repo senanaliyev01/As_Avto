@@ -101,6 +101,39 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
         });
     }
+
+    // --- Real-time buyer search filter for my_sales.html ---
+    var buyerInput = document.getElementById('buyerSearchInput');
+    var ordersTable = document.getElementById('ordersTable');
+    var countSpan = document.getElementById('buyerSearchCount');
+    if (buyerInput && ordersTable) {
+        buyerInput.addEventListener('input', function() {
+            var filter = buyerInput.value.toLowerCase();
+            var rows = ordersTable.querySelectorAll('tbody tr');
+            var visible = 0;
+            rows.forEach(function(row) {
+                var buyerCell = row.querySelector('td:nth-child(2)');
+                if (buyerCell) {
+                    var text = buyerCell.textContent.toLowerCase();
+                    if (text.includes(filter)) {
+                        row.style.display = '';
+                        visible++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+            });
+            if (countSpan) {
+                if (filter && visible > 0) {
+                    countSpan.textContent = visible + ' nəticə';
+                } else if (filter && visible === 0) {
+                    countSpan.textContent = 'Heç bir nəticə tapılmadı';
+                } else {
+                    countSpan.textContent = '';
+                }
+            }
+        });
+    }
 });
 
 function initializeSearch() {

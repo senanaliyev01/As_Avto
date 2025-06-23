@@ -101,6 +101,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
         });
     }
+
+    // Buyer Filter for my_sales.html (ən sağda yerləşən filter üçün)
+    initializeBuyerFilterDropdown();
 });
 
 function initializeSearch() {
@@ -1250,6 +1253,48 @@ function initializeProfileModal() {
         .catch(() => {
             alert('Xəta baş verdi!');
         });
+    });
+}
+
+// Yeni buyer filter dropdown üçün real-time filter funksiyası
+function initializeBuyerFilterDropdown() {
+    const dropdown = document.getElementById('buyer-filter-dropdown');
+    if (!dropdown) return;
+    const input = dropdown.querySelector('.dropdown-search-input');
+    const optionsContainer = dropdown.querySelector('.dropdown-options');
+    const options = Array.from(optionsContainer.querySelectorAll('.dropdown-option'));
+    // Dropdown açılıb/bağlanma
+    input.addEventListener('focus', function() {
+        optionsContainer.style.display = 'block';
+    });
+    input.addEventListener('blur', function() {
+        setTimeout(() => { optionsContainer.style.display = 'none'; }, 150);
+    });
+    // Filter options
+    input.addEventListener('input', function() {
+        const val = input.value.toLowerCase();
+        options.forEach(opt => {
+            if (opt.textContent.toLowerCase().includes(val)) {
+                opt.style.display = '';
+            } else {
+                opt.style.display = 'none';
+            }
+        });
+    });
+    // Option click
+    options.forEach(opt => {
+        opt.addEventListener('click', function(e) {
+            e.stopPropagation();
+            input.value = opt.textContent;
+            optionsContainer.style.display = 'none';
+            filterOrdersByBuyer(opt.getAttribute('data-value'));
+        });
+    });
+    // Click outside closes
+    document.addEventListener('click', function(e) {
+        if (!dropdown.contains(e.target)) {
+            optionsContainer.style.display = 'none';
+        }
     });
 }
 

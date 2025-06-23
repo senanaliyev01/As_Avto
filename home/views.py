@@ -985,7 +985,7 @@ def user_details_view(request, user_id):
                 'username': user.username,
                 'phone': user.profile.phone,
                 'address': user.profile.address,
-                'sekil_url': user.profile.sekil.url if user.profile.sekil else ''
+                'sekil_url': user.profile.sekil.url if user.profile and user.profile.sekil else '/static/images/no_image.jpg',
             }
         }
     except User.DoesNotExist:

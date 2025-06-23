@@ -839,9 +839,12 @@ function openUserDetailsModal(userId) {
                 document.getElementById('userDetailsUsername').textContent = data.user.username;
                 document.getElementById('userDetailsPhone').textContent = data.user.phone || '-';
                 document.getElementById('userDetailsAddress').textContent = data.user.address || '-';
+                // Profil şəkli
                 var img = document.getElementById('userDetailsImage');
-                if (img) {
-                    img.src = data.user.sekil_url ? data.user.sekil_url : '/static/images/no_image.jpg';
+                if (img && data.user.sekil_url) {
+                    img.src = data.user.sekil_url;
+                } else if (img) {
+                    img.src = '/static/images/no_image.jpg';
                 }
                 // Show modal with animation
                 modal.style.display = 'block';

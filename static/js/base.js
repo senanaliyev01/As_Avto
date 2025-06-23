@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeProfileModal();
 
     // Real-time sales notification
-    let lastSalesCount = 0;
+    let lastSalesCount = parseInt(localStorage.getItem('lastSalesCount') || '0', 10);
     let salesSound = null;
 
     function playSalesSound() {
@@ -82,6 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         playSalesSound();
                     }
                     lastSalesCount = data.count;
+                    localStorage.setItem('lastSalesCount', lastSalesCount);
                 }
             })
             .catch(() => {});
@@ -98,6 +99,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(() => {
                     updateSalesBadge(0);
                     lastSalesCount = 0;
+                    localStorage.setItem('lastSalesCount', '0');
                 });
         });
     }

@@ -432,18 +432,18 @@ def checkout(request):
             for seller_id, data in order_items_by_seller.items():
                 items = data['items']
                 total = sum(item['price'] * item['quantity'] for item in items)
-            order = Sifaris.objects.create(
-                istifadeci=request.user,
-                umumi_mebleg=total,
-                catdirilma_usulu=catdirilma_usulu
-            )
-            for item in items:
-                SifarisItem.objects.create(
-                    sifaris=order,
-                    mehsul=item['product'],
-                    miqdar=item['quantity'],
-                    qiymet=item['price']
+                order = Sifaris.objects.create(
+                    istifadeci=request.user,
+                    umumi_mebleg=total,
+                    catdirilma_usulu=catdirilma_usulu
                 )
+                for item in items:
+                    SifarisItem.objects.create(
+                        sifaris=order,
+                        mehsul=item['product'],
+                        miqdar=item['quantity'],
+                        qiymet=item['price']
+                    )
                 created_orders.append(order)
 
             # Səbəti yeniləyirik (yalnız seçilməmiş məhsulları saxlayırıq)
@@ -451,7 +451,7 @@ def checkout(request):
             request.session.modified = True
             
             if len(created_orders) == 1:
-             messages.success(request, 'Sifarişiniz uğurla yaradıldı.')
+                messages.success(request, 'Sifarişiniz uğurla yaradıldı.')
             elif len(created_orders) > 1:
                 messages.success(request, f'{len(created_orders)} ayrı sifariş yaradıldı (fərqli satıcılar üçün).')
             else:

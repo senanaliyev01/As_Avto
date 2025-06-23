@@ -137,8 +137,11 @@
                                 <i class="fas fa-search"></i>
                             </button>
                             <span class="total-debt">
-                                <i class="fas fa-money-bill-wave"></i>
-                                Borc: {{ request.statistics.umumi_borc }} ₼
+                                {% if request.statistics.umumi_borc < 0 %}
+                                    <span style="color: #28a745; font-weight: bold;">+{{ request.statistics.umumi_borc|floatformat:2|slice:'1:' }} ₼</span>
+                                {% else %}
+                                    <i class="fas fa-money-bill-wave"></i> Borc: {{ request.statistics.umumi_borc|floatformat:2 }} ₼
+                                {% endif %}
                             </span>
                         </div>
                     </div>

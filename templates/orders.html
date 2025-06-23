@@ -28,7 +28,13 @@
                     <div class="summary-item">
                         <i class="fas fa-exclamation-circle"></i>
                         <span class="summary-label">Qalıq Borc:</span>
-                        <span class="summary-value">{{ statistics.umumi_borc }} ₼</span>
+                        <span class="summary-value">
+                            {% if statistics.umumi_borc < 0 %}
+                                <span style="color: #28a745; font-weight: bold;">+{{ statistics.umumi_borc|floatformat:2|slice:'1:' }} ₼</span>
+                            {% else %}
+                                {{ statistics.umumi_borc|floatformat:2 }} ₼
+                            {% endif %}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -66,7 +72,13 @@
                         </td>
                         <td>{{ order.umumi_mebleg }} ₼</td>
                         <td>{{ order.odenilen_mebleg }} ₼</td>
-                        <td>{{ order.qaliq_borc }} ₼</td>
+                        <td>
+                            {% if order.qaliq_borc < 0 %}
+                                <span style="color: #28a745; font-weight: bold;">+{{ order.qaliq_borc|floatformat:2|slice:'1:' }} ₼</span>
+                            {% else %}
+                                {{ order.qaliq_borc|floatformat:2 }} ₼
+                            {% endif %}
+                        </td>
                         <td>
                             {% with first_item=order.sifarisitem_set.first %}
                                 {% if first_item and first_item.mehsul.sahib %}

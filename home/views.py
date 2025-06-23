@@ -822,7 +822,7 @@ def my_sales_view(request):
         order_total = sum(item.umumi_mebleg for item in items)
         if order_total > 0:
             # İstifadəçiyə aid məhsullar üçün ödənilən məbləğ (yalnız öz məhsullarına görə)
-            seller_paid = min(order.odenilen_mebleg, order_total)
+            seller_paid = order.odenilen_mebleg or 0
             total_orders += 1
             total_amount += order_total
             total_paid += seller_paid

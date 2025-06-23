@@ -557,6 +557,8 @@ body {
 }
 
 .btn-secondary {
+    margin: 10px;
+    position: relative;
     background-color: #6c757d;
     color: white;
 }

@@ -900,6 +900,14 @@ function openDetailsModal(productId) {
                 document.getElementById('detailsStok').textContent = data.product.stok + ' ədəd';
                 document.getElementById('detailsMelumat').textContent = data.product.melumat || '-';
 
+                // Seller info
+                const detailsSeller = document.getElementById('detailsSeller');
+                if (data.product.sahib_id && data.product.sahib_username) {
+                    detailsSeller.innerHTML = `<a href="#" class="seller-link" onclick="openUserDetailsModal(${data.product.sahib_id}); return false;"><i class='fas fa-user'></i> ${data.product.sahib_username}</a>`;
+                } else {
+                    detailsSeller.textContent = 'AS-AVTO';
+                }
+
                 // Show modal with animation
                 modal.style.display = 'block';
                 setTimeout(() => {

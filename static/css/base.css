@@ -3133,3 +3133,56 @@ body {
     margin-right: 6px;
     vertical-align: middle;
 }
+
+/* Custom Searchable Dropdown Styles */
+.custom-dropdown {
+    position: relative;
+    width: 100%;
+}
+.dropdown-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 0.9rem;
+    background: #fff;
+    cursor: pointer;
+}
+.dropdown-list {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    max-height: 220px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 4px 12px rgba(44,62,80,0.08);
+    z-index: 100;
+}
+.custom-dropdown.open .dropdown-list {
+    display: block;
+}
+.dropdown-option {
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: #333;
+    transition: background 0.2s, color 0.2s;
+}
+.dropdown-option:hover, .dropdown-option.active {
+    background: #e9f7ef;
+    color: #1d6f42;
+}
+@media (max-width: 768px) {
+    .dropdown-list {
+        max-height: 160px;
+        font-size: 0.93rem;
+    }
+    .dropdown-option {
+        padding: 8px 10px;
+    }
+}

@@ -37,6 +37,65 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize Header Messages
     initializeHeaderMessages();
+
+    // Custom Searchable Dropdown for Category
+    (function() {
+        const dropdown = document.getElementById('categoryDropdown');
+        if (!dropdown) return;
+        const input = document.getElementById('categoryInput');
+        const hiddenInput = document.getElementById('categoryHiddenInput');
+        const list = document.getElementById('categoryDropdownList');
+        const options = Array.from(list.querySelectorAll('.dropdown-option'));
+
+        // Show dropdown
+        function openDropdown() {
+            dropdown.classList.add('open');
+            input.select();
+        }
+        // Hide dropdown
+        function closeDropdown() {
+            dropdown.classList.remove('open');
+        }
+        // Filter options
+        function filterOptions() {
+            const val = input.value.toLowerCase();
+            let anyVisible = false;
+            options.forEach(opt => {
+                if (opt.textContent.toLowerCase().includes(val)) {
+                    opt.style.display = '';
+                    anyVisible = true;
+                } else {
+                    opt.style.display = 'none';
+                }
+            });
+            if (!anyVisible) list.style.display = 'none';
+            else list.style.display = 'block';
+        }
+        // Option click
+        options.forEach(opt => {
+            opt.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                input.value = this.textContent;
+                hiddenInput.value = this.getAttribute('data-value');
+                closeDropdown();
+            });
+        });
+        // Input events
+        input.addEventListener('focus', openDropdown);
+        input.addEventListener('click', openDropdown);
+        input.addEventListener('input', function() {
+            filterOptions();
+            openDropdown();
+        });
+        // Click outside
+        document.addEventListener('mousedown', function(e) {
+            if (!dropdown.contains(e.target)) closeDropdown();
+        });
+        // On form submit, use hidden input value
+        input.form && input.form.addEventListener('submit', function() {
+            hiddenInput.value = input.value;
+        });
+    })();
 });
 
 function initializeSearch() {
@@ -1021,60 +1080,4 @@ function initializeHeaderMessages() {
     // Hər 5 saniyədən bir növbəti mesaja keç
     setInterval(nextMessage, interval);
 }
-
-function filterSelectOptions(input, selectId) {
-    const filter = input.value.toLowerCase();
-    const select = document.getElementById(selectId);
-    if (!select) return;
-    const options = select.options;
-    let startIdx = 1;
-    if (selectId === 'seller') startIdx = 2; // Keep first two options for seller
-    for (let i = 0; i < options.length; i++) {
-        if (i < startIdx) {
-            options[i].style.display = '';
-            continue;
-        }
-        const txt = options[i].text.toLowerCase();
-        options[i].style.display = txt.includes(filter) ? '' : 'none';
-    }
-}
-
-function toggleDropdown(type) {
-    const dropdown = document.getElementById(type + 'DropdownList');
-    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-    if (dropdown.style.display === 'block') {
-        const searchInput = dropdown.querySelector('.dropdown-search-input');
-        if (searchInput) searchInput.focus();
-    }
-}
-
-function filterDropdown(type) {
-    const dropdown = document.getElementById(type + 'DropdownList');
-    const searchInput = dropdown.querySelector('.dropdown-search-input');
-    const filter = searchInput.value.toLowerCase();
-    const items = dropdown.querySelectorAll('.dropdown-items-wrapper .dropdown-item');
-    for (let i = 0; i < items.length; i++) {
-        const txt = items[i].textContent.toLowerCase();
-        items[i].style.display = txt.includes(filter) ? '' : 'none';
-    }
-}
-
-function selectDropdownItem(type, value) {
-    const input = document.getElementById(type + 'Input');
-    const hidden = document.getElementById(type + 'Hidden');
-    input.value = value;
-    hidden.value = value;
-    document.getElementById(type + 'DropdownList').style.display = 'none';
-}
-
-// Close dropdown if clicked outside
-window.addEventListener('click', function(e) {
-    ['category', 'brand', 'model', 'seller'].forEach(function(type) {
-        const dropdown = document.getElementById(type + 'DropdownList');
-        const input = document.getElementById(type + 'Input');
-        if (dropdown && input && !dropdown.contains(e.target) && e.target !== input) {
-            dropdown.style.display = 'none';
-        }
-    });
-});
 

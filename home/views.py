@@ -1148,11 +1148,9 @@ def my_sale_pdf(request, order_id):
         raise Http404("Bu sifarişdə sizin məhsul yoxdur")
     profile = getattr(request.user, 'profile', None)
     phone = profile.phone if profile and profile.phone else ''
-    # Profil şəkli (default varsa onu göstər)
     profile_image_path = None
     if profile and profile.sekil:
         profile_image_path = profile.sekil.path
-    # PDF yaratmaq
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=20, leftMargin=20, topMargin=0, bottomMargin=20)
     elements = []
@@ -1162,7 +1160,6 @@ def my_sale_pdf(request, order_id):
     styles['Normal'].fontName = 'NotoSans'
     styles['Normal'].spaceBefore = 0
     styles['Normal'].spaceAfter = 0
-    # Tarixi Azərbaycan formatında göstər
     az_months = {
         1: 'Yanvar', 2: 'Fevral', 3: 'Mart', 4: 'Aprel',
         5: 'May', 6: 'İyun', 7: 'İyul', 8: 'Avqust',
@@ -1170,7 +1167,6 @@ def my_sale_pdf(request, order_id):
     }
     local_time = timezone.localtime(order.tarix)
     az_date = f"{local_time.day} {az_months[local_time.month]} {local_time.year}, {local_time.strftime('%H:%M')}"
-    # Profil və order info header (iki sütunlu cədvəl)
     seller_info = []
     if profile_image_path:
         try:
@@ -1218,7 +1214,6 @@ def my_sale_pdf(request, order_id):
     ]))
     elements.append(header_table)
     elements.append(Spacer(1, 20))
-    # Cədvəl başlıqları və stillər
     headerStyle = ParagraphStyle(
         'HeaderStyle',
         parent=styles['Normal'],
@@ -1285,7 +1280,14 @@ def my_sale_pdf(request, order_id):
     ]))
     elements.append(table)
     elements.append(Spacer(1, 15))
-    # Ümumi məbləğ və Ümumi borc cədvəli (yalnız iki sətr: Ümumi Cəmi və Ümumi Borc)
+    # Ümumi borc hesabla (alıcı ilə bu satıcı arasında bütün sifarişlər üzrə)
+    all_orders = Sifaris.objects.filter(istifadeci=order.istifadeci)
+    umumi_borc = 0
+    for o in all_orders:
+        seller_items = o.sifarisitem_set.filter(mehsul__sahib=request.user)
+        order_total = sum(item.umumi_mebleg for item in seller_items)
+        if order_total > 0:
+            umumi_borc += order_total - (o.odenilen_mebleg or 0)
     totalStyle = ParagraphStyle(
         'TotalStyle',
         parent=styles['Normal'],
@@ -1307,16 +1309,11 @@ def my_sale_pdf(request, order_id):
         leading=12,
         textColor=colors.HexColor('#2B5173')
     )
-    # Hər sifariş yalnız bir satıcıya aiddir, ona görə birbaşa order sahələrindən istifadə et
-    order_total = order.umumi_mebleg
-    paid = order.odenilen_mebleg
-    debt = order_total - paid
     total_data = [
-        [Paragraph('Toplam Sifarişlər :', totalStyle), Paragraph(f"{order_total:.2f} ₼", amountStyle)],
-        [Paragraph('Toplam Ödənişlər :', totalStyle), Paragraph(f"{paid:.2f} ₼", amountStyle)],
-        [Paragraph('Yerdə qalan borc :', totalStyle), Paragraph(f"{debt:.2f} ₼", amountStyle)]
+        [Paragraph('Ümumi Cəmi :', totalStyle), Paragraph(f"{total_amount} ₼", amountStyle)],
+        [Paragraph('Ümumi Borc :', totalStyle), Paragraph(f"{umumi_borc} ₼", amountStyle)]
     ]
-    total_table = Table(total_data, colWidths=[150, 120])
+    total_table = Table(total_data, colWidths=[100, 100])
     total_table.setStyle(TableStyle([
         ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
         ('TOPPADDING', (0, 0), (-1, -1), 3),

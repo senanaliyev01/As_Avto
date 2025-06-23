@@ -6,23 +6,27 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">Mənə Gələn Sifarişlər</h2>
-        <div class="buyer-filter-container" style="min-width:260px;max-width:320px;">
-            <div class="custom-dropdown" id="buyer-dropdown" style="width:100%;">
-                <div class="custom-dropdown-selected" id="buyer-dropdown-selected">Bütün Alıcılar</div>
-                <div class="custom-dropdown-list" id="buyer-dropdown-list" style="display:none;">
-                    <input type="text" class="custom-dropdown-search" id="buyer-dropdown-search" placeholder="Alıcı axtar...">
-                    <div class="custom-dropdown-options" id="buyer-dropdown-options">
-                        <div class="custom-dropdown-option" data-buyer="">Bütün Alıcılar</div>
+        <div class="d-flex align-items-center gap-3" style="margin-left:auto;">
+            <button id="openStatsModal" class="btn btn-secondary mb-0">Statistikanı bax</button>
+            <div class="search-item" style="min-width:260px;max-width:320px;">
+                <div class="custom-dropdown" id="buyer-dropdown">
+                    <input type="text" class="dropdown-search-input" placeholder="Alıcı axtar...">
+                    <div class="dropdown-options">
+                        <div class="dropdown-option" data-value="">Bütün Alıcılar</div>
                         {% for buyer in buyer_stats %}
-                            <div class="custom-dropdown-option" data-buyer="{{ buyer.user_id }}">{{ buyer.username }}</div>
+                        <div class="dropdown-option" data-value="{{ buyer.user_id }}">{{ buyer.username }}</div>
                         {% endfor %}
                     </div>
                 </div>
+                <select id="buyer" style="display:none;">
+                    <option value="">Bütün Alıcılar</option>
+                    {% for buyer in buyer_stats %}
+                    <option value="{{ buyer.user_id }}">{{ buyer.username }}</option>
+                    {% endfor %}
+                </select>
             </div>
         </div>
     </div>
-
-    <button id="openStatsModal" class="btn btn-secondary mb-3">Statistikanı bax</button>
 
     <div class="orders-summary">
         <div class="summary-item">

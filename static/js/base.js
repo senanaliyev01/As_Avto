@@ -101,9 +101,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
         });
     }
-
-    // Buyer Filter for my_sales.html
-    initializeBuyerDropdown();
 });
 
 function initializeSearch() {
@@ -1253,63 +1250,6 @@ function initializeProfileModal() {
         .catch(() => {
             alert('Xəta baş verdi!');
         });
-    });
-}
-
-// Buyer Filter for my_sales.html
-function initializeBuyerDropdown() {
-    const dropdown = document.getElementById('buyer-dropdown');
-    if (!dropdown) return;
-    const selected = document.getElementById('buyer-dropdown-selected');
-    const list = document.getElementById('buyer-dropdown-list');
-    const search = document.getElementById('buyer-dropdown-search');
-    const options = document.getElementById('buyer-dropdown-options');
-
-    // Dropdown açılıb/bağlanma
-    selected.addEventListener('click', function() {
-        list.style.display = list.style.display === 'block' ? 'none' : 'block';
-        search.value = '';
-        filterBuyerOptions('');
-        search.focus();
-    });
-    document.addEventListener('click', function(e) {
-        if (!dropdown.contains(e.target)) {
-            list.style.display = 'none';
-        }
-    });
-    // Axtarış
-    search.addEventListener('input', function() {
-        filterBuyerOptions(this.value);
-    });
-    function filterBuyerOptions(query) {
-        const q = query.toLowerCase();
-        options.querySelectorAll('.custom-dropdown-option').forEach(opt => {
-            if (opt.textContent.toLowerCase().includes(q)) {
-                opt.style.display = '';
-            } else {
-                opt.style.display = 'none';
-            }
-        });
-    }
-    // Seçim
-    options.querySelectorAll('.custom-dropdown-option').forEach(opt => {
-        opt.addEventListener('click', function() {
-            selected.textContent = this.textContent;
-            list.style.display = 'none';
-            filterOrdersByBuyer(this.getAttribute('data-buyer'));
-        });
-    });
-}
-
-function filterOrdersByBuyer(buyerId) {
-    const rows = document.querySelectorAll('table.table tbody tr');
-    rows.forEach(row => {
-        const buyerCell = row.querySelector('td:nth-child(2) a');
-        if (!buyerId || (buyerCell && buyerCell.getAttribute('onclick').includes(`(${buyerId})`))) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
-        }
     });
 }
 

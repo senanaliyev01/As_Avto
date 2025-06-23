@@ -6,17 +6,18 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">Mənə Gələn Sifarişlər</h2>
+        <button id="openStatsModal" class="btn btn-secondary mb-3">Statistikanı bax</button>
+    </div>
+    <div class="d-flex justify-content-end mb-3">
         <div class="buyer-filter-container" style="min-width:260px;max-width:320px;position:relative;">
             <input type="text" id="buyerLiveSearch" class="form-control" placeholder="Alıcı axtar..." autocomplete="off" style="width:100%;">
-            <div id="buyerLiveDropdown" class="buyer-live-dropdown" style="display:none;position:absolute;top:100%;left:0;width:100%;z-index:10;background:#fff;border:1px solid #dcdde1;border-top:none;border-radius:0 0 8px 8px;max-height:220px;overflow-y:auto;box-shadow:0 2px 8px rgba(44,62,80,0.08);">
+            <div id="buyerLiveDropdown" class="buyer-live-dropdown">
                 {% for buyer in buyer_stats %}
                     <div class="buyer-live-option" data-username="{{ buyer.username|lower }}">{{ buyer.username }}</div>
                 {% endfor %}
             </div>
         </div>
     </div>
-
-    <button id="openStatsModal" class="btn btn-secondary mb-3">Statistikanı bax</button>
 
     <div class="orders-summary">
         <div class="summary-item">

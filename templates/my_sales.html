@@ -6,21 +6,21 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">Mənə Gələn Sifarişlər</h2>
-        <!-- Ən sağda yeni alıcı filteri -->
-        <div style="min-width:220px;max-width:260px;">
-            <div class="custom-dropdown" id="buyer-filter-dropdown">
-                <input type="text" class="dropdown-search-input" placeholder="Alıcı axtar...">
-                <div class="dropdown-options">
-                    <div class="dropdown-option" data-value="">Bütün Alıcılar</div>
-                    {% for buyer in buyer_stats %}
-                    <div class="dropdown-option" data-value="{{ buyer.user_id }}">{{ buyer.username }}</div>
-                    {% endfor %}
+        <div class="d-flex align-items-center gap-3" style="margin-left:auto;">
+            <button id="openStatsModal" class="btn btn-secondary mb-0">Statistikanı bax</button>
+            <div style="min-width:220px;max-width:260px;">
+                <div class="custom-dropdown" id="buyer-filter-dropdown">
+                    <input type="text" class="dropdown-search-input" placeholder="Alıcı axtar...">
+                    <div class="dropdown-options">
+                        <div class="dropdown-option" data-value="">Bütün Alıcılar</div>
+                        {% for buyer in buyer_stats %}
+                        <div class="dropdown-option" data-value="{{ buyer.user_id }}">{{ buyer.username }}</div>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <button id="openStatsModal" class="btn btn-secondary mb-3">Statistikanı bax</button>
 
     <div class="orders-summary">
         <div class="summary-item">

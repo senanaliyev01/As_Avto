@@ -7,21 +7,6 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">Mənə Gələn Sifarişlər</h2>
     </div>
-    <div class="d-flex justify-content-end align-items-center mb-2">
-        <!-- Statistikaların üstündə, ən sağda fərqli class ilə alıcı filteri -->
-        <div class="buyer-search-filter" id="buyer-search-filter">
-            <input type="text" class="buyer-search-input" placeholder="Alıcı axtar...">
-            <div class="buyer-search-options">
-                <div class="buyer-search-option" data-value="">Bütün Alıcılar</div>
-                {% for buyer in buyer_stats %}
-                <div class="buyer-search-option" data-value="{{ buyer.user_id }}">{{ buyer.username }}</div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-
-    <button id="openStatsModal" class="btn btn-secondary mb-3">Statistikanı bax</button>
-
     <div class="orders-summary">
         <div class="summary-item">
             <span class="summary-label">Ümumi Sifariş Sayı</span>
@@ -46,6 +31,19 @@
             </span>
         </div>
     </div>
+    <div class="d-flex justify-content-end align-items-center mb-3">
+        <div class="buyer-search-filter" id="buyer-search-filter">
+            <input type="text" class="buyer-search-input" placeholder="Alıcı axtar...">
+            <div class="buyer-search-options">
+                <div class="buyer-search-option" data-value="">Bütün Alıcılar</div>
+                {% for buyer in buyer_stats %}
+                <div class="buyer-search-option" data-value="{{ buyer.user_id }}">{{ buyer.username }}</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <button id="openStatsModal" class="btn btn-secondary mb-3">Statistikanı bax</button>
 
     {% if orders %}
         <div class="table-responsive">

@@ -48,6 +48,59 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Profile Modal logic
     initializeProfileModal();
+
+    // Real-time sales notification
+    let lastSalesCount = 0;
+    let salesSound = null;
+
+    function playSalesSound() {
+        if (!salesSound) {
+            salesSound = new Audio('/static/sounds/new_order.mp3');
+        }
+        salesSound.play();
+    }
+
+    function updateSalesBadge(count) {
+        const badge = document.getElementById('salesBadge');
+        if (!badge) return;
+        if (count > 0) {
+            badge.textContent = count;
+            badge.style.display = 'inline-block';
+        } else {
+            badge.textContent = '0';
+            badge.style.display = 'none';
+        }
+    }
+
+    function pollSalesCount() {
+        fetch('/api/unread-sales-count/', { credentials: 'same-origin' })
+            .then(res => res.json())
+            .then(data => {
+                if (typeof data.count === 'number') {
+                    updateSalesBadge(data.count);
+                    if (data.count > lastSalesCount) {
+                        playSalesSound();
+                    }
+                    lastSalesCount = data.count;
+                }
+            })
+            .catch(() => {});
+    }
+
+    setInterval(pollSalesCount, 10000); // 10 saniyədən bir yoxla
+    pollSalesCount(); // İlk yükləmədə də yoxla
+
+    // Linkə kliklədikdə sayğacı sıfırla
+    const salesLink = document.querySelector('.user-dropdown .mr-sls');
+    if (salesLink) {
+        salesLink.addEventListener('click', function() {
+            fetch('/api/unread-sales-count/', { method: 'POST', credentials: 'same-origin' })
+                .then(() => {
+                    updateSalesBadge(0);
+                    lastSalesCount = 0;
+                });
+        });
+    }
 });
 
 function initializeSearch() {

@@ -444,6 +444,15 @@ def checkout(request):
                         miqdar=item['quantity'],
                         qiymet=item['price']
                     )
+                # Satıcıya yeni sifariş bildirişi
+                if seller_id:
+                    try:
+                        seller = User.objects.get(id=seller_id)
+                        if hasattr(seller, 'profile'):
+                            seller.profile.yeni_unread_sales += 1
+                            seller.profile.save()
+                    except User.DoesNotExist:
+                        pass
                 created_orders.append(order)
 
             # Səbəti yeniləyirik (yalnız seçilməmiş məhsulları saxlayırıq)
@@ -1458,3 +1467,18 @@ def my_products_pdf(request):
     buffer.close()
     response.write(pdf)
     return response
+
+@csrf_exempt
+@login_required
+def unread_sales_count(request):
+    if request.method == 'GET':
+        count = 0
+        if hasattr(request.user, 'profile'):
+            count = request.user.profile.yeni_unread_sales
+        return JsonResponse({'count': count})
+    elif request.method == 'POST':
+        # Sıfırla
+        if hasattr(request.user, 'profile'):
+            request.user.profile.yeni_unread_sales = 0
+            request.user.profile.save()
+        return JsonResponse({'status': 'ok'})

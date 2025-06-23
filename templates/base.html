@@ -215,6 +215,14 @@
                                     <h3 class="product-title">{{ product.adi }}</h3>
                                     <p class="product-code">{{ product.brend_kod }}</p>
                                     <p class="product-price">{{ product.qiymet }} ₼</p>
+                                    <p class="product-seller">
+                                        Satıcı: 
+                                        {% if product.sahib %}
+                                            {{ product.sahib.username }}
+                                        {% else %}
+                                            AS-AVTO
+                                        {% endif %}
+                                    </p>
                                     <a href="{% url 'products' %}?search={{ product.brend_kod }}" class="view-product">
                                         Məhsula bax <i class="fas fa-arrow-right"></i>
                                     </a>
@@ -297,9 +305,9 @@
                     </div>
                     {% endfor %}
                 </div>
-                <div class="swiper-pagination"></div>
+                <!-- <div class="swiper-pagination"></div>
                 <div class="swiper-button-prev"></div>
-                <div class="swiper-button-next"></div>
+                <div class="swiper-button-next"></div> -->
             </div>
         </div>
     </div>

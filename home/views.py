@@ -104,7 +104,7 @@ def products_view(request):
     avtomobil = request.GET.get('avtomobil', '')
     satici = request.GET.get('satici', '')
     
-    mehsullar = Mehsul.objects.all().order_by('-id')
+    mehsullar = Mehsul.objects.all().order_by('?')
     popup_images = PopupImage.objects.filter(aktiv=True)
     
     if search_query:
@@ -188,7 +188,7 @@ def load_more_products(request):
     avtomobil = request.GET.get('avtomobil', '')
     satici = request.GET.get('satici', '')
     
-    mehsullar = Mehsul.objects.all().order_by('-id')
+    mehsullar = Mehsul.objects.all().order_by('?')
     
     if search_query:
         # Kodlarla axtarış üçün əvvəlki təmizləmə
@@ -600,8 +600,7 @@ def search_suggestions(request):
 @login_required
 def new_products_view(request):
     # Yeni məhsulları əldə et
-    mehsullar = Mehsul.objects.filter(yenidir=True).order_by('-id')  # Ən son əlavə edilən yeni məhsullardan başla
-    
+    mehsullar = Mehsul.objects.filter(yenidir=True).order_by('?')  # Qarışıq qaydada göstər
     # İlk 5 məhsulu götür
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
@@ -625,7 +624,7 @@ def load_more_new_products(request):
     offset = int(request.GET.get('offset', 0))
     limit = 5
     
-    mehsullar = Mehsul.objects.filter(yenidir=True).order_by('-id')
+    mehsullar = Mehsul.objects.filter(yenidir=True).order_by('?')
     
     # Get next batch of products
     products = mehsullar[offset:offset + limit]

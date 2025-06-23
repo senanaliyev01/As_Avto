@@ -91,13 +91,16 @@
                     <div class="search-grid">
                         <div class="search-item">
                             <div class="custom-dropdown" id="categoryDropdown">
-                                <input type="text" id="categoryInput" class="custom-dropdown-input" placeholder="Kateqoriya seç..." readonly onclick="toggleDropdown('category')" oninput="filterDropdown('category')" autocomplete="off">
+                                <input type="text" id="categoryInput" class="custom-dropdown-input" placeholder="Kateqoriya seç..." readonly onclick="toggleDropdown('category')" value="{{ request.GET.kateqoriya }}" autocomplete="off">
                                 <input type="hidden" id="categoryHidden" name="kateqoriya" value="{{ request.GET.kateqoriya }}">
                                 <div class="dropdown-list" id="categoryDropdownList">
-                                    <div class="dropdown-item" onclick="selectDropdownItem('category', '')">Bütün Kateqoriyalar</div>
-                                    {% for category in request.categories %}
-                                    <div class="dropdown-item" onclick="selectDropdownItem('category', '{{ category.adi }}')">{{ category.adi }}</div>
-                                    {% endfor %}
+                                    <input type="text" class="dropdown-search-input" placeholder="Axtar..." onkeyup="filterDropdown('category')" autocomplete="off">
+                                    <div class="dropdown-items-wrapper">
+                                        <div class="dropdown-item" onclick="selectDropdownItem('category', '')">Bütün Kateqoriyalar</div>
+                                        {% for category in request.categories %}
+                                        <div class="dropdown-item" onclick="selectDropdownItem('category', '{{ category.adi }}')">{{ category.adi }}</div>
+                                        {% endfor %}
+                                    </div>
                                 </div>
                             </div>
                         </div>

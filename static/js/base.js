@@ -1042,13 +1042,17 @@ function filterSelectOptions(input, selectId) {
 function toggleDropdown(type) {
     const dropdown = document.getElementById(type + 'DropdownList');
     dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    if (dropdown.style.display === 'block') {
+        const searchInput = dropdown.querySelector('.dropdown-search-input');
+        if (searchInput) searchInput.focus();
+    }
 }
 
 function filterDropdown(type) {
-    const input = document.getElementById(type + 'Input');
-    const filter = input.value.toLowerCase();
     const dropdown = document.getElementById(type + 'DropdownList');
-    const items = dropdown.getElementsByClassName('dropdown-item');
+    const searchInput = dropdown.querySelector('.dropdown-search-input');
+    const filter = searchInput.value.toLowerCase();
+    const items = dropdown.querySelectorAll('.dropdown-items-wrapper .dropdown-item');
     for (let i = 0; i < items.length; i++) {
         const txt = items[i].textContent.toLowerCase();
         items[i].style.display = txt.includes(filter) ? '' : 'none';

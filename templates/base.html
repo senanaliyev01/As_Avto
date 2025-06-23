@@ -145,7 +145,7 @@
                                 <input type="text" class="dropdown-search-input" placeholder="Satıcı axtar...">
                                 <div class="dropdown-options">
                                     <div class="dropdown-option" data-value="">Bütün Satıcılar</div>
-                                    <div class="dropdown-option" data-value="0">AS-AVTO</div>
+                                    
                                     {% for seller in request.sellers|slice:'1:' %}
                                     <div class="dropdown-option" data-value="{{ seller.id }}">{{ seller.username }}</div>
                                     {% endfor %}

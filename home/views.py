@@ -116,7 +116,7 @@ def products_view(request):
             # Kod və ölçü ilə axtarış
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
-            brend_kod_filter = Q(brend_kod__icontains=search_query)  # Sade brend_kod axtarışı
+            brend_kod_filter = Q(brend_kod__icontains=search_query) | Q(brend_kod__icontains=clean_search)  # Həm orijinal, həm təmizlənmiş formada axtarış
             
             # Ad ilə təkmilləşdirilmiş axtarış
             # Çoxlu boşluq və təbləri tək boşluğa çeviririk
@@ -199,7 +199,7 @@ def load_more_products(request):
         if clean_search:
             # Kod ilə axtarış
             kod_filter = Q(kodlar__icontains=clean_search)
-            brend_kod_filter = Q(brend_kod__icontains=search_query)  # Sade brend_kod axtarışı
+            brend_kod_filter = Q(brend_kod__icontains=search_query) | Q(brend_kod__icontains=clean_search)  # Həm orijinal, həm təmizlənmiş formada axtarış
             
             # Ad ilə təkmilləşdirilmiş axtarış
             # Çoxlu boşluq və təbləri tək boşluğa çeviririk
@@ -559,7 +559,7 @@ def search_suggestions(request):
             # Kod və ölçü ilə axtarış
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
-            brend_kod_filter = Q(brend_kod__icontains=search_query)  # Sade brend_kod axtarışı
+            brend_kod_filter = Q(brend_kod__icontains=search_query) | Q(brend_kod__icontains=clean_search)  # Həm orijinal, həm təmizlənmiş formada axtarış
             
             # Ad ilə təkmilləşdirilmiş axtarış
             # Çoxlu boşluq və təbləri tək boşluğa çeviririk
@@ -772,7 +772,7 @@ def my_products_view(request):
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
-            brend_kod_filter = Q(brend_kod__icontains=search_query)  # Sade brend_kod axtarışı
+            brend_kod_filter = Q(brend_kod__icontains=search_query) | Q(brend_kod__icontains=clean_search)  # Həm orijinal, həm təmizlənmiş formada axtarış
             processed_query = re.sub(r'\s+', ' ', search_query).strip()
             search_words = processed_query.split()
             if search_words:
@@ -804,7 +804,7 @@ def load_more_my_products(request):
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
-            brend_kod_filter = Q(brend_kod__icontains=search_query)  # Sade brend_kod axtarışı
+            brend_kod_filter = Q(brend_kod__icontains=search_query) | Q(brend_kod__icontains=clean_search)  # Həm orijinal, həm təmizlənmiş formada axtarış
             processed_query = re.sub(r'\s+', ' ', search_query).strip()
             search_words = processed_query.split()
             if search_words:

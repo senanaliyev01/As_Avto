@@ -152,7 +152,13 @@ class MehsulAdmin(admin.ModelAdmin):
         return response
 
     def mark_as_new(self, request, queryset):
-        updated = queryset.update(yenidir=True)
+        from django.utils import timezone
+        updated = 0
+        for obj in queryset:
+            obj.yenidir = True
+            obj.yenidir_set_time = timezone.now()
+            obj.save()
+            updated += 1
         self.message_user(request, f'{updated} məhsul yeni olaraq işarələndi.')
     mark_as_new.short_description = "Seçilmiş məhsulları yeni olaraq işarələ"
 

@@ -8,7 +8,7 @@ from io import BytesIO
 import uuid
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-import threading
+from django.utils import timezone
 
 class Header_Message(models.Model):
     mesaj = models.CharField(max_length=100)
@@ -82,8 +82,22 @@ class Mehsul(models.Model):
     melumat = models.TextField(null=True, blank=True)
     sekil = models.ImageField(upload_to='mehsul_sekilleri', default='mehsul_sekilleri/no_image.webp',null=True, blank=True)    
     yenidir = models.BooleanField(default=False)
+    yenidir_set_time = models.DateTimeField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
+        import datetime
+        from django.utils import timezone
+        # Əgər yenidir true-ya dəyişirsə, vaxtı qeyd et
+        if self.yenidir:
+            if not self.yenidir_set_time:
+                self.yenidir_set_time = timezone.now()
+            else:
+                # Əgər artıq vaxt qeyd olunubsa və 10 saniyə keçibsə, avtomatik false et
+                if (timezone.now() - self.yenidir_set_time).total_seconds() > 10:
+                    self.yenidir = False
+                    self.yenidir_set_time = None
+        else:
+            self.yenidir_set_time = None
         if self.kodlar:
             # Yalnız hərf, rəqəm və boşluq saxla
             self.kodlar = re.sub(r'[^a-zA-Z0-9 ]', '', self.kodlar)
@@ -129,21 +143,7 @@ class Mehsul(models.Model):
                     None
                 )
         
-        # Əgər yenidir true olarsa, 10 saniyə sonra avtomatik false et
-        is_new = self.pk is None or not Mehsul.objects.filter(pk=self.pk, yenidir=True).exists()
         super().save(*args, **kwargs)
-        if self.yenidir and is_new:
-            def set_yenidir_false(pk):
-                import time
-                time.sleep(10)
-                try:
-                    obj = Mehsul.objects.get(pk=pk)
-                    if obj.yenidir:
-                        obj.yenidir = False
-                        obj.save(update_fields=['yenidir'])
-                except Mehsul.DoesNotExist:
-                    pass
-            threading.Thread(target=set_yenidir_false, args=(self.pk,), daemon=True).start()
 
     def __str__(self):
         return f"{self.adi} - {self.brend_kod} - {self.oem}"

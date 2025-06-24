@@ -108,38 +108,42 @@ def products_view(request):
     popup_images = PopupImage.objects.filter(aktiv=True)
     
     if search_query:
-        # Kodlarla axtarış üçün əvvəlki təmizləmə
-        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
-        
-        # İki ayrı filter tətbiq edək
-        if clean_search:
-            # Kod və ölçü ilə axtarış
-            kod_filter = Q(kodlar__icontains=clean_search)
-            olcu_filter = Q(olcu__icontains=clean_search)
+        # Əgər tam ədəd id daxil edilibsə, birbaşa məhsulun id-si ilə axtarış et
+        if search_query.isdigit():
+            mehsullar = Mehsul.objects.filter(id=int(search_query))
+        else:
+            # Kodlarla axtarış üçün əvvəlki təmizləmə
+            clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
             
-            # Ad ilə təkmilləşdirilmiş axtarış
-            # Çoxlu boşluq və təbləri tək boşluğa çeviririk
-            processed_query = re.sub(r'\s+', ' ', search_query).strip()
-            
-            # Axtarış sözlərini ayırırıq
-            search_words = processed_query.split()
-            
-            if search_words:
-                # Hər bir söz üçün bütün mümkün variantları yarat
-                ad_filters = []
-                for word in search_words:
-                    word_variations = normalize_azerbaijani_chars(word)
-                    word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
-                    ad_filters.append(word_filter)
+            # İki ayrı filter tətbiq edək
+            if clean_search:
+                # Kod və ölçü ilə axtarış
+                kod_filter = Q(kodlar__icontains=clean_search)
+                olcu_filter = Q(olcu__icontains=clean_search)
                 
-                # "AND" operatoru ilə birləşdiririk - bütün sözlər olmalıdır
-                ad_filter = reduce(and_, ad_filters)
+                # Ad ilə təkmilləşdirilmiş axtarış
+                # Çoxlu boşluq və təbləri tək boşluğa çeviririk
+                processed_query = re.sub(r'\s+', ' ', search_query).strip()
                 
-                # Kod, ölçü və ad filterini "OR" operatoru ilə birləşdiririk
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | ad_filter)
-            else:
-                # Əgər heç bir söz yoxdursa, yalnız kod və ölçü ilə axtarış
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter)
+                # Axtarış sözlərini ayırırıq
+                search_words = processed_query.split()
+                
+                if search_words:
+                    # Hər bir söz üçün bütün mümkün variantları yarat
+                    ad_filters = []
+                    for word in search_words:
+                        word_variations = normalize_azerbaijani_chars(word)
+                        word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
+                        ad_filters.append(word_filter)
+                    
+                    # "AND" operatoru ilə birləşdiririk - bütün sözlər olmalıdır
+                    ad_filter = reduce(and_, ad_filters)
+                    
+                    # Kod, ölçü və ad filterini "OR" operatoru ilə birləşdiririk
+                    mehsullar = mehsullar.filter(kod_filter | olcu_filter | ad_filter)
+                else:
+                    # Əgər heç bir söz yoxdursa, yalnız kod və ölçü ilə axtarış
+                    mehsullar = mehsullar.filter(kod_filter | olcu_filter)
     
     if kateqoriya:
         mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)
@@ -550,37 +554,52 @@ def search_suggestions(request):
     search_query = request.GET.get('search', '')
     
     if search_query:
-        # Kodlarla axtarış üçün əvvəlki təmizləmə
-        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
-        
-        if clean_search:
-            # Kod və ölçü ilə axtarış
-            kod_filter = Q(kodlar__icontains=clean_search)
-            olcu_filter = Q(olcu__icontains=clean_search)
-            
-            # Ad ilə təkmilləşdirilmiş axtarış
-            # Çoxlu boşluq və təbləri tək boşluğa çeviririk
-            processed_query = re.sub(r'\s+', ' ', search_query).strip()
-            
-            # Axtarış sözlərini ayırırıq
-            search_words = processed_query.split()
-            
-            if search_words:
-                # Hər bir söz üçün bütün mümkün variantları yarat
-                ad_filters = []
-                for word in search_words:
-                    word_variations = normalize_azerbaijani_chars(word)
-                    word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
-                    ad_filters.append(word_filter)
-                
-                # "AND" operatoru ilə birləşdiririk - bütün sözlər olmalıdır
-                ad_filter = reduce(and_, ad_filters)
-                
-                # Kod, ölçü və ad filterini "OR" operatoru ilə birləşdiririk
-                mehsullar = Mehsul.objects.filter(kod_filter | olcu_filter | ad_filter)[:5]
+        # Əgər tam ədəd id daxil edilibsə, birbaşa məhsulun id-si ilə nəticə qaytar
+        if search_query.isdigit():
+            mehsul = Mehsul.objects.filter(id=int(search_query)).first()
+            if mehsul:
+                return JsonResponse({'suggestions': [{
+                    'id': mehsul.id,
+                    'adi': mehsul.adi,
+                    'brend_kod': mehsul.brend_kod,
+                    'olcu': mehsul.olcu,
+                    'qiymet': str(mehsul.qiymet),
+                    'sekil_url': mehsul.sekil.url if mehsul.sekil else None,
+                }]})
             else:
-                # Əgər heç bir söz yoxdursa, yalnız kod və ölçü ilə axtarış
-                mehsullar = Mehsul.objects.filter(kod_filter | olcu_filter)[:5]
+                return JsonResponse({'suggestions': []})
+        else:
+            # Kodlarla axtarış üçün əvvəlki təmizləmə
+            clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
+            
+            if clean_search:
+                # Kod və ölçü ilə axtarış
+                kod_filter = Q(kodlar__icontains=clean_search)
+                olcu_filter = Q(olcu__icontains=clean_search)
+                
+                # Ad ilə təkmilləşdirilmiş axtarış
+                # Çoxlu boşluq və təbləri tək boşluğa çeviririk
+                processed_query = re.sub(r'\s+', ' ', search_query).strip()
+                
+                # Axtarış sözlərini ayırırıq
+                search_words = processed_query.split()
+                
+                if search_words:
+                    # Hər bir söz üçün bütün mümkün variantları yarat
+                    ad_filters = []
+                    for word in search_words:
+                        word_variations = normalize_azerbaijani_chars(word)
+                        word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
+                        ad_filters.append(word_filter)
+                    
+                    # "AND" operatoru ilə birləşdiririk - bütün sözlər olmalıdır
+                    ad_filter = reduce(and_, ad_filters)
+                    
+                    # Kod, ölçü və ad filterini "OR" operatoru ilə birləşdiririk
+                    mehsullar = Mehsul.objects.filter(kod_filter | olcu_filter | ad_filter)[:5]
+                else:
+                    # Əgər heç bir söz yoxdursa, yalnız kod və ölçü ilə axtarış
+                    mehsullar = Mehsul.objects.filter(kod_filter | olcu_filter)[:5]
             
             suggestions = []
             for mehsul in mehsullar:

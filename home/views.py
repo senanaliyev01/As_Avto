@@ -88,7 +88,7 @@ def login_view(request):
 @login_required
 def home_view(request):
     # Yeni məhsulları əldə et
-    new_products = Mehsul.objects.filter(yenidir=True)
+    new_products = Mehsul.objects.filter(yenidir=True).order_by('?')
     # Aktiv popup şəkilləri əldə et
     popup_images = PopupImage.objects.filter(aktiv=True)
     return render(request, 'base.html', {

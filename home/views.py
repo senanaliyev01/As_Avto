@@ -116,31 +116,26 @@ def products_view(request):
             # Kod və ölçü ilə axtarış
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
-            brend_kod_filter = Q(brend_kod__icontains=search_query) | Q(brend_kod__icontains=clean_search)  # Həm orijinal, həm təmizlənmiş formada axtarış
+            # brend_kod üçün həm istifadəçi sorğusunu, həm də brend_kod-u təmizləyib müqayisə edirik
+            def clean_code(val):
+                return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
+            # Bütün məhsulları çəkib, təmizlənmiş brend_kod ilə uyğunluq tapanları tapırıq
+            brend_kod_ids = [m.id for m in Mehsul.objects.all() if clean_code(search_query) in clean_code(m.brend_kod)]
+            brend_kod_filter = Q(id__in=brend_kod_ids)
             
             # Ad ilə təkmilləşdirilmiş axtarış
-            # Çoxlu boşluq və təbləri tək boşluğa çeviririk
             processed_query = re.sub(r'\s+', ' ', search_query).strip()
-            
-            # Axtarış sözlərini ayırırıq
             search_words = processed_query.split()
-            
             if search_words:
-                # Hər bir söz üçün bütün mümkün variantları yarat
                 ad_filters = []
                 for word in search_words:
                     word_variations = normalize_azerbaijani_chars(word)
                     word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
                     ad_filters.append(word_filter)
-                
-                # "AND" operatoru ilə birləşdiririk - bütün sözlər olmalıdır
                 ad_filter = reduce(and_, ad_filters)
-                
-                # Kod, ölçü, brend_kod və ad filterini "OR" operatoru ilə birləşdiririk
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter)
+                mehsullar = Mehsul.objects.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter)[:5]
             else:
-                # Əgər heç bir söz yoxdursa, yalnız kod, ölçü və brend_kod ilə axtarış
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)
+                mehsullar = Mehsul.objects.filter(kod_filter | olcu_filter | brend_kod_filter)[:5]
     
     if kateqoriya:
         mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)
@@ -199,7 +194,7 @@ def load_more_products(request):
         if clean_search:
             # Kod ilə axtarış
             kod_filter = Q(kodlar__icontains=clean_search)
-            brend_kod_filter = Q(brend_kod__icontains=search_query) | Q(brend_kod__icontains=clean_search)  # Həm orijinal, həm təmizlənmiş formada axtarış
+            brend_kod_filter = Q(brend_kod__icontains=search_query)  # Sade brend_kod axtarışı
             
             # Ad ilə təkmilləşdirilmiş axtarış
             # Çoxlu boşluq və təbləri tək boşluğa çeviririk
@@ -559,30 +554,25 @@ def search_suggestions(request):
             # Kod və ölçü ilə axtarış
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
-            brend_kod_filter = Q(brend_kod__icontains=search_query) | Q(brend_kod__icontains=clean_search)  # Həm orijinal, həm təmizlənmiş formada axtarış
+            # brend_kod üçün həm istifadəçi sorğusunu, həm də brend_kod-u təmizləyib müqayisə edirik
+            def clean_code(val):
+                return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
+            # Bütün məhsulları çəkib, təmizlənmiş brend_kod ilə uyğunluq tapanları tapırıq
+            brend_kod_ids = [m.id for m in Mehsul.objects.all() if clean_code(search_query) in clean_code(m.brend_kod)]
+            brend_kod_filter = Q(id__in=brend_kod_ids)
             
             # Ad ilə təkmilləşdirilmiş axtarış
-            # Çoxlu boşluq və təbləri tək boşluğa çeviririk
             processed_query = re.sub(r'\s+', ' ', search_query).strip()
-            
-            # Axtarış sözlərini ayırırıq
             search_words = processed_query.split()
-            
             if search_words:
-                # Hər bir söz üçün bütün mümkün variantları yarat
                 ad_filters = []
                 for word in search_words:
                     word_variations = normalize_azerbaijani_chars(word)
                     word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
                     ad_filters.append(word_filter)
-                
-                # "AND" operatoru ilə birləşdiririk - bütün sözlər olmalıdır
                 ad_filter = reduce(and_, ad_filters)
-                
-                # Kod, ölçü, brend_kod və ad filterini "OR" operatoru ilə birləşdiririk
                 mehsullar = Mehsul.objects.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter)[:5]
             else:
-                # Əgər heç bir söz yoxdursa, yalnız kod, ölçü və brend_kod ilə axtarış
                 mehsullar = Mehsul.objects.filter(kod_filter | olcu_filter | brend_kod_filter)[:5]
             
             suggestions = []
@@ -772,7 +762,7 @@ def my_products_view(request):
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
-            brend_kod_filter = Q(brend_kod__icontains=search_query) | Q(brend_kod__icontains=clean_search)  # Həm orijinal, həm təmizlənmiş formada axtarış
+            brend_kod_filter = Q(brend_kod__icontains=search_query)  # Sade brend_kod axtarışı
             processed_query = re.sub(r'\s+', ' ', search_query).strip()
             search_words = processed_query.split()
             if search_words:
@@ -804,7 +794,7 @@ def load_more_my_products(request):
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
-            brend_kod_filter = Q(brend_kod__icontains=search_query) | Q(brend_kod__icontains=clean_search)  # Həm orijinal, həm təmizlənmiş formada axtarış
+            brend_kod_filter = Q(brend_kod__icontains=search_query)  # Sade brend_kod axtarışı
             processed_query = re.sub(r'\s+', ' ', search_query).strip()
             search_words = processed_query.split()
             if search_words:

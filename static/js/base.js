@@ -178,7 +178,6 @@ function initializeSearch() {
                                             <div class="search-result-title">${item.adi}</div>
                                             <div class="search-result-details">
                                                 Brend Kodu: ${item.brend_kod}<br>
-                                                OEM: ${item.oem}<br>
                                                 ${item.olcu ? `Ölçü: ${item.olcu}` : ''}
                                             </div>
                                         </div>
@@ -1013,7 +1012,6 @@ function openDetailsModal(productId) {
                 document.getElementById('detailsFirma').textContent = data.product.firma;
                 document.getElementById('detailsAvtomobil').textContent = data.product.avtomobil;
                 document.getElementById('detailsBrendKod').textContent = data.product.brend_kod;
-                document.getElementById('detailsOEM').textContent = data.product.oem;
                 document.getElementById('detailsOlcu').textContent = data.product.olcu || '-';
                 document.getElementById('detailsQiymet').textContent = data.product.qiymet + ' ₼';
                 document.getElementById('detailsStok').textContent = data.product.stok + ' ədəd';

@@ -11,21 +11,18 @@
 </head>
 <body>
     <div class="login-page">
-        {# PROFILE SLIDER - YUXARIDA #}
-        {% if verified_profiles and verified_profiles|length > 0 %}
-        <div class="profile-slider-section" style="margin-bottom: 18px;">
-            <div class="swiper profile-swiper">
+        <!-- PROFILE SLIDER (Yuxarıda, promo-bannerin üstündə) -->
+        <div class="profile-slider-section" style="display: flex; flex-direction: column; align-items: center; margin-bottom: 18px;">
+            <div class="swiper profile-swiper" style="width: 90px; height: 320px;">
                 <div class="swiper-wrapper">
                     {% for profile in verified_profiles %}
-                    <div class="swiper-slide" style="display:flex;flex-direction:column;align-items:center;">
-                        <img src="{{ profile.sekil.url }}" alt="{{ profile.user.username }}" style="width:70px;height:70px;border-radius:50%;object-fit:cover;border:3px solid #3498db;box-shadow:0 2px 8px rgba(44,62,80,0.10);">
-                        <div style="margin-top:7px;font-size:0.95rem;font-weight:500;color:#2c3e50;white-space:nowrap;">{{ profile.user.username }}</div>
-                    </div>
+                        <div class="swiper-slide" style="display: flex; justify-content: center; align-items: center; height: 90px;">
+                            <img src="{{ profile.sekil.url }}" alt="{{ profile.user.username }}" style="width: 70px; height: 70px; object-fit: cover; border-radius: 50%; border: 3px solid #3498db; box-shadow: 0 2px 8px rgba(44,62,80,0.08); background: #fff;" />
+                        </div>
                     {% endfor %}
                 </div>
             </div>
         </div>
-        {% endif %}
         <!-- REKLAM BANNERI -->
         <div class="promo-banner" style="background: linear-gradient(90deg, #2c3e50 0%, #3498db 100%); color: #fff; padding: 22px 24px; border-radius: 12px; margin-bottom: 28px; text-align: center; font-size: 1.13rem; font-weight: 500; box-shadow: 0 2px 12px rgba(44,62,80,0.08);">
             <i class="fas fa-bullhorn" style="margin-right: 10px;"></i>
@@ -41,23 +38,20 @@
             </div>
         </div>
         <!-- END REKLAM BANNERI -->
-        {# FIRMA SLIDER - ALTDA #}
-        {% if all_firmalar and all_firmalar|length > 0 %}
-        <div class="firma-slider-section" style="margin: 18px 0 18px 0;">
-            <div class="swiper firma-swiper">
+        <!-- FIRMA SLIDER (Aşağıda, promo-bannerin altında) -->
+        <div class="firma-slider-section" style="display: flex; flex-direction: column; align-items: center; margin-bottom: 18px; margin-top: 18px;">
+            <div class="swiper firma-swiper" style="width: 120px; height: 320px;">
                 <div class="swiper-wrapper">
-                    {% for firma in all_firmalar %}
+                    {% for firma in firmalar_slider %}
                         {% if firma.logo %}
-                        <div class="swiper-slide" style="display:flex;flex-direction:column;align-items:center;">
-                            <img src="{{ firma.logo.url }}" alt="{{ firma.adi }}" style="width:90px;height:90px;object-fit:contain;border-radius:16px;background:#fff;box-shadow:0 2px 8px rgba(44,62,80,0.10);">
-                            <div style="margin-top:7px;font-size:0.93rem;font-weight:500;color:#2c3e50;white-space:nowrap;">{{ firma.adi }}</div>
+                        <div class="swiper-slide" style="display: flex; justify-content: center; align-items: center; height: 110px;">
+                            <img src="{{ firma.logo.url }}" alt="{{ firma.adi }}" style="width: 90px; height: 90px; object-fit: contain; border-radius: 18px; background: #fff; box-shadow: 0 2px 8px rgba(44,62,80,0.08); border: 2px solid #eee;" />
                         </div>
                         {% endif %}
                     {% endfor %}
                 </div>
             </div>
         </div>
-        {% endif %}
         <div class="login-container">
             <div class="login-logo">
                 <img src="{% static 'images/Header_Logo.png' %}" alt="AS-AVTO">
@@ -108,7 +102,6 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
     function togglePassword() {
         const passwordInput = document.getElementById('password');
@@ -124,26 +117,27 @@
             toggleIcon.classList.add('fa-eye');
         }
     }
-    // Profile Swiper
-    if(document.querySelector('.profile-swiper')){
-        new Swiper('.profile-swiper', {
-            slidesPerView: 5,
-            spaceBetween: 18,
-            loop: true,
-            autoplay: { delay: 1800, disableOnInteraction: false },
-            breakpoints: { 0: {slidesPerView: 2}, 480: {slidesPerView: 3}, 768: {slidesPerView: 5} }
-        });
-    }
-    // Firma Swiper
-    if(document.querySelector('.firma-swiper')){
-        new Swiper('.firma-swiper', {
-            slidesPerView: 4,
-            spaceBetween: 24,
-            loop: true,
-            autoplay: { delay: 2000, disableOnInteraction: false },
-            breakpoints: { 0: {slidesPerView: 2}, 480: {slidesPerView: 3}, 768: {slidesPerView: 4} }
-        });
-    }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+    var profileSwiper = new Swiper('.profile-swiper', {
+        direction: 'vertical',
+        slidesPerView: 3,
+        spaceBetween: 18,
+        loop: true,
+        autoplay: { delay: 1800, disableOnInteraction: false },
+        centeredSlides: true,
+        allowTouchMove: true,
+    });
+    var firmaSwiper = new Swiper('.firma-swiper', {
+        direction: 'vertical',
+        slidesPerView: 3,
+        spaceBetween: 18,
+        loop: true,
+        autoplay: { delay: 2000, disableOnInteraction: false },
+        centeredSlides: true,
+        allowTouchMove: true,
+    });
     </script>
 </body>
 </html> 

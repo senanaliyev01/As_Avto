@@ -1249,28 +1249,37 @@ body {
     background: #1d6f42;
 }
 
+/* Ribbon düzəlişi: product-card sağ yuxarı künc və kiçik ölçü */
 .ribbon-wrapper {
     position: absolute;
-    top: 4px;
-    left: 4px;
+    top: 6px;
+    right: 6px;
+    left: auto;
     z-index: 2;
-    width: 36px;
-    height: 36px;
+    width: auto;
+    height: auto;
+    padding: 0;
+    margin: 0;
+    background: none;
+    box-shadow: none;
 }
-
 .ribbon {
     background: #1d6f42;
     color: #fff;
     font-size: 9px;
     font-weight: bold;
-    padding: 1px 6px;
+    padding: 2px 8px;
     border-radius: 4px;
     box-shadow: 0 1px 4px rgba(44,62,80,0.08);
     letter-spacing: 0.5px;
-    position: absolute;
-    top: 8px;
-    left: 0;
-    transform: rotate(-12deg);
+    position: static;
+    top: auto;
+    left: auto;
+    right: auto;
+    transform: none;
+    min-width: 0;
+    min-height: 0;
+    display: inline-block;
 }
 
 @media (max-width: 900px) {

@@ -113,8 +113,9 @@ def products_view(request):
         
         # İki ayrı filter tətbiq edək
         if clean_search:
-            # Kod və ölçü ilə axtarış
+            # Kod, brend_kod və ölçü ilə axtarış
             kod_filter = Q(kodlar__icontains=clean_search)
+            brend_kod_filter = Q(brend_kod__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
             
             # Ad ilə təkmilləşdirilmiş axtarış
@@ -135,11 +136,11 @@ def products_view(request):
                 # "AND" operatoru ilə birləşdiririk - bütün sözlər olmalıdır
                 ad_filter = reduce(and_, ad_filters)
                 
-                # Kod, ölçü və ad filterini "OR" operatoru ilə birləşdiririk
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | ad_filter)
+                # Kod, brend_kod, ölçü və ad filterini "OR" operatoru ilə birləşdiririk
+                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | olcu_filter | ad_filter)
             else:
-                # Əgər heç bir söz yoxdursa, yalnız kod və ölçü ilə axtarış
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter)
+                # Əgər heç bir söz yoxdursa, yalnız kod, brend_kod və ölçü ilə axtarış
+                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | olcu_filter)
     
     if kateqoriya:
         mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)
@@ -196,8 +197,9 @@ def load_more_products(request):
         
         # İki ayrı filter tətbiq edək
         if clean_search:
-            # Kod ilə axtarış
+            # Kod və brend_kod ilə axtarış
             kod_filter = Q(kodlar__icontains=clean_search)
+            brend_kod_filter = Q(brend_kod__icontains=clean_search)
             
             # Ad ilə təkmilləşdirilmiş axtarış
             # Çoxlu boşluq və təbləri tək boşluğa çeviririk
@@ -215,11 +217,11 @@ def load_more_products(request):
                 # "AND" operatoru ilə birləşdiririk - bütün sözlər olmalıdır
                 ad_filter = reduce(and_, ad_filters)
                 
-                # Kod və ad filterini "OR" operatoru ilə birləşdiririk
-                mehsullar = mehsullar.filter(kod_filter | ad_filter)
+                # Kod, brend_kod və ad filterini "OR" operatoru ilə birləşdiririk
+                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | ad_filter)
             else:
-                # Əgər heç bir söz yoxdursa, yalnız kod ilə axtarış
-                mehsullar = mehsullar.filter(kod_filter)
+                # Əgər heç bir söz yoxdursa, yalnız kod və brend_kod ilə axtarış
+                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter)
     
     if kateqoriya:
         mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)

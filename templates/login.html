@@ -11,6 +11,16 @@
 </head>
 <body>
     <div class="login-page">
+        <!-- PROFIL SLIDERI (Reklamın üstündə) -->
+        <div class="profile-slider-container">
+            <div class="profile-slider">
+                {% for img in profile_images %}
+                    <div class="profile-slide">
+                        <img src="{{ img }}" alt="Profil" />
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
         <!-- REKLAM BANNERI -->
         <div class="promo-banner" style="background: linear-gradient(90deg, #2c3e50 0%, #3498db 100%); color: #fff; padding: 22px 24px; border-radius: 12px; margin-bottom: 28px; text-align: center; font-size: 1.13rem; font-weight: 500; box-shadow: 0 2px 12px rgba(44,62,80,0.08);">
             <i class="fas fa-bullhorn" style="margin-right: 10px;"></i>
@@ -26,6 +36,16 @@
             </div>
         </div>
         <!-- END REKLAM BANNERI -->
+        <!-- FIRMA SLIDERI (Reklamın altında) -->
+        <div class="firm-slider-container">
+            <div class="firm-slider">
+                {% for img in firm_images %}
+                    <div class="firm-slide">
+                        <img src="{{ img }}" alt="Firma" />
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
         <div class="login-container">
             <div class="login-logo">
                 <img src="{% static 'images/Header_Logo.png' %}" alt="AS-AVTO">
@@ -65,4 +85,23 @@
         </div>
     </div>
 </body>
+<!-- SLIDER JS -->
+<script>
+function startSlider(sliderSelector, slideClass, speed = 2200) {
+    const slider = document.querySelector(sliderSelector);
+    if (!slider) return;
+    let slides = slider.querySelectorAll(slideClass);
+    if (slides.length <= 1) return;
+    let index = 0;
+    setInterval(() => {
+        index++;
+        if (index > slides.length - 1) index = 0;
+        slider.style.transform = `translateX(-${index * (slides[0].offsetWidth + 18)}px)`;
+    }, speed);
+}
+window.addEventListener('DOMContentLoaded', function() {
+    startSlider('.profile-slider', '.profile-slide', 2200);
+    startSlider('.firm-slider', '.firm-slide', 2200);
+});
+</script>
 </html>

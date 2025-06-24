@@ -277,3 +277,28 @@ body {
     align-items: center;
     gap: 10px;
 }
+
+/* Profil və firma slayderləri üçün */
+.profile-slider-container, .firm-slider-container {
+    width: 100%;
+    overflow: hidden;
+    margin-bottom: 18px;
+    margin-top: 18px;
+    display: flex;
+    justify-content: center;
+}
+.profile-slider, .firm-slider {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    transition: transform 0.5s linear;
+}
+.profile-slide img, .firm-slide img {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+    background: #f5f6fa;
+}

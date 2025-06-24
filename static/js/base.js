@@ -201,7 +201,7 @@ function initializeSearch() {
             }
         });
 
-        // Close search results when clicking outside
+        // Close search resul2ts when clicking outside
         document.addEventListener('click', function(e) {
             if (!searchResults.contains(e.target) && e.target !== searchInput) {
                 searchResults.style.display = 'none';

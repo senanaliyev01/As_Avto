@@ -8,6 +8,7 @@ from io import BytesIO
 import uuid
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+import threading
 
 class Header_Message(models.Model):
     mesaj = models.CharField(max_length=100)
@@ -128,7 +129,21 @@ class Mehsul(models.Model):
                     None
                 )
         
+        # Əgər yenidir true olarsa, 10 saniyə sonra avtomatik false et
+        is_new = self.pk is None or not Mehsul.objects.filter(pk=self.pk, yenidir=True).exists()
         super().save(*args, **kwargs)
+        if self.yenidir and is_new:
+            def set_yenidir_false(pk):
+                import time
+                time.sleep(10)
+                try:
+                    obj = Mehsul.objects.get(pk=pk)
+                    if obj.yenidir:
+                        obj.yenidir = False
+                        obj.save(update_fields=['yenidir'])
+                except Mehsul.DoesNotExist:
+                    pass
+            threading.Thread(target=set_yenidir_false, args=(self.pk,), daemon=True).start()
 
     def __str__(self):
         return f"{self.adi} - {self.brend_kod} - {self.oem}"

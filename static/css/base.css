@@ -3231,3 +3231,39 @@ body {
     background: #e9f7ef;
     color: #1d6f42;
 }
+
+/* Global Statistics Bar */
+.global-stats-bar {
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    padding: 10px 0;
+    margin-bottom: 10px;
+}
+.global-stats-bar .container {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    font-size: 15px;
+}
+.global-stats-bar span {
+    background: #fff;
+    border-radius: 8px;
+    padding: 6px 18px;
+    box-shadow: 0 1px 4px rgba(44, 62, 80, 0.04);
+    font-weight: 500;
+    color: #1d6f42;
+    border: 1px solid #e9ecef;
+    margin: 2px 0;
+}
+@media (max-width: 600px) {
+    .global-stats-bar .container {
+        gap: 10px;
+        font-size: 13px;
+    }
+    .global-stats-bar span {
+        padding: 4px 8px;
+        font-size: 13px;
+    }
+}

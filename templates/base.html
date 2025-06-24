@@ -13,6 +13,15 @@
 </head>
 <body>
     <div class="wrapper">
+        <!-- Global Statistics Bar -->
+        <div class="global-stats-bar" style="background:#f8f9fa;border-bottom:1px solid #e9ecef;padding:10px 0;margin-bottom:10px;">
+            <div class="container" style="display:flex;gap:30px;flex-wrap:wrap;justify-content:center;align-items:center;font-size:15px;">
+                <span><b>İstifadəçi sayı:</b> {{ request.total_user_count }}</span>
+                <span><b>Satıcı sayı:</b> {{ request.total_seller_count }}</span>
+                <span><b>Məhsul sayı:</b> {{ request.total_product_count }}</span>
+                <span><b>Firma sayı:</b> {{ request.total_firma_count }}</span>
+            </div>
+        </div>
         <!-- Header -->
         <header class="header">
             <div class="container">
@@ -274,14 +283,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        {# Statistik məlumatlar bütün səhifələrdə göstərilsin #}
-        <div class="site-stats" style="display:flex;justify-content:center;gap:40px;margin:20px 0 0 0;">
-            <div class="stat-item"><b>Toplam İstifadəçi sayı:</b> {{ request.total_users }}</div>
-            <div class="stat-item"><b>Toplam Satıcı sayı:</b> {{ request.total_sellers }}</div>
-            <div class="stat-item"><b>Toplam Məhsul sayı:</b> {{ request.total_products }}</div>
-            <div class="stat-item"><b>Toplam Firma sayı:</b> {{ request.total_firm_count }}</div>
         </div>
     </div>
 

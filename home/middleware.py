@@ -4,7 +4,7 @@ from django.conf import settings
 from .views import custom_404
 from django.shortcuts import render
 from django.contrib.auth.models import User
-from home.models import Mehsul, Profile
+from home.models import Mehsul
 
 class GlobalDataMiddleware:
     def __init__(self, get_response):
@@ -13,11 +13,6 @@ class GlobalDataMiddleware:
     def __call__(self, request):
         # Bütün aktiv mesajları əldə et
         request.header_messages = Header_Message.objects.filter(aktiv=True).order_by('id')
-        from home.models import Firma
-        request.total_firm_count = Firma.objects.count()
-        request.total_users = User.objects.count()
-        request.total_sellers = User.objects.filter(profile__is_verified=True).count()
-        request.total_products = Mehsul.objects.count()
 
         if request.user.is_authenticated:
             # Ümumi borcu əldə edirik
@@ -39,6 +34,12 @@ class GlobalDataMiddleware:
                     self.username = username
             sellers.insert(0, PseudoUser(0, 'AS-AVTO'))
             request.sellers = sellers
+
+        # Qlobal statistikalar (bütün səhifələr üçün)
+        request.total_user_count = User.objects.count()
+        request.total_seller_count = Mehsul.objects.exclude(sahib=None).values('sahib').distinct().count()
+        request.total_product_count = Mehsul.objects.count()
+        request.total_firma_count = Firma.objects.count()
 
         response = self.get_response(request)
         return response 

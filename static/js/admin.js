@@ -140,10 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Excel Import Modal Functions
-document.addEventListener('DOMContentLoaded', function() {
-    initializeExcelModal();
-});
-
+// Only initialize modal if elements exist
 function initializeExcelModal() {
     var modal = document.getElementById('excelImportModal');
     var btn = document.getElementById('showExcelImportModal');
@@ -151,7 +148,7 @@ function initializeExcelModal() {
     var closeBtn = document.getElementsByClassName('closeBtn')[0];
 
     if (!modal || !btn) {
-        console.log('Modal elements not found');
+        // Modal elements not found, skip
         return;
     }
 
@@ -182,6 +179,9 @@ function initializeExcelModal() {
     });
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+    initializeExcelModal();
+});
 
 document.addEventListener('DOMContentLoaded', function() {
     // Cədvəldəki borc məbləğlərini yoxla və sinif əlavə et
@@ -211,8 +211,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 document.addEventListener('DOMContentLoaded', function() {
     // Timer logic for yenidir
+    var yenidirTimers = document.querySelectorAll('.yenidir-timer');
+    if (!yenidirTimers.length) return; // Only run if timers exist
+
     function startYenidirTimers() {
-        document.querySelectorAll('.yenidir-timer').forEach(function(timerElem) {
+        yenidirTimers.forEach(function(timerElem) {
             if (timerElem.dataset.running) return; // Prevent double init
             timerElem.dataset.running = '1';
             let seconds = parseInt(timerElem.dataset.seconds);
@@ -220,7 +223,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const btn = document.querySelector('.reset-yenidir-btn[data-id="' + id + '"]');
 
             function resetYenidir() {
-                fetch('reset-yenidir/' + id + '/', {
+                // Use full admin URL for AJAX
+                var baseUrl = window.location.pathname;
+                // Find the base admin path (e.g. /admin/home/mehsul/)
+                var adminBase = baseUrl.split('mehsul')[0] + 'mehsul/';
+                var url = adminBase + 'reset-yenidir/' + id + '/';
+                fetch(url, {
                     method: 'POST',
                     headers: {
                         'X-CSRFToken': getCookie('csrftoken'),

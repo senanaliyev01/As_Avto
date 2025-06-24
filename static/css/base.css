@@ -817,12 +817,12 @@ body {
 }
 @media (max-width: 600px) {
     .search-results {
-        /* max-width: 98vw; */
-        /* left: 50%; */
-        /* transform: translateX(-50%); */
+        width: 100%;
+        left: 0;
+        transform: none;
         border-radius: 10px;
         top: 110%;
-        width: 100%;
+        /* max-width: 98vw; */
     }
     .search-result-item {
         padding: 10px 8px;

@@ -14,12 +14,14 @@
 <body>
     <div class="wrapper">
         <!-- Global Statistics Bar -->
-        <div class="global-stats-bar" style="background:#f8f9fa;border-bottom:1px solid #e9ecef;padding:10px 0;margin-bottom:10px;">
-            <div class="container" style="display:flex;gap:30px;flex-wrap:wrap;justify-content:center;align-items:center;font-size:15px;">
-                <span><b>İstifadəçi sayı:</b> {{ request.total_user_count }}</span>
-                <span><b>Satıcı sayı:</b> {{ request.total_seller_count }}</span>
-                <span><b>Məhsul sayı:</b> {{ request.total_product_count }}</span>
-                <span><b>Firma sayı:</b> {{ request.total_firma_count }}</span>
+        <div class="global-stats-bar">
+            <div class="container">
+                <div class="global-stats-bar-content">
+                    <span><b>İstifadəçi sayı:</b> {{ request.total_user_count }}</span>
+                    <span><b>Satıcı sayı:</b> {{ request.total_seller_count }}</span>
+                    <span><b>Məhsul sayı:</b> {{ request.total_product_count }}</span>
+                    <span><b>Firma sayı:</b> {{ request.total_firma_count }}</span>
+                </div>
             </div>
         </div>
         <!-- Header -->

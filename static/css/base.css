@@ -3241,6 +3241,11 @@ body {
 }
 .global-stats-bar .container {
     display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.global-stats-bar-content {
+    display: flex;
     gap: 30px;
     flex-wrap: wrap;
     justify-content: center;
@@ -3258,7 +3263,7 @@ body {
     margin: 2px 0;
 }
 @media (max-width: 600px) {
-    .global-stats-bar .container {
+    .global-stats-bar-content {
         gap: 10px;
         font-size: 13px;
     }

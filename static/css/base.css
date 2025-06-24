@@ -740,7 +740,7 @@ body {
 .search-results {
     display: none;
     position: fixed;
-    top: 265px;
+    top: 255px;
     left: 50%;
     transform: translateX(-50%);
     width: 100%;

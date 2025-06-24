@@ -3236,8 +3236,8 @@ body {
 .global-stats-bar {
     background: #f8f9fa;
     border-bottom: 1px solid #e9ecef;
-    padding: 10px 0;
-    margin-bottom: 10px;
+    padding: 5px 0;
+    /* margin-bottom: 10px; */
 }
 .global-stats-bar .container {
     display: flex;

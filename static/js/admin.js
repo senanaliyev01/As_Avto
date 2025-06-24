@@ -140,7 +140,10 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Excel Import Modal Functions
-// Only initialize modal if elements exist
+document.addEventListener('DOMContentLoaded', function() {
+    initializeExcelModal();
+});
+
 function initializeExcelModal() {
     var modal = document.getElementById('excelImportModal');
     var btn = document.getElementById('showExcelImportModal');
@@ -148,7 +151,7 @@ function initializeExcelModal() {
     var closeBtn = document.getElementsByClassName('closeBtn')[0];
 
     if (!modal || !btn) {
-        // Modal elements not found, skip
+        console.log('Modal elements not found');
         return;
     }
 
@@ -179,9 +182,6 @@ function initializeExcelModal() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    initializeExcelModal();
-});
 
 document.addEventListener('DOMContentLoaded', function() {
     // Cədvəldəki borc məbləğlərini yoxla və sinif əlavə et
@@ -207,78 +207,4 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         totalDebtItem.classList.add('zero');
     }
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Timer logic for yenidir
-    var yenidirTimers = document.querySelectorAll('.yenidir-timer');
-    if (!yenidirTimers.length) return; // Only run if timers exist
-
-    function startYenidirTimers() {
-        yenidirTimers.forEach(function(timerElem) {
-            if (timerElem.dataset.running) return; // Prevent double init
-            timerElem.dataset.running = '1';
-            let seconds = parseInt(timerElem.dataset.seconds);
-            const id = timerElem.dataset.id;
-            const btn = document.querySelector('.reset-yenidir-btn[data-id="' + id + '"]');
-
-            function resetYenidir() {
-                // Use full admin URL for AJAX
-                var baseUrl = window.location.pathname;
-                // Find the base admin path (e.g. /admin/home/mehsul/)
-                var adminBase = baseUrl.split('mehsul')[0] + 'mehsul/';
-                var url = adminBase + 'reset-yenidir/' + id + '/';
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken'),
-                        'Accept': 'application/json',
-                    },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Remove timer and button
-                        if (timerElem) timerElem.parentElement.innerHTML = '-';
-                    }
-                });
-            }
-
-            // Countdown
-            let interval = setInterval(function() {
-                seconds--;
-                if (timerElem) timerElem.textContent = seconds;
-                if (seconds <= 0) {
-                    clearInterval(interval);
-                    resetYenidir();
-                }
-            }, 1000);
-
-            // Manual reset
-            if (btn) {
-                btn.addEventListener('click', function() {
-                    clearInterval(interval);
-                    resetYenidir();
-                });
-            }
-        });
-    }
-
-    // Helper to get CSRF token
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
-    startYenidirTimers();
 });

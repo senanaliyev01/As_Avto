@@ -133,9 +133,9 @@ def products_view(request):
                     word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
                     ad_filters.append(word_filter)
                 ad_filter = reduce(and_, ad_filters)
-                mehsullar = Mehsul.objects.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter)[:5]
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter)
             else:
-                mehsullar = Mehsul.objects.filter(kod_filter | olcu_filter | brend_kod_filter)[:5]
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)
     
     if kateqoriya:
         mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)

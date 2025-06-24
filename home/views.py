@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import Mehsul, Kateqoriya, Sifaris, SifarisItem, Firma, Avtomobil, PopupImage, Header_Message, Vitrin
+from .models import Mehsul, Kateqoriya, Sifaris, SifarisItem, Firma, Avtomobil, PopupImage, Header_Message, Vitrin, Profile
 from django.db.models import Q, Sum, F, Case, When, DecimalField
 from decimal import Decimal
 from django.contrib import messages
@@ -73,6 +73,9 @@ def custom_404(request, exception=None):
 
 def login_view(request):
     error_message = None
+    from .models import Profile, Firma
+    verified_profiles = Profile.objects.filter(is_verified=True)
+    all_firmalar = Firma.objects.all()
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -83,7 +86,7 @@ def login_view(request):
             return redirect('base')
         else:
             error_message = 'İstifadəçi adı və ya şifrə yanlışdır'
-    return render(request, 'login.html', {'error_message': error_message})
+    return render(request, 'login.html', {'error_message': error_message, 'verified_profiles': verified_profiles, 'all_firmalar': all_firmalar})
 
 @login_required
 def home_view(request):
@@ -654,6 +657,9 @@ def logout_view(request):
     return redirect('login')
 
 def register_view(request):
+    from .models import Profile, Firma
+    verified_profiles = Profile.objects.filter(is_verified=True)
+    all_firmalar = Firma.objects.all()
     if request.method == 'POST':
         username = request.POST.get('username', '').strip()
         password = request.POST.get('password', '')
@@ -663,37 +669,37 @@ def register_view(request):
         # Username validasiyası
         if not username:
             messages.error(request, 'İstifadəçi adı boş ola bilməz!')
-            return render(request, 'register.html')
+            return render(request, 'register.html', {'verified_profiles': verified_profiles, 'all_firmalar': all_firmalar})
             
         # Username formatı yoxlaması
         if not re.match(r'^[a-zA-Z0-9_]+$', username):
             messages.error(request, 'İstifadəçi adı yalnız ingilis hərfləri, rəqəmlər və _ simvolundan ibarət ola bilər!')
-            return render(request, 'register.html')
+            return render(request, 'register.html', {'verified_profiles': verified_profiles, 'all_firmalar': all_firmalar})
             
         # Şifrə validasiyası
         if len(password) < 8:
             messages.error(request, 'Şifrə minimum 8 simvol olmalıdır!')
-            return render(request, 'register.html')
+            return render(request, 'register.html', {'verified_profiles': verified_profiles, 'all_firmalar': all_firmalar})
             
         # Telefon nömrəsi validasiyası
         if not phone.startswith('+994'):
             messages.error(request, 'Telefon nömrəsi +994 ilə başlamalıdır!')
-            return render(request, 'register.html')
+            return render(request, 'register.html', {'verified_profiles': verified_profiles, 'all_firmalar': all_firmalar})
             
         # Unvan validasiyası
         if not address:
             messages.error(request, 'Ünvan boş ola bilməz!')
-            return render(request, 'register.html')
+            return render(request, 'register.html', {'verified_profiles': verified_profiles, 'all_firmalar': all_firmalar})
             
         # Username mövcudluğu yoxlaması
         if User.objects.filter(username=username).exists():
             messages.error(request, 'Bu istifadəçi adı artıq mövcuddur!')
-            return render(request, 'register.html')
+            return render(request, 'register.html', {'verified_profiles': verified_profiles, 'all_firmalar': all_firmalar})
             
         # Telefon nömrəsi mövcudluğu yoxlaması
         if User.objects.filter(profile__phone=phone).exists():
             messages.error(request, 'Bu telefon nömrəsi artıq qeydiyyatdan keçirilib!')
-            return render(request, 'register.html')
+            return render(request, 'register.html', {'verified_profiles': verified_profiles, 'all_firmalar': all_firmalar})
             
         try:
             # Yeni istifadəçi yaradırıq
@@ -710,9 +716,9 @@ def register_view(request):
             
         except Exception as e:
             messages.error(request, 'Qeydiyyat zamanı xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.')
-            return render(request, 'register.html')
+            return render(request, 'register.html', {'verified_profiles': verified_profiles, 'all_firmalar': all_firmalar})
             
-    return render(request, 'register.html')
+    return render(request, 'register.html', {'verified_profiles': verified_profiles, 'all_firmalar': all_firmalar})
 
 @require_http_methods(["GET"])
 def product_details(request, product_id):

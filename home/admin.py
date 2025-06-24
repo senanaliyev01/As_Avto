@@ -19,7 +19,6 @@ from django.contrib import messages
 from django.db import transaction
 import math
 from django.contrib.admin import SimpleListFilter
-import threading
 
 @admin.register(Header_Message)
 class Header_MessageAdmin(admin.ModelAdmin):
@@ -48,7 +47,7 @@ class AvtomobilAdmin(admin.ModelAdmin):
 
 @admin.register(Mehsul)
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ['sahib', 'brend_kod', 'firma', 'adi',  'olcu', 'vitrin', 'stok', 'maya_qiymet', 'qiymet',  'yenidir', 'sekil_preview']
+    list_display = ['sahib', 'brend_kod', 'firma', 'adi',  'olcu', 'vitrin', 'stok', 'maya_qiymet', 'qiymet',  'yenidir_status', 'sekil_preview']
     list_filter = ['sahib', 'kateqoriya', 'firma', 'avtomobil', 'vitrin', 'yenidir']
     search_fields = ['adi', 'brend_kod', 'oem', 'kodlar', 'olcu', 'sahib__username']
     change_list_template = 'admin/mehsul_change_list.html'
@@ -59,6 +58,11 @@ class MehsulAdmin(admin.ModelAdmin):
             return format_html('<img src="{}" style="max-height: 50px;"/>', obj.sekil.url)
         return '-'
     sekil_preview.short_description = 'Şəkil'
+
+    def yenidir_status(self, obj):
+        return obj.check_and_update_yenidir()
+    yenidir_status.short_description = 'Yenidir'
+    yenidir_status.boolean = True
 
     def get_urls(self):
         urls = super().get_urls()
@@ -155,13 +159,6 @@ class MehsulAdmin(admin.ModelAdmin):
     def mark_as_new(self, request, queryset):
         updated = queryset.update(yenidir=True)
         self.message_user(request, f'{updated} məhsul yeni olaraq işarələndi.')
-        # 10 saniyə sonra yenidir sahəsini False et
-        def reset_new(ids):
-            from .models import Mehsul
-            Mehsul.objects.filter(id__in=ids).update(yenidir=False)
-        ids = list(queryset.values_list('id', flat=True))
-        timer = threading.Timer(10, reset_new, args=(ids,))
-        timer.start()
     mark_as_new.short_description = "Seçilmiş məhsulları yeni olaraq işarələ"
 
     def remove_from_new(self, request, queryset):

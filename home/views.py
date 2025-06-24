@@ -95,14 +95,12 @@ def home_view(request):
     total_users = User.objects.count()
     total_sellers = User.objects.filter(profile__is_verified=True).count()
     total_products = Mehsul.objects.count()
-    total_firms = Firma.objects.count()
     return render(request, 'base.html', {
         'new_products': new_products,
         'popup_images': popup_images,
         'total_users': total_users,
         'total_sellers': total_sellers,
         'total_products': total_products,
-        'total_firms': total_firms,
     })
 
 @login_required
@@ -1492,15 +1490,3 @@ def unread_sales_count(request):
             request.user.profile.yeni_unread_sales = 0
             request.user.profile.save()
         return JsonResponse({'status': 'ok'})
-
-def global_stats(request):
-    total_users = User.objects.count()
-    total_sellers = User.objects.filter(profile__is_verified=True).count()
-    total_products = Mehsul.objects.count()
-    total_firms = Firma.objects.count()
-    return {
-        'total_users': total_users,
-        'total_sellers': total_sellers,
-        'total_products': total_products,
-        'total_firms': total_firms,
-    }

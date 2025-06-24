@@ -13,6 +13,8 @@ class GlobalDataMiddleware:
     def __call__(self, request):
         # Bütün aktiv mesajları əldə et
         request.header_messages = Header_Message.objects.filter(aktiv=True).order_by('id')
+        from home.models import Firma
+        request.total_firm_count = Firma.objects.count()
 
         if request.user.is_authenticated:
             # Ümumi borcu əldə edirik

@@ -1140,7 +1140,7 @@ body {
 
 /* New Products Section */
 .new-products-section {
-    padding: 10px 0;
+    /* padding: 10px 0; */
     background-color: #f8f9fa;
 }
 
@@ -2505,7 +2505,7 @@ body {
     background-color: #fff;
     border: 1px solid var(--border-color);
     border-radius: 0 0 15px 15px;
-    margin: 4px auto 30px auto;
+    margin: 4px auto 0px auto;
     width: fit-content;
     min-width: 300px;
     max-width: 1200px;

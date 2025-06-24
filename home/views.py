@@ -108,9 +108,8 @@ def products_view(request):
     popup_images = PopupImage.objects.filter(aktiv=True)
     
     if search_query:
-        # Əgər tam ədəd id daxil edilibsə, birbaşa məhsulun id-si ilə axtarış et
         if search_query.isdigit():
-            mehsullar = Mehsul.objects.filter(id=int(search_query))
+            mehsullar = mehsullar.filter(id=int(search_query))
         else:
             # Kodlarla axtarış üçün əvvəlki təmizləmə
             clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
@@ -554,20 +553,8 @@ def search_suggestions(request):
     search_query = request.GET.get('search', '')
     
     if search_query:
-        # Əgər tam ədəd id daxil edilibsə, birbaşa məhsulun id-si ilə nəticə qaytar
         if search_query.isdigit():
-            mehsul = Mehsul.objects.filter(id=int(search_query)).first()
-            if mehsul:
-                return JsonResponse({'suggestions': [{
-                    'id': mehsul.id,
-                    'adi': mehsul.adi,
-                    'brend_kod': mehsul.brend_kod,
-                    'olcu': mehsul.olcu,
-                    'qiymet': str(mehsul.qiymet),
-                    'sekil_url': mehsul.sekil.url if mehsul.sekil else None,
-                }]})
-            else:
-                return JsonResponse({'suggestions': []})
+            mehsullar = Mehsul.objects.filter(id=int(search_query))[:5]
         else:
             # Kodlarla axtarış üçün əvvəlki təmizləmə
             clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())

@@ -91,9 +91,16 @@ def home_view(request):
     new_products = Mehsul.objects.filter(yenidir=True)
     # Aktiv popup şəkilləri əldə et
     popup_images = PopupImage.objects.filter(aktiv=True)
+    # Statistikalar
+    total_users = User.objects.count()
+    total_sellers = User.objects.filter(profile__is_verified=True).count()
+    total_products = Mehsul.objects.count()
     return render(request, 'base.html', {
         'new_products': new_products,
-        'popup_images': popup_images
+        'popup_images': popup_images,
+        'total_users': total_users,
+        'total_sellers': total_sellers,
+        'total_products': total_products,
     })
 
 @login_required

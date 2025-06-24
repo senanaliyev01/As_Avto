@@ -559,6 +559,7 @@ def search_suggestions(request):
             # Kod və ölçü ilə axtarış
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
+            brend_kod_filter = Q(brend_kod__icontains=search_query)  # Sade brend_kod axtarışı
             
             # Ad ilə təkmilləşdirilmiş axtarış
             # Çoxlu boşluq və təbləri tək boşluğa çeviririk
@@ -578,11 +579,11 @@ def search_suggestions(request):
                 # "AND" operatoru ilə birləşdiririk - bütün sözlər olmalıdır
                 ad_filter = reduce(and_, ad_filters)
                 
-                # Kod, ölçü və ad filterini "OR" operatoru ilə birləşdiririk
-                mehsullar = Mehsul.objects.filter(kod_filter | olcu_filter | ad_filter)[:5]
+                # Kod, ölçü, brend_kod və ad filterini "OR" operatoru ilə birləşdiririk
+                mehsullar = Mehsul.objects.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter)[:5]
             else:
-                # Əgər heç bir söz yoxdursa, yalnız kod və ölçü ilə axtarış
-                mehsullar = Mehsul.objects.filter(kod_filter | olcu_filter)[:5]
+                # Əgər heç bir söz yoxdursa, yalnız kod, ölçü və brend_kod ilə axtarış
+                mehsullar = Mehsul.objects.filter(kod_filter | olcu_filter | brend_kod_filter)[:5]
             
             suggestions = []
             for mehsul in mehsullar:

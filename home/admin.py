@@ -19,6 +19,7 @@ from django.contrib import messages
 from django.db import transaction
 import math
 from django.contrib.admin import SimpleListFilter
+import threading
 
 @admin.register(Header_Message)
 class Header_MessageAdmin(admin.ModelAdmin):
@@ -154,6 +155,13 @@ class MehsulAdmin(admin.ModelAdmin):
     def mark_as_new(self, request, queryset):
         updated = queryset.update(yenidir=True)
         self.message_user(request, f'{updated} məhsul yeni olaraq işarələndi.')
+        # 10 saniyə sonra yenidir sahəsini False et
+        def reset_new(ids):
+            from .models import Mehsul
+            Mehsul.objects.filter(id__in=ids).update(yenidir=False)
+        ids = list(queryset.values_list('id', flat=True))
+        timer = threading.Timer(10, reset_new, args=(ids,))
+        timer.start()
     mark_as_new.short_description = "Seçilmiş məhsulları yeni olaraq işarələ"
 
     def remove_from_new(self, request, queryset):

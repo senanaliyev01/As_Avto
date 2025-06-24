@@ -223,6 +223,7 @@ body {
 
 /* Search Section Styles */
 .search-section {
+    position: relative;
     background-color: #fff;
     border: 1px solid var(--border-color);
     border-radius: 15px 15px 0 0;
@@ -736,14 +737,16 @@ body {
     width: 100%;
 }
 
-/* --- Realtime Search (Axtarış nəticələri) üçün professional dizayn --- */
+/* --- Realtime Search (Axtarış nəticələri) üçün geniş və parent containerə uyğun dizayn --- */
 .search-results {
     display: none;
     position: absolute;
-    top: 100%;
     left: 0;
+    right: 0;
+    top: 100%;
     width: 100%;
-    /* max-width: 420px; */
+    min-width: 320px;
+    max-width: none;
     background: #fff;
     border: 1.5px solid #e9ecef;
     border-radius: 12px;
@@ -758,6 +761,25 @@ body {
 @keyframes fadeInSearch {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 900px) {
+    .search-results {
+        min-width: 0;
+        width: 100vw;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 10px;
+        top: 110%;
+    }
+}
+@media (max-width: 600px) {
+    .search-results {
+        width: 100vw;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 10px;
+        top: 110%;
+    }
 }
 .search-result-item {
     display: flex;
@@ -816,14 +838,6 @@ body {
     white-space: nowrap;
 }
 @media (max-width: 600px) {
-    .search-results {
-        width: 100%;
-        left: 0;
-        transform: none;
-        border-radius: 10px;
-        top: 110%;
-        /* max-width: 98vw; */
-    }
     .search-result-item {
         padding: 10px 8px;
         gap: 8px;

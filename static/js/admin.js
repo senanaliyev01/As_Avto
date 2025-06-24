@@ -208,3 +208,69 @@ document.addEventListener('DOMContentLoaded', function() {
         totalDebtItem.classList.add('zero');
     }
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Timer logic for yenidir
+    function startYenidirTimers() {
+        document.querySelectorAll('.yenidir-timer').forEach(function(timerElem) {
+            if (timerElem.dataset.running) return; // Prevent double init
+            timerElem.dataset.running = '1';
+            let seconds = parseInt(timerElem.dataset.seconds);
+            const id = timerElem.dataset.id;
+            const btn = document.querySelector('.reset-yenidir-btn[data-id="' + id + '"]');
+
+            function resetYenidir() {
+                fetch('reset-yenidir/' + id + '/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Accept': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Remove timer and button
+                        if (timerElem) timerElem.parentElement.innerHTML = '-';
+                    }
+                });
+            }
+
+            // Countdown
+            let interval = setInterval(function() {
+                seconds--;
+                if (timerElem) timerElem.textContent = seconds;
+                if (seconds <= 0) {
+                    clearInterval(interval);
+                    resetYenidir();
+                }
+            }, 1000);
+
+            // Manual reset
+            if (btn) {
+                btn.addEventListener('click', function() {
+                    clearInterval(interval);
+                    resetYenidir();
+                });
+            }
+        });
+    }
+
+    // Helper to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    startYenidirTimers();
+});

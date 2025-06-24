@@ -8,8 +8,6 @@ from io import BytesIO
 import uuid
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-import threading
-import time
 
 class Header_Message(models.Model):
     mesaj = models.CharField(max_length=100)
@@ -131,19 +129,6 @@ class Mehsul(models.Model):
                 )
         
         super().save(*args, **kwargs)
-        # Əgər yenidir True-dursa, 10 saniyə sonra False et
-        if self.yenidir:
-            def reset_yenidir(pk):
-                time.sleep(10)
-                from home.models import Mehsul
-                try:
-                    obj = Mehsul.objects.get(pk=pk)
-                    if obj.yenidir:
-                        obj.yenidir = False
-                        obj.save(update_fields=['yenidir'])
-                except Mehsul.DoesNotExist:
-                    pass
-            threading.Thread(target=reset_yenidir, args=(self.pk,), daemon=True).start()
 
     def __str__(self):
         return f"{self.adi} - {self.brend_kod} - {self.oem}"

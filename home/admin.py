@@ -47,7 +47,7 @@ class AvtomobilAdmin(admin.ModelAdmin):
 
 @admin.register(Mehsul)
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ['sahib', 'brend_kod', 'firma', 'adi',  'olcu', 'vitrin', 'stok', 'maya_qiymet', 'qiymet',  'yenidir', 'sekil_preview']
+    list_display = ['sahib', 'brend_kod', 'firma', 'adi',  'olcu', 'vitrin', 'stok', 'maya_qiymet', 'qiymet',  'yenidir', 'sekil_preview', 'yenidir_timer']
     list_filter = ['sahib', 'kateqoriya', 'firma', 'avtomobil', 'vitrin', 'yenidir']
     search_fields = ['adi', 'brend_kod', 'oem', 'kodlar', 'olcu', 'sahib__username']
     change_list_template = 'admin/mehsul_change_list.html'
@@ -59,11 +59,21 @@ class MehsulAdmin(admin.ModelAdmin):
         return '-'
     sekil_preview.short_description = 'Şəkil'
 
+    def yenidir_timer(self, obj):
+        if obj.yenidir:
+            return format_html(
+                '<span class="yenidir-timer" data-id="{}" data-seconds="10">10</span> <button class="reset-yenidir-btn" data-id="{}">Yeniliyi Bitir</button>',
+                obj.id, obj.id
+            )
+        return '-'
+    yenidir_timer.short_description = 'Yenidir Timer'
+
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
             path('import-excel/', self.import_excel_view, name='import_excel'),
             path('export-pdf/', self.export_pdf, name='export_pdf'),
+            path('reset-yenidir/<int:pk>/', self.admin_site.admin_view(self.reset_yenidir), name='reset_yenidir'),
         ]
         return custom_urls + urls
 
@@ -364,6 +374,16 @@ class MehsulAdmin(admin.ModelAdmin):
                 instance.sahib = request.user
             instance.save()
         formset.save_m2m()
+
+    def reset_yenidir(self, request, pk):
+        from django.http import JsonResponse
+        try:
+            mehsul = Mehsul.objects.get(pk=pk)
+            mehsul.yenidir = False
+            mehsul.save()
+            return JsonResponse({'success': True})
+        except Mehsul.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Mehsul tapılmadı'})
 
 class SifarisItemInline(admin.TabularInline):
     model = SifarisItem

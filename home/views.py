@@ -83,13 +83,7 @@ def login_view(request):
             return redirect('base')
         else:
             error_message = 'İstifadəçi adı və ya şifrə yanlışdır'
-    # Profil və firma şəkilləri üçün context əlavə et
-    from home.models import Profile, Firma
-    profiles = Profile.objects.filter(is_verified=True).exclude(sekil='profile_pics/no_image.webp')
-    firms = Firma.objects.exclude(logo='')
-    profile_images = [p.sekil.url for p in profiles if p.sekil]
-    firm_images = [f.logo.url for f in firms if f.logo]
-    return render(request, 'login.html', {'error_message': error_message, 'profile_images': profile_images, 'firm_images': firm_images})
+    return render(request, 'login.html', {'error_message': error_message})
 
 @login_required
 def home_view(request):
@@ -669,92 +663,56 @@ def register_view(request):
         # Username validasiyası
         if not username:
             messages.error(request, 'İstifadəçi adı boş ola bilməz!')
-            # Profil və firma şəkilləri üçün context əlavə et
-            from home.models import Profile, Firma
-            profiles = Profile.objects.filter(is_verified=True).exclude(sekil='profile_pics/no_image.webp')
-            firms = Firma.objects.exclude(logo='')
-            profile_images = [p.sekil.url for p in profiles if p.sekil]
-            firm_images = [f.logo.url for f in firms if f.logo]
-            return render(request, 'register.html', {'profile_images': profile_images, 'firm_images': firm_images})
+            return render(request, 'register.html')
+            
         # Username formatı yoxlaması
         if not re.match(r'^[a-zA-Z0-9_]+$', username):
             messages.error(request, 'İstifadəçi adı yalnız ingilis hərfləri, rəqəmlər və _ simvolundan ibarət ola bilər!')
-            from home.models import Profile, Firma
-            profiles = Profile.objects.filter(is_verified=True).exclude(sekil='profile_pics/no_image.webp')
-            firms = Firma.objects.exclude(logo='')
-            profile_images = [p.sekil.url for p in profiles if p.sekil]
-            firm_images = [f.logo.url for f in firms if f.logo]
-            return render(request, 'register.html', {'profile_images': profile_images, 'firm_images': firm_images})
+            return render(request, 'register.html')
+            
         # Şifrə validasiyası
         if len(password) < 8:
             messages.error(request, 'Şifrə minimum 8 simvol olmalıdır!')
-            from home.models import Profile, Firma
-            profiles = Profile.objects.filter(is_verified=True).exclude(sekil='profile_pics/no_image.webp')
-            firms = Firma.objects.exclude(logo='')
-            profile_images = [p.sekil.url for p in profiles if p.sekil]
-            firm_images = [f.logo.url for f in firms if f.logo]
-            return render(request, 'register.html', {'profile_images': profile_images, 'firm_images': firm_images})
+            return render(request, 'register.html')
+            
         # Telefon nömrəsi validasiyası
         if not phone.startswith('+994'):
             messages.error(request, 'Telefon nömrəsi +994 ilə başlamalıdır!')
-            from home.models import Profile, Firma
-            profiles = Profile.objects.filter(is_verified=True).exclude(sekil='profile_pics/no_image.webp')
-            firms = Firma.objects.exclude(logo='')
-            profile_images = [p.sekil.url for p in profiles if p.sekil]
-            firm_images = [f.logo.url for f in firms if f.logo]
-            return render(request, 'register.html', {'profile_images': profile_images, 'firm_images': firm_images})
+            return render(request, 'register.html')
+            
         # Unvan validasiyası
         if not address:
             messages.error(request, 'Ünvan boş ola bilməz!')
-            from home.models import Profile, Firma
-            profiles = Profile.objects.filter(is_verified=True).exclude(sekil='profile_pics/no_image.webp')
-            firms = Firma.objects.exclude(logo='')
-            profile_images = [p.sekil.url for p in profiles if p.sekil]
-            firm_images = [f.logo.url for f in firms if f.logo]
-            return render(request, 'register.html', {'profile_images': profile_images, 'firm_images': firm_images})
+            return render(request, 'register.html')
+            
         # Username mövcudluğu yoxlaması
         if User.objects.filter(username=username).exists():
             messages.error(request, 'Bu istifadəçi adı artıq mövcuddur!')
-            from home.models import Profile, Firma
-            profiles = Profile.objects.filter(is_verified=True).exclude(sekil='profile_pics/no_image.webp')
-            firms = Firma.objects.exclude(logo='')
-            profile_images = [p.sekil.url for p in profiles if p.sekil]
-            firm_images = [f.logo.url for f in firms if f.logo]
-            return render(request, 'register.html', {'profile_images': profile_images, 'firm_images': firm_images})
+            return render(request, 'register.html')
+            
         # Telefon nömrəsi mövcudluğu yoxlaması
         if User.objects.filter(profile__phone=phone).exists():
             messages.error(request, 'Bu telefon nömrəsi artıq qeydiyyatdan keçirilib!')
-            from home.models import Profile, Firma
-            profiles = Profile.objects.filter(is_verified=True).exclude(sekil='profile_pics/no_image.webp')
-            firms = Firma.objects.exclude(logo='')
-            profile_images = [p.sekil.url for p in profiles if p.sekil]
-            firm_images = [f.logo.url for f in firms if f.logo]
-            return render(request, 'register.html', {'profile_images': profile_images, 'firm_images': firm_images})
+            return render(request, 'register.html')
+            
         try:
             # Yeni istifadəçi yaradırıq
             user = User.objects.create_user(username=username, password=password)
+            
             # Profil məlumatlarını əlavə edirik
             user.profile.phone = phone
             user.profile.address = address
             user.profile.is_verified = False  # Profil təsdiqlənməmiş olaraq yaradılır
             user.profile.save()
+            
             messages.success(request, 'Qeydiyyat uğurla tamamlandı!')
             return redirect('register')
+            
         except Exception as e:
             messages.error(request, 'Qeydiyyat zamanı xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.')
-            from home.models import Profile, Firma
-            profiles = Profile.objects.filter(is_verified=True).exclude(sekil='profile_pics/no_image.webp')
-            firms = Firma.objects.exclude(logo='')
-            profile_images = [p.sekil.url for p in profiles if p.sekil]
-            firm_images = [f.logo.url for f in firms if f.logo]
-            return render(request, 'register.html', {'profile_images': profile_images, 'firm_images': firm_images})
-    # GET request üçün də şəkilləri əlavə et
-    from home.models import Profile, Firma
-    profiles = Profile.objects.filter(is_verified=True).exclude(sekil='profile_pics/no_image.webp')
-    firms = Firma.objects.exclude(logo='')
-    profile_images = [p.sekil.url for p in profiles if p.sekil]
-    firm_images = [f.logo.url for f in firms if f.logo]
-    return render(request, 'register.html', {'profile_images': profile_images, 'firm_images': firm_images})
+            return render(request, 'register.html')
+            
+    return render(request, 'register.html')
 
 @require_http_methods(["GET"])
 def product_details(request, product_id):

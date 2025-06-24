@@ -10,6 +10,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 import threading
 import time
+import home.signals
 
 class Header_Message(models.Model):
     mesaj = models.CharField(max_length=100)

@@ -184,7 +184,7 @@ function initializeSearch() {
                                         <div class="search-result-price">${item.qiymet} ₼</div>
                                     `;
                                     div.addEventListener('click', () => {
-                                        searchInput.value = item.id;
+                                        searchInput.value = item.adi;
                                         searchResults.style.display = 'none';
                                         document.querySelector('form.search-form').submit();
                                     });

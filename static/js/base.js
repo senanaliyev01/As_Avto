@@ -870,7 +870,7 @@ function initializeProductsPage() {
                                 <td>${product.brend_kod}</td>
                                 <td>${product.firma}</td>
                                 <td>
-                                    ${product.adi}
+                                    <span class="product-name-ellipsis">${product.adi}</span>
                                     ${product.yenidir ? '<span class="new-badge">Yeni</span>' : ''}
                                 </td>
                                 <td>

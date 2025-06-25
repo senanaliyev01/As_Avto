@@ -309,11 +309,10 @@ body {
 
 /* Table Styles */
 .table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    margin: 2rem auto;
-    text-align: center;
+    width: 100vw !important;
+    min-width: 100vw !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
 }
 
 .table thead th {
@@ -342,13 +341,13 @@ body {
 
 /* Table Container */
 .table-container {
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    margin: 2rem auto;
-    overflow-x: auto; /* horizontal scroll əlavə edirik */
-    width: 100%;
-    padding: 1rem;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow-x: auto;
 }
 
 /* Product Image in Tables */
@@ -1653,10 +1652,18 @@ body {
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .table-container {
-        margin: 1rem auto;
-        padding: 0.5rem;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
     }
-    
+    .table {
+        width: 100vw !important;
+        min-width: 100vw !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+    }
     .table thead th,
     .table tbody td {
         padding: 10px 8px;
@@ -1922,11 +1929,18 @@ body {
 /* Responsive */
 @media (max-width: 768px) {
     .table-container {
-        margin: 1rem 0;
-        padding: 0.5rem;
-        border-radius: 0;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
     }
-    
+    .table {
+        width: 100vw !important;
+        min-width: 100vw !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+    }
     .table th,
     .table td {
         padding: 6px 4px;

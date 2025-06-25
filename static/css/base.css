@@ -3460,51 +3460,49 @@ body {
     }
 }
 
-.fullwidth-table {
+.full-width-table {
     width: 100vw !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border-collapse: collapse;
-    border-spacing: 0;
+    min-width: 100vw !important;
+    max-width: 100vw !important;
+    margin-left: calc(-1 * ((100vw - 100%) / 2));
+    margin-right: 0;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
     background: #fff;
     box-shadow: none;
-    border-radius: 0;
-    text-align: center;
-    position: relative;
-    left: 50%;
-    right: 50%;
-    transform: translateX(-50%);
+    overflow-x: auto;
+    table-layout: auto;
 }
-.fullwidth-table th, .fullwidth-table td {
-    border: 1px solid #e9ecef;
-    padding: 14px 8px;
-    font-size: 15px;
-    color: #2c3e50;
-    background: #fff;
-    text-align: center;
+
+.full-width-table th, .full-width-table td {
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    padding: 15px 10px;
+    border-bottom: 1px solid #e9ecef;
+    border-right: 1px solid #e9ecef;
+    color: #2d3436;
+    vertical-align: middle;
+    text-align: center;
+    font-size: 15px;
 }
-.fullwidth-table th {
+
+.full-width-table th {
     background: #f8f9fa;
+    color: #2c3e50;
     font-weight: 600;
+    border-bottom: 2px solid #e9ecef;
 }
-.fullwidth-table tr:nth-child(even) td {
-    background: #f8f9fa;
-}
-@media (max-width: 900px) {
-    .fullwidth-table th, .fullwidth-table td {
+
+@media (max-width: 1200px) {
+    .full-width-table {
         font-size: 13px;
-        padding: 8px 4px;
+        min-width: 1200px;
     }
 }
-@media (max-width: 600px) {
-    .fullwidth-table {
-        font-size: 11px;
-    }
-    .fullwidth-table th, .fullwidth-table td {
-        font-size: 11px;
-        padding: 6px 2px;
+
+@media (max-width: 768px) {
+    .full-width-table {
+        font-size: 12px;
+        min-width: 900px;
     }
 }

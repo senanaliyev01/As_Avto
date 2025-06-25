@@ -4,9 +4,8 @@
 {% block title %}Məhsullar - AS-AVTO{% endblock %}
 
 {% block content %}
-<h2 style="margin-left: 30px;">Məhsullar</h2>
-
-<table class="fullwidth-table">
+<h2 style="margin-left: 24px;">Məhsullar</h2>
+<table class="table full-width-table">
     <thead>
         <tr>
             <th>Şəkil</th>
@@ -69,13 +68,11 @@
         {% endfor %}
     </tbody>
 </table>
-
 {% if has_more %}
 <div id="loading-spinner" class="loading-spinner" style="display: none;">
     <div class="spinner"></div>
 </div>
 {% endif %}
-
 <!-- Miqdar Modal -->
 <div id="quantityModal" class="modal">
     <div class="custom-quantity-modal-content">
@@ -91,7 +88,6 @@
         </form>
     </div>
 </div>
-
 <!-- Image Modal -->
 <div id="imageModal" class="image-modal">
     <span class="image-modal-close">&times;</span>
@@ -99,7 +95,6 @@
         <img id="modalImage" class="modal-image" src="" alt="Modal Image">
     </div>
 </div>
-
 <!-- Details Modal -->
 <div id="detailsModal" class="details-modal">
     <div class="details-modal-content">
@@ -158,5 +153,4 @@
         </div>
     </div>
 </div>
-
 {% endblock %} 

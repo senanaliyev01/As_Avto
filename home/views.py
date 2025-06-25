@@ -727,7 +727,6 @@ def product_details(request, product_id):
                 'firma': product.firma.adi,
                 'avtomobil': product.avtomobil.adi,
                 'brend_kod': product.brend_kod,
-                'oem': product.oem,
                 'olcu': product.olcu,
                 'qiymet': str(product.qiymet),
                 'stok': product.stok,

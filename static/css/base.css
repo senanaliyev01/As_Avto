@@ -343,12 +343,18 @@ body {
 /* Table Container */
 .table-container {
     background: #fff;
-    border-radius: 8px;
+    /* Remove border-radius and margin for full width */
+    border-radius: 0;
+    margin: 0;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    margin: 2rem auto;
-    overflow-x: auto; /* horizontal scroll əlavə edirik */
-    width: 100%;
-    padding: 1rem;
+    overflow-x: auto;
+    width: 100vw;
+    max-width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    transform: translateX(-50%);
+    padding: 1rem 0;
 }
 
 /* Product Image in Tables */
@@ -3457,5 +3463,19 @@ body {
     .global-stats-bar span {
         padding: 4px 8px;
         font-size: 13px;
+    }
+}
+
+/* Product name cell ellipsis */
+.product-name-cell {
+    max-width: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 768px) {
+    .product-name-cell {
+        max-width: 90px;
     }
 }

@@ -762,13 +762,20 @@ def my_products_view(request):
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
-            brend_kod_filter = Q(brend_kod__icontains=search_query)  # Sade brend_kod axtarışı
+            # brend_kod üçün həm istifadəçi sorğusunu, həm də brend_kod-u təmizləyib müqayisə edirik
+            def clean_code(val):
+                return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
+            brend_kod_ids = [m.id for m in mehsullar if clean_code(search_query) in clean_code(m.brend_kod)]
+            brend_kod_filter = Q(id__in=brend_kod_ids)
+            # Ad ilə təkmilləşdirilmiş axtarış
             processed_query = re.sub(r'\s+', ' ', search_query).strip()
             search_words = processed_query.split()
             if search_words:
                 ad_filters = []
                 for word in search_words:
-                    ad_filters.append(Q(adi__icontains=word))
+                    word_variations = normalize_azerbaijani_chars(word)
+                    word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
+                    ad_filters.append(word_filter)
                 ad_filter = reduce(and_, ad_filters)
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter)
             else:

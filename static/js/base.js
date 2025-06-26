@@ -62,13 +62,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateSalesBadge(count) {
         const badge = document.getElementById('salesBadge');
+        const badgeSidebar = document.getElementById('salesBadgeSidebar');
         if (!badge) return;
         if (count > 0) {
             badge.textContent = count;
             badge.style.display = 'inline-block';
+            if (badgeSidebar) {
+                badgeSidebar.textContent = count;
+                badgeSidebar.style.display = 'inline-block';
+            }
         } else {
             badge.textContent = '0';
             badge.style.display = 'none';
+            if (badgeSidebar) {
+                badgeSidebar.textContent = '0';
+                badgeSidebar.style.display = 'none';
+            }
         }
     }
 

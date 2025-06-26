@@ -501,6 +501,7 @@ def search_suggestions(request):
                     'olcu': mehsul.olcu,
                     'qiymet': str(mehsul.qiymet),
                     'sekil_url': mehsul.sekil.url if mehsul.sekil else None,
+                    'satici': mehsul.sahib.username if mehsul.sahib else 'AS-AVTO',
                 })
             return JsonResponse({'suggestions': suggestions})
     

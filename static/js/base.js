@@ -179,6 +179,7 @@ function initializeSearch() {
                                                 Kodu: ${item.brend_kod}<br>
                                                 ${item.olcu ? `Ölçü: ${item.olcu}` : ''}
                                             </div>
+                                            <div class="search-result-seller"><i class="fas fa-user"></i> ${item.satici || 'AS-AVTO'}</div>
                                         </div>
                                         <div class="search-result-price">${item.qiymet} ₼</div>
                                     `;

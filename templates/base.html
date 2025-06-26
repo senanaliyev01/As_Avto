@@ -26,84 +26,82 @@
         </div>
         <!-- Header -->
         <header class="header">
-            <div class="container">
-                <div class="header-content header-search-layout">
-                    <div class="logo">
-                        <a href="{% url 'base' %}">
-                            <img src="{% static 'images/Header_Logo.png' %}" alt="AS-AVTO" class="logo-img">
-                        </a>
+            <div class="header-content header-search-layout">
+                <div class="logo">
+                    <a href="{% url 'base' %}">
+                        <img src="{% static 'images/Header_Logo.png' %}" alt="AS-AVTO" class="logo-img">
+                    </a>
+                </div>
+                <form method="get" action="{% url 'products' %}" class="header-search-form">
+                    <div class="header-search-input-wrapper">
+                        <input type="text" id="query" name="search" placeholder="Məhsul, kod və ya ad axtar..." value="{{ request.GET.search }}" autocomplete="off" class="header-search-input">
+                        <button type="submit" class="header-search-btn"><i class="fas fa-search"></i></button>
+                        <div id="search-results" class="search-results"></div>
                     </div>
-                    <form method="get" action="{% url 'products' %}" class="header-search-form">
-                        <div class="header-search-input-wrapper">
-                            <input type="text" id="query" name="search" placeholder="Məhsul, kod və ya ad axtar..." value="{{ request.GET.search }}" autocomplete="off" class="header-search-input">
-                            <button type="submit" class="header-search-btn"><i class="fas fa-search"></i></button>
-                            <div id="search-results" class="search-results"></div>
-                        </div>
-                    </form>
-                    <div class="header-right">
-                        <span class="total-debt">
-                            {% if request.statistics.umumi_borc < 0 %}
-                                <span style="color: #28a745; font-weight: bold;">Balans +{{ request.statistics.umumi_borc|floatformat:2|slice:'1:' }} ₼</span>
-                            {% else %}
-                                <i class="fas fa-money-bill-wave"></i> Borc: {{ request.statistics.umumi_borc|floatformat:2 }} ₼
-                            {% endif %}
-                        </span>
-                        <nav class="main-nav">
-                            <ul>
-                                <li><a href="#" class="nav-link blink-news" id="yeniliklerLink"><i class="fas fa-bullhorn"></i> Yeniliklər</a></li>
-                                <li><a href="{% url 'products' %}" class="nav-link {% if request.resolver_match.url_name == 'products' %}active{% endif %}"><i class="fas fa-box"></i> Məhsullar</a></li>
-                                <li><a href="{% url 'new_products' %}" class="nav-link {% if request.resolver_match.url_name == 'new_products' %}active{% endif %}"><i class="fas fa-star"></i> Yeni Məhsullar</a></li>
-                                <li><a href="{% url 'orders' %}" class="nav-link {% if request.resolver_match.url_name == 'orders' %}active{% endif %}"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a></li>
-                                <li>
-                                    <a href="tel:+994702754499" class="nav-link">
-                                        <i class="fas fa-phone"></i> +994 70 275 44 99
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" class="nav-link {% if request.resolver_match.url_name == 'cart' %}active{% endif %}" id="cartSidebarToggle">
-                                        <span class="cart-icon">
-                                            <i class="fas fa-shopping-cart"></i>
-                                            <span class="cart-counter">{{ request.session.cart|length }}</span>
-                                        </span>
-                                        Səbət
-                                    </a>
-                                </li>
-                                <li class="user-menu">
-                                    <div class="user-dropdown">
-                                        <button class="user-button">
-                                            <i class="fas fa-user"></i>
-                                            <i class="fas fa-chevron-down"></i>
-                                        </button>
-                                        <div class="user-dropdown-content">
-                                            <a href="#" id="openProfileModal" class="user-name">
-                                                <i class="fas fa-user"></i> {{ request.user.username }}
+                </form>
+                <div class="header-right">
+                    <span class="total-debt">
+                        {% if request.statistics.umumi_borc < 0 %}
+                            <span style="color: #28a745; font-weight: bold;">Balans +{{ request.statistics.umumi_borc|floatformat:2|slice:'1:' }} ₼</span>
+                        {% else %}
+                            <i class="fas fa-money-bill-wave"></i> Borc: {{ request.statistics.umumi_borc|floatformat:2 }} ₼
+                        {% endif %}
+                    </span>
+                    <nav class="main-nav">
+                        <ul>
+                            <li><a href="#" class="nav-link nav-link-sm blink-news" id="yeniliklerLink"><i class="fas fa-bullhorn"></i> Yeniliklər</a></li>
+                            <li><a href="{% url 'products' %}" class="nav-link nav-link-sm {% if request.resolver_match.url_name == 'products' %}active{% endif %}"><i class="fas fa-box"></i> Məhsullar</a></li>
+                            <li><a href="{% url 'new_products' %}" class="nav-link nav-link-sm {% if request.resolver_match.url_name == 'new_products' %}active{% endif %}"><i class="fas fa-star"></i> Yeni Məhsullar</a></li>
+                            <li><a href="{% url 'orders' %}" class="nav-link nav-link-sm {% if request.resolver_match.url_name == 'orders' %}active{% endif %}"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a></li>
+                            <li>
+                                <a href="tel:+994702754499" class="nav-link nav-link-sm">
+                                    <i class="fas fa-phone"></i> +994 70 275 44 99
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="nav-link nav-link-sm {% if request.resolver_match.url_name == 'cart' %}active{% endif %}" id="cartSidebarToggle">
+                                    <span class="cart-icon">
+                                        <i class="fas fa-shopping-cart"></i>
+                                        <span class="cart-counter">{{ request.session.cart|length }}</span>
+                                    </span>
+                                    Səbət
+                                </a>
+                            </li>
+                            <li class="user-menu">
+                                <div class="user-dropdown">
+                                    <button class="user-button">
+                                        <i class="fas fa-user"></i>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                    <div class="user-dropdown-content">
+                                        <a href="#" id="openProfileModal" class="user-name">
+                                            <i class="fas fa-user"></i> {{ request.user.username }}
+                                        </a>
+                                        {% if user.is_authenticated %}
+                                            <a href="{% url 'my_products' %}" class="my-pr">
+                                                {% if not user.profile.is_verified %}
+                                                    <i class="fas fa-lock icon-locked"></i> Mənim Məhsullarım
+                                                {% else %}
+                                                    <i class="fas fa-box"></i> Mənim Məhsullarım
+                                                {% endif %}
                                             </a>
-                                            {% if user.is_authenticated %}
-                                                <a href="{% url 'my_products' %}" class="my-pr">
-                                                    {% if not user.profile.is_verified %}
-                                                        <i class="fas fa-lock icon-locked"></i> Mənim Məhsullarım
-                                                    {% else %}
-                                                        <i class="fas fa-box"></i> Mənim Məhsullarım
-                                                    {% endif %}
-                                                </a>
-                                                <a href="{% url 'my_sales' %}" class="mr-sls">
-                                                    {% if not user.profile.is_verified %}
-                                                        <i class="fas fa-lock icon-locked"></i> Mənə gələn sifarişlər
-                                                    {% else %}
-                                                        <i class="fas fa-receipt"></i> Mənə gələn sifarişlər
-                                                    {% endif %}
-                                                    <span id="salesBadge" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span>
-                                                </a>
-                                            {% endif %}
-                                            <a href="{% url 'logout' %}" class="logout-link">
-                                                <i class="fas fa-sign-out-alt"></i> Çıxış et
+                                            <a href="{% url 'my_sales' %}" class="mr-sls">
+                                                {% if not user.profile.is_verified %}
+                                                    <i class="fas fa-lock icon-locked"></i> Mənə gələn sifarişlər
+                                                {% else %}
+                                                    <i class="fas fa-receipt"></i> Mənə gələn sifarişlər
+                                                {% endif %}
+                                                <span id="salesBadge" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span>
                                             </a>
-                                        </div>
+                                        {% endif %}
+                                        <a href="{% url 'logout' %}" class="logout-link">
+                                            <i class="fas fa-sign-out-alt"></i> Çıxış et
+                                        </a>
                                     </div>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </header>

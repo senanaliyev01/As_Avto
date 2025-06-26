@@ -99,31 +99,17 @@ def home_view(request):
 @login_required
 def products_view(request):
     search_query = request.GET.get('search', '')
-    kateqoriya = request.GET.get('kateqoriya', '')
-    firma = request.GET.get('firma', '')
-    avtomobil = request.GET.get('avtomobil', '')
-    satici = request.GET.get('satici', '')
-    
     mehsullar = Mehsul.objects.all().order_by('?')
     popup_images = PopupImage.objects.filter(aktiv=True)
-    
     if search_query:
-        # Kodlarla axtarış üçün əvvəlki təmizləmə
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
-        
-        # İki ayrı filter tətbiq edək
         if clean_search:
-            # Kod və ölçü ilə axtarış
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
-            # brend_kod üçün həm istifadəçi sorğusunu, həm də brend_kod-u təmizləyib müqayisə edirik
             def clean_code(val):
                 return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
-            # Bütün məhsulları çəkib, təmizlənmiş brend_kod ilə uyğunluq tapanları tapırıq
             brend_kod_ids = [m.id for m in Mehsul.objects.all() if clean_code(search_query) in clean_code(m.brend_kod)]
             brend_kod_filter = Q(id__in=brend_kod_ids)
-            
-            # Ad ilə təkmilləşdirilmiş axtarış
             processed_query = re.sub(r'\s+', ' ', search_query).strip()
             search_words = processed_query.split()
             if search_words:
@@ -136,41 +122,12 @@ def products_view(request):
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter)
             else:
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)
-    
-    if kateqoriya:
-        mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)
-        
-    if firma:
-        mehsullar = mehsullar.filter(firma__adi=firma)
-        
-    if avtomobil:
-        mehsullar = mehsullar.filter(avtomobil__adi=avtomobil)
-    
-    if satici:
-        if satici == '0':
-            mehsullar = mehsullar.filter(sahib=None)
-        else:
-            mehsullar = mehsullar.filter(sahib_id=satici)
-    
-    # İlk 5 məhsulu götür
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
-    
-    kateqoriyalar = Kateqoriya.objects.all()
-    firmalar = Firma.objects.all()
-    avtomobiller = Avtomobil.objects.all()
-    
     return render(request, 'products.html', {
         'mehsullar': initial_products,
         'has_more': has_more,
-        'kateqoriyalar': kateqoriyalar,
-        'firmalar': firmalar,
-        'avtomobiller': avtomobiller,
         'search_query': search_query,
-        'selected_kateqoriya': kateqoriya,
-        'selected_firma': firma,
-        'selected_avtomobil': avtomobil,
-        'selected_satici': satici,
         'popup_images': popup_images
     })
 
@@ -179,64 +136,24 @@ def load_more_products(request):
     offset = int(request.GET.get('offset', 0))
     limit = 5
     search_query = request.GET.get('search', '')
-    kateqoriya = request.GET.get('kateqoriya', '')
-    firma = request.GET.get('firma', '')
-    avtomobil = request.GET.get('avtomobil', '')
-    satici = request.GET.get('satici', '')
-    
     mehsullar = Mehsul.objects.all().order_by('?')
-    
     if search_query:
-        # Kodlarla axtarış üçün əvvəlki təmizləmə
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
-        
-        # İki ayrı filter tətbiq edək
         if clean_search:
-            # Kod ilə axtarış
             kod_filter = Q(kodlar__icontains=clean_search)
-            brend_kod_filter = Q(brend_kod__icontains=search_query)  # Sade brend_kod axtarışı
-            
-            # Ad ilə təkmilləşdirilmiş axtarış
-            # Çoxlu boşluq və təbləri tək boşluğa çeviririk
+            brend_kod_filter = Q(brend_kod__icontains=search_query)
             processed_query = re.sub(r'\s+', ' ', search_query).strip()
-            
-            # Axtarış sözlərini ayırırıq
             search_words = processed_query.split()
-            
             if search_words:
-                # Hər bir söz məhsulun adında olmalıdır (sıradan asılı olmayaraq)
                 ad_filters = []
                 for word in search_words:
                     ad_filters.append(Q(adi__icontains=word))
-                
-                # "AND" operatoru ilə birləşdiririk - bütün sözlər olmalıdır
                 ad_filter = reduce(and_, ad_filters)
-                
-                # Kod, brend_kod və ad filterini "OR" operatoru ilə birləşdiririk
                 mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | ad_filter)
             else:
-                # Əgər heç bir söz yoxdursa, yalnız kod və brend_kod ilə axtarış
                 mehsullar = mehsullar.filter(kod_filter | brend_kod_filter)
-    
-    if kateqoriya:
-        mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)
-        
-    if firma:
-        mehsullar = mehsullar.filter(firma__adi=firma)
-        
-    if avtomobil:
-        mehsullar = mehsullar.filter(avtomobil__adi=avtomobil)
-    
-    if satici:
-        if satici == '0':
-            mehsullar = mehsullar.filter(sahib=None)
-        else:
-            mehsullar = mehsullar.filter(sahib_id=satici)
-    
-    # Get next batch of products
     products = mehsullar[offset:offset + limit]
     has_more = mehsullar.count() > (offset + limit)
-    
     products_data = []
     for product in products:
         products_data.append({
@@ -252,7 +169,6 @@ def load_more_products(request):
             'sahib_id': product.sahib.id if product.sahib else None,
             'sahib_username': product.sahib.username if product.sahib else 'AS-AVTO',
         })
-    
     return JsonResponse({
         'products': products_data,
         'has_more': has_more

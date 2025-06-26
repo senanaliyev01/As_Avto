@@ -27,16 +27,22 @@
         <!-- Header -->
         <header class="header">
             <div class="container">
-                <div class="header-content">
+                <div class="header-content new-header-layout">
                     <div class="logo">
                         <a href="{% url 'base' %}">
                             <img src="{% static 'images/Header_Logo.png' %}" alt="AS-AVTO" class="logo-img">
                         </a>
                     </div>
-                    <div class="header-right">
+                    <div class="header-links">
+                        <span class="total-debt">
+                            {% if request.statistics.umumi_borc < 0 %}
+                                <span style="color: #28a745; font-weight: bold;">Balans +{{ request.statistics.umumi_borc|floatformat:2|slice:'1:' }} ₼</span>
+                            {% else %}
+                                <i class="fas fa-money-bill-wave"></i> Borc: {{ request.statistics.umumi_borc|floatformat:2 }} ₼
+                            {% endif %}
+                        </span>
                         <nav class="main-nav">
                             <ul>
-                                <!-- <li><a href="{% url 'base' %}" class="nav-link {% if request.resolver_match.url_name == 'base' %}active{% endif %}"><i class="fas fa-home"></i> Ana Səhifə</a></li> -->
                                 <li><a href="#" class="nav-link blink-news" id="yeniliklerLink"><i class="fas fa-bullhorn"></i> Yeniliklər</a></li>
                                 <li><a href="{% url 'products' %}" class="nav-link {% if request.resolver_match.url_name == 'products' %}active{% endif %}"><i class="fas fa-box"></i> Məhsullar</a></li>
                                 <li><a href="{% url 'new_products' %}" class="nav-link {% if request.resolver_match.url_name == 'new_products' %}active{% endif %}"><i class="fas fa-star"></i> Yeni Məhsullar</a></li>
@@ -94,104 +100,6 @@
                 </div>
             </div>
         </header>
-
-        <!-- Search Section -->
-        <div class="search-section">
-            <div class="container">
-                <form method="get" action="{% url 'products' %}" class="search-form">
-                    <div class="search-grid">
-                        <div class="search-item">
-                            <div class="custom-dropdown" id="category-dropdown">
-                                <input type="text" class="dropdown-search-input" placeholder="Kateqoriya axtar...">
-                                <div class="dropdown-options">
-                                    <div class="dropdown-option" data-value="">Bütün Kateqoriyalar</div>
-                                    {% for category in request.categories %}
-                                    <div class="dropdown-option" data-value="{{ category.adi }}">{{ category.adi }}</div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                            <select id="category" name="kateqoriya" style="display:none;">
-                                <option value="">Bütün Kateqoriyalar</option>
-                                {% for category in request.categories %}
-                                <option value="{{ category.adi }}" {% if request.GET.kateqoriya == category.adi %}selected{% endif %}>{{ category.adi }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="search-item">
-                            <div class="custom-dropdown" id="brand-dropdown">
-                                <input type="text" class="dropdown-search-input" placeholder="Firma axtar...">
-                                <div class="dropdown-options">
-                                    <div class="dropdown-option" data-value="">Bütün Firmalar</div>
-                                    {% for brand in request.brands %}
-                                    <div class="dropdown-option" data-value="{{ brand.adi }}">{{ brand.adi }}</div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                            <select id="brand" name="firma" style="display:none;">
-                                <option value="">Bütün Firmalar</option>
-                                {% for brand in request.brands %}
-                                <option value="{{ brand.adi }}" {% if request.GET.firma == brand.adi %}selected{% endif %}>{{ brand.adi }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="search-item">
-                            <div class="custom-dropdown" id="model-dropdown">
-                                <input type="text" class="dropdown-search-input" placeholder="Model axtar...">
-                                <div class="dropdown-options">
-                                    <div class="dropdown-option" data-value="">Bütün Avtomobillər</div>
-                                    {% for model in request.models %}
-                                    <div class="dropdown-option" data-value="{{ model.adi }}">{{ model.adi }}</div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                            <select id="model" name="avtomobil" style="display:none;">
-                                <option value="">Bütün Avtomobillər</option>
-                                {% for model in request.models %}
-                                <option value="{{ model.adi }}" {% if request.GET.avtomobil == model.adi %}selected{% endif %}>{{ model.adi }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="search-item">
-                            <div class="custom-dropdown" id="seller-dropdown">
-                                <input type="text" class="dropdown-search-input" placeholder="Satıcı axtar...">
-                                <div class="dropdown-options">
-                                    <div class="dropdown-option" data-value="">Bütün Satıcılar</div>
-                                    
-                                    {% for seller in request.sellers|slice:'1:' %}
-                                    <div class="dropdown-option" data-value="{{ seller.id }}">{{ seller.username }}</div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                            <select id="seller" name="satici" style="display:none;">
-                                <option value="">Bütün Satıcılar</option>
-                                <option value="0" {% if request.GET.satici == '0' %}selected{% endif %}>AS-AVTO</option>
-                                {% for seller in request.sellers|slice:'1:' %}
-                                <option value="{{ seller.id }}" {% if request.GET.satici == seller.id|stringformat:'s' %}selected{% endif %}>{{ seller.username }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="search-item">
-                            <div class="search-container">
-                                <input type="text" id="query" name="search" placeholder="Kodu daxil edin..." value="{{ request.GET.search }}" autocomplete="off">
-                                <div id="search-results" class="search-results"></div>
-                            </div>
-                        </div>
-                        <div class="search-item search-button">
-                            <button type="submit" class="search-icon-button">
-                                <i class="fas fa-search"></i>
-                            </button>
-                            <span class="total-debt">
-                                {% if request.statistics.umumi_borc < 0 %}
-                                    <span style="color: #28a745; font-weight: bold;">Balans +{{ request.statistics.umumi_borc|floatformat:2|slice:'1:' }} ₼</span>
-                                {% else %}
-                                    <i class="fas fa-money-bill-wave"></i> Borc: {{ request.statistics.umumi_borc|floatformat:2 }} ₼
-                                {% endif %}
-                            </span>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
 
         {% if request.header_messages %}
         <div class="header-message">

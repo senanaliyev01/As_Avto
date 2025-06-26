@@ -322,7 +322,7 @@
                         <i class="fas fa-lock icon-locked"></i> Mənə gələn sifarişlər
                     </a>
                 {% else %}
-                    <a href="{% url 'my_sales' %}"><i class="fas fa-receipt"></i> Mənə gələn sifarişlər <span id="salesBadgeSidebar" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span></a>
+                    <a href="{% url 'my_sales' %}"><i class="fas fa-receipt"></i> Mənə gələn sifarişlər <span id="salesBadgeSidebar" class="sales-badge-sidebar" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span></a>
                 {% endif %}
             </li>
             <li><a href="{% url 'products' %}"><i class="fas fa-box"></i> Məhsullar</a></li>

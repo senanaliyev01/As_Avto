@@ -25,7 +25,9 @@
         <!-- Header -->
         <header class="header">
             <div class="header-content header-search-layout">
-                <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+                <div class="header-menu-btn">
+                    <button id="sideMenuToggle" class="side-menu-btn"><i class="fas fa-bars"></i></button>
+                </div>
                 <div class="logo">
                     <a href="{% url 'base' %}">
                         <img src="{% static 'images/Header_Logo.png' %}" alt="AS-AVTO" class="logo-img">
@@ -317,17 +319,17 @@
         </div>
     </div>
 
-    <!-- Sidebar (slide-out) -->
-    <div id="sidebarNav" class="sidebar-nav">
-        <div class="sidebar-nav-content">
-            <button class="sidebar-close" id="sidebarClose"><i class="fas fa-times"></i></button>
-            <ul>
+    <!-- Side Navbar -->
+    <div id="sideNavbar" class="side-navbar">
+        <div class="side-navbar-content">
+            <button id="sideNavbarClose" class="side-navbar-close"><i class="fas fa-times"></i></button>
+            <ul class="side-navbar-links">
                 <li><a href="{% url 'products' %}"><i class="fas fa-box"></i> Məhsullar</a></li>
                 <li><a href="{% url 'new_products' %}"><i class="fas fa-star"></i> Yeni Məhsullar</a></li>
                 <li><a href="{% url 'orders' %}"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a></li>
             </ul>
         </div>
-        <div class="sidebar-nav-overlay" id="sidebarOverlay"></div>
+        <div class="side-navbar-overlay"></div>
     </div>
 </body>
 </html>

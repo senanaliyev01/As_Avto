@@ -151,32 +151,32 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Sidebar açılıb-bağlanması üçün
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const sidebarNav = document.getElementById('sidebarNav');
-    const sidebarClose = document.getElementById('sidebarClose');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-    if (sidebarToggle && sidebarNav && sidebarClose && sidebarOverlay) {
-        sidebarToggle.addEventListener('click', function(e) {
+    // Side Navbar açılıb-bağlanması
+    const sideMenuToggle = document.getElementById('sideMenuToggle');
+    const sideNavbar = document.getElementById('sideNavbar');
+    const sideNavbarClose = document.getElementById('sideNavbarClose');
+    const sideNavbarOverlay = document.querySelector('.side-navbar-overlay');
+    if (sideMenuToggle && sideNavbar && sideNavbarClose && sideNavbarOverlay) {
+        sideMenuToggle.addEventListener('click', function(e) {
             e.preventDefault();
-            sidebarNav.classList.add('active');
-            sidebarOverlay.style.display = 'block';
+            sideNavbar.classList.add('active');
+            sideNavbarOverlay.style.display = 'block';
             document.body.style.overflow = 'hidden';
         });
-        sidebarClose.addEventListener('click', function() {
-            sidebarNav.classList.remove('active');
-            sidebarOverlay.style.display = 'none';
+        sideNavbarClose.addEventListener('click', function() {
+            sideNavbar.classList.remove('active');
+            sideNavbarOverlay.style.display = 'none';
             document.body.style.overflow = '';
         });
-        sidebarOverlay.addEventListener('click', function() {
-            sidebarNav.classList.remove('active');
-            sidebarOverlay.style.display = 'none';
+        sideNavbarOverlay.addEventListener('click', function() {
+            sideNavbar.classList.remove('active');
+            sideNavbarOverlay.style.display = 'none';
             document.body.style.overflow = '';
         });
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && sidebarNav.classList.contains('active')) {
-                sidebarNav.classList.remove('active');
-                sidebarOverlay.style.display = 'none';
+            if (e.key === 'Escape' && sideNavbar.classList.contains('active')) {
+                sideNavbar.classList.remove('active');
+                sideNavbarOverlay.style.display = 'none';
                 document.body.style.overflow = '';
             }
         });

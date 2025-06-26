@@ -15,19 +15,17 @@
     <div class="wrapper">
         <!-- Global Statistics Bar -->
         <div class="global-stats-bar global-stats-bar-header">
-            <div class="global-stats-bar-content">
-                <span><b>İstifadəçi sayı:</b> {{ request.total_user_count }}</span>
-                <span><b>Satıcı sayı:</b> {{ request.total_seller_count }}</span>
-                <span><b>Məhsul sayı:</b> {{ request.total_product_count }}</span>
-                <span><b>Firma sayı:</b> {{ request.total_firma_count }}</span>
+                <div class="global-stats-bar-content">
+                    <span><b>İstifadəçi sayı:</b> {{ request.total_user_count }}</span>
+                    <span><b>Satıcı sayı:</b> {{ request.total_seller_count }}</span>
+                    <span><b>Məhsul sayı:</b> {{ request.total_product_count }}</span>
+                    <span><b>Firma sayı:</b> {{ request.total_firma_count }}</span>
             </div>
         </div>
         <!-- Header -->
         <header class="header">
             <div class="header-content header-search-layout">
-                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Menyu aç">
-                    <i class="fas fa-bars"></i>
-                </button>
+                <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
                 <div class="logo">
                     <a href="{% url 'base' %}">
                         <img src="{% static 'images/Header_Logo.png' %}" alt="AS-AVTO" class="logo-img">
@@ -319,19 +317,17 @@
         </div>
     </div>
 
-    <!-- Sidebar Offcanvas -->
-    <div id="sidebar" class="sidebar-offcanvas">
-        <div class="sidebar-header">
-            <span class="sidebar-title">Menyu</span>
-            <button class="sidebar-close" id="sidebarClose" aria-label="Bağla"><i class="fas fa-times"></i></button>
+    <!-- Sidebar (slide-out) -->
+    <div id="sidebarNav" class="sidebar-nav">
+        <div class="sidebar-nav-content">
+            <button class="sidebar-close" id="sidebarClose"><i class="fas fa-times"></i></button>
+            <ul>
+                <li><a href="{% url 'products' %}"><i class="fas fa-box"></i> Məhsullar</a></li>
+                <li><a href="{% url 'new_products' %}"><i class="fas fa-star"></i> Yeni Məhsullar</a></li>
+                <li><a href="{% url 'orders' %}"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a></li>
+            </ul>
         </div>
-        <ul class="sidebar-menu">
-            <li><a href="{% url 'products' %}"><i class="fas fa-box"></i> Məhsullar</a></li>
-            <li><a href="{% url 'new_products' %}"><i class="fas fa-star"></i> Yeni Məhsullar</a></li>
-            <li><a href="{% url 'orders' %}"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a></li>
-            <li><a href="#" id="yeniliklerLinkSidebar"><i class="fas fa-bullhorn"></i> Yeniliklər</a></li>
-            <li><a href="{% url 'cart' %}"><i class="fas fa-shopping-cart"></i> Səbət</a></li>
-        </ul>
+        <div class="sidebar-nav-overlay" id="sidebarOverlay"></div>
     </div>
 </body>
 </html>

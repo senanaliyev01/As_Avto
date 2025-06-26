@@ -151,7 +151,36 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    initializeSidebar();
+    // Sidebar açılıb-bağlanması üçün
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebarNav = document.getElementById('sidebarNav');
+    const sidebarClose = document.getElementById('sidebarClose');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    if (sidebarToggle && sidebarNav && sidebarClose && sidebarOverlay) {
+        sidebarToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            sidebarNav.classList.add('active');
+            sidebarOverlay.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        });
+        sidebarClose.addEventListener('click', function() {
+            sidebarNav.classList.remove('active');
+            sidebarOverlay.style.display = 'none';
+            document.body.style.overflow = '';
+        });
+        sidebarOverlay.addEventListener('click', function() {
+            sidebarNav.classList.remove('active');
+            sidebarOverlay.style.display = 'none';
+            document.body.style.overflow = '';
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && sidebarNav.classList.contains('active')) {
+                sidebarNav.classList.remove('active');
+                sidebarOverlay.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        });
+    }
 });
 
 function initializeSearch() {
@@ -1299,45 +1328,5 @@ function initializeProfileModal() {
             alert('Xəta baş verdi!');
         });
     });
-}
-
-function initializeSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const sidebarClose = document.getElementById('sidebarClose');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-    const yeniliklerLinkSidebar = document.getElementById('yeniliklerLinkSidebar');
-
-    if (!sidebar || !sidebarToggle || !sidebarClose || !sidebarOverlay) return;
-
-    function openSidebar() {
-        sidebar.classList.add('active');
-        sidebarOverlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-    function closeSidebar() {
-        sidebar.classList.remove('active');
-        sidebarOverlay.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-    sidebarToggle.addEventListener('click', openSidebar);
-    sidebarClose.addEventListener('click', closeSidebar);
-    sidebarOverlay.addEventListener('click', closeSidebar);
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && sidebar.classList.contains('active')) {
-            closeSidebar();
-        }
-    });
-    // Sidebar-dakı Yeniliklər linki popup modalı açsın
-    if (yeniliklerLinkSidebar) {
-        yeniliklerLinkSidebar.addEventListener('click', function(e) {
-            e.preventDefault();
-            closeSidebar();
-            const yeniliklerLink = document.getElementById('yeniliklerLink');
-            if (yeniliklerLink) {
-                yeniliklerLink.click();
-            }
-        });
-    }
 }
 

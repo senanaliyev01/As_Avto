@@ -14,14 +14,12 @@
 <body>
     <div class="wrapper">
         <!-- Global Statistics Bar -->
-        <div class="global-stats-bar">
-            <div class="container">
-                <div class="global-stats-bar-content">
-                    <span><b>İstifadəçi sayı:</b> {{ request.total_user_count }}</span>
-                    <span><b>Satıcı sayı:</b> {{ request.total_seller_count }}</span>
-                    <span><b>Məhsul sayı:</b> {{ request.total_product_count }}</span>
-                    <span><b>Firma sayı:</b> {{ request.total_firma_count }}</span>
-                </div>
+        <div class="global-stats-bar global-stats-bar-header">
+            <div class="global-stats-bar-content">
+                <span><b>İstifadəçi sayı:</b> {{ request.total_user_count }}</span>
+                <span><b>Satıcı sayı:</b> {{ request.total_seller_count }}</span>
+                <span><b>Məhsul sayı:</b> {{ request.total_product_count }}</span>
+                <span><b>Firma sayı:</b> {{ request.total_firma_count }}</span>
             </div>
         </div>
         <!-- Header -->
@@ -53,11 +51,6 @@
                             <li><a href="{% url 'products' %}" class="nav-link nav-link-sm {% if request.resolver_match.url_name == 'products' %}active{% endif %}"><i class="fas fa-box"></i> Məhsullar</a></li>
                             <li><a href="{% url 'new_products' %}" class="nav-link nav-link-sm {% if request.resolver_match.url_name == 'new_products' %}active{% endif %}"><i class="fas fa-star"></i> Yeni Məhsullar</a></li>
                             <li><a href="{% url 'orders' %}" class="nav-link nav-link-sm {% if request.resolver_match.url_name == 'orders' %}active{% endif %}"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a></li>
-                            <li>
-                                <a href="tel:+994702754499" class="nav-link nav-link-sm">
-                                    <i class="fas fa-phone"></i> +994 70 275 44 99
-                                </a>
-                            </li>
                             <li>
                                 <a href="#" class="nav-link nav-link-sm {% if request.resolver_match.url_name == 'cart' %}active{% endif %}" id="cartSidebarToggle">
                                     <span class="cart-icon">

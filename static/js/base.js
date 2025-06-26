@@ -176,8 +176,9 @@ function initializeSearch() {
                                         <div class="search-result-info">
                                             <div class="search-result-title">${item.adi}</div>
                                             <div class="search-result-details">
-                                                Kodu: ${item.brend_kod}<br>
-                                                ${item.olcu ? `Ölçü: ${item.olcu}` : ''}
+                                                <b>Kod:</b> ${item.brend_kod}<br>
+                                                ${item.oem ? `<b>OEM:</b> ${item.oem}<br>` : ''}
+                                                ${item.olcu ? `<b>Ölçü:</b> ${item.olcu}<br>` : ''}
                                             </div>
                                             <div class="search-result-seller"><i class="fas fa-user"></i> ${item.satici || 'AS-AVTO'}</div>
                                         </div>

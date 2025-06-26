@@ -52,41 +52,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // Real-time sales notification
     let lastSalesCount = parseInt(localStorage.getItem('lastSalesCount') || '0', 10);
     let salesSound = null;
-    let audioUnlocked = false;
-    let audioBlockedWarned = false;
-
-    function unlockAudio() {
-        if (!salesSound) {
-            salesSound = new Audio('/static/sounds/new_order.mp3');
-        }
-        // Try to play and pause immediately to unlock
-        salesSound.play().then(() => {
-            salesSound.pause();
-            salesSound.currentTime = 0;
-            audioUnlocked = true;
-        }).catch(() => {
-            // Still blocked
-            audioUnlocked = false;
-        });
-    }
-    // İlk interaction-da audio unlock
-    window.addEventListener('click', unlockAudio, { once: true });
-    window.addEventListener('keydown', unlockAudio, { once: true });
 
     function playSalesSound() {
-        if (!salesSound) {
-            salesSound = new Audio('/static/sounds/new_order.mp3');
-        }
-        if (audioUnlocked) {
-            salesSound.play().catch(() => {
-                if (!audioBlockedWarned) {
-                    showMessage('error', 'Brauzer səsin səslənməsinə icazə vermir. Səsi aktiv etmək üçün səhifəyə klik edin.');
-                    audioBlockedWarned = true;
-                }
+        try {
+            const audio = new Audio('/static/sounds/new_order.mp3');
+            audio.currentTime = 0;
+            audio.play().catch((err) => {
+                // Səs çalınmadısa istifadəçiyə xəbərdarlıq göstər
+                showMessage('error', 'Sifariş bildiriş səsi çalına bilmədi. Zəhmət olmasa brauzerinizin səs və autoplay icazələrini yoxlayın.');
+                console.warn('Audio play error:', err);
             });
-        } else {
-            // Hələ unlock edilməyib, unlock etməyə çalış
-            unlockAudio();
+        } catch (e) {
+            showMessage('error', 'Sifariş bildiriş səsi çalına bilmədi.');
+            console.error('Audio play exception:', e);
         }
     }
 

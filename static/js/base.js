@@ -62,24 +62,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateSalesBadge(count) {
         const badge = document.getElementById('salesBadge');
-        const badgeSidebar = document.getElementById('salesBadgeSidebar');
-        if (badge) {
-            if (count > 0) {
-                badge.textContent = count;
-                badge.style.display = 'inline-block';
-            } else {
-                badge.textContent = '0';
-                badge.style.display = 'none';
-            }
-        }
-        if (badgeSidebar) {
-            if (count > 0) {
-                badgeSidebar.textContent = count;
-                badgeSidebar.style.display = 'inline-block';
-            } else {
-                badgeSidebar.textContent = '';
-                badgeSidebar.style.display = 'none';
-            }
+        if (!badge) return;
+        if (count > 0) {
+            badge.textContent = count;
+            badge.style.display = 'inline-block';
+        } else {
+            badge.textContent = '0';
+            badge.style.display = 'none';
         }
     }
 
@@ -1318,6 +1307,7 @@ function initializeSidebarNav() {
     const toggle = document.getElementById('sidebarToggle');
     const closeBtn = document.getElementById('sidebarClose');
     const salesBadgeSidebar = document.getElementById('salesBadgeSidebar');
+    const mySalesLink = document.getElementById('sidebarMySalesLink');
     // Aç
     if (toggle && sidebar && overlay) {
         toggle.addEventListener('click', function(e) {
@@ -1325,6 +1315,8 @@ function initializeSidebarNav() {
             sidebar.classList.add('active');
             overlay.classList.add('active');
             document.body.style.overflow = 'hidden';
+            // Sidebar açıldıqda badge-i yenilə
+            pollSidebarSalesBadge();
         });
     }
     // Bağla
@@ -1342,15 +1334,35 @@ function initializeSidebarNav() {
             document.body.style.overflow = '';
         });
     }
-    // Sifariş badge-i dəstəklə
-    const badgeMain = document.getElementById('salesBadge');
-    if (salesBadgeSidebar && badgeMain) {
-        salesBadgeSidebar.textContent = badgeMain.textContent;
-        if (badgeMain.style.display !== 'none') {
-            salesBadgeSidebar.style.display = 'inline-block';
-        } else {
-            salesBadgeSidebar.style.display = 'none';
-        }
+    // Real-time badge üçün polling
+    function pollSidebarSalesBadge() {
+        fetch('/api/unread-sales-count/', { credentials: 'same-origin' })
+            .then(res => res.json())
+            .then(data => {
+                if (typeof data.count === 'number' && salesBadgeSidebar) {
+                    if (data.count > 0) {
+                        salesBadgeSidebar.textContent = data.count;
+                        salesBadgeSidebar.style.display = 'inline-block';
+                    } else {
+                        salesBadgeSidebar.textContent = '0';
+                        salesBadgeSidebar.style.display = 'none';
+                    }
+                }
+            });
+    }
+    setInterval(pollSidebarSalesBadge, 10000);
+    pollSidebarSalesBadge();
+    // Linkə kliklədikdə sayğacı sıfırla
+    if (mySalesLink) {
+        mySalesLink.addEventListener('click', function() {
+            fetch('/api/unread-sales-count/', { method: 'POST', credentials: 'same-origin' })
+                .then(() => {
+                    if (salesBadgeSidebar) {
+                        salesBadgeSidebar.textContent = '0';
+                        salesBadgeSidebar.style.display = 'none';
+                    }
+                });
+        });
     }
 }
 

@@ -151,36 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Side Navbar açılıb-bağlanması
-    const sideMenuToggle = document.getElementById('sideMenuToggle');
-    const sideNavbar = document.getElementById('sideNavbar');
-    const sideNavbarClose = document.getElementById('sideNavbarClose');
-    const sideNavbarOverlay = document.querySelector('.side-navbar-overlay');
-    if (sideMenuToggle && sideNavbar && sideNavbarClose && sideNavbarOverlay) {
-        sideMenuToggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            sideNavbar.classList.add('active');
-            sideNavbarOverlay.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        });
-        sideNavbarClose.addEventListener('click', function() {
-            sideNavbar.classList.remove('active');
-            sideNavbarOverlay.style.display = 'none';
-            document.body.style.overflow = '';
-        });
-        sideNavbarOverlay.addEventListener('click', function() {
-            sideNavbar.classList.remove('active');
-            sideNavbarOverlay.style.display = 'none';
-            document.body.style.overflow = '';
-        });
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && sideNavbar.classList.contains('active')) {
-                sideNavbar.classList.remove('active');
-                sideNavbarOverlay.style.display = 'none';
-                document.body.style.overflow = '';
-            }
-        });
-    }
+    initializeSidebarMenu();
 });
 
 function initializeSearch() {
@@ -1327,6 +1298,42 @@ function initializeProfileModal() {
         .catch(() => {
             alert('Xəta baş verdi!');
         });
+    });
+}
+
+function initializeSidebarMenu() {
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebarMenu = document.getElementById('sidebarMenu');
+    const sidebarClose = document.getElementById('sidebarClose');
+    const sidebarOverlay = document.querySelector('.sidebar-menu-overlay');
+    if (!sidebarToggle || !sidebarMenu || !sidebarClose || !sidebarOverlay) return;
+
+    function openSidebar() {
+        sidebarMenu.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        sidebarOverlay.style.display = 'block';
+    }
+    function closeSidebar() {
+        sidebarMenu.classList.remove('active');
+        document.body.style.overflow = '';
+        sidebarOverlay.style.display = 'none';
+    }
+    sidebarToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        openSidebar();
+    });
+    sidebarClose.addEventListener('click', function(e) {
+        e.preventDefault();
+        closeSidebar();
+    });
+    sidebarOverlay.addEventListener('click', function(e) {
+        e.preventDefault();
+        closeSidebar();
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && sidebarMenu.classList.contains('active')) {
+            closeSidebar();
+        }
     });
 }
 

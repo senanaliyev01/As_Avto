@@ -740,22 +740,24 @@ body {
 /* --- Realtime Search (Canlı Axtarış) Professional Dizayn --- */
 .search-results {
     display: none;
-    position: fixed;
-    top: 255px;
-    left: 50%;
-    transform: translateX(-50%);
+    position: absolute;
+    left: 0;
+    top: 100%;
     width: 100%;
-    max-width: 520px;
     background: #fff;
     border: 1.5px solid #e9ecef;
-    border-radius: 16px;
+    border-top: none;
+    border-radius: 0 0 18px 18px;
     box-shadow: 0 8px 32px rgba(44,62,80,0.13);
     z-index: 1000;
     max-height: 420px;
     overflow-y: auto;
     padding: 0;
-    margin: 0 auto;
+    margin: 0;
     transition: box-shadow 0.2s;
+}
+.search-result-item:first-child {
+    border-radius: 0;
 }
 .search-result-item {
     display: flex;
@@ -819,18 +821,11 @@ body {
 }
 @media (max-width: 600px) {
     .search-results {
-        top: auto;
-        bottom: 0;
         left: 0;
         right: 0;
-        transform: none;
         width: 100%;
         max-width: 100vw;
-        max-height: 60vh;
-        border-radius: 12px 12px 0 0;
-        box-shadow: 0 -2px 12px rgba(44,62,80,0.13);
-        margin: 0;
-        padding: 0;
+        border-radius: 0 0 14px 14px;
     }
     .search-result-item {
         gap: 8px;

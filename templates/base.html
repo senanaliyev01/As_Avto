@@ -25,6 +25,9 @@
         <!-- Header -->
         <header class="header">
             <div class="header-content header-search-layout">
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Menyu aç">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <div class="logo">
                     <a href="{% url 'base' %}">
                         <img src="{% static 'images/Header_Logo.png' %}" alt="AS-AVTO" class="logo-img">
@@ -48,9 +51,6 @@
                     <nav class="main-nav">
                         <ul>
                             <li><a href="#" class="nav-link nav-link-sm blink-news" id="yeniliklerLink"><i class="fas fa-bullhorn"></i> Yeniliklər</a></li>
-                            <li><a href="{% url 'products' %}" class="nav-link nav-link-sm {% if request.resolver_match.url_name == 'products' %}active{% endif %}"><i class="fas fa-box"></i> Məhsullar</a></li>
-                            <li><a href="{% url 'new_products' %}" class="nav-link nav-link-sm {% if request.resolver_match.url_name == 'new_products' %}active{% endif %}"><i class="fas fa-star"></i> Yeni Məhsullar</a></li>
-                            <li><a href="{% url 'orders' %}" class="nav-link nav-link-sm {% if request.resolver_match.url_name == 'orders' %}active{% endif %}"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a></li>
                             <li>
                                 <a href="#" class="nav-link nav-link-sm {% if request.resolver_match.url_name == 'cart' %}active{% endif %}" id="cartSidebarToggle">
                                     <span class="cart-icon">
@@ -317,6 +317,21 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Sidebar Offcanvas -->
+    <div id="sidebar" class="sidebar-offcanvas">
+        <div class="sidebar-header">
+            <span class="sidebar-title">Menyu</span>
+            <button class="sidebar-close" id="sidebarClose" aria-label="Bağla"><i class="fas fa-times"></i></button>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="{% url 'products' %}"><i class="fas fa-box"></i> Məhsullar</a></li>
+            <li><a href="{% url 'new_products' %}"><i class="fas fa-star"></i> Yeni Məhsullar</a></li>
+            <li><a href="{% url 'orders' %}"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a></li>
+            <li><a href="#" id="yeniliklerLinkSidebar"><i class="fas fa-bullhorn"></i> Yeniliklər</a></li>
+            <li><a href="{% url 'cart' %}"><i class="fas fa-shopping-cart"></i> Səbət</a></li>
+        </ul>
     </div>
 </body>
 </html>

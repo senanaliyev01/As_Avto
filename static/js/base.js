@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeSearch() {
-    const searchInput = document.getElementById('query');
+    const searchInput = document.querySelector('.header-search-input');
     const searchResults = document.getElementById('search-results');
     let searchTimeout;
 
@@ -161,7 +161,6 @@ function initializeSearch() {
         searchInput.addEventListener('input', function() {
             clearTimeout(searchTimeout);
             const query = this.value.trim();
-            
             if (query.length > 0) {
                 searchTimeout = setTimeout(() => {
                     fetch(`/search-suggestions/?search=${encodeURIComponent(query)}`)
@@ -186,7 +185,7 @@ function initializeSearch() {
                                     div.addEventListener('click', () => {
                                         searchInput.value = item.brend_kod;
                                         searchResults.style.display = 'none';
-                                        document.querySelector('form.search-form').submit();
+                                        document.querySelector('.header-search-form').submit();
                                     });
                                     searchResults.appendChild(div);
                                 });
@@ -200,8 +199,6 @@ function initializeSearch() {
                 searchResults.style.display = 'none';
             }
         });
-
-        // Close search resul2ts when clicking outside
         document.addEventListener('click', function(e) {
             if (!searchResults.contains(e.target) && e.target !== searchInput) {
                 searchResults.style.display = 'none';

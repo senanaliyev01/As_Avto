@@ -3469,24 +3469,23 @@ body {
     vertical-align: middle;
 }
 
-/* Yeni Header Layout */
-.header-content.new-header-layout {
+/* Yeni Header Search Layout */
+.header-content.header-search-layout {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 24px;
+    gap: 30px;
 }
 .header-search-form {
     flex: 1;
     display: flex;
     justify-content: center;
+    align-items: center;
+    max-width: 500px;
 }
-.header-search-container {
+.header-search-input-wrapper {
     position: relative;
     width: 100%;
-    max-width: 420px;
-    display: flex;
-    align-items: center;
 }
 .header-search-input {
     width: 100%;
@@ -3500,7 +3499,7 @@ body {
     box-shadow: 0 1px 4px rgba(44,62,80,0.04);
 }
 .header-search-input:focus {
-    border-color: #3498db;
+    border-color: #1d6f42;
     background: #fff;
 }
 .header-search-btn {
@@ -3508,7 +3507,7 @@ body {
     right: 8px;
     top: 50%;
     transform: translateY(-50%);
-    background: #3498db;
+    background: #1d6f42;
     color: #fff;
     border: none;
     border-radius: 50%;
@@ -3523,63 +3522,28 @@ body {
     z-index: 2;
 }
 .header-search-btn:hover {
-    background: #217dbb;
+    background: #218838;
 }
-.header-links {
+.header-right {
     display: flex;
+    flex-direction: row;
     align-items: center;
     gap: 24px;
 }
-.header-links .total-debt {
-    font-size: 1.08rem;
-    font-weight: 600;
-    margin-right: 8px;
-    white-space: nowrap;
-}
 @media (max-width: 900px) {
-    .header-content.new-header-layout {
+    .header-content.header-search-layout {
         flex-direction: column;
-        align-items: stretch;
         gap: 12px;
+        align-items: stretch;
     }
     .header-search-form {
-        width: 100%;
-        margin: 0 auto;
+        max-width: 100%;
     }
-    .header-links {
-        flex-direction: row;
-        justify-content: flex-end;
-        gap: 10px;
-    }
-}
-@media (max-width: 600px) {
-    .header-content.new-header-layout {
+    .header-right {
         flex-direction: column;
-        gap: 8px;
-    }
-    .header-search-container {
-        max-width: 100vw;
-    }
-    .header-search-input {
-        font-size: 0.97rem;
-        padding: 10px 40px 10px 12px;
-    }
-    .header-search-btn {
-        width: 30px;
-        height: 30px;
-        font-size: 1rem;
-    }
-    .header-links {
-        gap: 6px;
-        font-size: 0.97rem;
+        gap: 10px;
+        align-items: flex-end;
     }
 }
 /* Köhnə search-section və əlaqəli stilləri silirik */
-.search-section, .search-form, .search-grid, .search-item, .search-button, .search-icon-button, .custom-dropdown, .dropdown-search-input, .dropdown-options, .dropdown-option, #category, #brand, #model, #seller {
-    display: none !important;
-    height: 0 !important;
-    width: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    border: none !important;
-}
+.search-section, .search-form, .search-grid, .search-item, .search-button, .search-icon-button, .custom-dropdown, .dropdown-search-input, .dropdown-options, .dropdown-option { display: none !important; }

@@ -27,13 +27,20 @@
         <!-- Header -->
         <header class="header">
             <div class="container">
-                <div class="header-content new-header-layout">
+                <div class="header-content header-search-layout">
                     <div class="logo">
                         <a href="{% url 'base' %}">
                             <img src="{% static 'images/Header_Logo.png' %}" alt="AS-AVTO" class="logo-img">
                         </a>
                     </div>
-                    <div class="header-links">
+                    <form method="get" action="{% url 'products' %}" class="header-search-form">
+                        <div class="header-search-input-wrapper">
+                            <input type="text" id="query" name="search" placeholder="Məhsul, kod və ya ad axtar..." value="{{ request.GET.search }}" autocomplete="off" class="header-search-input">
+                            <button type="submit" class="header-search-btn"><i class="fas fa-search"></i></button>
+                            <div id="search-results" class="search-results"></div>
+                        </div>
+                    </form>
+                    <div class="header-right">
                         <span class="total-debt">
                             {% if request.statistics.umumi_borc < 0 %}
                                 <span style="color: #28a745; font-weight: bold;">Balans +{{ request.statistics.umumi_borc|floatformat:2|slice:'1:' }} ₼</span>

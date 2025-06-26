@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 badgeSidebar.textContent = count;
                 badgeSidebar.style.display = 'inline-block';
             } else {
-                badgeSidebar.textContent = '0';
+                badgeSidebar.textContent = '';
                 badgeSidebar.style.display = 'none';
             }
         }

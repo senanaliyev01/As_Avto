@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    initializeSidebarMenu();
+    initializeSidebarNav();
 });
 
 function initializeSearch() {
@@ -1301,39 +1301,45 @@ function initializeProfileModal() {
     });
 }
 
-function initializeSidebarMenu() {
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const sidebarMenu = document.getElementById('sidebarMenu');
-    const sidebarClose = document.getElementById('sidebarClose');
-    const sidebarOverlay = document.querySelector('.sidebar-menu-overlay');
-    if (!sidebarToggle || !sidebarMenu || !sidebarClose || !sidebarOverlay) return;
-
-    function openSidebar() {
-        sidebarMenu.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        sidebarOverlay.style.display = 'block';
+function initializeSidebarNav() {
+    const sidebar = document.getElementById('sidebarNav');
+    const overlay = document.getElementById('sidebarOverlayNav');
+    const toggle = document.getElementById('sidebarToggle');
+    const closeBtn = document.getElementById('sidebarClose');
+    const salesBadgeSidebar = document.getElementById('salesBadgeSidebar');
+    // Aç
+    if (toggle && sidebar && overlay) {
+        toggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            sidebar.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
     }
-    function closeSidebar() {
-        sidebarMenu.classList.remove('active');
-        document.body.style.overflow = '';
-        sidebarOverlay.style.display = 'none';
+    // Bağla
+    if (closeBtn && sidebar && overlay) {
+        closeBtn.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
     }
-    sidebarToggle.addEventListener('click', function(e) {
-        e.preventDefault();
-        openSidebar();
-    });
-    sidebarClose.addEventListener('click', function(e) {
-        e.preventDefault();
-        closeSidebar();
-    });
-    sidebarOverlay.addEventListener('click', function(e) {
-        e.preventDefault();
-        closeSidebar();
-    });
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && sidebarMenu.classList.contains('active')) {
-            closeSidebar();
+    if (overlay && sidebar) {
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+    }
+    // Sifariş badge-i dəstəklə
+    const badgeMain = document.getElementById('salesBadge');
+    if (salesBadgeSidebar && badgeMain) {
+        salesBadgeSidebar.textContent = badgeMain.textContent;
+        if (badgeMain.style.display !== 'none') {
+            salesBadgeSidebar.style.display = 'inline-block';
+        } else {
+            salesBadgeSidebar.style.display = 'none';
         }
-    });
+    }
 }
 

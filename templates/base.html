@@ -25,13 +25,11 @@
         <!-- Header -->
         <header class="header">
             <div class="header-content header-search-layout">
-                <div class="header-left">
-                    <button id="sidebarToggle" class="sidebar-toggle-btn" aria-label="Menyu aç"><i class="fas fa-bars"></i></button>
-                    <div class="logo">
-                        <a href="{% url 'base' %}">
-                            <img src="{% static 'images/Header_Logo.png' %}" alt="AS-AVTO" class="logo-img">
-                        </a>
-                    </div>
+                <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+                <div class="logo">
+                    <a href="{% url 'base' %}">
+                        <img src="{% static 'images/Header_Logo.png' %}" alt="AS-AVTO" class="logo-img">
+                    </a>
                 </div>
                 <form method="get" action="{% url 'products' %}" class="header-search-form">
                     <div class="header-search-input-wrapper">
@@ -70,23 +68,6 @@
                                         <a href="#" id="openProfileModal" class="user-name">
                                             <i class="fas fa-user"></i> {{ request.user.username }}
                                         </a>
-                                        {% if user.is_authenticated %}
-                                            <a href="{% url 'my_products' %}" class="my-pr">
-                                                {% if not user.profile.is_verified %}
-                                                    <i class="fas fa-lock icon-locked"></i> Mənim Məhsullarım
-                                                {% else %}
-                                                    <i class="fas fa-box"></i> Mənim Məhsullarım
-                                                {% endif %}
-                                            </a>
-                                            <a href="{% url 'my_sales' %}" class="mr-sls">
-                                                {% if not user.profile.is_verified %}
-                                                    <i class="fas fa-lock icon-locked"></i> Mənə gələn sifarişlər
-                                                {% else %}
-                                                    <i class="fas fa-receipt"></i> Mənə gələn sifarişlər
-                                                {% endif %}
-                                                <span id="salesBadge" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span>
-                                            </a>
-                                        {% endif %}
                                         <a href="{% url 'logout' %}" class="logout-link">
                                             <i class="fas fa-sign-out-alt"></i> Çıxış et
                                         </a>
@@ -320,16 +301,16 @@
     </div>
 
     <!-- Soldan açılan sidebar menyu -->
-    <div id="sidebarMenu" class="sidebar-menu">
-        <div class="sidebar-menu-content">
-            <button id="sidebarClose" class="sidebar-close-btn" aria-label="Bağla"><i class="fas fa-times"></i></button>
-            <ul class="sidebar-links">
-                <li><a href="{% url 'products' %}"><i class="fas fa-box"></i> Məhsullar</a></li>
-                <li><a href="{% url 'new_products' %}"><i class="fas fa-star"></i> Yeni Məhsullar</a></li>
-                <li><a href="{% url 'orders' %}"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a></li>
-            </ul>
+    <div id="sidebarNav" class="sidebar-nav">
+        <div class="sidebar-nav-header">
+            <span>Menu</span>
+            <button class="sidebar-close" id="sidebarClose"><i class="fas fa-times"></i></button>
         </div>
-        <div class="sidebar-menu-overlay"></div>
+        <ul class="sidebar-nav-list">
+            <li><a href="{% url 'my_products' %}"><i class="fas fa-box"></i> Mənim Məhsullarım</a></li>
+            <li><a href="{% url 'my_sales' %}"><i class="fas fa-receipt"></i> Mənə gələn sifarişlər <span id="salesBadgeSidebar" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span></a></li>
+        </ul>
     </div>
+    <div id="sidebarOverlayNav" class="sidebar-overlay-nav"></div>
 </body>
 </html>

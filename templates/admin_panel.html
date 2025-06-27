@@ -38,7 +38,11 @@
                     <span class="admin-header-title">{% block panel_title %}Satıcı Paneli{% endblock %}</span>
                 </div>
                 <div class="admin-header-right">
-                    <span class="admin-user"><i class="fas fa-user"></i> {{ request.user.username }}</span>
+                    <span class="admin-user">
+                        <img src="{{ request.user.profile.sekil.url|default:'/static/images/no_image.jpg' }}" alt="Profil şəkli" class="admin-user-avatar" style="width:36px;height:36px;border-radius:50%;object-fit:cover;margin-right:8px;vertical-align:middle;">
+                        {{ request.user.username }}
+                    </span>
+                    <a href="{% url 'base' %}" class="admin-site-link" style="margin-right: 16px;"><i class="fas fa-globe"></i> Sayta bax</a>
                     <a href="{% url 'logout' %}" class="admin-logout"><i class="fas fa-sign-out-alt"></i> Çıxış</a>
                 </div>
             </header>

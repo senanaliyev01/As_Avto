@@ -3918,3 +3918,35 @@ body {
 .admin-sidebar .admin-panel-link:hover i, .admin-sidebar .admin-panel-link:focus i {
     color: #fff;
 }
+
+/* --- Admin Panel: Sayta bax linki --- */
+.admin-header-right .admin-site-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2B5173;
+    background: #f4f6fa;
+    border: 1px solid #2B5173;
+    border-radius: 6px;
+    padding: 6px 16px;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s, border 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 4px rgba(44, 62, 80, 0.06);
+}
+.admin-header-right .admin-site-link i {
+    font-size: 1.1rem;
+    color: #3a6ea5;
+    transition: color 0.2s;
+}
+.admin-header-right .admin-site-link:hover, .admin-header-right .admin-site-link:focus {
+    background: #2B5173;
+    color: #fff;
+    border-color: #2B5173;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.12);
+}
+.admin-header-right .admin-site-link:hover i, .admin-header-right .admin-site-link:focus i {
+    color: #ffd700;
+}

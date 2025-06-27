@@ -21,12 +21,17 @@
                 <span><b>Satıcı sayı:</b> {{ request.total_seller_count }}</span>
                 <span><b>Məhsul sayı:</b> {{ request.total_product_count }}</span>
                 <span><b>Firma sayı:</b> {{ request.total_firma_count }}</span>
-                {% if request.user.is_authenticated and request.user.profile.is_verified %}
-                <a href="{% url 'seller_admin_panel' %}" class="header-seller-panel-link">
-                    <i class="fas fa-cogs"></i> Satıcı Paneli
-                    <span id="headerSalesBadge" class="sales-badge-header" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span>
-                </a>
-                {% endif %}
+                <nav class="main-stat-nav">
+                    <a href="{% url 'products' %}" class="stat-nav-link"><i class="fas fa-box"></i> Məhsullar</a>
+                    <a href="{% url 'new_products' %}" class="stat-nav-link"><i class="fas fa-star"></i> Yeni Məhsullar</a>
+                    <a href="{% url 'orders' %}" class="stat-nav-link"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a>
+                    {% if request.user.is_authenticated and request.user.profile.is_verified %}
+                    <a href="{% url 'seller_admin_panel' %}" class="stat-nav-link stat-seller-link">
+                        <i class="fas fa-cogs"></i> Satıcı Paneli
+                        <span id="salesBadgeBase" class="sales-badge-sidebar" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span>
+                    </a>
+                    {% endif %}
+                </nav>
             </div>
         </div>
         <!-- Header -->
@@ -75,6 +80,10 @@
                                         <a href="#" id="openProfileModal" class="user-name">
                                             <i class="fas fa-user"></i> {{ request.user.username }}
                                         </a>
+                                        {% if request.user.is_authenticated and request.user.profile.is_verified %}
+                                        <div class="dropdown-divider"></div>
+                                        <!-- Satıcı Paneli linki buradan silindi -->
+                                        {% endif %}
                                         <a href="{% url 'logout' %}" class="logout-link">
                                             <i class="fas fa-sign-out-alt"></i> Çıxış et
                                         </a>
@@ -306,8 +315,5 @@
             </div>
         </div>
     </div>
-
-    <!-- Soldan açılan sidebar menyu -->
-    {# Sidebar nav tamamilə silindi #}
 </body>
 </html>

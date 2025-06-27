@@ -54,18 +54,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let salesSound = null;
 
     function playSalesSound() {
-        try {
-            const audio = new Audio('/static/sounds/new_order.mp3');
-            audio.currentTime = 0;
-            audio.play().catch((err) => {
-                // Səs çalınmadısa istifadəçiyə xəbərdarlıq göstər
-                showMessage('error', 'Sifariş bildiriş səsi çalına bilmədi. Zəhmət olmasa brauzerinizin səs və autoplay icazələrini yoxlayın.');
-                console.warn('Audio play error:', err);
-            });
-        } catch (e) {
-            showMessage('error', 'Sifariş bildiriş səsi çalına bilmədi.');
-            console.error('Audio play exception:', e);
-        }
+        const audio = new Audio('/static/sounds/new_order.mp3');
+        audio.currentTime = 0;
+        audio.play();
     }
 
     function updateSalesBadge(count) {

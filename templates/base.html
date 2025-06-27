@@ -16,25 +16,23 @@
     <div class="wrapper">
         <!-- Global Statistics Bar -->
         <div class="global-stats-bar global-stats-bar-header">
-            <div class="container">
-                <div class="global-stats-bar-content">
-                    <span><b>İstifadəçi sayı:</b> {{ request.total_user_count }}</span>
-                    <span><b>Satıcı sayı:</b> {{ request.total_seller_count }}</span>
-                    <span><b>Məhsul sayı:</b> {{ request.total_product_count }}</span>
-                    <span><b>Firma sayı:</b> {{ request.total_firma_count }}</span>
-                    <!-- Naviqasiya linkləri və Satıcı Paneli sayğacı -->
-                    <span class="stats-nav-links">
-                        <a href="{% url 'products' %}" class="stats-nav-link"><i class="fas fa-box"></i> Məhsullar</a>
-                        <a href="{% url 'new_products' %}" class="stats-nav-link"><i class="fas fa-star"></i> Yeni Məhsullar</a>
-                        <a href="{% url 'orders' %}" class="stats-nav-link"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a>
-                        {% if request.user.is_authenticated and request.user.profile.is_verified %}
-                        <a href="{% url 'seller_admin_panel' %}" class="stats-nav-link seller-panel-link">
-                            <i class="fas fa-cogs"></i> Satıcı Paneli
-                            <span id="salesBadge" class="sales-badge-sidebar" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span>
-                        </a>
-                        {% endif %}
-                    </span>
-                </div>
+            <div class="global-stats-bar-content">
+                <span><b>İstifadəçi sayı:</b> {{ request.total_user_count }}</span>
+                <span><b>Satıcı sayı:</b> {{ request.total_seller_count }}</span>
+                <span><b>Məhsul sayı:</b> {{ request.total_product_count }}</span>
+                <span><b>Firma sayı:</b> {{ request.total_firma_count }}</span>
+                <!-- Naviqasiya linkləri və Satıcı Paneli sayğacı -->
+                <span class="stats-nav-links">
+                    <a href="{% url 'products' %}" class="stats-nav-link"><i class="fas fa-box"></i> Məhsullar</a>
+                    <a href="{% url 'new_products' %}" class="stats-nav-link"><i class="fas fa-star"></i> Yeni Məhsullar</a>
+                    <a href="{% url 'orders' %}" class="stats-nav-link"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a>
+                    {% if request.user.is_authenticated and request.user.profile.is_verified %}
+                    <a href="{% url 'seller_admin_panel' %}" class="stats-nav-link seller-panel-link">
+                        <i class="fas fa-cogs"></i> Satıcı Paneli
+                        <span id="salesBadge" class="sales-badge-sidebar" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span>
+                    </a>
+                    {% endif %}
+                </span>
             </div>
         </div>
         <!-- Header -->

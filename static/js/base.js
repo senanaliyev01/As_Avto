@@ -49,14 +49,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Profile Modal logic
     initializeProfileModal();
 
-    // Real-time sales notification (universal for both base.html and admin_panel.html)
+    // Real-time sales notification
     let lastSalesCount = parseInt(localStorage.getItem('lastSalesCount') || '0', 10);
+    let salesSound = null;
 
     function playSalesSound() {
         try {
             const audio = new Audio('/static/sounds/new_order.mp3');
             audio.currentTime = 0;
             audio.play().catch((err) => {
+                // Səs çalınmadısa istifadəçiyə xəbərdarlıq göstər
                 showMessage('error', 'Sifariş bildiriş səsi çalına bilmədi. Zəhmət olmasa brauzerinizin səs və autoplay icazələrini yoxlayın.');
                 console.warn('Audio play error:', err);
             });
@@ -66,19 +68,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function updateAllSalesBadges(count) {
-        const badge1 = document.getElementById('salesBadge');
-        const badge2 = document.getElementById('salesBadgeSidebar');
-        [badge1, badge2].forEach(badge => {
-            if (!badge) return;
-            if (count > 0) {
-                badge.textContent = count;
-                badge.style.display = 'inline-block';
-            } else {
-                badge.textContent = '0';
-                badge.style.display = 'none';
-            }
-        });
+    function updateSalesBadge(count) {
+        const badge = document.getElementById('salesBadge');
+        if (!badge) return;
+        if (count > 0) {
+            badge.textContent = count;
+            badge.style.display = 'inline-block';
+        } else {
+            badge.textContent = '0';
+            badge.style.display = 'none';
+        }
     }
 
     function pollSalesCount() {
@@ -86,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(res => res.json())
             .then(data => {
                 if (typeof data.count === 'number') {
-                    updateAllSalesBadges(data.count);
+                    updateSalesBadge(data.count);
                     if (data.count > lastSalesCount) {
                         playSalesSound();
                     }
@@ -100,22 +99,18 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(pollSalesCount, 10000); // 10 saniyədən bir yoxla
     pollSalesCount(); // İlk yükləmədə də yoxla
 
-    // Linkə kliklədikdə sayğacı sıfırla (hər iki badge üçün universal)
-    function resetSalesBadgesOnClick(linkSelector) {
-        const link = document.querySelector(linkSelector);
-        if (link) {
-            link.addEventListener('click', function() {
-                fetch('/api/unread-sales-count/', { method: 'POST', credentials: 'same-origin' })
-                    .then(() => {
-                        updateAllSalesBadges(0);
-                        lastSalesCount = 0;
-                        localStorage.setItem('lastSalesCount', '0');
-                    });
-            });
-        }
+    // Linkə kliklədikdə sayğacı sıfırla
+    const salesLink = document.querySelector('.user-dropdown .mr-sls');
+    if (salesLink) {
+        salesLink.addEventListener('click', function() {
+            fetch('/api/unread-sales-count/', { method: 'POST', credentials: 'same-origin' })
+                .then(() => {
+                    updateSalesBadge(0);
+                    lastSalesCount = 0;
+                    localStorage.setItem('lastSalesCount', '0');
+                });
+        });
     }
-    resetSalesBadgesOnClick('#sidebarMySalesLink');
-    resetSalesBadgesOnClick('.user-dropdown .admin-panel-link');
 
     // --- Buyer live dropdown for my_sales.html ---
     const buyerSearch = document.getElementById('buyerLiveSearch');

@@ -124,7 +124,7 @@
                     if (typeof data.count === 'number') {
                         updateSalesBadge(data.count);
                         if (data.count > lastSalesCount) {
-                            playSalesSound();
+                            triggerSalesSoundAllTabs();
                         }
                         lastSalesCount = data.count;
                         localStorage.setItem('lastSalesCount', lastSalesCount);

@@ -160,6 +160,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     initializeSidebarNav();
+
+    // Səs çalınmasını bütün tablarda sinxron etmək üçün
+    window.addEventListener('storage', function(event) {
+        if (event.key === 'playSalesSound' && event.newValue === '1') {
+            playSalesSound();
+            // Səs çalındıqdan sonra flag-i sıfırla
+            setTimeout(() => localStorage.setItem('playSalesSound', '0'), 500);
+        }
+    });
+
+    function triggerSalesSoundAllTabs() {
+        localStorage.setItem('playSalesSound', '1');
+    }
 });
 
 function initializeSearch() {

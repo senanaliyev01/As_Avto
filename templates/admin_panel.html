@@ -7,6 +7,7 @@
     <title>{% block title %}Satıcı Paneli{% endblock %}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -14,8 +15,9 @@
         <!-- Sidebar -->
         <aside class="admin-sidebar">
             <div class="sidebar-header">
-                <span class="sidebar-logo"><i class="fas fa-cogs"></i></span>
-                <span class="sidebar-title">Satıcı Paneli</span>
+                <a href="{% url 'seller_admin_panel' %}" class="admin-panel-link">
+                    <i class="fas fa-cogs"></i> Satıcı Paneli
+                </a>
             </div>
             <nav class="sidebar-nav">
                 <ul>

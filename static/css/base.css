@@ -3886,3 +3886,35 @@ body {
     padding: 0;
     margin: 0;
 }
+
+/* --- Satıcı Paneli Linki (Sidebar Header) --- */
+.admin-sidebar .admin-panel-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(90deg, #2B5173 60%, #3a6ea5 100%);
+    padding: 18px 24px 18px 24px;
+    border-radius: 0 0 12px 12px;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
+    letter-spacing: 0.5px;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.admin-sidebar .admin-panel-link i {
+    font-size: 1.5rem;
+    margin-right: 8px;
+    color: #ffd700;
+    transition: color 0.2s;
+}
+.admin-sidebar .admin-panel-link:hover, .admin-sidebar .admin-panel-link:focus {
+    background: linear-gradient(90deg, #3a6ea5 60%, #2B5173 100%);
+    color: #ffd700;
+    text-decoration: none;
+    box-shadow: 0 4px 16px rgba(44, 62, 80, 0.15);
+}
+.admin-sidebar .admin-panel-link:hover i, .admin-sidebar .admin-panel-link:focus i {
+    color: #fff;
+}

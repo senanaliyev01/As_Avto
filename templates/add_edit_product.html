@@ -2,8 +2,9 @@
 {% load static %}
 
 {% block title %}{% if form.instance.pk %}Məhsulu Redaktə Et{% else %}Yeni Məhsul Əlavə Et{% endif %} - AS-AVTO{% endblock %}
+{% block panel_title %}{% if form.instance.pk %}Məhsulu Redaktə Et{% else %}Yeni Məhsul Əlavə Et{% endif %}{% endblock %}
 
-{% block admin_content %}
+{% block content %}
 <div class="container">
     <h2>{% if form.instance.pk %}Məhsulu Redaktə Et{% else %}Yeni Məhsul Əlavə Et{% endif %}</h2>
     

@@ -1,15 +1,16 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="az">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Satıcı Paneli</title>
+    <title>{% block title %}Satıcı Paneli{% endblock %}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
     <div class="admin-layout">
+        <!-- Sidebar -->
         <aside class="admin-sidebar">
             <div class="sidebar-header">
                 <span class="sidebar-logo"><i class="fas fa-cogs"></i></span>
@@ -17,30 +18,36 @@
             </div>
             <nav class="sidebar-nav">
                 <ul>
-                    <li class="sidebar-item {% if request.resolver_match.url_name == 'my_products' %}active{% endif %}">
+                    <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'my_products' %}active{% endif %}">
                         <a href="{% url 'my_products' %}"><i class="fas fa-box"></i> Mənim Məhsullarım</a>
                     </li>
-                    <li class="sidebar-item {% if request.resolver_match.url_name == 'my_sales' %}active{% endif %}">
+                    <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'my_sales' %}active{% endif %}">
                         <a href="{% url 'my_sales' %}"><i class="fas fa-shopping-basket"></i> Mənə Gələn Sifarişlər</a>
                     </li>
                 </ul>
             </nav>
         </aside>
-        <main class="admin-main">
+        <!-- Main Content -->
+        <div class="admin-main">
+            <!-- Header -->
             <header class="admin-header">
-                <div class="admin-header-content">
+                <div class="admin-header-left">
+                    <span class="admin-header-title">{% block panel_title %}Satıcı Paneli{% endblock %}</span>
+                </div>
+                <div class="admin-header-right">
                     <span class="admin-user"><i class="fas fa-user"></i> {{ request.user.username }}</span>
-                    <a href="{% url 'logout' %}" class="admin-logout"><i class="fas fa-sign-out-alt"></i> Çıxış et</a>
+                    <a href="{% url 'logout' %}" class="admin-logout"><i class="fas fa-sign-out-alt"></i> Çıxış</a>
                 </div>
             </header>
-            <section class="admin-content">
-                {% block admin_content %}{% endblock %}
-            </section>
+            <main class="admin-content">
+                {% block content %}{% endblock %}
+            </main>
             <footer class="admin-footer">
-                <span>© {{ now|date:'Y' }} AS-AVTO Satıcı Paneli</span>
+                <span>© {{ now|date:'Y' }} AS-AVTO Satıcı Paneli. Bütün hüquqlar qorunur.</span>
             </footer>
-        </main>
+        </div>
     </div>
     <script src="{% static 'js/admin.js' %}"></script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html> 

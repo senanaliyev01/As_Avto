@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Responsive sidebar toggle (əgər əlavə etmək istəsəniz)
+    // Responsive sidebar toggle
     const sidebar = document.querySelector('.admin-sidebar');
     const main = document.querySelector('.admin-main');
     let sidebarOpen = true;
@@ -165,7 +165,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
-    // Mobil üçün toggle düyməsi əlavə et
     if (!document.getElementById('sidebarToggleBtn')) {
         const btn = document.createElement('button');
         btn.id = 'sidebarToggleBtn';
@@ -217,7 +216,265 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.style.transform = 'scale(1)';
         });
     });
+
+    // === Modal funksionallığı ===
+    initializeModal();
+    initializeImageModal();
+    initializeDetailsModal();
+    initializeUserDetailsModal();
+    // Əlavə olaraq showMessage funksiyası
 });
+
+// Modal açıb-bağlama funksiyası (base.js-dən)
+function initializeModal() {
+    const modal = document.getElementById('quantityModal');
+    const closeBtn = document.querySelector('.close');
+    const form = document.getElementById('addToCartForm');
+    const modalContent = document.querySelector('.custom-quantity-modal-content');
+    if (modal && closeBtn && form && modalContent) {
+        closeBtn.onclick = () => modal.style.display = 'none';
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const url = this.action;
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showMessage('success', data.message);
+                    if (data.cart_count !== undefined) {
+                        updateCartCounter(data.cart_count);
+                    }
+                    modal.style.display = 'none';
+                } else {
+                    showMessage('error', data.message);
+                }
+            })
+            .catch(error => {
+                showMessage('error', 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+            });
+        });
+    }
+}
+
+// Şəkil modalı funksiyası (base.js-dən)
+function initializeImageModal() {
+    const modal = document.getElementById('imageModal');
+    const closeBtn = document.querySelector('.image-modal-close');
+    if (modal && closeBtn) {
+        closeBtn.onclick = closeImageModal;
+        modal.onclick = function(e) {
+            if (e.target === modal) {
+                closeImageModal();
+            }
+        };
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.style.display === 'block') {
+                closeImageModal();
+            }
+        });
+    }
+}
+function openImageModal(imageSrc) {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    if (modal && modalImg && imageSrc) {
+        modalImg.src = imageSrc;
+        modal.style.display = 'block';
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+    }
+}
+function closeImageModal() {
+    const modal = document.getElementById('imageModal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+}
+
+// Details Modal funksiyası (base.js-dən)
+function initializeDetailsModal() {
+    const modal = document.getElementById('detailsModal');
+    const closeBtn = document.querySelector('.details-modal-close');
+    if (modal && closeBtn) {
+        closeBtn.onclick = closeDetailsModal;
+        modal.onclick = function(e) {
+            if (e.target === modal) {
+                closeDetailsModal();
+            }
+        };
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.style.display === 'block') {
+                closeDetailsModal();
+            }
+        });
+    }
+}
+function openDetailsModal(productId) {
+    const modal = document.getElementById('detailsModal');
+    if (!modal) return;
+    fetch(`/product-details/${productId}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                document.getElementById('detailsImage').src = data.product.sekil_url;
+                document.getElementById('detailsName').textContent = data.product.adi;
+                document.getElementById('detailsCategory').textContent = data.product.kateqoriya || '-';
+                document.getElementById('detailsFirma').textContent = data.product.firma;
+                document.getElementById('detailsAvtomobil').textContent = data.product.avtomobil;
+                document.getElementById('detailsBrendKod').textContent = data.product.brend_kod;
+                document.getElementById('detailsOlcu').textContent = data.product.olcu || '-';
+                document.getElementById('detailsQiymet').textContent = data.product.qiymet + ' ₼';
+                document.getElementById('detailsStok').textContent = data.product.stok + ' ədəd';
+                document.getElementById('detailsMelumat').textContent = data.product.melumat || '-';
+                const detailsSeller = document.getElementById('detailsSeller');
+                if (detailsSeller) {
+                    if (data.product.sahib_id && data.product.sahib_username) {
+                        detailsSeller.innerHTML = `<a href="#" class="seller-link" onclick="openUserDetailsModal(${data.product.sahib_id}); return false;"><i class="fas fa-user"></i> ${data.product.sahib_username}</a>`;
+                    } else {
+                        detailsSeller.textContent = 'AS-AVTO';
+                    }
+                }
+                modal.style.display = 'block';
+                setTimeout(() => {
+                    modal.classList.add('show');
+                }, 10);
+            } else {
+                showMessage('error', data.message);
+            }
+        })
+        .catch(error => {
+            showMessage('error', 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+        });
+}
+function closeDetailsModal() {
+    const modal = document.getElementById('detailsModal');
+    if (!modal) return;
+    modal.classList.remove('show');
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
+}
+
+// User Details Modal funksiyası (base.js-dən)
+function initializeUserDetailsModal() {
+    const modal = document.getElementById('userDetailsModal');
+    const closeBtn = document.querySelector('.user-details-modal-close');
+    if (modal && closeBtn) {
+        closeBtn.onclick = closeUserDetailsModal;
+        modal.onclick = function(e) {
+            if (e.target === modal) {
+                closeUserDetailsModal();
+            }
+        };
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.style.display === 'block') {
+                closeUserDetailsModal();
+            }
+        });
+    }
+}
+function openUserDetailsModal(userId) {
+    const modal = document.getElementById('userDetailsModal');
+    if (!modal) return;
+    fetch(`/user-details/${userId}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                document.getElementById('userDetailsUsername').textContent = data.user.username;
+                document.getElementById('userDetailsPhone').textContent = data.user.phone || '-';
+                document.getElementById('userDetailsAddress').textContent = data.user.address || '-';
+                var img = document.getElementById('userDetailsImage');
+                if (img && data.user.sekil_url) {
+                    img.src = data.user.sekil_url;
+                } else if (img) {
+                    img.src = '/static/images/no_image.jpg';
+                }
+                modal.style.display = 'block';
+                setTimeout(() => {
+                    modal.classList.add('show');
+                }, 10);
+            } else {
+                showMessage('error', data.message);
+            }
+        })
+        .catch(error => {
+            showMessage('error', 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+        });
+}
+function closeUserDetailsModal() {
+    const modal = document.getElementById('userDetailsModal');
+    if (!modal) return;
+    modal.classList.remove('show');
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
+}
+
+// showMessage funksiyası (base.js-dən)
+function showMessage(type, message) {
+    const messagesContainer = document.createElement('div');
+    messagesContainer.className = 'messages';
+    messagesContainer.style.position = 'fixed';
+    messagesContainer.style.top = '20px';
+    messagesContainer.style.right = '-300px';
+    messagesContainer.style.zIndex = '9999';
+    messagesContainer.style.width = '300px';
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message message-${type}`;
+    const icon = document.createElement('i');
+    icon.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+    messageDiv.appendChild(icon);
+    messageDiv.appendChild(document.createTextNode(' ' + message));
+    messagesContainer.appendChild(messageDiv);
+    document.body.appendChild(messagesContainer);
+    setTimeout(() => {
+        messagesContainer.style.transition = 'right 0.5s ease';
+        messagesContainer.style.right = '20px';
+    }, 100);
+    setTimeout(() => {
+        messagesContainer.style.right = '-300px';
+        setTimeout(() => messagesContainer.remove(), 500);
+    }, 3000);
+}
+
+// Əlavə köməkçi funksiyalar
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+function updateCartCounter(count) {
+    const counter = document.querySelector('.cart-counter');
+    if (counter) {
+        counter.textContent = count;
+    }
+}
 
 // Excel Import Modal Functions
 document.addEventListener('DOMContentLoaded', function() {

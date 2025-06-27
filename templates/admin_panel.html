@@ -41,37 +41,7 @@
                 </div>
             </header>
             <main class="admin-content">
-                {% block content %}
-                <button id="openStatsModal" class="btn btn-info">Statistikanı bax</button>
-
-                <div id="buyerStatsModal" class="details-modal" style="display:none;">
-                    <div class="details-modal-content">
-                        <span class="buyer-stats-modal-close" style="position:absolute;right:20px;top:20px;cursor:pointer;font-size:24px;">&times;</span>
-                        <div class="details-header">
-                            <h3>Alıcı Statistikası</h3>
-                        </div>
-                        <input type="text" id="buyerStatsSearch" placeholder="Alıcı adı ilə axtar..." class="form-control" style="margin-bottom:10px;">
-                        <table id="buyerStatsTable" class="table">
-                            <thead>
-                                <tr>
-                                    <th>Alıcı</th>
-                                    <th>Sifariş sayı</th>
-                                    <th>Ümumi məbləğ</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for buyer in buyers %}
-                                <tr>
-                                    <td>{{ buyer.username }}</td>
-                                    <td>{{ buyer.order_count }}</td>
-                                    <td>{{ buyer.total_amount }} ₼</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                {% endblock %}
+                {% block content %}{% endblock %}
             </main>
             <footer class="admin-footer">
                 <span>© {{ now|date:'Y' }} AS-AVTO Satıcı Paneli. Bütün hüquqlar qorunur.</span>

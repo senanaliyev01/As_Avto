@@ -1401,3 +1401,10 @@ def unread_sales_count(request):
             request.user.profile.yeni_unread_sales = 0
             request.user.profile.save()
         return JsonResponse({'status': 'ok'})
+
+def seller_admin_panel(request):
+    if not request.user.is_authenticated or not hasattr(request.user, 'profile') or not request.user.profile.is_verified:
+        from django.contrib import messages
+        messages.error(request, 'Satıcı panelinə giriş üçün icazəniz yoxdur.')
+        return redirect('base')
+    return render(request, 'admin_panel.html')

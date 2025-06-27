@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Satıcı Paneli{% endblock %}
+{% block content %}
+<div class="seller-admin-panel">
+    <h2 class="panel-title">Satıcı Paneli</h2>
+    <div class="panel-links">
+        <a href="{% url 'my_products' %}" class="panel-link-btn">
+            <i class="fas fa-box"></i> Mənim məhsullarım
+        </a>
+        <a href="{% url 'my_sales' %}" class="panel-link-btn">
+            <i class="fas fa-shopping-basket"></i> Mənə gələn sifarişlər
+        </a>
+    </div>
+</div>
+<style>
+.seller-admin-panel {
+    max-width: 500px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(44, 62, 80, 0.08);
+    padding: 32px 24px 40px 24px;
+    text-align: center;
+}
+.panel-title {
+    font-size: 2rem;
+    color: #2B5173;
+    margin-bottom: 32px;
+    font-weight: 700;
+}
+.panel-links {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+.panel-link-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    background: #2B5173;
+    color: #fff;
+    padding: 18px 0;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background 0.2s;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.06);
+}
+.panel-link-btn:hover {
+    background: #1a3654;
+    color: #fff;
+}
+</style>
+{% endblock %} 

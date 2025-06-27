@@ -76,7 +76,7 @@ body {
 .logo-img {
     width: 100%;
     max-width: 140px;
-    height: 75px;
+    height: 48px;
     object-fit: contain;
     margin: 0;
 }
@@ -3561,71 +3561,443 @@ body {
 .search-section, .search-form, .search-grid, .search-item, .search-button, .search-icon-button, .custom-dropdown, .dropdown-search-input, .dropdown-options, .dropdown-option { display: none !important; }
 
 .global-stats-bar.global-stats-bar-header {
-    width: 100%;
-    max-width: 1200px;
-    min-width: 320px;
-    margin: 0 auto 0 auto;
+    width: 100vw;
+    max-width: 100vw;
     background: #f8f9fa;
-    border-bottom: 1.5px solid #e9ecef;
-    border-radius: 0 0 12px 12px;
-    box-shadow: 0 2px 12px rgba(44,62,80,0.06);
-    padding: 0 18px;
-    font-size: 14px;
+    border-bottom: 1px solid #e9ecef;
+    padding: 8px 0 8px 0;
+    margin: 0;
+    font-size: 15px;
     display: flex;
     justify-content: center;
     align-items: center;
-    position: relative;
-    z-index: 9;
+    /* z-index: 1002; */
 }
 .global-stats-bar-content {
     display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
+    gap: 32px;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    max-width: 1200px;
-    padding: 4px 0;
+    width: 100vw;
+    max-width: 100vw;
 }
-.global-stats-bar-content span {
+
+/* Sidebar Nav (soldan açılan menyu) */
+.sidebar-toggle {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #2b5173;
+    cursor: pointer;
+    margin-right: 18px;
+    margin-left: 0;
+    outline: none;
+    display: flex;
+    align-items: center;
+}
+.sidebar-nav {
+    position: fixed;
+    top: 0;
+    left: -320px;
+    width: 300px;
+    height: 100vh;
     background: #fff;
-    border-radius: 7px;
-    padding: 3px 10px;
-    box-shadow: 0 1px 4px rgba(44, 62, 80, 0.03);
-    font-weight: 500;
-    color: #1d6f42;
-    border: 1px solid #e9ecef;
-    margin: 1px 0;
-    font-size: 13px;
-    min-width: 80px;
-    text-align: center;
+    box-shadow: 2px 0 24px rgba(44,62,80,0.13);
+    z-index: 2002;
+    transition: left 0.3s cubic-bezier(.4,0,.2,1);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
 }
+.sidebar-nav.active {
+    left: 0;
+}
+.sidebar-nav-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px 10px 20px;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #2b5173;
+}
+.sidebar-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #2b5173;
+    cursor: pointer;
+    outline: none;
+}
+.sidebar-nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 18px 0 0 0;
+    flex: 1;
+}
+.sidebar-nav-list li {
+    margin: 0;
+    padding: 0;
+}
+.sidebar-nav-list a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 28px;
+    font-size: 1.08rem;
+    color: #2b5173;
+    text-decoration: none;
+    border-radius: 0 18px 18px 0;
+    transition: background 0.15s, color 0.15s;
+}
+.sidebar-nav-list a:hover {
+    background: #f8f9fa;
+    color: #1e7e34;
+}
+.sidebar-overlay-nav {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(44,62,80,0.13);
+    z-index: 2001;
+    transition: opacity 0.2s;
+}
+.sidebar-overlay-nav.active {
+    display: block;
+    opacity: 1;
+}
+@media (max-width: 600px) {
+    .sidebar-nav {
+        width: 85vw;
+        min-width: 0;
+        max-width: 340px;
+    }
+    .sidebar-nav-header {
+        font-size: 1rem;
+        padding: 14px 12px 8px 12px;
+    }
+    .sidebar-nav-list a {
+        font-size: 1rem;
+        padding: 12px 16px;
+    }
+}
+
+.sales-badge-sidebar {
+    display: inline-block;
+    margin-left: 8px;
+    background: #dc3545;
+    color: #fff;
+    border-radius: 10px;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: bold;
+    vertical-align: middle;
+    min-width: 22px;
+    text-align: center;
+    transition: background 0.2s, color 0.2s;
+}
+
+/* --- Satıcı Admin Paneli Layout --- */
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+    background: #f4f6fa;
+}
+.admin-sidebar {
+    width: 240px;
+    background: #2B5173;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    box-shadow: 2px 0 8px rgba(44, 62, 80, 0.08);
+    position: relative;
+    z-index: 10;
+}
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 32px 24px 24px 24px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.sidebar-logo {
+    font-size: 2rem;
+    color: #fff;
+}
+.sidebar-title {
+    color: #fff;
+    letter-spacing: 1px;
+}
+.sidebar-nav {
+    flex: 1;
+    padding: 32px 0 0 0;
+}
+.sidebar-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.sidebar-nav-item {
+    margin-bottom: 8px;
+}
+.sidebar-nav-item a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.08rem;
+    font-weight: 500;
+    padding: 12px 32px;
+    border-radius: 6px 0 0 6px;
+    transition: background 0.18s, color 0.18s;
+    position: relative;
+}
+.sidebar-nav-item.active a,
+.sidebar-nav-item a:hover {
+    background: #1a3654;
+    color: #ffd700;
+}
+
+.admin-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+.admin-header {
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.06);
+    padding: 0 32px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #e5e9f2;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
+.admin-header-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2B5173;
+    letter-spacing: 1px;
+}
+.admin-header-right {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+.admin-user {
+    color: #2B5173;
+    font-weight: 600;
+    font-size: 1.08rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.admin-logout {
+    color: #fff;
+    background: #dc3545;
+    padding: 7px 18px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: background 0.18s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.admin-logout:hover {
+    background: #b52a37;
+    color: #fff;
+}
+.admin-content {
+    flex: 1;
+    padding: 40px 40px 24px 40px;
+    background: #f4f6fa;
+    min-height: 0;
+}
+.admin-footer {
+    background: #fff;
+    color: #2B5173;
+    text-align: center;
+    padding: 18px 0 12px 0;
+    font-size: 1rem;
+    border-top: 1px solid #e5e9f2;
+    margin-top: auto;
+    box-shadow: 0 -2px 8px rgba(44, 62, 80, 0.04);
+}
+
+@media (max-width: 900px) {
+    .admin-layout {
+        flex-direction: column;
+    }
+    .admin-sidebar {
+        width: 100%;
+        min-height: unset;
+        flex-direction: row;
+        box-shadow: none;
+        border-bottom: 1px solid #e5e9f2;
+    }
+    .sidebar-header {
+        padding: 18px 12px;
+        font-size: 1.1rem;
+    }
+    .sidebar-nav {
+        padding: 0;
+    }
+    .sidebar-nav ul {
+        display: flex;
+        flex-direction: row;
+        gap: 0;
+    }
+    .sidebar-nav-item {
+        margin-bottom: 0;
+    }
+    .sidebar-nav-item a {
+        border-radius: 0;
+        padding: 12px 18px;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .admin-content {
+        padding: 16px 4px 12px 4px;
+    }
+    .admin-header {
+        padding: 0 8px;
+        height: 54px;
+    }
+    .admin-header-title {
+        font-size: 1.05rem;
+    }
+    .admin-footer {
+        font-size: 0.95rem;
+        padding: 10px 0 8px 0;
+    }
+}
+
+/* Admin panel üçün sidebar-nav düzəlişi */
+.admin-sidebar .sidebar-nav {
+    display: block !important;
+    position: static !important;
+    background: none;
+    box-shadow: none;
+    width: 100%;
+    height: auto;
+    padding: 32px 0 0 0;
+}
+.admin-sidebar .sidebar-nav ul {
+    display: block !important;
+    position: static !important;
+    background: none;
+    box-shadow: none;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+/* --- Satıcı Paneli Linki (Sidebar Header) --- */
+.admin-sidebar .admin-panel-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(90deg, #2B5173 60%, #3a6ea5 100%);
+    padding: 18px 24px 18px 24px;
+    border-radius: 0 0 12px 12px;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
+    letter-spacing: 0.5px;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.admin-sidebar .admin-panel-link i {
+    font-size: 1.5rem;
+    margin-right: 8px;
+    color: #ffd700;
+    transition: color 0.2s;
+}
+.admin-sidebar .admin-panel-link:hover, .admin-sidebar .admin-panel-link:focus {
+    background: linear-gradient(90deg, #3a6ea5 60%, #2B5173 100%);
+    color: #ffd700;
+    text-decoration: none;
+    box-shadow: 0 4px 16px rgba(44, 62, 80, 0.15);
+}
+.admin-sidebar .admin-panel-link:hover i, .admin-sidebar .admin-panel-link:focus i {
+    color: #fff;
+}
+
+.admin-header-right .admin-site-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2B5173;
+    background: #f4f6fa;
+    border: 1px solid #2B5173;
+    border-radius: 6px;
+    padding: 6px 16px;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s, border 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 4px rgba(44, 62, 80, 0.06);
+}
+.admin-header-right .admin-site-link i {
+    font-size: 1.1rem;
+    color: #3a6ea5;
+    transition: color 0.2s;
+}
+.admin-header-right .admin-site-link:hover, .admin-header-right .admin-site-link:focus {
+    background: #2B5173;
+    color: #fff;
+    border-color: #2B5173;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.12);
+}
+.admin-header-right .admin-site-link:hover i, .admin-header-right .admin-site-link:focus i {
+    color: #ffd700;
+}
+
+/* --- Statistikada Naviqasiya Linkləri (stats-nav-links) --- */
 .stats-nav-links {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    margin-left: 10px;
+    gap: 18px;
+    margin-left: 32px;
     vertical-align: middle;
 }
 .stats-nav-link {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    font-size: 13px;
+    gap: 7px;
+    font-size: 1.08rem;
     font-weight: 600;
     color: #2B5173;
     background: #fff;
-    border: 1.2px solid #e9ecef;
-    border-radius: 7px;
-    padding: 5px 12px;
+    border: 1.5px solid #e9ecef;
+    border-radius: 8px;
+    padding: 7px 18px;
     text-decoration: none;
-    box-shadow: 0 1px 4px rgba(44, 62, 80, 0.03);
-    letter-spacing: 0.1px;
+    box-shadow: 0 1px 4px rgba(44, 62, 80, 0.06);
+    letter-spacing: 0.2px;
     transition: background 0.18s, color 0.18s, border 0.18s, box-shadow 0.18s;
     position: relative;
 }
 .stats-nav-link i {
-    font-size: 1rem;
+    font-size: 1.1rem;
     color: #3a6ea5;
     transition: color 0.18s;
 }
@@ -3633,90 +4005,65 @@ body {
     background: #2B5173;
     color: #fff;
     border-color: #2B5173;
-    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.10);
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.12);
     text-decoration: none;
 }
 .stats-nav-link:hover i, .stats-nav-link:focus i {
     color: #ffd700;
 }
+
+/* Satıcı Paneli Linki üçün xüsusi dizayn */
 .seller-panel-link {
     background: linear-gradient(90deg, #2B5173 60%, #3a6ea5 100%);
     color: #fff;
     border: none;
-    font-size: 13px;
+    font-size: 1.13rem;
     font-weight: 700;
-    padding: 5px 16px 5px 14px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
-    letter-spacing: 0.3px;
+    padding: 9px 26px 9px 22px;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(44, 62, 80, 0.10);
+    letter-spacing: 0.5px;
     position: relative;
     z-index: 2;
     transition: background 0.18s, color 0.18s, box-shadow 0.18s;
 }
 .seller-panel-link i {
-    font-size: 1.1rem;
-    margin-right: 6px;
+    font-size: 1.3rem;
+    margin-right: 8px;
     color: #ffd700;
     transition: color 0.18s;
 }
 .seller-panel-link:hover, .seller-panel-link:focus {
     background: linear-gradient(90deg, #3a6ea5 60%, #2B5173 100%);
     color: #ffd700;
-    box-shadow: 0 4px 12px rgba(44, 62, 80, 0.13);
+    box-shadow: 0 4px 16px rgba(44, 62, 80, 0.15);
     text-decoration: none;
 }
 .seller-panel-link:hover i, .seller-panel-link:focus i {
     color: #fff;
 }
+
 @media (max-width: 900px) {
-    .global-stats-bar.global-stats-bar-header {
-        max-width: 100vw;
-        padding: 0 4vw;
-    }
-    .global-stats-bar-content {
-        gap: 6px;
-        padding: 2px 0;
-    }
-    .global-stats-bar-content span {
-        font-size: 12px;
-        padding: 2px 6px;
-    }
     .stats-nav-links {
-        gap: 6px;
-        margin-left: 4px;
+        gap: 10px;
+        margin-left: 8px;
     }
     .stats-nav-link, .seller-panel-link {
-        font-size: 12px;
-        padding: 4px 7px;
+        font-size: 0.98rem;
+        padding: 7px 10px;
     }
 }
 @media (max-width: 600px) {
-    .global-stats-bar.global-stats-bar-header {
-        max-width: 100vw;
-        min-width: 0;
-        border-radius: 0 0 10px 10px;
-        padding: 0 2vw;
-    }
-    .global-stats-bar-content {
-        gap: 4px;
-        font-size: 11px;
-        padding: 1px 0;
-    }
-    .global-stats-bar-content span {
-        font-size: 11px;
-        padding: 2px 4px;
-        min-width: 60px;
-    }
     .stats-nav-links {
         flex-direction: column;
-        gap: 3px;
+        gap: 6px;
         margin-left: 0;
-        margin-top: 4px;
+        margin-top: 8px;
     }
     .stats-nav-link, .seller-panel-link {
         width: 100%;
         justify-content: center;
-        font-size: 11px;
-        padding: 4px 0;
+        font-size: 0.93rem;
+        padding: 7px 0;
     }
 }

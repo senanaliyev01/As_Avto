@@ -48,6 +48,41 @@
             </footer>
         </div>
     </div>
+    <!-- Şəkil Modalı -->
+    <div id="imageModal" class="image-modal" style="display:none;">
+        <span class="image-modal-close" style="position:absolute;right:20px;top:20px;cursor:pointer;font-size:24px;">&times;</span>
+        <div class="modal-image-content">
+            <img id="modalImage" class="modal-image" src="" alt="Modal Image" style="max-width:100%;max-height:80vh;display:block;margin:auto;">
+        </div>
+    </div>
+    <!-- İstifadəçi Detalları Modalı -->
+    <div id="userDetailsModal" class="details-modal" style="display:none;">
+        <div class="details-modal-content">
+            <span class="user-details-modal-close" style="position:absolute;right:20px;top:20px;cursor:pointer;font-size:24px;">&times;</span>
+            <div class="details-content">
+                <div class="details-header">
+                    <h3>İstifadəçi Məlumatları</h3>
+                </div>
+                <div class="details-body">
+                    <div class="details-info text-center">
+                        <img id="userDetailsImage" src="" alt="Profil şəkli" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:10px;">
+                        <div class="info-row">
+                            <span class="info-label">İstifadəçi adı:</span>
+                            <span id="userDetailsUsername" class="info-value"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Telefon:</span>
+                            <span id="userDetailsPhone" class="info-value"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Ünvan:</span>
+                            <span id="userDetailsAddress" class="info-value"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="{% static 'js/base.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>

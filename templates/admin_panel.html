@@ -25,9 +25,9 @@
                         <a href="{% url 'my_products' %}"><i class="fas fa-box"></i> Mənim Məhsullarım</a>
                     </li>
                     <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'my_sales' %}active{% endif %}">
-                        <a href="{% url 'my_sales' %}" class="admin-sales-link">
+                        <a href="{% url 'my_sales' %}" id="sidebarMySalesLink">
                             <i class="fas fa-receipt"></i> Mənə gələn sifarişlər
-                            <span id="adminSalesBadge" class="sales-badge-sidebar" style="display:none; margin-left:8px;">0</span>
+                            <span id="salesBadge" class="sales-badge-sidebar" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span>
                         </a>
                     </li>
                 </ul>
@@ -95,6 +95,58 @@
     <script src="{% static 'js/base.js' %}"></script>
     {% block extra_js %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    // Real-time sales badge və mesaj səsi üçün kod
+    (function() {
+        let lastSalesCount = parseInt(localStorage.getItem('lastSalesCount') || '0', 10);
+        function playSalesSound() {
+            try {
+                const audio = new Audio('/static/sounds/new_order.mp3');
+                audio.currentTime = 0;
+                audio.play().catch(() => {});
+            } catch (e) {}
+        }
+        function updateSalesBadge(count) {
+            const badge = document.getElementById('salesBadge');
+            if (!badge) return;
+            if (count > 0) {
+                badge.textContent = count;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.textContent = '0';
+                badge.style.display = 'none';
+            }
+        }
+        function pollSalesCount() {
+            fetch('/api/unread-sales-count/', { credentials: 'same-origin' })
+                .then(res => res.json())
+                .then(data => {
+                    if (typeof data.count === 'number') {
+                        updateSalesBadge(data.count);
+                        if (data.count > lastSalesCount) {
+                            playSalesSound();
+                        }
+                        lastSalesCount = data.count;
+                        localStorage.setItem('lastSalesCount', lastSalesCount);
+                    }
+                });
+        }
+        setInterval(pollSalesCount, 10000);
+        pollSalesCount();
+        // Linkə kliklədikdə sayğacı sıfırla
+        const salesLink = document.getElementById('sidebarMySalesLink');
+        if (salesLink) {
+            salesLink.addEventListener('click', function() {
+                fetch('/api/unread-sales-count/', { method: 'POST', credentials: 'same-origin' })
+                    .then(() => {
+                        updateSalesBadge(0);
+                        lastSalesCount = 0;
+                        localStorage.setItem('lastSalesCount', '0');
+                    });
+            });
+        }
+    })();
+    </script>
     {% endblock %}
 </body>
 </html> 

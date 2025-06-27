@@ -3561,8 +3561,8 @@ body {
 .search-section, .search-form, .search-grid, .search-item, .search-button, .search-icon-button, .custom-dropdown, .dropdown-search-input, .dropdown-options, .dropdown-option { display: none !important; }
 
 .global-stats-bar.global-stats-bar-header {
-    width: 100vw;
-    max-width: 100vw;
+    width: 100%;
+    max-width: 100%;
     background: #f8f9fa;
     border-bottom: 1px solid #e9ecef;
     padding: 8px 0 8px 0;

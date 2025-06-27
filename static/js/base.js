@@ -69,15 +69,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateSalesBadge(count) {
-        const badge = document.getElementById('salesBadge');
-        if (!badge) return;
-        if (count > 0) {
-            badge.textContent = count;
-            badge.style.display = 'inline-block';
-        } else {
-            badge.textContent = '0';
-            badge.style.display = 'none';
-        }
+        const badges = [
+            document.getElementById('salesBadge'),
+            document.getElementById('salesBadgeSidebar')
+        ];
+        badges.forEach(badge => {
+            if (!badge) return;
+            if (count > 0) {
+                badge.textContent = count;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.textContent = '0';
+                badge.style.display = 'none';
+            }
+        });
     }
 
     function pollSalesCount() {

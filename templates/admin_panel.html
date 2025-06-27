@@ -1,56 +1,136 @@
-{% extends 'base.html' %}
-{% block title %}Satıcı Paneli{% endblock %}
-{% block content %}
-<div class="seller-admin-panel">
-    <h2 class="panel-title">Satıcı Paneli</h2>
-    <div class="panel-links">
-        <a href="{% url 'my_products' %}" class="panel-link-btn">
-            <i class="fas fa-box"></i> Mənim məhsullarım
-        </a>
-        <a href="{% url 'my_sales' %}" class="panel-link-btn">
-            <i class="fas fa-shopping-basket"></i> Mənə gələn sifarişlər
-        </a>
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Satıcı Paneli{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: #f4f6fa;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+        }
+        .admin-panel-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+        .admin-sidebar {
+            width: 240px;
+            background: #2B5173;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            box-shadow: 2px 0 8px rgba(44,62,80,0.04);
+        }
+        .admin-sidebar .sidebar-header {
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 32px 0 24px 0;
+            text-align: center;
+            letter-spacing: 1px;
+            background: #23405a;
+        }
+        .admin-sidebar .sidebar-links {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 24px 0;
+        }
+        .admin-sidebar .sidebar-link {
+            color: #fff;
+            text-decoration: none;
+            padding: 14px 32px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: background 0.15s;
+        }
+        .admin-sidebar .sidebar-link.active, .admin-sidebar .sidebar-link:hover {
+            background: #1a3654;
+            color: #fff;
+        }
+        .admin-sidebar .sidebar-footer {
+            padding: 18px 0;
+            text-align: center;
+            font-size: 0.95rem;
+            background: #23405a;
+        }
+        .admin-main {
+            flex: 1;
+            padding: 0 0 0 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .admin-header {
+            background: #fff;
+            padding: 18px 32px;
+            border-bottom: 1px solid #e3e6ef;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .admin-header .admin-user {
+            font-weight: 600;
+            color: #2B5173;
+        }
+        .admin-content {
+            flex: 1;
+            padding: 32px 40px;
+        }
+        .admin-footer {
+            background: #fff;
+            border-top: 1px solid #e3e6ef;
+            text-align: center;
+            padding: 16px 0;
+            color: #888;
+            font-size: 0.95rem;
+        }
+        @media (max-width: 900px) {
+            .admin-panel-wrapper { flex-direction: column; }
+            .admin-sidebar { width: 100%; flex-direction: row; height: 60px; }
+            .admin-sidebar .sidebar-header, .admin-sidebar .sidebar-footer { display: none; }
+            .admin-sidebar .sidebar-links { flex-direction: row; gap: 0; padding: 0; }
+            .admin-sidebar .sidebar-link { flex: 1; justify-content: center; padding: 0; font-size: 1rem; }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+<div class="admin-panel-wrapper">
+    <nav class="admin-sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-cogs"></i> Satıcı Paneli
+        </div>
+        <div class="sidebar-links">
+            <a href="{% url 'my_products' %}" class="sidebar-link{% if request.resolver_match.url_name == 'my_products' %} active{% endif %}">
+                <i class="fas fa-box"></i> Mənim Məhsullarım
+            </a>
+            <a href="{% url 'my_sales' %}" class="sidebar-link{% if request.resolver_match.url_name == 'my_sales' %} active{% endif %}">
+                <i class="fas fa-shopping-basket"></i> Mənə Gələn Sifarişlər
+            </a>
+        </div>
+        <div class="sidebar-footer">
+            &copy; {{ now|default:2024 }} AS-AVTO
+        </div>
+    </nav>
+    <div class="admin-main">
+        <div class="admin-header">
+            <span class="admin-user"><i class="fas fa-user"></i> {{ request.user.username }}</span>
+            <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm"><i class="fas fa-sign-out-alt"></i> Çıxış</a>
+        </div>
+        <div class="admin-content">
+            {% block content %}{% endblock %}
+        </div>
+        <div class="admin-footer">
+            Satıcı Paneli &mdash; AS-AVTO &copy; {{ now|default:2024 }}
+        </div>
     </div>
 </div>
-<style>
-.seller-admin-panel {
-    max-width: 500px;
-    margin: 40px auto;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 16px rgba(44, 62, 80, 0.08);
-    padding: 32px 24px 40px 24px;
-    text-align: center;
-}
-.panel-title {
-    font-size: 2rem;
-    color: #2B5173;
-    margin-bottom: 32px;
-    font-weight: 700;
-}
-.panel-links {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-.panel-link-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    font-size: 1.2rem;
-    font-weight: 600;
-    background: #2B5173;
-    color: #fff;
-    padding: 18px 0;
-    border-radius: 8px;
-    text-decoration: none;
-    transition: background 0.2s;
-    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.06);
-}
-.panel-link-btn:hover {
-    background: #1a3654;
-    color: #fff;
-}
-</style>
-{% endblock %} 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html> 

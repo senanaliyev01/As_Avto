@@ -149,8 +149,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
-
-    initializeSidebarNav();
 });
 
 function initializeSearch() {
@@ -1298,70 +1296,5 @@ function initializeProfileModal() {
             alert('Xəta baş verdi!');
         });
     });
-}
-
-function initializeSidebarNav() {
-    const sidebar = document.getElementById('sidebarNav');
-    const overlay = document.getElementById('sidebarOverlayNav');
-    const toggle = document.getElementById('sidebarToggle');
-    const closeBtn = document.getElementById('sidebarClose');
-    const salesBadgeSidebar = document.getElementById('salesBadgeSidebar');
-    const mySalesLink = document.getElementById('sidebarMySalesLink');
-    // Aç
-    if (toggle && sidebar && overlay) {
-        toggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            sidebar.classList.add('active');
-            overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            // Sidebar açıldıqda badge-i yenilə
-            pollSidebarSalesBadge();
-        });
-    }
-    // Bağla
-    if (closeBtn && sidebar && overlay) {
-        closeBtn.addEventListener('click', function() {
-            sidebar.classList.remove('active');
-            overlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-    }
-    if (overlay && sidebar) {
-        overlay.addEventListener('click', function() {
-            sidebar.classList.remove('active');
-            overlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-    }
-    // Real-time badge üçün polling
-    function pollSidebarSalesBadge() {
-        fetch('/api/unread-sales-count/', { credentials: 'same-origin' })
-            .then(res => res.json())
-            .then(data => {
-                if (typeof data.count === 'number' && salesBadgeSidebar) {
-                    if (data.count > 0) {
-                        salesBadgeSidebar.textContent = data.count;
-                        salesBadgeSidebar.style.display = 'inline-block';
-                    } else {
-                        salesBadgeSidebar.textContent = '0';
-                        salesBadgeSidebar.style.display = 'none';
-                    }
-                }
-            });
-    }
-    setInterval(pollSidebarSalesBadge, 10000);
-    pollSidebarSalesBadge();
-    // Linkə kliklədikdə sayğacı sıfırla
-    if (mySalesLink) {
-        mySalesLink.addEventListener('click', function() {
-            fetch('/api/unread-sales-count/', { method: 'POST', credentials: 'same-origin' })
-                .then(() => {
-                    if (salesBadgeSidebar) {
-                        salesBadgeSidebar.textContent = '0';
-                        salesBadgeSidebar.style.display = 'none';
-                    }
-                });
-        });
-    }
 }
 

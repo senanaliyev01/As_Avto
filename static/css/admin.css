@@ -1,3 +1,260 @@
+/* === Satıcı Admin Paneli Layout === */
+body, html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', 'Arial', sans-serif;
+    background: #f4f6fa;
+}
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+.admin-sidebar {
+    width: 240px;
+    background: #2B5173;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    box-shadow: 2px 0 8px rgba(44,62,80,0.07);
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 100;
+}
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    padding: 28px 24px 18px 24px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    border-bottom: 1px solid #23405a;
+    letter-spacing: 1px;
+}
+.sidebar-logo {
+    font-size: 2rem;
+    margin-right: 12px;
+    color: #fff;
+}
+.sidebar-title {
+    color: #fff;
+}
+.sidebar-nav {
+    flex: 1;
+    padding: 24px 0;
+}
+.sidebar-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.sidebar-item {
+    margin-bottom: 8px;
+}
+.sidebar-item a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #cfd8e3;
+    text-decoration: none;
+    font-size: 1.08rem;
+    padding: 12px 28px;
+    border-radius: 6px 0 0 6px;
+    transition: background 0.18s, color 0.18s;
+}
+.sidebar-item.active a,
+.sidebar-item a:hover {
+    background: #1a3654;
+    color: #fff;
+    font-weight: 600;
+}
+.admin-main {
+    margin-left: 240px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+.admin-header {
+    background: #fff;
+    border-bottom: 1px solid #e3e8ee;
+    padding: 0 32px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+.admin-header-content {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+.admin-user {
+    color: #2B5173;
+    font-weight: 600;
+    font-size: 1.08rem;
+}
+.admin-logout {
+    color: #dc3545;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1.08rem;
+    transition: color 0.18s;
+}
+.admin-logout:hover {
+    color: #a71d2a;
+}
+.admin-content {
+    padding: 36px 32px 32px 32px;
+    flex: 1;
+    background: #f4f6fa;
+    min-height: 80vh;
+}
+.admin-footer {
+    background: #fff;
+    border-top: 1px solid #e3e8ee;
+    text-align: center;
+    padding: 18px 0 12px 0;
+    color: #7a8597;
+    font-size: 0.98rem;
+    margin-top: auto;
+}
+
+/* === Cədvəl və Formlar === */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(44,62,80,0.06);
+    padding: 32px 24px 40px 24px;
+}
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
+    background: #fff;
+}
+.table th, .table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #e3e8ee;
+    text-align: left;
+    font-size: 1rem;
+}
+.table th {
+    background: #f4f6fa;
+    color: #2B5173;
+    font-weight: 700;
+}
+.table tr:last-child td {
+    border-bottom: none;
+}
+.table img.product-image {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #e3e8ee;
+}
+.btn, button, .btn-primary, .btn-secondary, .btn-danger {
+    display: inline-block;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s;
+    text-decoration: none;
+}
+.btn-primary {
+    background: #2B5173;
+    color: #fff;
+}
+.btn-primary:hover {
+    background: #1a3654;
+}
+.btn-secondary {
+    background: #e3e8ee;
+    color: #2B5173;
+}
+.btn-secondary:hover {
+    background: #cfd8e3;
+}
+.btn-danger {
+    background: #dc3545;
+    color: #fff;
+}
+.btn-danger:hover {
+    background: #a71d2a;
+}
+input[type="text"], input[type="number"], input[type="file"], select, textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #e3e8ee;
+    border-radius: 6px;
+    font-size: 1rem;
+    margin-bottom: 12px;
+    background: #f8fafc;
+    transition: border 0.18s;
+}
+input:focus, select:focus, textarea:focus {
+    border-color: #2B5173;
+    outline: none;
+}
+.alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 10px 16px;
+    border-radius: 6px;
+    margin-top: 6px;
+    font-size: 0.98rem;
+}
+.new-badge {
+    background: #28a745;
+    color: #fff;
+    font-size: 0.85rem;
+    padding: 2px 8px;
+    border-radius: 8px;
+    margin-left: 6px;
+    font-weight: 600;
+}
+/* Responsive */
+@media (max-width: 900px) {
+    .admin-sidebar {
+        width: 60px;
+        min-width: 60px;
+    }
+    .sidebar-header {
+        padding: 18px 8px 10px 8px;
+        font-size: 1.1rem;
+    }
+    .sidebar-title {
+        display: none;
+    }
+    .sidebar-item a {
+        padding: 12px 10px;
+        font-size: 1rem;
+        justify-content: center;
+    }
+    .admin-main {
+        margin-left: 60px;
+    }
+}
+@media (max-width: 600px) {
+    .admin-content, .container {
+        padding: 12px 2vw;
+    }
+    .admin-header {
+        padding: 0 8px;
+    }
+}
+
 .header-container {
     display: flex;
     justify-content: space-between;

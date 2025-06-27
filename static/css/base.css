@@ -3537,7 +3537,7 @@ body {
     }
 }
 /* Köhnə search-section və əlaqəli stilləri silirik */
-.search-section, .search-form, .search-grid, .search-item, .search-button, .search-icon-button, .custom-dropdown, .dropdown-search-input, .dropdown-options, .dropdown-option { display: none !important; }
+.search-section, .search-form, .search-grid, .search-item, .search-button, .search-icon-button { display: none !important; }
 
 .global-stats-bar.global-stats-bar-header {
     width: 100vw;

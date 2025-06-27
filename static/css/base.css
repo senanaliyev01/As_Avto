@@ -3949,3 +3949,51 @@ body {
 .admin-header-right .admin-site-link:hover i, .admin-header-right .admin-site-link:focus i {
     color: #ffd700;
 }
+
+/* --- Satıcı Paneli Linki (Header) --- */
+.header-seller-panel-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.13rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(90deg, #2B5173 60%, #3a6ea5 100%);
+    padding: 10px 22px;
+    border-radius: 8px;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
+    letter-spacing: 0.5px;
+    margin-left: 18px;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    position: relative;
+}
+.header-seller-panel-link i {
+    font-size: 1.3rem;
+    margin-right: 6px;
+    color: #ffd700;
+    transition: color 0.2s;
+}
+.header-seller-panel-link:hover, .header-seller-panel-link:focus {
+    background: linear-gradient(90deg, #3a6ea5 60%, #2B5173 100%);
+    color: #ffd700;
+    text-decoration: none;
+    box-shadow: 0 4px 16px rgba(44, 62, 80, 0.15);
+}
+.header-seller-panel-link:hover i, .header-seller-panel-link:focus i {
+    color: #fff;
+}
+.sales-badge-header {
+    display: inline-block;
+    margin-left: 8px;
+    background: #dc3545;
+    color: #fff;
+    border-radius: 10px;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: bold;
+    vertical-align: middle;
+    min-width: 22px;
+    text-align: center;
+    transition: background 0.2s, color 0.2s;
+}

@@ -25,7 +25,7 @@
                         <a href="{% url 'my_products' %}"><i class="fas fa-box"></i> Mənim Məhsullarım</a>
                     </li>
                     <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'my_sales' %}active{% endif %}">
-                        <a href="{% url 'my_sales' %}"><i class="fas fa-shopping-basket"></i> Mənə Gələn Sifarişlər</a>
+                        <a href="{% url 'my_sales' %}" id="sidebarMySalesLink"><i class="fas fa-receipt"></i> Mənə gələn sifarişlər <span id="salesBadgeSidebar" class="sales-badge-sidebar" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span></a>
                     </li>
                 </ul>
             </nav>

@@ -160,57 +160,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     initializeSidebarNav();
-
-    // --- Satıcı Paneli üçün real-time badge və səs (base.html üçün) ---
-    (function() {
-        let lastSalesCountBase = parseInt(localStorage.getItem('lastSalesCountBase') || '0', 10);
-        function playSalesSoundBase() {
-            try {
-                const audio = new Audio('/static/sounds/new_order.mp3');
-                audio.currentTime = 0;
-                audio.play().catch(() => {});
-            } catch (e) {}
-        }
-        function updateSalesBadgeBase(count) {
-            const badge = document.getElementById('salesBadgeBase');
-            if (!badge) return;
-            if (count > 0) {
-                badge.textContent = count;
-                badge.style.display = 'inline-block';
-            } else {
-                badge.textContent = '0';
-                badge.style.display = 'none';
-            }
-        }
-        function pollSalesCountBase() {
-            fetch('/api/unread-sales-count/', { credentials: 'same-origin' })
-                .then(res => res.json())
-                .then(data => {
-                    if (typeof data.count === 'number') {
-                        updateSalesBadgeBase(data.count);
-                        if (data.count > lastSalesCountBase) {
-                            playSalesSoundBase();
-                        }
-                        lastSalesCountBase = data.count;
-                        localStorage.setItem('lastSalesCountBase', lastSalesCountBase);
-                    }
-                });
-        }
-        setInterval(pollSalesCountBase, 10000);
-        pollSalesCountBase();
-        // Linkə kliklədikdə sayğacı sıfırla
-        const salesLinkBase = document.querySelector('.stat-seller-link');
-        if (salesLinkBase) {
-            salesLinkBase.addEventListener('click', function() {
-                fetch('/api/unread-sales-count/', { method: 'POST', credentials: 'same-origin' })
-                    .then(() => {
-                        updateSalesBadgeBase(0);
-                        lastSalesCountBase = 0;
-                        localStorage.setItem('lastSalesCountBase', '0');
-                    });
-            });
-        }
-    })();
 });
 
 function initializeSearch() {

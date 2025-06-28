@@ -38,9 +38,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize Header Messages
     initializeHeaderMessages();
 
-    // Initialize Admin Sidebar Toggle
-    initializeAdminSidebar();
-
     setupCustomDropdown('category-dropdown', 'category');
     setupCustomDropdown('brand-dropdown', 'brand');
     setupCustomDropdown('model-dropdown', 'model');
@@ -152,96 +149,24 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
-});
 
-// Admin Sidebar Toggle Functionality
-function initializeAdminSidebar() {
+    // Sidebar açılıb-bağlanma funksionallığı
     const sidebarToggle = document.getElementById('sidebarToggle');
-    const adminSidebar = document.getElementById('adminSidebar');
-    const adminMain = document.getElementById('adminMain');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-    
-    if (!sidebarToggle || !adminSidebar || !adminMain) return;
-    
-    // Local storage-dan sidebar vəziyyətini al
-    const isSidebarCollapsed = localStorage.getItem('adminSidebarCollapsed') === 'true';
-    const isMobile = window.innerWidth <= 900;
-    
-    // İlk yükləmədə vəziyyəti tətbiq et
-    if (isSidebarCollapsed && !isMobile) {
-        adminSidebar.classList.add('collapsed');
-        adminMain.style.marginLeft = '60px';
-    }
-    
-    // Toggle button event listener
-    sidebarToggle.addEventListener('click', function() {
-        if (isMobile) {
-            // Mobil üçün overlay ilə aç/bağla
-            adminSidebar.classList.toggle('mobile-open');
-            sidebarOverlay.classList.toggle('active');
-            document.body.style.overflow = adminSidebar.classList.contains('mobile-open') ? 'hidden' : '';
-        } else {
-            // Desktop üçün collapse/expand
-            adminSidebar.classList.toggle('collapsed');
-            const isCollapsed = adminSidebar.classList.contains('collapsed');
-            
-            if (isCollapsed) {
-                adminMain.style.marginLeft = '60px';
+    const adminLayout = document.querySelector('.admin-layout');
+    if (sidebarToggle && adminLayout) {
+        sidebarToggle.addEventListener('click', function() {
+            adminLayout.classList.toggle('sidebar-collapsed');
+            if (adminLayout.classList.contains('sidebar-collapsed')) {
+                localStorage.setItem('sidebarCollapsed', '1');
             } else {
-                adminMain.style.marginLeft = '0';
+                localStorage.removeItem('sidebarCollapsed');
             }
-            
-            // Local storage-a saxla
-            localStorage.setItem('adminSidebarCollapsed', isCollapsed);
-        }
-    });
-    
-    // Overlay click event (mobil üçün)
-    if (sidebarOverlay) {
-        sidebarOverlay.addEventListener('click', function() {
-            adminSidebar.classList.remove('mobile-open');
-            sidebarOverlay.classList.remove('active');
-            document.body.style.overflow = '';
         });
+        if (localStorage.getItem('sidebarCollapsed') === '1') {
+            adminLayout.classList.add('sidebar-collapsed');
+        }
     }
-    
-    // ESC düyməsi ilə bağla (mobil üçün)
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && adminSidebar.classList.contains('mobile-open')) {
-            adminSidebar.classList.remove('mobile-open');
-            sidebarOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-    });
-    
-    // Window resize event
-    window.addEventListener('resize', function() {
-        const newIsMobile = window.innerWidth <= 900;
-        
-        if (newIsMobile !== isMobile) {
-            // Mobil vəziyyətdən desktop-a keçid
-            if (!newIsMobile) {
-                adminSidebar.classList.remove('mobile-open');
-                sidebarOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-                
-                // Desktop vəziyyətini bərpa et
-                const isCollapsed = localStorage.getItem('adminSidebarCollapsed') === 'true';
-                if (isCollapsed) {
-                    adminSidebar.classList.add('collapsed');
-                    adminMain.style.marginLeft = '60px';
-                } else {
-                    adminSidebar.classList.remove('collapsed');
-                    adminMain.style.marginLeft = '0';
-                }
-            } else {
-                // Desktop-dan mobilə keçid
-                adminSidebar.classList.remove('collapsed');
-                adminMain.style.marginLeft = '0';
-            }
-        }
-    });
-}
+});
 
 function initializeSearch() {
     const searchInput = document.querySelector('.header-search-input');

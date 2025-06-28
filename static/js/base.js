@@ -652,9 +652,7 @@ function openImageModal(imageSrc) {
     const modal = document.getElementById('imageModal');
     const modalImg = document.getElementById('modalImage');
     if (modal && modalImg && imageSrc) {
-        // Cache busting: always show latest image
-        const srcWithTimestamp = imageSrc + (imageSrc.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
-        modalImg.src = srcWithTimestamp;
+        modalImg.src = imageSrc;
         modal.style.display = 'block';
         setTimeout(() => {
             modal.classList.add('show');

@@ -1435,3 +1435,15 @@ def toggle_product_new_status(request, product_id):
                 'message': 'Xəta baş verdi'
             })
     return JsonResponse({'success': False, 'message': 'Yanlış sorğu'})
+
+@csrf_exempt
+@login_required
+def update_product_image(request, product_id):
+    """Məhsulun şəklini yeniləyir (AJAX üçün)"""
+    if request.method == 'POST' and request.FILES.get('image'):
+        mehsul = get_object_or_404(Mehsul, id=product_id, sahib=request.user)
+        image = request.FILES['image']
+        mehsul.sekil = image
+        mehsul.save()
+        return JsonResponse({'success': True, 'image_url': mehsul.sekil.url})
+    return JsonResponse({'success': False, 'message': 'Şəkil göndərilmədi və ya icazə yoxdur.'})

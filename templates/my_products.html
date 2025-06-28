@@ -148,6 +148,10 @@
                         <button class="btn btn-info btn-sm toggle-new-btn" data-product-id="{{ mehsul.id }}" data-yenidir="{{ mehsul.yenidir|yesno:'true,false' }}" title="{% if mehsul.yenidir %}Yenidən çıxar{% else %}Yeni et{% endif %}">
                             <i class="fas fa-star"></i>
                         </button>
+                        <button class="btn btn-warning btn-sm change-image-btn" data-product-id="{{ mehsul.id }}" title="Şəkli dəyiş">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                        <input type="file" accept="image/*" class="d-none product-image-input" data-product-id="{{ mehsul.id }}">
                         <a href="{% url 'delete_product' mehsul.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Bu məhsulu silmək istədiyinizə əminsiniz?')">
                             <i class="fas fa-trash"></i>
                         </a>
@@ -291,6 +295,10 @@
                                     <button class="btn btn-info btn-sm toggle-new-btn" data-product-id="${product.id}" data-yenidir="${product.yenidir}" title="${product.yenidir ? 'Yenidən çıxar' : 'Yeni et'}">
                                         <i class="fas ${product.yenidir ? 'fa-star' : 'fa-star'}"></i>
                                     </button>
+                                    <button class="btn btn-warning btn-sm change-image-btn" data-product-id="${product.id}" title="Şəkli dəyiş">
+                                        <i class="fas fa-camera"></i>
+                                    </button>
+                                    <input type="file" accept="image/*" class="d-none product-image-input" data-product-id="${product.id}">
                                     <a href="/my-products/delete/${product.id}/" class="btn btn-danger btn-sm" onclick="return confirm('Bu məhsulu silmək istədiyinizə əminsiniz?')">
                                         <i class="fas fa-trash"></i>
                                     </a>
@@ -308,6 +316,55 @@
                     });
             });
         }
+
+        // Şəkli dəyiş düyməsi funksionallığı
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.change-image-btn')) {
+                const btn = e.target.closest('.change-image-btn');
+                const productId = btn.getAttribute('data-product-id');
+                const fileInput = document.querySelector('.product-image-input[data-product-id="' + productId + '"]');
+                if (fileInput) fileInput.click();
+            }
+        });
+        // File seçildikdə AJAX ilə yüklə
+        document.querySelectorAll('.product-image-input').forEach(function(input) {
+            input.addEventListener('change', function() {
+                const productId = this.getAttribute('data-product-id');
+                const file = this.files[0];
+                if (!file) return;
+                const formData = new FormData();
+                formData.append('image', file);
+                // CSRF token
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                // Tap row və img
+                const row = this.closest('tr');
+                const img = row.querySelector('img.product-image');
+                // Spinner göstəricisi
+                const oldSrc = img.src;
+                img.src = '/static/images/loading.gif';
+                fetch(`/my-products/update-image/${productId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        img.src = data.image_url;
+                        showMessage('Şəkil uğurla yeniləndi', 'success');
+                    } else {
+                        img.src = oldSrc;
+                        showMessage(data.message || 'Şəkil yenilənmədi', 'error');
+                    }
+                })
+                .catch(() => {
+                    img.src = oldSrc;
+                    showMessage('Şəkil yenilənmədi', 'error');
+                });
+            });
+        });
     });
     </script>
 </div>

@@ -145,8 +145,8 @@
                         <a href="{% url 'edit_product' mehsul.id %}" class="btn btn-secondary btn-sm">
                             <i class="fas fa-edit"></i>
                         </a>
-                        <button class="btn btn-info btn-sm toggle-new-btn" data-product-id="{{ mehsul.id }}" data-yenidir="{{ mehsul.yenidir|yesno:'true,false' }}" title="{% if mehsul.yenidir %}Yenidən çıxar{% else %}Yeni et{% endif %}">
-                            <i class="fas {% if mehsul.yenidir %}fa-star{% else %}fa-star-o{% endif %}"></i>
+                        <button class="btn btn-sm toggle-new-btn {% if mehsul.yenidir %}btn-success{% else %}btn-danger{% endif %}" data-product-id="{{ mehsul.id }}" data-yenidir="{{ mehsul.yenidir|yesno:'true,false' }}" title="{% if mehsul.yenidir %}Yenidən çıxar{% else %}Yeni et{% endif %}">
+                            <i class="fas fa-star" style="color: {% if mehsul.yenidir %}#ffc107{% else %}white{% endif %};"></i>
                         </button>
                         <a href="{% url 'delete_product' mehsul.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Bu məhsulu silmək istədiyinizə əminsiniz?')">
                             <i class="fas fa-trash"></i>
@@ -199,10 +199,12 @@
                         // Update button appearance
                         const icon = btn.querySelector('i');
                         if (data.yenidir) {
-                            icon.className = 'fas fa-star';
+                            btn.className = 'btn btn-sm toggle-new-btn btn-success';
+                            icon.style.color = '#ffc107';
                             btn.title = 'Yenidən çıxar';
                         } else {
-                            icon.className = 'fas fa-star-o';
+                            btn.className = 'btn btn-sm toggle-new-btn btn-danger';
+                            icon.style.color = 'white';
                             btn.title = 'Yeni et';
                         }
                         btn.setAttribute('data-yenidir', data.yenidir);
@@ -288,8 +290,8 @@
                                     <a href="/my-products/edit/${product.id}/" class="btn btn-secondary btn-sm">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <button class="btn btn-info btn-sm toggle-new-btn" data-product-id="${product.id}" data-yenidir="${product.yenidir}" title="${product.yenidir ? 'Yenidən çıxar' : 'Yeni et'}">
-                                        <i class="fas ${product.yenidir ? 'fa-star' : 'fa-star-o'}"></i>
+                                    <button class="btn btn-sm toggle-new-btn ${product.yenidir ? 'btn-success' : 'btn-danger'}" data-product-id="${product.id}" data-yenidir="${product.yenidir}" title="${product.yenidir ? 'Yenidən çıxar' : 'Yeni et'}">
+                                        <i class="fas fa-star" style="color: ${product.yenidir ? '#ffc107' : 'white'};"></i>
                                     </button>
                                     <a href="/my-products/delete/${product.id}/" class="btn btn-danger btn-sm" onclick="return confirm('Bu məhsulu silmək istədiyinizə əminsiniz?')">
                                         <i class="fas fa-trash"></i>

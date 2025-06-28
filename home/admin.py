@@ -53,7 +53,7 @@ class AvtomobilAdmin(admin.ModelAdmin):
 
 @admin.register(Mehsul)
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ['sahib', 'brend_kod', 'firma', 'adi',  'olcu', 'vitrin', 'stok', 'maya_qiymet', 'qiymet',  'yenidir', 'sekil_preview']
+    list_display = ['sahib', 'brend_kod', 'firma', 'adi',  'olcu', 'vitrin', 'stok', 'maya_qiymet', 'qiymet',  'yenidir', 'qalan_vaxt', 'sekil_preview']
     list_filter = ['sahib', 'kateqoriya', 'firma', 'avtomobil', 'vitrin', 'yenidir']
     search_fields = ['adi', 'brend_kod', 'oem', 'kodlar', 'olcu', 'sahib__username']
     change_list_template = 'admin/mehsul_change_list.html'
@@ -64,6 +64,12 @@ class MehsulAdmin(admin.ModelAdmin):
             return format_html('<img src="{}" style="max-height: 50px;"/>', obj.sekil.url)
         return '-'
     sekil_preview.short_description = 'Şəkil'
+
+    def qalan_vaxt(self, obj):
+        if obj.yenidir and obj.qalan_vaxt():
+            return format_html('<span style="color: #17a2b8; font-weight: bold;">{}</span>', obj.qalan_vaxt())
+        return '-'
+    qalan_vaxt.short_description = 'Qalan Vaxt'
 
     def get_urls(self):
         urls = super().get_urls()
@@ -158,9 +164,9 @@ class MehsulAdmin(admin.ModelAdmin):
         return response
 
     def mark_as_new(self, request, queryset):
-        updated = queryset.update(yenidir=True)
+        updated = queryset.update(yenidir=True, yeni_edildiyi_tarix=timezone.now())
         
-        # 10 saniyə sonra avtomatik olaraq yenidən çıxar
+        # 3 gün sonra avtomatik olaraq yenidən çıxar
         import threading
         def auto_remove_new():
             import time
@@ -170,7 +176,7 @@ class MehsulAdmin(admin.ModelAdmin):
                 from django.db import transaction
                 with transaction.atomic():
                     new_products = Mehsul.objects.filter(id__in=queryset.values_list('id', flat=True), yenidir=True)
-                    new_products.update(yenidir=False)
+                    new_products.update(yenidir=False, yeni_edildiyi_tarix=None)
             except Exception as e:
                 print(f"Auto remove new status error: {e}")
         
@@ -379,6 +385,10 @@ class MehsulAdmin(admin.ModelAdmin):
         return super().changelist_view(request, extra_context=extra_context)
 
     def save_model(self, request, obj, form, change):
+        # Əgər məhsul yeni olaraq işarələnibsə, tarixi qeyd et
+        if obj.yenidir:
+            obj.yeni_edildiyi_tarix = timezone.now()
+        
         # Əgər məhsul yeni olaraq işarələnibsə, 3 gün sonra avtomatik olaraq yenidən çıxar
         if obj.yenidir:  # Həm yeni yaradılan, həm də redaktə edilən məhsullar üçün
             import threading
@@ -392,6 +402,7 @@ class MehsulAdmin(admin.ModelAdmin):
                         mehsul = Mehsul.objects.select_for_update().get(id=obj.id)
                         if mehsul.yenidir:  # Əgər hələ də yenidirsə
                             mehsul.yenidir = False
+                            mehsul.yeni_edildiyi_tarix = None
                             mehsul.save()
                 except Exception as e:
                     print(f"Auto remove new status error: {e}")
@@ -407,7 +418,11 @@ class MehsulAdmin(admin.ModelAdmin):
         instances = formset.save(commit=False)
         for instance in instances:
             if hasattr(instance, 'yenidir') and instance.yenidir:
-                # Əgər məhsul yeni olaraq işarələnibsə, 10 saniyə sonra avtomatik olaraq yenidən çıxar
+                # Əgər məhsul yeni olaraq işarələnibsə, tarixi qeyd et
+                from django.utils import timezone
+                instance.yeni_edildiyi_tarix = timezone.now()
+                
+                # Əgər məhsul yeni olaraq işarələnibsə, 3 gün sonra avtomatik olaraq yenidən çıxar
                 import threading
                 def auto_remove_new():
                     import time
@@ -419,6 +434,7 @@ class MehsulAdmin(admin.ModelAdmin):
                             mehsul = Mehsul.objects.select_for_update().get(id=instance.id)
                             if mehsul.yenidir:  # Əgər hələ də yenidirsə
                                 mehsul.yenidir = False
+                                mehsul.yeni_edildiyi_tarix = None
                                 mehsul.save()
                     except Exception as e:
                         print(f"Auto remove new status error: {e}")

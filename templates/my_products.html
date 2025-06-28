@@ -114,6 +114,21 @@
         </div>
     </div>
 
+    <!-- Modal for image preview -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imageModalLabel">Məhsul Şəkli</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="modalProductImage" src="" alt="Məhsul şəkli" style="max-width:100%; max-height:60vh; border-radius:8px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="table-container">
         <table class="table" id="products-table">
             <thead>
@@ -130,7 +145,7 @@
             <tbody id="products-tbody">
                 {% for mehsul in mehsullar %}
                 <tr>
-                    <td><img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image" onclick="openImageModal('{{ mehsul.sekil.url }}')"></td>
+                    <td><img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image" onclick="openImageModal({{ mehsul.id }})"></td>
                     <td>{{ mehsul.brend_kod }}</td>
                     <td>{{ mehsul.firma.adi }}</td>
                     <td>
@@ -281,7 +296,7 @@
                             const row = document.createElement('tr');
                             row.innerHTML = `
                                 <td>
-                                    ${product.sekil_url ? `<img src="${product.sekil_url}" alt="${product.adi}" class="product-image" onclick="openImageModal('${product.sekil_url}')">` : ''}
+                                    ${product.sekil_url ? `<img src="${product.sekil_url}" alt="${product.adi}" class="product-image" onclick="openImageModal(${product.id})">` : ''}
                                 </td>
                                 <td>${product.brend_kod}</td>
                                 <td>${product.firma}</td>
@@ -372,6 +387,19 @@
                 });
             });
         });
+
+        window.openImageModal = function(productId) {
+            // Tap: cədvəldəki img-i productId ilə tap
+            const img = document.querySelector(`.change-image-btn[data-product-id='${productId}']`).closest('tr').querySelector('td img.product-image');
+            if (!img) return;
+            // Cache busting üçün src-yə timestamp əlavə et
+            const src = img.src.split('?')[0] + '?t=' + new Date().getTime();
+            const modalImg = document.getElementById('modalProductImage');
+            modalImg.src = src;
+            // Modalı aç
+            const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+            modal.show();
+        }
     });
     </script>
 </div>

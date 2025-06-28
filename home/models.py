@@ -8,6 +8,7 @@ from io import BytesIO
 import uuid
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import timezone
 
 class Header_Message(models.Model):
     mesaj = models.CharField(max_length=100)
@@ -81,8 +82,22 @@ class Mehsul(models.Model):
     melumat = models.TextField(null=True, blank=True)
     sekil = models.ImageField(upload_to='mehsul_sekilleri', default='mehsul_sekilleri/no_image.webp',null=True, blank=True)    
     yenidir = models.BooleanField(default=False)
+    yenidir_oldu_tarix = models.DateTimeField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
+        import datetime
+        # Avtomatik yenilikdən çıxarma məntiqi
+        if self.yenidir:
+            if not self.yenidir_oldu_tarix:
+                self.yenidir_oldu_tarix = timezone.now()
+            else:
+                # Əgər 10 saniyə keçibsə, avtomatik olaraq yenilikdən çıxar
+                if (timezone.now() - self.yenidir_oldu_tarix).total_seconds() > 10:
+                    self.yenidir = False
+                    self.yenidir_oldu_tarix = None
+        else:
+            self.yenidir_oldu_tarix = None
+        
         if self.kodlar:
             # Yalnız hərf, rəqəm və boşluq saxla
             self.kodlar = re.sub(r'[^a-zA-Z0-9 ]', '', self.kodlar)

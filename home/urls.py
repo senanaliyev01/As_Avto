@@ -38,5 +38,5 @@ urlpatterns = [
     path('my-products/pdf/', views.my_products_pdf, name='my_products_pdf'),
     path('api/unread-sales-count/', views.unread_sales_count, name='unread_sales_count'),
     path('seller-admin-panel/', views.seller_admin_panel, name='seller_admin_panel'),
-    path('my-products/update-image/<int:product_id>/', views.update_product_image, name='update_product_image'),
+    path('my-products/change-image/<int:product_id>/', views.change_product_image, name='change_product_image'),
 ]

@@ -1438,11 +1438,15 @@ def toggle_product_new_status(request, product_id):
 
 @csrf_exempt
 @login_required
-def update_product_image(request, product_id):
-    """Məhsulun şəklini yeniləyir (AJAX üçün)"""
-    if request.method == 'POST' and request.FILES.get('image'):
+def change_product_image(request, product_id):
+    """Məhsulun şəklini dəyişmək üçün AJAX endpoint"""
+    if request.method == 'POST' and request.FILES.get('sekil'):
         mehsul = get_object_or_404(Mehsul, id=product_id, sahib=request.user)
-        mehsul.sekil = request.FILES['image']
+        sekil = request.FILES['sekil']
+        mehsul.sekil = sekil
         mehsul.save()
-        return JsonResponse({'success': True, 'image_url': mehsul.sekil.url})
+        return JsonResponse({
+            'success': True,
+            'sekil_url': mehsul.sekil.url
+        })
     return JsonResponse({'success': False, 'message': 'Şəkil yüklənmədi'})

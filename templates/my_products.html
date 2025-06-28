@@ -205,7 +205,7 @@
                         if (data.yenidir) {
                             icon.className = 'fas fa-star';
                             btn.title = 'Yenidən çıxar';
-                            // 10 saniyə sonra avtomatik olaraq yenidən çıxar
+                            // 3 gün (72 saat) sonra avtomatik olaraq yenidən çıxar
                             setTimeout(() => {
                                 if (btn.getAttribute('data-yenidir') === 'true') {
                                     // Avtomatik olaraq yenidən çıxar
@@ -241,7 +241,7 @@
                                         console.error('Auto toggle error:', error);
                                     });
                                 }
-                            }, 10000); // 10 saniyə
+                            }, 259200000); // 3 gün (72 saat)
                         } else {
                             icon.className = 'fas fa-star';
                             btn.title = 'Yeni et';

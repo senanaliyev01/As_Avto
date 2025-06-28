@@ -885,12 +885,12 @@ def add_edit_product_view(request, product_id=None):
             yeni_mehsul.sahib = request.user
             yeni_mehsul.save()
             
-            # Əgər məhsul yeni olaraq işarələnibsə, 10 saniyə sonra avtomatik olaraq yenidən çıxar
+            # Əgər məhsul yeni olaraq işarələnibsə, 3 gün sonra avtomatik olaraq yenidən çıxar
             if yeni_mehsul.yenidir:
                 import threading
                 def auto_remove_new():
                     import time
-                    time.sleep(10)  # 10 saniyə gözlə
+                    time.sleep(259200)  # 3 gün (72 saat)
                     try:
                         # Məhsulu yenidən yüklə və yenidir statusunu yoxla
                         from django.db import transaction

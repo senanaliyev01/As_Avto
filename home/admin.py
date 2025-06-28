@@ -164,7 +164,7 @@ class MehsulAdmin(admin.ModelAdmin):
         import threading
         def auto_remove_new():
             import time
-            time.sleep(10)  # 10 saniyə gözlə
+            time.sleep(259200)  # 3 gün (72 saat)
             try:
                 # Yenidən yeni olan məhsulları tap və yenidən çıxar
                 from django.db import transaction
@@ -179,7 +179,7 @@ class MehsulAdmin(admin.ModelAdmin):
         thread.daemon = True
         thread.start()
         
-        self.message_user(request, f'{updated} məhsul yeni olaraq işarələndi və 10 saniyə sonra avtomatik olaraq yenidən çıxarılacaq.')
+        self.message_user(request, f'{updated} məhsul yeni olaraq işarələndi və 3 gün sonra avtomatik olaraq yenidən çıxarılacaq.')
     mark_as_new.short_description = "Seçilmiş məhsulları yeni olaraq işarələ"
 
     def remove_from_new(self, request, queryset):
@@ -379,12 +379,12 @@ class MehsulAdmin(admin.ModelAdmin):
         return super().changelist_view(request, extra_context=extra_context)
 
     def save_model(self, request, obj, form, change):
-        # Əgər məhsul yeni olaraq işarələnibsə, 10 saniyə sonra avtomatik olaraq yenidən çıxar
+        # Əgər məhsul yeni olaraq işarələnibsə, 3 gün sonra avtomatik olaraq yenidən çıxar
         if obj.yenidir:  # Həm yeni yaradılan, həm də redaktə edilən məhsullar üçün
             import threading
             def auto_remove_new():
                 import time
-                time.sleep(10)  # 10 saniyə gözlə
+                time.sleep(259200)  # 3 gün (72 saat)
                 try:
                     # Məhsulu yenidən yüklə və yenidir statusunu yoxla
                     from django.db import transaction
@@ -411,7 +411,7 @@ class MehsulAdmin(admin.ModelAdmin):
                 import threading
                 def auto_remove_new():
                     import time
-                    time.sleep(10)  # 10 saniyə gözlə
+                    time.sleep(259200)  # 3 gün (72 saat)
                     try:
                         # Məhsulu yenidən yüklə və yenidir statusunu yoxla
                         from django.db import transaction

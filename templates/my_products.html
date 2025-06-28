@@ -373,35 +373,15 @@
             });
         });
 
-        // Modal açmaq üçün funksiyanı yenilə
-        function openImageModal(imgOrUrl) {
-            let url = '';
-            if (typeof imgOrUrl === 'string') {
-                // Əgər əvvəlki kimi string göndərilibsə, onu istifadə et
-                url = imgOrUrl;
-            } else if (imgOrUrl && imgOrUrl.tagName === 'IMG') {
-                // Əgər img elementi göndərilibsə, onun cari src-ni istifadə et
-                url = imgOrUrl.src;
+        function openImageModal(url) {
+            // Cache busting: always show the latest image
+            const modalImg = document.getElementById('modal-image');
+            if (modalImg) {
+                const cleanUrl = url.split('?')[0];
+                modalImg.src = cleanUrl + '?t=' + new Date().getTime();
             }
-            // Modal açma kodunuzu buraya əlavə edin (əgər varsa)
-            // Məsələn:
-            let modal = document.getElementById('imageModal');
-            let modalImg = document.getElementById('modalImage');
-            if (modal && modalImg) {
-                modalImg.src = url;
-                modal.style.display = 'block';
-            } else {
-                // Əgər xüsusi modal yoxdursa, yeni pəncərədə aç
-                window.open(url, '_blank');
-            }
+            // ... (modal açma kodu varsa onu saxla)
         }
-
-        // Bütün məhsul şəkillərinə click event əlavə et
-        document.querySelectorAll('img.product-image').forEach(function(img) {
-            img.onclick = function() {
-                openImageModal(this);
-            };
-        });
     });
     </script>
 </div>

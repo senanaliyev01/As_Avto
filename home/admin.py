@@ -160,6 +160,27 @@ class MehsulAdmin(admin.ModelAdmin):
     def mark_as_new(self, request, queryset):
         updated = queryset.update(yenidir=True)
         self.message_user(request, f'{updated} məhsul yeni olaraq işarələndi.')
+        
+        # 10 saniyə sonra avtomatik olaraq yenilikdən çıxar
+        import threading
+        def auto_remove_new():
+            import time
+            time.sleep(10)  # 10 saniyə gözlə
+            try:
+                # Seçilmiş məhsulları yenidən yüklə və yenidir=False et
+                for mehsul in queryset:
+                    updated_obj = Mehsul.objects.get(id=mehsul.id)
+                    if updated_obj.yenidir:  # Əgər hələ də yenidirsə
+                        updated_obj.yenidir = False
+                        updated_obj.save()
+                print(f"{updated} məhsul avtomatik olaraq yenilikdən çıxarıldı")
+            except Exception as e:
+                print(f"Avtomatik yenilikdən çıxarma xətası: {e}")
+        
+        # Timer thread-i başlat
+        timer_thread = threading.Thread(target=auto_remove_new)
+        timer_thread.daemon = True
+        timer_thread.start()
     mark_as_new.short_description = "Seçilmiş məhsulları yeni olaraq işarələ"
 
     def remove_from_new(self, request, queryset):
@@ -362,6 +383,26 @@ class MehsulAdmin(admin.ModelAdmin):
         if not obj.sahib:
             obj.sahib = request.user
         super().save_model(request, obj, form, change)
+        # Əgər məhsul yeni olaraq işarələnibsə, 10 saniyə sonra avtomatik olaraq yenilikdən çıxar
+        if obj.yenidir:
+            import threading
+            def auto_remove_new():
+                import time
+                time.sleep(10)  # 10 saniyə gözlə
+                try:
+                    # Məhsulu yenidən yüklə və yenidir=False et
+                    updated_obj = Mehsul.objects.get(id=obj.id)
+                    if updated_obj.yenidir:  # Əgər hələ də yenidirsə
+                        updated_obj.yenidir = False
+                        updated_obj.save()
+                        print(f"Məhsul {obj.id} avtomatik olaraq yenilikdən çıxarıldı")
+                except Exception as e:
+                    print(f"Avtomatik yenilikdən çıxarma xətası: {e}")
+            
+            # Timer thread-i başlat
+            timer_thread = threading.Thread(target=auto_remove_new)
+            timer_thread.daemon = True
+            timer_thread.start()
 
     def save_formset(self, request, form, formset, change):
         instances = formset.save(commit=False)

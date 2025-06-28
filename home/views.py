@@ -1424,6 +1424,28 @@ def toggle_product_new_status(request, product_id):
             mehsul = get_object_or_404(Mehsul, id=product_id, sahib=request.user)
             mehsul.yenidir = not mehsul.yenidir
             mehsul.save()
+            
+            # Əgər məhsul yeni olduysa, 10 saniyə sonra avtomatik olaraq yenilikdən çıxar
+            if mehsul.yenidir:
+                import threading
+                def auto_remove_new():
+                    import time
+                    time.sleep(10)  # 10 saniyə gözlə
+                    try:
+                        # Məhsulu yenidən yüklə və yenidir=False et
+                        updated_mehsul = Mehsul.objects.get(id=product_id)
+                        if updated_mehsul.yenidir:  # Əgər hələ də yenidirsə
+                            updated_mehsul.yenidir = False
+                            updated_mehsul.save()
+                            print(f"Məhsul {product_id} avtomatik olaraq yenilikdən çıxarıldı")
+                    except Exception as e:
+                        print(f"Avtomatik yenilikdən çıxarma xətası: {e}")
+                
+                # Timer thread-i başlat
+                timer_thread = threading.Thread(target=auto_remove_new)
+                timer_thread.daemon = True
+                timer_thread.start()
+            
             return JsonResponse({
                 'success': True,
                 'yenidir': mehsul.yenidir,

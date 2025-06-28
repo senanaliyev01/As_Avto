@@ -205,6 +205,53 @@
                         if (data.yenidir) {
                             icon.className = 'fas fa-star';
                             btn.title = 'Yenidən çıxar';
+                            
+                            // 10 saniyə sonra avtomatik olaraq "yeni" statusundan çıxar
+                            setTimeout(() => {
+                                if (btn.getAttribute('data-yenidir') === 'true') {
+                                    // Avtomatik olaraq "yeni" statusundan çıxar
+                                    btn.disabled = true;
+                                    const originalContent = btn.innerHTML;
+                                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                                    
+                                    fetch(`/my-products/toggle-new/${productId}/`, {
+                                        method: 'POST',
+                                        headers: {
+                                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                                            'Content-Type': 'application/json',
+                                        },
+                                    })
+                                    .then(response => response.json())
+                                    .then(autoData => {
+                                        if (autoData.success) {
+                                            // Update button appearance
+                                            const autoIcon = btn.querySelector('i');
+                                            autoIcon.className = 'fas fa-star';
+                                            btn.title = 'Yeni et';
+                                            btn.setAttribute('data-yenidir', autoData.yenidir);
+                                            
+                                            // Update product name display
+                                            const productRow = btn.closest('tr');
+                                            const productNameCell = productRow.querySelector('td:nth-child(4)');
+                                            const newBadge = productNameCell.querySelector('.new-badge');
+                                            
+                                            if (newBadge) {
+                                                newBadge.remove();
+                                            }
+                                            
+                                            showMessage('Məhsul avtomatik olaraq yenilikdən çıxarıldı', 'success');
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Auto toggle error:', error);
+                                    })
+                                    .finally(() => {
+                                        btn.disabled = false;
+                                        btn.innerHTML = originalContent;
+                                    });
+                                }
+                            }, 10000); // 10 saniyə
+                            
                         } else {
                             icon.className = 'fas fa-star';
                             btn.title = 'Yeni et';
@@ -231,41 +278,6 @@
                         
                         // Show success message
                         showMessage('Məhsul yeni statusu yeniləndi', 'success');
-
-                        // 10 saniyə sonra avtomatik ləğv et
-                        setTimeout(function() {
-                            // Əgər hələ də yenidir-dirsə, avtomatik ləğv et
-                            if (btn.getAttribute('data-yenidir') === 'true') {
-                                btn.disabled = true;
-                                const originalContent2 = btn.innerHTML;
-                                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                                fetch(`/my-products/toggle-new/${productId}/`, {
-                                    method: 'POST',
-                                    headers: {
-                                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                                        'Content-Type': 'application/json',
-                                    },
-                                })
-                                .then(response => response.json())
-                                .then(data2 => {
-                                    if (data2.success) {
-                                        icon.className = 'fas fa-star';
-                                        btn.title = 'Yeni et';
-                                        btn.setAttribute('data-yenidir', 'false');
-                                        // Badge silinsin
-                                        const productRow = btn.closest('tr');
-                                        const productNameCell = productRow.querySelector('td:nth-child(4)');
-                                        const newBadge = productNameCell.querySelector('.new-badge');
-                                        if (newBadge) newBadge.remove();
-                                        showMessage('Məhsul avtomatik yenilikdən çıxarıldı', 'success');
-                                    }
-                                })
-                                .finally(() => {
-                                    btn.disabled = false;
-                                    btn.innerHTML = originalContent2;
-                                });
-                            }
-                        }, 10000);
                     } else {
                         showMessage(data.message || 'Xəta baş verdi', 'error');
                     }

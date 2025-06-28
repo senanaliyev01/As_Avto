@@ -372,16 +372,6 @@
                 });
             });
         });
-
-        function openImageModal(url) {
-            // Cache busting: always show the latest image
-            const modalImg = document.getElementById('modal-image');
-            if (modalImg) {
-                const cleanUrl = url.split('?')[0];
-                modalImg.src = cleanUrl + '?t=' + new Date().getTime();
-            }
-            // ... (modal açma kodu varsa onu saxla)
-        }
     });
     </script>
 </div>

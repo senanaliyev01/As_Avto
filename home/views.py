@@ -30,6 +30,30 @@ from reportlab.pdfbase.ttfonts import TTFont
 import io
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+import os
+import threading
+
+# Səs səsləndirmə funksiyası
+def play_notification_sound():
+    """Yeni sifariş bildirişi üçün səs səsləndirir"""
+    try:
+        from playsound import playsound
+        sound_file = os.path.join(os.path.dirname(__file__), '..', 'static', 'sounds', 'new_order.mp3')
+        if os.path.exists(sound_file):
+            # Səsi ayrı thread-də səsləndir (UI-ni bloklamamaq üçün)
+            def play_sound():
+                try:
+                    playsound(sound_file, block=False)
+                except Exception as e:
+                    print(f"Səs səsləndirmə xətası: {e}")
+            
+            sound_thread = threading.Thread(target=play_sound)
+            sound_thread.daemon = True
+            sound_thread.start()
+    except ImportError:
+        print("playsound kitabxanası quraşdırılmayıb. Səs səsləndirilməyəcək.")
+    except Exception as e:
+        print(f"Səs səsləndirmə xətası: {e}")
 
 def normalize_azerbaijani_chars(text):
     # Azərbaycan hərflərinin qarşılıqlı çevrilməsi
@@ -371,6 +395,10 @@ def checkout(request):
             # Səbəti yeniləyirik (yalnız seçilməmiş məhsulları saxlayırıq)
             request.session['cart'] = remaining_cart
             request.session.modified = True
+
+            # Yeni sifariş yaradıldığında səs səsləndir
+            if created_orders:
+                play_notification_sound()
 
             if len(created_orders) == 1:
                 messages.success(request, 'Sifarişiniz uğurla yaradıldı.')
@@ -749,6 +777,10 @@ def my_sales_view(request):
     if not request.user.profile.is_verified:
         messages.error(request, 'Bu səhifəyə giriş üçün icazəniz yoxdur.')
         return redirect('base')
+
+    # Yeni sifarişlər varsa səs səsləndir
+    if request.user.profile.yeni_unread_sales > 0:
+        play_notification_sound()
 
     all_orders = Sifaris.objects.all().order_by('-tarix')
     filtered_orders = []
@@ -1394,6 +1426,9 @@ def unread_sales_count(request):
         count = 0
         if hasattr(request.user, 'profile'):
             count = request.user.profile.yeni_unread_sales
+            # Yeni sifarişlər varsa səs səsləndir
+            if count > 0:
+                play_notification_sound()
         return JsonResponse({'count': count})
     elif request.method == 'POST':
         # Sıfırla
@@ -1407,4 +1442,9 @@ def seller_admin_panel(request):
         from django.contrib import messages
         messages.error(request, 'Satıcı panelinə giriş üçün icazəniz yoxdur.')
         return redirect('base')
+    
+    # Yeni sifarişlər varsa səs səsləndir
+    if request.user.profile.yeni_unread_sales > 0:
+        play_notification_sound()
+    
     return render(request, 'admin_panel.html')

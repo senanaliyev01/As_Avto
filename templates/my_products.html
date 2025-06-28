@@ -130,7 +130,7 @@
             <tbody id="products-tbody">
                 {% for mehsul in mehsullar %}
                 <tr>
-                    <td><img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image" data-product-id="{{ mehsul.id }}"></td>
+                    <td><img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image" onclick="openImageModal('{{ mehsul.sekil.url }}')"></td>
                     <td>{{ mehsul.brend_kod }}</td>
                     <td>{{ mehsul.firma.adi }}</td>
                     <td>
@@ -151,7 +151,7 @@
                         <button class="btn btn-warning btn-sm change-image-btn" data-product-id="{{ mehsul.id }}" title="Şəkli dəyiş">
                             <i class="fas fa-image"></i>
                         </button>
-                        <input type="file" accept="image/*" class="d-none product-image-input" data-product-id="{{ mehsul.id }}">
+                        <input type="file" accept="image/*" class="product-image-input" data-product-id="{{ mehsul.id }}" style="display:none;">
                         <a href="{% url 'delete_product' mehsul.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Bu məhsulu silmək istədiyinizə əminsiniz?')">
                             <i class="fas fa-trash"></i>
                         </a>
@@ -174,12 +174,6 @@
             <button id="load-more-btn" class="btn btn-outline-primary" data-offset="5" data-search="{{ search_query }}">Daha çox göstər</button>
             {% endif %}
         </div>
-    </div>
-
-    <!-- Modal for image preview -->
-    <div id="imageModal" class="modal" tabindex="-1" style="display:none;">
-      <span class="close" onclick="closeImageModal()">&times;</span>
-      <img class="modal-content" id="modalImage">
     </div>
 
     <script>
@@ -287,7 +281,7 @@
                             const row = document.createElement('tr');
                             row.innerHTML = `
                                 <td>
-                                    ${product.sekil_url ? `<img src="${product.sekil_url}" alt="${product.adi}" class="product-image" data-product-id="${product.id}">` : ''}
+                                    ${product.sekil_url ? `<img src="${product.sekil_url}" alt="${product.adi}" class="product-image" onclick="openImageModal('${product.sekil_url}')">` : ''}
                                 </td>
                                 <td>${product.brend_kod}</td>
                                 <td>${product.firma}</td>
@@ -304,7 +298,7 @@
                                     <button class="btn btn-warning btn-sm change-image-btn" data-product-id="${product.id}" title="Şəkli dəyiş">
                                         <i class="fas fa-image"></i>
                                     </button>
-                                    <input type="file" accept="image/*" class="d-none product-image-input" data-product-id="${product.id}">
+                                    <input type="file" accept="image/*" class="product-image-input" data-product-id="${product.id}" style="display:none;">
                                     <a href="/my-products/delete/${product.id}/" class="btn btn-danger btn-sm" onclick="return confirm('Bu məhsulu silmək istədiyinizə əminsiniz?')">
                                         <i class="fas fa-trash"></i>
                                     </a>
@@ -362,12 +356,6 @@
                         const img = row.querySelector('td img.product-image');
                         if (img) {
                             img.src = data.sekil_url + '?t=' + new Date().getTime(); // Cache bust
-                            // Modal açıqdırsa, modalda da src-ni yenilə
-                            const modal = document.getElementById('imageModal');
-                            const modalImg = document.getElementById('modalImage');
-                            if (modal && modalImg && modal.style.display === 'block') {
-                                modalImg.src = img.src;
-                            }
                         }
                         showMessage('Şəkil uğurla dəyişdirildi', 'success');
                     } else {
@@ -383,13 +371,6 @@
                     input.value = '';
                 });
             });
-        });
-
-        // Şəkil klikində modal aç
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('product-image')) {
-                openImageModal(e.target.src);
-            }
         });
     });
     </script>

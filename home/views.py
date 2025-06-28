@@ -1414,3 +1414,24 @@ def seller_admin_panel(request):
         messages.error(request, 'Satıcı panelinə giriş üçün icazəniz yoxdur.')
         return redirect('base')
     return render(request, 'admin_panel.html')
+
+@csrf_exempt
+@login_required
+def toggle_product_new_status(request, product_id):
+    """Məhsulun yeni statusunu dəyişdirir"""
+    if request.method == 'POST':
+        try:
+            mehsul = get_object_or_404(Mehsul, id=product_id, sahib=request.user)
+            mehsul.yenidir = not mehsul.yenidir
+            mehsul.save()
+            return JsonResponse({
+                'success': True,
+                'yenidir': mehsul.yenidir,
+                'message': 'Məhsul yeni statusu yeniləndi'
+            })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': 'Xəta baş verdi'
+            })
+    return JsonResponse({'success': False, 'message': 'Yanlış sorğu'})

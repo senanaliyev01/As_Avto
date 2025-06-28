@@ -6,6 +6,7 @@
 
 {% block content %}
 <div class="container">
+    {% csrf_token %}
     {% if messages %}
     <div class="messages">
         {% for message in messages %}
@@ -144,6 +145,9 @@
                         <a href="{% url 'edit_product' mehsul.id %}" class="btn btn-secondary btn-sm">
                             <i class="fas fa-edit"></i>
                         </a>
+                        <button class="btn btn-info btn-sm toggle-new-btn" data-product-id="{{ mehsul.id }}" data-yenidir="{{ mehsul.yenidir|yesno:'true,false' }}" title="{% if mehsul.yenidir %}Yenidən çıxar{% else %}Yeni et{% endif %}">
+                            <i class="fas {% if mehsul.yenidir %}fa-star{% else %}fa-star-o{% endif %}"></i>
+                        </button>
                         <a href="{% url 'delete_product' mehsul.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Bu məhsulu silmək istədiyinizə əminsiniz?')">
                             <i class="fas fa-trash"></i>
                         </a>
@@ -170,6 +174,94 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Toggle new status functionality
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.toggle-new-btn')) {
+                const btn = e.target.closest('.toggle-new-btn');
+                const productId = btn.getAttribute('data-product-id');
+                const currentStatus = btn.getAttribute('data-yenidir') === 'true';
+                
+                // Disable button during request
+                btn.disabled = true;
+                const originalContent = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                
+                fetch(`/my-products/toggle-new/${productId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update button appearance
+                        const icon = btn.querySelector('i');
+                        if (data.yenidir) {
+                            icon.className = 'fas fa-star';
+                            btn.title = 'Yenidən çıxar';
+                        } else {
+                            icon.className = 'fas fa-star-o';
+                            btn.title = 'Yeni et';
+                        }
+                        btn.setAttribute('data-yenidir', data.yenidir);
+                        
+                        // Update product name display
+                        const productRow = btn.closest('tr');
+                        const productNameCell = productRow.querySelector('td:nth-child(4)');
+                        const newBadge = productNameCell.querySelector('.new-badge');
+                        
+                        if (data.yenidir) {
+                            if (!newBadge) {
+                                const badge = document.createElement('span');
+                                badge.className = 'new-badge';
+                                badge.textContent = 'Yeni';
+                                productNameCell.appendChild(badge);
+                            }
+                        } else {
+                            if (newBadge) {
+                                newBadge.remove();
+                            }
+                        }
+                        
+                        // Show success message
+                        showMessage('Məhsul yeni statusu yeniləndi', 'success');
+                    } else {
+                        showMessage(data.message || 'Xəta baş verdi', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showMessage('Xəta baş verdi', 'error');
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalContent;
+                });
+            }
+        });
+        
+        // Message display function
+        function showMessage(message, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message message-${type === 'success' ? 'success' : 'error'}`;
+            messageDiv.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+            
+            const messagesContainer = document.querySelector('.messages') || document.createElement('div');
+            if (!document.querySelector('.messages')) {
+                messagesContainer.className = 'messages';
+                document.querySelector('.container').insertBefore(messagesContainer, document.querySelector('.container').firstChild);
+            }
+            
+            messagesContainer.appendChild(messageDiv);
+            
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 3000);
+        }
+        
         const loadMoreBtn = document.getElementById('load-more-btn');
         if (loadMoreBtn) {
             loadMoreBtn.addEventListener('click', function() {
@@ -196,6 +288,9 @@
                                     <a href="/my-products/edit/${product.id}/" class="btn btn-secondary btn-sm">
                                         <i class="fas fa-edit"></i>
                                     </a>
+                                    <button class="btn btn-info btn-sm toggle-new-btn" data-product-id="${product.id}" data-yenidir="${product.yenidir}" title="${product.yenidir ? 'Yenidən çıxar' : 'Yeni et'}">
+                                        <i class="fas ${product.yenidir ? 'fa-star' : 'fa-star-o'}"></i>
+                                    </button>
                                     <a href="/my-products/delete/${product.id}/" class="btn btn-danger btn-sm" onclick="return confirm('Bu məhsulu silmək istədiyinizə əminsiniz?')">
                                         <i class="fas fa-trash"></i>
                                     </a>

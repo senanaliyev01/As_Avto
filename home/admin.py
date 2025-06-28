@@ -19,30 +19,6 @@ from django.contrib import messages
 from django.db import transaction
 import math
 from django.contrib.admin import SimpleListFilter
-import os
-import threading
-
-# Səs səsləndirmə funksiyası
-def play_notification_sound():
-    """Yeni sifariş bildirişi üçün səs səsləndirir"""
-    try:
-        from playsound import playsound
-        sound_file = os.path.join(os.path.dirname(__file__), '..', 'static', 'sounds', 'new_order.mp3')
-        if os.path.exists(sound_file):
-            # Səsi ayrı thread-də səsləndir (UI-ni bloklamamaq üçün)
-            def play_sound():
-                try:
-                    playsound(sound_file, block=False)
-                except Exception as e:
-                    print(f"Səs səsləndirmə xətası: {e}")
-            
-            sound_thread = threading.Thread(target=play_sound)
-            sound_thread.daemon = True
-            sound_thread.start()
-    except ImportError:
-        print("playsound kitabxanası quraşdırılmayıb. Səs səsləndirilməyəcək.")
-    except Exception as e:
-        print(f"Səs səsləndirmə xətası: {e}")
 
 @admin.register(Header_Message)
 class Header_MessageAdmin(admin.ModelAdmin):
@@ -448,29 +424,6 @@ class SifarisAdmin(admin.ModelAdmin):
     fields = ['istifadeci', 'tarix', 'status', 'catdirilma_usulu', 'umumi_mebleg', 'odenilen_mebleg', 'qaliq_borc', 'qeyd']
     inlines = [SifarisItemInline]
     change_list_template = 'admin/sifaris_change_list.html'
-
-    def save_model(self, request, obj, form, change):
-        """Sifariş statusu dəyişdirildikdə səs səsləndir"""
-        if change:  # Əgər mövcud sifariş yenilənirsə
-            try:
-                # Əvvəlki statusu al
-                old_obj = Sifaris.objects.get(pk=obj.pk)
-                old_status = old_obj.status
-                
-                # Yeni statusu yadda saxla
-                super().save_model(request, obj, form, change)
-                
-                # Əgər status dəyişibsə və yeni status "tamamlandı" və ya "göndərildi"dirsə
-                if obj.status != old_status and obj.status in ['tamamlandı', 'göndərildi']:
-                    play_notification_sound()
-            except Sifaris.DoesNotExist:
-                # Yeni sifariş yaradılır
-                super().save_model(request, obj, form, change)
-                play_notification_sound()
-        else:
-            # Yeni sifariş yaradılır
-            super().save_model(request, obj, form, change)
-            play_notification_sound()
 
     def saticilar(self, obj):
         # Sifarişdə olan bütün məhsulların sahiblərini tapırıq

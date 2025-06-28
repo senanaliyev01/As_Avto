@@ -15,30 +15,37 @@
         <!-- Sidebar -->
         <aside class="admin-sidebar" id="adminSidebar">
             <div class="sidebar-header">
-                <button id="sidebarToggle" class="sidebar-toggle" aria-label="Menunu aç/bağla" style="background:none;border:none;color:#fff;font-size:1.5rem;margin-right:10px;cursor:pointer;"><i class="fas fa-bars"></i></button>
                 <a href="{% url 'seller_admin_panel' %}" class="admin-panel-link">
-                    <i class="fas fa-cogs"></i> Satıcı Paneli
+                    <i class="fas fa-cogs"></i> <span class="sidebar-title-text">Satıcı Paneli</span>
                 </a>
             </div>
             <nav class="sidebar-nav">
                 <ul>
                     <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'my_products' %}active{% endif %}">
-                        <a href="{% url 'my_products' %}"><i class="fas fa-box"></i> Mənim Məhsullarım</a>
+                        <a href="{% url 'my_products' %}">
+                            <i class="fas fa-box"></i> 
+                            <span class="nav-text">Mənim Məhsullarım</span>
+                        </a>
                     </li>
                     <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'my_sales' %}active{% endif %}">
                         <a href="{% url 'my_sales' %}" id="sidebarMySalesLink">
-                            <i class="fas fa-receipt"></i> Mənə gələn sifarişlər
+                            <i class="fas fa-receipt"></i> 
+                            <span class="nav-text">Mənə gələn sifarişlər</span>
                             <span id="salesBadge" class="sales-badge-sidebar" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span>
                         </a>
                     </li>
                 </ul>
             </nav>
         </aside>
+        
         <!-- Main Content -->
         <div class="admin-main" id="adminMain">
             <!-- Header -->
             <header class="admin-header">
                 <div class="admin-header-left">
+                    <button class="sidebar-toggle-btn" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
                     <span class="admin-header-title">{% block panel_title %}Satıcı Paneli{% endblock %}</span>
                 </div>
                 <div class="admin-header-right">
@@ -58,6 +65,10 @@
             </footer>
         </div>
     </div>
+    
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
     <!-- Şəkil Modalı -->
     <div id="imageModal" class="image-modal" style="display:none;">
         <span class="image-modal-close" style="position:absolute;right:20px;top:20px;cursor:pointer;font-size:24px;">&times;</span>

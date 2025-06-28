@@ -11,26 +11,23 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <div class="admin-layout" id="adminLayout">
+    <div class="admin-layout">
         <!-- Sidebar -->
         <aside class="admin-sidebar" id="adminSidebar">
             <div class="sidebar-header">
+                <button id="sidebarToggle" class="sidebar-toggle" aria-label="Menunu aç/bağla" style="background:none;border:none;color:#fff;font-size:1.5rem;margin-right:10px;cursor:pointer;"><i class="fas fa-bars"></i></button>
                 <a href="{% url 'seller_admin_panel' %}" class="admin-panel-link">
-                    <i class="fas fa-cogs"></i> <span class="sidebar-title-text">Satıcı Paneli</span>
+                    <i class="fas fa-cogs"></i> Satıcı Paneli
                 </a>
             </div>
             <nav class="sidebar-nav">
                 <ul>
                     <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'my_products' %}active{% endif %}">
-                        <a href="{% url 'my_products' %}" data-title="Mənim Məhsullarım">
-                            <i class="fas fa-box"></i> 
-                            <span class="nav-text">Mənim Məhsullarım</span>
-                        </a>
+                        <a href="{% url 'my_products' %}"><i class="fas fa-box"></i> Mənim Məhsullarım</a>
                     </li>
                     <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'my_sales' %}active{% endif %}">
-                        <a href="{% url 'my_sales' %}" id="sidebarMySalesLink" data-title="Mənə gələn sifarişlər">
-                            <i class="fas fa-receipt"></i> 
-                            <span class="nav-text">Mənə gələn sifarişlər</span>
+                        <a href="{% url 'my_sales' %}" id="sidebarMySalesLink">
+                            <i class="fas fa-receipt"></i> Mənə gələn sifarişlər
                             <span id="salesBadge" class="sales-badge-sidebar" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span>
                         </a>
                     </li>
@@ -42,9 +39,6 @@
             <!-- Header -->
             <header class="admin-header">
                 <div class="admin-header-left">
-                    <button id="sidebarToggle" class="sidebar-toggle-btn" title="Sidebar-ı aç/bağla">
-                        <i class="fas fa-bars"></i>
-                    </button>
                     <span class="admin-header-title">{% block panel_title %}Satıcı Paneli{% endblock %}</span>
                 </div>
                 <div class="admin-header-right">
@@ -153,30 +147,6 @@
             });
         }
     })();
-
-    // Sidebar Toggle Functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const adminLayout = document.getElementById('adminLayout');
-        const adminSidebar = document.getElementById('adminSidebar');
-        const adminMain = document.getElementById('adminMain');
-        
-        // Get saved state from localStorage
-        const sidebarCollapsed = localStorage.getItem('adminSidebarCollapsed') === 'true';
-        
-        // Apply initial state
-        if (sidebarCollapsed) {
-            adminLayout.classList.add('sidebar-collapsed');
-        }
-        
-        sidebarToggle.addEventListener('click', function() {
-            adminLayout.classList.toggle('sidebar-collapsed');
-            
-            // Save state to localStorage
-            const isCollapsed = adminLayout.classList.contains('sidebar-collapsed');
-            localStorage.setItem('adminSidebarCollapsed', isCollapsed);
-        });
-    });
     </script>
     {% endblock %}
 </body>

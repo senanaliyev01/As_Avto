@@ -149,6 +149,24 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
+
+    // Sidebar açılıb bağlanma funksionallığı
+    const sidebar = document.getElementById('adminSidebar');
+    const main = document.getElementById('adminMain');
+    const toggleBtn = document.getElementById('sidebarToggle');
+    if (sidebar && main && toggleBtn) {
+        // Yadda saxlanmış vəziyyəti oxu
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            sidebar.classList.add('collapsed');
+            main.classList.add('sidebar-collapsed');
+        }
+        toggleBtn.addEventListener('click', function() {
+            sidebar.classList.toggle('collapsed');
+            main.classList.toggle('sidebar-collapsed');
+            // Vəziyyəti yadda saxla
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+        });
+    }
 });
 
 function initializeSearch() {

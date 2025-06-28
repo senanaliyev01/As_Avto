@@ -3706,7 +3706,6 @@ body {
     display: flex;
     min-height: 100vh;
     background: #f4f6fa;
-    transition: all 0.3s ease;
 }
 .admin-sidebar {
     width: 240px;
@@ -3718,8 +3717,57 @@ body {
     box-shadow: 2px 0 8px rgba(44, 62, 80, 0.08);
     position: relative;
     z-index: 10;
-    transition: all 0.3s ease;
-    overflow: hidden;
+    transition: width 0.3s cubic-bezier(.4,2,.6,1);
+}
+.admin-sidebar.collapsed {
+    width: 64px !important;
+    min-width: 64px !important;
+    max-width: 64px !important;
+    overflow-x: hidden;
+}
+.admin-sidebar.collapsed .sidebar-header {
+    justify-content: center;
+    padding: 20px 8px 20px 8px;
+}
+.admin-sidebar.collapsed .admin-panel-link {
+    font-size: 0;
+    padding: 0;
+    justify-content: center;
+}
+.admin-sidebar.collapsed .admin-panel-link i {
+    font-size: 1.5rem;
+    margin: 0;
+}
+.admin-sidebar.collapsed .sidebar-nav ul {
+    padding: 0;
+}
+.admin-sidebar.collapsed .sidebar-nav-item a {
+    justify-content: center;
+    padding: 12px 0;
+    font-size: 1.3rem;
+}
+.admin-sidebar.collapsed .sidebar-nav-item a span,
+.admin-sidebar.collapsed .sidebar-nav-item a i + span,
+.admin-sidebar.collapsed .sidebar-nav-item a .sidebar-nav-text {
+    display: none !important;
+}
+.admin-main {
+    transition: margin-left 0.3s cubic-bezier(.4,2,.6,1);
+}
+.admin-main.sidebar-collapsed {
+    margin-left: 64px !important;
+}
+@media (max-width: 900px) {
+    .admin-sidebar.collapsed {
+        width: 0 !important;
+        min-width: 0 !important;
+        max-width: 0 !important;
+        padding: 0;
+        overflow: hidden;
+    }
+    .admin-main.sidebar-collapsed {
+        margin-left: 0 !important;
+    }
 }
 .sidebar-header {
     display: flex;
@@ -3729,7 +3777,6 @@ body {
     font-size: 1.3rem;
     font-weight: 700;
     border-bottom: 1px solid rgba(255,255,255,0.08);
-    transition: all 0.3s ease;
 }
 .sidebar-logo {
     font-size: 2rem;
@@ -3763,7 +3810,6 @@ body {
     border-radius: 6px 0 0 6px;
     transition: background 0.18s, color 0.18s;
     position: relative;
-    white-space: nowrap;
 }
 .sidebar-nav-item.active a,
 .sidebar-nav-item a:hover {
@@ -3776,7 +3822,6 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    transition: all 0.3s ease;
 }
 .admin-header {
     background: #fff;
@@ -3790,11 +3835,6 @@ body {
     position: sticky;
     top: 0;
     z-index: 5;
-}
-.admin-header-left {
-    display: flex;
-    align-items: center;
-    gap: 16px;
 }
 .admin-header-title {
     font-size: 1.3rem;
@@ -3849,90 +3889,6 @@ body {
     box-shadow: 0 -2px 8px rgba(44, 62, 80, 0.04);
 }
 
-/* Sidebar Toggle Button */
-.sidebar-toggle-btn {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    color: #2B5173;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-}
-.sidebar-toggle-btn:hover {
-    background: #f4f6fa;
-    color: #1a3654;
-    transform: scale(1.05);
-}
-.sidebar-toggle-btn:active {
-    transform: scale(0.95);
-}
-
-/* Collapsed Sidebar Styles */
-.admin-layout.sidebar-collapsed .admin-sidebar {
-    width: 60px;
-}
-.admin-layout.sidebar-collapsed .sidebar-header {
-    padding: 32px 12px 24px 12px;
-    justify-content: center;
-}
-.admin-layout.sidebar-collapsed .sidebar-title-text {
-    display: none;
-}
-.admin-layout.sidebar-collapsed .nav-text {
-    display: none;
-}
-.admin-layout.sidebar-collapsed .sidebar-nav-item a {
-    padding: 12px;
-    justify-content: center;
-    border-radius: 6px;
-    margin: 0 8px 8px 8px;
-}
-.admin-layout.sidebar-collapsed .sales-badge-sidebar {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    margin: 0;
-    font-size: 10px;
-    padding: 1px 4px;
-    min-width: 16px;
-    height: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.admin-layout.sidebar-collapsed .admin-main {
-    margin-left: 0;
-}
-
-/* Tooltip for collapsed sidebar */
-.admin-layout.sidebar-collapsed .sidebar-nav-item {
-    position: relative;
-}
-.admin-layout.sidebar-collapsed .sidebar-nav-item a:hover::after {
-    content: attr(data-title);
-    position: absolute;
-    left: 100%;
-    top: 50%;
-    transform: translateY(-50%);
-    background: #2B5173;
-    color: #fff;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    white-space: nowrap;
-    z-index: 1000;
-    margin-left: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    pointer-events: none;
-}
-
 @media (max-width: 900px) {
     .admin-layout {
         flex-direction: column;
@@ -3964,20 +3920,6 @@ body {
         padding: 12px 18px;
         font-size: 1rem;
     }
-    /* Mobile collapsed state */
-    .admin-layout.sidebar-collapsed .admin-sidebar {
-        width: 100%;
-    }
-    .admin-layout.sidebar-collapsed .sidebar-title-text,
-    .admin-layout.sidebar-collapsed .nav-text {
-        display: inline;
-    }
-    .admin-layout.sidebar-collapsed .sidebar-nav-item a {
-        padding: 12px 18px;
-        justify-content: flex-start;
-        border-radius: 0;
-        margin: 0;
-    }
 }
 
 @media (max-width: 600px) {
@@ -3994,11 +3936,6 @@ body {
     .admin-footer {
         font-size: 0.95rem;
         padding: 10px 0 8px 0;
-    }
-    .sidebar-toggle-btn {
-        font-size: 1.3rem;
-        width: 36px;
-        height: 36px;
     }
 }
 
@@ -4054,16 +3991,6 @@ body {
     color: #fff;
 }
 
-/* Collapsed state for admin panel link */
-.admin-layout.sidebar-collapsed .admin-sidebar .admin-panel-link {
-    padding: 18px 12px;
-    justify-content: center;
-    border-radius: 0 0 6px 6px;
-}
-.admin-layout.sidebar-collapsed .admin-sidebar .admin-panel-link i {
-    margin-right: 0;
-}
-
 .admin-header-right .admin-site-link {
     display: inline-flex;
     align-items: center;
@@ -4093,4 +4020,101 @@ body {
 }
 .admin-header-right .admin-site-link:hover i, .admin-header-right .admin-site-link:focus i {
     color: #ffd700;
+}
+
+/* --- Statistikada Naviqasiya Linkləri (stats-nav-links) --- */
+.stats-nav-links {
+    display: inline-flex;
+    align-items: center;
+    gap: 18px;
+    margin-left: 32px;
+    vertical-align: middle;
+}
+.stats-nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 1.08rem;
+    font-weight: 600;
+    color: #2B5173;
+    background: #fff;
+    border: 1.5px solid #e9ecef;
+    border-radius: 8px;
+    padding: 7px 18px;
+    text-decoration: none;
+    box-shadow: 0 1px 4px rgba(44, 62, 80, 0.06);
+    letter-spacing: 0.2px;
+    transition: background 0.18s, color 0.18s, border 0.18s, box-shadow 0.18s;
+    position: relative;
+}
+.stats-nav-link i {
+    font-size: 1.1rem;
+    color: #3a6ea5;
+    transition: color 0.18s;
+}
+.stats-nav-link:hover, .stats-nav-link:focus {
+    background: #2B5173;
+    color: #fff;
+    border-color: #2B5173;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.12);
+    text-decoration: none;
+}
+.stats-nav-link:hover i, .stats-nav-link:focus i {
+    color: #ffd700;
+}
+
+/* Satıcı Paneli Linki üçün xüsusi dizayn */
+.seller-panel-link {
+    background: linear-gradient(90deg, #2B5173 60%, #3a6ea5 100%);
+    color: #fff;
+    border: none;
+    font-size: 1.13rem;
+    font-weight: 700;
+    padding: 9px 26px 9px 22px;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(44, 62, 80, 0.10);
+    letter-spacing: 0.5px;
+    position: relative;
+    z-index: 2;
+    transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+}
+.seller-panel-link i {
+    font-size: 1.3rem;
+    margin-right: 8px;
+    color: #ffd700;
+    transition: color 0.18s;
+}
+.seller-panel-link:hover, .seller-panel-link:focus {
+    background: linear-gradient(90deg, #3a6ea5 60%, #2B5173 100%);
+    color: #ffd700;
+    box-shadow: 0 4px 16px rgba(44, 62, 80, 0.15);
+    text-decoration: none;
+}
+.seller-panel-link:hover i, .seller-panel-link:focus i {
+    color: #fff;
+}
+
+@media (max-width: 900px) {
+    .stats-nav-links {
+        gap: 10px;
+        margin-left: 8px;
+    }
+    .stats-nav-link, .seller-panel-link {
+        font-size: 0.98rem;
+        padding: 7px 10px;
+    }
+}
+@media (max-width: 600px) {
+    .stats-nav-links {
+        flex-direction: column;
+        gap: 6px;
+        margin-left: 0;
+        margin-top: 8px;
+    }
+    .stats-nav-link, .seller-panel-link {
+        width: 100%;
+        justify-content: center;
+        font-size: 0.93rem;
+        padding: 7px 0;
+    }
 }

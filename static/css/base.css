@@ -4075,23 +4075,31 @@ body {
 }
 
 .toggle-new-btn[data-yenidir="true"] {
-    background-color: #ffc107;
-    color: #212529;
+    background-color: #28a745;
+    color: white;
 }
 
 .toggle-new-btn[data-yenidir="true"]:hover {
-    background-color: #e0a800;
-    color: #212529;
+    background-color: #218838;
+    color: white;
+}
+
+.toggle-new-btn[data-yenidir="true"] i {
+    color: #ffc107;
 }
 
 .toggle-new-btn[data-yenidir="false"] {
-    background-color: #17a2b8;
+    background-color: #dc3545;
     color: white;
 }
 
 .toggle-new-btn[data-yenidir="false"]:hover {
-    background-color: #138496;
+    background-color: #c82333;
     color: white;
+}
+
+.toggle-new-btn[data-yenidir="false"] i {
+    color: #ffc107;
 }
 
 .toggle-new-btn:disabled {

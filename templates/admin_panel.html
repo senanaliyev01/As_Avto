@@ -16,17 +16,17 @@
         <aside class="admin-sidebar">
             <div class="sidebar-header">
                 <a href="{% url 'seller_admin_panel' %}" class="admin-panel-link">
-                    <i class="fas fa-cogs"></i> <span>Satıcı Paneli</span>
+                    <i class="fas fa-cogs"></i> Satıcı Paneli
                 </a>
             </div>
             <nav class="sidebar-nav">
                 <ul>
                     <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'my_products' %}active{% endif %}">
-                        <a href="{% url 'my_products' %}"><i class="fas fa-box"></i> <span>Mənim Məhsullarım</span></a>
+                        <a href="{% url 'my_products' %}"><i class="fas fa-box"></i> Mənim Məhsullarım</a>
                     </li>
                     <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'my_sales' %}active{% endif %}">
                         <a href="{% url 'my_sales' %}" id="sidebarMySalesLink">
-                            <i class="fas fa-receipt"></i> <span>Mənə gələn sifarişlər</span>
+                            <i class="fas fa-receipt"></i> Mənə gələn sifarişlər
                             <span id="salesBadge" class="sales-badge-sidebar" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span>
                         </a>
                     </li>
@@ -37,7 +37,7 @@
         <div class="admin-main">
             <!-- Header -->
             <header class="admin-header">
-                <button id="sidebarToggle" class="sidebar-toggle" style="margin-right:16px;">
+                <button id="sidebarToggle" class="sidebar-toggle" aria-label="Menunu aç/bağla" style="margin-right:16px;font-size:1.5rem;background:none;border:none;color:#2B5173;cursor:pointer;">
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="admin-header-left">
@@ -148,6 +148,22 @@
                     });
             });
         }
+    })();
+    // Sidebar açılıb bağlanma funksionallığı
+    (function() {
+        const sidebar = document.querySelector('.admin-sidebar');
+        const main = document.querySelector('.admin-main');
+        const toggleBtn = document.getElementById('sidebarToggle');
+        // LocalStorage ilə yadda saxla
+        if (localStorage.getItem('sidebarClosed') === 'true') {
+            sidebar.classList.add('closed');
+            main.classList.add('expanded');
+        }
+        toggleBtn.addEventListener('click', function() {
+            sidebar.classList.toggle('closed');
+            main.classList.toggle('expanded');
+            localStorage.setItem('sidebarClosed', sidebar.classList.contains('closed'));
+        });
     })();
     </script>
     {% endblock %}

@@ -149,23 +149,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
-
-    // Sidebar açılıb-bağlanma funksionallığı
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const adminLayout = document.querySelector('.admin-layout');
-    if (sidebarToggle && adminLayout) {
-        sidebarToggle.addEventListener('click', function() {
-            adminLayout.classList.toggle('sidebar-collapsed');
-            if (adminLayout.classList.contains('sidebar-collapsed')) {
-                localStorage.setItem('sidebarCollapsed', '1');
-            } else {
-                localStorage.removeItem('sidebarCollapsed');
-            }
-        });
-        if (localStorage.getItem('sidebarCollapsed') === '1') {
-            adminLayout.classList.add('sidebar-collapsed');
-        }
-    }
 });
 
 function initializeSearch() {

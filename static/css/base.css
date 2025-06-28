@@ -3717,6 +3717,22 @@ body {
     box-shadow: 2px 0 8px rgba(44, 62, 80, 0.08);
     position: relative;
     z-index: 10;
+    transition: width 0.3s;
+}
+.admin-sidebar.closed {
+    width: 60px;
+}
+.admin-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    transition: margin-left 0.3s;
+    margin-left: 240px;
+}
+.admin-sidebar.closed ~ .admin-main,
+.admin-main.expanded {
+    margin-left: 60px;
 }
 .sidebar-header {
     display: flex;
@@ -3766,12 +3782,6 @@ body {
     color: #ffd700;
 }
 
-.admin-main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
 .admin-header {
     background: #fff;
     box-shadow: 0 2px 8px rgba(44, 62, 80, 0.06);
@@ -4066,25 +4076,4 @@ body {
         font-size: 0.93rem;
         padding: 7px 0;
     }
-}
-
-/* --- Jazzmin tipli açılıb-bağlanan sidebar üçün --- */
-.admin-layout.sidebar-collapsed .admin-sidebar {
-    width: 60px !important;
-    min-width: 60px !important;
-    transition: width 0.3s;
-}
-.admin-layout.sidebar-collapsed .admin-sidebar .sidebar-header .admin-panel-link span,
-.admin-layout.sidebar-collapsed .admin-sidebar .sidebar-nav ul li a span {
-    display: none !important;
-}
-.admin-layout.sidebar-collapsed .admin-main {
-    padding-left: 60px !important;
-    transition: padding 0.3s;
-}
-.admin-sidebar {
-    transition: width 0.3s;
-}
-.admin-main {
-    transition: padding 0.3s;
 }

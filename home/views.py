@@ -31,6 +31,12 @@ import io
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
+def truncate_product_name(name, max_length=20):
+    """Məhsul adını qısaldır və uzun olarsa ... əlavə edir"""
+    if len(name) <= max_length:
+        return name
+    return name[:max_length-3] + "..."
+
 def normalize_azerbaijani_chars(text):
     # Azərbaycan hərflərinin qarşılıqlı çevrilməsi
     char_map = {
@@ -1182,7 +1188,7 @@ def my_sale_pdf(request, order_id):
             Paragraph(str(idx), contentStyle),
             Paragraph(item.mehsul.brend_kod, contentStyle),
             Paragraph(item.mehsul.firma.adi if item.mehsul.firma else '-', contentStyle),
-            Paragraph(item.mehsul.adi, contentStyle),
+            Paragraph(truncate_product_name(item.mehsul.adi), contentStyle),
             Paragraph(str(item.mehsul.vitrin.nomre) if item.mehsul.vitrin else '-', contentStyle),
             Paragraph(str(item.miqdar), contentStyle),
             Paragraph(f"{item.qiymet} ₼", contentStyle),
@@ -1354,7 +1360,7 @@ def my_products_pdf(request):
             str(index),
             mehsul.brend_kod,
             mehsul.firma.adi if mehsul.firma else '-',
-            mehsul.adi,
+            truncate_product_name(mehsul.adi),
             str(mehsul.vitrin.nomre) if mehsul.vitrin else '-',
             str(mehsul.stok),
             f"{mehsul.qiymet} ₼"

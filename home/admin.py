@@ -20,6 +20,12 @@ from django.db import transaction
 import math
 from django.contrib.admin import SimpleListFilter
 
+def truncate_product_name(name, max_length=20):
+    """Məhsul adını qısaldır və uzun olarsa ... əlavə edir"""
+    if len(name) <= max_length:
+        return name
+    return name[:max_length-3] + "..."
+
 @admin.register(Header_Message)
 class Header_MessageAdmin(admin.ModelAdmin):
     list_display = ['mesaj']
@@ -105,7 +111,7 @@ class MehsulAdmin(admin.ModelAdmin):
                 str(index),
                 mehsul.brend_kod,
                 mehsul.firma.adi if mehsul.firma else '-',
-                mehsul.adi,
+                truncate_product_name(mehsul.adi),
                 str(mehsul.vitrin.nomre) if mehsul.vitrin else '-',
                 str(mehsul.stok),
                 f"{mehsul.qiymet} ₼"
@@ -573,7 +579,7 @@ class SifarisAdmin(admin.ModelAdmin):
                 Paragraph(str(index), contentStyle),
                 Paragraph(item.mehsul.brend_kod, contentStyle),
                 Paragraph(item.mehsul.firma.adi, contentStyle),
-                Paragraph(item.mehsul.adi, contentStyle),
+                Paragraph(truncate_product_name(item.mehsul.adi), contentStyle),
                 Paragraph(str(item.mehsul.vitrin.nomre) if item.mehsul.vitrin else '-', contentStyle),
                 Paragraph(str(item.miqdar), contentStyle),
                 Paragraph(f"{item.qiymet} ₼", contentStyle),

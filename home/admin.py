@@ -159,28 +159,27 @@ class MehsulAdmin(admin.ModelAdmin):
 
     def mark_as_new(self, request, queryset):
         updated = queryset.update(yenidir=True)
-        self.message_user(request, f'{updated} məhsul yeni olaraq işarələndi.')
         
-        # 10 saniyə sonra avtomatik olaraq yenilikdən çıxar
+        # 10 saniyə sonra avtomatik olaraq yenidən çıxar
         import threading
         def auto_remove_new():
             import time
             time.sleep(10)  # 10 saniyə gözlə
             try:
-                # Seçilmiş məhsulları yenidən yüklə və yenidir=False et
-                for mehsul in queryset:
-                    updated_obj = Mehsul.objects.get(id=mehsul.id)
-                    if updated_obj.yenidir:  # Əgər hələ də yenidirsə
-                        updated_obj.yenidir = False
-                        updated_obj.save()
-                print(f"{updated} məhsul avtomatik olaraq yenilikdən çıxarıldı")
+                # Yenidən yeni olan məhsulları tap və yenidən çıxar
+                from django.db import transaction
+                with transaction.atomic():
+                    new_products = Mehsul.objects.filter(id__in=queryset.values_list('id', flat=True), yenidir=True)
+                    new_products.update(yenidir=False)
             except Exception as e:
-                print(f"Avtomatik yenilikdən çıxarma xətası: {e}")
+                print(f"Auto remove new status error: {e}")
         
-        # Timer thread-i başlat
-        timer_thread = threading.Thread(target=auto_remove_new)
-        timer_thread.daemon = True
-        timer_thread.start()
+        # Thread-i başlat
+        thread = threading.Thread(target=auto_remove_new)
+        thread.daemon = True
+        thread.start()
+        
+        self.message_user(request, f'{updated} məhsul yeni olaraq işarələndi və 10 saniyə sonra avtomatik olaraq yenidən çıxarılacaq.')
     mark_as_new.short_description = "Seçilmiş məhsulları yeni olaraq işarələ"
 
     def remove_from_new(self, request, queryset):
@@ -380,37 +379,57 @@ class MehsulAdmin(admin.ModelAdmin):
         return super().changelist_view(request, extra_context=extra_context)
 
     def save_model(self, request, obj, form, change):
-        if not obj.sahib:
-            obj.sahib = request.user
-        super().save_model(request, obj, form, change)
-        # Əgər məhsul yeni olaraq işarələnibsə, 10 saniyə sonra avtomatik olaraq yenilikdən çıxar
-        if obj.yenidir:
+        # Əgər məhsul yeni olaraq işarələnibsə, 10 saniyə sonra avtomatik olaraq yenidən çıxar
+        if obj.yenidir and not change:  # Yalnız yeni yaradılan məhsullar üçün
             import threading
             def auto_remove_new():
                 import time
                 time.sleep(10)  # 10 saniyə gözlə
                 try:
-                    # Məhsulu yenidən yüklə və yenidir=False et
-                    updated_obj = Mehsul.objects.get(id=obj.id)
-                    if updated_obj.yenidir:  # Əgər hələ də yenidirsə
-                        updated_obj.yenidir = False
-                        updated_obj.save()
-                        print(f"Məhsul {obj.id} avtomatik olaraq yenilikdən çıxarıldı")
+                    # Məhsulu yenidən yüklə və yenidir statusunu yoxla
+                    from django.db import transaction
+                    with transaction.atomic():
+                        mehsul = Mehsul.objects.select_for_update().get(id=obj.id)
+                        if mehsul.yenidir:  # Əgər hələ də yenidirsə
+                            mehsul.yenidir = False
+                            mehsul.save()
                 except Exception as e:
-                    print(f"Avtomatik yenilikdən çıxarma xətası: {e}")
+                    print(f"Auto remove new status error: {e}")
             
-            # Timer thread-i başlat
-            timer_thread = threading.Thread(target=auto_remove_new)
-            timer_thread.daemon = True
-            timer_thread.start()
+            # Thread-i başlat
+            thread = threading.Thread(target=auto_remove_new)
+            thread.daemon = True
+            thread.start()
+        
+        super().save_model(request, obj, form, change)
 
     def save_formset(self, request, form, formset, change):
         instances = formset.save(commit=False)
         for instance in instances:
-            if hasattr(instance, 'sahib') and not instance.sahib:
-                instance.sahib = request.user
-            instance.save()
-        formset.save_m2m()
+            if hasattr(instance, 'yenidir') and instance.yenidir:
+                # Əgər məhsul yeni olaraq işarələnibsə, 10 saniyə sonra avtomatik olaraq yenidən çıxar
+                import threading
+                def auto_remove_new():
+                    import time
+                    time.sleep(10)  # 10 saniyə gözlə
+                    try:
+                        # Məhsulu yenidən yüklə və yenidir statusunu yoxla
+                        from django.db import transaction
+                        with transaction.atomic():
+                            mehsul = Mehsul.objects.select_for_update().get(id=instance.id)
+                            if mehsul.yenidir:  # Əgər hələ də yenidirsə
+                                mehsul.yenidir = False
+                                mehsul.save()
+                    except Exception as e:
+                        print(f"Auto remove new status error: {e}")
+                
+                # Thread-i başlat
+                thread = threading.Thread(target=auto_remove_new)
+                thread.daemon = True
+                thread.start()
+        
+        formset.save()
+        super().save_formset(request, form, formset, change)
 
 class SifarisItemInline(admin.TabularInline):
     model = SifarisItem

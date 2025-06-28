@@ -205,15 +205,10 @@
                         if (data.yenidir) {
                             icon.className = 'fas fa-star';
                             btn.title = 'Yenidən çıxar';
-                            
-                            // 10 saniyə sonra avtomatik olaraq "yeni" statusundan çıxar
+                            // 10 saniyə sonra avtomatik olaraq yenidən çıxar
                             setTimeout(() => {
                                 if (btn.getAttribute('data-yenidir') === 'true') {
-                                    // Avtomatik olaraq "yeni" statusundan çıxar
-                                    btn.disabled = true;
-                                    const originalContent = btn.innerHTML;
-                                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                                    
+                                    // Avtomatik olaraq yenidən çıxar
                                     fetch(`/my-products/toggle-new/${productId}/`, {
                                         method: 'POST',
                                         headers: {
@@ -239,19 +234,14 @@
                                                 newBadge.remove();
                                             }
                                             
-                                            showMessage('Məhsul avtomatik olaraq yenilikdən çıxarıldı', 'success');
+                                            showMessage('Məhsul avtomatik olaraq yenidən çıxarıldı', 'success');
                                         }
                                     })
                                     .catch(error => {
                                         console.error('Auto toggle error:', error);
-                                    })
-                                    .finally(() => {
-                                        btn.disabled = false;
-                                        btn.innerHTML = originalContent;
                                     });
                                 }
                             }, 10000); // 10 saniyə
-                            
                         } else {
                             icon.className = 'fas fa-star';
                             btn.title = 'Yeni et';

@@ -380,7 +380,7 @@ class MehsulAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         # Əgər məhsul yeni olaraq işarələnibsə, 10 saniyə sonra avtomatik olaraq yenidən çıxar
-        if obj.yenidir and not change:  # Yalnız yeni yaradılan məhsullar üçün
+        if obj.yenidir:  # Həm yeni yaradılan, həm də redaktə edilən məhsullar üçün
             import threading
             def auto_remove_new():
                 import time

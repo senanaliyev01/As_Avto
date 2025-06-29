@@ -1451,24 +1451,14 @@ def seller_admin_panel(request):
     # Məhsul statistikaları
     total_products = Mehsul.objects.filter(sahib=request.user).count()
     new_products = Mehsul.objects.filter(sahib=request.user, yenidir=True).count()
-    low_stock_products = Mehsul.objects.filter(sahib=request.user, stok__lte=5).count()
     out_of_stock_products = Mehsul.objects.filter(sahib=request.user, stok=0).count()
+    low_stock_products = Mehsul.objects.filter(sahib=request.user, stok__lt=10, stok__gt=0).count()
     
     # Satış statistikaları
     from .models import SifarisItem
     all_order_items = SifarisItem.objects.filter(mehsul__sahib=request.user)
     seller_orders = []
     total_sales = 0
-    total_paid = 0
-    total_debt = 0
-    monthly_sales = 0
-    weekly_sales = 0
-    
-    # Bu ay və bu həftə tarixləri
-    now = timezone.now()
-    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    week_start = now - timedelta(days=now.weekday())
-    week_start = week_start.replace(hour=0, minute=0, second=0, microsecond=0)
     
     # Sifarişləri qruplaşdır
     order_totals = {}
@@ -1477,27 +1467,13 @@ def seller_admin_panel(request):
         if order.id not in order_totals:
             order_totals[order.id] = {
                 'order': order,
-                'total': 0,
-                'paid': order.odenilen_mebleg or 0,
-                'debt': 0
+                'total': 0
             }
         order_totals[order.id]['total'] += item.umumi_mebleg
     
-    # Borc hesabla
+    # Ümumi satış hesabla
     for order_data in order_totals.values():
-        order_data['debt'] = order_data['total'] - order_data['paid']
         total_sales += order_data['total']
-        total_paid += order_data['paid']
-        total_debt += order_data['debt']
-        
-        # Aylıq satışlar
-        if order_data['order'].tarix >= month_start:
-            monthly_sales += order_data['total']
-        
-        # Həftəlik satışlar
-        if order_data['order'].tarix >= week_start:
-            weekly_sales += order_data['total']
-        
         seller_orders.append(order_data)
     
     # Son 5 sifariş
@@ -1511,14 +1487,10 @@ def seller_admin_panel(request):
             buyer_stats[buyer.id] = {
                 'username': buyer.username,
                 'order_count': 0,
-                'total_amount': 0,
-                'total_paid': 0,
-                'total_debt': 0
+                'total_amount': 0
             }
         buyer_stats[buyer.id]['order_count'] += 1
         buyer_stats[buyer.id]['total_amount'] += order_data['total']
-        buyer_stats[buyer.id]['total_paid'] += order_data['paid']
-        buyer_stats[buyer.id]['total_debt'] += order_data['debt']
     
     # Ən yaxşı alıcılar (top 5)
     top_buyers = sorted(buyer_stats.values(), key=lambda x: x['total_amount'], reverse=True)[:5]
@@ -1548,10 +1520,6 @@ def seller_admin_panel(request):
         'low_stock_products': low_stock_products,
         'out_of_stock_products': out_of_stock_products,
         'total_sales': total_sales,
-        'total_paid': total_paid,
-        'total_debt': total_debt,
-        'monthly_sales': monthly_sales,
-        'weekly_sales': weekly_sales,
         'recent_orders': recent_orders,
         'top_buyers': top_buyers,
         'category_stats': category_stats,

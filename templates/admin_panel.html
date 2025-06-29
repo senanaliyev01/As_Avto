@@ -100,42 +100,12 @@
                                 <p class="stat-label">Ümumi Satış</p>
                             </div>
                         </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-calendar-week"></i>
-                            </div>
-                            <div class="stat-content">
-                                <h3 class="stat-number">{{ weekly_sales|floatformat:2 }} ₼</h3>
-                                <p class="stat-label">Bu Həftə</p>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-calendar-alt"></i>
-                            </div>
-                            <div class="stat-content">
-                                <h3 class="stat-number">{{ monthly_sales|floatformat:2 }} ₼</h3>
-                                <p class="stat-label">Bu Ay</p>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Alerts Section -->
                     <div class="alerts-section mb-4">
-                        <h3 class="section-title">Diqqət Tələb Edən Məhsullar</h3>
+                        <h3 class="section-title">Stok Xəbərdarlıqları</h3>
                         <div class="alerts-grid">
-                            {% if low_stock_products > 0 %}
-                            <div class="alert-card alert-warning">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <div class="alert-content">
-                                    <h4>{{ low_stock_products }}</h4>
-                                    <p>Az stokda olan məhsul</p>
-                                </div>
-                            </div>
-                            {% endif %}
-                            
                             {% if out_of_stock_products > 0 %}
                             <div class="alert-card alert-danger">
                                 <i class="fas fa-times-circle"></i>
@@ -146,12 +116,12 @@
                             </div>
                             {% endif %}
                             
-                            {% if total_debt > 0 %}
-                            <div class="alert-card alert-info">
-                                <i class="fas fa-credit-card"></i>
+                            {% if low_stock_products > 0 %}
+                            <div class="alert-card alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
                                 <div class="alert-content">
-                                    <h4>{{ total_debt|floatformat:2 }} ₼</h4>
-                                    <p>Qalıq borc</p>
+                                    <h4>{{ low_stock_products }}</h4>
+                                    <p>10-dan az stokda olan məhsul</p>
                                 </div>
                             </div>
                             {% endif %}

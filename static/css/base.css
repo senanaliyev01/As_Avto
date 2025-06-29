@@ -4420,20 +4420,19 @@ body {
 }
 
 .card-body {
-    padding: 20px;
+    padding: 15px;
 }
 
 /* Recent Orders */
 .recent-orders {
-    max-height: 300px;
-    overflow-y: auto;
+    /* max-height və overflow-y silindi */
 }
 
 .order-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 0;
+    padding: 8px 0;
     border-bottom: 1px solid #f1f3f4;
 }
 
@@ -4449,11 +4448,11 @@ body {
 .order-number {
     font-weight: 600;
     color: #2c3e50;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
 }
 
 .order-customer {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: #6c757d;
     margin-top: 2px;
 }
@@ -4465,11 +4464,11 @@ body {
 .amount {
     font-weight: 600;
     color: #28a745;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
 }
 
 .order-date {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: #6c757d;
     display: block;
     margin-top: 2px;
@@ -4477,15 +4476,14 @@ body {
 
 /* Top Buyers */
 .top-buyers {
-    max-height: 300px;
-    overflow-y: auto;
+    /* max-height və overflow-y silindi */
 }
 
 .buyer-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 0;
+    padding: 8px 0;
     border-bottom: 1px solid #f1f3f4;
 }
 
@@ -4501,11 +4499,11 @@ body {
 .buyer-name {
     font-weight: 600;
     color: #2c3e50;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
 }
 
 .buyer-orders {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: #6c757d;
     margin-top: 2px;
 }

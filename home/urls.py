@@ -40,4 +40,5 @@ urlpatterns = [
     path('seller-admin-panel/', views.seller_admin_panel, name='seller_admin_panel'),
     path('my-products/change-image/<int:product_id>/', views.change_product_image, name='change_product_image'),
     path('my-firms/', views.my_firms_view, name='my_firms'),
+    path('my-firms/<int:firm_id>/edit/', views.edit_firm_view, name='edit_firm'),
 ]

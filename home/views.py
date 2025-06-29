@@ -1574,24 +1574,24 @@ def change_product_image(request, product_id):
 
 @login_required
 def my_firms_view(request):
-    # Satıcının məhsullarında istifadə olunan firmalar
+    # Satıcının məhsullarında olan firmalar
     user = request.user
     firm_ids = Mehsul.objects.filter(sahib=user).values_list('firma_id', flat=True).distinct()
     firms = Firma.objects.filter(id__in=firm_ids)
+    return render(request, 'my_firms.html', {'firms': firms})
 
-    # Firma redaktə və logo yükləmə
+@login_required
+def edit_firm_view(request, firm_id):
+    user = request.user
+    # Yalnız istifadəçinin məhsullarında olan firmaları redaktə edə bilər
+    firm_ids = Mehsul.objects.filter(sahib=user).values_list('firma_id', flat=True).distinct()
+    firm = get_object_or_404(Firma, id=firm_id, id__in=firm_ids)
     if request.method == 'POST':
-        firm_id = request.POST.get('firm_id')
-        firm = Firma.objects.get(id=firm_id)
         form = BrandEditForm(request.POST, request.FILES, instance=firm)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Firma uğurla yeniləndi!')
+            messages.success(request, 'Firma uğurla yeniləndi.')
             return redirect('my_firms')
     else:
-        form = BrandEditForm()
-
-    return render(request, 'my_firms.html', {
-        'firms': firms,
-        'form': form,
-    })
+        form = BrandEditForm(instance=firm)
+    return render(request, 'edit_firm.html', {'form': form, 'firm': firm})

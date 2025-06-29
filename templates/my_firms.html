@@ -1,8 +1,6 @@
 {% extends 'admin_panel.html' %}
-{% load static %}
 {% block title %}Firmalar{% endblock %}
 {% block panel_title %}Firmalar{% endblock %}
-
 {% block content %}
 <div class="container">
     <h2 class="mb-4">Mənim Firmalarım</h2>
@@ -17,26 +15,15 @@
     </div>
     {% endif %}
     <div class="row">
-        {% for firma in firms %}
+        {% for firm in firms %}
         <div class="col-md-4 mb-4">
             <div class="card h-100">
-                <div class="card-body text-center">
-                    <h5 class="card-title">{{ firma.adi }}</h5>
-                    <div class="mb-3">
-                        {% if firma.logo %}
-                        <img src="{{ firma.logo.url }}" alt="{{ firma.adi }} logo" style="max-width:100px;max-height:100px;object-fit:contain;">
-                        {% else %}
-                        <span class="text-muted">Logo yoxdur</span>
-                        {% endif %}
+                <div class="card-body d-flex align-items-center">
+                    <img src="{{ firm.logo.url if firm.logo else '/static/images/no_image.jpg' }}" alt="Logo" style="width:60px;height:60px;object-fit:cover;border-radius:8px;margin-right:16px;">
+                    <div>
+                        <h5 class="card-title mb-1">{{ firm.adi }}</h5>
+                        <a href="{% url 'edit_firm' firm.id %}" class="btn btn-sm btn-primary mt-2"><i class="fas fa-edit"></i> Redaktə et</a>
                     </div>
-                    <form method="post" enctype="multipart/form-data" class="d-inline-block">
-                        {% csrf_token %}
-                        <input type="hidden" name="firm_id" value="{{ firma.id }}">
-                        <div class="mb-2">
-                            <input type="file" name="logo" class="form-control form-control-sm mb-2" accept="image/*">
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-sm">Yadda saxla</button>
-                    </form>
                 </div>
             </div>
         </div>

@@ -30,6 +30,15 @@
                             <span id="salesBadge" class="sales-badge-sidebar" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span>
                         </a>
                     </li>
+                    <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'seller_categories' %}active{% endif %}">
+                        <a href="{% url 'seller_categories' %}"><i class="fas fa-tags"></i> Kateqoriyalarım</a>
+                    </li>
+                    <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'seller_brands' %}active{% endif %}">
+                        <a href="{% url 'seller_brands' %}"><i class="fas fa-building"></i> Firmalarım</a>
+                    </li>
+                    <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'seller_automobiles' %}active{% endif %}">
+                        <a href="{% url 'seller_automobiles' %}"><i class="fas fa-car"></i> Avtomobillərim</a>
+                    </li>
                 </ul>
             </nav>
         </aside>

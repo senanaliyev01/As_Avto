@@ -1,0 +1,178 @@
+{% extends 'admin_panel.html' %}
+{% load static %}
+
+{% block title %}Kateqoriyalarım - AS-AVTO{% endblock %}
+{% block panel_title %}Kateqoriyalarım{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% csrf_token %}
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message message-{{ message.tags }}">
+            <i class="fas fa-info-circle"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="categories-header d-flex align-items-center mb-3">
+        <h4>Kateqoriya İdarəetməsi</h4>
+        <button class="btn btn-primary btn-sm ms-auto" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+            <i class="fas fa-plus"></i> Yeni Kateqoriya
+        </button>
+    </div>
+    
+    <!-- Add Category Modal -->
+    <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCategoryModalLabel">Yeni Kateqoriya Əlavə Et</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <input type="hidden" name="action" value="add">
+                        <div class="mb-3">
+                            <label for="categoryName" class="form-label">Kateqoriya Adı</label>
+                            <input type="text" class="form-control" id="categoryName" name="name" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ləğv et</button>
+                        <button type="submit" class="btn btn-primary">Əlavə et</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Category Modal -->
+    <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCategoryModalLabel">Kateqoriya Redaktə Et</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <input type="hidden" name="action" value="edit">
+                        <input type="hidden" name="category_id" id="editCategoryId">
+                        <div class="mb-3">
+                            <label for="editCategoryName" class="form-label">Kateqoriya Adı</label>
+                            <input type="text" class="form-control" id="editCategoryName" name="name" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ləğv et</button>
+                        <button type="submit" class="btn btn-primary">Yenilə</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Categories Table -->
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Kateqoriya Adı</th>
+                    <th>Məhsul Sayı</th>
+                    <th>Əməliyyatlar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in seller_categories %}
+                <tr>
+                    <td>{{ category.adi }}</td>
+                    <td>{{ category.mehsullar.count }}</td>
+                    <td>
+                        <button class="btn btn-secondary btn-sm edit-category-btn" 
+                                data-category-id="{{ category.id }}" 
+                                data-category-name="{{ category.adi }}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        {% if category.mehsullar.count == 0 %}
+                        <form method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="category_id" value="{{ category.id }}">
+                            <button type="submit" class="btn btn-danger btn-sm" 
+                                    onclick="return confirm('Bu kateqoriyanı silmək istədiyinizə əminsiniz?')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center">
+                        <div class="empty-message">
+                            <i class="fas fa-tags"></i>
+                            <p>Hələ heç bir kateqoriya yoxdur.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- All Categories Section -->
+    <div class="mt-5">
+        <h5>Bütün Mövcud Kateqoriyalar</h5>
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Kateqoriya Adı</th>
+                        <th>Məhsul Sayı</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in all_categories %}
+                    <tr>
+                        <td>{{ category.adi }}</td>
+                        <td>{{ category.mehsullar.count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Mesajları avtomatik sil
+    const messages = document.querySelectorAll('.message');
+    messages.forEach(function(message) {
+        setTimeout(function() {
+            message.remove();
+        }, 3000);
+    });
+    
+    // Edit category functionality
+    document.querySelectorAll('.edit-category-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const categoryId = this.getAttribute('data-category-id');
+            const categoryName = this.getAttribute('data-category-name');
+            
+            document.getElementById('editCategoryId').value = categoryId;
+            document.getElementById('editCategoryName').value = categoryName;
+            
+            const editModal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
+            editModal.show();
+        });
+    });
+});
+</script>
+{% endblock %} 

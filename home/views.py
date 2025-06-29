@@ -678,7 +678,34 @@ def my_products_view(request):
         return redirect('base')
     
     search_query = request.GET.get('search', '')
+    selected_category = request.GET.get('category', '')
+    selected_brand = request.GET.get('brand', '')
+    selected_automobile = request.GET.get('automobile', '')
+    selected_stock_status = request.GET.get('stock_status', '')
+    
     mehsullar = Mehsul.objects.filter(sahib=request.user).order_by('-id')
+    
+    # Filter by category
+    if selected_category:
+        mehsullar = mehsullar.filter(kateqoriya_id=selected_category)
+    
+    # Filter by brand
+    if selected_brand:
+        mehsullar = mehsullar.filter(firma_id=selected_brand)
+    
+    # Filter by automobile
+    if selected_automobile:
+        mehsullar = mehsullar.filter(avtomobil_id=selected_automobile)
+    
+    # Filter by stock status
+    if selected_stock_status:
+        if selected_stock_status == 'in_stock':
+            mehsullar = mehsullar.filter(stok__gt=10)
+        elif selected_stock_status == 'low_stock':
+            mehsullar = mehsullar.filter(stok__range=(1, 10))
+        elif selected_stock_status == 'out_of_stock':
+            mehsullar = mehsullar.filter(stok=0)
+    
     if search_query:
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         if clean_search:
@@ -702,22 +729,69 @@ def my_products_view(request):
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter)
             else:
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)
+    
+    # Get filter options for the current user's products
+    categories = Kateqoriya.objects.filter(
+        mehsullar__sahib=request.user
+    ).distinct().order_by('adi')
+    
+    brands = Firma.objects.filter(
+        mehsullar__sahib=request.user
+    ).distinct().order_by('adi')
+    
+    automobiles = Avtomobil.objects.filter(
+        mehsullar__sahib=request.user
+    ).distinct().order_by('adi')
+    
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
+    
     return render(request, 'my_products.html', {
         'mehsullar': initial_products,
         'has_more': has_more,
         'search_query': search_query,
+        'categories': categories,
+        'brands': brands,
+        'automobiles': automobiles,
+        'selected_category': selected_category,
+        'selected_brand': selected_brand,
+        'selected_automobile': selected_automobile,
+        'selected_stock_status': selected_stock_status,
     })
 
 @login_required
 def load_more_my_products(request):
     if not request.user.profile.is_verified:
         return JsonResponse({'products': [], 'has_more': False})
+    
     offset = int(request.GET.get('offset', 0))
     limit = 5
     search_query = request.GET.get('search', '')
+    selected_category = request.GET.get('category', '')
+    selected_brand = request.GET.get('brand', '')
+    selected_automobile = request.GET.get('automobile', '')
+    selected_stock_status = request.GET.get('stock_status', '')
+    
     mehsullar = Mehsul.objects.filter(sahib=request.user).order_by('-id')
+    
+    # Apply filters
+    if selected_category:
+        mehsullar = mehsullar.filter(kateqoriya_id=selected_category)
+    
+    if selected_brand:
+        mehsullar = mehsullar.filter(firma_id=selected_brand)
+    
+    if selected_automobile:
+        mehsullar = mehsullar.filter(avtomobil_id=selected_automobile)
+    
+    if selected_stock_status:
+        if selected_stock_status == 'in_stock':
+            mehsullar = mehsullar.filter(stok__gt=10)
+        elif selected_stock_status == 'low_stock':
+            mehsullar = mehsullar.filter(stok__range=(1, 10))
+        elif selected_stock_status == 'out_of_stock':
+            mehsullar = mehsullar.filter(stok=0)
+    
     if search_query:
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         if clean_search:
@@ -734,6 +808,7 @@ def load_more_my_products(request):
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter)
             else:
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)
+    
     products = mehsullar[offset:offset+limit]
     has_more = mehsullar.count() > (offset + limit)
     products_data = []
@@ -1571,3 +1646,162 @@ def change_product_image(request, product_id):
             'sekil_url': mehsul.sekil.url
         })
     return JsonResponse({'success': False, 'message': 'Şəkil yüklənmədi'})
+
+@login_required
+def seller_categories_view(request):
+    """Satıcının öz kateqoriyalarını idarə etməsi"""
+    from .models import Kateqoriya
+    
+    # Satıcının məhsullarında istifadə etdiyi kateqoriyaları əldə et
+    seller_categories = Kateqoriya.objects.filter(
+        mehsullar__sahib=request.user
+    ).distinct().order_by('adi')
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'add':
+            name = request.POST.get('name', '').strip()
+            if name:
+                Kateqoriya.objects.get_or_create(adi=name)
+                messages.success(request, f'Kateqoriya "{name}" əlavə edildi.')
+        elif action == 'edit':
+            category_id = request.POST.get('category_id')
+            name = request.POST.get('name', '').strip()
+            if category_id and name:
+                try:
+                    category = Kateqoriya.objects.get(id=category_id)
+                    category.adi = name
+                    category.save()
+                    messages.success(request, f'Kateqoriya "{name}" yeniləndi.')
+                except Kateqoriya.DoesNotExist:
+                    messages.error(request, 'Kateqoriya tapılmadı.')
+        elif action == 'delete':
+            category_id = request.POST.get('category_id')
+            if category_id:
+                try:
+                    category = Kateqoriya.objects.get(id=category_id)
+                    # Əgər bu kateqoriyada məhsul varsa, silmə
+                    if category.mehsullar.filter(sahib=request.user).exists():
+                        messages.error(request, f'"{category.adi}" kateqoriyasında məhsullar var. Əvvəlcə məhsulları silin.')
+                    else:
+                        category.delete()
+                        messages.success(request, f'Kateqoriya "{category.adi}" silindi.')
+                except Kateqoriya.DoesNotExist:
+                    messages.error(request, 'Kateqoriya tapılmadı.')
+        
+        return redirect('seller_categories')
+    
+    # Bütün mövcud kateqoriyaları da göstər
+    all_categories = Kateqoriya.objects.all().order_by('adi')
+    
+    context = {
+        'seller_categories': seller_categories,
+        'all_categories': all_categories,
+    }
+    return render(request, 'seller_categories.html', context)
+
+@login_required
+def seller_brands_view(request):
+    """Satıcının öz firmalarını idarə etməsi"""
+    from .models import Firma
+    
+    # Satıcının məhsullarında istifadə etdiyi firmaları əldə et
+    seller_brands = Firma.objects.filter(
+        mehsullar__sahib=request.user
+    ).distinct().order_by('adi')
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'add':
+            name = request.POST.get('name', '').strip()
+            if name:
+                Firma.objects.get_or_create(adi=name)
+                messages.success(request, f'Firma "{name}" əlavə edildi.')
+        elif action == 'edit':
+            brand_id = request.POST.get('brand_id')
+            name = request.POST.get('name', '').strip()
+            if brand_id and name:
+                try:
+                    brand = Firma.objects.get(id=brand_id)
+                    brand.adi = name
+                    brand.save()
+                    messages.success(request, f'Firma "{name}" yeniləndi.')
+                except Firma.DoesNotExist:
+                    messages.error(request, 'Firma tapılmadı.')
+        elif action == 'delete':
+            brand_id = request.POST.get('brand_id')
+            if brand_id:
+                try:
+                    brand = Firma.objects.get(id=brand_id)
+                    # Əgər bu firmada məhsul varsa, silmə
+                    if brand.mehsullar.filter(sahib=request.user).exists():
+                        messages.error(request, f'"{brand.adi}" firmasında məhsullar var. Əvvəlcə məhsulları silin.')
+                    else:
+                        brand.delete()
+                        messages.success(request, f'Firma "{brand.adi}" silindi.')
+                except Firma.DoesNotExist:
+                    messages.error(request, 'Firma tapılmadı.')
+        
+        return redirect('seller_brands')
+    
+    # Bütün mövcud firmaları da göstər
+    all_brands = Firma.objects.all().order_by('adi')
+    
+    context = {
+        'seller_brands': seller_brands,
+        'all_brands': all_brands,
+    }
+    return render(request, 'seller_brands.html', context)
+
+@login_required
+def seller_automobiles_view(request):
+    """Satıcının öz avtomobillərini idarə etməsi"""
+    from .models import Avtomobil
+    
+    # Satıcının məhsullarında istifadə etdiyi avtomobilləri əldə et
+    seller_automobiles = Avtomobil.objects.filter(
+        mehsullar__sahib=request.user
+    ).distinct().order_by('adi')
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'add':
+            name = request.POST.get('name', '').strip()
+            if name:
+                Avtomobil.objects.get_or_create(adi=name)
+                messages.success(request, f'Avtomobil "{name}" əlavə edildi.')
+        elif action == 'edit':
+            auto_id = request.POST.get('auto_id')
+            name = request.POST.get('name', '').strip()
+            if auto_id and name:
+                try:
+                    auto = Avtomobil.objects.get(id=auto_id)
+                    auto.adi = name
+                    auto.save()
+                    messages.success(request, f'Avtomobil "{name}" yeniləndi.')
+                except Avtomobil.DoesNotExist:
+                    messages.error(request, 'Avtomobil tapılmadı.')
+        elif action == 'delete':
+            auto_id = request.POST.get('auto_id')
+            if auto_id:
+                try:
+                    auto = Avtomobil.objects.get(id=auto_id)
+                    # Əgər bu avtomobildə məhsul varsa, silmə
+                    if auto.mehsullar.filter(sahib=request.user).exists():
+                        messages.error(request, f'"{auto.adi}" avtomobilində məhsullar var. Əvvəlcə məhsulları silin.')
+                    else:
+                        auto.delete()
+                        messages.success(request, f'Avtomobil "{auto.adi}" silindi.')
+                except Avtomobil.DoesNotExist:
+                    messages.error(request, 'Avtomobil tapılmadı.')
+        
+        return redirect('seller_automobiles')
+    
+    # Bütün mövcud avtomobilləri də göstər
+    all_automobiles = Avtomobil.objects.all().order_by('adi')
+    
+    context = {
+        'seller_automobiles': seller_automobiles,
+        'all_automobiles': all_automobiles,
+    }
+    return render(request, 'seller_automobiles.html', context)

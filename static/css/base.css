@@ -4723,3 +4723,37 @@ body {
         transform: translateX(0);
     }
 }
+
+/* Filters Section */
+.filters-section {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.filters-section .form-select {
+    font-size: 0.875rem;
+}
+
+.filters-section .btn {
+    font-size: 0.875rem;
+}
+
+/* Empty Message */
+.empty-message {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6c757d;
+}
+
+.empty-message i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+.empty-message p {
+    margin: 0;
+    font-size: 1.1rem;
+}

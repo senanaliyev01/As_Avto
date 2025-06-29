@@ -39,6 +39,60 @@
         </div>
     </div>
     
+    <!-- Filters Section -->
+    <div class="filters-section mb-3">
+        <form method="get" id="filters-form" class="row g-2">
+            <div class="col-md-2">
+                <select name="category" class="form-select form-select-sm">
+                    <option value="">Bütün Kateqoriyalar</option>
+                    {% for category in categories %}
+                    <option value="{{ category.id }}" {% if selected_category == category.id %}selected{% endif %}>
+                        {{ category.adi }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="brand" class="form-select form-select-sm">
+                    <option value="">Bütün Firmalar</option>
+                    {% for brand in brands %}
+                    <option value="{{ brand.id }}" {% if selected_brand == brand.id %}selected{% endif %}>
+                        {{ brand.adi }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="automobile" class="form-select form-select-sm">
+                    <option value="">Bütün Avtomobillər</option>
+                    {% for auto in automobiles %}
+                    <option value="{{ auto.id }}" {% if selected_automobile == auto.id %}selected{% endif %}>
+                        {{ auto.adi }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="stock_status" class="form-select form-select-sm">
+                    <option value="">Stok Statusu</option>
+                    <option value="in_stock" {% if selected_stock_status == 'in_stock' %}selected{% endif %}>Stokda var</option>
+                    <option value="low_stock" {% if selected_stock_status == 'low_stock' %}selected{% endif %}>Az stok (1-10)</option>
+                    <option value="out_of_stock" {% if selected_stock_status == 'out_of_stock' %}selected{% endif %}>Stokda yoxdur</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                    <i class="fas fa-filter"></i> Filtr
+                </button>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'my_products' %}" class="btn btn-outline-secondary btn-sm w-100">
+                    <i class="fas fa-times"></i> Təmizlə
+                </a>
+            </div>
+        </form>
+    </div>
+
     <!-- Excel Import Modal -->
     <div class="modal fade" id="importExcelModal" tabindex="-1" aria-labelledby="importExcelModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -174,7 +228,15 @@
         </table>
         <div class="text-center my-3">
             {% if has_more %}
-            <button id="load-more-btn" class="btn btn-outline-primary" data-offset="5" data-search="{{ search_query }}">Daha çox göstər</button>
+            <button id="load-more-btn" class="btn btn-outline-primary" 
+                    data-offset="5" 
+                    data-search="{{ search_query }}"
+                    data-category="{{ selected_category }}"
+                    data-brand="{{ selected_brand }}"
+                    data-automobile="{{ selected_automobile }}"
+                    data-stock-status="{{ selected_stock_status }}">
+                Daha çox göstər
+            </button>
             {% endif %}
         </div>
     </div>
@@ -392,9 +454,24 @@
             loadMoreBtn.addEventListener('click', function() {
                 const offset = parseInt(this.getAttribute('data-offset'));
                 const search = this.getAttribute('data-search') || '';
+                const category = this.getAttribute('data-category') || '';
+                const brand = this.getAttribute('data-brand') || '';
+                const automobile = this.getAttribute('data-automobile') || '';
+                const stockStatus = this.getAttribute('data-stock-status') || '';
+                
                 this.disabled = true;
                 this.textContent = 'Yüklənir...';
-                fetch(`/my-products/load-more/?offset=${offset}&search=${encodeURIComponent(search)}`)
+                
+                const params = new URLSearchParams({
+                    offset: offset,
+                    search: search,
+                    category: category,
+                    brand: brand,
+                    automobile: automobile,
+                    stock_status: stockStatus
+                });
+                
+                fetch(`/my-products/load-more/?${params.toString()}`)
                     .then(response => response.json())
                     .then(data => {
                         const tbody = document.getElementById('products-tbody');

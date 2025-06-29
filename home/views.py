@@ -1452,10 +1452,6 @@ def seller_admin_panel(request):
     total_products = Mehsul.objects.filter(sahib=request.user).count()
     new_products = Mehsul.objects.filter(sahib=request.user, yenidir=True).count()
     out_of_stock_products = Mehsul.objects.filter(sahib=request.user, stok=0).count()
-    low_stock_products = Mehsul.objects.filter(sahib=request.user, stok__lt=10, stok__gt=0).count()
-    
-    # Top 5 az stokda olan məhsullar
-    top_low_stock_products = Mehsul.objects.filter(sahib=request.user, stok__lt=10, stok__gt=0).order_by('stok')[:5]
     
     # Satış statistikaları
     from .models import SifarisItem
@@ -1520,9 +1516,7 @@ def seller_admin_panel(request):
     context = {
         'total_products': total_products,
         'new_products': new_products,
-        'low_stock_products': low_stock_products,
         'out_of_stock_products': out_of_stock_products,
-        'top_low_stock_products': top_low_stock_products,
         'total_sales': total_sales,
         'recent_orders': recent_orders,
         'top_buyers': top_buyers,

@@ -101,60 +101,6 @@
                         </div>
                     </div>
 
-                    <!-- Alerts Section -->
-                    <div class="alerts-section mb-4">
-                        <h3 class="section-title">Stok Xəbərdarlıqları</h3>
-                        <div class="alerts-grid">
-                            {% if out_of_stock_products > 0 %}
-                            <div class="alert-card alert-danger">
-                                <i class="fas fa-times-circle"></i>
-                                <div class="alert-content">
-                                    <h4>{{ out_of_stock_products }}</h4>
-                                    <p>Stokda olmayan məhsul</p>
-                                </div>
-                            </div>
-                            {% endif %}
-                            
-                            {% if low_stock_products > 0 %}
-                            <div class="alert-card alert-warning">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <div class="alert-content">
-                                    <h4>{{ low_stock_products }}</h4>
-                                    <p>10-dan az stokda olan məhsul</p>
-                                </div>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <!-- Top 5 Az Stokda Olan Məhsullar -->
-                    {% if top_low_stock_products %}
-                    <div class="dashboard-row mb-4">
-                        <div class="dashboard-col">
-                            <div class="dashboard-card">
-                                <div class="card-header">
-                                    <h3>Top 5 Az Stokda Olan Məhsullar</h3>
-                                </div>
-                                <div class="card-body">
-                                    <div class="low-stock-products">
-                                        {% for product in top_low_stock_products %}
-                                        <div class="product-item">
-                                            <div class="product-info">
-                                                <span class="product-name">{{ product.adi }}</span>
-                                                <span class="product-code">{{ product.brend_kod }}</span>
-                                            </div>
-                                            <div class="product-stock">
-                                                <span class="stock-count">{{ product.stok }} ədəd</span>
-                                            </div>
-                                        </div>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-
                     <!-- Recent Orders and Top Buyers -->
                     <div class="dashboard-row mb-4">
                         <div class="dashboard-col">

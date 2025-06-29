@@ -181,6 +181,14 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Mesajları avtomatik sil
+        const messages = document.querySelectorAll('.message');
+        messages.forEach(function(message) {
+            setTimeout(function() {
+                message.remove();
+            }, 3000);
+        });
+        
         // Toggle new status functionality
         document.addEventListener('click', function(e) {
             if (e.target.closest('.toggle-new-btn')) {

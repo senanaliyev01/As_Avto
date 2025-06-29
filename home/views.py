@@ -1444,39 +1444,118 @@ def seller_admin_panel(request):
         messages.error(request, 'Satıcı panelinə giriş üçün icazəniz yoxdur.')
         return redirect('base')
     
-    # Dashboard üçün məlumatları əldə et
-    from django.db.models import Sum, Count
+    # Dashboard statistikaları
     from django.utils import timezone
     from datetime import timedelta
     
-    # Məhsul sayı
+    # Məhsul statistikaları
     total_products = Mehsul.objects.filter(sahib=request.user).count()
+    new_products = Mehsul.objects.filter(sahib=request.user, yenidir=True).count()
+    low_stock_products = Mehsul.objects.filter(sahib=request.user, stok__lte=5).count()
+    out_of_stock_products = Mehsul.objects.filter(sahib=request.user, stok=0).count()
     
-    # Sifariş sayı və gəlir
-    orders = Sifaris.objects.filter(mehsullar__sahib=request.user).distinct()
-    total_orders = orders.count()
+    # Satış statistikaları
+    all_orders = Sifaris.objects.all()
+    seller_orders = []
+    total_sales = 0
+    total_paid = 0
+    total_debt = 0
+    monthly_sales = 0
+    weekly_sales = 0
     
-    # Ümumi gəlir - SifarisItem-lərdən hesabla
-    total_revenue = SifarisItem.objects.filter(
-        sifaris__in=orders,
-        mehsul__sahib=request.user
-    ).aggregate(
-        total=Sum('qiymet', default=0)
-    )['total'] or 0
+    # Bu ay və bu həftə tarixləri
+    now = timezone.now()
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    week_start = now - timedelta(days=now.weekday())
+    week_start = week_start.replace(hour=0, minute=0, second=0, microsecond=0)
     
-    # Gözləyən sifarişlər
-    pending_orders = orders.filter(status='pending').count()
+    for order in all_orders:
+        items = order.sifarisitem_set.filter(mehsul__sahib=request.user)
+        order_total = sum(item.umumi_mebleg for item in items)
+        if order_total > 0:
+            seller_paid = order.odenilen_mebleg or 0
+            seller_debt = order_total - seller_paid
+            
+            total_sales += order_total
+            total_paid += seller_paid
+            total_debt += seller_debt
+            
+            # Aylıq satışlar
+            if order.tarix >= month_start:
+                monthly_sales += order_total
+            
+            # Həftəlik satışlar
+            if order.tarix >= week_start:
+                weekly_sales += order_total
+            
+            seller_orders.append({
+                'order': order,
+                'total': order_total,
+                'paid': seller_paid,
+                'debt': seller_debt
+            })
     
     # Son 5 sifariş
-    recent_orders = orders.order_by('-tarix')[:5]
+    recent_orders = sorted(seller_orders, key=lambda x: x['order'].tarix, reverse=True)[:5]
+    
+    # Alıcı statistikaları
+    buyer_stats = {}
+    for order in all_orders:
+        items = order.sifarisitem_set.filter(mehsul__sahib=request.user)
+        order_total = sum(item.umumi_mebleg for item in items)
+        if order_total > 0:
+            buyer = order.istifadeci
+            if buyer.id not in buyer_stats:
+                buyer_stats[buyer.id] = {
+                    'username': buyer.username,
+                    'order_count': 0,
+                    'total_amount': 0,
+                    'total_paid': 0,
+                    'total_debt': 0
+                }
+            buyer_stats[buyer.id]['order_count'] += 1
+            buyer_stats[buyer.id]['total_amount'] += order_total
+            buyer_stats[buyer.id]['total_paid'] += order.odenilen_mebleg or 0
+            buyer_stats[buyer.id]['total_debt'] += order_total - (order.odenilen_mebleg or 0)
+    
+    # Ən yaxşı alıcılar (top 5)
+    top_buyers = sorted(buyer_stats.values(), key=lambda x: x['total_amount'], reverse=True)[:5]
+    
+    # Kateqoriya üzrə məhsul sayı
+    category_stats = {}
+    for product in Mehsul.objects.filter(sahib=request.user):
+        category_name = product.kateqoriya.adi if product.kateqoriya else 'Kateqoriyasız'
+        if category_name not in category_stats:
+            category_stats[category_name] = 0
+        category_stats[category_name] += 1
+    
+    # Firma üzrə məhsul sayı
+    brand_stats = {}
+    for product in Mehsul.objects.filter(sahib=request.user):
+        brand_name = product.firma.adi if product.firma else 'Firmasız'
+        if brand_name not in brand_stats:
+            brand_stats[brand_name] = 0
+        brand_stats[brand_name] += 1
+    
+    # Top 5 firma
+    top_brands = sorted(brand_stats.items(), key=lambda x: x[1], reverse=True)[:5]
     
     context = {
         'total_products': total_products,
-        'total_orders': total_orders,
-        'total_revenue': total_revenue,
-        'pending_orders': pending_orders,
+        'new_products': new_products,
+        'low_stock_products': low_stock_products,
+        'out_of_stock_products': out_of_stock_products,
+        'total_sales': total_sales,
+        'total_paid': total_paid,
+        'total_debt': total_debt,
+        'monthly_sales': monthly_sales,
+        'weekly_sales': weekly_sales,
         'recent_orders': recent_orders,
-        'now': timezone.now(),
+        'top_buyers': top_buyers,
+        'category_stats': category_stats,
+        'top_brands': top_brands,
+        'total_orders': len(seller_orders),
+        'now': now,
     }
     
     return render(request, 'admin_panel.html', context)

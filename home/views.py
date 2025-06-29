@@ -1574,7 +1574,7 @@ def change_product_image(request, product_id):
 
 @login_required
 def my_categories_view(request):
-    categories = Kateqoriya.objects.filter(mehsul__satici=request.user).distinct()
+    categories = Kateqoriya.objects.filter(mehsul__sahib=request.user).distinct()
     return render(request, 'my_categories.html', {'categories': categories})
 
 @login_required
@@ -1592,7 +1592,7 @@ def edit_category_view(request, pk):
 
 @login_required
 def my_brands_view(request):
-    brands = Firma.objects.filter(mehsul__satici=request.user).distinct()
+    brands = Firma.objects.filter(mehsul__sahib=request.user).distinct()
     return render(request, 'my_brands.html', {'brands': brands})
 
 @login_required
@@ -1610,7 +1610,7 @@ def edit_brand_view(request, pk):
 
 @login_required
 def my_cars_view(request):
-    cars = Avtomobil.objects.filter(mehsul__satici=request.user).distinct()
+    cars = Avtomobil.objects.filter(mehsul__sahib=request.user).distinct()
     return render(request, 'my_cars.html', {'cars': cars})
 
 @login_required

@@ -1448,6 +1448,9 @@ def seller_admin_panel(request):
     from django.utils import timezone
     from datetime import timedelta
     
+    # Cari vaxt
+    now = timezone.now()
+    
     # Məhsul statistikaları
     total_products = Mehsul.objects.filter(sahib=request.user).count()
     new_products = Mehsul.objects.filter(sahib=request.user, yenidir=True).count()

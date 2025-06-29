@@ -129,7 +129,7 @@
             </thead>
             <tbody id="products-tbody">
                 {% for mehsul in mehsullar %}
-                <tr>
+                <tr data-initialized="true">
                     <td><img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image" onclick="openImageModal('{{ mehsul.sekil.url }}')"></td>
                     <td>{{ mehsul.brend_kod }}</td>
                     <td>{{ mehsul.firma.adi }}</td>
@@ -299,6 +299,66 @@
             }
         });
         
+        // Şəkli dəyiş düyməsi funksionallığı - Event delegation istifadə edirik
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.change-image-btn')) {
+                const btn = e.target.closest('.change-image-btn');
+                const productId = btn.getAttribute('data-product-id');
+                const input = document.querySelector('.product-image-input[data-product-id="' + productId + '"]');
+                if (input) input.click();
+            }
+        });
+        
+        // File seçiləndə AJAX ilə yüklə - Event delegation istifadə edirik
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('product-image-input')) {
+                const input = e.target;
+                const productId = input.getAttribute('data-product-id');
+                const file = input.files[0];
+                if (!file) return;
+                
+                const formData = new FormData();
+                formData.append('sekil', file);
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                
+                // Disable button
+                const btn = document.querySelector('.change-image-btn[data-product-id="' + productId + '"]');
+                btn.disabled = true;
+                const originalContent = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                
+                fetch(`/my-products/change-image/${productId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Şəkli cədvəldə yenilə
+                        const row = btn.closest('tr');
+                        const img = row.querySelector('td img.product-image');
+                        if (img) {
+                            img.src = data.sekil_url + '?t=' + new Date().getTime(); // Cache bust
+                        }
+                        showMessage('Şəkil uğurla dəyişdirildi', 'success');
+                    } else {
+                        showMessage(data.message || 'Şəkil yüklənmədi', 'error');
+                    }
+                })
+                .catch(() => {
+                    showMessage('Şəkil yüklənmədi', 'error');
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalContent;
+                    input.value = '';
+                });
+            }
+        });
+        
         // Message display function
         function showMessage(message, type) {
             const messageDiv = document.createElement('div');
@@ -359,6 +419,7 @@
                             `;
                             tbody.appendChild(row);
                         });
+                        
                         if (data.has_more) {
                             loadMoreBtn.setAttribute('data-offset', offset + data.products.length);
                             loadMoreBtn.disabled = false;
@@ -369,62 +430,6 @@
                     });
             });
         }
-
-        // Şəkli dəyiş düyməsi funksionallığı
-        document.addEventListener('click', function(e) {
-            if (e.target.closest('.change-image-btn')) {
-                const btn = e.target.closest('.change-image-btn');
-                const productId = btn.getAttribute('data-product-id');
-                const input = document.querySelector('.product-image-input[data-product-id="' + productId + '"]');
-                if (input) input.click();
-            }
-        });
-        // File seçiləndə AJAX ilə yüklə
-        document.querySelectorAll('.product-image-input').forEach(function(input) {
-            input.addEventListener('change', function(e) {
-                const productId = input.getAttribute('data-product-id');
-                const file = input.files[0];
-                if (!file) return;
-                const formData = new FormData();
-                formData.append('sekil', file);
-                // CSRF token
-                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-                // Disable button
-                const btn = document.querySelector('.change-image-btn[data-product-id="' + productId + '"]');
-                btn.disabled = true;
-                const originalContent = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                fetch(`/my-products/change-image/${productId}/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': csrfToken
-                    },
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Şəkli cədvəldə yenilə
-                        const row = btn.closest('tr');
-                        const img = row.querySelector('td img.product-image');
-                        if (img) {
-                            img.src = data.sekil_url + '?t=' + new Date().getTime(); // Cache bust
-                        }
-                        showMessage('Şəkil uğurla dəyişdirildi', 'success');
-                    } else {
-                        showMessage(data.message || 'Şəkil yüklənmədi', 'error');
-                    }
-                })
-                .catch(() => {
-                    showMessage('Şəkil yüklənmədi', 'error');
-                })
-                .finally(() => {
-                    btn.disabled = false;
-                    btn.innerHTML = originalContent;
-                    input.value = '';
-                });
-            });
-        });
     });
     </script>
 </div>

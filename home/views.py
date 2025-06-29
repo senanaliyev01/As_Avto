@@ -14,7 +14,7 @@ from operator import and_, or_
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.views.decorators.http import require_http_methods
-from .forms import MehsulForm, SifarisEditForm, SifarisItemEditForm, CategoryEditForm, BrandEditForm, CarEditForm
+from .forms import MehsulForm, SifarisEditForm, SifarisItemEditForm
 import pandas as pd
 from django.db import transaction
 import math
@@ -1571,57 +1571,3 @@ def change_product_image(request, product_id):
             'sekil_url': mehsul.sekil.url
         })
     return JsonResponse({'success': False, 'message': 'Şəkil yüklənmədi'})
-
-@login_required
-def my_categories_view(request):
-    categories = Kateqoriya.objects.filter(mehsul__sahib=request.user).distinct()
-    return render(request, 'my_categories.html', {'categories': categories})
-
-@login_required
-def edit_category_view(request, pk):
-    category = get_object_or_404(Kateqoriya, pk=pk, mehsul__satici=request.user)
-    if request.method == 'POST':
-        form = CategoryEditForm(request.POST, instance=category)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Kateqoriya uğurla yeniləndi!')
-            return redirect('my_categories')
-    else:
-        form = CategoryEditForm(instance=category)
-    return render(request, 'edit_category.html', {'form': form, 'category': category})
-
-@login_required
-def my_brands_view(request):
-    brands = Firma.objects.filter(mehsul__sahib=request.user).distinct()
-    return render(request, 'my_brands.html', {'brands': brands})
-
-@login_required
-def edit_brand_view(request, pk):
-    brand = get_object_or_404(Firma, pk=pk, mehsul__satici=request.user)
-    if request.method == 'POST':
-        form = BrandEditForm(request.POST, request.FILES, instance=brand)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Firma uğurla yeniləndi!')
-            return redirect('my_brands')
-    else:
-        form = BrandEditForm(instance=brand)
-    return render(request, 'edit_brand.html', {'form': form, 'brand': brand})
-
-@login_required
-def my_cars_view(request):
-    cars = Avtomobil.objects.filter(mehsul__sahib=request.user).distinct()
-    return render(request, 'my_cars.html', {'cars': cars})
-
-@login_required
-def edit_car_view(request, pk):
-    car = get_object_or_404(Avtomobil, pk=pk, mehsul__satici=request.user)
-    if request.method == 'POST':
-        form = CarEditForm(request.POST, instance=car)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Avtomobil uğurla yeniləndi!')
-            return redirect('my_cars')
-    else:
-        form = CarEditForm(instance=car)
-    return render(request, 'edit_car.html', {'form': form, 'car': car})

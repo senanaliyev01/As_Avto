@@ -44,3 +44,28 @@ class SifarisItemEditForm(forms.ModelForm):
             'miqdar': forms.NumberInput(attrs={'class': 'form-control form-control-sm item-input', 'min': '1', 'data-field': 'quantity'}),
             'qiymet': forms.NumberInput(attrs={'class': 'form-control form-control-sm item-input', 'step': '0.01', 'data-field': 'price'}),
         } 
+
+class CategoryEditForm(forms.ModelForm):
+    class Meta:
+        model = Kateqoriya
+        fields = ['adi']
+        widgets = {
+            'adi': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+class BrandEditForm(forms.ModelForm):
+    class Meta:
+        model = Firma
+        fields = ['adi', 'logo']
+        widgets = {
+            'adi': forms.TextInput(attrs={'class': 'form-control'}),
+            'logo': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        }
+
+class CarEditForm(forms.ModelForm):
+    class Meta:
+        model = Avtomobil
+        fields = ['adi']
+        widgets = {
+            'adi': forms.TextInput(attrs={'class': 'form-control'}),
+        } 

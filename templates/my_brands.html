@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h4>Firmalarım</h4>
+    <table class="table table-sm table-bordered bg-white">
+        <thead><tr><th>#</th><th>Adı</th><th>Logo</th><th>Düzəliş</th></tr></thead>
+        <tbody>
+        {% for b in brands %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ b.adi }}</td>
+            <td>{% if b.logo %}<img src="{{ b.logo.url }}" height="32">{% endif %}</td>
+            <td><a href="{% url 'edit_brand' b.pk %}" class="btn btn-sm btn-primary">Düzəliş et</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">Məhsulunuza aid firma yoxdur.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %} 

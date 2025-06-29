@@ -92,14 +92,14 @@
                 {% for automobile in seller_automobiles %}
                 <tr>
                     <td>{{ automobile.adi }}</td>
-                    <td>{{ automobile.mehsullar.count }}</td>
+                    <td>{{ automobile.mehsul.count }}</td>
                     <td>
                         <button class="btn btn-secondary btn-sm edit-automobile-btn" 
                                 data-auto-id="{{ automobile.id }}" 
                                 data-auto-name="{{ automobile.adi }}">
                             <i class="fas fa-edit"></i>
                         </button>
-                        {% if automobile.mehsullar.count == 0 %}
+                        {% if automobile.mehsul.count == 0 %}
                         <form method="post" style="display: inline;">
                             {% csrf_token %}
                             <input type="hidden" name="action" value="delete">
@@ -141,7 +141,7 @@
                     {% for automobile in all_automobiles %}
                     <tr>
                         <td>{{ automobile.adi }}</td>
-                        <td>{{ automobile.mehsullar.count }}</td>
+                        <td>{{ automobile.mehsul.count }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

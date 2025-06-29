@@ -92,14 +92,14 @@
                 {% for brand in seller_brands %}
                 <tr>
                     <td>{{ brand.adi }}</td>
-                    <td>{{ brand.mehsullar.count }}</td>
+                    <td>{{ brand.mehsul.count }}</td>
                     <td>
                         <button class="btn btn-secondary btn-sm edit-brand-btn" 
                                 data-brand-id="{{ brand.id }}" 
                                 data-brand-name="{{ brand.adi }}">
                             <i class="fas fa-edit"></i>
                         </button>
-                        {% if brand.mehsullar.count == 0 %}
+                        {% if brand.mehsul.count == 0 %}
                         <form method="post" style="display: inline;">
                             {% csrf_token %}
                             <input type="hidden" name="action" value="delete">
@@ -141,7 +141,7 @@
                     {% for brand in all_brands %}
                     <tr>
                         <td>{{ brand.adi }}</td>
-                        <td>{{ brand.mehsullar.count }}</td>
+                        <td>{{ brand.mehsul.count }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

@@ -732,15 +732,15 @@ def my_products_view(request):
     
     # Get filter options for the current user's products
     categories = Kateqoriya.objects.filter(
-        mehsullar__sahib=request.user
+        mehsul__sahib=request.user
     ).distinct().order_by('adi')
     
     brands = Firma.objects.filter(
-        mehsullar__sahib=request.user
+        mehsul__sahib=request.user
     ).distinct().order_by('adi')
     
     automobiles = Avtomobil.objects.filter(
-        mehsullar__sahib=request.user
+        mehsul__sahib=request.user
     ).distinct().order_by('adi')
     
     initial_products = mehsullar[:5]
@@ -1654,7 +1654,7 @@ def seller_categories_view(request):
     
     # Satıcının məhsullarında istifadə etdiyi kateqoriyaları əldə et
     seller_categories = Kateqoriya.objects.filter(
-        mehsullar__sahib=request.user
+        mehsul__sahib=request.user
     ).distinct().order_by('adi')
     
     if request.method == 'POST':
@@ -1681,7 +1681,7 @@ def seller_categories_view(request):
                 try:
                     category = Kateqoriya.objects.get(id=category_id)
                     # Əgər bu kateqoriyada məhsul varsa, silmə
-                    if category.mehsullar.filter(sahib=request.user).exists():
+                    if category.mehsul.filter(sahib=request.user).exists():
                         messages.error(request, f'"{category.adi}" kateqoriyasında məhsullar var. Əvvəlcə məhsulları silin.')
                     else:
                         category.delete()
@@ -1707,7 +1707,7 @@ def seller_brands_view(request):
     
     # Satıcının məhsullarında istifadə etdiyi firmaları əldə et
     seller_brands = Firma.objects.filter(
-        mehsullar__sahib=request.user
+        mehsul__sahib=request.user
     ).distinct().order_by('adi')
     
     if request.method == 'POST':
@@ -1734,7 +1734,7 @@ def seller_brands_view(request):
                 try:
                     brand = Firma.objects.get(id=brand_id)
                     # Əgər bu firmada məhsul varsa, silmə
-                    if brand.mehsullar.filter(sahib=request.user).exists():
+                    if brand.mehsul.filter(sahib=request.user).exists():
                         messages.error(request, f'"{brand.adi}" firmasında məhsullar var. Əvvəlcə məhsulları silin.')
                     else:
                         brand.delete()
@@ -1760,7 +1760,7 @@ def seller_automobiles_view(request):
     
     # Satıcının məhsullarında istifadə etdiyi avtomobilləri əldə et
     seller_automobiles = Avtomobil.objects.filter(
-        mehsullar__sahib=request.user
+        mehsul__sahib=request.user
     ).distinct().order_by('adi')
     
     if request.method == 'POST':
@@ -1787,7 +1787,7 @@ def seller_automobiles_view(request):
                 try:
                     auto = Avtomobil.objects.get(id=auto_id)
                     # Əgər bu avtomobildə məhsul varsa, silmə
-                    if auto.mehsullar.filter(sahib=request.user).exists():
+                    if auto.mehsul.filter(sahib=request.user).exists():
                         messages.error(request, f'"{auto.adi}" avtomobilində məhsullar var. Əvvəlcə məhsulları silin.')
                     else:
                         auto.delete()

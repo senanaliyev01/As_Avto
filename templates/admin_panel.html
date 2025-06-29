@@ -56,7 +56,6 @@
                     <!-- Welcome Section -->
                     <div class="welcome-section mb-4">
                         <h1 class="dashboard-title">Xoş gəlmisiniz, {{ request.user.username }}!</h1>
-                        <p class="dashboard-subtitle">{{ now|date:"d F Y, l" }}</p>
                     </div>
 
                     <!-- Statistics Cards -->
@@ -127,6 +126,34 @@
                             {% endif %}
                         </div>
                     </div>
+
+                    <!-- Top 5 Az Stokda Olan Məhsullar -->
+                    {% if top_low_stock_products %}
+                    <div class="dashboard-row mb-4">
+                        <div class="dashboard-col">
+                            <div class="dashboard-card">
+                                <div class="card-header">
+                                    <h3>Top 5 Az Stokda Olan Məhsullar</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="low-stock-products">
+                                        {% for product in top_low_stock_products %}
+                                        <div class="product-item">
+                                            <div class="product-info">
+                                                <span class="product-name">{{ product.adi }}</span>
+                                                <span class="product-code">{{ product.brend_kod }}</span>
+                                            </div>
+                                            <div class="product-stock">
+                                                <span class="stock-count">{{ product.stok }} ədəd</span>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
 
                     <!-- Recent Orders and Top Buyers -->
                     <div class="dashboard-row mb-4">

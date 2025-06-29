@@ -1443,7 +1443,43 @@ def seller_admin_panel(request):
         from django.contrib import messages
         messages.error(request, 'Satıcı panelinə giriş üçün icazəniz yoxdur.')
         return redirect('base')
-    return render(request, 'admin_panel.html')
+    
+    # Dashboard üçün məlumatları əldə et
+    from django.db.models import Sum, Count
+    from django.utils import timezone
+    from datetime import timedelta
+    
+    # Məhsul sayı
+    total_products = Mehsul.objects.filter(sahib=request.user).count()
+    
+    # Sifariş sayı və gəlir
+    orders = Sifaris.objects.filter(mehsullar__sahib=request.user).distinct()
+    total_orders = orders.count()
+    
+    # Ümumi gəlir - SifarisItem-lərdən hesabla
+    total_revenue = SifarisItem.objects.filter(
+        sifaris__in=orders,
+        mehsul__sahib=request.user
+    ).aggregate(
+        total=Sum('qiymet', default=0)
+    )['total'] or 0
+    
+    # Gözləyən sifarişlər
+    pending_orders = orders.filter(status='pending').count()
+    
+    # Son 5 sifariş
+    recent_orders = orders.order_by('-tarix')[:5]
+    
+    context = {
+        'total_products': total_products,
+        'total_orders': total_orders,
+        'total_revenue': total_revenue,
+        'pending_orders': pending_orders,
+        'recent_orders': recent_orders,
+        'now': timezone.now(),
+    }
+    
+    return render(request, 'admin_panel.html', context)
 
 @csrf_exempt
 @login_required

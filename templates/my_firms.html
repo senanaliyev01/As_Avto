@@ -1,0 +1,50 @@
+{% extends 'admin_panel.html' %}
+{% load static %}
+{% block title %}Firmalar{% endblock %}
+{% block panel_title %}Firmalar{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Mənim Firmalarım</h2>
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message message-{{ message.tags }}">
+            <i class="fas fa-info-circle"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div class="row">
+        {% for firma in firms %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ firma.adi }}</h5>
+                    <div class="mb-3">
+                        {% if firma.logo %}
+                        <img src="{{ firma.logo.url }}" alt="{{ firma.adi }} logo" style="max-width:100px;max-height:100px;object-fit:contain;">
+                        {% else %}
+                        <span class="text-muted">Logo yoxdur</span>
+                        {% endif %}
+                    </div>
+                    <form method="post" enctype="multipart/form-data" class="d-inline-block">
+                        {% csrf_token %}
+                        <input type="hidden" name="firm_id" value="{{ firma.id }}">
+                        <div class="mb-2">
+                            <input type="file" name="logo" class="form-control form-control-sm mb-2" accept="image/*">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm">Yadda saxla</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">Heç bir firma tapılmadı.</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

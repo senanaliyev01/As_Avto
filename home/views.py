@@ -14,7 +14,7 @@ from operator import and_, or_
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.views.decorators.http import require_http_methods
-from .forms import MehsulForm, SifarisEditForm, SifarisItemEditForm
+from .forms import MehsulForm, SifarisEditForm, SifarisItemEditForm, BrandEditForm
 import pandas as pd
 from django.db import transaction
 import math
@@ -1571,3 +1571,27 @@ def change_product_image(request, product_id):
             'sekil_url': mehsul.sekil.url
         })
     return JsonResponse({'success': False, 'message': 'Şəkil yüklənmədi'})
+
+@login_required
+def my_firms_view(request):
+    # Satıcının məhsullarında istifadə olunan firmalar
+    user = request.user
+    firm_ids = Mehsul.objects.filter(sahib=user).values_list('firma_id', flat=True).distinct()
+    firms = Firma.objects.filter(id__in=firm_ids)
+
+    # Firma redaktə və logo yükləmə
+    if request.method == 'POST':
+        firm_id = request.POST.get('firm_id')
+        firm = Firma.objects.get(id=firm_id)
+        form = BrandEditForm(request.POST, request.FILES, instance=firm)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Firma uğurla yeniləndi!')
+            return redirect('my_firms')
+    else:
+        form = BrandEditForm()
+
+    return render(request, 'my_firms.html', {
+        'firms': firms,
+        'form': form,
+    })

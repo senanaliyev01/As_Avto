@@ -14,7 +14,7 @@ from operator import and_, or_
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.views.decorators.http import require_http_methods
-from .forms import MehsulForm, SifarisEditForm, SifarisItemEditForm, BrandEditForm
+from .forms import MehsulForm, SifarisEditForm, SifarisItemEditForm
 import pandas as pd
 from django.db import transaction
 import math
@@ -1571,27 +1571,3 @@ def change_product_image(request, product_id):
             'sekil_url': mehsul.sekil.url
         })
     return JsonResponse({'success': False, 'message': 'Şəkil yüklənmədi'})
-
-@login_required
-def my_firms_view(request):
-    # Satıcının məhsullarında olan firmalar
-    user = request.user
-    firm_ids = Mehsul.objects.filter(sahib=user).values_list('firma_id', flat=True).distinct()
-    firms = Firma.objects.filter(id__in=firm_ids)
-    return render(request, 'my_firms.html', {'firms': firms})
-
-@login_required
-def edit_firm_view(request, firm_id):
-    user = request.user
-    # Yalnız istifadəçinin məhsullarında olan firmaları redaktə edə bilər
-    firm_ids = Mehsul.objects.filter(sahib=user).values_list('firma_id', flat=True).distinct()
-    firm = get_object_or_404(Firma, id=firm_id, id__in=firm_ids)
-    if request.method == 'POST':
-        form = BrandEditForm(request.POST, request.FILES, instance=firm)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Firma uğurla yeniləndi.')
-            return redirect('my_firms')
-    else:
-        form = BrandEditForm(instance=firm)
-    return render(request, 'edit_firm.html', {'form': form, 'firm': firm})

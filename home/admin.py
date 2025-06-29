@@ -43,8 +43,15 @@ class VitrinAdmin(admin.ModelAdmin):
 
 @admin.register(Firma)
 class FirmaAdmin(admin.ModelAdmin):
-    list_display = ['adi']
+    list_display = ['adi', 'logo_tag']
     search_fields = ['adi']
+
+    def logo_tag(self, obj):
+        if obj.logo:
+            return format_html('<img src="{}" style="height:40px;max-width:80px;object-fit:contain;" />', obj.logo.url)
+        return "-"
+    logo_tag.short_description = "Logo"
+    logo_tag.allow_tags = True
 
 @admin.register(Avtomobil)
 class AvtomobilAdmin(admin.ModelAdmin):

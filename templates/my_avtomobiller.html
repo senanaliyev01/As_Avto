@@ -1,0 +1,20 @@
+{% extends 'admin_panel.html' %}
+{% block title %}Avtomobillərim{% endblock %}
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Mənim Avtomobillərim</h2>
+    <div class="row">
+        {% for avtomobil in avtomobiller %}
+        <div class="col-md-4 col-sm-6 mb-4">
+            <div class="card h-100 text-center p-3">
+                <h5>{{ avtomobil.adi }}</h5>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">Heç bir avtomobil tapılmadı.</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

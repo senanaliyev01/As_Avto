@@ -1,0 +1,20 @@
+{% extends 'admin_panel.html' %}
+{% block title %}Kateqoriyalarım{% endblock %}
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Mənim Kateqoriyalarım</h2>
+    <div class="row">
+        {% for kateqoriya in kateqoriyalar %}
+        <div class="col-md-4 col-sm-6 mb-4">
+            <div class="card h-100 text-center p-3">
+                <h5>{{ kateqoriya.adi }}</h5>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">Heç bir kateqoriya tapılmadı.</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

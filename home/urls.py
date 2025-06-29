@@ -38,8 +38,8 @@ urlpatterns = [
     path('my-products/pdf/', views.my_products_pdf, name='my_products_pdf'),
     path('api/unread-sales-count/', views.unread_sales_count, name='unread_sales_count'),
     path('seller-admin-panel/', views.seller_admin_panel, name='seller_admin_panel'),
-    path('seller-categories/', views.seller_categories_view, name='seller_categories'),
-    path('seller-brands/', views.seller_brands_view, name='seller_brands'),
-    path('seller-automobiles/', views.seller_automobiles_view, name='seller_automobiles'),
     path('my-products/change-image/<int:product_id>/', views.change_product_image, name='change_product_image'),
+    path('my-firmalar/', views.my_firmalar, name='my_firmalar'),
+    path('my-kateqoriyalar/', views.my_kateqoriyalar, name='my_kateqoriyalar'),
+    path('my-avtomobiller/', views.my_avtomobiller, name='my_avtomobiller'),
 ]

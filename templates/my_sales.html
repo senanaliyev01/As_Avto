@@ -5,6 +5,17 @@
 
 {% block content %}
 <div class="container">
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message message-{{ message.tags }}">
+            <i class="fas fa-info-circle"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">Mənə Gələn Sifarişlər</h2>
         <button id="openStatsModal" class="btn btn-secondary mb-3">Statistikanı bax</button>
@@ -154,6 +165,16 @@
 
 {% block extra_js %}
 <script>
+    // Mesajları avtomatik sil
+    document.addEventListener('DOMContentLoaded', function() {
+        const messages = document.querySelectorAll('.message');
+        messages.forEach(function(message) {
+            setTimeout(function() {
+                message.remove();
+            }, 3000);
+        });
+    });
+    
     if (typeof initializeBuyerStatsModal === 'function') {
         initializeBuyerStatsModal();
     }

@@ -846,7 +846,7 @@ def edit_my_sale_view(request, order_id):
             formset.save()
             order.update_total() # Formset save olanda onsuz da total update olur, amma zəmanət üçün
             messages.success(request, f"Sifariş #{order.id} uğurla yeniləndi.")
-            return redirect('edit_my_sale', order_id=order.id)
+            return redirect('my_sales')
         else:
             messages.error(request, "Zəhmət olmasa xətaları düzəldin.")
 

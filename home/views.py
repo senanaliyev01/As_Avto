@@ -1455,7 +1455,8 @@ def seller_admin_panel(request):
     out_of_stock_products = Mehsul.objects.filter(sahib=request.user, stok=0).count()
     
     # Satış statistikaları
-    all_orders = Sifaris.objects.all()
+    from .models import SifarisItem
+    all_order_items = SifarisItem.objects.filter(mehsul__sahib=request.user)
     seller_orders = []
     total_sales = 0
     total_paid = 0
@@ -1469,54 +1470,55 @@ def seller_admin_panel(request):
     week_start = now - timedelta(days=now.weekday())
     week_start = week_start.replace(hour=0, minute=0, second=0, microsecond=0)
     
-    for order in all_orders:
-        items = order.sifarisitem_set.filter(mehsul__sahib=request.user)
-        order_total = sum(item.umumi_mebleg for item in items)
-        if order_total > 0:
-            seller_paid = order.odenilen_mebleg or 0
-            seller_debt = order_total - seller_paid
-            
-            total_sales += order_total
-            total_paid += seller_paid
-            total_debt += seller_debt
-            
-            # Aylıq satışlar
-            if order.tarix >= month_start:
-                monthly_sales += order_total
-            
-            # Həftəlik satışlar
-            if order.tarix >= week_start:
-                weekly_sales += order_total
-            
-            seller_orders.append({
+    # Sifarişləri qruplaşdır
+    order_totals = {}
+    for item in all_order_items:
+        order = item.sifaris
+        if order.id not in order_totals:
+            order_totals[order.id] = {
                 'order': order,
-                'total': order_total,
-                'paid': seller_paid,
-                'debt': seller_debt
-            })
+                'total': 0,
+                'paid': order.odenilen_mebleg or 0,
+                'debt': 0
+            }
+        order_totals[order.id]['total'] += item.umumi_mebleg
+    
+    # Borc hesabla
+    for order_data in order_totals.values():
+        order_data['debt'] = order_data['total'] - order_data['paid']
+        total_sales += order_data['total']
+        total_paid += order_data['paid']
+        total_debt += order_data['debt']
+        
+        # Aylıq satışlar
+        if order_data['order'].tarix >= month_start:
+            monthly_sales += order_data['total']
+        
+        # Həftəlik satışlar
+        if order_data['order'].tarix >= week_start:
+            weekly_sales += order_data['total']
+        
+        seller_orders.append(order_data)
     
     # Son 5 sifariş
     recent_orders = sorted(seller_orders, key=lambda x: x['order'].tarix, reverse=True)[:5]
     
     # Alıcı statistikaları
     buyer_stats = {}
-    for order in all_orders:
-        items = order.sifarisitem_set.filter(mehsul__sahib=request.user)
-        order_total = sum(item.umumi_mebleg for item in items)
-        if order_total > 0:
-            buyer = order.istifadeci
-            if buyer.id not in buyer_stats:
-                buyer_stats[buyer.id] = {
-                    'username': buyer.username,
-                    'order_count': 0,
-                    'total_amount': 0,
-                    'total_paid': 0,
-                    'total_debt': 0
-                }
-            buyer_stats[buyer.id]['order_count'] += 1
-            buyer_stats[buyer.id]['total_amount'] += order_total
-            buyer_stats[buyer.id]['total_paid'] += order.odenilen_mebleg or 0
-            buyer_stats[buyer.id]['total_debt'] += order_total - (order.odenilen_mebleg or 0)
+    for order_data in seller_orders:
+        buyer = order_data['order'].istifadeci
+        if buyer.id not in buyer_stats:
+            buyer_stats[buyer.id] = {
+                'username': buyer.username,
+                'order_count': 0,
+                'total_amount': 0,
+                'total_paid': 0,
+                'total_debt': 0
+            }
+        buyer_stats[buyer.id]['order_count'] += 1
+        buyer_stats[buyer.id]['total_amount'] += order_data['total']
+        buyer_stats[buyer.id]['total_paid'] += order_data['paid']
+        buyer_stats[buyer.id]['total_debt'] += order_data['debt']
     
     # Ən yaxşı alıcılar (top 5)
     top_buyers = sorted(buyer_stats.values(), key=lambda x: x['total_amount'], reverse=True)[:5]

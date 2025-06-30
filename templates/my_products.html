@@ -27,6 +27,7 @@
             </div>
         </form>
         <div class="my-products-actions ms-auto d-flex align-items-center gap-2">
+            <button id="delete-selected-btn" class="btn btn-danger btn-sm" disabled>Seçilmişləri sil</button>
             <a href="{% url 'my_products_pdf' %}" class="btn btn-danger btn-sm" target="_blank">
                 <i class="fas fa-file-pdf"></i> Məhsulları PDF-ə çıxar
             </a>
@@ -118,6 +119,7 @@
         <table class="table" id="products-table">
             <thead>
                 <tr>
+                    <th><input type="checkbox" id="select-all"></th>
                     <th>Şəkil</th>
                     <th>Kodu</th>
                     <th>Firma Adı</th>
@@ -130,6 +132,7 @@
             <tbody id="products-tbody">
                 {% for mehsul in mehsullar %}
                 <tr data-initialized="true">
+                    <td><input type="checkbox" class="select-product" value="{{ mehsul.id }}"></td>
                     <td><img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image" onclick="openImageModal('{{ mehsul.sekil.url }}')"></td>
                     <td>{{ mehsul.brend_kod }}</td>
                     <td>{{ mehsul.firma.adi }}</td>
@@ -436,6 +439,65 @@
                             loadMoreBtn.remove();
                         }
                     });
+            });
+        }
+
+        // Checkbox funksionallığı
+        const selectAllCheckbox = document.getElementById('select-all');
+        const deleteSelectedBtn = document.getElementById('delete-selected-btn');
+        const productCheckboxes = () => document.querySelectorAll('.select-product');
+
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', function() {
+                productCheckboxes().forEach(cb => cb.checked = this.checked);
+                toggleDeleteSelectedBtn();
+            });
+        }
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('select-product')) {
+                // Əgər bütün checkboxlar seçilibsə, baş checkbox-u da seç
+                const allChecked = Array.from(productCheckboxes()).every(cb => cb.checked);
+                selectAllCheckbox.checked = allChecked;
+                toggleDeleteSelectedBtn();
+            }
+        });
+        function toggleDeleteSelectedBtn() {
+            const anyChecked = Array.from(productCheckboxes()).some(cb => cb.checked);
+            deleteSelectedBtn.disabled = !anyChecked;
+        }
+        if (deleteSelectedBtn) {
+            deleteSelectedBtn.addEventListener('click', function() {
+                const selectedIds = Array.from(productCheckboxes())
+                    .filter(cb => cb.checked)
+                    .map(cb => cb.value);
+                if (selectedIds.length === 0) return;
+                if (!confirm('Seçilmiş məhsulları silmək istədiyinizə əminsiniz?')) return;
+                // AJAX ilə silmək üçün backend-ə göndər
+                fetch('/my-products/delete-selected/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ ids: selectedIds })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Seçilmiş sətirləri cədvəldən sil
+                        selectedIds.forEach(id => {
+                            const row = document.querySelector('input.select-product[value="' + id + '"]').closest('tr');
+                            if (row) row.remove();
+                        });
+                        showMessage('Seçilmiş məhsullar silindi', 'success');
+                        toggleDeleteSelectedBtn();
+                    } else {
+                        showMessage(data.message || 'Xəta baş verdi', 'error');
+                    }
+                })
+                .catch(() => {
+                    showMessage('Xəta baş verdi', 'error');
+                });
             });
         }
     });

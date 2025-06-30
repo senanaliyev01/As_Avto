@@ -39,4 +39,5 @@ urlpatterns = [
     path('api/unread-sales-count/', views.unread_sales_count, name='unread_sales_count'),
     path('seller-admin-panel/', views.seller_admin_panel, name='seller_admin_panel'),
     path('my-products/change-image/<int:product_id>/', views.change_product_image, name='change_product_image'),
+    path('my-products/bulk-delete/', views.bulk_delete_products_view, name='bulk_delete_products'),
 ]

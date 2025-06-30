@@ -18,12 +18,19 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import HttpResponse
+
+
+def ads_txt_view(request):
+    content = "google.com, pub-8801377705417869, DIRECT, f08c47fec0942fa0"
+    return HttpResponse(content, content_type="text/plain")
 
 handler404 = 'home.views.custom_404'
 
 urlpatterns = [
     path('admin-as-avto-1983-2002/', admin.site.urls),
     path('', include('home.urls')),
+    path("ads.txt", ads_txt_view),
 ]
 
 if settings.DEBUG:

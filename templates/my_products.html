@@ -118,7 +118,6 @@
         <table class="table" id="products-table">
             <thead>
                 <tr>
-                    <th><input type="checkbox" id="select-all"></th>
                     <th>Şəkil</th>
                     <th>Kodu</th>
                     <th>Firma Adı</th>
@@ -131,7 +130,6 @@
             <tbody id="products-tbody">
                 {% for mehsul in mehsullar %}
                 <tr data-initialized="true">
-                    <td><input type="checkbox" class="select-product" value="{{ mehsul.id }}"></td>
                     <td><img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image" onclick="openImageModal('{{ mehsul.sekil.url }}')"></td>
                     <td>{{ mehsul.brend_kod }}</td>
                     <td>{{ mehsul.firma.adi }}</td>
@@ -174,15 +172,10 @@
                 {% endfor %}
             </tbody>
         </table>
-        <div class="text-center my-3 d-flex justify-content-between align-items-center">
-            <div>
-                <button id="delete-selected-btn" class="btn btn-danger btn-sm" disabled>Seçilmişləri sil</button>
-            </div>
-            <div>
-                {% if has_more %}
-                <button id="load-more-btn" class="btn btn-outline-primary" data-offset="5" data-search="{{ search_query }}">Daha çox göstər</button>
-                {% endif %}
-            </div>
+        <div class="text-center my-3">
+            {% if has_more %}
+            <button id="load-more-btn" class="btn btn-outline-primary" data-offset="5" data-search="{{ search_query }}">Daha çox göstər</button>
+            {% endif %}
         </div>
     </div>
 
@@ -443,68 +436,6 @@
                             loadMoreBtn.remove();
                         }
                     });
-            });
-        }
-
-        // Checkbox funksionallığı
-        const selectAll = document.getElementById('select-all');
-        const deleteSelectedBtn = document.getElementById('delete-selected-btn');
-        function updateDeleteBtnState() {
-            const checked = document.querySelectorAll('.select-product:checked').length;
-            deleteSelectedBtn.disabled = checked === 0;
-        }
-        if (selectAll) {
-            selectAll.addEventListener('change', function() {
-                document.querySelectorAll('.select-product').forEach(cb => {
-                    cb.checked = selectAll.checked;
-                });
-                updateDeleteBtnState();
-            });
-        }
-        document.addEventListener('change', function(e) {
-            if (e.target.classList.contains('select-product')) {
-                updateDeleteBtnState();
-                if (!e.target.checked && selectAll.checked) {
-                    selectAll.checked = false;
-                }
-            }
-        });
-        if (deleteSelectedBtn) {
-            deleteSelectedBtn.addEventListener('click', function() {
-                const selected = Array.from(document.querySelectorAll('.select-product:checked')).map(cb => cb.value);
-                if (selected.length === 0) return;
-                if (!confirm('Seçilmiş məhsulları silmək istədiyinizə əminsiniz?')) return;
-                deleteSelectedBtn.disabled = true;
-                deleteSelectedBtn.textContent = 'Silinir...';
-                fetch("{% url 'delete_selected_products' %}", {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({product_ids: selected})
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Seçilmiş sətirləri sil
-                        selected.forEach(id => {
-                            const row = document.querySelector('.select-product[value="' + id + '"]')?.closest('tr');
-                            if (row) row.remove();
-                        });
-                        showMessage('Seçilmiş məhsullar silindi', 'success');
-                    } else {
-                        showMessage(data.message || 'Xəta baş verdi', 'error');
-                    }
-                })
-                .catch(() => {
-                    showMessage('Xəta baş verdi', 'error');
-                })
-                .finally(() => {
-                    deleteSelectedBtn.disabled = false;
-                    deleteSelectedBtn.textContent = 'Seçilmişləri sil';
-                    updateDeleteBtnState();
-                });
             });
         }
     });

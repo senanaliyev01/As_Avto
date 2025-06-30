@@ -13,7 +13,7 @@ from functools import reduce
 from operator import and_, or_
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
-from django.views.decorators.http import require_http_methods, require_POST
+from django.views.decorators.http import require_http_methods
 from .forms import MehsulForm, SifarisEditForm, SifarisItemEditForm
 import pandas as pd
 from django.db import transaction
@@ -1571,17 +1571,3 @@ def change_product_image(request, product_id):
             'sekil_url': mehsul.sekil.url
         })
     return JsonResponse({'success': False, 'message': 'Şəkil yüklənmədi'})
-
-@require_POST
-@login_required
-def bulk_delete_products_view(request):
-    if not request.user.profile.is_verified:
-        messages.error(request, 'Bu əməliyyatı etmək üçün icazəniz yoxdur.')
-        return redirect('my_products')
-    ids = request.POST.getlist('product_ids')
-    if ids:
-        Mehsul.objects.filter(id__in=ids, sahib=request.user).delete()
-        messages.success(request, f"{len(ids)} məhsul uğurla silindi.")
-    else:
-        messages.warning(request, "Heç bir məhsul seçilməyib.")
-    return redirect('my_products')

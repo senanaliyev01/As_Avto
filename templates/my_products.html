@@ -114,79 +114,77 @@
         </div>
     </div>
 
-    <form id="bulk-delete-form" method="post" action="{% url 'bulk_delete_products' %}">
-        {% csrf_token %}
-        <div class="d-flex align-items-center mb-2">
-            <button type="submit" class="btn btn-danger btn-sm me-2" id="bulk-delete-btn" disabled>Seçilmişləri Sil</button>
-            <span id="selected-count" class="text-muted small"></span>
-        </div>
-        <div class="table-container">
-            <table class="table" id="products-table">
-                <thead>
-                    <tr>
-                        <th><input type="checkbox" id="select-all"></th>
-                        <th>Şəkil</th>
-                        <th>Kodu</th>
-                        <th>Firma Adı</th>
-                        <th>Məhsul Adı</th>
-                        <th>Stok</th>
-                        <th>Qiymət</th>
-                        <th>Əməliyyatlar</th>
-                    </tr>
-                </thead>
-                <tbody id="products-tbody">
-                    {% for mehsul in mehsullar %}
-                    <tr data-initialized="true">
-                        <td><input type="checkbox" name="product_ids" value="{{ mehsul.id }}" class="select-product"></td>
-                        <td><img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image" onclick="openImageModal('{{ mehsul.sekil.url }}')"></td>
-                        <td>{{ mehsul.brend_kod }}</td>
-                        <td>{{ mehsul.firma.adi }}</td>
-                        <td>
-                            <span class="product-name-ellipsis">{{ mehsul.adi }}</span>
-                            {% if mehsul.yenidir %}
-                            <span class="new-badge">Yeni</span>
-                            {% if mehsul.qalan_vaxt %}
-                            <span class="time-badge">{{ mehsul.qalan_vaxt }}</span>
-                            {% endif %}
-                            {% endif %}
-                        </td>
-                        <td>{{ mehsul.stok }}</td>
-                        <td>{{ mehsul.qiymet }} ₼</td>
-                        <td>
-                            <a href="{% url 'edit_product' mehsul.id %}" class="btn btn-secondary btn-sm">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <button class="btn btn-info btn-sm toggle-new-btn" data-product-id="{{ mehsul.id }}" data-yenidir="{{ mehsul.yenidir|yesno:'true,false' }}" title="{% if mehsul.yenidir %}Yenidən çıxar{% else %}Yeni et{% endif %}">
-                                <i class="fas fa-star"></i>
-                            </button>
-                            <button class="btn btn-warning btn-sm change-image-btn" data-product-id="{{ mehsul.id }}" title="Şəkli dəyiş">
-                                <i class="fas fa-image"></i>
-                            </button>
-                            <input type="file" accept="image/*" class="product-image-input" data-product-id="{{ mehsul.id }}" style="display:none;">
-                            <a href="{% url 'delete_product' mehsul.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Bu məhsulu silmək istədiyinizə əminsiniz?')">
-                                <i class="fas fa-trash"></i>
-                            </a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="7" class="text-center">
-                            <div class="empty-message">
-                                <i class="fas fa-box-open"></i>
-                                <p>Heç bir məhsul əlavə etməmisiniz.</p>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <div class="text-center my-3">
+    <div class="table-container">
+        <table class="table" id="products-table">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="select-all"></th>
+                    <th>Şəkil</th>
+                    <th>Kodu</th>
+                    <th>Firma Adı</th>
+                    <th>Məhsul Adı</th>
+                    <th>Stok</th>
+                    <th>Qiymət</th>
+                    <th>Əməliyyatlar</th>
+                </tr>
+            </thead>
+            <tbody id="products-tbody">
+                {% for mehsul in mehsullar %}
+                <tr data-initialized="true">
+                    <td><input type="checkbox" class="select-product" value="{{ mehsul.id }}"></td>
+                    <td><img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image" onclick="openImageModal('{{ mehsul.sekil.url }}')"></td>
+                    <td>{{ mehsul.brend_kod }}</td>
+                    <td>{{ mehsul.firma.adi }}</td>
+                    <td>
+                        <span class="product-name-ellipsis">{{ mehsul.adi }}</span>
+                        {% if mehsul.yenidir %}
+                        <span class="new-badge">Yeni</span>
+                        {% if mehsul.qalan_vaxt %}
+                        <span class="time-badge">{{ mehsul.qalan_vaxt }}</span>
+                        {% endif %}
+                        {% endif %}
+                    </td>
+                    <td>{{ mehsul.stok }}</td>
+                    <td>{{ mehsul.qiymet }} ₼</td>
+                    <td>
+                        <a href="{% url 'edit_product' mehsul.id %}" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <button class="btn btn-info btn-sm toggle-new-btn" data-product-id="{{ mehsul.id }}" data-yenidir="{{ mehsul.yenidir|yesno:'true,false' }}" title="{% if mehsul.yenidir %}Yenidən çıxar{% else %}Yeni et{% endif %}">
+                            <i class="fas fa-star"></i>
+                        </button>
+                        <button class="btn btn-warning btn-sm change-image-btn" data-product-id="{{ mehsul.id }}" title="Şəkli dəyiş">
+                            <i class="fas fa-image"></i>
+                        </button>
+                        <input type="file" accept="image/*" class="product-image-input" data-product-id="{{ mehsul.id }}" style="display:none;">
+                        <a href="{% url 'delete_product' mehsul.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Bu məhsulu silmək istədiyinizə əminsiniz?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center">
+                        <div class="empty-message">
+                            <i class="fas fa-box-open"></i>
+                            <p>Heç bir məhsul əlavə etməmisiniz.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="text-center my-3 d-flex justify-content-between align-items-center">
+            <div>
+                <button id="delete-selected-btn" class="btn btn-danger btn-sm" disabled>Seçilmişləri sil</button>
+            </div>
+            <div>
                 {% if has_more %}
                 <button id="load-more-btn" class="btn btn-outline-primary" data-offset="5" data-search="{{ search_query }}">Daha çox göstər</button>
                 {% endif %}
             </div>
         </div>
-    </form>
+    </div>
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -448,39 +446,67 @@
             });
         }
 
-        // Toplu seçim və silmə funksionallığı
+        // Checkbox funksionallığı
         const selectAll = document.getElementById('select-all');
-        const checkboxes = document.querySelectorAll('.select-product');
-        const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
-        const selectedCount = document.getElementById('selected-count');
-        const bulkDeleteForm = document.getElementById('bulk-delete-form');
-
-        function updateBulkDeleteState() {
-            const checked = document.querySelectorAll('.select-product:checked');
-            bulkDeleteBtn.disabled = checked.length === 0;
-            selectedCount.textContent = checked.length > 0 ? `${checked.length} məhsul seçildi` : '';
+        const deleteSelectedBtn = document.getElementById('delete-selected-btn');
+        function updateDeleteBtnState() {
+            const checked = document.querySelectorAll('.select-product:checked').length;
+            deleteSelectedBtn.disabled = checked === 0;
         }
-
         if (selectAll) {
             selectAll.addEventListener('change', function() {
-                checkboxes.forEach(cb => cb.checked = selectAll.checked);
-                updateBulkDeleteState();
+                document.querySelectorAll('.select-product').forEach(cb => {
+                    cb.checked = selectAll.checked;
+                });
+                updateDeleteBtnState();
             });
         }
-
-        checkboxes.forEach(cb => {
-            cb.addEventListener('change', function() {
-                if (!this.checked) selectAll.checked = false;
-                else if (document.querySelectorAll('.select-product:checked').length === checkboxes.length) selectAll.checked = true;
-                updateBulkDeleteState();
-            });
-        });
-
-        bulkDeleteForm.addEventListener('submit', function(e) {
-            if (!confirm('Seçilmiş məhsulları silmək istədiyinizə əminsiniz?')) {
-                e.preventDefault();
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('select-product')) {
+                updateDeleteBtnState();
+                if (!e.target.checked && selectAll.checked) {
+                    selectAll.checked = false;
+                }
             }
         });
+        if (deleteSelectedBtn) {
+            deleteSelectedBtn.addEventListener('click', function() {
+                const selected = Array.from(document.querySelectorAll('.select-product:checked')).map(cb => cb.value);
+                if (selected.length === 0) return;
+                if (!confirm('Seçilmiş məhsulları silmək istədiyinizə əminsiniz?')) return;
+                deleteSelectedBtn.disabled = true;
+                deleteSelectedBtn.textContent = 'Silinir...';
+                fetch("{% url 'delete_selected_products' %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({product_ids: selected})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Seçilmiş sətirləri sil
+                        selected.forEach(id => {
+                            const row = document.querySelector('.select-product[value="' + id + '"]')?.closest('tr');
+                            if (row) row.remove();
+                        });
+                        showMessage('Seçilmiş məhsullar silindi', 'success');
+                    } else {
+                        showMessage(data.message || 'Xəta baş verdi', 'error');
+                    }
+                })
+                .catch(() => {
+                    showMessage('Xəta baş verdi', 'error');
+                })
+                .finally(() => {
+                    deleteSelectedBtn.disabled = false;
+                    deleteSelectedBtn.textContent = 'Seçilmişləri sil';
+                    updateDeleteBtnState();
+                });
+            });
+        }
     });
     </script>
 </div>

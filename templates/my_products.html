@@ -95,7 +95,10 @@
                                 <li><b>firma</b>, <b>kateqoriya</b>, <b>avtomobil</b>, <b>vitrin</b> kimi sütunlar varsa, avtomatik yaradılır və ya mövcud olan seçilir.</li>
                                 <li><b>maya_qiymet</b> və <b>qiymet</b> sütunları ədədi olmalıdır (nöqtə və ya vergül ilə yazıla bilər).</li>
                                 <li><b>stok</b> tam ədəd olmalıdır.</li>
-                                <li>Əgər <b>brend_kod</b> mövcuddursa və həmin istifadəçiyə aid məhsul varsa, məlumatlar yenilənir. Əks halda yeni məhsul yaradılır.</li>
+                                <li>Bütün nümunədə göstərilən sütunlar Excel faylınızda <b>mütləq olmalıdır</b> və <b>adlandırmaları eyni olmalıdır</b> (sıra fərq etmir).</li>
+                                <li><b>brend_kod</b> sütunu məhsulun unikal identifikatorudur. Hər bir məhsul üçün fərqli olmalıdır. Eyni brend_kod istifadə etməyin!</li>
+                                <li>Excel import zamanı mövcud brend_kod-a sahib məhsullar yenilənir, olmayanlar isə yeni yaradılır. Yəni, eyni brend_kod yazsanız, əvvəlki məhsul yenilənəcək, yeni məhsul əlavə olunmayacaq.</li>
+                                <li>Yeni məhsul əlavə edərkən fərqli brend_kod istifadə edin. Məsələn: <i>28113-2p300</i>, <i>28113-2p300FOLGEL</i>, <i>28113-2p300F</i>, <i>FG-SO</i> və ya <i>FGA15110/28113-2P300</i> kimi fərqli brend_kod-lar istifadə edə bilərsiniz.</li>
                                 <li>Boş və ya səhv doldurulmuş sətirlər üçün xəta mesajı göstəriləcək.</li>
                                 <li>Yalnız təsdiqlənmiş istifadəçilər məhsul import edə bilər.</li>
                             </ul>

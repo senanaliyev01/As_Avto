@@ -8,6 +8,9 @@ class Command(BaseCommand):
     help = "Məhsullar üçün cross reference kodlarını partsouq.com saytından çəkir və kodlar sahəsinə yazır"
 
     def handle(self, *args, **kwargs):
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
         products = Mehsul.objects.all()
         for idx, mehsul in enumerate(products, 1):
             print(f"{idx}/{products.count()} - Yoxlanır: {mehsul.adi} (ID: {mehsul.id}) | brend_kod: {mehsul.brend_kod}")
@@ -20,7 +23,7 @@ class Command(BaseCommand):
                 print(f"  Kod yoxlanır: {kod}")
                 search_url = f"https://partsouq.com/en/search/all?q={kod}"
                 try:
-                    resp = requests.get(search_url, timeout=7)
+                    resp = requests.get(search_url, headers=headers, timeout=7)
                     if resp.status_code == 200:
                         soup = BeautifulSoup(resp.text, "html.parser")
                         # Cross reference kodlarını tapmaq üçün uyğun selector tapmaq lazımdır

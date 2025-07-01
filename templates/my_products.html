@@ -90,11 +90,14 @@
                         <div class="notes mt-2">
                             <p><strong>Qeydlər:</strong></p>
                             <ul>
-                                <li>Bütün başlıqlar kiçik hərflərlə yazılmalıdır</li>
-                                <li>brend_kod və ya kodlar sütunundan ən azı biri dolu olmalıdır</li>
-                                <li>Qiymətlər nöqtə (. ,) ilə yazılmalıdır (məs: 15.50) və ya (məs: 15,50)</li>
-                                <li>Stok tam ədəd olmalıdır</li>
-                                <li>Axtarış Məhsulun adı, kodlar və brend_kod sütunundan etibarlıdır.</li>
+                                <li>Yalnız <b>.xlsx</b> formatında olan Excel faylları qəbul edilir.</li>
+                                <li><b>adi</b> (məhsulun adı) və <b>brend_kod</b> sütunları <b>mütləq doldurulmalıdır</b>. Hər ikisi boş və ya "nan" olarsa, həmin sətir qəbul edilmir.</li>
+                                <li><b>firma</b>, <b>kateqoriya</b>, <b>avtomobil</b>, <b>vitrin</b> kimi sütunlar varsa, avtomatik yaradılır və ya mövcud olan seçilir.</li>
+                                <li><b>maya_qiymet</b> və <b>qiymet</b> sütunları ədədi olmalıdır (nöqtə və ya vergül ilə yazıla bilər).</li>
+                                <li><b>stok</b> tam ədəd olmalıdır.</li>
+                                <li>Əgər <b>brend_kod</b> mövcuddursa və həmin istifadəçiyə aid məhsul varsa, məlumatlar yenilənir. Əks halda yeni məhsul yaradılır.</li>
+                                <li>Boş və ya səhv doldurulmuş sətirlər üçün xəta mesajı göstəriləcək.</li>
+                                <li>Yalnız təsdiqlənmiş istifadəçilər məhsul import edə bilər.</li>
                             </ul>
                         </div>
                     </div>

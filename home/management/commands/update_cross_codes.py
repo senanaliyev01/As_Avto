@@ -19,8 +19,14 @@ class Command(BaseCommand):
             for kod in brend_kodlar:
                 print(f"  Kod yoxlanır: {kod}")
                 search_url = f"https://jsfilter.jp/catalogue?search={kod}"
+                headers = {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                }
                 try:
-                    resp = requests.get(search_url, timeout=7)
+                    resp = requests.get(search_url, headers=headers, timeout=10, allow_redirects=True)
+                    print("Gələn URL:", resp.url)
+                    print("Status:", resp.status_code)
+                    print("HTML başlanğıcı:", resp.text[:500])
                     if resp.status_code == 200:
                         soup = BeautifulSoup(resp.text, "html.parser")
                         # 1. Əgər birbaşa məhsul səhifəsinə yönləndirilibsə, cross reference bölməsini tap

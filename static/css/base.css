@@ -4723,3 +4723,49 @@ body {
         transform: translateX(0);
     }
 }
+
+/* Excel Import Modal - Daha kiçik və kompakt */
+.modal-dialog {
+    max-width: 400px !important;
+    width: 95vw !important;
+    margin: 1.5rem auto !important;
+}
+.modal-content {
+    padding: 10px 8px !important;
+    border-radius: 8px !important;
+}
+@media (max-width: 600px) {
+    .modal-dialog {
+        max-width: 98vw !important;
+        margin: 0.5rem auto !important;
+    }
+    .modal-content {
+        padding: 4px 2px !important;
+    }
+}
+
+/* Excel Sample və Notes üçün daha kompakt stil */
+.excel-sample {
+    padding: 10px 6px 8px 6px !important;
+    margin-bottom: 10px !important;
+}
+.excel-sample h6 {
+    font-size: 1rem !important;
+    margin-bottom: 8px !important;
+}
+.sample-table th, .sample-table td {
+    font-size: 0.85rem !important;
+    padding: 4px 3px !important;
+}
+.notes {
+    padding: 6px 8px !important;
+    font-size: 0.91rem !important;
+    margin-top: 6px !important;
+}
+.notes ul {
+    margin-left: 10px !important;
+}
+.notes li {
+    margin-bottom: 2px !important;
+    font-size: 0.91rem !important;
+}

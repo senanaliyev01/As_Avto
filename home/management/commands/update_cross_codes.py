@@ -18,15 +18,47 @@ class Command(BaseCommand):
                 brend_kodlar = [mehsul.brend_kod.strip()]
             for kod in brend_kodlar:
                 print(f"  Kod yoxlanır: {kod}")
-                url = f"https://jsfilter.jp/catalogue?search={kod}"
+                search_url = f"https://jsfilter.jp/catalogue?search={kod}"
                 try:
-                    resp = requests.get(url, timeout=7)
+                    resp = requests.get(search_url, timeout=7)
                     if resp.status_code == 200:
                         soup = BeautifulSoup(resp.text, "html.parser")
-                        for tag in soup.find_all("td"):
-                            text = tag.get_text(strip=True)
-                            if text and text not in kodlar and text != kod:
-                                kodlar.append(text)
+                        # 1. Əgər birbaşa məhsul səhifəsinə yönləndirilibsə, cross reference bölməsini tap
+                        cross_found = False
+                        cross_section = soup.find(string=lambda s: s and "Cross reference" in s)
+                        if cross_section:
+                            # Cross reference başlığını tapdıqdan sonra, onun altındakı kodları yığ
+                            table = cross_section.find_parent("table")
+                            if table:
+                                for row in table.find_all("tr"):
+                                    cols = row.find_all("td")
+                                    if len(cols) >= 2:
+                                        code = cols[1].get_text(strip=True)
+                                        if code and code not in kodlar and code != kod:
+                                            kodlar.append(code)
+                                cross_found = True
+                        # 2. Əgər siyahı çıxıbsa, ilk məhsulun linkini tap və ora daxil ol
+                        if not cross_found:
+                            # Siyahıdakı ilk məhsulun linkini tap
+                            first_link = soup.find("a", href=True, text=True)
+                            if first_link and "/catalogue/filter/" in first_link["href"]:
+                                product_url = "https://jsfilter.jp" + first_link["href"]
+                                print(f"    Məhsul səhifəsinə daxil olunur: {product_url}")
+                                prod_resp = requests.get(product_url, timeout=7)
+                                if prod_resp.status_code == 200:
+                                    prod_soup = BeautifulSoup(prod_resp.text, "html.parser")
+                                    cross_section = prod_soup.find(string=lambda s: s and "Cross reference" in s)
+                                    if cross_section:
+                                        table = cross_section.find_parent("table")
+                                        if table:
+                                            for row in table.find_all("tr"):
+                                                cols = row.find_all("td")
+                                                if len(cols) >= 2:
+                                                    code = cols[1].get_text(strip=True)
+                                                    if code and code not in kodlar and code != kod:
+                                                        kodlar.append(code)
+                        if not kodlar:
+                            print(f"    Cross reference kod tapılmadı.")
                     else:
                         print(f"    Sayt cavab vermədi: {resp.status_code}")
                 except Exception as e:

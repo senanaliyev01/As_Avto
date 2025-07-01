@@ -3067,49 +3067,50 @@ body {
 .excel-sample {
     background: #f8fafc;
     border: 1.5px solid #d1e7dd;
-    border-radius: 10px;
-    padding: 24px 18px 18px 18px;
-    margin-bottom: 24px;
-    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.06);
+    border-radius: 8px;
+    padding: 10px 6px 8px 6px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(44, 62, 80, 0.04);
     max-width: 100%;
 }
 .excel-sample h6 {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
     color: #1d6f42;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 .excel-sample h6:before {
     content: '\f1c3';
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;
     color: #1d6f42;
-    font-size: 1.2em;
+    font-size: 1em;
 }
 .sample-table {
     background: #fff;
-    border-radius: 8px;
+    border-radius: 6px;
     overflow: hidden;
-    box-shadow: 0 1px 4px rgba(44, 62, 80, 0.04);
-    margin-bottom: 12px;
+    box-shadow: 0 1px 2px rgba(44, 62, 80, 0.03);
+    margin-bottom: 6px;
+    font-size: 0.92rem;
 }
 .sample-table th {
     background: #e9f7ef;
     color: #1d6f42;
     font-weight: 600;
-    font-size: 0.98rem;
-    border-bottom: 2px solid #b7e4c7;
-    padding: 8px 10px;
+    font-size: 0.92rem;
+    border-bottom: 1px solid #b7e4c7;
+    padding: 4px 5px;
     text-align: center;
 }
 .sample-table td {
     background: #fff;
     color: #333;
-    font-size: 0.97rem;
-    padding: 8px 10px;
+    font-size: 0.91rem;
+    padding: 4px 5px;
     text-align: center;
     border-bottom: 1px solid #e9ecef;
 }
@@ -3118,51 +3119,45 @@ body {
 }
 .notes {
     background: #e9f7ef;
-    border-left: 4px solid #1d6f42;
-    border-radius: 0 8px 8px 0;
-    padding: 14px 18px;
-    margin-top: 10px;
+    border-left: 3px solid #1d6f42;
+    border-radius: 0 6px 6px 0;
+    padding: 7px 8px;
+    margin-top: 6px;
     color: #1d6f42;
-    font-size: 0.97rem;
-    box-shadow: 0 1px 4px rgba(44, 62, 80, 0.03);
+    font-size: 0.93rem;
+    box-shadow: 0 1px 2px rgba(44, 62, 80, 0.02);
 }
 .notes p {
     font-weight: 600;
-    margin-bottom: 6px;
+    margin-bottom: 3px;
     color: #1d6f42;
     display: flex;
     align-items: center;
-    gap: 6px;
-}
-.notes p:before {
-    content: '\f05a';
-    font-family: 'Font Awesome 5 Free';
-    font-weight: 900;
-    color: #1d6f42;
-    font-size: 1em;
+    gap: 4px;
+    font-size: 0.95em;
 }
 .notes ul {
-    margin: 0 0 0 18px;
+    margin: 0 0 0 10px;
     padding: 0;
     list-style: disc inside;
 }
 .notes li {
-    margin-bottom: 4px;
-    font-size: 0.97rem;
+    margin-bottom: 2px;
+    font-size: 0.93rem;
     color: #14532d;
-    padding-left: 2px;
+    padding-left: 1px;
 }
 @media (max-width: 600px) {
     .excel-sample {
-        padding: 12px 4px 8px 4px;
+        padding: 5px 2px 4px 2px;
     }
     .sample-table th, .sample-table td {
-        font-size: 0.90rem;
-        padding: 6px 4px;
+        font-size: 0.85rem;
+        padding: 2px 2px;
     }
     .notes {
-        padding: 8px 8px;
-        font-size: 0.93rem;
+        padding: 4px 4px;
+        font-size: 0.89rem;
     }
 }
 
@@ -4722,50 +4717,4 @@ body {
     .admin-layout .admin-sidebar.active {
         transform: translateX(0);
     }
-}
-
-/* Excel Import Modal - Daha kiçik və kompakt */
-.modal-dialog {
-    max-width: 400px !important;
-    width: 95vw !important;
-    margin: 1.5rem auto !important;
-}
-.modal-content {
-    padding: 10px 8px !important;
-    border-radius: 8px !important;
-}
-@media (max-width: 600px) {
-    .modal-dialog {
-        max-width: 98vw !important;
-        margin: 0.5rem auto !important;
-    }
-    .modal-content {
-        padding: 4px 2px !important;
-    }
-}
-
-/* Excel Sample və Notes üçün daha kompakt stil */
-.excel-sample {
-    padding: 10px 6px 8px 6px !important;
-    margin-bottom: 10px !important;
-}
-.excel-sample h6 {
-    font-size: 1rem !important;
-    margin-bottom: 8px !important;
-}
-.sample-table th, .sample-table td {
-    font-size: 0.85rem !important;
-    padding: 4px 3px !important;
-}
-.notes {
-    padding: 6px 8px !important;
-    font-size: 0.91rem !important;
-    margin-top: 6px !important;
-}
-.notes ul {
-    margin-left: 10px !important;
-}
-.notes li {
-    margin-bottom: 2px !important;
-    font-size: 0.91rem !important;
 }

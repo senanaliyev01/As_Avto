@@ -67,8 +67,9 @@ class MehsulAdmin(admin.ModelAdmin):
     actions = ['mark_as_new', 'remove_from_new']
 
     def sekil_preview(self, obj):
+        from django.utils import timezone
         if obj.sekil:
-            return format_html('<img src="{}" style="max-height: 50px;"/>', obj.sekil.url)
+            return format_html('<img src="{}?t={}" style="max-height: 50px;"/>', obj.sekil.url, int(timezone.now().timestamp()))
         return '-'
     sekil_preview.short_description = 'Şəkil'
 

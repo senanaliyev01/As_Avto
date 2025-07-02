@@ -60,7 +60,7 @@ class AvtomobilAdmin(admin.ModelAdmin):
 
 @admin.register(Mehsul)
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ['sahib', 'brend_kod', 'firma', 'adi',  'olcu', 'vitrin', 'stok', 'maya_qiymet', 'qiymet',  'yenidir', 'qalan_vaxt', 'sekil_preview']
+    list_display = ['sahib', 'brend_kod', 'firma', 'adi',  'olcu', 'vitrin', 'stok', 'maya_qiymet', 'qiymet',  'yenidir', 'sekil_preview']
     list_filter = ['sahib', 'kateqoriya', 'firma', 'avtomobil', 'vitrin', 'yenidir']
     search_fields = ['adi', 'brend_kod', 'oem', 'kodlar', 'olcu', 'sahib__username']
     change_list_template = 'admin/mehsul_change_list.html'
@@ -71,12 +71,6 @@ class MehsulAdmin(admin.ModelAdmin):
             return format_html('<img src="{}" style="max-height: 50px;"/>', obj.sekil.url)
         return '-'
     sekil_preview.short_description = 'Şəkil'
-
-    def qalan_vaxt(self, obj):
-        if obj.yenidir and obj.qalan_vaxt():
-            return format_html('<span style="color: #17a2b8; font-weight: bold;">{}</span>', obj.qalan_vaxt())
-        return '-'
-    qalan_vaxt.short_description = 'Qalan Vaxt'
 
     def get_urls(self):
         urls = super().get_urls()

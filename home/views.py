@@ -892,8 +892,7 @@ def add_edit_product_view(request, product_id=None):
             
             yeni_mehsul.save()
             
-            # Əgər məhsul yeni olaraq işarələnibsə, 3 gün sonra avtomatik olaraq yenidən çıxar
-            # (Avtomatik çıxarma funksiyası ləğv edildi)
+            # Remove: 3 gün sonra avtomatik olaraq yenidən çıxar (threading/timer)
             
             messages.success(request, f'Məhsul uğurla {"yeniləndi" if mehsul else "əlavə edildi"}.')
             return redirect('my_products')

@@ -240,6 +240,7 @@
                                 badge.textContent = 'Yeni';
                                 productNameCell.appendChild(badge);
                             }
+                            
                             // Qalan vaxtı göstər
                             if (data.qalan_vaxt) {
                                 const timeBadge = document.createElement('span');
@@ -257,6 +258,7 @@
                                 timeBadge.remove();
                             }
                         }
+                        
                         // Show success message
                         showMessage('Məhsul yeni statusu yeniləndi', 'success');
                     } else {

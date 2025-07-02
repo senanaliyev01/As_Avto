@@ -1158,30 +1158,13 @@ body {
 }
 
 .modal-content {
-    background-color: #fefefe;
-    margin: 5% auto;
-    padding: 16px 14px;
-    border: 1px solid #888;
-    width: 95%;
-    max-width: 420px;
-    min-width: 180px;
-    border-radius: 7px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+    background-color: #fff;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 100%;
+    height: auto;
     position: relative;
-    animation: slideIn 0.3s ease-out;
-    max-height: 90vh;
-    overflow-y: visible;
-    display: block;
-}
-@keyframes slideIn {
-    from {
-        transform: translateY(-60px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
 }
 
 .close {

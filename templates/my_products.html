@@ -355,10 +355,7 @@
                         const row = btn.closest('tr');
                         const img = row.querySelector('td img.product-image');
                         if (img) {
-                            // Yeni bir <img> elementi yaradıb köhnəsini əvəz et
-                            const newImg = img.cloneNode();
-                            newImg.src = data.sekil_url + '?t=' + new Date().getTime(); // Cache bust
-                            img.parentNode.replaceChild(newImg, img);
+                            img.src = data.sekil_url + '?t=' + new Date().getTime(); // Cache bust
                         }
                         showMessage('Şəkil uğurla dəyişdirildi', 'success');
                     } else {

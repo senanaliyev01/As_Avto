@@ -12,18 +12,36 @@
         {% csrf_token %}
         <div class="row">
             {% for field in form %}
+                {% if field.name != 'sekil' %}
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="alert alert-danger mt-1">
+                                {{ field.errors.as_text }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
             <div class="col-md-6 mb-3">
                 <div class="form-group">
-                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.errors %}
+                    <label for="id_sekil">Şəkil</label>
+                    {% if form.instance.sekil %}
+                        <div class="mb-2">
+                            <img src="{{ form.instance.sekil.url }}" alt="Məhsul şəkli" style="max-width: 120px; max-height: 120px;">
+                        </div>
+                    {% endif %}
+                    <input type="file" name="sekil" class="form-control" id="id_sekil">
+                    {% if form.sekil.errors %}
                         <div class="alert alert-danger mt-1">
-                            {{ field.errors.as_text }}
+                            {{ form.sekil.errors.as_text }}
                         </div>
                     {% endif %}
                 </div>
             </div>
-            {% endfor %}
         </div>
         <button type="submit" class="btn btn-primary">
             {% if form.instance.pk %}Yadda Saxla{% else %}Əlavə Et{% endif %}

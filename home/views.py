@@ -920,7 +920,7 @@ def add_edit_product_view(request, product_id=None):
     else:
         form = MehsulForm(instance=mehsul)
 
-    return render(request, 'add_edit_product.html', {'form': form})
+    return render(request, 'add_edit_product.html', {'form': form, 'now': timezone.now()})
 
 @login_required
 def delete_product_view(request, product_id):

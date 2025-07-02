@@ -31,7 +31,7 @@
                     <label for="id_sekil">Şəkil</label>
                     {% if form.instance.sekil %}
                         <div class="mb-2">
-                            <img src="{{ form.instance.sekil.url }}" alt="Məhsul şəkli" style="max-width: 120px; max-height: 120px;">
+                            <img src="{{ form.instance.sekil.url }}?t={{ now|date:'U' }}" alt="Məhsul şəkli" style="max-width: 120px; max-height: 120px;">
                         </div>
                     {% endif %}
                     <input type="file" name="sekil" class="form-control" id="id_sekil">

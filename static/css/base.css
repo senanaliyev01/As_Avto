@@ -1160,21 +1160,22 @@ body {
 .modal-content {
     background-color: #fefefe;
     margin: 5% auto;
-    padding: 20px;
+    padding: 16px 14px;
     border: 1px solid #888;
-    width: 80%;
-    max-width: 520px;
-    min-width: 220px;
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    width: 95%;
+    max-width: 420px;
+    min-width: 180px;
+    border-radius: 7px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.13);
     position: relative;
     animation: slideIn 0.3s ease-out;
     max-height: 90vh;
     overflow-y: visible;
+    display: block;
 }
 @keyframes slideIn {
     from {
-        transform: translateY(-100px);
+        transform: translateY(-60px);
         opacity: 0;
     }
     to {
@@ -3081,9 +3082,13 @@ body {
 
 /* Excel Sample Styles */
 .excel-sample {
-    margin-bottom: 20px;
-    padding: 10px 8px 8px 8px;
-    border-radius: 5px;
+    background: #f8fafc;
+    border: 1.5px solid #d1e7dd;
+    border-radius: 8px;
+    padding: 10px 6px 8px 6px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(44, 62, 80, 0.04);
+    max-width: 100%;
 }
 .excel-sample h6 {
     font-size: 1rem;
@@ -3102,66 +3107,74 @@ body {
     font-size: 1em;
 }
 .sample-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 12px;
-    font-size: 13px;
+    background: #fff;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(44, 62, 80, 0.03);
+    margin-bottom: 6px;
+    font-size: 0.92rem;
 }
 .sample-table th {
-    background-color: #417690;
-    color: white;
-    padding: 6px;
-    border: 1px solid #ddd;
-    font-size: 13px;
-    white-space: nowrap;
+    background: #e9f7ef;
+    color: #1d6f42;
     font-weight: 600;
+    font-size: 0.92rem;
+    border-bottom: 1px solid #b7e4c7;
+    padding: 4px 5px;
+    text-align: center;
 }
 .sample-table td {
-    padding: 6px;
-    border: 1px solid #ddd;
-    font-size: 13px;
-    white-space: nowrap;
+    background: #fff;
+    color: #333;
+    font-size: 0.91rem;
+    padding: 4px 5px;
+    text-align: center;
+    border-bottom: 1px solid #e9ecef;
+}
+.sample-table tr:last-child td {
+    border-bottom: none;
 }
 .notes {
-    background-color: #f8f9fa;
-    padding: 10px;
-    border-radius: 4px;
-    margin-bottom: 12px;
-    color: #666;
-    font-size: 0.97rem;
+    background: #e9f7ef;
+    border-left: 3px solid #1d6f42;
+    border-radius: 0 6px 6px 0;
+    padding: 7px 8px;
+    margin-top: 6px;
+    color: #1d6f42;
+    font-size: 0.93rem;
+    box-shadow: 0 1px 2px rgba(44, 62, 80, 0.02);
 }
 .notes p {
-    margin: 0;
-    color: #417690;
     font-weight: 600;
+    margin-bottom: 3px;
+    color: #1d6f42;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.95em;
 }
 .notes ul {
-    margin: 8px 0 0 0;
-    padding-left: 18px;
-    color: #417690;
+    margin: 0 0 0 10px;
+    padding: 0;
+    list-style: disc inside;
 }
 .notes li {
     margin-bottom: 2px;
-    font-size: 0.97rem;
+    font-size: 0.93rem;
     color: #14532d;
     padding-left: 1px;
 }
 @media (max-width: 600px) {
-    .modal-content {
-        padding: 8px 2px;
-        max-width: 99vw;
-        min-width: 0;
-    }
     .excel-sample {
-        padding: 4px 2px 4px 2px;
+        padding: 5px 2px 4px 2px;
     }
     .sample-table th, .sample-table td {
-        font-size: 12px;
-        padding: 3px 2px;
+        font-size: 0.85rem;
+        padding: 2px 2px;
     }
     .notes {
-        padding: 5px 4px;
-        font-size: 0.93rem;
+        padding: 4px 4px;
+        font-size: 0.89rem;
     }
 }
 

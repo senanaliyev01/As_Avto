@@ -60,7 +60,7 @@ class AvtomobilAdmin(admin.ModelAdmin):
 
 @admin.register(Mehsul)
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ['sahib', 'brend_kod', 'firma', 'adi',  'olcu', 'vitrin', 'stok', 'maya_qiymet', 'qiymet',  'yenidir', 'qalan_vaxt', 'sekil_preview']
+    list_display = ['sahib', 'brend_kod', 'firma', 'adi',  'olcu', 'vitrin', 'stok', 'maya_qiymet', 'qiymet',  'yenidir', 'sekil_preview']
     list_filter = ['sahib', 'kateqoriya', 'firma', 'avtomobil', 'vitrin', 'yenidir']
     search_fields = ['adi', 'brend_kod', 'oem', 'kodlar', 'olcu', 'sahib__username']
     change_list_template = 'admin/mehsul_change_list.html'
@@ -71,12 +71,6 @@ class MehsulAdmin(admin.ModelAdmin):
             return format_html('<img src="{}" style="max-height: 50px;"/>', obj.sekil.url)
         return '-'
     sekil_preview.short_description = 'Şəkil'
-
-    def qalan_vaxt(self, obj):
-        if obj.yenidir and obj.qalan_vaxt():
-            return format_html('<span style="color: #17a2b8; font-weight: bold;">{}</span>', obj.qalan_vaxt())
-        return '-'
-    qalan_vaxt.short_description = 'Qalan Vaxt'
 
     def get_urls(self):
         urls = super().get_urls()
@@ -171,7 +165,7 @@ class MehsulAdmin(admin.ModelAdmin):
         return response
 
     def mark_as_new(self, request, queryset):
-        updated = queryset.update(yenidir=True, yeni_edildiyi_tarix=timezone.now())
+        updated = queryset.update(yenidir=True)
         self.message_user(request, f'{updated} məhsul yeni olaraq işarələndi.')
     mark_as_new.short_description = "Seçilmiş məhsulları yeni olaraq işarələ"
 
@@ -373,17 +367,13 @@ class MehsulAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         # Əgər məhsul yeni olaraq işarələnibsə, tarixi qeyd et
-        if obj.yenidir:
-            obj.yeni_edildiyi_tarix = timezone.now()
         super().save_model(request, obj, form, change)
 
     def save_formset(self, request, form, formset, change):
         instances = formset.save(commit=False)
         for instance in instances:
             if hasattr(instance, 'yenidir') and instance.yenidir:
-                # Əgər məhsul yeni olaraq işarələnibsə, tarixi qeyd et
-                from django.utils import timezone
-                instance.yeni_edildiyi_tarix = timezone.now()
+                pass
         formset.save()
         super().save_formset(request, form, formset, change)
 

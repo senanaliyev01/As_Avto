@@ -684,12 +684,10 @@ def my_products_view(request):
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
-            # brend_kod üçün həm istifadəçi sorğusunu, həm də brend_kod-u təmizləyib müqayisə edirik
             def clean_code(val):
                 return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
             brend_kod_ids = [m.id for m in mehsullar if clean_code(search_query) in clean_code(m.brend_kod)]
             brend_kod_filter = Q(id__in=brend_kod_ids)
-            # Ad ilə təkmilləşdirilmiş axtarış
             processed_query = re.sub(r'\s+', ' ', search_query).strip()
             search_words = processed_query.split()
             if search_words:
@@ -723,7 +721,7 @@ def load_more_my_products(request):
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
-            brend_kod_filter = Q(brend_kod__icontains=search_query)
+            brend_kod_filter = Q(brend_kod__icontains=search_query)  # Sade brend_kod axtarışı
             processed_query = re.sub(r'\s+', ' ', search_query).strip()
             search_words = processed_query.split()
             if search_words:
@@ -883,6 +881,7 @@ def add_edit_product_view(request, product_id=None):
         if form.is_valid():
             yeni_mehsul = form.save(commit=False)
             yeni_mehsul.sahib = request.user
+            # Əgər yeni edilirsə, tarixi qeyd et
             yeni_mehsul.save()
             messages.success(request, f'Məhsul uğurla {"yeniləndi" if mehsul else "əlavə edildi"}.')
             return redirect('my_products')

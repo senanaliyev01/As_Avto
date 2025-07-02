@@ -225,24 +225,6 @@
                         }
                         btn.setAttribute('data-yenidir', data.yenidir);
                         
-                        // Update product name display
-                        const productRow = btn.closest('tr');
-                        const productNameCell = productRow.querySelector('td:nth-child(4)');
-                        const newBadge = productNameCell.querySelector('.new-badge');
-                        
-                        if (data.yenidir) {
-                            if (!newBadge) {
-                                const badge = document.createElement('span');
-                                badge.className = 'new-badge';
-                                badge.textContent = 'Yeni';
-                                productNameCell.appendChild(badge);
-                            }
-                        } else {
-                            if (newBadge) {
-                                newBadge.remove();
-                            }
-                        }
-                        
                         // Show success message
                         showMessage('Məhsul yeni statusu yeniləndi', 'success');
                     } else {

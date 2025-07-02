@@ -91,17 +91,8 @@ class Mehsul(models.Model):
             # Yalnız hərf, rəqəm və boşluq saxla
             self.kodlar = re.sub(r'[^a-zA-Z0-9 ]', '', self.kodlar)
         
-        # Şəkil yüklənəndə yeni ad ver (webp çevirmə ləğv olundu)
+        # Şəkil yüklənəndə köhnə şəkli sil, amma adı dəyişdirmə
         if self.sekil and hasattr(self.sekil, 'file'):
-            # Orijinal uzantını saxla
-            original_extension = os.path.splitext(self.sekil.name)[1]
-            # Ad, brend_kod, firma.adi təmizlə
-            adi = slugify(self.adi) if self.adi else 'mehsul'
-            brend_kod = slugify(self.brend_kod) if self.brend_kod else 'kod'
-            firma_adi = slugify(self.firma.adi) if self.firma and self.firma.adi else 'firma'
-            random_code = uuid.uuid4().hex[:10]
-            new_name = f"{adi}_{brend_kod}_{firma_adi}_{random_code}{original_extension}"
-            # Köhnə şəkli sil (əgər varsa və default deyilsə)
             if self.pk:
                 try:
                     old_instance = Mehsul.objects.get(pk=self.pk)
@@ -110,7 +101,6 @@ class Mehsul(models.Model):
                             os.remove(old_instance.sekil.path)
                 except:
                     pass
-            self.sekil.name = new_name
         
         super().save(*args, **kwargs)
 

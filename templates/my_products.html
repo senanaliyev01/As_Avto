@@ -143,9 +143,6 @@
                         <span class="product-name-ellipsis">{{ mehsul.adi }}</span>
                         {% if mehsul.yenidir %}
                         <span class="new-badge">Yeni</span>
-                        {% if mehsul.qalan_vaxt %}
-                        <span class="time-badge">{{ mehsul.qalan_vaxt }}</span>
-                        {% endif %}
                         {% endif %}
                     </td>
                     <td>{{ mehsul.stok }}</td>
@@ -240,22 +237,9 @@
                                 badge.textContent = 'Yeni';
                                 productNameCell.appendChild(badge);
                             }
-                            
-                            // Qalan vaxtı göstər
-                            if (data.qalan_vaxt) {
-                                const timeBadge = document.createElement('span');
-                                timeBadge.className = 'time-badge';
-                                timeBadge.textContent = data.qalan_vaxt;
-                                productNameCell.appendChild(timeBadge);
-                            }
                         } else {
                             if (newBadge) {
                                 newBadge.remove();
-                            }
-                            // Qalan vaxt nişanını da sil
-                            const timeBadge = productNameCell.querySelector('.time-badge');
-                            if (timeBadge) {
-                                timeBadge.remove();
                             }
                         }
                         
@@ -375,7 +359,7 @@
                                 </td>
                                 <td>${product.brend_kod}</td>
                                 <td>${product.firma}</td>
-                                <td>${product.adi} ${product.yenidir ? '<span class="new-badge">Yeni</span>' : ''} ${product.qalan_vaxt ? '<span class="time-badge">' + product.qalan_vaxt + '</span>' : ''}</td>
+                                <td>${product.adi} ${product.yenidir ? '<span class="new-badge">Yeni</span>' : ''}</td>
                                 <td>${product.stok}</td>
                                 <td>${product.qiymet} ₼</td>
                                 <td>

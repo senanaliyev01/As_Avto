@@ -723,7 +723,7 @@ def load_more_my_products(request):
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
-            brend_kod_filter = Q(brend_kod__icontains=search_query)  # Sade brend_kod axtarışı
+            brend_kod_filter = Q(brend_kod__icontains=search_query)
             processed_query = re.sub(r'\s+', ' ', search_query).strip()
             search_words = processed_query.split()
             if search_words:
@@ -747,7 +747,6 @@ def load_more_my_products(request):
             'stok': product.stok,
             'qiymet': str(product.qiymet),
             'yenidir': product.yenidir,
-            'qalan_vaxt': product.qalan_vaxt() if product.yenidir else None,
         })
     return JsonResponse({'products': products_data, 'has_more': has_more})
 
@@ -884,16 +883,7 @@ def add_edit_product_view(request, product_id=None):
         if form.is_valid():
             yeni_mehsul = form.save(commit=False)
             yeni_mehsul.sahib = request.user
-            
-            # Əgər yeni edilirsə, tarixi qeyd et
-            if yeni_mehsul.yenidir:
-                from django.utils import timezone
-                yeni_mehsul.yeni_edildiyi_tarix = timezone.now()
-            
             yeni_mehsul.save()
-            
-            # Remove: 3 gün sonra avtomatik olaraq yenidən çıxar (threading/timer)
-            
             messages.success(request, f'Məhsul uğurla {"yeniləndi" if mehsul else "əlavə edildi"}.')
             return redirect('my_products')
     else:
@@ -1515,19 +1505,10 @@ def toggle_product_new_status(request, product_id):
         try:
             mehsul = get_object_or_404(Mehsul, id=product_id, sahib=request.user)
             mehsul.yenidir = not mehsul.yenidir
-            
-            # Əgər yeni edilirsə, tarixi qeyd et
-            if mehsul.yenidir:
-                from django.utils import timezone
-                mehsul.yeni_edildiyi_tarix = timezone.now()
-            else:
-                mehsul.yeni_edildiyi_tarix = None
-                
             mehsul.save()
             return JsonResponse({
                 'success': True,
                 'yenidir': mehsul.yenidir,
-                'qalan_vaxt': mehsul.qalan_vaxt() if mehsul.yenidir else None,
                 'message': 'Məhsul yeni statusu yeniləndi'
             })
         except Exception as e:

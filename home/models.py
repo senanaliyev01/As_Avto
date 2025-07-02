@@ -96,7 +96,7 @@ class Mehsul(models.Model):
             ext = os.path.splitext(self.sekil.name)[1]
             sahib = self.sahib.username if self.sahib else 'anonim'
             yeni_ad = f"{slugify(self.adi)}_{slugify(self.firma.adi)}_{slugify(self.brend_kod)}_{slugify(sahib)}_{uuid.uuid4().hex[:8]}{ext}"
-            self.sekil.name = f"mehsul_sekilleri/{yeni_ad}"
+            self.sekil.name = yeni_ad
 
         super().save(*args, **kwargs)
 

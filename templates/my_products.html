@@ -408,7 +408,7 @@
                             const row = document.createElement('tr');
                             row.innerHTML = `
                                 <td>
-                                    ${product.sekil_url ? `<img src="${product.sekil_url}" alt="${product.adi}" class="product-image" onclick="openImageModal('${product.sekil_url}')">` : ''}
+                                    ${product.sekil_url ? `<img src="${product.sekil_url}?t=${Date.now()}" alt="${product.adi}" class="product-image" onclick="openImageModal('${product.sekil_url}')">` : ''}
                                 </td>
                                 <td>${product.brend_kod}</td>
                                 <td>${product.firma}</td>

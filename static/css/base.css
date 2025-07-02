@@ -1154,23 +1154,17 @@ body {
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.4);
-    overflow-y: auto;
+    background-color: rgba(0,0,0,0.5);
 }
 
 .modal-content {
-    background-color: #fefefe;
-    margin: 5% auto;
+    background-color: #fff;
+    margin: 0 auto;
     padding: 20px;
-    border: 1px solid #888;
-    width: 95%;
-    max-width: 600px;
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    width: 100%;
+    height: auto;
     position: relative;
-    animation: slideIn 0.3s ease-out;
-    max-height: 90vh;
-    overflow-y: auto;
 }
 
 .close {
@@ -4725,92 +4719,82 @@ body {
     }
 }
 
-/* Excel Import Modal İçindəkilər üçün yığcam dizayn */
-.modal-content .excel-sample {
-    padding: 6px 2px 4px 2px;
-    margin-bottom: 8px;
-    border-radius: 4px;
-    box-shadow: none;
+/* Excel Import Modal Styles (admin.css ilə eyni) */
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 1200px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    position: relative;
+    animation: slideIn 0.3s ease-out;
+    max-height: 90vh;
+    overflow-y: auto;
 }
-.modal-content .excel-sample h6,
-.modal-content .excel-sample h4 {
-    font-size: 0.98rem;
-    margin-bottom: 6px;
+@keyframes slideIn {
+    from {
+        transform: translateY(-100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
-.modal-content .sample-table {
+.excel-sample {
+    margin-bottom: 20px;
+}
+.sample-table {
     width: 100%;
-    font-size: 0.85rem;
-    margin-bottom: 6px;
-    border-radius: 3px;
-    box-shadow: none;
-    table-layout: fixed;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 13px;
 }
-.modal-content .sample-table th,
-.modal-content .sample-table td {
-    padding: 2px 3px;
-    font-size: 0.85rem;
-    white-space: normal;
-    word-break: break-word;
+.sample-table th {
+    background-color: #417690;
+    color: white;
+    padding: 8px;
+    border: 1px solid #ddd;
+    white-space: nowrap;
+    font-weight: 600;
 }
-.modal-content .sample-table th {
-    background: #e9f7ef;
-    color: #1d6f42;
-    border-bottom: 1px solid #b7e4c7;
+.sample-table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    white-space: nowrap;
 }
-.modal-content .sample-table td {
-    border-bottom: 1px solid #e9ecef;
+.notes {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    color: #666;
+    font-size: 1rem;
 }
-.modal-content .notes {
-    padding: 4px 6px;
-    font-size: 0.85rem;
-    margin-top: 4px;
-    border-radius: 3px;
-    box-shadow: none;
+.notes p {
+    margin: 0;
+    color: #666;
 }
-.modal-content .notes p {
-    font-size: 0.88em;
-    margin-bottom: 2px;
-}
-.modal-content .notes ul {
-    margin: 0 0 0 10px;
-    padding: 0;
-}
-.modal-content .notes li {
-    margin-bottom: 1px;
-    font-size: 0.85rem;
-    padding-left: 0;
-}
-.modal-content form .form-control,
-.modal-content form input[type="file"] {
-    font-size: 0.95rem;
-    padding: 4px 6px;
-    border-radius: 3px;
-}
-.modal-content .btn,
-.modal-content button {
-    font-size: 0.95rem;
-    padding: 5px 12px;
-    border-radius: 3px;
+.notes ul {
+    margin: 10px 0 0 0;
+    padding-left: 20px;
+    color: #666;
 }
 @media (max-width: 600px) {
-    .modal-content .excel-sample {
-        padding: 2px 1px 2px 1px;
+    .modal-content {
+        width: 98vw;
+        max-width: 99vw;
+        padding: 8px 2px;
     }
-    .modal-content .sample-table th,
-    .modal-content .sample-table td {
-        font-size: 0.78rem;
-        padding: 1px 2px;
+    .sample-table th, .sample-table td {
+        font-size: 12px;
+        padding: 4px 2px;
     }
-    .modal-content .notes {
-        padding: 2px 2px;
-        font-size: 0.78rem;
-    }
-    .modal-content .notes li {
-        font-size: 0.78rem;
-    }
-    .modal-content .btn,
-    .modal-content button {
-        font-size: 0.85rem;
-        padding: 4px 8px;
+    .notes {
+        padding: 8px 4px;
+        font-size: 0.95rem;
     }
 }

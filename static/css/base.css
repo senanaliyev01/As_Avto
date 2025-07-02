@@ -1158,18 +1158,13 @@ body {
 }
 
 .modal-content {
-    background-color: #ffffff;
-    margin: 5% auto;
+    background-color: #fff;
+    margin: 0 auto;
     padding: 20px;
-    border: 1px solid #888;
-    width: 95%;
-    max-width: 1300px;
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    width: 100%;
+    height: auto;
     position: relative;
-    animation: slideIn 0.3s ease-out;
-    max-height: 90vh;
-    overflow-y: auto;
 }
 
 .close {
@@ -4724,20 +4719,33 @@ body {
     }
 }
 
-/* Excel Import Modal Styles (admin.css ilə eyni) */
+/* Excel Import Modal - Compact Centered Style (admin.css ilə eyni) */
+.modal {
+    display: block; /* Bootstrap və ya JS ilə idarə olunur */
+    position: fixed;
+    z-index: 1050;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0,0,0,0.4);
+    overflow-y: auto;
+    padding: 0;
+}
 .modal-content {
     background-color: #fefefe;
-    margin: 5% auto;
-    padding: 20px;
+    margin: 40px auto;
+    padding: 18px 18px 12px 18px;
     border: 1px solid #888;
-    width: 80%;
-    max-width: 1200px;
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    width: 98%;
+    max-width: 420px;
+    min-width: 180px;
+    border-radius: 6px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.13);
     position: relative;
-    animation: slideIn 0.3s ease-out;
     max-height: 90vh;
     overflow-y: auto;
+    animation: slideIn 0.3s ease-out;
 }
 @keyframes slideIn {
     from {
@@ -4750,56 +4758,64 @@ body {
     }
 }
 .excel-sample {
-    margin-bottom: 20px;
+    margin-bottom: 14px;
+    padding: 8px 4px 6px 4px;
+    background: #f8fafc;
+    border: 1px solid #d1e7dd;
+    border-radius: 6px;
+    box-shadow: 0 1px 2px rgba(44, 62, 80, 0.03);
 }
 .sample-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     font-size: 13px;
 }
 .sample-table th {
     background-color: #417690;
     color: white;
-    padding: 8px;
+    padding: 6px;
     border: 1px solid #ddd;
-    white-space: nowrap;
     font-weight: 600;
+    white-space: nowrap;
 }
 .sample-table td {
-    padding: 8px;
+    padding: 6px;
     border: 1px solid #ddd;
     white-space: nowrap;
 }
 .notes {
     background-color: #f8f9fa;
-    padding: 15px;
+    padding: 8px 10px;
     border-radius: 4px;
-    margin-bottom: 20px;
-    color: #666;
-    font-size: 1rem;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    color: #417690;
 }
 .notes p {
-    margin: 0;
-    color: #666;
+    margin: 0 0 4px 0;
+    color: #417690;
+    font-weight: 600;
 }
 .notes ul {
-    margin: 10px 0 0 0;
-    padding-left: 20px;
-    color: #666;
+    margin: 6px 0 0 0;
+    padding-left: 18px;
+    color: #417690;
 }
 @media (max-width: 600px) {
     .modal-content {
-        width: 98vw;
+        padding: 6px 2px 4px 2px;
         max-width: 99vw;
-        padding: 8px 2px;
+    }
+    .excel-sample {
+        padding: 4px 1px 2px 1px;
     }
     .sample-table th, .sample-table td {
         font-size: 12px;
-        padding: 4px 2px;
+        padding: 3px 2px;
     }
     .notes {
-        padding: 8px 4px;
-        font-size: 0.95rem;
+        padding: 4px 4px;
+        font-size: 0.89rem;
     }
 }

@@ -91,13 +91,7 @@ class Mehsul(models.Model):
             # Yalnız hərf, rəqəm və boşluq saxla
             self.kodlar = re.sub(r'[^a-zA-Z0-9 ]', '', self.kodlar)
 
-        # Şəkil üçün xüsusi adlandırma
-        if self.sekil and hasattr(self.sekil, 'file') and not str(self.sekil).startswith('mehsul_sekilleri/no_image.webp'):
-            ext = os.path.splitext(self.sekil.name)[1]
-            sahib = self.sahib.username if self.sahib else 'anonim'
-            yeni_ad = f"{slugify(self.adi)}_{slugify(self.firma.adi)}_{slugify(self.brend_kod)}_{slugify(sahib)}_{uuid.uuid4().hex[:8]}{ext}"
-            yeni_ad = os.path.basename(yeni_ad)
-            self.sekil.name = yeni_ad
+        
 
         super().save(*args, **kwargs)
 

@@ -136,7 +136,7 @@
             <tbody id="products-tbody">
                 {% for mehsul in mehsullar %}
                 <tr data-initialized="true">
-                    <td><img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image" onclick="openImageModal('{{ mehsul.sekil.url }}')"></td>
+                    <td><img src="{{ mehsul.sekil.url }}?t={{ now|date:'U' }}" alt="{{ mehsul.adi }}" class="product-image" onclick="openImageModal('{{ mehsul.sekil.url }}')"></td>
                     <td>{{ mehsul.brend_kod }}</td>
                     <td>{{ mehsul.firma.adi }}</td>
                     <td>

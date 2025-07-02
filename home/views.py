@@ -708,6 +708,7 @@ def my_products_view(request):
         'mehsullar': initial_products,
         'has_more': has_more,
         'search_query': search_query,
+        'now': timezone.now(),
     })
 
 @login_required

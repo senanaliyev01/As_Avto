@@ -4718,3 +4718,29 @@ body {
         transform: translateX(0);
     }
 }
+
+/* Modal Content (Excel Import Modal) */
+.modal-content {
+    padding: 16px 18px;
+    border-radius: 10px;
+    width: 600px;
+    height: 300px;
+    max-width: 95vw;
+    max-height: 90vh;
+    min-width: 220px;
+    margin: 0 auto;
+    overflow-y: auto;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+@media (max-width: 700px) {
+    .modal-content {
+        width: 98vw;
+        height: 95vw;
+        max-width: 99vw;
+        max-height: 98vh;
+        padding: 8px 4px;
+    }
+}

@@ -172,7 +172,27 @@ class MehsulAdmin(admin.ModelAdmin):
 
     def mark_as_new(self, request, queryset):
         updated = queryset.update(yenidir=True, yeni_edildiyi_tarix=timezone.now())
-        self.message_user(request, f'{updated} məhsul yeni olaraq işarələndi.')
+        
+        # 3 gün sonra avtomatik olaraq yenidən çıxar
+        import threading
+        def auto_remove_new():
+            import time
+            time.sleep(259200)  # 3 gün (72 saat)
+            try:
+                # Yenidən yeni olan məhsulları tap və yenidən çıxar
+                from django.db import transaction
+                with transaction.atomic():
+                    new_products = Mehsul.objects.filter(id__in=queryset.values_list('id', flat=True), yenidir=True)
+                    new_products.update(yenidir=False, yeni_edildiyi_tarix=None)
+            except Exception as e:
+                print(f"Auto remove new status error: {e}")
+        
+        # Thread-i başlat
+        thread = threading.Thread(target=auto_remove_new)
+        thread.daemon = True
+        thread.start()
+        
+        self.message_user(request, f'{updated} məhsul yeni olaraq işarələndi və 3 gün sonra avtomatik olaraq yenidən çıxarılacaq.')
     mark_as_new.short_description = "Seçilmiş məhsulları yeni olaraq işarələ"
 
     def remove_from_new(self, request, queryset):
@@ -375,14 +395,62 @@ class MehsulAdmin(admin.ModelAdmin):
         # Əgər məhsul yeni olaraq işarələnibsə, tarixi qeyd et
         if obj.yenidir:
             obj.yeni_edildiyi_tarix = timezone.now()
+        
+        # Əgər məhsul yeni olaraq işarələnibsə, 3 gün sonra avtomatik olaraq yenidən çıxar
+        if obj.yenidir:  # Həm yeni yaradılan, həm də redaktə edilən məhsullar üçün
+            import threading
+            def auto_remove_new():
+                import time
+                time.sleep(259200)  # 3 gün (72 saat)
+                try:
+                    # Məhsulu yenidən yüklə və yenidir statusunu yoxla
+                    from django.db import transaction
+                    with transaction.atomic():
+                        mehsul = Mehsul.objects.select_for_update().get(id=obj.id)
+                        if mehsul.yenidir:  # Əgər hələ də yenidirsə
+                            mehsul.yenidir = False
+                            mehsul.yeni_edildiyi_tarix = None
+                            mehsul.save()
+                except Exception as e:
+                    print(f"Auto remove new status error: {e}")
+            
+            # Thread-i başlat
+            thread = threading.Thread(target=auto_remove_new)
+            thread.daemon = True
+            thread.start()
+        
         super().save_model(request, obj, form, change)
 
     def save_formset(self, request, form, formset, change):
         instances = formset.save(commit=False)
         for instance in instances:
             if hasattr(instance, 'yenidir') and instance.yenidir:
+                # Əgər məhsul yeni olaraq işarələnibsə, tarixi qeyd et
                 from django.utils import timezone
                 instance.yeni_edildiyi_tarix = timezone.now()
+                
+                # Əgər məhsul yeni olaraq işarələnibsə, 3 gün sonra avtomatik olaraq yenidən çıxar
+                import threading
+                def auto_remove_new():
+                    import time
+                    time.sleep(259200)  # 3 gün (72 saat)
+                    try:
+                        # Məhsulu yenidən yüklə və yenidir statusunu yoxla
+                        from django.db import transaction
+                        with transaction.atomic():
+                            mehsul = Mehsul.objects.select_for_update().get(id=instance.id)
+                            if mehsul.yenidir:  # Əgər hələ də yenidirsə
+                                mehsul.yenidir = False
+                                mehsul.yeni_edildiyi_tarix = None
+                                mehsul.save()
+                    except Exception as e:
+                        print(f"Auto remove new status error: {e}")
+                
+                # Thread-i başlat
+                thread = threading.Thread(target=auto_remove_new)
+                thread.daemon = True
+                thread.start()
+        
         formset.save()
         super().save_formset(request, form, formset, change)
 

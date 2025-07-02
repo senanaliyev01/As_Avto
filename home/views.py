@@ -748,7 +748,6 @@ def load_more_my_products(request):
             'stok': product.stok,
             'qiymet': str(product.qiymet),
             'yenidir': product.yenidir,
-            'qalan_vaxt': product.qalan_vaxt() if product.yenidir else None,
         })
     return JsonResponse({'products': products_data, 'has_more': has_more})
 

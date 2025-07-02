@@ -10,6 +10,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 from datetime import timedelta
+from django.utils.text import slugify
 
 class Header_Message(models.Model):
     mesaj = models.CharField(max_length=100)
@@ -90,46 +91,26 @@ class Mehsul(models.Model):
             # Yalnız hərf, rəqəm və boşluq saxla
             self.kodlar = re.sub(r'[^a-zA-Z0-9 ]', '', self.kodlar)
         
-        # Şəkil emalı
+        # Şəkil yüklənəndə yeni ad ver (webp çevirmə ləğv olundu)
         if self.sekil and hasattr(self.sekil, 'file'):
-            # Əgər şəkil yenidirsə və no_image.webp deyilsə
-            if isinstance(self.sekil.file, InMemoryUploadedFile) and 'no_image.webp' not in self.sekil.name:
-                # Şəkli aç
-                image = Image.open(self.sekil)
-                
-                # Şəkli RGBA formatına çevir (webp üçün)
-                if image.mode != 'RGBA':
-                    image = image.convert('RGBA')
-                
-                # Yeni fayl adı yarat
-                new_name = f"{uuid.uuid4().hex[:10]}_{self.brend_kod}.webp"
-                
-                # BytesIO buffer yarat
-                output = BytesIO()
-                
-                # Şəkli webp formatında saxla
-                image.save(output, format='WEBP', quality=85, optimize=True)
-                output.seek(0)
-                
-                # Köhnə şəkli sil (əgər varsa və default deyilsə)
-                if self.pk:
-                    try:
-                        old_instance = Mehsul.objects.get(pk=self.pk)
-                        if old_instance.sekil and old_instance.sekil.name != 'mehsul_sekilleri/no_image.webp':
-                            if os.path.isfile(old_instance.sekil.path):
-                                os.remove(old_instance.sekil.path)
-                    except:
-                        pass
-                
-                # Yeni şəkli təyin et
-                self.sekil = InMemoryUploadedFile(
-                    output,
-                    'ImageField',
-                    new_name,
-                    'image/webp',
-                    output.tell(),
-                    None
-                )
+            # Orijinal uzantını saxla
+            original_extension = os.path.splitext(self.sekil.name)[1]
+            # Ad, brend_kod, firma.adi təmizlə
+            adi = slugify(self.adi) if self.adi else 'mehsul'
+            brend_kod = slugify(self.brend_kod) if self.brend_kod else 'kod'
+            firma_adi = slugify(self.firma.adi) if self.firma and self.firma.adi else 'firma'
+            random_code = uuid.uuid4().hex[:10]
+            new_name = f"{adi}_{brend_kod}_{firma_adi}_{random_code}{original_extension}"
+            # Köhnə şəkli sil (əgər varsa və default deyilsə)
+            if self.pk:
+                try:
+                    old_instance = Mehsul.objects.get(pk=self.pk)
+                    if old_instance.sekil and old_instance.sekil.name != 'mehsul_sekilleri/no_image.webp':
+                        if os.path.isfile(old_instance.sekil.path):
+                            os.remove(old_instance.sekil.path)
+                except:
+                    pass
+            self.sekil.name = new_name
         
         super().save(*args, **kwargs)
 

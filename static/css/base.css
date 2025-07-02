@@ -4724,3 +4724,93 @@ body {
         transform: translateX(0);
     }
 }
+
+/* Excel Import Modal İçindəkilər üçün yığcam dizayn */
+.modal-content .excel-sample {
+    padding: 6px 2px 4px 2px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+    box-shadow: none;
+}
+.modal-content .excel-sample h6,
+.modal-content .excel-sample h4 {
+    font-size: 0.98rem;
+    margin-bottom: 6px;
+}
+.modal-content .sample-table {
+    width: 100%;
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+    border-radius: 3px;
+    box-shadow: none;
+    table-layout: fixed;
+}
+.modal-content .sample-table th,
+.modal-content .sample-table td {
+    padding: 2px 3px;
+    font-size: 0.85rem;
+    white-space: normal;
+    word-break: break-word;
+}
+.modal-content .sample-table th {
+    background: #e9f7ef;
+    color: #1d6f42;
+    border-bottom: 1px solid #b7e4c7;
+}
+.modal-content .sample-table td {
+    border-bottom: 1px solid #e9ecef;
+}
+.modal-content .notes {
+    padding: 4px 6px;
+    font-size: 0.85rem;
+    margin-top: 4px;
+    border-radius: 3px;
+    box-shadow: none;
+}
+.modal-content .notes p {
+    font-size: 0.88em;
+    margin-bottom: 2px;
+}
+.modal-content .notes ul {
+    margin: 0 0 0 10px;
+    padding: 0;
+}
+.modal-content .notes li {
+    margin-bottom: 1px;
+    font-size: 0.85rem;
+    padding-left: 0;
+}
+.modal-content form .form-control,
+.modal-content form input[type="file"] {
+    font-size: 0.95rem;
+    padding: 4px 6px;
+    border-radius: 3px;
+}
+.modal-content .btn,
+.modal-content button {
+    font-size: 0.95rem;
+    padding: 5px 12px;
+    border-radius: 3px;
+}
+@media (max-width: 600px) {
+    .modal-content .excel-sample {
+        padding: 2px 1px 2px 1px;
+    }
+    .modal-content .sample-table th,
+    .modal-content .sample-table td {
+        font-size: 0.78rem;
+        padding: 1px 2px;
+    }
+    .modal-content .notes {
+        padding: 2px 2px;
+        font-size: 0.78rem;
+    }
+    .modal-content .notes li {
+        font-size: 0.78rem;
+    }
+    .modal-content .btn,
+    .modal-content button {
+        font-size: 0.85rem;
+        padding: 4px 8px;
+    }
+}

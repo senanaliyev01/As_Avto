@@ -136,29 +136,6 @@ class Mehsul(models.Model):
     def __str__(self):
         return f"{self.adi} - {self.brend_kod} - {self.oem}"
     
-    def qalan_vaxt(self):
-        """Məhsulun yeni statusundan çıxmasına qalan vaxtı hesablayır"""
-        if not self.yenidir or not self.yeni_edildiyi_tarix:
-            return None
-        
-        indiki_vaxt = timezone.now()
-        bitis_vaxti = self.yeni_edildiyi_tarix + timedelta(days=3)
-        qalan = bitis_vaxti - indiki_vaxt
-        
-        if qalan.total_seconds() <= 0:
-            return "Vaxt bitdi"
-        
-        gun = int(qalan.days)
-        saat = int(qalan.seconds // 3600)
-        deqiqe = int((qalan.seconds % 3600) // 60)
-        
-        if gun > 0:
-            return f"{gun} gün {saat} saat"
-        elif saat > 0:
-            return f"{saat} saat {deqiqe} dəqiqə"
-        else:
-            return f"{deqiqe} dəqiqə"
-    
     class Meta:
         verbose_name = 'Məhsul'
         verbose_name_plural = 'Məhsullar'

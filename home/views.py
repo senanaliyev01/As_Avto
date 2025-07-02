@@ -893,26 +893,7 @@ def add_edit_product_view(request, product_id=None):
             yeni_mehsul.save()
             
             # Əgər məhsul yeni olaraq işarələnibsə, 3 gün sonra avtomatik olaraq yenidən çıxar
-            if yeni_mehsul.yenidir:
-                import threading
-                def auto_remove_new():
-                    import time
-                    time.sleep(259200)  # 3 gün (72 saat)
-                    try:
-                        # Məhsulu yenidən yüklə və yenidir statusunu yoxla
-                        from django.db import transaction
-                        with transaction.atomic():
-                            mehsul = Mehsul.objects.select_for_update().get(id=yeni_mehsul.id)
-                            if mehsul.yenidir:  # Əgər hələ də yenidirsə
-                                mehsul.yenidir = False
-                                mehsul.save()
-                    except Exception as e:
-                        print(f"Auto remove new status error: {e}")
-                
-                # Thread-i başlat
-                thread = threading.Thread(target=auto_remove_new)
-                thread.daemon = True
-                thread.start()
+            # (Avtomatik çıxarma funksiyası ləğv edildi)
             
             messages.success(request, f'Məhsul uğurla {"yeniləndi" if mehsul else "əlavə edildi"}.')
             return redirect('my_products')

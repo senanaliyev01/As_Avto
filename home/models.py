@@ -91,17 +91,7 @@ class Mehsul(models.Model):
             # Yalnız hərf, rəqəm və boşluq saxla
             self.kodlar = re.sub(r'[^a-zA-Z0-9 ]', '', self.kodlar)
         
-        # Şəkil yüklənəndə köhnə şəkli sil, amma ad dəyişdirmə
-        if self.sekil and hasattr(self.sekil, 'file'):
-            if self.pk:
-                try:
-                    old_instance = Mehsul.objects.get(pk=self.pk)
-                    if old_instance.sekil and old_instance.sekil.name != 'mehsul_sekilleri/no_image.webp':
-                        if os.path.isfile(old_instance.sekil.path):
-                            os.remove(old_instance.sekil.path)
-                except:
-                    pass
-        
+      
         super().save(*args, **kwargs)
 
     def __str__(self):

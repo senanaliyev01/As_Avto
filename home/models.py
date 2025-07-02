@@ -91,7 +91,7 @@ class Mehsul(models.Model):
             # Yalnız hərf, rəqəm və boşluq saxla
             self.kodlar = re.sub(r'[^a-zA-Z0-9 ]', '', self.kodlar)
         
-        # Şəkil yüklənəndə köhnə şəkli sil, amma adı dəyişdirmə
+        # Şəkil yüklənəndə köhnə şəkli sil, amma ad dəyişdirmə
         if self.sekil and hasattr(self.sekil, 'file'):
             if self.pk:
                 try:

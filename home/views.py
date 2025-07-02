@@ -684,10 +684,12 @@ def my_products_view(request):
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
+            # brend_kod üçün həm istifadəçi sorğusunu, həm də brend_kod-u təmizləyib müqayisə edirik
             def clean_code(val):
                 return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
             brend_kod_ids = [m.id for m in mehsullar if clean_code(search_query) in clean_code(m.brend_kod)]
             brend_kod_filter = Q(id__in=brend_kod_ids)
+            # Ad ilə təkmilləşdirilmiş axtarış
             processed_query = re.sub(r'\s+', ' ', search_query).strip()
             search_words = processed_query.split()
             if search_words:
@@ -745,6 +747,7 @@ def load_more_my_products(request):
             'stok': product.stok,
             'qiymet': str(product.qiymet),
             'yenidir': product.yenidir,
+            'qalan_vaxt': product.qalan_vaxt() if product.yenidir else None,
         })
     return JsonResponse({'products': products_data, 'has_more': has_more})
 
@@ -881,8 +884,36 @@ def add_edit_product_view(request, product_id=None):
         if form.is_valid():
             yeni_mehsul = form.save(commit=False)
             yeni_mehsul.sahib = request.user
+            
             # Əgər yeni edilirsə, tarixi qeyd et
+            if yeni_mehsul.yenidir:
+                from django.utils import timezone
+                yeni_mehsul.yeni_edildiyi_tarix = timezone.now()
+            
             yeni_mehsul.save()
+            
+            # Əgər məhsul yeni olaraq işarələnibsə, 3 gün sonra avtomatik olaraq yenidən çıxar
+            if yeni_mehsul.yenidir:
+                import threading
+                def auto_remove_new():
+                    import time
+                    time.sleep(259200)  # 3 gün (72 saat)
+                    try:
+                        # Məhsulu yenidən yüklə və yenidir statusunu yoxla
+                        from django.db import transaction
+                        with transaction.atomic():
+                            mehsul = Mehsul.objects.select_for_update().get(id=yeni_mehsul.id)
+                            if mehsul.yenidir:  # Əgər hələ də yenidirsə
+                                mehsul.yenidir = False
+                                mehsul.save()
+                    except Exception as e:
+                        print(f"Auto remove new status error: {e}")
+                
+                # Thread-i başlat
+                thread = threading.Thread(target=auto_remove_new)
+                thread.daemon = True
+                thread.start()
+            
             messages.success(request, f'Məhsul uğurla {"yeniləndi" if mehsul else "əlavə edildi"}.')
             return redirect('my_products')
     else:
@@ -1504,10 +1535,19 @@ def toggle_product_new_status(request, product_id):
         try:
             mehsul = get_object_or_404(Mehsul, id=product_id, sahib=request.user)
             mehsul.yenidir = not mehsul.yenidir
+            
+            # Əgər yeni edilirsə, tarixi qeyd et
+            if mehsul.yenidir:
+                from django.utils import timezone
+                mehsul.yeni_edildiyi_tarix = timezone.now()
+            else:
+                mehsul.yeni_edildiyi_tarix = None
+                
             mehsul.save()
             return JsonResponse({
                 'success': True,
                 'yenidir': mehsul.yenidir,
+                'qalan_vaxt': mehsul.qalan_vaxt() if mehsul.yenidir else None,
                 'message': 'Məhsul yeni statusu yeniləndi'
             })
         except Exception as e:

@@ -869,11 +869,11 @@ function initializeProductsPage() {
                                 // Spinner və image bir yerdə, image yüklənəndə spinner gizlənir
                                 const logoId = `logo_${product.id}_${Math.floor(Math.random()*100000)}`;
                                 firmaCell = `
-                                    <div style="position:relative;display:inline-block;min-width:40px;min-height:32px;vertical-align:middle;">
-                                        <span class="logo-spinner" id="spinner_${logoId}" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:22px;height:22px;display:flex;align-items:center;justify-content:center;">
-                                            <span class="spinner-border spinner-border-sm" style="width:22px;height:22px;border-width:2px;"></span>
+                                    <div class="firma-logo-table-wrapper">
+                                        <span class="logo-spinner" id="spinner_${logoId}">
+                                            <span class="spinner-border spinner-border-sm"></span>
                                         </span>
-                                        <img src="${product.firma_logo_url}" alt="${product.firma}" id="${logoId}" style="max-height:32px;max-width:80px;object-fit:contain;background:#fff;border-radius:4px;border:1px solid #e9ecef;padding:2px;display:none;">
+                                        <img src="${product.firma_logo_url}" alt="${product.firma}" id="${logoId}" class="firma-logo-table" style="display:none;">
                                     </div>
                                 `;
                             } else {

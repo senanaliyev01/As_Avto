@@ -4918,8 +4918,14 @@ body {
   }
 }
 
-/* Firma logo for product tables */
-.firma-logo {
+.firma-logo-table-wrapper {
+    position: relative;
+    display: inline-block;
+    min-width: 40px;
+    min-height: 32px;
+    vertical-align: middle;
+}
+.firma-logo-table {
     max-height: 32px;
     max-width: 80px;
     object-fit: contain;
@@ -4928,5 +4934,21 @@ body {
     border: 1px solid #e9ecef;
     padding: 2px;
     display: inline-block;
-    vertical-align: middle;
+}
+.logo-spinner {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+.spinner-border.spinner-border-sm {
+    width: 22px;
+    height: 22px;
+    border-width: 2px;
 }

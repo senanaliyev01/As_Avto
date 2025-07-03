@@ -12,32 +12,22 @@
 </head>
 <body>
     <div class="admin-layout">
-        <!-- Sidebar -->
-        <aside class="admin-sidebar">
-            <div class="sidebar-header">
-                <a href="{% url 'seller_admin_panel' %}" class="admin-panel-link {% if request.resolver_match.url_name == 'seller_admin_panel' %}active{% endif %}">
-                    <i class="fas fa-cogs"></i> Satıcı Paneli
-                </a>
-            </div>
-            <nav class="sidebar-nav">
-                <ul>
-                    <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'my_products' %}active{% endif %}">
-                        <a href="{% url 'my_products' %}"><i class="fas fa-box"></i> Mənim Məhsullarım</a>
-                    </li>
-                    <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'my_sales' %}active{% endif %}">
-                        <a href="{% url 'my_sales' %}" id="sidebarMySalesLink">
-                            <i class="fas fa-receipt"></i> Mənə gələn sifarişlər
-                            <span id="salesBadge" class="sales-badge-sidebar" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
         <!-- Main Content -->
         <div class="admin-main">
             <!-- Header -->
             <header class="admin-header">
-                <div class="admin-header-left">
+                <div class="admin-header-left" style="display: flex; align-items: center; gap: 24px;">
+                    <!-- Navigation Links -->
+                    <nav class="admin-header-nav" style="display: flex; align-items: center; gap: 16px;">
+                        <a href="{% url 'seller_admin_panel' %}" class="admin-panel-link {% if request.resolver_match.url_name == 'seller_admin_panel' %}active{% endif %}">
+                            <i class="fas fa-cogs"></i> Satıcı Paneli
+                        </a>
+                        <a href="{% url 'my_products' %}" class="admin-panel-link {% if request.resolver_match.url_name == 'my_products' %}active{% endif %}"><i class="fas fa-box"></i> Mənim Məhsullarım</a>
+                        <a href="{% url 'my_sales' %}" id="headerMySalesLink" class="admin-panel-link {% if request.resolver_match.url_name == 'my_sales' %}active{% endif %}" style="position:relative;">
+                            <i class="fas fa-receipt"></i> Mənə gələn sifarişlər
+                            <span id="salesBadge" class="sales-badge-sidebar" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;position:relative;top:-2px;">0</span>
+                        </a>
+                    </nav>
                     <span class="admin-header-title">{% if request.resolver_match.url_name == 'seller_admin_panel' %}Dashboard{% else %}{% block panel_title %}Satıcı Paneli{% endblock %}{% endif %}</span>
                 </div>
                 <div class="admin-header-right">
@@ -308,7 +298,7 @@
         setInterval(pollSalesCount, 10000);
         pollSalesCount();
         // Linkə kliklədikdə sayğacı sıfırla
-        const salesLink = document.getElementById('sidebarMySalesLink');
+        const salesLink = document.getElementById('headerMySalesLink');
         if (salesLink) {
             salesLink.addEventListener('click', function() {
                 fetch('/api/unread-sales-count/', { method: 'POST', credentials: 'same-origin' })

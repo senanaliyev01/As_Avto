@@ -30,7 +30,6 @@ from reportlab.pdfbase.ttfonts import TTFont
 import io
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
-import random
 
 def truncate_product_name(name, max_length=20):
     """Məhsul adını qısaldır və uzun olarsa ... əlavə edir"""
@@ -103,16 +102,10 @@ def home_view(request):
         'popup_images': popup_images
     })
 
-def stable_random_queryset(queryset, seed):
-    ids = list(queryset.values_list('id', flat=True))
-    random.Random(seed).shuffle(ids)
-    preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(ids)])
-    return queryset.filter(id__in=ids).order_by(preserved)
-
 @login_required
 def products_view(request):
     search_query = request.GET.get('search', '')
-    mehsullar = Mehsul.objects.all()
+    mehsullar = Mehsul.objects.all().order_by('?')
     popup_images = PopupImage.objects.filter(aktiv=True)
     if search_query:
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
@@ -135,9 +128,6 @@ def products_view(request):
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter)
             else:
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)
-    # Stable shuffle
-    seed = str(request.session.session_key) + '_' + search_query
-    mehsullar = stable_random_queryset(mehsullar, seed)
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
     return render(request, 'products.html', {
@@ -152,7 +142,7 @@ def load_more_products(request):
     offset = int(request.GET.get('offset', 0))
     limit = 5
     search_query = request.GET.get('search', '')
-    mehsullar = Mehsul.objects.all()
+    mehsullar = Mehsul.objects.all().order_by('?')
     if search_query:
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         if clean_search:
@@ -168,9 +158,6 @@ def load_more_products(request):
                 mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | ad_filter)
             else:
                 mehsullar = mehsullar.filter(kod_filter | brend_kod_filter)
-    # Stable shuffle
-    seed = str(request.session.session_key) + '_' + search_query
-    mehsullar = stable_random_queryset(mehsullar, seed)
     products = mehsullar[offset:offset + limit]
     has_more = mehsullar.count() > (offset + limit)
     products_data = []
@@ -528,15 +515,17 @@ def search_suggestions(request):
 
 @login_required
 def new_products_view(request):
-    mehsullar = Mehsul.objects.filter(yenidir=True)
-    seed = str(request.session.session_key) + '_new_products'
-    mehsullar = stable_random_queryset(mehsullar, seed)
+    # Yeni məhsulları əldə et
+    mehsullar = Mehsul.objects.filter(yenidir=True).order_by('?')  # Qarışıq qaydada göstər
+    # İlk 5 məhsulu götür
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
+    
     kateqoriyalar = Kateqoriya.objects.all()
     firmalar = Firma.objects.all()
     avtomobiller = Avtomobil.objects.all()
     popup_images = PopupImage.objects.filter(aktiv=True)
+    
     return render(request, 'new_products.html', {
         'mehsullar': initial_products,
         'has_more': has_more,
@@ -550,11 +539,13 @@ def new_products_view(request):
 def load_more_new_products(request):
     offset = int(request.GET.get('offset', 0))
     limit = 5
-    mehsullar = Mehsul.objects.filter(yenidir=True)
-    seed = str(request.session.session_key) + '_new_products'
-    mehsullar = stable_random_queryset(mehsullar, seed)
+    
+    mehsullar = Mehsul.objects.filter(yenidir=True).order_by('?')
+    
+    # Get next batch of products
     products = mehsullar[offset:offset + limit]
     has_more = mehsullar.count() > (offset + limit)
+    
     products_data = []
     for product in products:
         products_data.append({
@@ -570,6 +561,7 @@ def load_more_new_products(request):
             'sahib_id': product.sahib.id if product.sahib else None,
             'sahib_username': product.sahib.username if product.sahib else 'AS-AVTO',
         })
+    
     return JsonResponse({
         'products': products_data,
         'has_more': has_more

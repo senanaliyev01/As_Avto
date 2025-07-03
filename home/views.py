@@ -1032,7 +1032,11 @@ def import_user_products_view(request):
                         error_count += 1
                         continue
 
-                    existing_product = Mehsul.objects.filter(brend_kod=brend_kod, sahib=request.user).first()
+                    # Mövcud məhsulu həm brend_kod, həm firma, həm də sahib ilə yoxla
+                    if firma:
+                        existing_product = Mehsul.objects.filter(brend_kod=brend_kod, firma=firma, sahib=request.user).first()
+                    else:
+                        existing_product = Mehsul.objects.filter(brend_kod=brend_kod, firma__isnull=True, sahib=request.user).first()
 
                     if existing_product:
                         # Sahib onsuz da request.user olduğu üçün bu yoxlamaya ehtiyac yoxdur.

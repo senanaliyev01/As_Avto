@@ -41,18 +41,18 @@
     
     <!-- Excel Import Modal -->
     <div class="modal fade" id="importExcelModal" tabindex="-1" aria-labelledby="importExcelModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" style="border-radius: 16px; box-shadow: 0 4px 32px rgba(44,62,80,0.13);">
-                <div class="modal-header" style="border-bottom: 1.5px solid #e9ecef;">
-                    <h5 class="modal-title w-100 text-center" id="importExcelModalLabel" style="font-weight: 700; color: #1d6f42;">Excel Faylından Məhsul Import Et</h5>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importExcelModalLabel">Excel Faylından Məhsul Import Et</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.5rem; opacity: 0.8;"><span aria-hidden="true">&times;</span></button>
                 </div>
-                <div class="modal-body d-flex flex-column align-items-center justify-content-center p-4" style="min-width: 320px;">
+                <div class="modal-body">
                     <!-- Excel Nümunəsi -->
-                    <div class="excel-sample mb-3 w-100" style="max-width: 480px;">
-                        <h6 class="text-center mb-2">Excel Faylı Nümunəsi:</h6>
+                    <div class="excel-sample mb-3">
+                        <h6>Excel Faylı Nümunəsi:</h6>
                         <div class="table-responsive">
-                            <table class="sample-table table table-bordered table-sm mb-2">
+                            <table class="sample-table table table-bordered table-sm">
                                 <thead>
                                     <tr>
                                         <th>adi</th>
@@ -103,16 +103,16 @@
                             </ul>
                         </div>
                     </div>
-                    <form action="{% url 'import_user_products' %}" method="post" enctype="multipart/form-data" class="w-100 d-flex flex-column align-items-center" style="max-width: 400px;">
+                    <form action="{% url 'import_user_products' %}" method="post" enctype="multipart/form-data">
                         {% csrf_token %}
-                        <div class="mb-3 w-100">
+                        <div class="mb-3">
                             <label for="excel_file" class="form-label">Excel Faylı (.xlsx)</label>
                             <input class="form-control" type="file" name="excel_file" id="excel_file" accept=".xlsx" required>
                         </div>
-                        <p class="small text-muted text-center mb-2">
-                            <b>Vacib:</b> Excel faylınızda <code>brend_kod</code>, <code>adi</code>, <code>firma</code>, <code>avtomobil</code>, <code>qiymet</code>, <code>stok</code> kimi sütunlar olmalıdır. Mövcud <code>brend_kod</code>, <code>firma</code> və <code>sahib</code> eyni olan məhsullar yenilənəcək, digərləri yeni yaradılacaq.
+                        <p class="small text-muted">
+                            <b>Vacib:</b> Excel faylınızda `brend_kod`, `adi`, `firma`, `avtomobil`, `qiymet`, `stok` kimi sütunlar olmalıdır. Mövcud `brend_kod`-a malik məhsullar yenilənəcək, digərləri yeni yaradılacaq.
                         </p>
-                        <button type="submit" class="btn btn-success w-100" style="font-weight: 600; font-size: 1.08rem;">Import Et</button>
+                        <button type="submit" class="btn btn-success">Import Et</button>
                     </form>
                 </div>
             </div>

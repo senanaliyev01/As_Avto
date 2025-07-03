@@ -863,26 +863,10 @@ function initializeProductsPage() {
                     if (tbody) {
                         data.products.forEach(product => {
                             const row = document.createElement('tr');
-                            // Firma logo və ya adı üçün HTML
-                            let firmaCell = '';
-                            if (product.firma_logo_url) {
-                                // Spinner və image bir yerdə, image yüklənəndə spinner gizlənir
-                                const logoId = `logo_${product.id}_${Math.floor(Math.random()*100000)}`;
-                                firmaCell = `
-                                    <div class="firma-logo-table-wrapper">
-                                        <span class="logo-spinner" id="spinner_${logoId}">
-                                            <span class="spinner-border spinner-border-sm"></span>
-                                        </span>
-                                        <img src="${product.firma_logo_url}" alt="${product.firma}" id="${logoId}" class="firma-logo-table" style="display:none;">
-                                    </div>
-                                `;
-                            } else {
-                                firmaCell = product.firma;
-                            }
                             row.innerHTML = `
                                 <td><img src="${product.sekil_url || '/static/images/no_image.webp'}" alt="${product.adi}" class="product-image" onclick="openImageModal('${product.sekil_url}')"></td>
                                 <td>${product.brend_kod}</td>
-                                <td>${firmaCell}</td>
+                                <td>${product.firma}</td>
                                 <td>
                                     <span class="product-name-ellipsis">${product.adi}</span>
                                     ${product.yenidir ? '<span class="new-badge">Yeni</span>' : ''}
@@ -909,21 +893,6 @@ function initializeProductsPage() {
                                 </td>
                             `;
                             tbody.appendChild(row);
-                            // Logo yüklənəndə spinneri gizlət
-                            if (product.firma_logo_url) {
-                                const logoImg = row.querySelector('img[id^="logo_"]');
-                                const spinner = row.querySelector('.logo-spinner');
-                                if (logoImg && spinner) {
-                                    logoImg.onload = () => {
-                                        spinner.style.display = 'none';
-                                        logoImg.style.display = 'inline-block';
-                                    };
-                                    logoImg.onerror = () => {
-                                        spinner.style.display = 'none';
-                                        logoImg.style.display = 'none';
-                                    };
-                                }
-                            }
                         });
                         
                         hasMore = data.has_more;

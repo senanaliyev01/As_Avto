@@ -167,7 +167,6 @@ def load_more_products(request):
             'adi': product.adi,
             'sekil_url': product.sekil.url if product.sekil else None,
             'firma': product.firma.adi,
-            'firma_logo_url': product.firma.logo.url if hasattr(product.firma, 'logo') and product.firma.logo else None,
             'brend_kod': product.brend_kod,
             'oem': product.oem,
             'stok': product.stok,
@@ -554,7 +553,6 @@ def load_more_new_products(request):
             'adi': product.adi,
             'sekil_url': product.sekil.url if product.sekil else None,
             'firma': product.firma.adi,
-            'firma_logo_url': product.firma.logo.url if hasattr(product.firma, 'logo') and product.firma.logo else None,
             'brend_kod': product.brend_kod,
             'oem': product.oem,
             'stok': product.stok,
@@ -745,15 +743,12 @@ def load_more_my_products(request):
             'id': product.id,
             'adi': product.adi,
             'sekil_url': product.sekil.url if product.sekil else None,
-            'firma': product.firma.adi,
-            'firma_logo_url': product.firma.logo.url if hasattr(product.firma, 'logo') and product.firma.logo else None,
+            'firma': product.firma.adi if product.firma else '',
             'brend_kod': product.brend_kod,
-            'oem': product.oem,
             'stok': product.stok,
             'qiymet': str(product.qiymet),
             'yenidir': product.yenidir,
-            'sahib_id': product.sahib.id if product.sahib else None,
-            'sahib_username': product.sahib.username if product.sahib else 'AS-AVTO',
+            'qalan_vaxt': product.qalan_vaxt() if product.yenidir else None,
         })
     return JsonResponse({'products': products_data, 'has_more': has_more})
 

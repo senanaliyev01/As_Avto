@@ -27,13 +27,7 @@
                 <tr>
                     <td><img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image" onclick="openImageModal('{{ mehsul.sekil.url }}')"></td>
                     <td>{{ mehsul.brend_kod }}</td>
-                    <td>
-                        {% if mehsul.firma.logo %}
-                            <img src="{{ mehsul.firma.logo.url }}" alt="{{ mehsul.firma.adi }}" class="firma-logo-table">
-                        {% else %}
-                            {{ mehsul.firma.adi }}
-                        {% endif %}
-                    </td>
+                    <td>{{ mehsul.firma.adi }}</td>
                     <td>
                         <span class="product-name-ellipsis">{{ mehsul.adi }}</span>
                         <span class="new-badge">Yeni</span>

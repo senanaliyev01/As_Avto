@@ -863,10 +863,26 @@ function initializeProductsPage() {
                     if (tbody) {
                         data.products.forEach(product => {
                             const row = document.createElement('tr');
+                            // Firma logo və ya adı üçün HTML
+                            let firmaCell = '';
+                            if (product.firma_logo_url) {
+                                // Spinner və image bir yerdə, image yüklənəndə spinner gizlənir
+                                const logoId = `logo_${product.id}_${Math.floor(Math.random()*100000)}`;
+                                firmaCell = `
+                                    <div style="position:relative;display:inline-block;min-width:40px;min-height:32px;vertical-align:middle;">
+                                        <span class="logo-spinner" id="spinner_${logoId}" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:22px;height:22px;display:flex;align-items:center;justify-content:center;">
+                                            <span class="spinner-border spinner-border-sm" style="width:22px;height:22px;border-width:2px;"></span>
+                                        </span>
+                                        <img src="${product.firma_logo_url}" alt="${product.firma}" id="${logoId}" style="max-height:32px;max-width:80px;object-fit:contain;background:#fff;border-radius:4px;border:1px solid #e9ecef;padding:2px;display:none;">
+                                    </div>
+                                `;
+                            } else {
+                                firmaCell = product.firma;
+                            }
                             row.innerHTML = `
                                 <td><img src="${product.sekil_url || '/static/images/no_image.webp'}" alt="${product.adi}" class="product-image" onclick="openImageModal('${product.sekil_url}')"></td>
                                 <td>${product.brend_kod}</td>
-                                <td>${product.firma}</td>
+                                <td>${firmaCell}</td>
                                 <td>
                                     <span class="product-name-ellipsis">${product.adi}</span>
                                     ${product.yenidir ? '<span class="new-badge">Yeni</span>' : ''}
@@ -893,6 +909,21 @@ function initializeProductsPage() {
                                 </td>
                             `;
                             tbody.appendChild(row);
+                            // Logo yüklənəndə spinneri gizlət
+                            if (product.firma_logo_url) {
+                                const logoImg = row.querySelector('img[id^="logo_"]');
+                                const spinner = row.querySelector('.logo-spinner');
+                                if (logoImg && spinner) {
+                                    logoImg.onload = () => {
+                                        spinner.style.display = 'none';
+                                        logoImg.style.display = 'inline-block';
+                                    };
+                                    logoImg.onerror = () => {
+                                        spinner.style.display = 'none';
+                                        logoImg.style.display = 'none';
+                                    };
+                                }
+                            }
                         });
                         
                         hasMore = data.has_more;

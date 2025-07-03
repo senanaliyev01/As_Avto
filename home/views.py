@@ -94,7 +94,7 @@ def login_view(request):
 @login_required
 def home_view(request):
     # Yeni məhsulları əldə et
-    new_products = Mehsul.objects.filter(yenidir=True).order_by('?')
+    new_products = Mehsul.objects.filter(yenidir=True).order_by('-id')
     # Aktiv popup şəkilləri əldə et
     popup_images = PopupImage.objects.filter(aktiv=True)
     return render(request, 'base.html', {
@@ -105,7 +105,7 @@ def home_view(request):
 @login_required
 def products_view(request):
     search_query = request.GET.get('search', '')
-    mehsullar = Mehsul.objects.all().order_by('?')
+    mehsullar = Mehsul.objects.all().order_by('-id')
     popup_images = PopupImage.objects.filter(aktiv=True)
     if search_query:
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
@@ -125,9 +125,9 @@ def products_view(request):
                     word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
                     ad_filters.append(word_filter)
                 ad_filter = reduce(and_, ad_filters)
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter)
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter).order_by('-id')
             else:
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter).order_by('-id')
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
     return render(request, 'products.html', {
@@ -142,7 +142,7 @@ def load_more_products(request):
     offset = int(request.GET.get('offset', 0))
     limit = 5
     search_query = request.GET.get('search', '')
-    mehsullar = Mehsul.objects.all().order_by('?')
+    mehsullar = Mehsul.objects.all().order_by('-id')
     if search_query:
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         if clean_search:
@@ -155,9 +155,9 @@ def load_more_products(request):
                 for word in search_words:
                     ad_filters.append(Q(adi__icontains=word))
                 ad_filter = reduce(and_, ad_filters)
-                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | ad_filter)
+                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | ad_filter).order_by('-id')
             else:
-                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter)
+                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter).order_by('-id')
     products = mehsullar[offset:offset + limit]
     has_more = mehsullar.count() > (offset + limit)
     products_data = []
@@ -516,7 +516,7 @@ def search_suggestions(request):
 @login_required
 def new_products_view(request):
     # Yeni məhsulları əldə et
-    mehsullar = Mehsul.objects.filter(yenidir=True).order_by('?')  # Qarışıq qaydada göstər
+    mehsullar = Mehsul.objects.filter(yenidir=True).order_by('-id')  # Son əlavə olunanlar birinci
     # İlk 5 məhsulu götür
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
@@ -540,7 +540,7 @@ def load_more_new_products(request):
     offset = int(request.GET.get('offset', 0))
     limit = 5
     
-    mehsullar = Mehsul.objects.filter(yenidir=True).order_by('?')
+    mehsullar = Mehsul.objects.filter(yenidir=True).order_by('-id')
     
     # Get next batch of products
     products = mehsullar[offset:offset + limit]

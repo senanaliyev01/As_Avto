@@ -41,18 +41,18 @@
     
     <!-- Excel Import Modal -->
     <div class="modal fade" id="importExcelModal" tabindex="-1" aria-labelledby="importExcelModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="importExcelModalLabel">Excel Faylından Məhsul Import Et</h5>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 16px; box-shadow: 0 4px 32px rgba(44,62,80,0.13);">
+                <div class="modal-header" style="border-bottom: 1.5px solid #e9ecef;">
+                    <h5 class="modal-title w-100 text-center" id="importExcelModalLabel" style="font-weight: 700; color: #1d6f42;">Excel Faylından Məhsul Import Et</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.5rem; opacity: 0.8;"><span aria-hidden="true">&times;</span></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body d-flex flex-column align-items-center justify-content-center p-4" style="min-width: 320px;">
                     <!-- Excel Nümunəsi -->
-                    <div class="excel-sample mb-3">
-                        <h6>Excel Faylı Nümunəsi:</h6>
+                    <div class="excel-sample mb-3 w-100" style="max-width: 480px;">
+                        <h6 class="text-center mb-2">Excel Faylı Nümunəsi:</h6>
                         <div class="table-responsive">
-                            <table class="sample-table table table-bordered table-sm">
+                            <table class="sample-table table table-bordered table-sm mb-2">
                                 <thead>
                                     <tr>
                                         <th>adi</th>
@@ -96,24 +96,23 @@
                                 <li><b>maya_qiymet</b> və <b>qiymet</b> sütunları ədədi olmalıdır (nöqtə və ya vergül ilə yazıla bilər).</li>
                                 <li><b>stok</b> tam ədəd olmalıdır.</li>
                                 <li>Bütün nümunədə göstərilən sütunlar Excel faylınızda <b>mütləq olmalıdır</b> və <b>adlandırmaları eyni olmalıdır</b> (sıra fərq etmir).</li>
-                                <li><b>brend_kod</b> sütunu məhsulun unikal identifikatorudur. Hər bir məhsul üçün fərqli olmalıdır. Eyni brend_kod istifadə etməyin!</li>
-                                <li>Excel import zamanı mövcud brend_kod-a sahib məhsullar yenilənir, olmayanlar isə yeni yaradılır. Yəni, eyni brend_kod yazsanız, əvvəlki məhsul yenilənəcək, yeni məhsul əlavə olunmayacaq.</li>
-                                <li>Yeni məhsul əlavə edərkən fərqli brend_kod istifadə edin. Məsələn: <i>28113-2p300</i>, <i>28113-2p300FOLGEL</i>, <i>28113-2p300F</i>, <i>FG-SO</i> və ya <i>FGA15110/28113-2P300</i> kimi fərqli brend_kod-lar istifadə edə bilərsiniz.</li>
+                                <li><b>brend_kod</b>, <b>firma</b> və <b>sahib</b> eyni olan məhsul varsa, həmin məhsul yenilənir. Əgər <b>brend_kod</b> eyni, <b>firma</b> fərqlidirsə, yeni məhsul yaradılır. Yəni, eyni brend_kod və fərqli firma ilə bir neçə məhsul əlavə edə bilərsiniz.</li>
+                                <li>Excel import zamanı mövcud məhsulun firması dəyişdirilmir. Yalnız digər məlumatlar yenilənir.</li>
                                 <li>Boş və ya səhv doldurulmuş sətirlər üçün xəta mesajı göstəriləcək.</li>
                                 <li>Yalnız təsdiqlənmiş istifadəçilər məhsul import edə bilər.</li>
                             </ul>
                         </div>
                     </div>
-                    <form action="{% url 'import_user_products' %}" method="post" enctype="multipart/form-data">
+                    <form action="{% url 'import_user_products' %}" method="post" enctype="multipart/form-data" class="w-100 d-flex flex-column align-items-center" style="max-width: 400px;">
                         {% csrf_token %}
-                        <div class="mb-3">
+                        <div class="mb-3 w-100">
                             <label for="excel_file" class="form-label">Excel Faylı (.xlsx)</label>
                             <input class="form-control" type="file" name="excel_file" id="excel_file" accept=".xlsx" required>
                         </div>
-                        <p class="small text-muted">
-                            <b>Vacib:</b> Excel faylınızda `brend_kod`, `adi`, `firma`, `avtomobil`, `qiymet`, `stok` kimi sütunlar olmalıdır. Mövcud `brend_kod`-a malik məhsullar yenilənəcək, digərləri yeni yaradılacaq.
+                        <p class="small text-muted text-center mb-2">
+                            <b>Vacib:</b> Excel faylınızda <code>brend_kod</code>, <code>adi</code>, <code>firma</code>, <code>avtomobil</code>, <code>qiymet</code>, <code>stok</code> kimi sütunlar olmalıdır. Mövcud <code>brend_kod</code>, <code>firma</code> və <code>sahib</code> eyni olan məhsullar yenilənəcək, digərləri yeni yaradılacaq.
                         </p>
-                        <button type="submit" class="btn btn-success">Import Et</button>
+                        <button type="submit" class="btn btn-success w-100" style="font-weight: 600; font-size: 1.08rem;">Import Et</button>
                     </form>
                 </div>
             </div>

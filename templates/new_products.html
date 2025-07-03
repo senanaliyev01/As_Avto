@@ -29,7 +29,7 @@
                     <td>{{ mehsul.brend_kod }}</td>
                     <td>
                         {% if mehsul.firma.logo %}
-                            <img src="{{ mehsul.firma.logo.url }}" alt="{{ mehsul.firma.adi }}" style="max-height:32px; max-width:80px; object-fit:contain; background:#fff; border-radius:4px; border:1px solid #e9ecef; padding:2px;">
+                            <img src="{{ mehsul.firma.logo.url }}" alt="{{ mehsul.firma.adi }}" class="firma-logo">
                         {% else %}
                             {{ mehsul.firma.adi }}
                         {% endif %}

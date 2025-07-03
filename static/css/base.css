@@ -4719,218 +4719,165 @@ body {
     }
 }
 
-/* --- Excel Import Modal Professional Compact Design --- */
-
-/* Center and compact the Excel import modal */
-#importExcelModal .modal-dialog {
+.modal-dialog {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
   margin: 0 auto;
-  max-width: 480px;
+  max-width: 420px;
+  width: 100%;
 }
-#importExcelModal .modal-content {
-  max-width: 440px;
+
+.modal-content {
+  box-shadow: 0 8px 32px rgba(44,62,80,0.18);
+  border: 1.5px solid #e9ecef;
+  border-radius: 16px;
+  padding: 24px 18px 18px 18px;
+  max-width: 420px;
   margin: 0 auto;
-  padding: 18px 16px 16px 16px;
-  border-radius: 14px;
-  box-shadow: 0 4px 32px rgba(44,62,80,0.13);
-  background: #fff;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-#importExcelModal .modal-header {
+
+.modal-header {
   width: 100%;
-  padding: 0 0 10px 0;
-  border-bottom: 1px solid #e9ecef;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f1f1f1;
+  margin-bottom: 10px;
 }
-#importExcelModal .modal-title {
-  font-size: 1.13rem;
+
+.modal-title {
+  flex: 1;
+  text-align: center;
+  font-size: 1.18rem;
   font-weight: 700;
   color: #1d6f42;
-  text-align: center;
-  width: 100%;
 }
-#importExcelModal .modal-header .btn-close {
-  position: absolute;
-  right: 0;
-  top: 0;
-  font-size: 1.5rem;
-  color: #dc3545;
-  opacity: 0.8;
-  z-index: 10;
-  padding: 0 8px;
-  background: none;
-  border: none;
-}
-#importExcelModal .modal-body {
-  width: 100%;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-#importExcelModal .excel-sample {
+
+.excel-sample {
   background: #f8fafc;
   border: 1.5px solid #d1e7dd;
-  border-radius: 8px;
-  padding: 8px 4px 6px 4px;
-  margin-bottom: 10px;
-  box-shadow: 0 1px 4px rgba(44, 62, 80, 0.04);
+  border-radius: 10px;
+  padding: 10px 8px 8px 8px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.06);
   max-width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-#importExcelModal .excel-sample h6 {
-  font-size: 0.98rem;
-  font-weight: 600;
+
+.excel-sample h6 {
+  font-size: 1.05rem;
+  font-weight: 700;
   color: #1d6f42;
-  margin-bottom: 6px;
-  text-align: center;
-  width: 100%;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
 }
-#importExcelModal .sample-table {
+
+.sample-table {
   background: #fff;
-  border-radius: 6px;
+  border-radius: 8px;
   overflow-x: auto;
-  box-shadow: 0 1px 2px rgba(44, 62, 80, 0.03);
-  margin-bottom: 4px;
-  font-size: 0.85rem;
+  box-shadow: 0 1px 4px rgba(44, 62, 80, 0.06);
+  margin-bottom: 8px;
+  font-size: 0.91rem;
   width: 100%;
-  min-width: 420px;
+  min-width: 600px;
   max-width: 100%;
-  table-layout: fixed;
+  border-collapse: collapse;
 }
-#importExcelModal .sample-table th,
-#importExcelModal .sample-table td {
-  padding: 2px 4px;
-  font-size: 0.85rem;
+
+.sample-table th,
+.sample-table td {
+  padding: 4px 7px;
   text-align: center;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
-#importExcelModal .sample-table th {
+
+.sample-table th {
   background: #e9f7ef;
   color: #1d6f42;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 0.93rem;
   border-bottom: 1px solid #b7e4c7;
 }
-#importExcelModal .sample-table td {
+
+.sample-table td {
   background: #fff;
   color: #333;
+  font-size: 0.91rem;
   border-bottom: 1px solid #e9ecef;
 }
-#importExcelModal .sample-table tr:last-child td {
+
+.sample-table tr:last-child td {
   border-bottom: none;
 }
-#importExcelModal .notes {
+
+.notes {
   background: #e9f7ef;
   border-left: 3px solid #1d6f42;
-  border-radius: 0 6px 6px 0;
-  padding: 5px 6px;
-  margin-top: 4px;
+  border-radius: 0 8px 8px 0;
+  padding: 8px 10px;
+  margin-top: 8px;
   color: #1d6f42;
-  font-size: 0.89rem;
-  box-shadow: 0 1px 2px rgba(44, 62, 80, 0.02);
+  font-size: 0.95rem;
+  box-shadow: 0 1px 4px rgba(44, 62, 80, 0.04);
   width: 100%;
 }
-#importExcelModal .notes p {
-  font-weight: 600;
-  margin-bottom: 2px;
+
+.notes p {
+  font-weight: 700;
+  margin-bottom: 4px;
   color: #1d6f42;
-  font-size: 0.93em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 1em;
 }
-#importExcelModal .notes ul {
-  margin: 0 0 0 10px;
+
+.notes ul {
+  margin: 0 0 0 12px;
   padding: 0;
   list-style: disc inside;
 }
-#importExcelModal .notes li {
-  margin-bottom: 1px;
-  font-size: 0.89rem;
+
+.notes li {
+  margin-bottom: 2px;
+  font-size: 0.95rem;
   color: #14532d;
   padding-left: 1px;
 }
-#importExcelModal form {
-  width: 100%;
-  margin-top: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-#importExcelModal .form-label {
-  font-size: 0.97rem;
-  font-weight: 500;
-  color: #1d6f42;
-  margin-bottom: 2px;
-  text-align: left;
-  width: 100%;
-}
-#importExcelModal .form-control[type="file"] {
-  font-size: 0.93rem;
-  padding: 4px 6px;
-  border-radius: 5px;
-  border: 1px solid #b7e4c7;
-  background: #f8fafc;
-  width: 100%;
-}
-#importExcelModal .btn-success {
-  background: linear-gradient(90deg, #1d6f42 0%, #218838 100%);
-  color: #fff;
-  border: none;
-  border-radius: 20px;
-  padding: 7px 24px;
-  font-size: 1rem;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
-  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
-  margin: 0 auto;
-  display: block;
-  letter-spacing: 0.5px;
-}
-#importExcelModal .btn-success:hover, #importExcelModal .btn-success:focus {
-  background: linear-gradient(90deg, #218838 0%, #1d6f42 100%);
-  color: #fff;
-  transform: translateY(-2px) scale(1.04);
-  box-shadow: 0 4px 16px rgba(44, 62, 80, 0.13);
-}
-#importExcelModal .small.text-muted {
-  font-size: 0.89rem;
-  color: #888;
-  margin-bottom: 0;
-  margin-top: -4px;
-  text-align: left;
-  width: 100%;
-}
+
 @media (max-width: 600px) {
-  #importExcelModal .modal-dialog {
+  .modal-dialog,
+  .modal-content {
     max-width: 99vw;
     min-width: 0;
-    padding: 0 2vw;
+    padding: 8px 2px 8px 2px;
   }
-  #importExcelModal .modal-content {
-    max-width: 99vw;
-    padding: 8px 2vw 8px 2vw;
+  .excel-sample {
+    padding: 4px 1px 4px 1px;
   }
-  #importExcelModal .sample-table {
-    min-width: 340px;
-    font-size: 0.78rem;
-  }
-  #importExcelModal .sample-table th, #importExcelModal .sample-table td {
-    font-size: 0.78rem;
-    padding: 1px 2px;
-  }
-  #importExcelModal .notes {
+  .sample-table {
     font-size: 0.82rem;
-    padding: 3px 2px;
+    min-width: 420px;
+  }
+  .sample-table th, .sample-table td {
+    font-size: 0.82rem;
+    padding: 2px 2px;
+  }
+  .notes {
+    padding: 4px 4px;
+    font-size: 0.89rem;
   }
 }

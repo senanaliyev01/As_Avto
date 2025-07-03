@@ -283,10 +283,7 @@ class MehsulAdmin(admin.ModelAdmin):
                             print(f"Brend kod: {brend_kod}")
 
                             # Mövcud məhsulu həm brend_kod, həm firma, həm də sahib ilə yoxla
-                            if firma:
-                                existing_product = Mehsul.objects.filter(brend_kod=brend_kod, firma=firma, sahib=request.user).first()
-                            else:
-                                existing_product = Mehsul.objects.filter(brend_kod=brend_kod, firma__isnull=True, sahib=request.user).first()
+                            existing_product = Mehsul.objects.filter(brend_kod=brend_kod, firma=firma, sahib=request.user).first()
 
                             try:
                                 if existing_product:

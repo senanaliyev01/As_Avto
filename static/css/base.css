@@ -4882,11 +4882,9 @@ body {
     max-width: 340px;
     margin: 0 auto;
     display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    gap: 10px;
-    justify-content: center;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
 }
 
 .modal-content .form-label {
@@ -4897,16 +4895,21 @@ body {
     width: 100%;
 }
 
-.modal-content .form-control[type="file"] {
+.modal-content .form-control {
     border-radius: 6px;
     border: 1.5px solid #b7e4c7;
     padding: 7px 10px;
     font-size: 0.97rem;
-    width: 180px;
-    margin-bottom: 0;
+    width: 100%;
+    margin-bottom: 6px;
     background: #f8fafc;
     transition: border 0.2s;
-    display: inline-block;
+}
+
+.modal-content .form-control:focus {
+    border-color: #1d6f42;
+    outline: none;
+    background: #fff;
 }
 
 .modal-content .btn-success {
@@ -4914,28 +4917,74 @@ body {
     color: #fff;
     border: none;
     border-radius: 24px;
-    padding: 8px 18px;
-    font-size: 1rem;
+    padding: 8px 28px;
+    font-size: 1.08rem;
     font-weight: 600;
     box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
     transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
-    margin: 0;
-    display: inline-block;
+    margin: 0 auto;
+    display: block;
     letter-spacing: 0.5px;
+}
+
+.modal-content .btn-success:hover, .modal-content .btn-success:focus {
+    background: linear-gradient(90deg, #218838 0%, #1d6f42 100%);
+    color: #fff;
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 4px 16px rgba(44, 62, 80, 0.13);
+}
+
+/* Excel import form row: file input and button side by side */
+.modal-content form .mb-3 {
+    width: 100%;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+}
+
+.modal-content form .mb-3 .form-label {
+    display: none;
+}
+
+.modal-content form #excel_file {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 180px;
+    font-size: 0.97rem;
+    padding: 7px 8px;
+    border-radius: 6px;
+    border: 1.5px solid #b7e4c7;
+    background: #f8fafc;
+    margin-bottom: 0;
+}
+
+.modal-content form .btn-success {
+    flex: 0 0 auto;
+    padding: 8px 18px;
+    font-size: 1rem;
+    border-radius: 20px;
+    margin-left: 0;
+    margin-right: 0;
     height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 @media (max-width: 600px) {
-    .modal-content form {
+    .modal-content form .mb-3 {
         flex-direction: column;
+        gap: 6px;
         align-items: stretch;
-        gap: 8px;
     }
-    .modal-content .form-control[type="file"] {
-        width: 100%;
+    .modal-content form #excel_file {
+        max-width: 100%;
     }
-    .modal-content .btn-success {
+    .modal-content form .btn-success {
         width: 100%;
-        height: auto;
+        height: 36px;
+        font-size: 0.97rem;
     }
 }

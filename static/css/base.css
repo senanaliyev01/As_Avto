@@ -4932,7 +4932,7 @@ body {
     flex-direction: column;
 }
 .fullwidth-header.admin-header {
-    width: 1535px;
+    width: 100vw;
     left: 0 !important;
     margin: 0;
     border-radius: 0;

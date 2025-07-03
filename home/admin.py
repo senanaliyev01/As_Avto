@@ -287,18 +287,13 @@ class MehsulAdmin(admin.ModelAdmin):
 
                             try:
                                 if existing_product:
-                                    # Mövcud məhsulu yenilə
+                                    # Mövcud məhsulu yenilə, firmaya toxunma!
                                     if not existing_product.sahib:
                                         existing_product.sahib = request.user
                                     existing_product.adi = temiz_ad
-                                    
-                                    # Excel-də olan məlumatları yenilə, olmayanları None et
                                     existing_product.kateqoriya = kateqoriya
-                                    existing_product.firma = firma
                                     existing_product.avtomobil = avtomobil
                                     existing_product.vitrin = vitrin
-                                    
-                                    # Digər məlumatları yenilə
                                     existing_product.brend_kod = brend_kod
                                     existing_product.olcu = str(row['olcu']).strip() if 'olcu' in row and pd.notna(row['olcu']) else ''
                                     existing_product.maya_qiymet = float(row['maya_qiymet']) if 'maya_qiymet' in row and pd.notna(row['maya_qiymet']) else 0
@@ -306,7 +301,6 @@ class MehsulAdmin(admin.ModelAdmin):
                                     existing_product.stok = int(row['stok']) if 'stok' in row and pd.notna(row['stok']) else 0
                                     existing_product.kodlar = str(row['kodlar']) if 'kodlar' in row and pd.notna(row['kodlar']) else ''
                                     existing_product.melumat = str(row['melumat']) if 'melumat' in row and pd.notna(row['melumat']) else ''
-                                    
                                     existing_product.save()
                                     print(f"Məhsul yeniləndi: {existing_product}")
                                     update_count += 1

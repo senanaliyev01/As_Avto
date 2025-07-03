@@ -1039,13 +1039,11 @@ def import_user_products_view(request):
                         existing_product = Mehsul.objects.filter(brend_kod=brend_kod, firma__isnull=True, sahib=request.user).first()
 
                     if existing_product:
-                        # Sahib onsuz da request.user olduğu üçün bu yoxlamaya ehtiyac yoxdur.
-                        # Mövcud məhsulu yeniləyirik.
+                        # Mövcud məhsulu yenilə, firmaya toxunma!
                         if not existing_product.sahib:
                             existing_product.sahib = request.user
                         existing_product.adi = temiz_ad
                         existing_product.kateqoriya = kateqoriya
-                        existing_product.firma = firma
                         existing_product.avtomobil = avtomobil
                         existing_product.vitrin = vitrin
                         existing_product.olcu = str(row['olcu']).strip() if 'olcu' in row and pd.notna(row['olcu']) else ''
@@ -1054,7 +1052,6 @@ def import_user_products_view(request):
                         existing_product.stok = int(row['stok']) if 'stok' in row and pd.notna(row['stok']) else 0
                         existing_product.kodlar = str(row['kodlar']) if 'kodlar' in row and pd.notna(row['kodlar']) else ''
                         existing_product.melumat = str(row['melumat']) if 'melumat' in row and pd.notna(row['melumat']) else ''
-                        
                         existing_product.save()
                         update_count += 1
                     else:

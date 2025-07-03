@@ -11,16 +11,35 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <div class="admin-layout no-sidebar">
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <a href="{% url 'seller_admin_panel' %}" class="admin-panel-link {% if request.resolver_match.url_name == 'seller_admin_panel' %}active{% endif %}">
+                    <i class="fas fa-cogs"></i> Satıcı Paneli
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'my_products' %}active{% endif %}">
+                        <a href="{% url 'my_products' %}"><i class="fas fa-box"></i> Mənim Məhsullarım</a>
+                    </li>
+                    <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'my_sales' %}active{% endif %}">
+                        <a href="{% url 'my_sales' %}" id="sidebarMySalesLink">
+                            <i class="fas fa-receipt"></i> Mənə gələn sifarişlər
+                            <span id="salesBadge" class="sales-badge-sidebar" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
         <!-- Main Content -->
         <div class="admin-main">
             <!-- Header -->
-            <header class="admin-header fullwidth-header">
-                <nav class="admin-header-nav">
-                    <a href="{% url 'seller_admin_panel' %}" class="admin-header-link {% if request.resolver_match.url_name == 'seller_admin_panel' %}active{% endif %}"><i class="fas fa-cogs"></i> Satıcı Paneli</a>
-                    <a href="{% url 'my_products' %}" class="admin-header-link {% if request.resolver_match.url_name == 'my_products' %}active{% endif %}"><i class="fas fa-box"></i> Mənim Məhsullarım</a>
-                    <a href="{% url 'my_sales' %}" id="sidebarMySalesLink" class="admin-header-link {% if request.resolver_match.url_name == 'my_sales' %}active{% endif %}"><i class="fas fa-receipt"></i> Mənə gələn sifarişlər <span id="salesBadge" class="sales-badge-sidebar" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span></a>
-                </nav>
+            <header class="admin-header">
+                <div class="admin-header-left">
+                    <span class="admin-header-title">{% if request.resolver_match.url_name == 'seller_admin_panel' %}Dashboard{% else %}{% block panel_title %}Satıcı Paneli{% endblock %}{% endif %}</span>
+                </div>
                 <div class="admin-header-right">
                     <span class="admin-user">
                         <img src="{{ request.user.profile.sekil.url|default:'/static/images/no_image.jpg' }}" alt="Profil şəkli" class="admin-user-avatar" style="width:36px;height:36px;border-radius:50%;object-fit:cover;margin-right:8px;vertical-align:middle;">
@@ -30,7 +49,7 @@
                     <a href="{% url 'logout' %}" class="admin-logout"><i class="fas fa-sign-out-alt"></i> Çıxış</a>
                 </div>
             </header>
-            <main class="admin-content fullwidth-content">
+            <main class="admin-content">
                 {% if request.resolver_match.url_name == 'seller_admin_panel' %}
                 <!-- Dashboard Content -->
                 <div class="dashboard-container">
@@ -207,7 +226,7 @@
                 {% block content %}{% endblock %}
                 {% endif %}
             </main>
-            <footer class="admin-footer fullwidth-footer">
+            <footer class="admin-footer">
                 <span>© {{ now|date:'Y' }} AS-AVTO Satıcı Paneli. Bütün hüquqlar qorunur.</span>
             </footer>
         </div>

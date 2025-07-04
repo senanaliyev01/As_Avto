@@ -17,10 +17,10 @@
         <!-- Global Statistics Bar -->
         <div class="global-stats-bar global-stats-bar-header">
             <div class="global-stats-bar-content">
-                <span><b>İstifadəçi sayı:</b> {{ request.total_user_count }}</span>
-                <span><b>Satıcı sayı:</b> {{ request.total_seller_count }}</span>
-                <span><b>Məhsul sayı:</b> {{ request.total_product_count }}</span>
-                <span><b>Firma sayı:</b> {{ request.total_firma_count }}</span>
+                <span><b>İstifadəçi sayı:</b> {{ total_user_count }}</span>
+                <span><b>Satıcı sayı:</b> {{ total_seller_count }}</span>
+                <span><b>Məhsul sayı:</b> {{ total_product_count }}</span>
+                <span><b>Firma sayı:</b> {{ total_firma_count }}</span>
                 <!-- Naviqasiya linkləri və Satıcı Paneli sayğacı -->
                 <span class="stats-nav-links">
                     <a href="{% url 'products' %}" class="stats-nav-link"><i class="fas fa-box"></i> Məhsullar</a>
@@ -52,10 +52,10 @@
                 </form>
                 <div class="header-right">
                     <span class="total-debt">
-                        {% if request.statistics.umumi_borc < 0 %}
-                            <span style="color: #28a745; font-weight: bold;">Balans +{{ request.statistics.umumi_borc|floatformat:2|slice:'1:' }} ₼</span>
+                        {% if statistics.umumi_borc < 0 %}
+                            <span style="color: #28a745; font-weight: bold;">Balans +{{ statistics.umumi_borc|floatformat:2|slice:'1:' }} ₼</span>
                         {% else %}
-                            <i class="fas fa-money-bill-wave"></i> Borc: {{ request.statistics.umumi_borc|floatformat:2 }} ₼
+                            <i class="fas fa-money-bill-wave"></i> Borc: {{ statistics.umumi_borc|floatformat:2 }} ₼
                         {% endif %}
                     </span>
                     <nav class="main-nav">
@@ -96,10 +96,10 @@
             </div>
         </header>
 
-        {% if request.header_messages %}
+        {% if header_messages %}
         <div class="header-message">
             <div class="header-message-content">
-                {% for message in request.header_messages %}
+                {% for message in header_messages %}
                     <p class="message-slide" {% if not forloop.first %}style="display: none;"{% endif %}>{{ message.mesaj }}</p>
                 {% endfor %}
             </div>
@@ -176,7 +176,7 @@
             <div class="container">
                 <div class="swiper logo-swiper">
                     <div class="swiper-wrapper">
-                        {% for firma in request.brands %}
+                        {% for firma in brands %}
                             {% if firma.logo %}
                             <div class="swiper-slide">
                                 <div class="logo-slide">

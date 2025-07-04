@@ -5,12 +5,18 @@ from home.models import Sifaris
 
 async def global_data(request):
     context = {}
-    context['header_messages'] = await sync_to_async(list)(Header_Message.objects.filter(aktiv=True).order_by('id'))
-    context['total_user_count'] = await sync_to_async(User.objects.count)()
-    context['total_seller_count'] = await sync_to_async(Mehsul.objects.exclude(sahib=None).values('sahib').distinct().count)()
-    context['total_product_count'] = await sync_to_async(Mehsul.objects.count)()
-    context['total_firma_count'] = await sync_to_async(Firma.objects.count)()
-    context['brands'] = await sync_to_async(list)(Firma.objects.all())
-    if request.user.is_authenticated:
-        context['statistics'] = await sync_to_async(Sifaris.get_order_statistics)(request.user)
-    return context 
+    try:
+        context['header_messages'] = await sync_to_async(list)(Header_Message.objects.filter(aktiv=True).order_by('id'))
+        context['total_user_count'] = await sync_to_async(User.objects.count)()
+        context['total_seller_count'] = await sync_to_async(Mehsul.objects.exclude(sahib=None).values('sahib').distinct().count)()
+        context['total_product_count'] = await sync_to_async(Mehsul.objects.count)()
+        context['total_firma_count'] = await sync_to_async(Firma.objects.count)()
+        context['brands'] = await sync_to_async(list)(Firma.objects.all())
+        if request.user.is_authenticated:
+            context['statistics'] = await sync_to_async(Sifaris.get_order_statistics)(request.user)
+    except Exception as e:
+        # Əgər hər hansı bir error baş verərsə, heç olmasa boş dict qaytar
+        import logging
+        logging.exception('Context processor global_data error:')
+        return {}
+    return context

@@ -2,6 +2,7 @@ from asgiref.sync import sync_to_async
 from .models import Header_Message, Kateqoriya, Firma, Avtomobil, Mehsul
 from django.contrib.auth.models import User
 from home.models import Sifaris
+import logging
 
 async def global_data(request):
     context = {}
@@ -15,8 +16,6 @@ async def global_data(request):
         if request.user.is_authenticated:
             context['statistics'] = await sync_to_async(Sifaris.get_order_statistics)(request.user)
     except Exception as e:
-        # Əgər hər hansı bir error baş verərsə, heç olmasa boş dict qaytar
-        import logging
         logging.exception('Context processor global_data error:')
         return {}
     return context

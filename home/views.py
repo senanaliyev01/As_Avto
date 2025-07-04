@@ -30,6 +30,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 import io
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+from asgiref.sync import sync_to_async
 
 def truncate_product_name(name, max_length=20):
     """Məhsul adını qısaldır və uzun olarsa ... əlavə edir"""
@@ -92,21 +93,21 @@ def login_view(request):
     return render(request, 'login.html', {'error_message': error_message})
 
 @login_required
-def home_view(request):
+async def home_view(request):
     # Yeni məhsulları əldə et
-    new_products = Mehsul.objects.filter(yenidir=True).order_by('-id')
+    new_products = await sync_to_async(list)(Mehsul.objects.filter(yenidir=True).order_by('-id'))
     # Aktiv popup şəkilləri əldə et
-    popup_images = PopupImage.objects.filter(aktiv=True)
+    popup_images = await sync_to_async(list)(PopupImage.objects.filter(aktiv=True))
     return render(request, 'base.html', {
         'new_products': new_products,
         'popup_images': popup_images
     })
 
 @login_required
-def products_view(request):
+async def products_view(request):
     search_query = request.GET.get('search', '')
-    mehsullar = Mehsul.objects.all().order_by('-id')
-    popup_images = PopupImage.objects.filter(aktiv=True)
+    mehsullar = await sync_to_async(list)(Mehsul.objects.all().order_by('-id'))
+    popup_images = await sync_to_async(list)(PopupImage.objects.filter(aktiv=True))
     if search_query:
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         if clean_search:
@@ -138,11 +139,11 @@ def products_view(request):
     })
 
 @login_required
-def load_more_products(request):
+async def load_more_products(request):
     offset = int(request.GET.get('offset', 0))
     limit = 5
     search_query = request.GET.get('search', '')
-    mehsullar = Mehsul.objects.all().order_by('-id')
+    mehsullar = await sync_to_async(list)(Mehsul.objects.all().order_by('-id'))
     if search_query:
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         if clean_search:
@@ -155,11 +156,11 @@ def load_more_products(request):
                 for word in search_words:
                     ad_filters.append(Q(adi__icontains=word))
                 ad_filter = reduce(and_, ad_filters)
-                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | ad_filter).order_by('-id')
+                mehsullar = await sync_to_async(list)(Mehsul.objects.filter(kod_filter | brend_kod_filter | ad_filter).order_by('-id'))
             else:
-                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter).order_by('-id')
+                mehsullar = await sync_to_async(list)(Mehsul.objects.filter(kod_filter | brend_kod_filter).order_by('-id'))
     products = mehsullar[offset:offset + limit]
-    has_more = mehsullar.count() > (offset + limit)
+    has_more = len(mehsullar) > (offset + limit)
     products_data = []
     for product in products:
         products_data.append({
@@ -181,19 +182,17 @@ def load_more_products(request):
     })
 
 @login_required
-def cart_view(request):
+async def cart_view(request):
     if 'cart' not in request.session:
         request.session['cart'] = {}
-    
     cart = request.session['cart']
     cart_items = []
     total = Decimal('0.00')
-    popup_images = PopupImage.objects.filter(aktiv=True)
-    invalid_products = []  # Mövcud olmayan məhsulları izləmək üçün
-    
+    popup_images = await sync_to_async(list)(PopupImage.objects.filter(aktiv=True))
+    invalid_products = []
     for product_id, quantity in cart.items():
         try:
-            product = Mehsul.objects.get(id=product_id)
+            product = await sync_to_async(Mehsul.objects.get)(id=product_id)
             subtotal = product.qiymet * Decimal(str(quantity))
             cart_items.append({
                 'product': product,
@@ -202,16 +201,13 @@ def cart_view(request):
             })
             total += subtotal
         except Mehsul.DoesNotExist:
-            invalid_products.append(product_id)  # Mövcud olmayan məhsulu qeyd et
-    
-    # Mövcud olmayan məhsulları səbətdən sil
+            invalid_products.append(product_id)
     if invalid_products:
         for product_id in invalid_products:
             if str(product_id) in cart:
                 del cart[str(product_id)]
         request.session.modified = True
         messages.warning(request, 'Bəzi məhsullar artıq mövcud olmadığı üçün səbətdən silindi.')
-    
     return render(request, 'cart.html', {
         'cart_items': cart_items,
         'total': total,
@@ -219,76 +215,63 @@ def cart_view(request):
     })
 
 @login_required
-def add_to_cart(request, product_id):
+async def add_to_cart(request, product_id):
     if request.method == 'POST':
-        product = get_object_or_404(Mehsul, id=product_id)
+        product = await sync_to_async(get_object_or_404)(Mehsul, id=product_id)
         quantity = int(request.POST.get('quantity', 1))
-        
         response_data = {
             'status': 'error',
             'message': ''
         }
-        
         if quantity > product.stok:
             response_data['message'] = f'{product.adi} məhsulundan stokda yalnız {product.stok} ədəd var!'
             return JsonResponse(response_data)
-        
         if 'cart' not in request.session:
             request.session['cart'] = {}
-        
         cart = request.session['cart']
         current_quantity = cart.get(str(product_id), 0)
         new_quantity = current_quantity + quantity
-        
         if new_quantity > product.stok:
             response_data['message'] = f'{product.adi} məhsulundan stokda yalnız {product.stok} ədəd var!'
             return JsonResponse(response_data)
-        
         cart[str(product_id)] = new_quantity
         request.session['cart'] = cart
         request.session.modified = True
-        
         response_data.update({
             'status': 'success',
             'message': f'{product.adi} məhsulundan {quantity} ədəd səbətə əlavə edildi!',
             'cart_count': len(cart)
         })
-        
         return JsonResponse(response_data)
-    
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
 
 @login_required
-def remove_from_cart(request, product_id):
+async def remove_from_cart(request, product_id):
     if request.method == 'POST':
         if 'cart' in request.session:
             cart = request.session['cart']
             if str(product_id) in cart:
                 del cart[str(product_id)]
                 request.session.modified = True
-                
                 return JsonResponse({
                     'status': 'success',
                     'message': 'Məhsul səbətdən silindi!',
                     'cart_count': len(cart)
                 })
-    
         return JsonResponse({
             'status': 'error',
             'message': 'Məhsul tapılmadı!'
         })
-        
     return JsonResponse({
         'status': 'error',
         'message': 'Invalid request method'
     })
 
 @login_required
-def orders_view(request):
-    orders = Sifaris.objects.filter(istifadeci=request.user).order_by('-tarix')
-    statistics = Sifaris.get_order_statistics(request.user)
-    popup_images = PopupImage.objects.filter(aktiv=True)
-    
+async def orders_view(request):
+    orders = await sync_to_async(list)(Sifaris.objects.filter(istifadeci=request.user).order_by('-tarix'))
+    statistics = await sync_to_async(Sifaris.get_order_statistics)(request.user)
+    popup_images = await sync_to_async(list)(PopupImage.objects.filter(aktiv=True))
     return render(request, 'orders.html', {
         'orders': orders,
         'statistics': statistics,
@@ -296,33 +279,26 @@ def orders_view(request):
     })
 
 @login_required
-def checkout(request):
+async def checkout(request):
     if request.method == 'POST':
         if 'cart' not in request.session or not request.session['cart']:
             messages.error(request, 'Səbətiniz boşdur.')
             return redirect('cart')
-
-        # Seçilmiş məhsulları al
         selected_items = request.POST.getlist('selected_items[]')
         catdirilma_usulu = request.POST.get('catdirilma_usulu')
-        
         if not selected_items:
             messages.error(request, 'Zəhmət olmasa ən azı bir məhsul seçin.')
             return redirect('cart')
-            
         if not catdirilma_usulu:
             messages.error(request, 'Zəhmət olmasa çatdırılma üsulunu seçin.')
             return redirect('cart')
-
         cart = request.session['cart']
-        remaining_cart = {}  # Seçilməmiş məhsullar üçün
+        remaining_cart = {}
         order_items_by_seller = {}
         errors = []
-
-        # Məhsulları satıcıya görə qruplaşdırırıq
         for product_id, quantity in cart.items():
             if product_id in selected_items:
-                product = get_object_or_404(Mehsul, id=product_id)
+                product = await sync_to_async(get_object_or_404)(Mehsul, id=product_id)
                 if product.stok < quantity:
                     errors.append(f'{product.adi} məhsulundan kifayət qədər stok yoxdur.')
                     continue
@@ -338,46 +314,39 @@ def checkout(request):
                     'price': product.qiymet
                 })
             else:
-                # Seçilməmiş məhsulları yeni səbətə əlavə et
                 remaining_cart[product_id] = quantity
-
         if errors:
             for err in errors:
                 messages.error(request, err)
             return redirect('cart')
-
         created_orders = []
         try:
             for seller_id, data in order_items_by_seller.items():
                 items = data['items']
                 total = sum(item['price'] * item['quantity'] for item in items)
-                order = Sifaris.objects.create(
+                order = await sync_to_async(Sifaris.objects.create)(
                     istifadeci=request.user,
                     umumi_mebleg=total,
                     catdirilma_usulu=catdirilma_usulu
                 )
                 for item in items:
-                    SifarisItem.objects.create(
+                    await sync_to_async(SifarisItem.objects.create)(
                         sifaris=order,
                         mehsul=item['product'],
                         miqdar=item['quantity'],
                         qiymet=item['price']
                     )
-                # Satıcıya yeni sifariş bildirişi
                 if seller_id:
                     try:
-                        seller = User.objects.get(id=seller_id)
+                        seller = await sync_to_async(User.objects.get)(id=seller_id)
                         if hasattr(seller, 'profile'):
                             seller.profile.yeni_unread_sales += 1
-                            seller.profile.save()
+                            await sync_to_async(seller.profile.save)()
                     except User.DoesNotExist:
                         pass
                 created_orders.append(order)
-
-            # Səbəti yeniləyirik (yalnız seçilməmiş məhsulları saxlayırıq)
             request.session['cart'] = remaining_cart
             request.session.modified = True
-
             if len(created_orders) == 1:
                 messages.success(request, 'Sifarişiniz uğurla yaradıldı.')
             elif len(created_orders) > 1:
@@ -386,55 +355,44 @@ def checkout(request):
                 messages.error(request, 'Sifariş yaradılmadı.')
             return redirect('orders')
         except Exception as e:
-            # Əgər hər hansı bir order yaradılıbsa, onları sil
             for order in created_orders:
-                order.delete()
+                await sync_to_async(order.delete)()
             messages.error(request, 'Sifariş yaradılarkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.')
             return redirect('cart')
-
     return redirect('cart')
 
 @login_required
-def update_cart(request, product_id):
+async def update_cart(request, product_id):
     if request.method == 'POST':
         try:
-            product = get_object_or_404(Mehsul, id=product_id)
+            product = await sync_to_async(get_object_or_404)(Mehsul, id=product_id)
             quantity = int(request.POST.get('quantity', 1))
-            
             response_data = {
                 'status': 'error',
                 'message': ''
             }
-            
             if quantity > product.stok:
                 response_data['message'] = f'{product.adi} məhsulundan stokda yalnız {product.stok} ədəd var!'
                 return JsonResponse(response_data)
-            
             if quantity < 1:
                 response_data['message'] = 'Miqdar 1-dən az ola bilməz!'
                 return JsonResponse(response_data)
-            
             cart = request.session.get('cart', {})
             cart[str(product_id)] = quantity
             request.session['cart'] = cart
             request.session.modified = True
-            
-            # Calculate new subtotal and cart total
             subtotal = product.qiymet * quantity
-            cart_total = sum(
-                Mehsul.objects.get(id=int(pid)).qiymet * qty
-                for pid, qty in cart.items()
-            )
-            
+            cart_total = 0
+            for pid, qty in cart.items():
+                p = await sync_to_async(Mehsul.objects.get)(id=int(pid))
+                cart_total += p.qiymet * qty
             response_data.update({
                 'status': 'success',
                 'message': f'{product.adi} məhsulunun miqdarı yeniləndi!',
                 'subtotal': f'{subtotal} ₼',
                 'cart_total': f'{cart_total} ₼'
             })
-            
             return JsonResponse(response_data)
-            
         except ValueError:
             return JsonResponse({
                 'status': 'error',
@@ -445,45 +403,34 @@ def update_cart(request, product_id):
                 'status': 'error',
                 'message': 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.'
             })
-    
     return JsonResponse({
         'status': 'error',
         'message': 'Invalid request method'
     })
 
 @login_required
-def order_detail_view(request, order_id):
+async def order_detail_view(request, order_id):
     if not request.user.is_authenticated:
         return redirect('login')
-    
-    order = get_object_or_404(Sifaris, id=order_id, istifadeci=request.user)
-    popup_images = PopupImage.objects.filter(aktiv=True)
-    
+    order = await sync_to_async(get_object_or_404)(Sifaris, id=order_id, istifadeci=request.user)
+    popup_images = await sync_to_async(list)(PopupImage.objects.filter(aktiv=True))
     return render(request, 'order_detail.html', {
         'order': order,
         'popup_images': popup_images
     })
 
-@login_required
-def search_suggestions(request):
+@require_http_methods(["GET"])
+async def search_suggestions(request):
     search_query = request.GET.get('search', '')
-    
     if search_query:
-        # Kodlarla axtarış üçün əvvəlki təmizləmə
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
-        
         if clean_search:
-            # Kod və ölçü ilə axtarış
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
-            # brend_kod üçün həm istifadəçi sorğusunu, həm də brend_kod-u təmizləyib müqayisə edirik
             def clean_code(val):
                 return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
-            # Bütün məhsulları çəkib, təmizlənmiş brend_kod ilə uyğunluq tapanları tapırıq
-            brend_kod_ids = [m.id for m in Mehsul.objects.all() if clean_code(search_query) in clean_code(m.brend_kod)]
+            brend_kod_ids = [m.id for m in await sync_to_async(list)(Mehsul.objects.all()) if clean_code(search_query) in clean_code(m.brend_kod)]
             brend_kod_filter = Q(id__in=brend_kod_ids)
-            
-            # Ad ilə təkmilləşdirilmiş axtarış
             processed_query = re.sub(r'\s+', ' ', search_query).strip()
             search_words = processed_query.split()
             if search_words:
@@ -493,10 +440,9 @@ def search_suggestions(request):
                     word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
                     ad_filters.append(word_filter)
                 ad_filter = reduce(and_, ad_filters)
-                mehsullar = Mehsul.objects.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter)[:5]
+                mehsullar = await sync_to_async(list)(Mehsul.objects.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter)[:5])
             else:
-                mehsullar = Mehsul.objects.filter(kod_filter | olcu_filter | brend_kod_filter)[:5]
-            
+                mehsullar = await sync_to_async(list)(Mehsul.objects.filter(kod_filter | olcu_filter | brend_kod_filter)[:5])
             suggestions = []
             for mehsul in mehsullar:
                 suggestions.append({
@@ -510,21 +456,20 @@ def search_suggestions(request):
                     'satici': mehsul.sahib.username if mehsul.sahib else 'AS-AVTO',
                 })
             return JsonResponse({'suggestions': suggestions})
-    
     return JsonResponse({'suggestions': []})
 
 @login_required
-def new_products_view(request):
+async def new_products_view(request):
     # Yeni məhsulları əldə et
-    mehsullar = Mehsul.objects.filter(yenidir=True).order_by('-id')  # Son əlavə olunanlar birinci
+    mehsullar = await sync_to_async(list)(Mehsul.objects.filter(yenidir=True).order_by('-id'))  # Son əlavə olunanlar birinci
     # İlk 5 məhsulu götür
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
     
-    kateqoriyalar = Kateqoriya.objects.all()
-    firmalar = Firma.objects.all()
-    avtomobiller = Avtomobil.objects.all()
-    popup_images = PopupImage.objects.filter(aktiv=True)
+    kateqoriyalar = await sync_to_async(list)(Kateqoriya.objects.all())
+    firmalar = await sync_to_async(list)(Firma.objects.all())
+    avtomobiller = await sync_to_async(list)(Avtomobil.objects.all())
+    popup_images = await sync_to_async(list)(PopupImage.objects.filter(aktiv=True))
     
     return render(request, 'new_products.html', {
         'mehsullar': initial_products,
@@ -536,16 +481,12 @@ def new_products_view(request):
     })
 
 @login_required
-def load_more_new_products(request):
+async def load_more_new_products(request):
     offset = int(request.GET.get('offset', 0))
     limit = 5
-    
-    mehsullar = Mehsul.objects.filter(yenidir=True).order_by('-id')
-    
-    # Get next batch of products
+    mehsullar = await sync_to_async(list)(Mehsul.objects.filter(yenidir=True).order_by('-id'))
     products = mehsullar[offset:offset + limit]
-    has_more = mehsullar.count() > (offset + limit)
-    
+    has_more = len(mehsullar) > (offset + limit)
     products_data = []
     for product in products:
         products_data.append({
@@ -561,86 +502,61 @@ def load_more_new_products(request):
             'sahib_id': product.sahib.id if product.sahib else None,
             'sahib_username': product.sahib.username if product.sahib else 'AS-AVTO',
         })
-    
     return JsonResponse({
         'products': products_data,
         'has_more': has_more
     })
 
 @login_required
-def logout_view(request):
-    logout(request)
-    # Sessiya və keşi təmizləyirik
+async def logout_view(request):
+    await sync_to_async(logout)(request)
     request.session.flush()
-    
-    # İstifadəçini login səhifəsinə yönləndiririk
     return redirect('login')
 
-def register_view(request):
+async def register_view(request):
     if request.method == 'POST':
         username = request.POST.get('username', '').strip()
         password = request.POST.get('password', '')
         phone = request.POST.get('phone', '').strip()
         address = request.POST.get('address', '').strip()
-        
-        # Username validasiyası
         if not username:
             messages.error(request, 'İstifadəçi adı boş ola bilməz!')
             return render(request, 'register.html')
-            
-        # Username formatı yoxlaması
         if not re.match(r'^[a-zA-Z0-9_]+$', username):
             messages.error(request, 'İstifadəçi adı yalnız ingilis hərfləri, rəqəmlər və _ simvolundan ibarət ola bilər!')
             return render(request, 'register.html')
-            
-        # Şifrə validasiyası
         if len(password) < 8:
             messages.error(request, 'Şifrə minimum 8 simvol olmalıdır!')
             return render(request, 'register.html')
-            
-        # Telefon nömrəsi validasiyası
         if not phone.startswith('+994'):
             messages.error(request, 'Telefon nömrəsi +994 ilə başlamalıdır!')
             return render(request, 'register.html')
-            
-        # Unvan validasiyası
         if not address:
             messages.error(request, 'Ünvan boş ola bilməz!')
             return render(request, 'register.html')
-            
-        # Username mövcudluğu yoxlaması
-        if User.objects.filter(username=username).exists():
+        if await sync_to_async(User.objects.filter(username=username).exists)():
             messages.error(request, 'Bu istifadəçi adı artıq mövcuddur!')
             return render(request, 'register.html')
-            
-        # Telefon nömrəsi mövcudluğu yoxlaması
-        if User.objects.filter(profile__phone=phone).exists():
+        if await sync_to_async(User.objects.filter(profile__phone=phone).exists)():
             messages.error(request, 'Bu telefon nömrəsi artıq qeydiyyatdan keçirilib!')
             return render(request, 'register.html')
-            
         try:
-            # Yeni istifadəçi yaradırıq
-            user = User.objects.create_user(username=username, password=password)
-            
-            # Profil məlumatlarını əlavə edirik
+            user = await sync_to_async(User.objects.create_user)(username=username, password=password)
             user.profile.phone = phone
             user.profile.address = address
-            user.profile.is_verified = False  # Profil təsdiqlənməmiş olaraq yaradılır
-            user.profile.save()
-            
+            user.profile.is_verified = False
+            await sync_to_async(user.profile.save)()
             messages.success(request, 'Qeydiyyat uğurla tamamlandı!')
             return redirect('register')
-            
         except Exception as e:
             messages.error(request, 'Qeydiyyat zamanı xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.')
             return render(request, 'register.html')
-            
     return render(request, 'register.html')
 
 @require_http_methods(["GET"])
-def product_details(request, product_id):
+async def product_details(request, product_id):
     try:
-        product = Mehsul.objects.get(id=product_id)
+        product = await sync_to_async(Mehsul.objects.get)(id=product_id)
         data = {
             'status': 'success',
             'product': {
@@ -672,24 +588,21 @@ def product_details(request, product_id):
     return JsonResponse(data)
 
 @login_required
-def my_products_view(request):
+async def my_products_view(request):
     if not request.user.profile.is_verified:
         messages.error(request, 'Bu səhifəyə giriş üçün icazəniz yoxdur.')
         return redirect('base')
-    
     search_query = request.GET.get('search', '')
-    mehsullar = Mehsul.objects.filter(sahib=request.user).order_by('-id')
+    mehsullar = await sync_to_async(list)(Mehsul.objects.filter(sahib=request.user).order_by('-id'))
     if search_query:
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
-            # brend_kod üçün həm istifadəçi sorğusunu, həm də brend_kod-u təmizləyib müqayisə edirik
             def clean_code(val):
                 return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
             brend_kod_ids = [m.id for m in mehsullar if clean_code(search_query) in clean_code(m.brend_kod)]
             brend_kod_filter = Q(id__in=brend_kod_ids)
-            # Ad ilə təkmilləşdirilmiş axtarış
             processed_query = re.sub(r'\s+', ' ', search_query).strip()
             search_words = processed_query.split()
             if search_words:
@@ -699,11 +612,11 @@ def my_products_view(request):
                     word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
                     ad_filters.append(word_filter)
                 ad_filter = reduce(and_, ad_filters)
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter)
+                mehsullar = await sync_to_async(list)(Mehsul.objects.filter(sahib=request.user).filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter).order_by('-id'))
             else:
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)
+                mehsullar = await sync_to_async(list)(Mehsul.objects.filter(sahib=request.user).filter(kod_filter | olcu_filter | brend_kod_filter).order_by('-id'))
     initial_products = mehsullar[:5]
-    has_more = mehsullar.count() > 5
+    has_more = len(mehsullar) > 5
     return render(request, 'my_products.html', {
         'mehsullar': initial_products,
         'has_more': has_more,
@@ -712,19 +625,19 @@ def my_products_view(request):
     })
 
 @login_required
-def load_more_my_products(request):
+async def load_more_my_products(request):
     if not request.user.profile.is_verified:
         return JsonResponse({'products': [], 'has_more': False})
     offset = int(request.GET.get('offset', 0))
     limit = 5
     search_query = request.GET.get('search', '')
-    mehsullar = Mehsul.objects.filter(sahib=request.user).order_by('-id')
+    mehsullar = await sync_to_async(list)(Mehsul.objects.filter(sahib=request.user).order_by('-id'))
     if search_query:
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
-            brend_kod_filter = Q(brend_kod__icontains=search_query)  # Sade brend_kod axtarışı
+            brend_kod_filter = Q(brend_kod__icontains=search_query)
             processed_query = re.sub(r'\s+', ' ', search_query).strip()
             search_words = processed_query.split()
             if search_words:
@@ -732,11 +645,11 @@ def load_more_my_products(request):
                 for word in search_words:
                     ad_filters.append(Q(adi__icontains=word))
                 ad_filter = reduce(and_, ad_filters)
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter)
+                mehsullar = await sync_to_async(list)(Mehsul.objects.filter(sahib=request.user).filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter).order_by('-id'))
             else:
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)
+                mehsullar = await sync_to_async(list)(Mehsul.objects.filter(sahib=request.user).filter(kod_filter | olcu_filter | brend_kod_filter).order_by('-id'))
     products = mehsullar[offset:offset+limit]
-    has_more = mehsullar.count() > (offset + limit)
+    has_more = len(mehsullar) > (offset + limit)
     products_data = []
     for product in products:
         products_data.append({
@@ -753,21 +666,19 @@ def load_more_my_products(request):
     return JsonResponse({'products': products_data, 'has_more': has_more})
 
 @login_required
-def my_sales_view(request):
+async def my_sales_view(request):
     if not request.user.profile.is_verified:
         messages.error(request, 'Bu səhifəyə giriş üçün icazəniz yoxdur.')
         return redirect('base')
-
-    all_orders = Sifaris.objects.all().order_by('-tarix')
+    all_orders = await sync_to_async(list)(Sifaris.objects.all().order_by('-tarix'))
     filtered_orders = []
     total_orders = 0
     total_amount = 0
     total_paid = 0
     for order in all_orders:
-        items = order.sifarisitem_set.filter(mehsul__sahib=request.user)
+        items = await sync_to_async(list)(order.sifarisitem_set.filter(mehsul__sahib=request.user))
         order_total = sum(item.umumi_mebleg for item in items)
         if order_total > 0:
-            # İstifadəçiyə aid məhsullar üçün ödənilən məbləğ (yalnız öz məhsullarına görə)
             seller_paid = order.odenilen_mebleg or 0
             total_orders += 1
             total_amount += order_total
@@ -776,17 +687,15 @@ def my_sales_view(request):
             order.seller_paid = seller_paid
             order.seller_debt = order_total - seller_paid
             filtered_orders.append(order)
-
     stats = {
         'total_orders': total_orders,
         'total_amount': total_amount,
         'total_paid': total_paid,
         'total_debt': total_amount - total_paid
     }
-
     buyer_stats_dict = defaultdict(lambda: {'username': '', 'order_count': 0, 'total_amount': 0, 'total_paid': 0, 'total_debt': 0, 'user_id': None})
     for order in all_orders:
-        items = order.sifarisitem_set.filter(mehsul__sahib=request.user)
+        items = await sync_to_async(list)(order.sifarisitem_set.filter(mehsul__sahib=request.user))
         order_total = sum(item.umumi_mebleg for item in items)
         if order_total > 0:
             buyer = order.istifadeci
@@ -798,7 +707,6 @@ def my_sales_view(request):
             buyer_stats['total_paid'] += order.odenilen_mebleg or 0
             buyer_stats['total_debt'] += order_total - (order.odenilen_mebleg or 0)
     buyer_stats = list(buyer_stats_dict.values())
-
     context = {
         'orders': filtered_orders,
         'stats': stats,
@@ -807,18 +715,14 @@ def my_sales_view(request):
     return render(request, 'my_sales.html', context)
 
 @login_required
-def edit_my_sale_view(request, order_id):
+async def edit_my_sale_view(request, order_id):
     if not request.user.profile.is_verified:
         messages.error(request, 'Bu səhifəyə giriş üçün icazəniz yoxdur.')
         return redirect('my_sales')
-
-    order = get_object_or_404(Sifaris, id=order_id)
-    # Yalnız həmin satıcıya aid məhsulları olan sifarişlərə baxmaq üçün yoxlama
-    if not SifarisItem.objects.filter(sifaris=order, mehsul__sahib=request.user).exists():
+    order = await sync_to_async(get_object_or_404)(Sifaris, id=order_id)
+    if not await sync_to_async(SifarisItem.objects.filter(sifaris=order, mehsul__sahib=request.user).exists)():
         messages.error(request, 'Bu sifarişi redaktə etmək üçün icazəniz yoxdur.')
         return redirect('my_sales')
-
-    # Sifarişin öz məhsulları üçün formset yarat
     SifarisItemFormSet = inlineformset_factory(
         Sifaris, 
         SifarisItem, 
@@ -826,35 +730,27 @@ def edit_my_sale_view(request, order_id):
         extra=0, 
         can_delete=False
     )
-    
-    # Formset-ə yalnız satıcının öz məhsullarını daxil et
     queryset = order.sifarisitem_set.filter(mehsul__sahib=request.user)
-
-    # Yalnız bu istifadəçiyə aid məhsulların cəmini tap
     order_items = queryset
     total_amount = sum(item.umumi_mebleg for item in order_items)
     paid_share = 0
     if order.umumi_mebleg > 0:
         paid_share = (order.odenilen_mebleg or 0) * (total_amount / order.umumi_mebleg)
     qaliq_borc = total_amount - paid_share
-
     if request.method == 'POST':
         form = SifarisEditForm(request.POST, instance=order)
         formset = SifarisItemFormSet(request.POST, instance=order, queryset=queryset)
-        
         if form.is_valid() and formset.is_valid():
-            form.save()
-            formset.save()
-            order.update_total() # Formset save olanda onsuz da total update olur, amma zəmanət üçün
+            await sync_to_async(form.save)()
+            await sync_to_async(formset.save)()
+            await sync_to_async(order.update_total)()
             messages.success(request, f"Sifariş #{order.id} uğurla yeniləndi.")
             return redirect('my_sales')
         else:
             messages.error(request, "Zəhmət olmasa xətaları düzəldin.")
-
     else:
         form = SifarisEditForm(instance=order)
         formset = SifarisItemFormSet(instance=order, queryset=queryset)
-
     context = {
         'order': order,
         'form': form,
@@ -867,80 +763,66 @@ def edit_my_sale_view(request, order_id):
     return render(request, 'edit_my_sale.html', context)
 
 @login_required
-def add_edit_product_view(request, product_id=None):
+async def add_edit_product_view(request, product_id=None):
     if not request.user.profile.is_verified:
         messages.error(request, 'Bu əməliyyatı etmək üçün icazəniz yoxdur.')
         return redirect('my_products')
-
     if product_id:
-        mehsul = get_object_or_404(Mehsul, id=product_id)
+        mehsul = await sync_to_async(get_object_or_404)(Mehsul, id=product_id)
         if mehsul.sahib != request.user:
             messages.error(request, 'Bu məhsulu redaktə etmək üçün icazəniz yoxdur.')
             return redirect('my_products')
     else:
         mehsul = None
-
     if request.method == 'POST':
         form = MehsulForm(request.POST, request.FILES, instance=mehsul)
         if form.is_valid():
             yeni_mehsul = form.save(commit=False)
             yeni_mehsul.sahib = request.user
-            
-            # Əgər yeni edilirsə, tarixi qeyd et
             if yeni_mehsul.yenidir:
                 from django.utils import timezone
                 yeni_mehsul.yeni_edildiyi_tarix = timezone.now()
-            
-            yeni_mehsul.save()
-            
-            # Əgər məhsul yeni olaraq işarələnibsə, 3 gün sonra avtomatik olaraq yenidən çıxar
+            await sync_to_async(yeni_mehsul.save)()
             if yeni_mehsul.yenidir:
                 import threading
                 def auto_remove_new():
                     import time
-                    time.sleep(259200)  # 3 gün (72 saat)
+                    time.sleep(259200)
                     try:
-                        # Məhsulu yenidən yüklə və yenidir statusunu yoxla
                         from django.db import transaction
                         with transaction.atomic():
                             mehsul = Mehsul.objects.select_for_update().get(id=yeni_mehsul.id)
-                            if mehsul.yenidir:  # Əgər hələ də yenidirsə
+                            if mehsul.yenidir:
                                 mehsul.yenidir = False
                                 mehsul.save()
                     except Exception as e:
                         print(f"Auto remove new status error: {e}")
-                
-                # Thread-i başlat
                 thread = threading.Thread(target=auto_remove_new)
                 thread.daemon = True
                 thread.start()
-            
             messages.success(request, f'Məhsul uğurla {"yeniləndi" if mehsul else "əlavə edildi"}.')
             return redirect('my_products')
     else:
         form = MehsulForm(instance=mehsul)
-
     return render(request, 'add_edit_product.html', {'form': form, 'now': timezone.now()})
 
 @login_required
-def delete_product_view(request, product_id):
+async def delete_product_view(request, product_id):
     if not request.user.profile.is_verified:
         messages.error(request, 'Bu əməliyyatı etmək üçün icazəniz yoxdur.')
         return redirect('my_products')
-
-    mehsul = get_object_or_404(Mehsul, id=product_id)
+    mehsul = await sync_to_async(get_object_or_404)(Mehsul, id=product_id)
     if mehsul.sahib != request.user:
         messages.error(request, 'Bu məhsulu silmək üçün icazəniz yoxdur.')
         return redirect('my_products')
-    
-    mehsul.delete()
+    await sync_to_async(mehsul.delete)()
     messages.success(request, 'Məhsul uğurla silindi.')
     return redirect('my_products')
 
 @require_http_methods(["GET"])
-def user_details_view(request, user_id):
+async def user_details_view(request, user_id):
     try:
-        user = User.objects.select_related('profile').get(id=user_id)
+        user = await sync_to_async(User.objects.select_related('profile').get)(id=user_id)
         data = {
             'status': 'success',
             'user': {
@@ -961,62 +843,48 @@ def user_details_view(request, user_id):
             'status': 'error',
             'message': 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.'
         }
-    
     return JsonResponse(data)
 
 @login_required
 @transaction.atomic
-def import_user_products_view(request):
+async def import_user_products_view(request):
     if not request.user.profile.is_verified:
         messages.error(request, "Bu əməliyyatı etmək üçün icazəniz yoxdur.")
         return redirect('my_products')
-
     if request.method == 'POST':
         excel_file = request.FILES.get("excel_file")
         if not excel_file:
             messages.error(request, 'Zəhmət olmasa Excel faylı seçin')
             return redirect('my_products')
-        
         if not excel_file.name.endswith('.xlsx'):
             messages.error(request, 'Yalnız .xlsx faylları qəbul edilir')
             return redirect('my_products')
-            
         try:
-            df = pd.read_excel(excel_file)
-            
+            df = await sync_to_async(pd.read_excel)(excel_file)
             new_count = 0
             update_count = 0
             error_count = 0
-            
             for index, row in df.iterrows():
                 try:
                     row = {str(k).strip().lower(): v for k, v in row.items()}
-                    
                     kateqoriya = None
                     firma = None
                     avtomobil = None
                     vitrin = None
-                    
                     if 'kateqoriya' in row and pd.notna(row['kateqoriya']):
-                        kateqoriya, _ = Kateqoriya.objects.get_or_create(adi=str(row['kateqoriya']).strip())
-                    
+                        kateqoriya, _ = await sync_to_async(Kateqoriya.objects.get_or_create)(adi=str(row['kateqoriya']).strip())
                     if 'firma' in row and pd.notna(row['firma']):
-                        firma, _ = Firma.objects.get_or_create(adi=str(row['firma']).strip())
-                    
+                        firma, _ = await sync_to_async(Firma.objects.get_or_create)(adi=str(row['firma']).strip())
                     if 'avtomobil' in row and pd.notna(row['avtomobil']):
-                        avtomobil, _ = Avtomobil.objects.get_or_create(adi=str(row['avtomobil']).strip())
-
+                        avtomobil, _ = await sync_to_async(Avtomobil.objects.get_or_create)(adi=str(row['avtomobil']).strip())
                     if 'vitrin' in row and pd.notna(row['vitrin']):
-                        vitrin, _ = Vitrin.objects.get_or_create(nomre=str(row['vitrin']).strip())
-
+                        vitrin, _ = await sync_to_async(Vitrin.objects.get_or_create)(nomre=str(row['vitrin']).strip())
                     if 'adi' not in row or pd.isna(row['adi']):
                         messages.error(request, f'Sətir {index + 2}: Məhsulun adı boşdur.', level=messages.ERROR)
                         error_count += 1
                         continue
-
                     temiz_ad = str(row['adi']).strip()
                     temiz_ad = ' '.join(temiz_ad.split())
-
                     brend_kod = None
                     if 'brend_kod' in row and pd.notna(row['brend_kod']):
                         value = row['brend_kod']
@@ -1026,20 +894,15 @@ def import_user_products_view(request):
                             brend_kod = str(value).strip()
                             if brend_kod.lower() == 'nan' or brend_kod == '':
                                 brend_kod = None
-
                     if not brend_kod:
                         messages.error(request, f'Sətir {index + 2}: Brend kodu boşdur.', level=messages.ERROR)
                         error_count += 1
                         continue
-
-                    # Mövcud məhsulu həm brend_kod, həm firma, həm də sahib ilə yoxla
                     if firma:
-                        existing_product = Mehsul.objects.filter(brend_kod=brend_kod, firma=firma, sahib=request.user).first()
+                        existing_product = await sync_to_async(Mehsul.objects.filter(brend_kod=brend_kod, firma=firma, sahib=request.user).first)()
                     else:
-                        existing_product = Mehsul.objects.filter(brend_kod=brend_kod, firma__isnull=True, sahib=request.user).first()
-
+                        existing_product = await sync_to_async(Mehsul.objects.filter(brend_kod=brend_kod, firma__isnull=True, sahib=request.user).first)()
                     if existing_product:
-                        # Mövcud məhsulu yenilə, firmaya toxunma!
                         if not existing_product.sahib:
                             existing_product.sahib = request.user
                         existing_product.adi = temiz_ad
@@ -1052,10 +915,9 @@ def import_user_products_view(request):
                         existing_product.stok = int(row['stok']) if 'stok' in row and pd.notna(row['stok']) else 0
                         existing_product.kodlar = str(row['kodlar']) if 'kodlar' in row and pd.notna(row['kodlar']) else ''
                         existing_product.melumat = str(row['melumat']) if 'melumat' in row and pd.notna(row['melumat']) else ''
-                        existing_product.save()
+                        await sync_to_async(existing_product.save)()
                         update_count += 1
                     else:
-                        # Yeni məhsul yaradırıq
                         mehsul_data = {
                             'adi': temiz_ad,
                             'sahib': request.user,
@@ -1073,46 +935,39 @@ def import_user_products_view(request):
                             'melumat': str(row['melumat']) if 'melumat' in row and pd.notna(row['melumat']) else '',
                             'yenidir': False
                         }
-                        Mehsul.objects.create(**mehsul_data)
+                        await sync_to_async(Mehsul.objects.create)(**mehsul_data)
                         new_count += 1
-
                 except Exception as e:
                     messages.error(request, f'Sətir {index + 2} emal edilərkən xəta baş verdi: {e}', level=messages.ERROR)
                     error_count += 1
                     continue
-            
             success_message = f"Excel faylı uğurla import edildi! "
             if new_count > 0:
                 success_message += f"{new_count} yeni məhsul əlavə edildi. "
             if update_count > 0:
                 success_message += f"{update_count} məhsul yeniləndi. "
-            
             if error_count > 0:
                 messages.warning(request, f"{error_count} sətirdə xəta baş verdi.")
-            
             if new_count > 0 or update_count > 0:
                 messages.success(request, success_message)
             elif error_count == 0:
                 messages.info(request, "Faylda heç bir dəyişiklik edilmədi.")
-
         except Exception as e:
             messages.error(request, f'Excel faylı oxunarkən xəta: {e}', level=messages.ERROR)
-        
         return redirect('my_products')
-    
     return redirect('my_products')
 
-def my_sale_pdf(request, order_id):
+async def my_sale_pdf(request, order_id):
     from home.models import Sifaris, SifarisItem, Profile
     from django.contrib.auth.models import User
     from reportlab.platypus import Table, TableStyle, Image, Paragraph, Spacer
     from reportlab.lib.styles import ParagraphStyle
     try:
-        order = Sifaris.objects.get(id=order_id)
+        order = await sync_to_async(Sifaris.objects.get)(id=order_id)
     except Sifaris.DoesNotExist:
         raise Http404("Sifariş tapılmadı")
-    items = order.sifarisitem_set.filter(mehsul__sahib=request.user)
-    if not items.exists():
+    items = await sync_to_async(list)(order.sifarisitem_set.filter(mehsul__sahib=request.user))
+    if not items:
         raise Http404("Bu sifarişdə sizin məhsul yoxdur")
     profile = getattr(request.user, 'profile', None)
     phone = profile.phone if profile and profile.phone else ''
@@ -1319,7 +1174,7 @@ def my_sale_pdf(request, order_id):
 
 @csrf_exempt
 @login_required
-def update_profile(request):
+async def update_profile(request):
     user = request.user
     profile = getattr(user, 'profile', None)
     if request.method == 'POST':
@@ -1327,28 +1182,24 @@ def update_profile(request):
         phone = request.POST.get('phone', '').strip()
         address = request.POST.get('address', '').strip()
         sekil = request.FILES.get('sekil')
-        # Username yoxlaması
         if not username:
             return JsonResponse({'status': 'error', 'message': 'İstifadəçi adı boş ola bilməz!'}, status=400)
-        if username != user.username and User.objects.filter(username=username).exclude(id=user.id).exists():
+        if username != user.username and await sync_to_async(User.objects.filter(username=username).exclude(id=user.id).exists)():
             return JsonResponse({'status': 'error', 'message': 'Bu istifadəçi adı artıq mövcuddur!'}, status=400)
-        # Telefon yoxlaması
         if not phone:
             return JsonResponse({'status': 'error', 'message': 'Telefon boş ola bilməz!'}, status=400)
-        if profile and phone != profile.phone and User.objects.filter(profile__phone=phone).exclude(id=user.id).exists():
+        if profile and phone != profile.phone and await sync_to_async(User.objects.filter(profile__phone=phone).exclude(id=user.id).exists)():
             return JsonResponse({'status': 'error', 'message': 'Bu telefon nömrəsi artıq istifadə olunur!'}, status=400)
-        # Ünvan yoxlaması
         if not address:
             return JsonResponse({'status': 'error', 'message': 'Ünvan boş ola bilməz!'}, status=400)
-        # Yenilə
         user.username = username
-        user.save()
+        await sync_to_async(user.save)()
         if profile:
             profile.phone = phone
             profile.address = address
             if sekil:
                 profile.sekil = sekil
-            profile.save()
+            await sync_to_async(profile.save)()
         return JsonResponse({
             'status': 'success',
             'username': user.username,
@@ -1356,7 +1207,6 @@ def update_profile(request):
             'address': profile.address if profile else '',
             'sekil_url': profile.sekil.url if profile and profile.sekil else ''
         })
-    # GET üçün profil məlumatı qaytar
     if request.method == 'GET':
         return JsonResponse({
             'status': 'success',
@@ -1368,9 +1218,9 @@ def update_profile(request):
     return JsonResponse({'status': 'error', 'message': 'Yalnız POST və GET dəstəklənir.'}, status=405)
 
 @login_required
-def my_products_pdf(request):
+async def my_products_pdf(request):
     user = request.user
-    mehsullar = Mehsul.objects.filter(sahib=user)
+    mehsullar = await sync_to_async(list)(Mehsul.objects.filter(sahib=user))
     pdfmetrics.registerFont(TTFont('NotoSans', 'static/fonts/NotoSans-Regular.ttf'))
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="mehsullar.pdf"'
@@ -1379,7 +1229,6 @@ def my_products_pdf(request):
     elements = []
     styles = getSampleStyleSheet()
     styles['Title'].fontName = 'NotoSans'
-    # Profil nömrəsini əlavə et
     phone = user.profile.phone if hasattr(user, 'profile') and user.profile.phone else ''
     title_text = f"{user.username} ({phone}) Məhsulları" if phone else f"{user.username} Məhsulları"
     title = Paragraph(title_text, styles['Title'])
@@ -1427,37 +1276,30 @@ def my_products_pdf(request):
 
 @csrf_exempt
 @login_required
-def unread_sales_count(request):
+async def unread_sales_count(request):
     if request.method == 'GET':
         count = 0
         if hasattr(request.user, 'profile'):
             count = request.user.profile.yeni_unread_sales
         return JsonResponse({'count': count})
     elif request.method == 'POST':
-        # Sıfırla
         if hasattr(request.user, 'profile'):
             request.user.profile.yeni_unread_sales = 0
-            request.user.profile.save()
+            await sync_to_async(request.user.profile.save)()
         return JsonResponse({'status': 'ok'})
 
-def seller_admin_panel(request):
+async def seller_admin_panel(request):
     if not request.user.is_authenticated or not hasattr(request.user, 'profile') or not request.user.profile.is_verified:
         from django.contrib import messages
         messages.error(request, 'Satıcı panelinə giriş üçün icazəniz yoxdur.')
         return redirect('base')
-    
-    # Dashboard statistikaları
     from django.utils import timezone
     from datetime import timedelta
-    
-    # Məhsul statistikaları
-    total_products = Mehsul.objects.filter(sahib=request.user).count()
-    new_products = Mehsul.objects.filter(sahib=request.user, yenidir=True).count()
-    out_of_stock_products = Mehsul.objects.filter(sahib=request.user, stok=0).count()
-    
-    # Satış statistikaları
+    total_products = await sync_to_async(Mehsul.objects.filter(sahib=request.user).count)()
+    new_products = await sync_to_async(Mehsul.objects.filter(sahib=request.user, yenidir=True).count)()
+    out_of_stock_products = await sync_to_async(Mehsul.objects.filter(sahib=request.user, stok=0).count)()
     from .models import SifarisItem
-    all_order_items = SifarisItem.objects.filter(mehsul__sahib=request.user)
+    all_order_items = await sync_to_async(list)(SifarisItem.objects.filter(mehsul__sahib=request.user))
     seller_orders = []
     total_sales = 0
     
@@ -1531,21 +1373,17 @@ def seller_admin_panel(request):
 
 @csrf_exempt
 @login_required
-def toggle_product_new_status(request, product_id):
-    """Məhsulun yeni statusunu dəyişdirir"""
+async def toggle_product_new_status(request, product_id):
     if request.method == 'POST':
         try:
-            mehsul = get_object_or_404(Mehsul, id=product_id, sahib=request.user)
+            mehsul = await sync_to_async(get_object_or_404)(Mehsul, id=product_id, sahib=request.user)
             mehsul.yenidir = not mehsul.yenidir
-            
-            # Əgər yeni edilirsə, tarixi qeyd et
             if mehsul.yenidir:
                 from django.utils import timezone
                 mehsul.yeni_edildiyi_tarix = timezone.now()
             else:
                 mehsul.yeni_edildiyi_tarix = None
-                
-            mehsul.save()
+            await sync_to_async(mehsul.save)()
             return JsonResponse({
                 'success': True,
                 'yenidir': mehsul.yenidir,
@@ -1561,13 +1399,12 @@ def toggle_product_new_status(request, product_id):
 
 @csrf_exempt
 @login_required
-def change_product_image(request, product_id):
-    """Məhsulun şəklini dəyişmək üçün AJAX endpoint"""
+async def change_product_image(request, product_id):
     if request.method == 'POST' and request.FILES.get('sekil'):
-        mehsul = get_object_or_404(Mehsul, id=product_id, sahib=request.user)
+        mehsul = await sync_to_async(get_object_or_404)(Mehsul, id=product_id, sahib=request.user)
         sekil = request.FILES['sekil']
         mehsul.sekil = sekil
-        mehsul.save()
+        await sync_to_async(mehsul.save)()
         return JsonResponse({
             'success': True,
             'sekil_url': mehsul.sekil.url

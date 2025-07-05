@@ -13,7 +13,7 @@ from functools import reduce
 from operator import and_, or_
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
-from django.views.decorators.http import require_http_methods, require_GET
+from django.views.decorators.http import require_http_methods
 from .forms import MehsulForm, SifarisEditForm, SifarisItemEditForm
 import pandas as pd
 from django.db import transaction
@@ -1573,40 +1573,7 @@ def change_product_image(request, product_id):
         })
     return JsonResponse({'success': False, 'message': 'Şəkil yüklənmədi'})
 
-@require_GET
-def api_saticilar(request):
-    # Bütün təsdiqlənmiş satıcıların siyahısı (username, telefon, ünvan)
-    from django.contrib.auth.models import User
-    users = User.objects.filter(profile__is_verified=True)
-    data = []
-    for user in users:
-        profile = getattr(user, 'profile', None)
-        data.append({
-            'id': user.id,
-            'username': user.username,
-            'phone': profile.phone if profile else '',
-            'address': profile.address if profile else '',
-            'sekil_url': profile.sekil.url if profile and profile.sekil else '',
-        })
-    return JsonResponse({'saticilar': data})
-
-@require_GET
-def api_satici_mehsullari(request, user_id):
-    # Seçilmiş satıcının məhsulları (products.html-dəki kimi)
-    from .models import Mehsul
-    user = get_object_or_404(User, id=user_id)
-    mehsullar = Mehsul.objects.filter(sahib=user).order_by('-id')
-    products_data = []
-    for product in mehsullar:
-        products_data.append({
-            'id': product.id,
-            'adi': product.adi,
-            'sekil_url': product.sekil.url if product.sekil else None,
-            'firma': product.firma.adi if product.firma else '',
-            'brend_kod': product.brend_kod,
-            'oem': product.oem,
-            'stok': product.stok,
-            'qiymet': str(product.qiymet),
-            'yenidir': product.yenidir,
-        })
-    return JsonResponse({'products': products_data})
+def sellers_view(request):
+    # Bütün təsdiqlənmiş satıcıları çək
+    sellers = User.objects.filter(profile__is_verified=True).select_related('profile')
+    return render(request, 'sellers.html', {'sellers': sellers})

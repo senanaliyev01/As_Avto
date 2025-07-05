@@ -888,7 +888,6 @@ def add_edit_product_view(request, product_id=None):
             
             # Əgər yeni edilirsə, tarixi qeyd et
             if yeni_mehsul.yenidir:
-                from django.utils import timezone
                 yeni_mehsul.yeni_edildiyi_tarix = timezone.now()
             
             yeni_mehsul.save()

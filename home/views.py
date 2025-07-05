@@ -1572,8 +1572,3 @@ def change_product_image(request, product_id):
             'sekil_url': mehsul.sekil.url
         })
     return JsonResponse({'success': False, 'message': 'Şəkil yüklənmədi'})
-
-def sellers_view(request):
-    # Bütün təsdiqlənmiş satıcıları çək
-    sellers = User.objects.filter(profile__is_verified=True).select_related('profile')
-    return render(request, 'sellers.html', {'sellers': sellers})

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Bütün Satıcılar</h2>
+    <input type="text" id="sellerSearch" class="form-control mb-3" placeholder="Satıcı axtar...">
+    <div id="sellersList">
+        {% for s in sellers %}
+        <div class="card mb-2">
+            <div class="card-body">
+                <h5 class="card-title">{{ s.username }}</h5>
+                <p class="card-text">
+                    <b>Telefon:</b> {{ s.phone }}<br>
+                    <b>Ünvan:</b> {{ s.address }}
+                </p>
+                <a href="{% url 'seller_products_view' s.id %}" class="btn btn-primary">Məhsullarına bax</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<script>
+const allSellers = Array.from(document.querySelectorAll('#sellersList .card'));
+document.getElementById('sellerSearch').oninput = function() {
+    const val = this.value.toLowerCase();
+    allSellers.forEach(card => {
+        const text = card.innerText.toLowerCase();
+        card.style.display = text.includes(val) ? '' : 'none';
+    });
+};
+</script>
+{% endblock %} 

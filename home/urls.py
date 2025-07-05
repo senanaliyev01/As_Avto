@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import sellers_list_api, seller_products_api, seller_products_view
+from .views import sellers_list_view
 
 handler404 = 'home.views.custom_404'
 
@@ -40,7 +40,6 @@ urlpatterns = [
     path('api/unread-sales-count/', views.unread_sales_count, name='unread_sales_count'),
     path('seller-admin-panel/', views.seller_admin_panel, name='seller_admin_panel'),
     path('my-products/change-image/<int:product_id>/', views.change_product_image, name='change_product_image'),
-    path('api/sellers/', sellers_list_api, name='sellers_list_api'),
-    path('api/seller-products/<int:user_id>/', seller_products_api, name='seller_products_api'),
-    path('seller/<int:user_id>/products/', seller_products_view, name='seller_products_view'),
+    path('sellers/', sellers_list_view, name='sellers_list'),
+    path('seller/<int:user_id>/products/', views.seller_products_view, name='seller_products_view'),
 ]

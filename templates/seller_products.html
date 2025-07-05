@@ -1,44 +1,33 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container mt-4">
-    <h3>Satıcı: {{ seller.username }}</h3>
-    <p>Telefon: {{ seller.profile.phone }}</p>
-    <p>Ünvan: {{ seller.profile.address }}</p>
-    <hr>
-    <h4>Satıcının Məhsulları</h4>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Adı</th>
-                <th>Brend Kod</th>
-                <th>Firma</th>
-                <th>Qiymət</th>
-                <th>Stok</th>
-                <th>Şəkil</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for m in mehsullar %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ m.adi }}</td>
-                <td>{{ m.brend_kod }}</td>
-                <td>{{ m.firma.adi }}</td>
-                <td>{{ m.qiymet }} ₼</td>
-                <td>{{ m.stok }}</td>
-                <td>
-                    {% if m.sekil %}
-                        <img src="{{ m.sekil.url }}" alt="{{ m.adi }}" width="60">
-                    {% else %}
-                        <img src="/static/images/no_image.jpg" width="60">
-                    {% endif %}
-                </td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="7">Bu satıcıya aid məhsul yoxdur.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <h2>{{ seller.username }} - Məhsulları</h2>
+    <a href="{% url 'sellers_list' %}" class="btn btn-secondary mb-3">← Bütün Satıcılar</a>
+    <div class="row">
+        {% for product in mehsullar %}
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                {% if product.sekil %}
+                <img src="{{ product.sekil.url }}" class="card-img-top" alt="{{ product.adi }}">
+                {% else %}
+                <img src="/static/images/no_image.jpg" class="card-img-top" alt="No image">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.adi }}</h5>
+                    <p class="card-text">
+                        <b>Brend kod:</b> {{ product.brend_kod }}<br>
+                        <b>Firma:</b> {{ product.firma.adi }}<br>
+                        <b>Qiymət:</b> {{ product.qiymet }} ₼<br>
+                        <b>Stok:</b> {{ product.stok }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">Bu satıcının məhsulu yoxdur.</div>
+        </div>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %} 

@@ -1573,37 +1573,24 @@ def change_product_image(request, product_id):
         })
     return JsonResponse({'success': False, 'message': 'Şəkil yüklənmədi'})
 
-def sellers_list_api(request):
+def sellers_list_view(request):
     users = User.objects.select_related('profile').all()
-    data = []
+    sellers = []
     for user in users:
         profile = getattr(user, 'profile', None)
-        data.append({
+        sellers.append({
             'id': user.id,
             'username': user.username,
             'phone': profile.phone if profile else '',
             'address': profile.address if profile else '',
         })
-    return JsonResponse({'sellers': data})
-
-def seller_products_api(request, user_id):
-    mehsullar = Mehsul.objects.filter(sahib_id=user_id)
-    data = []
-    for m in mehsullar:
-        data.append({
-            'id': m.id,
-            'adi': m.adi,
-            'qiymet': str(m.qiymet),
-            'stok': m.stok,
-            'sekil_url': m.sekil.url if m.sekil else None,
-            'firma': m.firma.adi if m.firma else '',
-            'brend_kod': m.brend_kod,
-            'oem': m.oem,
-            'yenidir': m.yenidir,
-        })
-    return JsonResponse({'products': data})
+    return render(request, 'sellers_list.html', {'sellers': sellers})
 
 def seller_products_view(request, user_id):
-    mehsullar = Mehsul.objects.filter(sahib_id=user_id)
+    from django.contrib.auth.models import User
     user = User.objects.get(id=user_id)
-    return render(request, 'seller_products.html', {'mehsullar': mehsullar, 'seller': user})
+    mehsullar = Mehsul.objects.filter(sahib=user).order_by('-id')
+    return render(request, 'seller_products.html', {
+        'mehsullar': mehsullar,
+        'seller': user
+    })

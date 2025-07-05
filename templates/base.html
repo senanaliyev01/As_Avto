@@ -18,7 +18,7 @@
         <div class="global-stats-bar global-stats-bar-header">
             <div class="global-stats-bar-content">
                 <span><b>İstifadəçi sayı:</b> {{ request.total_user_count }}</span>
-                <span><b>Satıcı sayı:</b> {{ request.total_seller_count }}</span>
+                <span><b>Satıcı sayı:</b> <span id="seller-count" style="cursor:pointer;color:#007bff;text-decoration:underline;">{{ request.total_seller_count }}</span></span>
                 <span><b>Məhsul sayı:</b> {{ request.total_product_count }}</span>
                 <span><b>Firma sayı:</b> {{ request.total_firma_count }}</span>
                 <!-- Naviqasiya linkləri və Satıcı Paneli sayğacı -->
@@ -315,5 +315,47 @@
             </div>
         </div>
     </div>
+
+    <!-- Satıcılar Modalı -->
+    <div id="sellersModal" style="display:none;position:fixed;z-index:9999;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.4);">
+      <div style="background:#fff;max-width:500px;margin:60px auto;padding:24px 20px 20px 20px;border-radius:8px;position:relative;">
+        <button onclick="document.getElementById('sellersModal').style.display='none'" style="position:absolute;right:10px;top:10px;font-size:20px;background:none;border:none;">&times;</button>
+        <h4>Bütün Satıcılar</h4>
+        <input type="text" id="sellerSearch" placeholder="Satıcı axtar..." style="width:100%;margin-bottom:10px;padding:6px 8px;">
+        <div id="sellersList" style="max-height:350px;overflow-y:auto;"></div>
+      </div>
+    </div>
+    <script>
+    document.getElementById('seller-count').onclick = function() {
+        document.getElementById('sellersModal').style.display = 'block';
+        fetch('/api/sellers/')
+          .then(res => res.json())
+          .then(data => {
+            window.allSellers = data.sellers;
+            renderSellers(data.sellers);
+          });
+    };
+    function renderSellers(sellers) {
+        let html = '';
+        sellers.forEach(s => {
+            html += `<div class="seller-card" style="border:1px solid #eee;padding:10px 8px;margin-bottom:8px;border-radius:6px;">
+                <b>${s.username}</b><br>
+                <span style='font-size:13px;color:#555;'>Tel: ${s.phone || '-'}</span><br>
+                <span style='font-size:13px;color:#555;'>Ünvan: ${s.address || '-'}</span><br>
+                <a href="/seller/${s.id}/products/" class="btn btn-sm btn-primary mt-2" style="margin-top:6px;">Məhsullarına bax</a>
+            </div>`;
+        });
+        document.getElementById('sellersList').innerHTML = html;
+    }
+    document.getElementById('sellerSearch').oninput = function() {
+        const val = this.value.toLowerCase();
+        const filtered = window.allSellers.filter(s => 
+            s.username.toLowerCase().includes(val) ||
+            (s.phone && s.phone.toLowerCase().includes(val)) ||
+            (s.address && s.address.toLowerCase().includes(val))
+        );
+        renderSellers(filtered);
+    };
+    </script>
 </body>
 </html>

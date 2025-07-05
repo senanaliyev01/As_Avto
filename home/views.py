@@ -1572,3 +1572,38 @@ def change_product_image(request, product_id):
             'sekil_url': mehsul.sekil.url
         })
     return JsonResponse({'success': False, 'message': 'Şəkil yüklənmədi'})
+
+def sellers_list_api(request):
+    users = User.objects.select_related('profile').all()
+    data = []
+    for user in users:
+        profile = getattr(user, 'profile', None)
+        data.append({
+            'id': user.id,
+            'username': user.username,
+            'phone': profile.phone if profile else '',
+            'address': profile.address if profile else '',
+        })
+    return JsonResponse({'sellers': data})
+
+def seller_products_api(request, user_id):
+    mehsullar = Mehsul.objects.filter(sahib_id=user_id)
+    data = []
+    for m in mehsullar:
+        data.append({
+            'id': m.id,
+            'adi': m.adi,
+            'qiymet': str(m.qiymet),
+            'stok': m.stok,
+            'sekil_url': m.sekil.url if m.sekil else None,
+            'firma': m.firma.adi if m.firma else '',
+            'brend_kod': m.brend_kod,
+            'oem': m.oem,
+            'yenidir': m.yenidir,
+        })
+    return JsonResponse({'products': data})
+
+def seller_products_view(request, user_id):
+    mehsullar = Mehsul.objects.filter(sahib_id=user_id)
+    user = User.objects.get(id=user_id)
+    return render(request, 'seller_products.html', {'mehsullar': mehsullar, 'seller': user})

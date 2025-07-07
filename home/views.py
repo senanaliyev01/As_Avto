@@ -78,18 +78,16 @@ def custom_404(request, exception=None):
     return HttpResponseNotFound(render(request, '404.html').content)
 
 def login_view(request):
-    error_message = None
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            # Profil təsdiqlənmə yoxlaması silindi
             login(request, user)
-            return redirect('base')
+            return JsonResponse({'success': True})
         else:
-            error_message = 'İstifadəçi adı və ya şifrə yanlışdır'
-    return render(request, 'login.html', {'error_message': error_message})
+            return JsonResponse({'success': False, 'error': 'İstifadəçi adı və ya şifrə yanlışdır'})
+    return JsonResponse({'success': False, 'error': 'Yalnız POST sorğusu dəstəklənir'})
 
 @login_required
 def home_view(request):
@@ -578,64 +576,17 @@ def logout_view(request):
 
 def register_view(request):
     if request.method == 'POST':
-        username = request.POST.get('username', '').strip()
-        password = request.POST.get('password', '')
-        phone = request.POST.get('phone', '').strip()
-        address = request.POST.get('address', '').strip()
-        
-        # Username validasiyası
-        if not username:
-            messages.error(request, 'İstifadəçi adı boş ola bilməz!')
-            return render(request, 'register.html')
-            
-        # Username formatı yoxlaması
-        if not re.match(r'^[a-zA-Z0-9_]+$', username):
-            messages.error(request, 'İstifadəçi adı yalnız ingilis hərfləri, rəqəmlər və _ simvolundan ibarət ola bilər!')
-            return render(request, 'register.html')
-            
-        # Şifrə validasiyası
-        if len(password) < 8:
-            messages.error(request, 'Şifrə minimum 8 simvol olmalıdır!')
-            return render(request, 'register.html')
-            
-        # Telefon nömrəsi validasiyası
-        if not phone.startswith('+994'):
-            messages.error(request, 'Telefon nömrəsi +994 ilə başlamalıdır!')
-            return render(request, 'register.html')
-            
-        # Unvan validasiyası
-        if not address:
-            messages.error(request, 'Ünvan boş ola bilməz!')
-            return render(request, 'register.html')
-            
-        # Username mövcudluğu yoxlaması
+        username = request.POST['username']
+        email = request.POST['email']
+        password = request.POST['password']
         if User.objects.filter(username=username).exists():
-            messages.error(request, 'Bu istifadəçi adı artıq mövcuddur!')
-            return render(request, 'register.html')
-            
-        # Telefon nömrəsi mövcudluğu yoxlaması
-        if User.objects.filter(profile__phone=phone).exists():
-            messages.error(request, 'Bu telefon nömrəsi artıq qeydiyyatdan keçirilib!')
-            return render(request, 'register.html')
-            
-        try:
-            # Yeni istifadəçi yaradırıq
-            user = User.objects.create_user(username=username, password=password)
-            
-            # Profil məlumatlarını əlavə edirik
-            user.profile.phone = phone
-            user.profile.address = address
-            user.profile.is_verified = False  # Profil təsdiqlənməmiş olaraq yaradılır
-            user.profile.save()
-            
-            messages.success(request, 'Qeydiyyat uğurla tamamlandı!')
-            return redirect('register')
-            
-        except Exception as e:
-            messages.error(request, 'Qeydiyyat zamanı xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.')
-            return render(request, 'register.html')
-            
-    return render(request, 'register.html')
+            return JsonResponse({'success': False, 'error': 'Bu istifadəçi adı artıq mövcuddur'})
+        if User.objects.filter(email=email).exists():
+            return JsonResponse({'success': False, 'error': 'Bu email artıq mövcuddur'})
+        user = User.objects.create_user(username=username, email=email, password=password)
+        login(request, user)
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False, 'error': 'Yalnız POST sorğusu dəstəklənir'})
 
 @require_http_methods(["GET"])
 def product_details(request, product_id):

@@ -83,7 +83,6 @@
                                             </a>
                                             {% if request.user.profile.is_verified %}
                                             <div class="dropdown-divider"></div>
-                                            <!-- Satıcı Paneli linki buradan silindi -->
                                             {% endif %}
                                             <a href="{% url 'logout' %}" class="logout-link">
                                                 <i class="fas fa-sign-out-alt"></i> Çıxış et
@@ -92,8 +91,23 @@
                                     </div>
                                 </li>
                             {% else %}
-                                <li><a href="{% url 'login' %}" class="nav-link nav-link-sm">Daxil ol</a></li>
-                                <li><a href="{% url 'register' %}" class="nav-link nav-link-sm">Qeydiyyat</a></li>
+                                <li class="user-menu">
+                                    <div class="user-dropdown">
+                                        <button class="user-button">
+                                            <i class="fas fa-user"></i>
+                                            <i class="fas fa-chevron-down"></i>
+                                        </button>
+                                        <div class="user-dropdown-content">
+                                            <a href="#" id="openLoginModal" class="user-name">
+                                                <i class="fas fa-sign-in-alt"></i> Daxil ol
+                                            </a>
+                                            <div class="dropdown-divider"></div>
+                                            <a href="#" id="openRegisterModal" class="user-name">
+                                                <i class="fas fa-user-plus"></i> Qeydiyyat
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
                             {% endif %}
                         </ul>
                     </nav>
@@ -318,6 +332,54 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" id="closeLoginModal">&times;</span>
+            <h3>Daxil ol</h3>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginUsername">İstifadəçi adı</label>
+                    <input type="text" id="loginUsername" name="username" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Şifrə</label>
+                    <input type="password" id="loginPassword" name="password" class="form-control" required>
+                </div>
+                <div id="loginError" class="message message-error" style="display:none;"></div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn btn-primary">Daxil ol</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" id="closeRegisterModal">&times;</span>
+            <h3>Qeydiyyat</h3>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="registerUsername">İstifadəçi adı</label>
+                    <input type="text" id="registerUsername" name="username" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" name="email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Şifrə</label>
+                    <input type="password" id="registerPassword" name="password" class="form-control" required>
+                </div>
+                <div id="registerError" class="message message-error" style="display:none;"></div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn btn-primary">Qeydiyyat</button>
+                </div>
+            </form>
         </div>
     </div>
 </body>

@@ -149,6 +149,9 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
+
+    // Modal açıb-bağlama və AJAX login/register
+    initializeAuthModals();
 });
 
 function initializeSearch() {
@@ -1296,5 +1299,84 @@ function initializeProfileModal() {
             alert('Xəta baş verdi!');
         });
     });
+}
+
+// Modal açıb-bağlama və AJAX login/register
+function initializeAuthModals() {
+    // Modal elementləri
+    const loginModal = document.getElementById('loginModal');
+    const registerModal = document.getElementById('registerModal');
+    const openLoginModal = document.getElementById('openLoginModal');
+    const openRegisterModal = document.getElementById('openRegisterModal');
+    const closeLoginModal = document.getElementById('closeLoginModal');
+    const closeRegisterModal = document.getElementById('closeRegisterModal');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const loginError = document.getElementById('loginError');
+    const registerError = document.getElementById('registerError');
+
+    // Modal aç
+    if (openLoginModal) openLoginModal.onclick = function(e) { e.preventDefault(); loginModal.style.display = 'block'; };
+    if (openRegisterModal) openRegisterModal.onclick = function(e) { e.preventDefault(); registerModal.style.display = 'block'; };
+    // Modal bağla
+    if (closeLoginModal) closeLoginModal.onclick = function() { loginModal.style.display = 'none'; loginError.style.display = 'none'; };
+    if (closeRegisterModal) closeRegisterModal.onclick = function() { registerModal.style.display = 'none'; registerError.style.display = 'none'; };
+    // Modalı çöldə kliklədikdə bağla
+    window.onclick = function(event) {
+        if (event.target === loginModal) { loginModal.style.display = 'none'; loginError.style.display = 'none'; }
+        if (event.target === registerModal) { registerModal.style.display = 'none'; registerError.style.display = 'none'; }
+    };
+    // AJAX login
+    if (loginForm) loginForm.onsubmit = function(e) {
+        e.preventDefault();
+        loginError.style.display = 'none';
+        fetch('/login/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: `username=${encodeURIComponent(loginForm.username.value)}&password=${encodeURIComponent(loginForm.password.value)}`
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                loginError.textContent = data.error || 'Daxil olmaq mümkün olmadı';
+                loginError.style.display = 'block';
+            }
+        })
+        .catch(() => {
+            loginError.textContent = 'Xəta baş verdi';
+            loginError.style.display = 'block';
+        });
+    };
+    // AJAX register
+    if (registerForm) registerForm.onsubmit = function(e) {
+        e.preventDefault();
+        registerError.style.display = 'none';
+        fetch('/register/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: `username=${encodeURIComponent(registerForm.username.value)}&email=${encodeURIComponent(registerForm.email.value)}&password=${encodeURIComponent(registerForm.password.value)}`
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                registerError.textContent = data.error || 'Qeydiyyat mümkün olmadı';
+                registerError.style.display = 'block';
+            }
+        })
+        .catch(() => {
+            registerError.textContent = 'Xəta baş verdi';
+            registerError.style.display = 'block';
+        });
+    };
 }
 

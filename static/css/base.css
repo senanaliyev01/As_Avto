@@ -4995,3 +4995,24 @@ body {
     box-shadow: none;
     pointer-events: none;
 }
+
+.avtomobil-logos {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    right: 250px;
+    top: 50%;
+    transform: translateY(-50%);
+    gap: 8px;
+    z-index: 2;
+}
+.avtomobil-logo {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    background: none;
+    border: none;
+    box-shadow: none;
+    pointer-events: none;
+    position: static;
+}

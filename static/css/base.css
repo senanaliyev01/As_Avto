@@ -4924,10 +4924,8 @@ body {
   }
 }
 
-
-
-/* PRODUCTS PAGE - .product-row-pr və əlaqəli */
-.product-row-pr {
+/* Product Row Layout */
+.product-row {
     display: flex;
     align-items: center;
     border: 1px solid #e0e0e0;
@@ -4938,17 +4936,17 @@ body {
     box-shadow: 0 2px 8px rgba(44,62,80,0.04);
     transition: box-shadow 0.2s;
 }
-.product-row-pr:hover {
+.product-row:hover {
     box-shadow: 0 4px 16px rgba(44,62,80,0.10);
 }
-.product-row-image-pr {
+.product-row-image {
     flex: 0 0 80px;
     margin-right: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
-.product-row-image-pr img {
+.product-row-image img {
     width: 70px;
     height: 70px;
     object-fit: contain;
@@ -4956,11 +4954,11 @@ body {
     background: #f5f6fa;
     border: 1px solid #eee;
 }
-.product-row-info-pr {
+.product-row-info {
     flex: 1 1 auto;
     min-width: 0;
 }
-.product-title-pr {
+.product-title {
     font-size: 18px;
     font-weight: 600;
     color: #2c3e50;
@@ -4972,20 +4970,20 @@ body {
     line-height: 1.3;
     max-width: 100%;
 }
-.product-meta-pr {
+.product-meta {
     font-size: 14px;
     color: #888;
     margin-bottom: 6px;
-    white-space: normal;
-    overflow: visible;
-    text-overflow: unset;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-.product-price-pr {
+.product-price {
     font-size: 16px;
     font-weight: 500;
     color: #1d6f42;
 }
-.product-row-actions-pr {
+.product-row-actions {
     flex: 0 0 80px;
     display: flex;
     flex-direction: column;
@@ -4993,103 +4991,40 @@ body {
     gap: 8px;
     margin-left: 18px;
 }
-@media (max-width: 700px) {
-    .product-row-pr {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 12px 8px;
-    }
-    .product-row-image-pr {
-        margin-right: 0;
-        margin-bottom: 10px;
-    }
-    .product-row-actions-pr {
-        flex-direction: row;
-        margin-left: 0;
-        margin-top: 10px;
-        width: 100%;
-        justify-content: flex-end;
-    }
-}
-
-/* NEW PRODUCTS PAGE - .product-row-np və əlaqəli */
-.product-row-np {
-    display: flex;
-    align-items: center;
-    border: 1px solid #ffd700;
-    border-radius: 10px;
-    padding: 12px 18px;
-    margin-bottom: 16px;
-    background: #fffbe6;
-    box-shadow: 0 2px 8px rgba(255,215,0,0.08);
-    transition: box-shadow 0.2s;
-}
-.product-row-np:hover {
-    box-shadow: 0 4px 16px rgba(255,215,0,0.18);
-}
-.product-row-image-np {
-    flex: 0 0 80px;
-    margin-right: 18px;
+.product-row-actions button {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-.product-row-image-np img {
-    width: 70px;
-    height: 70px;
-    object-fit: contain;
-    border-radius: 8px;
-    background: #fffde4;
-    border: 1px solid #ffe066;
-}
-.product-row-info-np {
-    flex: 1 1 auto;
-    min-width: 0;
-}
-.product-title-np {
     font-size: 18px;
-    font-weight: 600;
-    color: #b8860b;
-    margin-bottom: 4px;
-    white-space: normal;
-    overflow: visible;
-    text-overflow: unset;
-    word-break: break-word;
-    line-height: 1.3;
-    max-width: 100%;
+    border: none;
+    background: #f5f6fa;
+    color: #2c3e50;
+    transition: background 0.2s, color 0.2s;
+    cursor: pointer;
 }
-.product-meta-np {
-    font-size: 14px;
-    color: #b8860b;
-    margin-bottom: 6px;
-    white-space: normal;
-    overflow: visible;
-    text-overflow: unset;
+.product-row-actions button:hover:not(:disabled) {
+    background: #3498db;
+    color: #fff;
 }
-.product-price-np {
-    font-size: 16px;
-    font-weight: 500;
-    color: #b8860b;
-}
-.product-row-actions-np {
-    flex: 0 0 80px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 8px;
-    margin-left: 18px;
+.product-row-actions button:disabled {
+    background: #eee;
+    color: #aaa;
+    cursor: not-allowed;
 }
 @media (max-width: 700px) {
-    .product-row-np {
+    .product-row {
         flex-direction: column;
         align-items: flex-start;
         padding: 12px 8px;
     }
-    .product-row-image-np {
+    .product-row-image {
         margin-right: 0;
         margin-bottom: 10px;
     }
-    .product-row-actions-np {
+    .product-row-actions {
         flex-direction: row;
         margin-left: 0;
         margin-top: 10px;

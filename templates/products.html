@@ -8,18 +8,18 @@
     <h2>Yeni Məhsullar</h2>
     <div id="products-list">
         {% for mehsul in mehsullar %}
-        <div class="product-row-pr">
-            <div class="product-row-image-pr">
+        <div class="product-row">
+            <div class="product-row-image">
                 <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" onclick="openImageModal('{{ mehsul.sekil.url }}')">
             </div>
-            <div class="product-row-info-pr">
-                <div class="product-title-pr">{{ mehsul.adi }} {{ mehsul.brend_kod }} {{ mehsul.firma.adi }} {{ mehsul.avtomobil.adi }}</div>
-                <div class="product-meta-pr">
-                    <span class="product-code-pr">Stok: {{ mehsul.stok }}</span> 
+            <div class="product-row-info">
+                <div class="product-title">{{ mehsul.adi }} {{ mehsul.brend_kod }} {{ mehsul.firma.adi }} {{ mehsul.avtomobil.adi }}</div>
+                <div class="product-meta">
+                    <span class="product-code">Stok: {{ mehsul.stok }}</span> 
                 </div>
-                <div class="product-price-pr">{{ mehsul.qiymet }} ₼</div>
+                <div class="product-price">{{ mehsul.qiymet }} ₼</div>
             </div>
-            <div class="product-row-actions-pr">
+            <div class="product-row-actions">
                 <button type="button" class="cart-add-btn" {% if mehsul.stok == 0 %}disabled{% endif %} onclick="openQuantityModal({{ mehsul.id }}, {{ mehsul.stok }})">
                     <i class="fas fa-shopping-cart"></i>
                 </button>

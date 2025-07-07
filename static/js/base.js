@@ -879,50 +879,26 @@ function initializeProductsPage() {
                 .then(data => {
                     if (productsList) {
                         data.products.forEach(product => {
-                            let row;
-                            if (isNewProductsPage) {
-                                row = document.createElement('div');
-                                row.className = 'product-row-np';
-                                row.innerHTML = `
-                                    <div class="product-row-image-np">
-                                        <img src="${product.sekil_url || '/static/images/no_image.webp'}" alt="${product.adi}" onclick="openImageModal('${product.sekil_url}')">
-                                    </div>
-                                    <div class="product-row-info-np">
-                                        <div class="product-title-np">${product.adi} ${product.brend_kod} ${product.firma} ${product.avtomobil}</div>
-                                        <div class="product-meta-np"><span class="product-code-np">Stok: ${product.stok}</span></div>
-                                        <div class="product-price-np">${product.qiymet} ₼</div>
-                                    </div>
-                                    <div class="product-row-actions-np">
-                                        <button type="button" class="cart-add-btn" ${product.stok === 0 ? 'disabled' : ''} onclick="openQuantityModal(${product.id}, ${product.stok})">
-                                            <i class="fas fa-shopping-cart"></i>
-                                        </button>
-                                        <button type="button" class="details-btn" onclick="openDetailsModal(${product.id})">
-                                            <i class="fas fa-info-circle"></i>
-                                        </button>
-                                    </div>
-                                `;
-                            } else {
-                                row = document.createElement('div');
-                                row.className = 'product-row-pr';
-                                row.innerHTML = `
-                                    <div class="product-row-image-pr">
-                                        <img src="${product.sekil_url || '/static/images/no_image.webp'}" alt="${product.adi}" onclick="openImageModal('${product.sekil_url}')">
-                                    </div>
-                                    <div class="product-row-info-pr">
-                                        <div class="product-title-pr">${product.adi} ${product.brend_kod} ${product.firma} ${product.avtomobil}</div>
-                                        <div class="product-meta-pr"><span class="product-code-pr">Stok: ${product.stok}</span></div>
-                                        <div class="product-price-pr">${product.qiymet} ₼</div>
-                                    </div>
-                                    <div class="product-row-actions-pr">
-                                        <button type="button" class="cart-add-btn" ${product.stok === 0 ? 'disabled' : ''} onclick="openQuantityModal(${product.id}, ${product.stok})">
-                                            <i class="fas fa-shopping-cart"></i>
-                                        </button>
-                                        <button type="button" class="details-btn" onclick="openDetailsModal(${product.id})">
-                                            <i class="fas fa-info-circle"></i>
-                                        </button>
-                                    </div>
-                                `;
-                            }
+                            const row = document.createElement('div');
+                            row.className = 'product-row';
+                            row.innerHTML = `
+                                <div class="product-row-image">
+                                    <img src="${product.sekil_url || '/static/images/no_image.webp'}" alt="${product.adi}" onclick="openImageModal('${product.sekil_url}')">
+                                </div>
+                                <div class="product-row-info">
+                                    <div class="product-title">${product.adi} ${product.brend_kod} ${product.firma} ${product.avtomobil}</div>
+                                    <div class="product-meta"><span class="product-code">Stok: ${product.stok}</span></div>
+                                    <div class="product-price">${product.qiymet} ₼</div>
+                                </div>
+                                <div class="product-row-actions">
+                                    <button type="button" class="cart-add-btn" ${product.stok === 0 ? 'disabled' : ''} onclick="openQuantityModal(${product.id}, ${product.stok})">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </button>
+                                    <button type="button" class="details-btn" onclick="openDetailsModal(${product.id})">
+                                        <i class="fas fa-info-circle"></i>
+                                    </button>
+                                </div>
+                            `;
                             productsList.appendChild(row);
                         });
                         hasMore = data.has_more;

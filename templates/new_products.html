@@ -10,7 +10,7 @@
         {% for mehsul in mehsullar %}
         <div class="product-row">
             <div class="product-row-image">
-                <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" onclick="openImageModal('{{ mehsul.sekil.url }}')">
+                <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
             </div>
             <div class="product-row-info">
                 <div class="product-title">{{ mehsul.adi }} {{ mehsul.brend_kod }} {{ mehsul.firma.adi }}</div>
@@ -18,14 +18,10 @@
                     <span class="product-code">Stok: {{ mehsul.stok }}</span> 
                 </div>
                 <div class="product-price">{{ mehsul.qiymet }} ₼</div>
-                <div class="firma-logo">
-                    {% if mehsul.firma.logo %}
-                        <img src="{{ mehsul.firma.logo.url }}" alt="{{ mehsul.firma.adi }} logo">
-                    {% else %}
-                        <img src="/static/images/no_image.webp" alt="No logo">
-                    {% endif %}
-                </div>
             </div>
+            {% if mehsul.firma.logo %}
+            <img class="firma-logo" src="{{ mehsul.firma.logo.url }}" alt="{{ mehsul.firma.adi }}">
+            {% endif %}
             <div class="product-row-actions">
                 <button type="button" class="cart-add-btn" {% if mehsul.stok == 0 %}disabled{% endif %} onclick="openQuantityModal({{ mehsul.id }}, {{ mehsul.stok }})">
                     <i class="fas fa-shopping-cart"></i>

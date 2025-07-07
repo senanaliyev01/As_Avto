@@ -152,6 +152,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Modal açıb-bağlama və AJAX login/register
     initializeAuthModals();
+
+    // Logout AJAX
+    const logoutLink = document.querySelector('.logout-link');
+    if (logoutLink) {
+        logoutLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            fetch('/logout/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                }
+            });
+        });
+    }
 });
 
 function initializeSearch() {

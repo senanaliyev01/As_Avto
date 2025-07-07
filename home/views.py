@@ -568,11 +568,10 @@ def load_more_new_products(request):
 @login_required
 def logout_view(request):
     logout(request)
-    # Sessiya və keşi təmizləyirik
     request.session.flush()
-    
-    # İstifadəçini login səhifəsinə yönləndiririk
-    return redirect('login')
+    if request.method == 'POST':
+        return JsonResponse({'success': True})
+    return redirect('base')
 
 def register_view(request):
     if request.method == 'POST':

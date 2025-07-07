@@ -352,6 +352,7 @@
                 <div id="loginError" class="message message-error" style="display:none;"></div>
                 <div class="modal-buttons">
                     <button type="submit" class="btn btn-primary">Daxil ol</button>
+                    <span id="loginSpinner" class="spinner" style="display:none; margin-left:10px;">• • •</span>
                 </div>
             </form>
         </div>
@@ -372,12 +373,21 @@
                     <input type="email" id="registerEmail" name="email" class="form-control" required>
                 </div>
                 <div class="form-group">
+                    <label for="registerPhone">Telefon nömrəsi</label>
+                    <input type="text" id="registerPhone" name="phone" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerAddress">Ünvan</label>
+                    <input type="text" id="registerAddress" name="address" class="form-control" required>
+                </div>
+                <div class="form-group">
                     <label for="registerPassword">Şifrə</label>
                     <input type="password" id="registerPassword" name="password" class="form-control" required>
                 </div>
                 <div id="registerError" class="message message-error" style="display:none;"></div>
                 <div class="modal-buttons">
                     <button type="submit" class="btn btn-primary">Qeydiyyat</button>
+                    <span id="registerSpinner" class="spinner" style="display:none; margin-left:10px;">• • •</span>
                 </div>
             </form>
         </div>

@@ -577,11 +577,18 @@ def register_view(request):
         username = request.POST['username']
         email = request.POST['email']
         password = request.POST['password']
+        phone = request.POST.get('phone', '')
+        address = request.POST.get('address', '')
         if User.objects.filter(username=username).exists():
             return JsonResponse({'success': False, 'error': 'Bu istifadəçi adı artıq mövcuddur'})
         if User.objects.filter(email=email).exists():
             return JsonResponse({'success': False, 'error': 'Bu email artıq mövcuddur'})
+        if phone and hasattr(User, 'profile') and hasattr(User.profile, 'phone') and User.objects.filter(profile__phone=phone).exists():
+            return JsonResponse({'success': False, 'error': 'Bu telefon nömrəsi artıq mövcuddur'})
         user = User.objects.create_user(username=username, email=email, password=password)
+        user.profile.phone = phone
+        user.profile.address = address
+        user.profile.save()
         login(request, user)
         return JsonResponse({'success': True})
     return redirect('base')

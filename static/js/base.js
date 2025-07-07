@@ -1334,6 +1334,8 @@ function initializeAuthModals() {
     const registerForm = document.getElementById('registerForm');
     const loginError = document.getElementById('loginError');
     const registerError = document.getElementById('registerError');
+    const loginSpinner = document.getElementById('loginSpinner');
+    const registerSpinner = document.getElementById('registerSpinner');
 
     // Modal aç
     if (openLoginModal) openLoginModal.onclick = function(e) { e.preventDefault(); loginModal.style.display = 'block'; };
@@ -1350,53 +1352,63 @@ function initializeAuthModals() {
     if (loginForm) loginForm.onsubmit = function(e) {
         e.preventDefault();
         loginError.style.display = 'none';
-        fetch('/login/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: `username=${encodeURIComponent(loginForm.username.value)}&password=${encodeURIComponent(loginForm.password.value)}`
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                window.location.reload();
-            } else {
-                loginError.textContent = data.error || 'Daxil olmaq mümkün olmadı';
+        loginSpinner.style.display = 'inline-block';
+        setTimeout(function() {
+            fetch('/login/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: `username=${encodeURIComponent(loginForm.username.value)}&password=${encodeURIComponent(loginForm.password.value)}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                loginSpinner.style.display = 'none';
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    loginError.textContent = data.error || 'Daxil olmaq mümkün olmadı';
+                    loginError.style.display = 'block';
+                }
+            })
+            .catch(() => {
+                loginSpinner.style.display = 'none';
+                loginError.textContent = 'Xəta baş verdi';
                 loginError.style.display = 'block';
-            }
-        })
-        .catch(() => {
-            loginError.textContent = 'Xəta baş verdi';
-            loginError.style.display = 'block';
-        });
+            });
+        }, 3000);
     };
     // AJAX register
     if (registerForm) registerForm.onsubmit = function(e) {
         e.preventDefault();
         registerError.style.display = 'none';
-        fetch('/register/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: `username=${encodeURIComponent(registerForm.username.value)}&email=${encodeURIComponent(registerForm.email.value)}&password=${encodeURIComponent(registerForm.password.value)}`
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                window.location.reload();
-            } else {
-                registerError.textContent = data.error || 'Qeydiyyat mümkün olmadı';
+        registerSpinner.style.display = 'inline-block';
+        setTimeout(function() {
+            fetch('/register/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: `username=${encodeURIComponent(registerForm.username.value)}&email=${encodeURIComponent(registerForm.email.value)}&phone=${encodeURIComponent(registerForm.phone.value)}&address=${encodeURIComponent(registerForm.address.value)}&password=${encodeURIComponent(registerForm.password.value)}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                registerSpinner.style.display = 'none';
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    registerError.textContent = data.error || 'Qeydiyyat mümkün olmadı';
+                    registerError.style.display = 'block';
+                }
+            })
+            .catch(() => {
+                registerSpinner.style.display = 'none';
+                registerError.textContent = 'Xəta baş verdi';
                 registerError.style.display = 'block';
-            }
-        })
-        .catch(() => {
-            registerError.textContent = 'Xəta baş verdi';
-            registerError.style.display = 'block';
-        });
+            });
+        }, 3000);
     };
 }
 

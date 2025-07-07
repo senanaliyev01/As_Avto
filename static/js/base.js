@@ -853,7 +853,7 @@ function initializeProductsPage() {
     let offset = 5;
     let loading = false;
     const productsList = document.getElementById('products-list');
-    const spinner = productsList ? productsList.querySelector('#loading-spinner') : null;
+    const spinner = document.getElementById('loading-spinner');
     let hasMore = false;
     if (productsList) {
         const hasMoreElement = document.querySelector('[data-has-more]');

@@ -13,9 +13,11 @@
                 <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" onclick="openImageModal('{{ mehsul.sekil.url }}')">
             </div>
             <div class="product-row-info">
-                <div class="product-title">{{ mehsul.adi }} {{ mehsul.brend_kod }} {{ mehsul.firma.adi }} {{ mehsul.avtomobil.adi }}</div>
+                <div class="product-title">{{ mehsul.adi }}</div>
                 <div class="product-meta">
-                    <span class="product-code">Stok: {{ mehsul.stok }}</span> 
+                    <span class="product-code">{{ mehsul.brend_kod }}</span> |
+                    <span class="product-firma">{{ mehsul.firma.adi }}</span> |
+                    <span class="product-avto">{{ mehsul.avtomobil.adi }}</span>
                 </div>
                 <div class="product-price">{{ mehsul.qiymet }} ₼</div>
             </div>
@@ -34,12 +36,12 @@
             <p>Hal-hazırda yeni məhsul yoxdur.</p>
         </div>
         {% endfor %}
-        {% if has_more %}
-        <div id="loading-spinner" class="loading-spinner" style="display: none;">
-            <div class="spinner"></div>
-        </div>
-        {% endif %}
     </div>
+    {% if has_more %}
+    <div id="loading-spinner" class="loading-spinner" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+    {% endif %}
 </div>
 
 <!-- Miqdar Modal -->

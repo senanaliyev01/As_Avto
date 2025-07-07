@@ -877,18 +877,20 @@ body {
     font-size: 0.95rem;
     color: #333;
     margin-bottom: 4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    word-break: break-word;
 }
 
 .search-result-details {
     font-size: 0.85rem;
     color: #666;
     line-height: 1.4;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    word-break: break-word;
 }
 
 .search-result-price {
@@ -2406,11 +2408,11 @@ body {
 
 /* Loading Spinner Styles */
 .loading-spinner {
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
     width: 100%;
-    padding: 16px 0;
+    padding: 20px 0;
 }
 
 .spinner {

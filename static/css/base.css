@@ -4947,7 +4947,7 @@ body {
 }
 .firma-logo {
     position: absolute;
-    right: 60px;
+    right: 150px;
     top: 50%;
     transform: translateY(-50%);
     width: 150px;
@@ -4968,7 +4968,7 @@ body {
 
 .avtomobil-logo {
     position: absolute;
-    right: 220px;
+    right: 300px;
     top: 50%;
     transform: translateY(-50%);
     width: 150px;

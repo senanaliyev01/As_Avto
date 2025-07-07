@@ -886,7 +886,7 @@ function initializeProductsPage() {
                                     <img src="${product.sekil_url || '/static/images/no_image.webp'}" alt="${product.adi}" onclick="openImageModal('${product.sekil_url}')">
                                 </div>
                                 <div class="product-row-info">
-                                    <div class="product-title">${product.adi} ${product.brend_kod} ${product.firma} ${product.avtomobil}</div>
+                                    <div class="product-title-pr">${product.adi} ${product.brend_kod} ${product.firma} ${product.avtomobil}</div>
                                     <div class="product-meta"><span class="product-code">Stok: ${product.stok}</span></div>
                                     <div class="product-price">${product.qiymet} ₼</div>
                                 </div>

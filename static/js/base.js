@@ -904,7 +904,7 @@ function initializeProductsPage() {
                                     </div>
                                     <div class="product-stock">Stok: ${product.stok}</div>
                                 </div>
-                                ${product.avtomobil_logo_url ? `<img class='avtomobil-logo' src='${product.avtomobil_logo_url}' alt='${product.avtomobil}'>` : ''}
+                                ${Array.isArray(product.avtomobil_logo_urls) ? product.avtomobil_logo_urls.map(url => `<img class='avtomobil-logo' src='${url}' alt='${product.avtomobil}'>`).join('') : ''}
                                 ${product.firma_logo_url ? `<img class='firma-logo' src='${product.firma_logo_url}' alt='${product.firma}'>` : ''}
                                 <div class="product-row-actions">
                                     <div class="product-price">${product.qiymet} ₼</div>

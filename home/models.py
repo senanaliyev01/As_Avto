@@ -48,14 +48,17 @@ class Firma(models.Model):
 
 class Avtomobil(models.Model):
     adi = models.CharField(max_length=100, null=True, blank=True)
-    logo = models.ImageField(upload_to='avtomobil_sekilleri', null=True, blank=True)
-
     def __str__(self):
         return f"{self.adi}"
-    
     class Meta:
         verbose_name = 'Avtomobil'
         verbose_name_plural = 'Avtomobillər'
+
+class AvtomobilLogo(models.Model):
+    avtomobil = models.ForeignKey(Avtomobil, on_delete=models.CASCADE, related_name='logolar')
+    logo = models.ImageField(upload_to='avtomobil_sekilleri')
+    def __str__(self):
+        return f"{self.avtomobil.adi} logo"
 
 class Vitrin(models.Model):
     nomre = models.CharField(max_length=100, null=True, blank=True)

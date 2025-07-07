@@ -57,10 +57,11 @@ class AvtomobilSekilInline(admin.TabularInline):
     model = AvtomobilSekil
     extra = 1
 
+@admin.register(Avtomobil)
 class AvtomobilAdmin(admin.ModelAdmin):
-    list_display = ['adi']
-    search_fields = ['adi']
     inlines = [AvtomobilSekilInline]
+    list_display = ('adi',)
+    search_fields = ['adi']
 
 @admin.register(Mehsul)
 class MehsulAdmin(admin.ModelAdmin):

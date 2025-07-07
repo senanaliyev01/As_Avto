@@ -4968,7 +4968,7 @@ body {
 
 .avtomobil-logo {
     position: absolute;
-    right: 280px;
+    left: 120px;
     top: 50%;
     transform: translateY(-50%);
     width: 150px;

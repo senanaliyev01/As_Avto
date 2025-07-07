@@ -47,10 +47,11 @@ class Firma(models.Model):
 
 
 class Avtomobil(models.Model):
-    adi = models.CharField(max_length=100, null=True, blank=True)
+    adi = models.CharField(max_length=100)
+    logo = models.ImageField(upload_to='avtomobil_logos/', null=True, blank=True)
 
     def __str__(self):
-        return f"{self.adi}"
+        return self.adi
     
     class Meta:
         verbose_name = 'Avtomobil'
@@ -237,7 +238,9 @@ def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
 class AvtomobilSekil(models.Model):
-    avtomobil = models.ForeignKey('Avtomobil', related_name='sekiller', on_delete=models.CASCADE)
+    avtomobil = models.ForeignKey(Avtomobil, on_delete=models.CASCADE, related_name='sekiller')
     sekil = models.ImageField(upload_to='avtomobil_sekiller/')
+    def __str__(self):
+        return f"{self.avtomobil.adi} şəkil"
 
 

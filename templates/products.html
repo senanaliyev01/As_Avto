@@ -10,16 +10,16 @@
         {% for mehsul in mehsullar %}
         <div class="product-row">
             <div class="product-row-image">
-                <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image" onclick="openImageModal('{{ mehsul.sekil.url }}')">
+                <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" onclick="openImageModal('{{ mehsul.sekil.url }}')">
             </div>
             <div class="product-row-info">
                 <div class="product-title">{{ mehsul.adi }}</div>
                 <div class="product-meta">
-                    <span class="product-code">Kod: {{ mehsul.brend_kod }}</span> |
-                    <span class="product-firma">Firma: {{ mehsul.firma.adi }}</span> |
-                    <span class="product-avto">Avtomobil: {{ mehsul.avtomobil.adi }}</span>
+                    <span class="product-code">{{ mehsul.brend_kod }}</span> |
+                    <span class="product-firma">{{ mehsul.firma.adi }}</span> |
+                    <span class="product-avto">{{ mehsul.avtomobil.adi }}</span>
                 </div>
-                <div class="product-price">Qiymət: {{ mehsul.qiymet }} ₼</div>
+                <div class="product-price">{{ mehsul.qiymet }} ₼</div>
             </div>
             <div class="product-row-actions">
                 <button type="button" class="cart-add-btn" {% if mehsul.stok == 0 %}disabled{% endif %} onclick="openQuantityModal({{ mehsul.id }}, {{ mehsul.stok }})">
@@ -36,12 +36,12 @@
             <p>Heç bir məhsul tapılmadı.</p>
         </div>
         {% endfor %}
+        {% if has_more %}
+        <div id="loading-spinner" class="loading-spinner" style="display: none;">
+            <div class="spinner"></div>
+        </div>
+        {% endif %}
     </div>
-    {% if has_more %}
-    <div id="loading-spinner" class="loading-spinner" style="display: none;">
-        <div class="spinner"></div>
-    </div>
-    {% endif %}
 </div>
 
 <!-- Miqdar Modal -->

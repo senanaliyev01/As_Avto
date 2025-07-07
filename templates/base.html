@@ -137,7 +137,7 @@
                                 <div class="ribbon-wrapper">
                                     <div class="ribbon">Yeni</div>
                                 </div>
-                                <div class="product-image-pr">
+                                <div class="product-image">
                                     {% if product.sekil and product.sekil.url != 'mehsul_sekilleri/no_image.webp' %}
                                     <img src="{{ product.sekil.url }}" alt="{{ product.adi }}" onclick="openImageModal('{{ product.sekil.url }}')" class="clickable-image" onerror="this.src='{% static 'images/no_image.webp' %}'">
                                     {% else %}

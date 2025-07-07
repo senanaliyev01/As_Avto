@@ -5044,8 +5044,8 @@ body {
     overflow: hidden;
 }
 .product-firma-logo img {
-    max-width: 100px;
-    max-height: 60px;
+    max-width: 150px;
+    max-height: 150px;
     object-fit: contain;
     border-radius: 6px;
     background: #fff;

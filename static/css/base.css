@@ -4982,10 +4982,10 @@ body {
 }
 
 .avtomobil-logo {
-    position: static;
     display: inline-block;
-    width: 70px;
-    height: 700px;
+    position: static;
+    width: 60px;
+    height: 60px;
     object-fit: contain;
     margin-right: 8px;
     vertical-align: middle;

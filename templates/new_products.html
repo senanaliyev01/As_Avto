@@ -19,7 +19,7 @@
                     <a href="#" class="seller-link" onclick="openUserDetailsModal({{ mehsul.sahib.id }}); return false;"><i class="fas fa-user"></i> {{ mehsul.sahib.username }}</a>
                     {% endif %}
                 </div>
-                <div class="product-price">{{ mehsul.qiymet }} ₼</div>
+                <div class="product-stock">Stok: {{ mehsul.stok }}</div>
             </div>
           
             {% if mehsul.avtomobil.logo %}
@@ -29,6 +29,7 @@
             <img class="firma-logo" src="{{ mehsul.firma.logo.url }}" alt="{{ mehsul.firma.adi }}">
             {% endif %}
             <div class="product-row-actions">
+                <div class="product-price">{{ mehsul.qiymet }} ₼</div>
                 <button type="button" class="cart-add-btn" {% if mehsul.stok == 0 %}disabled{% endif %} onclick="openQuantityModal({{ mehsul.id }}, {{ mehsul.stok }})">
                     <i class="fas fa-shopping-cart"></i>
                 </button>

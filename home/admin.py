@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Kateqoriya, Firma, Avtomobil, Mehsul, Sifaris, SifarisItem, Vitrin, PopupImage, Profile, Header_Message, AvtomobilSekil
+from .models import Kateqoriya, Firma, Avtomobil, Mehsul, Sifaris, SifarisItem, Vitrin, PopupImage, Profile, Header_Message
 from django.core.exceptions import ValidationError
 from django.utils.html import format_html
 from django.urls import path
@@ -53,14 +53,9 @@ class FirmaAdmin(admin.ModelAdmin):
     logo_tag.short_description = "Logo"
     logo_tag.allow_tags = True
 
-class AvtomobilSekilInline(admin.TabularInline):
-    model = AvtomobilSekil
-    extra = 1
-
 @admin.register(Avtomobil)
 class AvtomobilAdmin(admin.ModelAdmin):
-    inlines = [AvtomobilSekilInline]
-    list_display = ('adi',)
+    list_display = ['adi', 'logo']
     search_fields = ['adi']
 
 @admin.register(Mehsul)

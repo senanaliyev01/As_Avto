@@ -4984,13 +4984,41 @@ body {
 }
 
 .avtomobil-logo {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+    display: inline-block;
+    position: static;
+    width: 60px;
+    height: 60px;
+    right: 100px;
+    object-fit: contain;
+    margin-right: 8px;
+    vertical-align: middle;
+    background: none;
+    border: none;
+    box-shadow: none;
+    pointer-events: none;
+}
+
+.avtomobil-logos-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    pointer-events: none;
+}
+.avtomobil-logo {
+    display: inline-block;
     position: static;
     width: 60px;
     height: 60px;
     object-fit: contain;
+    margin: 0;
+    vertical-align: middle;
     background: none;
     border: none;
     box-shadow: none;

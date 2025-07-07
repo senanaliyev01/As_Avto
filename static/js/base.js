@@ -853,9 +853,8 @@ function initializeProductsPage() {
     let offset = 5;
     let loading = false;
     const productsList = document.getElementById('products-list');
-    const spinner = document.getElementById('loading-spinner');
+    const spinner = productsList ? productsList.querySelector('#loading-spinner') : null;
     let hasMore = false;
-    // hasMore dəyərini HTML-dən alırıq
     if (productsList) {
         const hasMoreElement = document.querySelector('[data-has-more]');
         if (hasMoreElement) {
@@ -921,7 +920,7 @@ function initializeProductsPage() {
         }, 500);
     }
     if (productsList) {
-        window.addEventListener('scroll', () => {
+        document.addEventListener('scroll', () => {
             if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 200) {
                 loadMoreProducts();
             }

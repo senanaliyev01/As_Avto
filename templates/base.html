@@ -191,23 +191,8 @@
         </main>
 
         <!-- Logo Slider -->
-        <div class="logo-slider-section">
-            <div class="container">
-                <div class="swiper logo-swiper">
-                    <div class="swiper-wrapper">
-                        {% for firma in request.brands %}
-                            {% if firma.logo %}
-                            <div class="swiper-slide">
-                                <div class="logo-slide">
-                                    <img src="{{ firma.logo.url }}" alt="{{ firma.adi }}" class="firma-logo">
-                                </div>
-                            </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Firma logo sliderinə aid bütün HTML kodu silindi -->
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>

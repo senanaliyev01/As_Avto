@@ -32,9 +32,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize User Details Modal
     initializeUserDetailsModal();
 
-    // Initialize Logo Slider
-    initializeLogoSlider();
-
     // Initialize Header Messages
     initializeHeaderMessages();
 
@@ -1097,37 +1094,6 @@ function initializeDetailsModal() {
             }
         });
     }
-}
-
-// Initialize Logo Slider
-function initializeLogoSlider() {
-    const logoSwiper = new Swiper('.logo-swiper', {
-        slidesPerView: 'auto',
-        spaceBetween: 3,
-        loop: true,
-        autoplay: {
-            delay: 2000,
-            disableOnInteraction: false,
-        },
-        breakpoints: {
-            320: {
-                slidesPerView: 4,
-                spaceBetween: 0
-            },
-            480: {
-                slidesPerView: 6,
-                spaceBetween: 0
-            },
-            768: {
-                slidesPerView: 8,
-                spaceBetween: 0
-            },
-            1024: {
-                slidesPerView: 10,
-                spaceBetween: 0
-            }
-        }
-    });
 }
 
 function initializeHeaderMessages() {

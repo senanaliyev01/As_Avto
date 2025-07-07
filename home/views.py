@@ -87,7 +87,7 @@ def login_view(request):
             return JsonResponse({'success': True})
         else:
             return JsonResponse({'success': False, 'error': 'İstifadəçi adı və ya şifrə yanlışdır'})
-    return JsonResponse({'success': False, 'error': 'Yalnız POST sorğusu dəstəklənir'})
+    return redirect('base')
 
 @login_required
 def home_view(request):
@@ -584,7 +584,7 @@ def register_view(request):
         user = User.objects.create_user(username=username, email=email, password=password)
         login(request, user)
         return JsonResponse({'success': True})
-    return JsonResponse({'success': False, 'error': 'Yalnız POST sorğusu dəstəklənir'})
+    return redirect('base')
 
 @require_http_methods(["GET"])
 def product_details(request, product_id):

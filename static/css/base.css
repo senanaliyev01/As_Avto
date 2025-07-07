@@ -5033,18 +5033,38 @@ body {
     }
 }
 
-.firma-logo-wrapper {
+/* Firma logo kart ortasında sağ tərəfə yaxın */
+.product-row-info {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 12px 0;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
 }
 .firma-logo {
-    max-width: 80px;
-    max-height: 80px;
-    width: auto;
-    height: auto;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    padding: 4px;
+}
+.firma-logo img {
+    max-width: 40px;
+    max-height: 40px;
     object-fit: contain;
-    display: block;
-    margin: 0 auto;
+    border-radius: 50%;
+}
+/* Məhsul şəkli daha böyük olsun */
+.product-row-image img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
 }

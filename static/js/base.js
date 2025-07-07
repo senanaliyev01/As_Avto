@@ -900,16 +900,16 @@ function initializeProductsPage() {
                                 <div class="product-row-info">
                                     <div class="product-title">${product.adi} ${product.brend_kod} ${product.firma}</div>
                                     <div class="product-meta">
-                                        <span class="product-code">Stok: ${product.stok}</span> 
+                                        ${product.sahib_id && product.sahib_username ? `<a href="#" class="seller-link" onclick="openUserDetailsModal(${product.sahib_id}); return false;"><i class='fas fa-user'></i> ${product.sahib_username}</a>` : ''}
                                     </div>
-                                    <div class="product-price">${product.qiymet} ₼</div>
+                                    <div class="product-stock">Stok: ${product.stok}</div>
                                 </div>
+                                ${product.avtomobil_logo_url ? `<img class='avtomobil-logo' src='${product.avtomobil_logo_url}' alt='${product.avtomobil}'>` : ''}
+                                ${product.firma_logo_url ? `<img class='firma-logo' src='${product.firma_logo_url}' alt='${product.firma}'>` : ''}
                                 <div class="product-row-actions">
+                                    <div class="product-price">${product.qiymet} ₼</div>
                                     <button type="button" class="cart-add-btn" ${product.stok === 0 ? 'disabled' : ''} onclick="openQuantityModal(${product.id}, ${product.stok})">
                                         <i class="fas fa-shopping-cart"></i>
-                                    </button>
-                                    <button type="button" class="details-btn" onclick="openDetailsModal(${product.id})">
-                                        <i class="fas fa-info-circle"></i>
                                     </button>
                                 </div>
                             `;

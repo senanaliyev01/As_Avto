@@ -23,7 +23,7 @@
             </div>
            
             {% for logo in mehsul.avtomobil.logolar.all %}
-            <img class="avtomobil-logo" src="{{ logo.logo.url }}" alt="{{ mehsul.avtomobil.adi }}">
+            <img class="avtomobil-logo" src="{{ logo.sekil.url }}" alt="{{ mehsul.avtomobil.adi }}">
             {% endfor %}
             {% if mehsul.firma.logo %}
             <img class="firma-logo" src="{{ mehsul.firma.logo.url }}" alt="{{ mehsul.firma.adi }}">

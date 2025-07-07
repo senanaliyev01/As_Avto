@@ -59,8 +59,8 @@ class AvtomobilLogoInline(admin.TabularInline):
 
 @admin.register(Avtomobil)
 class AvtomobilAdmin(admin.ModelAdmin):
-    inlines = [AvtomobilLogoInline]
     list_display = ['adi']
+    inlines = [AvtomobilLogoInline]
     search_fields = ['adi']
 
 @admin.register(Mehsul)

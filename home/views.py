@@ -167,7 +167,7 @@ def load_more_products(request):
             'firma': product.firma.adi,
             'firma_logo_url': product.firma.logo.url if product.firma and product.firma.logo else '',
             'avtomobil': product.avtomobil.adi if product.avtomobil else '',
-            'avtomobil_logo_urls': [logo.logo.url for logo in product.avtomobil.logolar.all()] if product.avtomobil else [],
+            'avtomobil_logo_urls': [logo.sekil.url for logo in product.avtomobil.logolar.all()],
             'brend_kod': product.brend_kod,
             'oem': product.oem,
             'stok': product.stok,
@@ -552,7 +552,7 @@ def load_more_new_products(request):
             'firma': product.firma.adi,
             'firma_logo_url': product.firma.logo.url if product.firma and product.firma.logo else '',
             'avtomobil': product.avtomobil.adi if product.avtomobil else '',
-            'avtomobil_logo_urls': [logo.logo.url for logo in product.avtomobil.logolar.all()] if product.avtomobil else [],
+            'avtomobil_logo_urls': [logo.sekil.url for logo in product.avtomobil.logolar.all()],
             'brend_kod': product.brend_kod,
             'oem': product.oem,
             'stok': product.stok,
@@ -587,9 +587,9 @@ def register_view(request):
         if phone and hasattr(User, 'profile') and hasattr(User.profile, 'phone') and User.objects.filter(profile__phone=phone).exists():
             return JsonResponse({'success': False, 'error': 'Bu telefon nömrəsi artıq mövcuddur'})
         user = User.objects.create_user(username=username, email=email, password=password)
-            user.profile.phone = phone
-            user.profile.address = address
-            user.profile.save()
+        user.profile.phone = phone
+        user.profile.address = address
+        user.profile.save()
         login(request, user)
         return JsonResponse({'success': True})
     return redirect('base')
@@ -1366,7 +1366,7 @@ def unread_sales_count(request):
             request.user.profile.yeni_unread_sales = 0
             request.user.profile.save()
         return JsonResponse({'status': 'ok'})
-
+    
 @login_required
 def seller_admin_panel(request):
     if not request.user.is_authenticated or not hasattr(request.user, 'profile') or not request.user.profile.is_verified:

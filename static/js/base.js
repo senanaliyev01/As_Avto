@@ -893,6 +893,12 @@ function initializeProductsPage() {
                         data.products.forEach(product => {
                             const div = document.createElement('div');
                             div.className = 'product-row';
+                            let avtomobilLogosHtml = '';
+                            if (product.avtomobil_logo_urls && Array.isArray(product.avtomobil_logo_urls)) {
+                                product.avtomobil_logo_urls.forEach(url => {
+                                    avtomobilLogosHtml += `<img class='avtomobil-logo' src='${url}' alt='${product.avtomobil}'>`;
+                                });
+                            }
                             div.innerHTML = `
                                 <div class="product-row-image">
                                     <img src="${product.sekil_url || '/static/images/no_image.webp'}" alt="${product.adi}" onclick="openImageModal('${product.sekil_url}')">
@@ -900,11 +906,11 @@ function initializeProductsPage() {
                                 <div class="product-row-info">
                                     <div class="product-title">${product.adi} ${product.brend_kod} ${product.firma}</div>
                                     <div class="product-meta">
-                                        ${product.sahib_id && product.sahib_username ? `<a href="#" class="seller-link" onclick="openUserDetailsModal(${product.sahib_id}); return false;"><i class='fas fa-user'></i> ${product.sahib_username}</a>` : ''}
+                                        ${product.sahib_id && product.sahib_username ? `<a href=\"#\" class=\"seller-link\" onclick=\"openUserDetailsModal(${product.sahib_id}); return false;\"><i class='fas fa-user'></i> ${product.sahib_username}</a>` : ''}
                                     </div>
                                     <div class="product-stock">Stok: ${product.stok}</div>
                                 </div>
-                                ${Array.isArray(product.avtomobil_logo_urls) ? product.avtomobil_logo_urls.map(url => `<img class='avtomobil-logo' src='${url}' alt='${product.avtomobil}'>`).join('') : ''}
+                                ${avtomobilLogosHtml}
                                 ${product.firma_logo_url ? `<img class='firma-logo' src='${product.firma_logo_url}' alt='${product.firma}'>` : ''}
                                 <div class="product-row-actions">
                                     <div class="product-price">${product.qiymet} ₼</div>

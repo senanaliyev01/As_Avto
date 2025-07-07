@@ -165,6 +165,9 @@ def load_more_products(request):
             'adi': product.adi,
             'sekil_url': product.sekil.url if product.sekil else None,
             'firma': product.firma.adi,
+            'firma_logo_url': product.firma.logo.url if product.firma and product.firma.logo else '',
+            'avtomobil': product.avtomobil.adi if product.avtomobil else '',
+            'avtomobil_logo_url': product.avtomobil.logo.url if product.avtomobil and product.avtomobil.logo else '',
             'brend_kod': product.brend_kod,
             'oem': product.oem,
             'stok': product.stok,
@@ -537,13 +540,9 @@ def new_products_view(request):
 def load_more_new_products(request):
     offset = int(request.GET.get('offset', 0))
     limit = 5
-    
     mehsullar = Mehsul.objects.filter(yenidir=True).order_by('-id')
-    
-    # Get next batch of products
     products = mehsullar[offset:offset + limit]
     has_more = mehsullar.count() > (offset + limit)
-    
     products_data = []
     for product in products:
         products_data.append({
@@ -551,6 +550,9 @@ def load_more_new_products(request):
             'adi': product.adi,
             'sekil_url': product.sekil.url if product.sekil else None,
             'firma': product.firma.adi,
+            'firma_logo_url': product.firma.logo.url if product.firma and product.firma.logo else '',
+            'avtomobil': product.avtomobil.adi if product.avtomobil else '',
+            'avtomobil_logo_url': product.avtomobil.logo.url if product.avtomobil and product.avtomobil.logo else '',
             'brend_kod': product.brend_kod,
             'oem': product.oem,
             'stok': product.stok,
@@ -559,7 +561,6 @@ def load_more_new_products(request):
             'sahib_id': product.sahib.id if product.sahib else None,
             'sahib_username': product.sahib.username if product.sahib else 'AS-AVTO',
         })
-    
     return JsonResponse({
         'products': products_data,
         'has_more': has_more

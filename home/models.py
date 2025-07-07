@@ -239,7 +239,7 @@ def save_user_profile(sender, instance, **kwargs):
 
 class AvtomobilSekil(models.Model):
     avtomobil = models.ForeignKey(Avtomobil, on_delete=models.CASCADE, related_name='sekiller')
-    sekil = models.ImageField(upload_to='avtomobil_sekiller/')
+    sekil = models.ImageField(upload_to='avtomobil_sekiller/', null=True, blank=True)
     def __str__(self):
         return f"{self.avtomobil.adi} şəkil"
 

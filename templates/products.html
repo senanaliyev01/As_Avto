@@ -10,7 +10,7 @@
         {% for mehsul in mehsullar %}
         <div class="product-row">
             <div class="product-row-image">
-                <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
+                <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" onclick="openImageModal('{{ mehsul.sekil.url }}')">
             </div>
             <div class="product-row-info">
                 <div class="product-title">{{ mehsul.adi }} {{ mehsul.brend_kod }} {{ mehsul.firma.adi }}</div>

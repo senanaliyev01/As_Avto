@@ -855,14 +855,23 @@ function initializeProductsPage() {
     const productsList = document.getElementById('products-list');
     const spinner = document.getElementById('loading-spinner');
     let hasMore = false;
+
+    console.log('initializeProductsPage called');
+    console.log('productsList:', productsList);
+    console.log('spinner:', spinner);
+
     if (productsList) {
         const hasMoreElement = document.querySelector('[data-has-more]');
         if (hasMoreElement) {
             hasMore = hasMoreElement.dataset.hasMore === 'true';
         }
     }
+
     function loadMoreProducts() {
-        if (loading || !hasMore) return;
+        if (loading || !hasMore) {
+            console.log('Already loading or no more products');
+            return;
+        }
         loading = true;
         if (spinner) {
             spinner.style.display = 'flex';
@@ -871,10 +880,15 @@ function initializeProductsPage() {
         params.append('offset', offset);
         const isNewProductsPage = window.location.pathname.includes('new-products');
         const endpoint = isNewProductsPage ? '/load-more-new-products/' : '/load-more-products/';
+        console.log('Sending AJAX request to:', endpoint, 'with params:', params.toString());
         setTimeout(() => {
             fetch(`${endpoint}?${params.toString()}`)
-                .then(response => response.json())
+                .then(response => {
+                    console.log('AJAX response status:', response.status);
+                    return response.json();
+                })
                 .then(data => {
+                    console.log('AJAX response data:', data);
                     if (productsList) {
                         data.products.forEach(product => {
                             const div = document.createElement('div');
@@ -909,7 +923,7 @@ function initializeProductsPage() {
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
+                    console.error('AJAX error:', error);
                 })
                 .finally(() => {
                     loading = false;
@@ -919,9 +933,12 @@ function initializeProductsPage() {
                 });
         }, 500);
     }
+
     if (productsList) {
         document.addEventListener('scroll', () => {
+            console.log('Scroll event fired');
             if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 200) {
+                console.log('Triggering loadMoreProducts');
                 loadMoreProducts();
             }
         });

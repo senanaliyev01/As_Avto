@@ -565,13 +565,12 @@ def load_more_new_products(request):
         'has_more': has_more
     })
 
+@require_http_methods(["POST"])
 @login_required
 def logout_view(request):
     logout(request)
     request.session.flush()
-    if request.method == 'POST':
-        return JsonResponse({'success': True})
-    return redirect('base')
+    return JsonResponse({'success': True})
 
 def register_view(request):
     if request.method == 'POST':

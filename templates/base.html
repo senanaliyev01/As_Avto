@@ -70,26 +70,31 @@
                                     Səbət
                                 </a>
                             </li>
-                            <li class="user-menu">
-                                <div class="user-dropdown">
-                                    <button class="user-button">
-                                        <i class="fas fa-user"></i>
-                                        <i class="fas fa-chevron-down"></i>
-                                    </button>
-                                    <div class="user-dropdown-content">
-                                        <a href="#" id="openProfileModal" class="user-name">
-                                            <i class="fas fa-user"></i> {{ request.user.username }}
-                                        </a>
-                                        {% if request.user.is_authenticated and request.user.profile.is_verified %}
-                                        <div class="dropdown-divider"></div>
-                                        <!-- Satıcı Paneli linki buradan silindi -->
-                                        {% endif %}
-                                        <a href="{% url 'logout' %}" class="logout-link">
-                                            <i class="fas fa-sign-out-alt"></i> Çıxış et
-                                        </a>
+                            {% if request.user.is_authenticated %}
+                                <li class="user-menu">
+                                    <div class="user-dropdown">
+                                        <button class="user-button">
+                                            <i class="fas fa-user"></i>
+                                            <i class="fas fa-chevron-down"></i>
+                                        </button>
+                                        <div class="user-dropdown-content">
+                                            <a href="#" id="openProfileModal" class="user-name">
+                                                <i class="fas fa-user"></i> {{ request.user.username }}
+                                            </a>
+                                            {% if request.user.profile.is_verified %}
+                                            <div class="dropdown-divider"></div>
+                                            <!-- Satıcı Paneli linki buradan silindi -->
+                                            {% endif %}
+                                            <a href="{% url 'logout' %}" class="logout-link">
+                                                <i class="fas fa-sign-out-alt"></i> Çıxış et
+                                            </a>
+                                        </div>
                                     </div>
-                                </div>
-                            </li>
+                                </li>
+                            {% else %}
+                                <li><a href="{% url 'login' %}" class="nav-link nav-link-sm">Daxil ol</a></li>
+                                <li><a href="{% url 'register' %}" class="nav-link nav-link-sm">Qeydiyyat</a></li>
+                            {% endif %}
                         </ul>
                     </nav>
                 </div>

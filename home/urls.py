@@ -1,12 +1,10 @@
 from django.urls import path
 from . import views
-from django.shortcuts import render
 
 handler404 = 'home.views.custom_404'
 
 urlpatterns = [
-    path('', views.main_view, name='main'),
-    path('login/', views.login_view, name='login'),
+    path('', views.root_view, name='root'),
     path('register/', views.register_view, name='register'),
     path('base/', views.home_view, name='base'),
     path('products/', views.products_view, name='products'),
@@ -41,8 +39,4 @@ urlpatterns = [
     path('api/unread-sales-count/', views.unread_sales_count, name='unread_sales_count'),
     path('seller-admin-panel/', views.seller_admin_panel, name='seller_admin_panel'),
     path('my-products/change-image/<int:product_id>/', views.change_product_image, name='change_product_image'),
-    path('about/', lambda request: render(request, 'about.html'), name='about'),
-    path('contact/', lambda request: render(request, 'contact.html'), name='contact'),
-    path('privacy/', lambda request: render(request, 'privacy.html'), name='privacy'),
-    path('terms/', lambda request: render(request, 'terms.html'), name='terms'),
 ]

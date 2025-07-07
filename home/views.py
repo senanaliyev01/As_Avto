@@ -1573,5 +1573,8 @@ def change_product_image(request, product_id):
         })
     return JsonResponse({'success': False, 'message': 'Şəkil yüklənmədi'})
 
-def main_view(request):
-    return render(request, 'main.html')
+def root_view(request):
+    if request.user.is_authenticated:
+        return redirect('base')
+    else:
+        return redirect('login')

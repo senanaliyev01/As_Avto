@@ -852,12 +852,11 @@ function initializeCartSidebar() {
 function initializeProductsPage() {
     let offset = 5;
     let loading = false;
-    const tbody = document.getElementById('products-tbody');
+    const productsList = document.getElementById('products-list');
     const spinner = document.getElementById('loading-spinner');
-    let hasMore = false; // Bu dəyər HTML-dən gələcək
+    let hasMore = false;
 
-    // hasMore dəyərini HTML-dən alırıq
-    if (tbody) {
+    if (productsList) {
         const hasMoreElement = document.querySelector('[data-has-more]');
         if (hasMoreElement) {
             hasMore = hasMoreElement.dataset.hasMore === 'true';
@@ -866,62 +865,44 @@ function initializeProductsPage() {
 
     function loadMoreProducts() {
         if (loading || !hasMore) return;
-        
         loading = true;
         if (spinner) {
             spinner.style.display = 'flex';
         }
-        
         const params = new URLSearchParams(window.location.search);
         params.append('offset', offset);
-        
-        // Determine if we're on the new products page
         const isNewProductsPage = window.location.pathname.includes('new-products');
         const endpoint = isNewProductsPage ? '/load-more-new-products/' : '/load-more-products/';
-        
         setTimeout(() => {
             fetch(`${endpoint}?${params.toString()}`)
                 .then(response => response.json())
                 .then(data => {
-                    if (tbody) {
+                    if (productsList) {
                         data.products.forEach(product => {
-                            const row = document.createElement('tr');
+                            const row = document.createElement('div');
+                            row.className = 'product-row';
                             row.innerHTML = `
-                                <td><img src="${product.sekil_url || '/static/images/no_image.webp'}" alt="${product.adi}" class="product-image" onclick="openImageModal('${product.sekil_url}')"></td>
-                                <td>${product.brend_kod}</td>
-                                <td>${product.firma}</td>
-                                <td>
-                                    <span class="product-name-ellipsis">${product.adi}</span>
-                                    ${product.yenidir ? '<span class="new-badge">Yeni</span>' : ''}
-                                </td>
-                                <td>
-                                    ${product.sahib_id ? `<a href="#" class=\"seller-link\" onclick=\"openUserDetailsModal(${product.sahib_id}); return false;\"><i class=\"fas fa-user\"></i> ${product.sahib_username}</a>` : 'AS-AVTO'}
-                                </td>
-                                <td>${product.stok}</td>
-                                <td>${product.qiymet} ₼</td>
-                                <td>
-                                    <button type="button" 
-                                            class="cart-add-btn" 
-                                            ${product.stok === 0 ? 'disabled' : ''}
-                                            onclick="openQuantityModal(${product.id}, ${product.stok})">
+                                <div class="product-row-image">
+                                    <img src="${product.sekil_url || '/static/images/no_image.webp'}" alt="${product.adi}" onclick="openImageModal('${product.sekil_url}')">
+                                </div>
+                                <div class="product-row-info">
+                                    <div class="product-title">${product.adi} ${product.brend_kod} ${product.firma} ${product.avtomobil}</div>
+                                    <div class="product-meta"><span class="product-code">Stok: ${product.stok}</span></div>
+                                    <div class="product-price">${product.qiymet} ₼</div>
+                                </div>
+                                <div class="product-row-actions">
+                                    <button type="button" class="cart-add-btn" ${product.stok === 0 ? 'disabled' : ''} onclick="openQuantityModal(${product.id}, ${product.stok})">
                                         <i class="fas fa-shopping-cart"></i>
                                     </button>
-                                </td>
-                                <td>
-                                    <button type="button" 
-                                            class="details-btn" 
-                                            onclick="openDetailsModal(${product.id})">
+                                    <button type="button" class="details-btn" onclick="openDetailsModal(${product.id})">
                                         <i class="fas fa-info-circle"></i>
                                     </button>
-                                </td>
+                                </div>
                             `;
-                            tbody.appendChild(row);
+                            productsList.appendChild(row);
                         });
-                        
                         hasMore = data.has_more;
                         offset += 5;
-                        
-                        // Initialize image modal for new images
                         initializeImageModal();
                     }
                 })
@@ -934,11 +915,9 @@ function initializeProductsPage() {
                         spinner.style.display = 'none';
                     }
                 });
-        }, 500); // 0.5 saniyə gözləmə
+        }, 500);
     }
-
-    // Scroll event listener
-    if (tbody) {
+    if (productsList) {
         window.addEventListener('scroll', () => {
             if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 200) {
                 loadMoreProducts();

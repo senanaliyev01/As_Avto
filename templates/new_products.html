@@ -26,9 +26,6 @@
                 <button type="button" class="cart-add-btn" {% if mehsul.stok == 0 %}disabled{% endif %} onclick="openQuantityModal({{ mehsul.id }}, {{ mehsul.stok }})">
                     <i class="fas fa-shopping-cart"></i>
                 </button>
-                <button type="button" class="details-btn" onclick="openDetailsModal({{ mehsul.id }})">
-                    <i class="fas fa-info-circle"></i>
-                </button>
             </div>
         </div>
         {% empty %}
@@ -66,61 +63,6 @@
     <span class="image-modal-close">&times;</span>
     <div class="modal-image-content">
         <img id="modalImage" class="modal-image" src="" alt="Modal Image">
-    </div>
-</div>
-
-<!-- Details Modal -->
-<div id="detailsModal" class="details-modal">
-    <div class="details-modal-content">
-        <span class="details-modal-close">&times;</span>
-        <div class="details-content">
-            <div class="details-header">
-                <h3>Məhsul Məlumatları</h3>
-            </div>
-            <div class="details-body">
-                <div class="details-image">
-                    <img id="detailsImage" src="" alt="Məhsul şəkli">
-                </div>
-                <div class="details-info">
-                    <div class="info-row">
-                        <span class="info-label">Məhsul adı:</span>
-                        <span id="detailsName" class="info-value"></span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Kateqoriya:</span>
-                        <span id="detailsCategory" class="info-value"></span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Firma:</span>
-                        <span id="detailsFirma" class="info-value"></span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Avtomobil:</span>
-                        <span id="detailsAvtomobil" class="info-value"></span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Brend Kodu:</span>
-                        <span id="detailsBrendKod" class="info-value"></span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Ölçü:</span>
-                        <span id="detailsOlcu" class="info-value"></span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Qiymət:</span>
-                        <span id="detailsQiymet" class="info-value"></span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Stok:</span>
-                        <span id="detailsStok" class="info-value"></span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Məlumat:</span>
-                        <span id="detailsMelumat" class="info-value"></span>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 

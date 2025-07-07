@@ -593,39 +593,8 @@ def register_view(request):
         return JsonResponse({'success': True})
     return redirect('base')
 
-@require_http_methods(["GET"])
-def product_details(request, product_id):
-    try:
-        product = Mehsul.objects.get(id=product_id)
-        data = {
-            'status': 'success',
-            'product': {
-                'id': product.id,
-                'adi': product.adi,
-                'kateqoriya': product.kateqoriya.adi if product.kateqoriya else None,
-                'firma': product.firma.adi,
-                'avtomobil': product.avtomobil.adi,
-                'brend_kod': product.brend_kod,
-                'olcu': product.olcu,
-                'qiymet': str(product.qiymet),
-                'stok': product.stok,
-                'melumat': product.melumat,
-                'sekil_url': product.sekil.url if product.sekil else None,
-                'sahib_id': product.sahib.id if product.sahib else None,
-                'sahib_username': product.sahib.username if product.sahib else None,
-            }
-        }
-    except Mehsul.DoesNotExist:
-        data = {
-            'status': 'error',
-            'message': 'Məhsul tapılmadı.'
-        }
-    except Exception as e:
-        data = {
-            'status': 'error',
-            'message': 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.'
-        }
-    return JsonResponse(data)
+
+
 
 @login_required
 def my_products_view(request):

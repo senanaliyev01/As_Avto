@@ -53,15 +53,14 @@ class FirmaAdmin(admin.ModelAdmin):
     logo_tag.short_description = "Logo"
     logo_tag.allow_tags = True
 
-@admin.register(Avtomobil)
+class AvtomobilSekilInline(admin.TabularInline):
+    model = AvtomobilSekil
+    extra = 1
+
 class AvtomobilAdmin(admin.ModelAdmin):
     list_display = ['adi']
     search_fields = ['adi']
     inlines = [AvtomobilSekilInline]
-
-class AvtomobilSekilInline(admin.TabularInline):
-    model = AvtomobilSekil
-    extra = 1
 
 @admin.register(Mehsul)
 class MehsulAdmin(admin.ModelAdmin):

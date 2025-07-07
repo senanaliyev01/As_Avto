@@ -13,15 +13,15 @@
                 <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" onclick="openImageModal('{{ mehsul.sekil.url }}')">
             </div>
             <div class="product-row-info">
-                <div class="product-title">{{ mehsul.adi }} {{ mehsul.brend_kod }} {{ mehsul.firma.adi }}</div>
+                <div class="product-title">{{ mehsul.adi }} {{ mehsul.brend_kod }} {{ mehsul.firma.adi }} Stok: {{ mehsul.stok}}</div>
                 <div class="product-meta">
-                    <span class="product-code">Stok: {{ mehsul.stok }}</span> 
+                    {% if mehsul.sahib %}
+                    <a href="#" class="seller-link" onclick="openUserDetailsModal({{ mehsul.sahib.id }}); return false;"><i class="fas fa-user"></i> {{ mehsul.sahib.username }}</a>
+                    {% endif %}
                 </div>
                 <div class="product-price">{{ mehsul.qiymet }} ₼</div>
             </div>
-            {% if mehsul.sahib %}
-            <a href="#" class="seller-link" onclick="openUserDetailsModal({{ mehsul.sahib.id }}); return false;"><i class="fas fa-user"></i> {{ mehsul.sahib.username }}</a>
-            {% endif %}
+          
             {% if mehsul.avtomobil.logo %}
             <img class="avtomobil-logo" src="{{ mehsul.avtomobil.logo.url }}" alt="{{ mehsul.avtomobil.adi }}">
             {% endif %}

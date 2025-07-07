@@ -14,17 +14,15 @@
             </div>
             <div class="product-row-info">
                 <div class="product-title">{{ mehsul.adi }} {{ mehsul.brend_kod }} {{ mehsul.firma.adi }}</div>
+                {% if mehsul.firma.logo %}
+                <div class="firma-logo-wrapper">
+                    <img src="{{ mehsul.firma.logo.url }}" alt="{{ mehsul.firma.adi }} logo" class="firma-logo">
+                </div>
+                {% endif %}
                 <div class="product-meta">
                     <span class="product-code">Stok: {{ mehsul.stok }}</span> 
                 </div>
                 <div class="product-price">{{ mehsul.qiymet }} ₼</div>
-            </div>
-            <div class="product-firma-logo">
-                {% if mehsul.firma.logo %}
-                    <img src="{{ mehsul.firma.logo.url }}" alt="{{ mehsul.firma.adi }} logo">
-                {% else %}
-                    <img src="/static/images/no_image.webp" alt="No logo">
-                {% endif %}
             </div>
             <div class="product-row-actions">
                 <button type="button" class="cart-add-btn" {% if mehsul.stok == 0 %}disabled{% endif %} onclick="openQuantityModal({{ mehsul.id }}, {{ mehsul.stok }})">

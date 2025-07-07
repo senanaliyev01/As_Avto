@@ -5033,24 +5033,18 @@ body {
     }
 }
 
-.product-firma-logo {
+.firma-logo-wrapper {
     display: flex;
-    align-items: center;
     justify-content: center;
-    min-width: 100px;
-    max-width: 120px;
-    margin: 0 2px 0 8px;
-    flex-shrink: 0;
-    overflow: hidden;
+    align-items: center;
+    margin: 12px 0;
 }
-.product-firma-logo img {
-    max-width: 150px;
-    max-height: 150px;
+.firma-logo {
+    max-width: 80px;
+    max-height: 80px;
+    width: auto;
+    height: auto;
     object-fit: contain;
-    border-radius: 6px;
-    background: #fff;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-    padding: 2px;
     display: block;
     margin: 0 auto;
 }

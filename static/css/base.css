@@ -4997,12 +4997,11 @@ body {
 }
 
 .avtomobil-logos {
-    display: flex;
-    align-items: center;
     position: absolute;
-    right: 250px;
+    right: 220px;
     top: 50%;
     transform: translateY(-50%);
+    display: flex;
     gap: 8px;
     z-index: 2;
 }

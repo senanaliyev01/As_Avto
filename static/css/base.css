@@ -4983,7 +4983,7 @@ body {
 
 .avtomobil-logo {
     display: inline-block;
-    position: absolute;
+    position: static;
     width: 60px;
     height: 60px;
     right: 400px;

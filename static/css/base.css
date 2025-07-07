@@ -4984,14 +4984,13 @@ body {
 }
 
 .avtomobil-logo {
-    display: inline-block;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
     position: static;
     width: 60px;
     height: 60px;
-    right: 100px;
     object-fit: contain;
-    margin-right: 8px;
-    vertical-align: middle;
     background: none;
     border: none;
     box-shadow: none;

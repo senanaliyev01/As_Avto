@@ -1572,3 +1572,6 @@ def change_product_image(request, product_id):
             'sekil_url': mehsul.sekil.url
         })
     return JsonResponse({'success': False, 'message': 'Şəkil yüklənmədi'})
+
+def main_view(request):
+    return render(request, 'main.html')

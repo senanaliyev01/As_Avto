@@ -1277,8 +1277,10 @@ body {
 }
 
 .product-title {
-    font-size: 18px;
-    font-weight: 400;
+    font-family: Montserrat, Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    font-weight: normal;
+    font-style: normal;
     color: #0080ff;
     margin-bottom: 4px;
     white-space: normal;

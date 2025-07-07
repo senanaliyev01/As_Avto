@@ -126,17 +126,6 @@ def products_view(request):
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter).order_by('-id')
             else:
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter).order_by('-id')
-            # Əlavə: inputda yazılan hər hansı hissə məhsulun adi, brend_kod, kodlar, olcu, melumat, firma.adi, avtomobil.adi sahələrinin hər hansı birində varsa, həmin məhsul çıxacaq
-            extra_filter = (
-                Q(adi__icontains=search_query) |
-                Q(brend_kod__icontains=search_query) |
-                Q(kodlar__icontains=search_query) |
-                Q(olcu__icontains=search_query) |
-                Q(melumat__icontains=search_query) |
-                Q(firma__adi__icontains=search_query) |
-                Q(avtomobil__adi__icontains=search_query)
-            )
-            mehsullar = mehsullar | Mehsul.objects.filter(extra_filter)
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
     return render(request, 'products.html', {
@@ -167,17 +156,6 @@ def load_more_products(request):
                 mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | ad_filter).order_by('-id')
             else:
                 mehsullar = mehsullar.filter(kod_filter | brend_kod_filter).order_by('-id')
-            # Əlavə: inputda yazılan hər hansı hissə məhsulun adi, brend_kod, kodlar, olcu, melumat, firma.adi, avtomobil.adi sahələrinin hər hansı birində varsa, həmin məhsul çıxacaq
-            extra_filter = (
-                Q(adi__icontains=search_query) |
-                Q(brend_kod__icontains=search_query) |
-                Q(kodlar__icontains=search_query) |
-                Q(olcu__icontains=search_query) |
-                Q(melumat__icontains=search_query) |
-                Q(firma__adi__icontains=search_query) |
-                Q(avtomobil__adi__icontains=search_query)
-            )
-            mehsullar = mehsullar | Mehsul.objects.filter(extra_filter)
     products = mehsullar[offset:offset + limit]
     has_more = mehsullar.count() > (offset + limit)
     products_data = []
@@ -543,46 +521,19 @@ def new_products_view(request):
     # İlk 5 məhsulu götür
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
+    
     kateqoriyalar = Kateqoriya.objects.all()
     firmalar = Firma.objects.all()
     avtomobiller = Avtomobil.objects.all()
     popup_images = PopupImage.objects.filter(aktiv=True)
-    search_query = request.GET.get('search', '')
-    if search_query:
-        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
-        if clean_search:
-            kod_filter = Q(kodlar__icontains=clean_search)
-            olcu_filter = Q(olcu__icontains=clean_search)
-            brend_kod_filter = Q(brend_kod__icontains=search_query)
-            processed_query = re.sub(r'\s+', ' ', search_query).strip()
-            search_words = processed_query.split()
-            if search_words:
-                ad_filters = []
-                for word in search_words:
-                    ad_filters.append(Q(adi__icontains=word))
-                ad_filter = reduce(and_, ad_filters)
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter)
-            else:
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)
-            # Əlavə: inputda yazılan hər hansı hissə məhsulun adi, brend_kod, kodlar, olcu, melumat, firma.adi, avtomobil.adi sahələrinin hər hansı birində varsa, həmin məhsul çıxacaq
-            extra_filter = (
-                Q(adi__icontains=search_query) |
-                Q(brend_kod__icontains=search_query) |
-                Q(kodlar__icontains=search_query) |
-                Q(olcu__icontains=search_query) |
-                Q(melumat__icontains=search_query) |
-                Q(firma__adi__icontains=search_query) |
-                Q(avtomobil__adi__icontains=search_query)
-            )
-            mehsullar = mehsullar | Mehsul.objects.filter(yenidir=True).filter(extra_filter)
+    
     return render(request, 'new_products.html', {
         'mehsullar': initial_products,
         'has_more': has_more,
         'kateqoriyalar': kateqoriyalar,
         'firmalar': firmalar,
         'avtomobiller': avtomobiller,
-        'popup_images': popup_images,
-        'search_query': search_query,
+        'popup_images': popup_images
     })
 
 
@@ -590,33 +541,6 @@ def load_more_new_products(request):
     offset = int(request.GET.get('offset', 0))
     limit = 5
     mehsullar = Mehsul.objects.filter(yenidir=True).order_by('-id')
-    search_query = request.GET.get('search', '')
-    if search_query:
-        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
-        if clean_search:
-            kod_filter = Q(kodlar__icontains=clean_search)
-            brend_kod_filter = Q(brend_kod__icontains=search_query)
-            processed_query = re.sub(r'\s+', ' ', search_query).strip()
-            search_words = processed_query.split()
-            if search_words:
-                ad_filters = []
-                for word in search_words:
-                    ad_filters.append(Q(adi__icontains=word))
-                ad_filter = reduce(and_, ad_filters)
-                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | ad_filter)
-            else:
-                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter)
-            # Əlavə: inputda yazılan hər hansı hissə məhsulun adi, brend_kod, kodlar, olcu, melumat, firma.adi, avtomobil.adi sahələrinin hər hansı birində varsa, həmin məhsul çıxacaq
-            extra_filter = (
-                Q(adi__icontains=search_query) |
-                Q(brend_kod__icontains=search_query) |
-                Q(kodlar__icontains=search_query) |
-                Q(olcu__icontains=search_query) |
-                Q(melumat__icontains=search_query) |
-                Q(firma__adi__icontains=search_query) |
-                Q(avtomobil__adi__icontains=search_query)
-            )
-            mehsullar = mehsullar | Mehsul.objects.filter(yenidir=True).filter(extra_filter)
     products = mehsullar[offset:offset + limit]
     has_more = mehsullar.count() > (offset + limit)
     products_data = []
@@ -678,6 +602,7 @@ def my_products_view(request):
     if not request.user.profile.is_verified:
         messages.error(request, 'Bu səhifəyə giriş üçün icazəniz yoxdur.')
         return redirect('base')
+    
     search_query = request.GET.get('search', '')
     mehsullar = Mehsul.objects.filter(sahib=request.user).order_by('-id')
     if search_query:
@@ -685,10 +610,12 @@ def my_products_view(request):
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
+            # brend_kod üçün həm istifadəçi sorğusunu, həm də brend_kod-u təmizləyib müqayisə edirik
             def clean_code(val):
                 return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
             brend_kod_ids = [m.id for m in mehsullar if clean_code(search_query) in clean_code(m.brend_kod)]
             brend_kod_filter = Q(id__in=brend_kod_ids)
+            # Ad ilə təkmilləşdirilmiş axtarış
             processed_query = re.sub(r'\s+', ' ', search_query).strip()
             search_words = processed_query.split()
             if search_words:
@@ -701,17 +628,6 @@ def my_products_view(request):
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter)
             else:
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)
-            # Əlavə: inputda yazılan hər hansı hissə məhsulun adi, brend_kod, kodlar, olcu, melumat, firma.adi, avtomobil.adi sahələrinin hər hansı birində varsa, həmin məhsul çıxacaq
-            extra_filter = (
-                Q(adi__icontains=search_query) |
-                Q(brend_kod__icontains=search_query) |
-                Q(kodlar__icontains=search_query) |
-                Q(olcu__icontains=search_query) |
-                Q(melumat__icontains=search_query) |
-                Q(firma__adi__icontains=search_query) |
-                Q(avtomobil__adi__icontains=search_query)
-            )
-            mehsullar = mehsullar | Mehsul.objects.filter(sahib=request.user).filter(extra_filter)
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
     return render(request, 'my_products.html', {
@@ -745,17 +661,6 @@ def load_more_my_products(request):
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter)
             else:
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)
-            # Əlavə: inputda yazılan hər hansı hissə məhsulun adi, brend_kod, kodlar, olcu, melumat, firma.adi, avtomobil.adi sahələrinin hər hansı birində varsa, həmin məhsul çıxacaq
-            extra_filter = (
-                Q(adi__icontains=search_query) |
-                Q(brend_kod__icontains=search_query) |
-                Q(kodlar__icontains=search_query) |
-                Q(olcu__icontains=search_query) |
-                Q(melumat__icontains=search_query) |
-                Q(firma__adi__icontains=search_query) |
-                Q(avtomobil__adi__icontains=search_query)
-            )
-            mehsullar = mehsullar | Mehsul.objects.filter(sahib=request.user).filter(extra_filter)
     products = mehsullar[offset:offset+limit]
     has_more = mehsullar.count() > (offset + limit)
     products_data = []

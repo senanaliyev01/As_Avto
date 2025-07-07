@@ -893,6 +893,7 @@ def delete_product_view(request, product_id):
     return redirect('my_products')
 
 @require_http_methods(["GET"])
+@login_required
 def user_details_view(request, user_id):
     try:
         user = User.objects.select_related('profile').get(id=user_id)
@@ -1057,6 +1058,7 @@ def import_user_products_view(request):
     
     return redirect('my_products')
 
+@login_required
 def my_sale_pdf(request, order_id):
     from home.models import Sifaris, SifarisItem, Profile
     from django.contrib.auth.models import User
@@ -1394,7 +1396,8 @@ def unread_sales_count(request):
             request.user.profile.yeni_unread_sales = 0
             request.user.profile.save()
         return JsonResponse({'status': 'ok'})
-
+    
+@login_required
 def seller_admin_panel(request):
     if not request.user.is_authenticated or not hasattr(request.user, 'profile') or not request.user.profile.is_verified:
         from django.contrib import messages

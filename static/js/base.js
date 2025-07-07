@@ -905,6 +905,7 @@ function initializeProductsPage() {
                                     <div class="product-meta">
                                         ${product.sahib_id && product.sahib_username ? `<a href=\"#\" class=\"seller-link\" onclick=\"openUserDetailsModal(${product.sahib_id}); return false;\"><i class='fas fa-user'></i> ${product.sahib_username}</a>` : ''}
                                     </div>
+                                    <div class="product-stock">Stok: ${product.brend_kod}</div>
                                     <div class="product-stock">Stok: ${product.stok}</div>
                                 </div>
                                 ${avtomobilLogosHtml}

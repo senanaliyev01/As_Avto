@@ -5032,3 +5032,21 @@ body {
         justify-content: flex-end;
     }
 }
+
+.product-firma-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 60px;
+    max-width: 80px;
+    margin: 0 10px;
+}
+.product-firma-logo img {
+    max-width: 60px;
+    max-height: 40px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    padding: 2px;
+}

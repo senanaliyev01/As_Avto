@@ -22,11 +22,9 @@
                 <div class="product-stock">Stok: {{ mehsul.stok }}</div>
             </div>
           
-            <div class="avtomobil-logos">
             {% for logo in mehsul.avtomobil.logolar.all %}
-                <img class="avtomobil-logo" src="{{ logo.sekil.url }}" alt="{{ mehsul.avtomobil.adi }}">
+            <img class="avtomobil-logo" src="{{ logo.sekil.url }}" alt="{{ mehsul.avtomobil.adi }}">
             {% endfor %}
-            </div>
             {% if mehsul.firma.logo %}
             <img class="firma-logo" src="{{ mehsul.firma.logo.url }}" alt="{{ mehsul.firma.adi }}">
             {% endif %}

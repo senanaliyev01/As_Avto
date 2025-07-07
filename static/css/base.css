@@ -4965,3 +4965,18 @@ body {
     flex-direction: column;
     gap: 12px;
 }
+
+.avtomobil-logo {
+    position: absolute;
+    right: 280px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    z-index: 2;
+    background: none;
+    border: none;
+    box-shadow: none;
+    pointer-events: none;
+}

@@ -236,4 +236,8 @@ def create_user_profile(sender, instance, created, **kwargs):
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
+class AvtomobilSekil(models.Model):
+    avtomobil = models.ForeignKey('Avtomobil', related_name='sekiller', on_delete=models.CASCADE)
+    sekil = models.ImageField(upload_to='avtomobil_sekiller/')
+
 

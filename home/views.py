@@ -89,7 +89,7 @@ def login_view(request):
             return JsonResponse({'success': False, 'error': 'İstifadəçi adı və ya şifrə yanlışdır'})
     return redirect('base')
 
-@login_required
+
 def home_view(request):
     # Yeni məhsulları əldə et
     new_products = Mehsul.objects.filter(yenidir=True).order_by('-id')
@@ -100,7 +100,7 @@ def home_view(request):
         'popup_images': popup_images
     })
 
-@login_required
+
 def products_view(request):
     search_query = request.GET.get('search', '')
     mehsullar = Mehsul.objects.all().order_by('-id')
@@ -135,7 +135,7 @@ def products_view(request):
         'popup_images': popup_images
     })
 
-@login_required
+
 def load_more_products(request):
     offset = int(request.GET.get('offset', 0))
     limit = 5
@@ -462,7 +462,7 @@ def order_detail_view(request, order_id):
         'popup_images': popup_images
     })
 
-@login_required
+
 def search_suggestions(request):
     search_query = request.GET.get('search', '')
     
@@ -511,7 +511,7 @@ def search_suggestions(request):
     
     return JsonResponse({'suggestions': []})
 
-@login_required
+
 def new_products_view(request):
     # Yeni məhsulları əldə et
     mehsullar = Mehsul.objects.filter(yenidir=True).order_by('-id')  # Son əlavə olunanlar birinci
@@ -533,7 +533,7 @@ def new_products_view(request):
         'popup_images': popup_images
     })
 
-@login_required
+
 def load_more_new_products(request):
     offset = int(request.GET.get('offset', 0))
     limit = 5

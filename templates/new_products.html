@@ -19,6 +19,9 @@
                 </div>
                 <div class="product-price">{{ mehsul.qiymet }} ₼</div>
             </div>
+            {% if mehsul.sahib %}
+            <a href="#" class="seller-link" onclick="openUserDetailsModal({{ mehsul.sahib.id }}); return false;"><i class="fas fa-user"></i> {{ mehsul.sahib.username }}</a>
+            {% endif %}
             {% if mehsul.avtomobil.logo %}
             <img class="avtomobil-logo" src="{{ mehsul.avtomobil.logo.url }}" alt="{{ mehsul.avtomobil.adi }}">
             {% endif %}

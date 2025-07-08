@@ -895,6 +895,9 @@ function initializeProductsPage() {
                                 product.avtomobil_logo_urls.forEach(url => {
                                     avtomobilLogosHtml += `<img class='avtomobil-logo' src='${url}' alt='${product.avtomobil}'>`;
                                 });
+                                if (avtomobilLogosHtml) {
+                                    avtomobilLogosHtml = `<div class="avtomobil-logos-wrapper">${avtomobilLogosHtml}</div>`;
+                                }
                             }
                             div.innerHTML = `
                                 <div class="product-row-image">

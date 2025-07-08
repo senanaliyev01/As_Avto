@@ -117,16 +117,21 @@ def products_view(request):
                 output_field=CharField()
             )
         )
-        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
+        clean_search = clean_code(search_query)
         processed_query = re.sub(r'\s+', ' ', search_query).strip()
         search_words = processed_query.split()
         if clean_search:
-            kod_filter = Q(kodlar__icontains=clean_search)
-            olcu_filter = Q(olcu__icontains=clean_search)
-            def clean_code(val):
-                return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
-            brend_kod_ids = [m.id for m in Mehsul.objects.all() if clean_code(search_query) in clean_code(m.brend_kod)]
-            brend_kod_filter = Q(id__in=brend_kod_ids)
+            # All normalized field matches
+            matching_ids = [
+                m.id for m in mehsullar
+                if clean_search in clean_code(m.adi)
+                or clean_search in clean_code(m.brend_kod)
+                or clean_search in clean_code(m.kodlar)
+                or clean_search in clean_code(m.olcu)
+                or clean_search in clean_code(m.firma.adi if m.firma else '')
+                or clean_search in clean_code(m.avtomobil.adi if m.avtomobil else '')
+            ]
+            normalized_filter = Q(id__in=matching_ids)
             if search_words:
                 ad_filters = []
                 for word in search_words:
@@ -134,14 +139,13 @@ def products_view(request):
                     word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
                     ad_filters.append(word_filter)
                 ad_filter = reduce(and_, ad_filters)
-                # search_text üçün AND və AZ variantları ilə
                 searchtext_and_filter = reduce(
                     and_,
                     [reduce(or_, [Q(search_text__icontains=variation) for variation in normalize_azerbaijani_chars(word)]) for word in search_words]
                 )
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | searchtext_and_filter).order_by('-id')
+                mehsullar = mehsullar.filter(normalized_filter | ad_filter | searchtext_and_filter).order_by('-id')
             else:
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter).order_by('-id')
+                mehsullar = mehsullar.filter(normalized_filter).order_by('-id')
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
     return render(request, 'products.html', {
@@ -169,7 +173,7 @@ def load_more_products(request):
         )
         processed_query = re.sub(r'\s+', ' ', search_query).strip()
         search_words = processed_query.split()
-        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
+        clean_search = clean_code(search_query)
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
             brend_kod_filter = Q(brend_kod__icontains=search_query)
@@ -509,14 +513,19 @@ def search_suggestions(request):
         )
         processed_query = re.sub(r'\s+', ' ', search_query).strip()
         search_words = processed_query.split()
-        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
+        clean_search = clean_code(search_query)
         if clean_search:
-            kod_filter = Q(kodlar__icontains=clean_search)
-            olcu_filter = Q(olcu__icontains=clean_search)
-            def clean_code(val):
-                return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
-            brend_kod_ids = [m.id for m in mehsullar if clean_code(search_query) in clean_code(m.brend_kod)]
-            brend_kod_filter = Q(id__in=brend_kod_ids)
+            # All normalized field matches
+            matching_ids = [
+                m.id for m in mehsullar
+                if clean_search in clean_code(m.adi)
+                or clean_search in clean_code(m.brend_kod)
+                or clean_search in clean_code(m.kodlar)
+                or clean_search in clean_code(m.olcu)
+                or clean_search in clean_code(m.firma.adi if m.firma else '')
+                or clean_search in clean_code(m.avtomobil.adi if m.avtomobil else '')
+            ]
+            normalized_filter = Q(id__in=matching_ids)
             if search_words:
                 ad_filters = []
                 for word in search_words:
@@ -528,9 +537,9 @@ def search_suggestions(request):
                     and_,
                     [reduce(or_, [Q(search_text__icontains=variation) for variation in normalize_azerbaijani_chars(word)]) for word in search_words]
                 )
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | searchtext_and_filter)[:5]
+                mehsullar = mehsullar.filter(normalized_filter | ad_filter | searchtext_and_filter).order_by('-id')
             else:
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)[:5]
+                mehsullar = mehsullar.filter(normalized_filter).order_by('-id')
             suggestions = []
             for mehsul in mehsullar:
                 suggestions.append({
@@ -560,16 +569,21 @@ def new_products_view(request):
                 output_field=CharField()
             )
         )
+        clean_search = clean_code(search_query)
         processed_query = re.sub(r'\s+', ' ', search_query).strip()
         search_words = processed_query.split()
-        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         if clean_search:
-            kod_filter = Q(kodlar__icontains=clean_search)
-            olcu_filter = Q(olcu__icontains=clean_search)
-            def clean_code(val):
-                return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
-            brend_kod_ids = [m.id for m in mehsullar if clean_code(search_query) in clean_code(m.brend_kod)]
-            brend_kod_filter = Q(id__in=brend_kod_ids)
+            # All normalized field matches
+            matching_ids = [
+                m.id for m in mehsullar
+                if clean_search in clean_code(m.adi)
+                or clean_search in clean_code(m.brend_kod)
+                or clean_search in clean_code(m.kodlar)
+                or clean_search in clean_code(m.olcu)
+                or clean_search in clean_code(m.firma.adi if m.firma else '')
+                or clean_search in clean_code(m.avtomobil.adi if m.avtomobil else '')
+            ]
+            normalized_filter = Q(id__in=matching_ids)
             if search_words:
                 ad_filters = []
                 for word in search_words:
@@ -581,9 +595,9 @@ def new_products_view(request):
                     and_,
                     [reduce(or_, [Q(search_text__icontains=variation) for variation in normalize_azerbaijani_chars(word)]) for word in search_words]
                 )
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | searchtext_and_filter)
+                mehsullar = mehsullar.filter(normalized_filter | ad_filter | searchtext_and_filter)
             else:
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)
+                mehsullar = mehsullar.filter(normalized_filter)
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
     kateqoriyalar = Kateqoriya.objects.all()
@@ -615,9 +629,9 @@ def load_more_new_products(request):
                 output_field=CharField()
             )
         )
+        clean_search = clean_code(search_query)
         processed_query = re.sub(r'\s+', ' ', search_query).strip()
         search_words = processed_query.split()
-        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
             brend_kod_filter = Q(brend_kod__icontains=search_query)
@@ -706,16 +720,21 @@ def my_products_view(request):
                 output_field=CharField()
             )
         )
+        clean_search = clean_code(search_query)
         processed_query = re.sub(r'\s+', ' ', search_query).strip()
         search_words = processed_query.split()
-        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         if clean_search:
-            kod_filter = Q(kodlar__icontains=clean_search)
-            olcu_filter = Q(olcu__icontains=clean_search)
-            def clean_code(val):
-                return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
-            brend_kod_ids = [m.id for m in mehsullar if clean_code(search_query) in clean_code(m.brend_kod)]
-            brend_kod_filter = Q(id__in=brend_kod_ids)
+            # All normalized field matches
+            matching_ids = [
+                m.id for m in mehsullar
+                if clean_search in clean_code(m.adi)
+                or clean_search in clean_code(m.brend_kod)
+                or clean_search in clean_code(m.kodlar)
+                or clean_search in clean_code(m.olcu)
+                or clean_search in clean_code(m.firma.adi if m.firma else '')
+                or clean_search in clean_code(m.avtomobil.adi if m.avtomobil else '')
+            ]
+            normalized_filter = Q(id__in=matching_ids)
             if search_words:
                 ad_filters = []
                 for word in search_words:
@@ -727,9 +746,9 @@ def my_products_view(request):
                     and_,
                     [reduce(or_, [Q(search_text__icontains=variation) for variation in normalize_azerbaijani_chars(word)]) for word in search_words]
                 )
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | searchtext_and_filter)
+                mehsullar = mehsullar.filter(normalized_filter | ad_filter | searchtext_and_filter)
             else:
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)
+                mehsullar = mehsullar.filter(normalized_filter)
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
     return render(request, 'my_products.html', {
@@ -757,9 +776,9 @@ def load_more_my_products(request):
                 output_field=CharField()
             )
         )
+        clean_search = clean_code(search_query)
         processed_query = re.sub(r'\s+', ' ', search_query).strip()
         search_words = processed_query.split()
-        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
@@ -1622,3 +1641,6 @@ def root_view(request):
         return redirect('base')
     else:
         return redirect('login')
+
+def clean_code(val):
+    return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''

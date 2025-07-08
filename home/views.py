@@ -113,18 +113,20 @@ def products_view(request):
                 'adi', Value(' '),
                 'brend_kod', Value(' '),
                 'firma__adi', Value(' '),
-                'avtomobil__adi',
+                'avtomobil__adi', Value(' '),
+                'kodlar',
                 output_field=CharField()
             )
         )
-        processed_query = normalize_search_text(search_query)
+        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
+        processed_query = re.sub(r'\s+', ' ', search_query).strip()
         search_words = processed_query.split()
-        if processed_query:
-            kod_filter = Q(kodlar__icontains=processed_query)
-            olcu_filter = Q(olcu__icontains=processed_query)
+        if clean_search:
+            kod_filter = Q(kodlar__icontains=clean_search)
+            olcu_filter = Q(olcu__icontains=clean_search)
             def clean_code(val):
-                return normalize_search_text(val) if val else ''
-            brend_kod_ids = [m.id for m in Mehsul.objects.all() if clean_code(processed_query) in clean_code(m.brend_kod)]
+                return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
+            brend_kod_ids = [m.id for m in Mehsul.objects.all() if clean_code(search_query) in clean_code(m.brend_kod)]
             brend_kod_filter = Q(id__in=brend_kod_ids)
             if search_words:
                 ad_filters = []
@@ -133,6 +135,7 @@ def products_view(request):
                     word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
                     ad_filters.append(word_filter)
                 ad_filter = reduce(and_, ad_filters)
+                # search_text üçün AND və AZ variantları ilə
                 searchtext_and_filter = reduce(
                     and_,
                     [reduce(or_, [Q(search_text__icontains=variation) for variation in normalize_azerbaijani_chars(word)]) for word in search_words]
@@ -161,14 +164,16 @@ def load_more_products(request):
                 'adi', Value(' '),
                 'brend_kod', Value(' '),
                 'firma__adi', Value(' '),
-                'avtomobil__adi',
+                'avtomobil__adi', Value(' '),
+                'kodlar',
                 output_field=CharField()
             )
         )
-        processed_query = normalize_search_text(search_query)
+        processed_query = re.sub(r'\s+', ' ', search_query).strip()
         search_words = processed_query.split()
-        if processed_query:
-            kod_filter = Q(kodlar__icontains=processed_query)
+        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
+        if clean_search:
+            kod_filter = Q(kodlar__icontains=clean_search)
             brend_kod_filter = Q(brend_kod__icontains=search_query)
             if search_words:
                 ad_filters = []
@@ -500,18 +505,20 @@ def search_suggestions(request):
                 'adi', Value(' '),
                 'brend_kod', Value(' '),
                 'firma__adi', Value(' '),
-                'avtomobil__adi',
+                'avtomobil__adi', Value(' '),
+                'kodlar',
                 output_field=CharField()
             )
         )
-        processed_query = normalize_search_text(search_query)
+        processed_query = re.sub(r'\s+', ' ', search_query).strip()
         search_words = processed_query.split()
-        if processed_query:
-            kod_filter = Q(kodlar__icontains=processed_query)
-            olcu_filter = Q(olcu__icontains=processed_query)
+        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
+        if clean_search:
+            kod_filter = Q(kodlar__icontains=clean_search)
+            olcu_filter = Q(olcu__icontains=clean_search)
             def clean_code(val):
-                return normalize_search_text(val) if val else ''
-            brend_kod_ids = [m.id for m in mehsullar if clean_code(processed_query) in clean_code(m.brend_kod)]
+                return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
+            brend_kod_ids = [m.id for m in mehsullar if clean_code(search_query) in clean_code(m.brend_kod)]
             brend_kod_filter = Q(id__in=brend_kod_ids)
             if search_words:
                 ad_filters = []
@@ -552,18 +559,20 @@ def new_products_view(request):
                 'adi', Value(' '),
                 'brend_kod', Value(' '),
                 'firma__adi', Value(' '),
-                'avtomobil__adi',
+                'avtomobil__adi', Value(' '),
+                'kodlar',
                 output_field=CharField()
             )
         )
-        processed_query = normalize_search_text(search_query)
+        processed_query = re.sub(r'\s+', ' ', search_query).strip()
         search_words = processed_query.split()
-        if processed_query:
-            kod_filter = Q(kodlar__icontains=processed_query)
-            olcu_filter = Q(olcu__icontains=processed_query)
+        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
+        if clean_search:
+            kod_filter = Q(kodlar__icontains=clean_search)
+            olcu_filter = Q(olcu__icontains=clean_search)
             def clean_code(val):
-                return normalize_search_text(val) if val else ''
-            brend_kod_ids = [m.id for m in mehsullar if clean_code(processed_query) in clean_code(m.brend_kod)]
+                return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
+            brend_kod_ids = [m.id for m in mehsullar if clean_code(search_query) in clean_code(m.brend_kod)]
             brend_kod_filter = Q(id__in=brend_kod_ids)
             if search_words:
                 ad_filters = []
@@ -606,14 +615,16 @@ def load_more_new_products(request):
                 'adi', Value(' '),
                 'brend_kod', Value(' '),
                 'firma__adi', Value(' '),
-                'avtomobil__adi',
+                'avtomobil__adi', Value(' '),
+                'kodlar',
                 output_field=CharField()
             )
         )
-        processed_query = normalize_search_text(search_query)
+        processed_query = re.sub(r'\s+', ' ', search_query).strip()
         search_words = processed_query.split()
-        if processed_query:
-            kod_filter = Q(kodlar__icontains=processed_query)
+        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
+        if clean_search:
+            kod_filter = Q(kodlar__icontains=clean_search)
             brend_kod_filter = Q(brend_kod__icontains=search_query)
             if search_words:
                 ad_filters = []
@@ -696,18 +707,20 @@ def my_products_view(request):
                 'adi', Value(' '),
                 'brend_kod', Value(' '),
                 'firma__adi', Value(' '),
-                'avtomobil__adi',
+                'avtomobil__adi', Value(' '),
+                'kodlar',
                 output_field=CharField()
             )
         )
-        processed_query = normalize_search_text(search_query)
+        processed_query = re.sub(r'\s+', ' ', search_query).strip()
         search_words = processed_query.split()
-        if processed_query:
-            kod_filter = Q(kodlar__icontains=processed_query)
-            olcu_filter = Q(olcu__icontains=processed_query)
+        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
+        if clean_search:
+            kod_filter = Q(kodlar__icontains=clean_search)
+            olcu_filter = Q(olcu__icontains=clean_search)
             def clean_code(val):
-                return normalize_search_text(val) if val else ''
-            brend_kod_ids = [m.id for m in mehsullar if clean_code(processed_query) in clean_code(m.brend_kod)]
+                return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
+            brend_kod_ids = [m.id for m in mehsullar if clean_code(search_query) in clean_code(m.brend_kod)]
             brend_kod_filter = Q(id__in=brend_kod_ids)
             if search_words:
                 ad_filters = []
@@ -746,15 +759,17 @@ def load_more_my_products(request):
                 'adi', Value(' '),
                 'brend_kod', Value(' '),
                 'firma__adi', Value(' '),
-                'avtomobil__adi',
+                'avtomobil__adi', Value(' '),
+                'kodlar',
                 output_field=CharField()
             )
         )
-        processed_query = normalize_search_text(search_query)
+        processed_query = re.sub(r'\s+', ' ', search_query).strip()
         search_words = processed_query.split()
-        if processed_query:
-            kod_filter = Q(kodlar__icontains=processed_query)
-            olcu_filter = Q(olcu__icontains=processed_query)
+        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
+        if clean_search:
+            kod_filter = Q(kodlar__icontains=clean_search)
+            olcu_filter = Q(olcu__icontains=clean_search)
             brend_kod_filter = Q(brend_kod__icontains=search_query)
             if search_words:
                 ad_filters = []
@@ -1614,9 +1629,3 @@ def root_view(request):
         return redirect('base')
     else:
         return redirect('login')
-
-def normalize_search_text(text):
-    # Remove all non-alphanumeric characters and collapse spaces
-    text = re.sub(r'[^\w\s]', ' ', text)  # Replace special chars with space
-    text = re.sub(r'\s+', ' ', text)  # Collapse multiple spaces
-    return text.strip().lower()

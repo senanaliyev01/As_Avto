@@ -118,6 +118,8 @@ def products_view(request):
             )
         )
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
+        processed_query = re.sub(r'\s+', ' ', search_query).strip()
+        search_words = processed_query.split()
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
@@ -125,8 +127,6 @@ def products_view(request):
                 return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
             brend_kod_ids = [m.id for m in Mehsul.objects.all() if clean_code(search_query) in clean_code(m.brend_kod)]
             brend_kod_filter = Q(id__in=brend_kod_ids)
-            processed_query = re.sub(r'\s+', ' ', search_query).strip()
-            search_words = processed_query.split()
             if search_words:
                 ad_filters = []
                 for word in search_words:
@@ -134,9 +134,11 @@ def products_view(request):
                     word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
                     ad_filters.append(word_filter)
                 ad_filter = reduce(and_, ad_filters)
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | Q(search_text__icontains=search_query)).order_by('-id')
+                # search_text üçün AND operatoru ilə
+                searchtext_and_filter = reduce(and_, [Q(search_text__icontains=word) for word in search_words])
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | searchtext_and_filter).order_by('-id')
             else:
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | Q(search_text__icontains=search_query)).order_by('-id')
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter).order_by('-id')
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
     return render(request, 'products.html', {
@@ -162,20 +164,21 @@ def load_more_products(request):
                 output_field=CharField()
             )
         )
+        processed_query = re.sub(r'\s+', ' ', search_query).strip()
+        search_words = processed_query.split()
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
             brend_kod_filter = Q(brend_kod__icontains=search_query)
-            processed_query = re.sub(r'\s+', ' ', search_query).strip()
-            search_words = processed_query.split()
             if search_words:
                 ad_filters = []
                 for word in search_words:
                     ad_filters.append(Q(adi__icontains=word))
                 ad_filter = reduce(and_, ad_filters)
-                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | ad_filter | Q(search_text__icontains=search_query)).order_by('-id')
+                searchtext_and_filter = reduce(and_, [Q(search_text__icontains=word) for word in search_words])
+                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | ad_filter | searchtext_and_filter).order_by('-id')
             else:
-                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | Q(search_text__icontains=search_query)).order_by('-id')
+                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter).order_by('-id')
     products = mehsullar[offset:offset + limit]
     has_more = mehsullar.count() > (offset + limit)
     products_data = []
@@ -498,6 +501,8 @@ def search_suggestions(request):
                 output_field=CharField()
             )
         )
+        processed_query = re.sub(r'\s+', ' ', search_query).strip()
+        search_words = processed_query.split()
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
@@ -506,8 +511,6 @@ def search_suggestions(request):
                 return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
             brend_kod_ids = [m.id for m in mehsullar if clean_code(search_query) in clean_code(m.brend_kod)]
             brend_kod_filter = Q(id__in=brend_kod_ids)
-            processed_query = re.sub(r'\s+', ' ', search_query).strip()
-            search_words = processed_query.split()
             if search_words:
                 ad_filters = []
                 for word in search_words:
@@ -515,9 +518,10 @@ def search_suggestions(request):
                     word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
                     ad_filters.append(word_filter)
                 ad_filter = reduce(and_, ad_filters)
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | Q(search_text__icontains=search_query))[:5]
+                searchtext_and_filter = reduce(and_, [Q(search_text__icontains=word) for word in search_words])
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | searchtext_and_filter)[:5]
             else:
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | Q(search_text__icontains=search_query))[:5]
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)[:5]
             suggestions = []
             for mehsul in mehsullar:
                 suggestions.append({
@@ -547,6 +551,8 @@ def new_products_view(request):
                 output_field=CharField()
             )
         )
+        processed_query = re.sub(r'\s+', ' ', search_query).strip()
+        search_words = processed_query.split()
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
@@ -555,8 +561,6 @@ def new_products_view(request):
                 return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
             brend_kod_ids = [m.id for m in mehsullar if clean_code(search_query) in clean_code(m.brend_kod)]
             brend_kod_filter = Q(id__in=brend_kod_ids)
-            processed_query = re.sub(r'\s+', ' ', search_query).strip()
-            search_words = processed_query.split()
             if search_words:
                 ad_filters = []
                 for word in search_words:
@@ -564,9 +568,10 @@ def new_products_view(request):
                     word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
                     ad_filters.append(word_filter)
                 ad_filter = reduce(and_, ad_filters)
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | Q(search_text__icontains=search_query))
+                searchtext_and_filter = reduce(and_, [Q(search_text__icontains=word) for word in search_words])
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | searchtext_and_filter)
             else:
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | Q(search_text__icontains=search_query))
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
     kateqoriyalar = Kateqoriya.objects.all()
@@ -598,20 +603,21 @@ def load_more_new_products(request):
                 output_field=CharField()
             )
         )
+        processed_query = re.sub(r'\s+', ' ', search_query).strip()
+        search_words = processed_query.split()
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
             brend_kod_filter = Q(brend_kod__icontains=search_query)
-            processed_query = re.sub(r'\s+', ' ', search_query).strip()
-            search_words = processed_query.split()
             if search_words:
                 ad_filters = []
                 for word in search_words:
                     ad_filters.append(Q(adi__icontains=word))
                 ad_filter = reduce(and_, ad_filters)
-                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | ad_filter | Q(search_text__icontains=search_query))
+                searchtext_and_filter = reduce(and_, [Q(search_text__icontains=word) for word in search_words])
+                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | ad_filter | searchtext_and_filter)
             else:
-                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | Q(search_text__icontains=search_query))
+                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter)
     products = mehsullar[offset:offset + limit]
     has_more = mehsullar.count() > (offset + limit)
     products_data = []
@@ -685,6 +691,8 @@ def my_products_view(request):
                 output_field=CharField()
             )
         )
+        processed_query = re.sub(r'\s+', ' ', search_query).strip()
+        search_words = processed_query.split()
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
@@ -693,8 +701,6 @@ def my_products_view(request):
                 return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
             brend_kod_ids = [m.id for m in mehsullar if clean_code(search_query) in clean_code(m.brend_kod)]
             brend_kod_filter = Q(id__in=brend_kod_ids)
-            processed_query = re.sub(r'\s+', ' ', search_query).strip()
-            search_words = processed_query.split()
             if search_words:
                 ad_filters = []
                 for word in search_words:
@@ -702,9 +708,10 @@ def my_products_view(request):
                     word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
                     ad_filters.append(word_filter)
                 ad_filter = reduce(and_, ad_filters)
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | Q(search_text__icontains=search_query))
+                searchtext_and_filter = reduce(and_, [Q(search_text__icontains=word) for word in search_words])
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | searchtext_and_filter)
             else:
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | Q(search_text__icontains=search_query))
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
     return render(request, 'my_products.html', {
@@ -732,21 +739,22 @@ def load_more_my_products(request):
                 output_field=CharField()
             )
         )
+        processed_query = re.sub(r'\s+', ' ', search_query).strip()
+        search_words = processed_query.split()
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
             brend_kod_filter = Q(brend_kod__icontains=search_query)
-            processed_query = re.sub(r'\s+', ' ', search_query).strip()
-            search_words = processed_query.split()
             if search_words:
                 ad_filters = []
                 for word in search_words:
                     ad_filters.append(Q(adi__icontains=word))
                 ad_filter = reduce(and_, ad_filters)
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | Q(search_text__icontains=search_query))
+                searchtext_and_filter = reduce(and_, [Q(search_text__icontains=word) for word in search_words])
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | searchtext_and_filter)
             else:
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | Q(search_text__icontains=search_query))
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)
     products = mehsullar[offset:offset+limit]
     has_more = mehsullar.count() > (offset + limit)
     products_data = []

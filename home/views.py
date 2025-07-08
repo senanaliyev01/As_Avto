@@ -134,8 +134,11 @@ def products_view(request):
                     word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
                     ad_filters.append(word_filter)
                 ad_filter = reduce(and_, ad_filters)
-                # search_text üçün AND operatoru ilə
-                searchtext_and_filter = reduce(and_, [Q(search_text__icontains=word) for word in search_words])
+                # search_text üçün AND və AZ variantları ilə
+                searchtext_and_filter = reduce(
+                    and_,
+                    [reduce(or_, [Q(search_text__icontains=variation) for variation in normalize_azerbaijani_chars(word)]) for word in search_words]
+                )
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | searchtext_and_filter).order_by('-id')
             else:
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter).order_by('-id')
@@ -175,7 +178,10 @@ def load_more_products(request):
                 for word in search_words:
                     ad_filters.append(Q(adi__icontains=word))
                 ad_filter = reduce(and_, ad_filters)
-                searchtext_and_filter = reduce(and_, [Q(search_text__icontains=word) for word in search_words])
+                searchtext_and_filter = reduce(
+                    and_,
+                    [reduce(or_, [Q(search_text__icontains=variation) for variation in normalize_azerbaijani_chars(word)]) for word in search_words]
+                )
                 mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | ad_filter | searchtext_and_filter).order_by('-id')
             else:
                 mehsullar = mehsullar.filter(kod_filter | brend_kod_filter).order_by('-id')
@@ -518,7 +524,10 @@ def search_suggestions(request):
                     word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
                     ad_filters.append(word_filter)
                 ad_filter = reduce(and_, ad_filters)
-                searchtext_and_filter = reduce(and_, [Q(search_text__icontains=word) for word in search_words])
+                searchtext_and_filter = reduce(
+                    and_,
+                    [reduce(or_, [Q(search_text__icontains=variation) for variation in normalize_azerbaijani_chars(word)]) for word in search_words]
+                )
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | searchtext_and_filter)[:5]
             else:
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)[:5]
@@ -568,7 +577,10 @@ def new_products_view(request):
                     word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
                     ad_filters.append(word_filter)
                 ad_filter = reduce(and_, ad_filters)
-                searchtext_and_filter = reduce(and_, [Q(search_text__icontains=word) for word in search_words])
+                searchtext_and_filter = reduce(
+                    and_,
+                    [reduce(or_, [Q(search_text__icontains=variation) for variation in normalize_azerbaijani_chars(word)]) for word in search_words]
+                )
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | searchtext_and_filter)
             else:
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)
@@ -614,7 +626,10 @@ def load_more_new_products(request):
                 for word in search_words:
                     ad_filters.append(Q(adi__icontains=word))
                 ad_filter = reduce(and_, ad_filters)
-                searchtext_and_filter = reduce(and_, [Q(search_text__icontains=word) for word in search_words])
+                searchtext_and_filter = reduce(
+                    and_,
+                    [reduce(or_, [Q(search_text__icontains=variation) for variation in normalize_azerbaijani_chars(word)]) for word in search_words]
+                )
                 mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | ad_filter | searchtext_and_filter)
             else:
                 mehsullar = mehsullar.filter(kod_filter | brend_kod_filter)
@@ -708,7 +723,10 @@ def my_products_view(request):
                     word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
                     ad_filters.append(word_filter)
                 ad_filter = reduce(and_, ad_filters)
-                searchtext_and_filter = reduce(and_, [Q(search_text__icontains=word) for word in search_words])
+                searchtext_and_filter = reduce(
+                    and_,
+                    [reduce(or_, [Q(search_text__icontains=variation) for variation in normalize_azerbaijani_chars(word)]) for word in search_words]
+                )
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | searchtext_and_filter)
             else:
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)
@@ -751,7 +769,10 @@ def load_more_my_products(request):
                 for word in search_words:
                     ad_filters.append(Q(adi__icontains=word))
                 ad_filter = reduce(and_, ad_filters)
-                searchtext_and_filter = reduce(and_, [Q(search_text__icontains=word) for word in search_words])
+                searchtext_and_filter = reduce(
+                    and_,
+                    [reduce(or_, [Q(search_text__icontains=variation) for variation in normalize_azerbaijani_chars(word)]) for word in search_words]
+                )
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | searchtext_and_filter)
             else:
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)

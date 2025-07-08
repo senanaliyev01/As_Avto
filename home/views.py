@@ -30,6 +30,8 @@ from reportlab.pdfbase.ttfonts import TTFont
 import io
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models.functions import Concat
+from django.db.models import CharField
 
 def truncate_product_name(name, max_length=20):
     """Məhsul adını qısaldır və uzun olarsa ... əlavə edir"""
@@ -106,6 +108,15 @@ def products_view(request):
     mehsullar = Mehsul.objects.all().order_by('-id')
     popup_images = PopupImage.objects.filter(aktiv=True)
     if search_query:
+        mehsullar = mehsullar.annotate(
+            search_text=Concat(
+                'adi', Value(' '),
+                'brend_kod', Value(' '),
+                'firma__adi', Value(' '),
+                'avtomobil__adi',
+                output_field=CharField()
+            )
+        )
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
@@ -123,9 +134,9 @@ def products_view(request):
                     word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
                     ad_filters.append(word_filter)
                 ad_filter = reduce(and_, ad_filters)
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter).order_by('-id')
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | Q(search_text__icontains=search_query)).order_by('-id')
             else:
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter).order_by('-id')
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | Q(search_text__icontains=search_query)).order_by('-id')
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
     return render(request, 'products.html', {
@@ -142,6 +153,15 @@ def load_more_products(request):
     search_query = request.GET.get('search', '')
     mehsullar = Mehsul.objects.all().order_by('-id')
     if search_query:
+        mehsullar = mehsullar.annotate(
+            search_text=Concat(
+                'adi', Value(' '),
+                'brend_kod', Value(' '),
+                'firma__adi', Value(' '),
+                'avtomobil__adi',
+                output_field=CharField()
+            )
+        )
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
@@ -153,9 +173,9 @@ def load_more_products(request):
                 for word in search_words:
                     ad_filters.append(Q(adi__icontains=word))
                 ad_filter = reduce(and_, ad_filters)
-                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | ad_filter).order_by('-id')
+                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | ad_filter | Q(search_text__icontains=search_query)).order_by('-id')
             else:
-                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter).order_by('-id')
+                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | Q(search_text__icontains=search_query)).order_by('-id')
     products = mehsullar[offset:offset + limit]
     has_more = mehsullar.count() > (offset + limit)
     products_data = []
@@ -468,23 +488,24 @@ def order_detail_view(request, order_id):
 
 def search_suggestions(request):
     search_query = request.GET.get('search', '')
-    
     if search_query:
-        # Kodlarla axtarış üçün əvvəlki təmizləmə
+        mehsullar = Mehsul.objects.all().annotate(
+            search_text=Concat(
+                'adi', Value(' '),
+                'brend_kod', Value(' '),
+                'firma__adi', Value(' '),
+                'avtomobil__adi',
+                output_field=CharField()
+            )
+        )
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
-        
         if clean_search:
-            # Kod və ölçü ilə axtarış
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
-            # brend_kod üçün həm istifadəçi sorğusunu, həm də brend_kod-u təmizləyib müqayisə edirik
             def clean_code(val):
                 return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
-            # Bütün məhsulları çəkib, təmizlənmiş brend_kod ilə uyğunluq tapanları tapırıq
-            brend_kod_ids = [m.id for m in Mehsul.objects.all() if clean_code(search_query) in clean_code(m.brend_kod)]
+            brend_kod_ids = [m.id for m in mehsullar if clean_code(search_query) in clean_code(m.brend_kod)]
             brend_kod_filter = Q(id__in=brend_kod_ids)
-            
-            # Ad ilə təkmilləşdirilmiş axtarış
             processed_query = re.sub(r'\s+', ' ', search_query).strip()
             search_words = processed_query.split()
             if search_words:
@@ -494,10 +515,9 @@ def search_suggestions(request):
                     word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
                     ad_filters.append(word_filter)
                 ad_filter = reduce(and_, ad_filters)
-                mehsullar = Mehsul.objects.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter)[:5]
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | Q(search_text__icontains=search_query))[:5]
             else:
-                mehsullar = Mehsul.objects.filter(kod_filter | olcu_filter | brend_kod_filter)[:5]
-            
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | Q(search_text__icontains=search_query))[:5]
             suggestions = []
             for mehsul in mehsullar:
                 suggestions.append({
@@ -511,22 +531,48 @@ def search_suggestions(request):
                     'satici': mehsul.sahib.username if mehsul.sahib else 'AS-AVTO',
                 })
             return JsonResponse({'suggestions': suggestions})
-    
     return JsonResponse({'suggestions': []})
 
 
 def new_products_view(request):
-    # Yeni məhsulları əldə et
-    mehsullar = Mehsul.objects.filter(yenidir=True).order_by('-id')  # Son əlavə olunanlar birinci
-    # İlk 5 məhsulu götür
+    search_query = request.GET.get('search', '')
+    mehsullar = Mehsul.objects.filter(yenidir=True).order_by('-id')
+    if search_query:
+        mehsullar = mehsullar.annotate(
+            search_text=Concat(
+                'adi', Value(' '),
+                'brend_kod', Value(' '),
+                'firma__adi', Value(' '),
+                'avtomobil__adi',
+                output_field=CharField()
+            )
+        )
+        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
+        if clean_search:
+            kod_filter = Q(kodlar__icontains=clean_search)
+            olcu_filter = Q(olcu__icontains=clean_search)
+            def clean_code(val):
+                return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
+            brend_kod_ids = [m.id for m in mehsullar if clean_code(search_query) in clean_code(m.brend_kod)]
+            brend_kod_filter = Q(id__in=brend_kod_ids)
+            processed_query = re.sub(r'\s+', ' ', search_query).strip()
+            search_words = processed_query.split()
+            if search_words:
+                ad_filters = []
+                for word in search_words:
+                    word_variations = normalize_azerbaijani_chars(word)
+                    word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
+                    ad_filters.append(word_filter)
+                ad_filter = reduce(and_, ad_filters)
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | Q(search_text__icontains=search_query))
+            else:
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | Q(search_text__icontains=search_query))
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
-    
     kateqoriyalar = Kateqoriya.objects.all()
     firmalar = Firma.objects.all()
     avtomobiller = Avtomobil.objects.all()
     popup_images = PopupImage.objects.filter(aktiv=True)
-    
     return render(request, 'new_products.html', {
         'mehsullar': initial_products,
         'has_more': has_more,
@@ -540,7 +586,32 @@ def new_products_view(request):
 def load_more_new_products(request):
     offset = int(request.GET.get('offset', 0))
     limit = 5
+    search_query = request.GET.get('search', '')
     mehsullar = Mehsul.objects.filter(yenidir=True).order_by('-id')
+    if search_query:
+        mehsullar = mehsullar.annotate(
+            search_text=Concat(
+                'adi', Value(' '),
+                'brend_kod', Value(' '),
+                'firma__adi', Value(' '),
+                'avtomobil__adi',
+                output_field=CharField()
+            )
+        )
+        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
+        if clean_search:
+            kod_filter = Q(kodlar__icontains=clean_search)
+            brend_kod_filter = Q(brend_kod__icontains=search_query)
+            processed_query = re.sub(r'\s+', ' ', search_query).strip()
+            search_words = processed_query.split()
+            if search_words:
+                ad_filters = []
+                for word in search_words:
+                    ad_filters.append(Q(adi__icontains=word))
+                ad_filter = reduce(and_, ad_filters)
+                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | ad_filter | Q(search_text__icontains=search_query))
+            else:
+                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | Q(search_text__icontains=search_query))
     products = mehsullar[offset:offset + limit]
     has_more = mehsullar.count() > (offset + limit)
     products_data = []
@@ -602,20 +673,26 @@ def my_products_view(request):
     if not request.user.profile.is_verified:
         messages.error(request, 'Bu səhifəyə giriş üçün icazəniz yoxdur.')
         return redirect('base')
-    
     search_query = request.GET.get('search', '')
     mehsullar = Mehsul.objects.filter(sahib=request.user).order_by('-id')
     if search_query:
+        mehsullar = mehsullar.annotate(
+            search_text=Concat(
+                'adi', Value(' '),
+                'brend_kod', Value(' '),
+                'firma__adi', Value(' '),
+                'avtomobil__adi',
+                output_field=CharField()
+            )
+        )
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
-            # brend_kod üçün həm istifadəçi sorğusunu, həm də brend_kod-u təmizləyib müqayisə edirik
             def clean_code(val):
                 return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
             brend_kod_ids = [m.id for m in mehsullar if clean_code(search_query) in clean_code(m.brend_kod)]
             brend_kod_filter = Q(id__in=brend_kod_ids)
-            # Ad ilə təkmilləşdirilmiş axtarış
             processed_query = re.sub(r'\s+', ' ', search_query).strip()
             search_words = processed_query.split()
             if search_words:
@@ -625,9 +702,9 @@ def my_products_view(request):
                     word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
                     ad_filters.append(word_filter)
                 ad_filter = reduce(and_, ad_filters)
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter)
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | Q(search_text__icontains=search_query))
             else:
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | Q(search_text__icontains=search_query))
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
     return render(request, 'my_products.html', {
@@ -646,11 +723,20 @@ def load_more_my_products(request):
     search_query = request.GET.get('search', '')
     mehsullar = Mehsul.objects.filter(sahib=request.user).order_by('-id')
     if search_query:
+        mehsullar = mehsullar.annotate(
+            search_text=Concat(
+                'adi', Value(' '),
+                'brend_kod', Value(' '),
+                'firma__adi', Value(' '),
+                'avtomobil__adi',
+                output_field=CharField()
+            )
+        )
         clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
         if clean_search:
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
-            brend_kod_filter = Q(brend_kod__icontains=search_query)  # Sade brend_kod axtarışı
+            brend_kod_filter = Q(brend_kod__icontains=search_query)
             processed_query = re.sub(r'\s+', ' ', search_query).strip()
             search_words = processed_query.split()
             if search_words:
@@ -658,9 +744,9 @@ def load_more_my_products(request):
                 for word in search_words:
                     ad_filters.append(Q(adi__icontains=word))
                 ad_filter = reduce(and_, ad_filters)
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter)
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | Q(search_text__icontains=search_query))
             else:
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | Q(search_text__icontains=search_query))
     products = mehsullar[offset:offset+limit]
     has_more = mehsullar.count() > (offset + limit)
     products_data = []

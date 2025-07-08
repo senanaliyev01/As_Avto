@@ -59,9 +59,20 @@ class AvtomobilLogoInline(admin.TabularInline):
 
 @admin.register(Avtomobil)
 class AvtomobilAdmin(admin.ModelAdmin):
-    list_display = ['adi']
+    list_display = ['adi', 'avtomobil_logos_preview']
     inlines = [AvtomobilLogoInline]
     search_fields = ['adi']
+
+    def avtomobil_logos_preview(self, obj):
+        logos = obj.logolar.all()
+        if logos:
+            return format_html(''.join([
+                '<img src="{}" style="height:40px;max-width:80px;object-fit:contain;margin-right:4px;" />'.format(logo.sekil.url)
+                for logo in logos if logo.sekil
+            ]))
+        return "-"
+    avtomobil_logos_preview.short_description = "Logolar"
+    avtomobil_logos_preview.allow_tags = True
 
 @admin.register(Mehsul)
 class MehsulAdmin(admin.ModelAdmin):

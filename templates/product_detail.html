@@ -147,7 +147,7 @@
             {% for i in "12345" %}
                 <span style="color:{% if avg_rating >= forloop.counter %}#FFD700{% elif avg_rating >= forloop.counter0 %}#FFD70099{% else %}#ccc{% endif %};font-size:1.1rem;">&#9733;</span>
             {% endfor %}
-            <span style="color:#2B5173;font-size:1rem;">{{ avg_rating|floatformat:1 }}</span>
+            <span id="avg-rating-value" style="color:#2B5173;font-size:1rem;">{{ avg_rating|floatformat:1 }}</span>
             <span id="review-count" style="font-size:1.1rem;color:#888;">({{ review_count }} rəy)</span>
         </div>
         <div class="product-detail-meta">

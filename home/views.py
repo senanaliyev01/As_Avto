@@ -1633,5 +1633,10 @@ def root_view(request):
 def product_detail_view(request, product_id):
     from .models import Mehsul
     from django.http import Http404
+    import re
     mehsul = get_object_or_404(Mehsul, id=product_id)
-    return render(request, 'product_detail.html', {'mehsul': mehsul})
+    kodlar_list = []
+    if mehsul.kodlar:
+        kodlar_list = re.split(r'[\s,\n]+', mehsul.kodlar)
+        kodlar_list = [k for k in kodlar_list if k]
+    return render(request, 'product_detail.html', {'mehsul': mehsul, 'kodlar_list': kodlar_list})

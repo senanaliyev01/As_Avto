@@ -173,7 +173,7 @@
     </div>
     <div class="product-detail-codes" id="productCodes" style="margin-top:12px;">
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
-            {% for kod in mehsul.kodlar|cut:' '|split:' ' %}
+            {% for kod in kodlar_list %}
                 {% if kod %}<div>{{ kod }}</div>{% endif %}
             {% endfor %}
         </div>

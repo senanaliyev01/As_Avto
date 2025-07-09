@@ -147,7 +147,7 @@
             {% for i in "12345" %}
                 {% if avg_rating >= forloop.counter %}
                     <span style="color:#FFD700;font-size:1.1rem;">&#9733;</span>
-                {% elif avg_rating >= forloop.counter0 + 0.5 %}
+                {% elif avg_rating >= forloop.counter0|add:"0.5" %}
                     <span style="color:#FFD70099;font-size:1.1rem;">&#9733;</span>
                 {% else %}
                     <span style="color:#ccc;font-size:1.1rem;">&#9733;</span>

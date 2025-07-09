@@ -1680,13 +1680,17 @@ def rate_product(request):
     product_id = request.POST.get('product_id')
     rating_value = int(request.POST.get('rating', 0))
     mehsul = get_object_or_404(Mehsul, id=product_id)
+    if rating_value == 0:
+        ProductRating.objects.filter(user=request.user, mehsul=mehsul).delete()
+        avg_rating = ProductRating.objects.filter(mehsul=mehsul).aggregate(models.Avg('rating'))['rating__avg'] or 0
+        return JsonResponse({'success': True, 'avg_rating': round(avg_rating, 2), 'user_rating': 0, 'deleted': True})
     if rating_value < 1 or rating_value > 5:
         return JsonResponse({'success': False, 'error': 'Yanlış reytinq'}, status=400)
     rating, created = ProductRating.objects.update_or_create(
         user=request.user, mehsul=mehsul,
         defaults={'rating': rating_value}
     )
-    avg_rating = ProductRating.objects.filter(mehsul=mehsul).aggregate(Avg('rating'))['rating__avg'] or 0
+    avg_rating = ProductRating.objects.filter(mehsul=mehsul).aggregate(models.Avg('rating'))['rating__avg'] or 0
     return JsonResponse({'success': True, 'avg_rating': round(avg_rating, 2), 'user_rating': rating_value})
 
 @login_required

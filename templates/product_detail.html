@@ -146,9 +146,15 @@
             <span style="font-size:1.1rem;color:#2B5173;font-weight:600;">Ortalama:</span>
             <span id="avg-rating-stars">
                 {% for i in "12345" %}
-                    {% with val=forloop.counter %}
-                        <span class="avg-star" style="color:{% if avg_rating|floatformat:1 >= val %}#FFD700{% elif avg_rating|floatformat:1 >= val-0.5 %}#FFD70099{% else %}#ccc{% endif %};font-size:1.5rem;">&#9733;</span>
-                    {% endwith %}
+                    <span class="avg-star" style="color:
+                        {% if avg_rating|floatformat:1 >= forloop.counter %}
+                            #FFD700
+                        {% elif avg_rating|floatformat:1 >= forloop.counter0 %}
+                            #FFD70099
+                        {% else %}
+                            #ccc
+                        {% endif %}
+                        ;font-size:1.5rem;">&#9733;</span>
                 {% endfor %}
             </span>
             <span id="avg-rating-value" style="font-size:1.1rem;color:#2B5173;">{{ avg_rating }}</span>

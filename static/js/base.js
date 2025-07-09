@@ -1330,12 +1330,14 @@ function initializeAuthModals() {
         e.preventDefault();
         loginError.style.display = 'none';
         loginSpinner.style.display = 'inline-block';
+        const csrfInput = loginForm.querySelector('[name=csrfmiddlewaretoken]');
+        const csrfToken = csrfInput ? csrfInput.value : getCookie('csrftoken');
         setTimeout(function() {
             fetch('/login/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': getCookie('csrftoken')
+                    'X-CSRFToken': csrfToken
                 },
                 body: `username=${encodeURIComponent(loginForm.username.value)}&password=${encodeURIComponent(loginForm.password.value)}`
             })
@@ -1361,12 +1363,14 @@ function initializeAuthModals() {
         e.preventDefault();
         registerError.style.display = 'none';
         registerSpinner.style.display = 'inline-block';
+        const csrfInput = registerForm.querySelector('[name=csrfmiddlewaretoken]');
+        const csrfToken = csrfInput ? csrfInput.value : getCookie('csrftoken');
         setTimeout(function() {
             fetch('/register/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': getCookie('csrftoken')
+                    'X-CSRFToken': csrfToken
                 },
                 body: `username=${encodeURIComponent(registerForm.username.value)}&email=${encodeURIComponent(registerForm.email.value)}&phone=${encodeURIComponent(registerForm.phone.value)}&address=${encodeURIComponent(registerForm.address.value)}&password=${encodeURIComponent(registerForm.password.value)}`
             })

@@ -327,6 +327,7 @@
             <span class="close" id="closeLoginModal">&times;</span>
             <h3>Daxil ol</h3>
             <form id="loginForm">
+                {% csrf_token %}
                 <div class="form-group">
                     <label for="loginUsername">İstifadəçi adı</label>
                     <input type="text" id="loginUsername" name="username" class="form-control" required>
@@ -350,6 +351,7 @@
             <span class="close" id="closeRegisterModal">&times;</span>
             <h3>Qeydiyyat</h3>
             <form id="registerForm">
+                {% csrf_token %}
                 <div class="form-group">
                     <label for="registerUsername">İstifadəçi adı</label>
                     <input type="text" id="registerUsername" name="username" class="form-control" required>

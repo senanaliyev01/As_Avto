@@ -4329,3 +4329,78 @@ body {
   }
 }
 
+@media (max-width: 600px) {
+  /* add_edit_product.html üçün xüsusi mobil stillər */
+  .container {
+    padding: 0 4px;
+    max-width: 100vw;
+  }
+  h2 {
+    font-size: 1.15rem;
+    margin: 12px 0 10px 0;
+    text-align: center;
+  }
+  form {
+    padding: 8px 2px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(44,62,80,0.06);
+  }
+  .row {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .col-md-6, .mb-3 {
+    width: 100% !important;
+    max-width: 100vw;
+    margin-bottom: 10px !important;
+    padding: 0 !important;
+  }
+  .form-group {
+    margin-bottom: 10px;
+  }
+  label {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 4px;
+    display: block;
+  }
+  input[type="text"], input[type="number"], input[type="file"], textarea, select, .form-control {
+    font-size: 1rem;
+    padding: 8px 8px;
+    width: 100%;
+    border-radius: 7px;
+    border: 1px solid #e5e9f2;
+    margin-bottom: 4px;
+  }
+  input[type="file"] {
+    padding: 4px 0;
+  }
+  .alert {
+    font-size: 0.97rem;
+    padding: 7px 8px;
+    margin: 4px 0;
+  }
+  .mb-2 img, .form-group img {
+    max-width: 90vw;
+    max-height: 160px;
+    border-radius: 8px;
+    margin: 0 auto 6px auto;
+    display: block;
+  }
+  button.btn, .btn {
+    width: 100%;
+    font-size: 1.05rem;
+    padding: 10px 0;
+    margin-bottom: 8px;
+    border-radius: 8px;
+  }
+  a.btn-secondary {
+    width: 100%;
+    margin-bottom: 0;
+    text-align: center;
+    display: block;
+  }
+}
+

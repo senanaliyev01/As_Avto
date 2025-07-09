@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Kateqoriya, Firma, Avtomobil, Mehsul, Sifaris, SifarisItem, Vitrin, PopupImage, Profile, Header_Message, AvtomobilLogo, ProductReview
+from .models import Kateqoriya, Firma, Avtomobil, Mehsul, Sifaris, SifarisItem, Vitrin, PopupImage, Profile, Header_Message, AvtomobilLogo
 from django.core.exceptions import ValidationError
 from django.utils.html import format_html
 from django.urls import path
@@ -860,14 +860,3 @@ class ProfileAdmin(admin.ModelAdmin):
         queryset.update(is_verified=False)
         self.message_user(request, f'{queryset.count()} profilin təsdiqi ləğv edildi.')
     unverify_profiles.short_description = "Seçilmiş profillərin təsdiqini ləğv et"
-
-@admin.register(ProductReview)
-class ProductReviewAdmin(admin.ModelAdmin):
-    list_display = ('mehsul', 'user', 'rating', 'is_approved', 'created_at')
-    list_filter = ('is_approved', 'mehsul', 'rating')
-    search_fields = ('mehsul__adi', 'user__username', 'comment')
-    actions = ['approve_reviews']
-
-    def approve_reviews(self, request, queryset):
-        queryset.update(is_approved=True)
-    approve_reviews.short_description = 'Seçilmiş şərhləri təsdiqlə'

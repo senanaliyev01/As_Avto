@@ -35,7 +35,6 @@ urlpatterns = [
     path('products/<int:product_id>/', views.product_detail_view, name='product_detail'),
     path('products/<int:product_id>/edit/', views.add_edit_product_view, name='edit_product'),
     path('products/<int:product_id>/delete/', views.delete_product_view, name='delete_product'),
-    path('products/<int:product_id>/add-review/', views.add_product_review_view, name='add_product_review'),
     path('update-profile/', views.update_profile, name='update_profile'),
     path('my-products/pdf/', views.my_products_pdf, name='my_products_pdf'),
     path('api/unread-sales-count/', views.unread_sales_count, name='unread_sales_count'),

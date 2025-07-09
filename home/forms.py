@@ -1,5 +1,5 @@
 from django import forms
-from .models import Mehsul, Kateqoriya, Firma, Avtomobil, Vitrin, Sifaris, SifarisItem, ProductReview
+from .models import Mehsul, Kateqoriya, Firma, Avtomobil, Vitrin, Sifaris, SifarisItem
 
 class MehsulForm(forms.ModelForm):
     class Meta:
@@ -44,16 +44,3 @@ class SifarisItemEditForm(forms.ModelForm):
             'miqdar': forms.NumberInput(attrs={'class': 'form-control form-control-sm item-input', 'min': '1', 'data-field': 'quantity'}),
             'qiymet': forms.NumberInput(attrs={'class': 'form-control form-control-sm item-input', 'step': '0.01', 'data-field': 'price'}),
         } 
-
-class ProductReviewForm(forms.ModelForm):
-    rating = forms.TypedChoiceField(
-        choices=[(i, str(i)) for i in range(1, 6)],
-        widget=forms.RadioSelect,
-        label="Qiymət",
-        coerce=int
-    )
-    comment = forms.CharField(widget=forms.Textarea(attrs={'rows': 3, 'placeholder': 'Şərhinizi yazın...'}), label="Şərh")
-
-    class Meta:
-        model = ProductReview
-        fields = ['rating', 'comment'] 

@@ -13,7 +13,7 @@ from functools import reduce
 from operator import and_, or_
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
-from django.views.decorators.http import require_http_methods, require_POST
+from django.views.decorators.http import require_http_methods
 from .forms import MehsulForm, SifarisEditForm, SifarisItemEditForm
 import pandas as pd
 from django.db import transaction
@@ -32,9 +32,6 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models.functions import Concat
 from django.db.models import CharField
-from .models import ProductReview
-from .forms import ProductReviewForm
-from django.db import models
 
 def truncate_product_name(name, max_length=20):
     """Məhsul adını qısaldır və uzun olarsa ... əlavə edir"""
@@ -1634,93 +1631,12 @@ def root_view(request):
         return redirect('login')
 
 def product_detail_view(request, product_id):
-    from .models import Mehsul, ProductReview
-    from .forms import ProductReviewForm
+    from .models import Mehsul
     from django.http import Http404
     import re
-    from django.utils import timezone
     mehsul = get_object_or_404(Mehsul, id=product_id)
     kodlar_list = []
     if mehsul.kodlar:
         kodlar_list = re.split(r'[\s,\n]+', mehsul.kodlar)
         kodlar_list = [k for k in kodlar_list if k]
-
-    # Təsdiqlənmiş şərhlər və ortalama qiymət
-    approved_reviews = mehsul.reviews.filter(is_approved=True)
-    avg_rating = approved_reviews.aggregate(models.Avg('rating'))['rating__avg']
-    review_count = approved_reviews.count()
-
-    # Şərh formu (yalnız login olan istifadəçi üçün)
-    review_form = None
-    review_submitted = False
-    if request.user.is_authenticated:
-        if request.method == 'POST' and 'add_review' in request.POST:
-            review_form = ProductReviewForm(request.POST)
-            if review_form.is_valid():
-                review = review_form.save(commit=False)
-                review.mehsul = mehsul
-                review.user = request.user
-                review.is_approved = False
-                review.save()
-                review_submitted = True
-        else:
-            review_form = ProductReviewForm()
-
-    # Sahib cavabı (yalnız məhsul sahibi üçün və yalnız təsdiqlənmiş şərhlərə)
-    if request.user.is_authenticated and mehsul.sahib == request.user and request.method == 'POST' and 'reply_review_id' in request.POST:
-        reply_id = request.POST.get('reply_review_id')
-        reply_text = request.POST.get('owner_reply', '').strip()
-        if reply_id and reply_text:
-            try:
-                review = ProductReview.objects.get(id=reply_id, mehsul=mehsul)
-                review.owner_reply = reply_text
-                review.owner_reply_created_at = timezone.now()
-                review.save()
-            except ProductReview.DoesNotExist:
-                pass
-
-    user_has_review = False
-    if request.user.is_authenticated:
-        user_has_review = mehsul.reviews.filter(user=request.user).exists()
-    context = {
-        'mehsul': mehsul,
-        'kodlar_list': kodlar_list,
-        'approved_reviews': approved_reviews,
-        'avg_rating': avg_rating,
-        'review_count': review_count,
-        'review_form': review_form,
-        'review_submitted': review_submitted,
-        'user_has_review': user_has_review,
-    }
-    return render(request, 'product_detail.html', context)
-
-@require_POST
-def add_product_review_view(request, product_id):
-    from .models import Mehsul, ProductReview
-    from .forms import ProductReviewForm
-    if not request.user.is_authenticated:
-        return JsonResponse({'success': False, 'error': 'Daxil olunmalıdır.'}, status=403)
-    mehsul = get_object_or_404(Mehsul, id=product_id)
-    form = ProductReviewForm(request.POST)
-    if form.is_valid():
-        review = form.save(commit=False)
-        review.mehsul = mehsul
-        review.user = request.user
-        review.is_approved = False
-        review.save()
-        # Profil şəkli
-        profile = getattr(request.user, 'profile', None)
-        sekil_url = profile.sekil.url if profile and profile.sekil else '/static/images/no_image.jpg'
-        return JsonResponse({
-            'success': True,
-            'review': {
-                'username': request.user.username,
-                'profile_img': sekil_url,
-                'comment': review.comment,
-                'rating': review.rating,
-                'created_at': review.created_at.strftime('%d.%m.%Y %H:%M'),
-                'pending': True
-            }
-        })
-    else:
-        return JsonResponse({'success': False, 'error': 'Form xətası', 'errors': form.errors}, status=400)
+    return render(request, 'product_detail.html', {'mehsul': mehsul, 'kodlar_list': kodlar_list})

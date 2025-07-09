@@ -6,146 +6,133 @@
 {% block content %}
 <div class="container product-detail-container">
     <div class="product-detail-card">
-        <div class="product-detail-image-section">
-            <img class="product-detail-image" src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
-        </div>
-        <div class="product-detail-info-section">
-            <h2 class="product-detail-title">{{ mehsul.adi }}</h2>
-            <div class="product-detail-meta">
-                <span class="product-detail-label">Brend kod:</span> <span>{{ mehsul.brend_kod }}</span><br>
-                <span class="product-detail-label">OEM:</span> <span>{{ mehsul.oem|default:'-' }}</span><br>
-                <span class="product-detail-label">Firma:</span> <span>{{ mehsul.firma.adi }}</span>
-                {% if mehsul.firma.logo %}
-                    <img class="firma-logo-detail" src="{{ mehsul.firma.logo.url }}" alt="{{ mehsul.firma.adi }}">
-                {% endif %}<br>
-                <span class="product-detail-label">Avtomobil:</span> <span>{{ mehsul.avtomobil.adi }}</span>
-                <div class="avtomobil-logos-detail">
-                    {% for logo in mehsul.avtomobil.logolar.all %}
-                        <img class="avtomobil-logo-detail" src="{{ logo.sekil.url }}" alt="{{ mehsul.avtomobil.adi }}">
-                    {% endfor %}
+        <div class="product-detail-main">
+            <div class="product-detail-image">
+                <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" style="width:300px; height:300px; object-fit:cover; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+            </div>
+            <div class="product-detail-info">
+                <h2 class="product-detail-title">{{ mehsul.adi }}</h2>
+                <div class="product-detail-meta">
+                    <div><b>Kod:</b> {{ mehsul.brend_kod }}</div>
+                    <div><b>Firma:</b> {{ mehsul.firma.adi }}</div>
+                    <div><b>Avtomobil:</b> {{ mehsul.avtomobil.adi }}</div>
+                    <div><b>Vitrin:</b> {{ mehsul.vitrin.nomre }}</div>
+                    <div><b>Ölçü:</b> {{ mehsul.olcu }}</div>
+                    <div><b>Qiymət:</b> <span class="product-detail-price">{{ mehsul.qiymet }} ₼</span></div>
+                    <div><b>Stok:</b> {{ mehsul.stok }}</div>
+                    <div><b>Satıcı:</b> {% if mehsul.sahib %}{{ mehsul.sahib.username }}{% else %}AS-AVTO{% endif %}</div>
+                    <div><b>Yeni məhsul:</b> {% if mehsul.yenidir %}Bəli{% else %}Xeyr{% endif %}</div>
                 </div>
-                <span class="product-detail-label">Kateqoriya:</span> <span>{{ mehsul.kateqoriya.adi|default:'-' }}</span><br>
-                <span class="product-detail-label">Ölçü:</span> <span>{{ mehsul.olcu|default:'-' }}</span><br>
-                <span class="product-detail-label">Vitrin:</span> <span>{{ mehsul.vitrin.nomre|default:'-' }}</span><br>
-                <span class="product-detail-label">Qiymət:</span> <span class="product-detail-price">{{ mehsul.qiymet }} ₼</span><br>
-                <span class="product-detail-label">Maya qiyməti:</span> <span>{{ mehsul.maya_qiymet }} ₼</span><br>
-                <span class="product-detail-label">Stok:</span> <span>{{ mehsul.stok }}</span><br>
-                <span class="product-detail-label">Kodlar:</span> <span>{{ mehsul.kodlar|default:'-' }}</span><br>
-                <span class="product-detail-label">Məlumat:</span> <span>{{ mehsul.melumat|default:'-' }}</span><br>
-                <span class="product-detail-label">Yeni məhsul:</span> <span>{% if mehsul.yenidir %}Bəli{% else %}Xeyr{% endif %}</span>
-                {% if mehsul.yenidir and mehsul.qalan_vaxt %}<br>
-                    <span class="product-detail-label">Qalan vaxt:</span> <span>{{ mehsul.qalan_vaxt }}</span>
-                {% endif %}
-                <br>
-                <span class="product-detail-label">Sahib:</span>
-                {% if mehsul.sahib %}
-                    <a href="#" class="seller-link" onclick="openUserDetailsModal({{ mehsul.sahib.id }}); return false;">
-                        <i class="fas fa-user"></i> {{ mehsul.sahib.username }}
-                    </a>
-                {% else %}
-                    AS-AVTO
-                {% endif %}
+            </div>
+        </div>
+        <div class="product-detail-bottom">
+            <div class="product-detail-about">
+                <h3>Məhsul haqqında</h3>
+                <div class="product-detail-description">{{ mehsul.melumat|linebreaksbr }}</div>
+            </div>
+            <div class="product-detail-codes-card">
+                <h3>Kodlar</h3>
+                <div class="product-detail-codes" id="productCodes">{{ mehsul.kodlar }}</div>
+                <button class="btn btn-outline-primary copy-codes-btn" onclick="copyProductCodes()">Kopyala</button>
             </div>
         </div>
     </div>
-    <div class="product-detail-actions">
-        {% if mehsul.stok > 0 %}
-        <button type="button" class="btn btn-primary" onclick="openQuantityModal({{ mehsul.id }}, {{ mehsul.stok }})">
-            <i class="fas fa-shopping-cart"></i> Səbətə əlavə et
-        </button>
-        {% else %}
-        <span class="out-of-stock">Stokda yoxdur</span>
-        {% endif %}
-    </div>
 </div>
+
+<script>
+function copyProductCodes() {
+    var codes = document.getElementById('productCodes').innerText;
+    navigator.clipboard.writeText(codes).then(function() {
+        alert('Kodlar uğurla kopyalandı!');
+    }, function() {
+        alert('Kopyalama zamanı xəta baş verdi.');
+    });
+}
+</script>
 
 <style>
 .product-detail-container {
     max-width: 900px;
     margin: 40px auto;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 16px rgba(44, 62, 80, 0.08);
-    padding: 32px 24px;
+    padding: 0 16px;
 }
 .product-detail-card {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 32px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    padding: 32px 24px;
 }
-.product-detail-image-section {
-    flex: 1 1 260px;
+.product-detail-main {
     display: flex;
+    gap: 32px;
     align-items: flex-start;
-    justify-content: center;
 }
 .product-detail-image {
-    max-width: 260px;
-    max-height: 320px;
-    border-radius: 8px;
-    border: 1px solid #eee;
-    background: #fafbfc;
+    flex: 0 0 300px;
 }
-.product-detail-info-section {
-    flex: 2 1 400px;
-    min-width: 300px;
+.product-detail-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 .product-detail-title {
     font-size: 2rem;
     font-weight: 700;
-    margin-bottom: 18px;
-    color: #2B5173;
+    margin-bottom: 8px;
 }
-.product-detail-meta {
-    font-size: 1.08rem;
-    line-height: 2.1;
-}
-.product-detail-label {
-    font-weight: 600;
-    color: #2B5173;
+.product-detail-meta > div {
+    font-size: 1.1rem;
+    margin-bottom: 6px;
 }
 .product-detail-price {
-    color: #27ae60;
-    font-weight: 700;
+    color: #2B5173;
+    font-weight: 600;
     font-size: 1.2rem;
 }
-.firma-logo-detail {
-    height: 28px;
-    margin-left: 8px;
-    vertical-align: middle;
+.product-detail-bottom {
+    display: flex;
+    gap: 32px;
+    margin-top: 36px;
 }
-.avtomobil-logos-detail {
-    margin: 6px 0 10px 0;
+.product-detail-about {
+    flex: 2;
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
 }
-.avtomobil-logo-detail {
-    height: 28px;
-    margin-right: 6px;
-    border-radius: 4px;
-    border: 1px solid #eee;
+.product-detail-codes-card {
+    flex: 1;
+    background: #f1f3f6;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
-.product-detail-actions {
-    margin-top: 32px;
-    text-align: right;
+.product-detail-codes {
+    font-size: 1.2rem;
+    font-family: 'Fira Mono', 'Consolas', monospace;
+    background: #fff;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    width: 100%;
+    word-break: break-all;
 }
-.btn.btn-primary {
-    background: #2B5173;
-    color: #fff;
-    border: none;
-    padding: 10px 28px;
-    border-radius: 6px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
+.copy-codes-btn {
+    margin-top: 4px;
 }
-.btn.btn-primary:hover {
-    background: #1a344a;
-}
-.out-of-stock {
-    color: #c0392b;
-    font-weight: 600;
-    font-size: 1.1rem;
+@media (max-width: 800px) {
+    .product-detail-main, .product-detail-bottom {
+        flex-direction: column;
+        gap: 20px;
+    }
+    .product-detail-image {
+        margin: 0 auto;
+    }
 }
 </style>
-
 {% endblock %} 

@@ -316,29 +316,32 @@ function updateAvgRatingStars(avg) {
 }
 // İlk yüklənəndə ortalama ulduzları göstər
 updateAvgRatingStars({{ avg_rating|default:0 }});
-// Ürək (like) AJAX
-const likeBtn = document.getElementById('like-btn');
-if (likeBtn) {
-    likeBtn.addEventListener('click', function() {
-        fetch('{% url "like_product" %}', {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `product_id={{ mehsul.id }}`
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.liked) {
-                likeBtn.style.color = '#e74c3c';
-            } else {
-                likeBtn.style.color = '#bbb';
-            }
-            document.getElementById('like-count').innerText = data.like_count;
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Ürək (like) AJAX
+    const likeBtn = document.getElementById('like-btn');
+    if (likeBtn) {
+        likeBtn.addEventListener('click', function() {
+            fetch('{% url "like_product" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `product_id={{ mehsul.id }}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.liked) {
+                    likeBtn.style.color = '#e74c3c';
+                } else {
+                    likeBtn.style.color = '#bbb';
+                }
+                document.getElementById('like-count').innerText = data.like_count;
+            });
         });
-    });
-}
+    }
+});
 </script>
 <!-- Miqdar Modal -->
 <div id="quantityModal" class="modal">

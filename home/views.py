@@ -1678,7 +1678,10 @@ def like_product(request):
 @require_POST
 def rate_product(request):
     product_id = request.POST.get('product_id')
-    rating_value = int(request.POST.get('rating', 0))
+    try:
+        rating_value = int(request.POST.get('rating', 0))
+    except (TypeError, ValueError):
+        return JsonResponse({'success': False, 'error': 'Yanlış reytinq'}, status=400)
     mehsul = get_object_or_404(Mehsul, id=product_id)
     if rating_value == 0:
         ProductRating.objects.filter(user=request.user, mehsul=mehsul).delete()

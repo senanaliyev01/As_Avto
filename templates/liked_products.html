@@ -9,6 +9,13 @@
     <div id="products-list">
         {% for mehsul in mehsullar %}
         <div class="product-row" style="position:relative;">
+            <div style="position:absolute;top:10px;right:10px;z-index:2;display:flex;align-items:center;gap:8px;">
+                {% for i in "12345" %}
+                    <span style="color:{% if mehsul.avg_rating >= forloop.counter %}#FFD700{% elif mehsul.avg_rating >= forloop.counter0 %}#FFD70099{% else %}#ccc{% endif %};font-size:1.1rem;">&#9733;</span>
+                {% endfor %}
+                <span style="color:#2B5173;font-size:1rem;">{{ mehsul.avg_rating|floatformat:1 }}</span>
+                <span style="color:#e74c3c;font-size:1.1rem;margin-left:8px;"><i class="fas fa-heart"></i> {{ mehsul.like_count }}</span>
+            </div>
             <button class="btn" style="background:none;border:none;font-size:1.7rem;position:absolute;top:10px;right:10px;color:#e74c3c;z-index:2;cursor:pointer;" disabled>
                 <i class="fas fa-heart"></i> <span style="font-size:1rem;vertical-align:top;">{{ mehsul.likes.count }}</span>
             </button>

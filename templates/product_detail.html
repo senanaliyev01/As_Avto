@@ -140,10 +140,23 @@
             <div class="product-detail-stock">Stok: {{ mehsul.stok }}</div>
             <div><span class="meta-label">Brend Kod:</span> {{ mehsul.brend_kod }}</div>
         </div>
+        <div style="display:flex;align-items:center;gap:12px;margin:18px 0 0 0;">
+            {% if mehsul.firma.logo %}
+            <img class="firma-logo" src="{{ mehsul.firma.logo.url }}" alt="{{ mehsul.firma.adi }}">
+            {% endif %}
+            <div class="avtomobil-logos-wrapper">
+                {% for logo in mehsul.avtomobil.logolar.all %}
+                <img class="avtomobil-logo" src="{{ logo.sekil.url }}" alt="{{ mehsul.avtomobil.adi }}">
+                {% endfor %}
+            </div>
+        </div>
         {% if mehsul.sahib %}
-        <div style="margin-top: 8px;">
+        <div style="margin-top: 8px;display:flex;align-items:center;gap:10px;">
             <span class="meta-label">Satıcı:</span>
             <a href="#" class="seller-link" onclick="openUserDetailsModal({{ mehsul.sahib.id }}); return false;" style="color:#2B5173;font-weight:600;"><i class="fas fa-user"></i> {{ mehsul.sahib.username }}</a>
+            <button type="button" class="cart-add-btn" {% if mehsul.stok == 0 %}disabled{% endif %} onclick="openQuantityModal({{ mehsul.id }}, {{ mehsul.stok }})" style="margin-left:18px;">
+                <i class="fas fa-shopping-cart"></i>
+            </button>
         </div>
         {% endif %}
     </div>
@@ -153,14 +166,23 @@
     <div class="product-detail-about">{{ mehsul.melumat|linebreaksbr }}</div>
 </div>
 {% if mehsul.kodlar %}
-<div class="product-detail-codes-card" style="max-width:1100px;margin:24px auto 0 auto;">
-    <div class="product-detail-codes" id="productCodes">{{ mehsul.kodlar }}</div>
-    <button class="copy-btn" onclick="copyCodesToClipboard()">Kopyala</button>
+<div class="product-detail-codes-card" style="max-width:1100px;margin:24px auto 0 auto;flex-direction:column;align-items:stretch;">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div class="product-detail-section-title" style="margin-bottom:0;">Kodlar</div>
+        <button class="copy-btn" onclick="copyCodesToClipboard()">Kopyala</button>
+    </div>
+    <div class="product-detail-codes" id="productCodes" style="margin-top:12px;">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+            {% for kod in mehsul.kodlar|cut:' '|split:' ' %}
+                {% if kod %}<div>{{ kod }}</div>{% endif %}
+            {% endfor %}
+        </div>
+    </div>
 </div>
 {% endif %}
 <script>
 function copyCodesToClipboard() {
-    var codes = document.getElementById('productCodes').innerText;
+    var codes = Array.from(document.querySelectorAll('#productCodes div')).map(e=>e.innerText).join('   ');
     navigator.clipboard.writeText(codes).then(function() {
         var btn = document.querySelector('.copy-btn');
         btn.innerText = 'Kopyalandı!';

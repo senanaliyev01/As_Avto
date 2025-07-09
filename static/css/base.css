@@ -5024,3 +5024,196 @@ body {
     box-shadow: none;
     pointer-events: none;
 }
+
+/* === RESPONSIVE: General Mobile Styles === */
+@media (max-width: 600px) {
+    .container {
+        padding: 0 6px;
+    }
+    h2, .container > h2 {
+        font-size: 1.2rem;
+        margin: 12px 0 8px 0;
+    }
+    .product-row {
+        flex-direction: column !important;
+        display: flex;
+        align-items: stretch;
+        min-width: 0;
+        margin-bottom: 16px;
+        padding: 10px 4px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(44,62,80,0.06);
+        background: #fff;
+        position: relative;
+    }
+    .product-row-image img {
+        width: 100%;
+        max-width: 220px;
+        height: auto;
+        margin: 0 auto 8px auto;
+        display: block;
+        border-radius: 8px;
+    }
+    .product-row-info {
+        padding: 0 2px;
+        font-size: 0.98rem;
+    }
+    .product-title a, .product-title {
+        font-size: 1.05rem;
+        word-break: break-word;
+    }
+    .product-meta, .product-stock {
+        font-size: 0.95rem;
+    }
+    .product-row-actions {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 8px;
+        gap: 8px;
+    }
+    .product-price {
+        font-size: 1.08rem;
+        font-weight: 600;
+    }
+    .cart-add-btn {
+        font-size: 1.1rem;
+        padding: 7px 12px;
+    }
+    .firma-logo, .avtomobil-logo {
+        width: 38px !important;
+        height: 38px !important;
+        margin: 0 2px;
+    }
+    .avtomobil-logos-wrapper {
+        justify-content: flex-start;
+        gap: 4px;
+        margin: 6px 0;
+    }
+    .product-row > div[style*="position:absolute"] {
+        position: static !important;
+        margin-bottom: 6px;
+        justify-content: flex-end;
+    }
+    /* Table responsive */
+    table, thead, tbody, th, td, tr {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    thead {
+        display: none;
+    }
+    tr {
+        margin-bottom: 12px;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(44,62,80,0.04);
+        background: #fff;
+        padding: 8px 0;
+    }
+    td {
+        padding: 6px 8px;
+        text-align: left;
+        font-size: 0.97rem;
+        border: none;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    td:last-child {
+        border-bottom: none;
+    }
+    .table {
+        border: none;
+    }
+    .cart-summary, .cart-total, .checkout-form {
+        padding: 8px 2px;
+        font-size: 1rem;
+    }
+    .modal, .modal-content, .custom-quantity-modal-content {
+        width: 98vw !important;
+        min-width: 0 !important;
+        max-width: 99vw !important;
+        left: 1vw !important;
+        right: 1vw !important;
+        padding: 8px 2px !important;
+    }
+    .modal h3 {
+        font-size: 1.1rem;
+    }
+    .form-control, input, select, textarea {
+        font-size: 1rem;
+        padding: 7px 8px;
+    }
+    .btn, button {
+        font-size: 1rem;
+        padding: 8px 12px;
+    }
+    .empty-message, .empty-cart, .empty-orders {
+        font-size: 1rem;
+        padding: 18px 4px;
+    }
+    .messages, .message {
+        font-size: 0.98rem;
+        padding: 8px 6px;
+    }
+    /* Hide some less important columns in tables */
+    .table th:nth-child(3), .table td:nth-child(3),
+    .table th:nth-child(4), .table td:nth-child(4),
+    .table th:nth-child(5), .table td:nth-child(5) {
+        display: none;
+    }
+    /* Orders table: show only key columns */
+    .orders-table th:not(:first-child):not(:nth-child(2)),
+    .orders-table td:not(:first-child):not(:nth-child(2)) {
+        display: none;
+    }
+    /* Dashboard/statistics cards */
+    .stat-card, .dashboard-card {
+        min-width: 0;
+        width: 100%;
+        margin-bottom: 12px;
+    }
+    .dashboard-row, .stats-grid {
+        flex-direction: column !important;
+        gap: 10px;
+    }
+    .card-header h3, .dashboard-title {
+        font-size: 1.1rem;
+    }
+    .card-body, .dashboard-card .card-body {
+        padding: 10px 4px;
+    }
+    /* Hide sidebar in admin_panel on mobile */
+    .admin-sidebar {
+        display: none !important;
+    }
+    .admin-main {
+        width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 2px !important;
+    }
+    .admin-header, .admin-header-title {
+        font-size: 1.1rem;
+        padding: 8px 2px;
+    }
+    .admin-header-right {
+        flex-direction: column;
+        gap: 6px;
+    }
+    .admin-content {
+        padding: 8px 2px;
+    }
+}
+
+@media (max-width: 400px) {
+    .product-title a, .product-title {
+        font-size: 0.98rem;
+    }
+    .btn, button {
+        font-size: 0.95rem;
+        padding: 7px 8px;
+    }
+    .firma-logo, .avtomobil-logo {
+        width: 28px !important;
+        height: 28px !important;
+    }
+}

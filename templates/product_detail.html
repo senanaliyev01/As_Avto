@@ -4,36 +4,38 @@
 {% block title %}{{ mehsul.adi }} - Məhsul Detalları{% endblock %}
 
 {% block content %}
-<div class="container product-detail-container">
-    <div class="product-detail-card">
-        <div class="product-detail-main">
-            <div class="product-detail-image">
-                <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" style="width:300px; height:300px; object-fit:cover; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+<div class="product-detail-outer">
+    <div class="product-detail-flex">
+        <div class="product-detail-left">
+            <div class="product-detail-image-card">
+                <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
             </div>
-            <div class="product-detail-info">
-                <h2 class="product-detail-title">{{ mehsul.adi }}</h2>
+        </div>
+        <div class="product-detail-right">
+            <div class="product-detail-info-card">
+                <h2>{{ mehsul.adi }}</h2>
                 <div class="product-detail-meta">
-                    <div><b>Kod:</b> {{ mehsul.brend_kod }}</div>
-                    <div><b>Firma:</b> {{ mehsul.firma.adi }}</div>
-                    <div><b>Avtomobil:</b> {{ mehsul.avtomobil.adi }}</div>
-                    <div><b>Vitrin:</b> {{ mehsul.vitrin.nomre }}</div>
-                    <div><b>Ölçü:</b> {{ mehsul.olcu }}</div>
-                    <div><b>Qiymət:</b> <span class="product-detail-price">{{ mehsul.qiymet }} ₼</span></div>
-                    <div><b>Stok:</b> {{ mehsul.stok }}</div>
-                    <div><b>Satıcı:</b> {% if mehsul.sahib %}{{ mehsul.sahib.username }}{% else %}AS-AVTO{% endif %}</div>
+                    <div><span>Kod:</span> <b>{{ mehsul.brend_kod }}</b></div>
+                    <div><span>Firma:</span> <b>{{ mehsul.firma.adi }}</b></div>
+                    <div><span>Avtomobil:</span> <b>{{ mehsul.avtomobil.adi }}</b></div>
+                    <div><span>Vitrin:</span> <b>{{ mehsul.vitrin.nomre }}</b></div>
+                    <div><span>Ölçü:</span> <b>{{ mehsul.olcu }}</b></div>
+                    <div><span>Qiymət:</span> <b class="product-detail-price">{{ mehsul.qiymet }} ₼</b></div>
+                    <div><span>Stok:</span> <b>{{ mehsul.stok }}</b></div>
+                    <div><span>Satıcı:</span> <b>{% if mehsul.sahib %}{{ mehsul.sahib.username }}{% else %}AS-AVTO{% endif %}</b></div>
                 </div>
             </div>
         </div>
-        <div class="product-detail-wide-cards">
-            <div class="product-detail-wide-card">
-                <h3>Məhsul haqqında</h3>
-                <div class="product-detail-description">{{ mehsul.melumat|linebreaksbr }}</div>
-            </div>
-            <div class="product-detail-wide-card">
-                <h3>Kodlar</h3>
-                <div class="product-detail-codes" id="productCodes">{{ mehsul.kodlar }}</div>
-                <button class="btn btn-outline-primary copy-codes-btn" onclick="copyProductCodes()">Kopyala</button>
-            </div>
+    </div>
+    <div class="product-detail-wide-row">
+        <div class="product-detail-wide-card">
+            <h3>Məhsul haqqında</h3>
+            <div class="product-detail-description">{{ mehsul.melumat|linebreaksbr }}</div>
+        </div>
+        <div class="product-detail-wide-card">
+            <h3>Kodlar</h3>
+            <div class="product-detail-codes" id="productCodes">{{ mehsul.kodlar }}</div>
+            <button class="btn btn-outline-primary copy-codes-btn" onclick="copyProductCodes()">Kopyala</button>
         </div>
     </div>
 </div>
@@ -50,64 +52,107 @@ function copyProductCodes() {
 </script>
 
 <style>
-.product-detail-container {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 0 16px;
+.product-detail-outer {
+    width: 100vw;
+    max-width: 100vw;
+    margin: 0;
+    padding: 0;
+    background: #f4f6fa;
 }
-.product-detail-card {
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-    padding: 32px 24px;
-}
-.product-detail-main {
+.product-detail-flex {
     display: flex;
-    gap: 40px;
+    flex-direction: row;
+    justify-content: center;
     align-items: flex-start;
+    gap: 48px;
+    width: 100%;
+    max-width: 1300px;
+    margin: 40px auto 0 auto;
+    padding: 0 32px;
 }
-.product-detail-image {
-    flex: 0 0 300px;
+.product-detail-left {
+    flex: 0 0 340px;
     display: flex;
-    justify-content: flex-start;
+    justify-content: flex-end;
 }
-.product-detail-info {
+.product-detail-image-card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 320px;
+    height: 340px;
+}
+.product-detail-image-card img {
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+.product-detail-right {
     flex: 1;
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-    justify-content: flex-start;
+    align-items: flex-start;
 }
-.product-detail-title {
-    font-size: 2rem;
+.product-detail-info-card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    padding: 32px 36px;
+    min-width: 340px;
+    max-width: 500px;
+    width: 100%;
+}
+.product-detail-info-card h2 {
+    font-size: 2.1rem;
     font-weight: 700;
-    margin-bottom: 8px;
+    margin-bottom: 18px;
+    color: #2B5173;
 }
-.product-detail-meta > div {
-    font-size: 1.1rem;
-    margin-bottom: 6px;
+.product-detail-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+    font-size: 1.13rem;
+}
+.product-detail-meta span {
+    color: #888;
+    min-width: 90px;
+    display: inline-block;
 }
 .product-detail-price {
     color: #2B5173;
-    font-weight: 600;
-    font-size: 1.2rem;
+    font-weight: 700;
+    font-size: 1.18rem;
 }
-.product-detail-wide-cards {
-    margin-top: 36px;
+.product-detail-wide-row {
+    width: 100vw;
+    max-width: 100vw;
     display: flex;
-    flex-direction: column;
-    gap: 24px;
+    flex-direction: row;
+    gap: 32px;
+    margin: 48px auto 0 auto;
+    justify-content: center;
+    padding: 0 32px 48px 32px;
 }
 .product-detail-wide-card {
-    width: 100%;
-    background: #f8f9fa;
-    border-radius: 12px;
-    padding: 28px 32px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-    margin-bottom: 0;
+    flex: 1;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    padding: 36px 32px 32px 32px;
+    min-width: 340px;
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
 }
 .product-detail-wide-card h3 {
-    margin-bottom: 12px;
+    margin-bottom: 14px;
     font-size: 1.25rem;
     font-weight: 600;
     color: #2B5173;
@@ -120,7 +165,7 @@ function copyProductCodes() {
 .product-detail-codes {
     font-size: 1.2rem;
     font-family: 'Fira Mono', 'Consolas', monospace;
-    background: #fff;
+    background: #f8f9fa;
     border-radius: 8px;
     padding: 12px 16px;
     margin-bottom: 12px;
@@ -129,17 +174,32 @@ function copyProductCodes() {
 }
 .copy-codes-btn {
     margin-top: 4px;
+    width: 120px;
 }
-@media (max-width: 800px) {
-    .product-detail-main {
+@media (max-width: 1100px) {
+    .product-detail-flex {
         flex-direction: column;
-        gap: 20px;
+        align-items: center;
+        gap: 32px;
     }
-    .product-detail-image {
-        margin: 0 auto 20px auto;
+    .product-detail-wide-row {
+        flex-direction: column;
+        gap: 24px;
+        padding: 0 10px 32px 10px;
     }
-    .product-detail-wide-card {
-        padding: 18px 10px;
+    .product-detail-left, .product-detail-right {
+        justify-content: center;
+    }
+}
+@media (max-width: 700px) {
+    .product-detail-image-card, .product-detail-info-card, .product-detail-wide-card {
+        min-width: unset;
+        max-width: 100vw;
+        width: 100%;
+        padding: 16px 6px;
+    }
+    .product-detail-flex, .product-detail-wide-row {
+        padding: 0 2px;
     }
 }
 </style>

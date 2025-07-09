@@ -243,3 +243,31 @@ def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
 
+class ProductLike(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='liked_products')
+    mehsul = models.ForeignKey(Mehsul, on_delete=models.CASCADE, related_name='likes')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'mehsul')
+        verbose_name = 'Məhsul Bəyənməsi'
+        verbose_name_plural = 'Məhsul Bəyənmələri'
+
+    def __str__(self):
+        return f"{self.user.username} - {self.mehsul.adi} (like)"
+
+class ProductRating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='rated_products')
+    mehsul = models.ForeignKey(Mehsul, on_delete=models.CASCADE, related_name='ratings')
+    rating = models.PositiveSmallIntegerField(choices=[(i, str(i)) for i in range(1, 6)])
+    created_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('user', 'mehsul')
+        verbose_name = 'Məhsul Qiymətləndirməsi'
+        verbose_name_plural = 'Məhsul Qiymətləndirmələri'
+
+    def __str__(self):
+        return f"{self.user.username} - {self.mehsul.adi} ({self.rating} ulduz)"
+
+

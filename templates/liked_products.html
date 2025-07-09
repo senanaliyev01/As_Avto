@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bəyəndiyim Məhsullar{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Bəyəndiyim Məhsullar</h2>
+    <div class="product-list">
+        {% for mehsul in mehsullar %}
+        <div class="product-row">
+            <div class="product-row-image">
+                <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
+            </div>
+            <div class="product-row-info">
+                <div class="product-title">
+                    <a href="{% url 'product_detail' mehsul.id %}" style="color:inherit;text-decoration:none;">{{ mehsul.adi }} {{ mehsul.brend_kod }} {{ mehsul.firma.adi }}</a>
+                </div>
+                <div class="product-meta">
+                    {% if mehsul.sahib %}
+                    <a href="#" class="seller-link" onclick="openUserDetailsModal({{ mehsul.sahib.id }}); return false;"><i class="fas fa-user"></i> {{ mehsul.sahib.username }}</a>
+                    {% endif %}
+                </div>
+                <div class="product-stock">Kod: {{ mehsul.brend_kod }}</div>
+                <div class="product-stock">Stok: {{ mehsul.stok }}</div>
+            </div>
+            <div class="avtomobil-logos-wrapper">
+            {% for logo in mehsul.avtomobil.logolar.all %}
+            <img class="avtomobil-logo" src="{{ logo.sekil.url }}" alt="{{ mehsul.avtomobil.adi }}">
+            {% endfor %}
+            </div>
+            {% if mehsul.firma.logo %}
+            <img class="firma-logo" src="{{ mehsul.firma.logo.url }}" alt="{{ mehsul.firma.adi }}">
+            {% endif %}
+            <div class="product-row-actions">
+                <div class="product-price">{{ mehsul.qiymet }} ₼</div>
+                <a href="{% url 'product_detail' mehsul.id %}" class="btn btn-primary">Bax</a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-message">
+            <i class="fas fa-heart-broken"></i>
+            <p>Heç bir bəyəndiyiniz məhsul yoxdur.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

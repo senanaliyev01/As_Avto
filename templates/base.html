@@ -61,6 +61,7 @@
                     <nav class="main-nav">
                         <ul>
                             <li><a href="#" class="nav-link nav-link-sm blink-news" id="yeniliklerLink"><i class="fas fa-bullhorn"></i> Yeniliklər</a></li>
+                            <li><a class="nav-link" href="{% url 'liked_products' %}"><i class="fas fa-heart"></i> Bəyəndiyim Məhsullar</a></li>
                             <li>
                                 <a href="#" class="nav-link nav-link-sm {% if request.resolver_match.url_name == 'cart' %}active{% endif %}" id="cartSidebarToggle">
                                     <span class="cart-icon">

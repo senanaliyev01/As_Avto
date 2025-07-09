@@ -130,6 +130,22 @@
     </div>
     <div class="product-detail-main">
         <div class="product-detail-title">{{ mehsul.adi }}</div>
+        <div style="display:flex;align-items:center;gap:18px;margin-bottom:10px;">
+            <!-- Ulduz reytinqi -->
+            <div id="rating-stars" style="font-size:2rem;cursor:pointer;">
+                {% for i in "12345" %}
+                    <span class="star" data-value="{{ forloop.counter }}" style="color:{% if user_rating|default:0 >= forloop.counter %}#FFD700{% else %}#ccc{% endif %};">&#9733;</span>
+                {% endfor %}
+            </div>
+            <span id="avg-rating" style="font-size:1.1rem;color:#2B5173;">Ortalama: <b>{{ avg_rating }}</b></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:18px;margin-bottom:10px;">
+            <!-- Ürək (like) düyməsi -->
+            <button id="like-btn" class="btn" style="background:none;border:none;font-size:2rem;cursor:pointer;color:{% if user_liked %}#e74c3c{% else %}#bbb{% endif %};">
+                <i class="fas fa-heart"></i>
+            </button>
+            <span id="like-count" style="font-size:1.1rem;color:#e74c3c;">Bəyənmə: <b>{{ like_count }}</b></span>
+        </div>
         <div class="product-detail-meta">
             <div><span class="meta-label">Firma:</span> {{ mehsul.firma.adi }}</div>
             <div><span class="meta-label">Avtomobil:</span> {{ mehsul.avtomobil.adi }}</div>
@@ -175,6 +191,70 @@ function copyCodesToClipboard() {
         var btn = document.querySelector('.copy-btn');
         btn.innerText = 'Kopyalandı!';
         setTimeout(function(){ btn.innerText = 'Kopyala'; }, 1200);
+    });
+}
+// Ulduz reytinqi AJAX
+const stars = document.querySelectorAll('#rating-stars .star');
+if (stars.length) {
+    stars.forEach(star => {
+        star.addEventListener('mouseenter', function() {
+            const val = parseInt(this.getAttribute('data-value'));
+            stars.forEach(s => {
+                if (parseInt(s.getAttribute('data-value')) <= val) s.style.color = '#FFD700';
+                else s.style.color = '#ccc';
+            });
+        });
+        star.addEventListener('mouseleave', function() {
+            const userRating = {{ user_rating|default:0 }};
+            stars.forEach(s => {
+                if (parseInt(s.getAttribute('data-value')) <= userRating) s.style.color = '#FFD700';
+                else s.style.color = '#ccc';
+            });
+        });
+        star.addEventListener('click', function() {
+            const val = parseInt(this.getAttribute('data-value'));
+            fetch('{% url "rate_product" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `product_id={{ mehsul.id }}&rating=${val}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('avg-rating').innerHTML = 'Ortalama: <b>' + data.avg_rating + '</b>';
+                    stars.forEach(s => {
+                        if (parseInt(s.getAttribute('data-value')) <= val) s.style.color = '#FFD700';
+                        else s.style.color = '#ccc';
+                    });
+                }
+            });
+        });
+    });
+}
+// Ürək (like) AJAX
+const likeBtn = document.getElementById('like-btn');
+if (likeBtn) {
+    likeBtn.addEventListener('click', function() {
+        fetch('{% url "like_product" %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `product_id={{ mehsul.id }}`
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.liked) {
+                likeBtn.style.color = '#e74c3c';
+            } else {
+                likeBtn.style.color = '#bbb';
+            }
+            document.getElementById('like-count').innerHTML = 'Bəyənmə: <b>' + data.like_count + '</b>';
+        });
     });
 }
 </script>

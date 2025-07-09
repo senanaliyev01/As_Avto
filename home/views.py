@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import Mehsul, Kateqoriya, Sifaris, SifarisItem, Firma, Avtomobil, PopupImage, Header_Message, Vitrin
-from django.db.models import Q, Sum, F, Case, When, DecimalField
+from .models import Mehsul, Kateqoriya, Sifaris, SifarisItem, Firma, Avtomobil, PopupImage, Header_Message, Vitrin, ProductLike, ProductRating
+from django.db.models import Q, Sum, F, Case, When, DecimalField, Avg
 from decimal import Decimal
 from django.contrib import messages
 import re
@@ -13,7 +13,7 @@ from functools import reduce
 from operator import and_, or_
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_POST
 from .forms import MehsulForm, SifarisEditForm, SifarisItemEditForm
 import pandas as pd
 from django.db import transaction
@@ -1639,4 +1639,57 @@ def product_detail_view(request, product_id):
     if mehsul.kodlar:
         kodlar_list = re.split(r'[\s,\n]+', mehsul.kodlar)
         kodlar_list = [k for k in kodlar_list if k]
-    return render(request, 'product_detail.html', {'mehsul': mehsul, 'kodlar_list': kodlar_list})
+    # Yeni: bəyənibmi və neçə ulduz verib
+    user_liked = False
+    user_rating = 0
+    if request.user.is_authenticated:
+        user_liked = ProductLike.objects.filter(user=request.user, mehsul=mehsul).exists()
+        rating_obj = ProductRating.objects.filter(user=request.user, mehsul=mehsul).first()
+        if rating_obj:
+            user_rating = rating_obj.rating
+    avg_rating = ProductRating.objects.filter(mehsul=mehsul).aggregate(Avg('rating'))['rating__avg'] or 0
+    like_count = ProductLike.objects.filter(mehsul=mehsul).count()
+    return render(request, 'product_detail.html', {
+        'mehsul': mehsul,
+        'kodlar_list': kodlar_list,
+        'user_liked': user_liked,
+        'user_rating': user_rating,
+        'avg_rating': round(avg_rating, 2),
+        'like_count': like_count,
+    })
+
+@csrf_exempt
+@login_required
+@require_POST
+def like_product(request):
+    product_id = request.POST.get('product_id')
+    mehsul = get_object_or_404(Mehsul, id=product_id)
+    like, created = ProductLike.objects.get_or_create(user=request.user, mehsul=mehsul)
+    if not created:
+        like.delete()
+        liked = False
+    else:
+        liked = True
+    like_count = ProductLike.objects.filter(mehsul=mehsul).count()
+    return JsonResponse({'liked': liked, 'like_count': like_count})
+
+@csrf_exempt
+@login_required
+@require_POST
+def rate_product(request):
+    product_id = request.POST.get('product_id')
+    rating_value = int(request.POST.get('rating', 0))
+    mehsul = get_object_or_404(Mehsul, id=product_id)
+    if rating_value < 1 or rating_value > 5:
+        return JsonResponse({'success': False, 'error': 'Yanlış reytinq'}, status=400)
+    rating, created = ProductRating.objects.update_or_create(
+        user=request.user, mehsul=mehsul,
+        defaults={'rating': rating_value}
+    )
+    avg_rating = ProductRating.objects.filter(mehsul=mehsul).aggregate(Avg('rating'))['rating__avg'] or 0
+    return JsonResponse({'success': True, 'avg_rating': round(avg_rating, 2), 'user_rating': rating_value})
+
+@login_required
+def liked_products_view(request):
+    liked_products = Mehsul.objects.filter(likes__user=request.user)
+    return render(request, 'liked_products.html', {'mehsullar': liked_products})

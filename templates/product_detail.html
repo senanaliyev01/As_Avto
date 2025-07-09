@@ -119,16 +119,16 @@
 <div class="product-detail-container">
     <div class="product-detail-image">
         <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
-        {% if mehsul.firma.logo %}
-        <img src="{{ mehsul.firma.logo.url }}" alt="{{ mehsul.firma.adi }}" style="width: 90px; margin-top: 18px; border-radius: 8px; background: #fff; border: 1px solid #e0e0e0;">
-        {% endif %}
-        {% if mehsul.avtomobil %}
-        <div style="margin-top: 18px; display: flex; gap: 8px; flex-wrap: wrap;">
-            {% for logo in mehsul.avtomobil.logolar.all %}
-            <img src="{{ logo.sekil.url }}" alt="{{ mehsul.avtomobil.adi }}" style="width: 38px; height: 38px; object-fit: contain; border-radius: 6px; background: #fff; border: 1px solid #e0e0e0;">
-            {% endfor %}
+        <div style="display:flex;align-items:center;gap:10px;margin-top:18px;">
+            {% if mehsul.firma.logo %}
+            <img class="firma-logo" src="{{ mehsul.firma.logo.url }}" alt="{{ mehsul.firma.adi }}">
+            {% endif %}
+            <div class="avtomobil-logos-wrapper">
+                {% for logo in mehsul.avtomobil.logolar.all %}
+                <img class="avtomobil-logo" src="{{ logo.sekil.url }}" alt="{{ mehsul.avtomobil.adi }}">
+                {% endfor %}
+            </div>
         </div>
-        {% endif %}
     </div>
     <div class="product-detail-main">
         <div class="product-detail-title">{{ mehsul.adi }}</div>
@@ -139,16 +139,6 @@
             <div><span class="meta-label">Qiymət:</span> <span style="color:#1a7f37;font-weight:700;">{{ mehsul.qiymet }} ₼</span></div>
             <div class="product-detail-stock">Stok: {{ mehsul.stok }}</div>
             <div><span class="meta-label">Brend Kod:</span> {{ mehsul.brend_kod }}</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;margin:18px 0 0 0;">
-            {% if mehsul.firma.logo %}
-            <img class="firma-logo" src="{{ mehsul.firma.logo.url }}" alt="{{ mehsul.firma.adi }}">
-            {% endif %}
-            <div class="avtomobil-logos-wrapper">
-                {% for logo in mehsul.avtomobil.logolar.all %}
-                <img class="avtomobil-logo" src="{{ logo.sekil.url }}" alt="{{ mehsul.avtomobil.adi }}">
-                {% endfor %}
-            </div>
         </div>
         {% if mehsul.sahib %}
         <div style="margin-top: 8px;display:flex;align-items:center;gap:10px;">

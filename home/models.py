@@ -244,20 +244,20 @@ def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
 
-class MehsulReview(models.Model):
+class ProductReview(models.Model):
     mehsul = models.ForeignKey('Mehsul', on_delete=models.CASCADE, related_name='reviews')
-    istifadeci = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='mehsul_reviews')
-    qiymet = models.PositiveSmallIntegerField(choices=[(i, str(i)) for i in range(1, 6)])
-    serh = models.TextField()
-    cavab = models.TextField(blank=True, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    rating = models.PositiveSmallIntegerField()
+    comment = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    is_approved = models.BooleanField(default=False)
+    owner_reply = models.TextField(blank=True, null=True)
+    owner_reply_created_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
-        unique_together = ('mehsul', 'istifadeci')
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"{self.mehsul.adi} - {self.istifadeci.username} ({self.qiymet})"
+        return f"{self.mehsul.adi} - {self.user.username} ({self.rating})"
 
 

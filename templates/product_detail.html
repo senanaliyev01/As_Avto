@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load custom_filters %}
 
 {% block title %}{{ mehsul.adi }} - Məhsul Detalları{% endblock %}
 
@@ -154,59 +153,6 @@
     <div class="product-detail-section-title">Məhsul haqqında</div>
     <div class="product-detail-about">{{ mehsul.melumat|linebreaksbr }}</div>
 </div>
-
-<!-- Şərhlər və Qiymətləndirmə bölməsi -->
-<div class="product-detail-card" style="max-width:1100px;margin:32px auto 0 auto;">
-    <div class="product-detail-section-title">Qiymətləndirmə və Şərhlər</div>
-    {% if reviews %}
-        <div style="display:flex;flex-direction:column;gap:24px;">
-            {% for review in reviews %}
-            <div style="border-bottom:1px solid #e0e0e0;padding-bottom:12px;">
-                <div style="display:flex;align-items:center;gap:12px;">
-                    <strong>{{ review.istifadeci.username }}</strong>
-                    <span style="color:#ffc107;font-size:1.1rem;">
-                        {% for i in "12345"|slice:":review.qiymet" %}<i class="fas fa-star"></i>{% endfor %}
-                        {% for i in "12345"|slice:"review.qiymet:" %}<i class="far fa-star"></i>{% endfor %}
-                    </span>
-                    <span style="font-size:0.95rem;color:#888;">{{ review.created_at|date:"d.m.Y H:i" }}</span>
-                </div>
-                <div style="margin:8px 0 0 0;">{{ review.serh|linebreaksbr }}</div>
-                {% if review.cavab %}
-                <div style="margin-top:10px;padding:10px 16px;background:#f7f7f7;border-radius:8px;border-left:4px solid #2B5173;">
-                    <strong>Satıcıdan cavab:</strong><br>{{ review.cavab|linebreaksbr }}
-                </div>
-                {% elif user.is_authenticated and mehsul.sahib == user and reply_forms and reply_forms|get_item:review.id %}
-                <form method="post" style="margin-top:10px;">
-                    {% csrf_token %}
-                    {{ reply_forms|get_item:review.id.cavab }}
-                    <input type="hidden" name="reply_review_id" value="{{ review.id }}">
-                    <button type="submit" class="btn btn-primary btn-sm">Cavabla</button>
-                </form>
-                {% endif %}
-            </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <div style="color:#888;">Hələ şərh yoxdur.</div>
-    {% endif %}
-
-    <!-- Şərh əlavə et formu -->
-    {% if user.is_authenticated and not user_review and review_form %}
-    <div style="margin-top:32px;">
-        <h4 style="font-size:1.1rem;color:#2B5173;margin-bottom:8px;">Şərh və qiymət əlavə et</h4>
-        <form method="post">
-            {% csrf_token %}
-            {{ review_form.qiymet }}<br>
-            {{ review_form.serh }}
-            <button type="submit" name="add_review" class="btn btn-primary" style="margin-top:8px;">Göndər</button>
-        </form>
-    </div>
-    {% elif user.is_authenticated and user_review %}
-    <div style="margin-top:32px;color:#1a7f37;font-weight:600;">Siz artıq bu məhsula şərh və qiymət vermisiniz.</div>
-    {% else %}
-    <div style="margin-top:32px;color:#888;">Şərh yazmaq üçün daxil olun.</div>
-    {% endif %}
-</div>
 {% if mehsul.kodlar %}
 <div class="product-detail-codes-card" style="max-width:1100px;margin:24px auto 0 auto;flex-direction:column;align-items:stretch;">
     <div style="display:flex;align-items:center;justify-content:space-between;">
@@ -222,6 +168,69 @@
     </div>
 </div>
 {% endif %}
+
+<!-- Yorum və Qiymətləndirmə Bölməsi -->
+<div class="product-review-section" style="max-width:1100px;margin:40px auto 0 auto;">
+    <div class="product-detail-section-title" style="font-size:1.3rem;">Qiymətləndirmə və Şərhlər</div>
+    <div style="display:flex;align-items:center;gap:18px;margin-bottom:18px;">
+        <span style="font-size:2.2rem;color:#f5b301;">
+            {% if avg_rating %}
+                {% for i in "12345" %}
+                    {% if i|add:'0' <= avg_rating %}<i class="fas fa-star"></i>{% elif i|add:'0' <= avg_rating|add:'1' %}<i class="fas fa-star-half-alt"></i>{% else %}<i class="far fa-star"></i>{% endif %}
+                {% endfor %}
+            {% else %}
+                {% for i in "12345" %}<i class="far fa-star"></i>{% endfor %}
+            {% endif %}
+        </span>
+        <span style="font-size:1.1rem;color:#2B5173;font-weight:600;">{% if avg_rating %}{{ avg_rating|floatformat:1 }}/5{% else %}Qiymət yoxdur{% endif %}</span>
+        <span style="color:#888;">({{ review_count }} şərh)</span>
+    </div>
+    <div class="product-reviews-list" style="margin-bottom:32px;">
+        {% for review in approved_reviews %}
+        <div class="review-card" style="background:#f8fafc;border-radius:10px;padding:18px 20px;margin-bottom:18px;box-shadow:0 2px 8px rgba(43,81,115,0.04);">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:1.3rem;color:#f5b301;">
+                    {% for i in "12345" %}
+                        {% if i|add:'0' <= review.rating %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}
+                    {% endfor %}
+                </span>
+                <span style="font-weight:600;color:#2B5173;">{{ review.user.username }}</span>
+                <span style="color:#888;font-size:0.95rem;">{{ review.created_at|date:"d.m.Y H:i" }}</span>
+            </div>
+            <div style="margin-top:8px;font-size:1.08rem;color:#333;">{{ review.comment|linebreaksbr }}</div>
+            {% if review.owner_reply %}
+            <div style="margin-top:12px;padding:10px 14px;background:#eaf1f8;border-radius:8px;color:#2B5173;font-size:1rem;">
+                <b>Satıcı cavabı:</b> {{ review.owner_reply|linebreaksbr }}
+                <span style="color:#888;font-size:0.92rem;margin-left:8px;">{{ review.owner_reply_created_at|date:"d.m.Y H:i" }}</span>
+            </div>
+            {% elif user.is_authenticated and mehsul.sahib == user %}
+            <form method="post" style="margin-top:12px;">
+                {% csrf_token %}
+                <input type="hidden" name="reply_review_id" value="{{ review.id }}">
+                <textarea name="owner_reply" rows="2" class="form-control" placeholder="Cavab yaz..." required></textarea>
+                <button type="submit" class="btn btn-primary btn-sm" style="margin-top:6px;">Cavabı göndər</button>
+            </form>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div style="color:#888;font-size:1.1rem;">Hələ şərh yoxdur.</div>
+        {% endfor %}
+    </div>
+    {% if review_submitted %}
+        <div class="alert alert-success">Şərhiniz göndərildi və təsdiqləndikdən sonra görünəcək.</div>
+    {% endif %}
+    {% if user.is_authenticated %}
+    <div class="review-form-card" style="background:#f5f8fa;border-radius:10px;padding:20px 24px;box-shadow:0 2px 8px rgba(43,81,115,0.04);">
+        <form method="post">
+            {% csrf_token %}
+            {{ review_form.as_p }}
+            <button type="submit" name="add_review" class="btn btn-primary">Göndər</button>
+        </form>
+    </div>
+    {% else %}
+    <div style="color:#888;font-size:1.08rem;">Şərh yazmaq üçün <a href="{% url 'login' %}">daxil olun</a>.</div>
+    {% endif %}
+</div>
 <script>
 function copyCodesToClipboard() {
     var codes = Array.from(document.querySelectorAll('#productCodes div')).map(e=>e.innerText).join('   ');

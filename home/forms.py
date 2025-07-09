@@ -1,5 +1,5 @@
 from django import forms
-from .models import Mehsul, Kateqoriya, Firma, Avtomobil, Vitrin, Sifaris, SifarisItem, MehsulReview
+from .models import Mehsul, Kateqoriya, Firma, Avtomobil, Vitrin, Sifaris, SifarisItem, ProductReview
 
 class MehsulForm(forms.ModelForm):
     class Meta:
@@ -45,26 +45,10 @@ class SifarisItemEditForm(forms.ModelForm):
             'qiymet': forms.NumberInput(attrs={'class': 'form-control form-control-sm item-input', 'step': '0.01', 'data-field': 'price'}),
         } 
 
-class MehsulReviewForm(forms.ModelForm):
-    class Meta:
-        model = MehsulReview
-        fields = ['qiymet', 'serh']
-        widgets = {
-            'qiymet': forms.RadioSelect(choices=[(i, str(i)) for i in range(1, 6)]),
-            'serh': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Şərhinizi yazın...'}),
-        }
-        labels = {
-            'qiymet': 'Qiymət',
-            'serh': 'Şərh',
-        }
+class ProductReviewForm(forms.ModelForm):
+    rating = forms.ChoiceField(choices=[(i, str(i)) for i in range(1, 6)], widget=forms.RadioSelect, label="Qiymət")
+    comment = forms.CharField(widget=forms.Textarea(attrs={'rows': 3, 'placeholder': 'Şərhinizi yazın...'}), label="Şərh")
 
-class MehsulReviewReplyForm(forms.ModelForm):
     class Meta:
-        model = MehsulReview
-        fields = ['cavab']
-        widgets = {
-            'cavab': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Cavabınızı yazın...'}),
-        }
-        labels = {
-            'cavab': 'Cavab',
-        } 
+        model = ProductReview
+        fields = ['rating', 'comment'] 

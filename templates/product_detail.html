@@ -134,24 +134,22 @@
         </button>
         <div class="product-detail-title" style="margin-top:30px;">{{ mehsul.adi }}</div>
         <div style="display:flex;align-items:center;gap:18px;margin-bottom:10px;">
-            <!-- Ulduz reytinqi -->
+            <!-- İstifadəçi ulduz reytinqi -->
             <div id="rating-stars" style="font-size:2rem;cursor:pointer;">
                 {% for i in "12345" %}
                     <span class="star" data-value="{{ forloop.counter }}" style="color:{% if user_rating|default:0 >= forloop.counter %}#FFD700{% else %}#ccc{% endif %};">&#9733;</span>
                 {% endfor %}
             </div>
-            <span id="avg-rating" style="font-size:1.1rem;color:#2B5173;">Ortalama: <b>{{ avg_rating }}</b></span>
-            <span id="avg-rating-stars" style="font-size:1.7rem;margin-left:8px;">
+        </div>
+        <!-- Ort. reytinq ayrıca blokda, ulduzlarla -->
+        <div id="avg-rating-block" style="margin-bottom:18px;">
+            <span style="font-size:1.1rem;color:#2B5173;font-weight:600;">Ortalama:</span>
+            <span id="avg-rating-stars">
                 {% for i in "12345" %}
-                    {% if avg_rating|floatformat:1 >= forloop.counter %}
-                        <span style="color:#FFD700;">&#9733;</span>
-                    {% elif avg_rating|floatformat:1 > forloop.counter0 and avg_rating|floatformat:1 < forloop.counter %}
-                        <span style="color:#FFD700;">&#189;</span>
-                    {% else %}
-                        <span style="color:#ccc;">&#9733;</span>
-                    {% endif %}
+                    <span class="avg-star" style="color:{% if avg_rating|floatformat:1 >= forloop.counter %}#FFD700{% elif avg_rating|floatformat:1 >= forloop.counter0 and avg_rating|floatformat:1 < forloop.counter %}#FFD70099{% else %}#ccc{% endif %};font-size:1.5rem;">&#9733;</span>
                 {% endfor %}
             </span>
+            <span id="avg-rating-value" style="font-size:1.1rem;color:#2B5173;">{{ avg_rating }}</span>
         </div>
         <div class="product-detail-meta">
             <div><span class="meta-label">Firma:</span> {{ mehsul.firma.adi }}</div>
@@ -232,24 +230,26 @@ if (stars.length) {
             .then(data => {
                 if (data.success) {
                     currentUserRating = val;
-                    document.getElementById('avg-rating').innerHTML = 'Ortalama: <b>' + data.avg_rating + '</b>';
-                    // Ortalama ulduzları yenilə
-                    let avg = parseFloat(data.avg_rating);
-                    let starsHtml = '';
-                    for (let i = 1; i <= 5; i++) {
-                        if (avg >= i) starsHtml += '<span style="color:#FFD700;">&#9733;</span>';
-                        else if (avg > i-1 && avg < i) starsHtml += '<span style="color:#FFD700;">&#189;</span>';
-                        else starsHtml += '<span style="color:#ccc;">&#9733;</span>';
-                    }
-                    document.getElementById('avg-rating-stars').innerHTML = starsHtml;
-                    stars.forEach(s => {
-                        if (parseInt(s.getAttribute('data-value')) <= val) s.style.color = '#FFD700';
-                        else s.style.color = '#ccc';
-                    });
+                    // Yenilə: ortalama ulduzlar və rəqəm
+                    updateAvgRatingStars(data.avg_rating);
                 }
             });
         });
     });
+}
+function updateAvgRatingStars(avg) {
+    const avgStars = document.querySelectorAll('#avg-rating-stars .avg-star');
+    avg = parseFloat(avg);
+    avgStars.forEach((star, idx) => {
+        if (avg >= idx + 1) {
+            star.style.color = '#FFD700';
+        } else if (avg > idx && avg < idx + 1) {
+            star.style.color = '#FFD70099'; // yarımçıq ulduz üçün
+        } else {
+            star.style.color = '#ccc';
+        }
+    });
+    document.getElementById('avg-rating-value').innerText = avg;
 }
 // Ürək (like) AJAX
 const likeBtn = document.getElementById('like-btn');

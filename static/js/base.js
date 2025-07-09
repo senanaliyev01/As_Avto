@@ -909,7 +909,7 @@ function initializeProductsPage() {
                                     <img src="${product.sekil_url || '/static/images/no_image.webp'}" alt="${product.adi}" onclick="openImageModal('${product.sekil_url}')">
                                 </div>
                                 <div class="product-row-info">
-                                    <div class="product-title"><a href="/product/${product.id}/" style="color:inherit;text-decoration:none;">${product.adi} ${product.brend_kod} ${product.firma}</a></div>
+                                    <div class="product-title"><a href="/products/${product.id}/" style="color:inherit;text-decoration:none;">${product.adi} ${product.brend_kod} ${product.firma}</a></div>
                                     <div class="product-meta">
                                         ${product.sahib_id && product.sahib_username ? `<a href=\"#\" class=\"seller-link\" onclick=\"openUserDetailsModal(${product.sahib_id}); return false;\"><i class='fas fa-user'></i> ${product.sahib_username}</a>` : ''}
                                     </div>

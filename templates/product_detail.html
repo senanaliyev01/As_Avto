@@ -121,13 +121,11 @@
         <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
         <div style="display:flex;align-items:center;gap:10px;margin-top:18px;">
             {% if mehsul.firma.logo %}
-            <img class="firma-logo" src="{{ mehsul.firma.logo.url }}" alt="{{ mehsul.firma.adi }}">
+            <img class="firma-logo" src="{{ mehsul.firma.logo.url }}" alt="{{ mehsul.firma.adi }}" style="width:70px;height:70px;object-fit:contain;border-radius:8px;background:#fff;border:1px solid #e0e0e0;">
             {% endif %}
-            <div class="avtomobil-logos-wrapper">
-                {% for logo in mehsul.avtomobil.logolar.all %}
-                <img class="avtomobil-logo" src="{{ logo.sekil.url }}" alt="{{ mehsul.avtomobil.adi }}">
-                {% endfor %}
-            </div>
+            {% for logo in mehsul.avtomobil.logolar.all %}
+            <img class="avtomobil-logo" src="{{ logo.sekil.url }}" alt="{{ mehsul.avtomobil.adi }}" style="width:70px;height:70px;object-fit:contain;border-radius:8px;background:#fff;border:1px solid #e0e0e0;">
+            {% endfor %}
         </div>
     </div>
     <div class="product-detail-main">

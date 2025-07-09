@@ -224,7 +224,7 @@
         <form id="reviewForm" method="post" action="{% url 'add_product_review' mehsul.id %}" autocomplete="off">
             {% csrf_token %}
             <div style="display:flex;align-items:flex-start;gap:16px;">
-                <img src="{{ user.profile.sekil.url if user.profile and user.profile.sekil else '/static/images/no_image.jpg' }}" alt="Profil" style="width:48px;height:48px;border-radius:50%;object-fit:cover;box-shadow:0 1px 4px rgba(0,0,0,0.07);">
+                <img src="{{ user.profile.sekil.url }}" alt="Profil" style="width:48px;height:48px;border-radius:50%;object-fit:cover;box-shadow:0 1px 4px rgba(0,0,0,0.07);">
                 <div style="flex:1;">
                     <div style="margin-bottom:8px;">{{ review_form.rating }}</div>
                     <div>{{ review_form.comment }}</div>

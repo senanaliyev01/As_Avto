@@ -250,8 +250,8 @@ class ProductLike(models.Model):
 
     class Meta:
         unique_together = ('user', 'mehsul')
-        verbose_name = 'Məhsul Bəyənməsi'
-        verbose_name_plural = 'Məhsul Bəyənmələri'
+        verbose_name = 'Bəyənmə'
+        verbose_name_plural = 'Bəyənmələr'
 
     def __str__(self):
         return f"{self.user.username} - {self.mehsul.adi} (like)"
@@ -265,8 +265,8 @@ class ProductRating(models.Model):
 
     class Meta:
         unique_together = ('user', 'mehsul')
-        verbose_name = 'Məhsul Qiymətləndirməsi'
-        verbose_name_plural = 'Məhsul Qiymətləndirmələri'
+        verbose_name = 'Qiymətləndirmə'
+        verbose_name_plural = 'Qiymətləndirmələr'
 
     def __str__(self):
         return f"{self.user.username} - {self.mehsul.adi} ({self.rating} ulduz)"

@@ -218,6 +218,8 @@ JAZZMIN_SETTINGS = {
         "home.PopupImage": "fa-solid fa-image",
         "home.Profile": "fa-regular fa-circle-user",
         "home.Header_Message": "fa-solid fa-comment",
+        "home.ProductLike": "fa-solid fa-thumbs-up",
+        "home.ProductRating": "fa-solid fa-star-half-stroke",
     },
     
     # Related Modal

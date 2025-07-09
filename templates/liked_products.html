@@ -50,4 +50,20 @@
         {% endfor %}
     </div>
 </div>
+
+<!-- Miqdar Modal -->
+<div id="quantityModal" class="modal">
+    <div class="custom-quantity-modal-content">
+        <span class="close" onclick="closeQuantityModal()">&times;</span>
+        <h3>Miqdar seçin</h3>
+        <form method="POST" id="addToCartForm">
+            {% csrf_token %}
+            <input type="number" name="quantity" id="quantityInput" value="1" min="1" class="form-control">
+            <div class="modal-buttons">
+                <button type="button" class="btn btn-danger" onclick="closeQuantityModal()">Ləğv et</button>
+                <button type="submit" class="btn btn-primary">Təsdiq et</button>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %} 

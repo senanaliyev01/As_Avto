@@ -117,30 +117,63 @@
 }
 .rating-radio-group {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
+    justify-content: flex-start;
 }
 .rating-radio-group label {
     cursor: pointer;
-    font-size: 2rem;
+    font-size: 2.2rem;
     color: #e0e0e0;
-    transition: color 0.2s;
+    transition: color 0.2s, transform 0.2s;
     margin-bottom: 0;
+    padding: 0 2px;
+    position: relative;
 }
 .rating-radio-group input[type="radio"] {
     display: none;
 }
 .rating-radio-group input[type="radio"]:checked + span {
     color: #f5b301;
-    text-shadow: 0 1px 4px rgba(245,179,1,0.12);
+    text-shadow: 0 2px 8px rgba(245,179,1,0.18);
+    transform: scale(1.15);
 }
 .rating-radio-group span {
-    transition: color 0.2s;
+    transition: color 0.2s, transform 0.2s;
+    display: inline-block;
 }
 .rating-radio-group label:hover span,
 .rating-radio-group label:focus span {
     color: #f5b301;
+    transform: scale(1.12);
+}
+.review-form-card textarea.form-control {
+    width: 100%;
+    min-height: 80px;
+    max-height: 220px;
+    border-radius: 10px;
+    border: 1.5px solid #e0e0e0;
+    padding: 12px 14px;
+    font-size: 1.08rem;
+    background: #f8fafc;
+    color: #222;
+    resize: vertical;
+    box-shadow: 0 1px 4px rgba(43,81,115,0.04);
+    transition: border 0.2s, box-shadow 0.2s;
+}
+.review-form-card textarea.form-control:focus {
+    border: 1.5px solid #2B5173;
+    outline: none;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(43,81,115,0.09);
+}
+.review-form-card .btn-primary {
+    padding: 8px 28px;
+    font-size: 1.08rem;
+    border-radius: 8px;
+    font-weight: 600;
+    box-shadow: 0 1px 4px rgba(43,81,115,0.07);
 }
 </style>
 <div class="product-detail-container" style="position:relative;">
@@ -254,7 +287,11 @@
             <div style="display:flex;align-items:flex-start;gap:16px;">
                 <img src="{{ user.profile.sekil.url }}" alt="Profil" style="width:48px;height:48px;border-radius:50%;object-fit:cover;box-shadow:0 1px 4px rgba(0,0,0,0.07);">
                 <div style="flex:1;">
-                    <div style="margin-bottom:8px;">{{ review_form.rating }}</div>
+                    <div class="rating-radio-group">
+                        {% for radio in review_form.rating %}
+                            <label>{% include "star_radio.html" with radio=radio %}</label>
+                        {% endfor %}
+                    </div>
                     <div>{{ review_form.comment }}</div>
                 </div>
             </div>

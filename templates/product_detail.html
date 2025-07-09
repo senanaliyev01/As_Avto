@@ -146,7 +146,9 @@
             <span style="font-size:1.1rem;color:#2B5173;font-weight:600;">Ortalama:</span>
             <span id="avg-rating-stars">
                 {% for i in "12345" %}
-                    <span class="avg-star" style="color:{% if avg_rating|floatformat:1 >= forloop.counter %}#FFD700{% elif avg_rating|floatformat:1 >= forloop.counter0 and avg_rating|floatformat:1 < forloop.counter %}#FFD70099{% else %}#ccc{% endif %};font-size:1.5rem;">&#9733;</span>
+                    {% with val=forloop.counter %}
+                        <span class="avg-star" style="color:{% if avg_rating|floatformat:1 >= val %}#FFD700{% elif avg_rating|floatformat:1 >= val-0.5 %}#FFD70099{% else %}#ccc{% endif %};font-size:1.5rem;">&#9733;</span>
+                    {% endwith %}
                 {% endfor %}
             </span>
             <span id="avg-rating-value" style="font-size:1.1rem;color:#2B5173;">{{ avg_rating }}</span>
@@ -243,14 +245,16 @@ function updateAvgRatingStars(avg) {
     avgStars.forEach((star, idx) => {
         if (avg >= idx + 1) {
             star.style.color = '#FFD700';
-        } else if (avg > idx && avg < idx + 1) {
-            star.style.color = '#FFD70099'; // yarımçıq ulduz üçün
+        } else if (avg >= idx + 0.5) {
+            star.style.color = '#FFD70099';
         } else {
             star.style.color = '#ccc';
         }
     });
     document.getElementById('avg-rating-value').innerText = avg;
 }
+// İlk yüklənəndə ortalama ulduzları göstər
+updateAvgRatingStars({{ avg_rating|default:0 }});
 // Ürək (like) AJAX
 const likeBtn = document.getElementById('like-btn');
 if (likeBtn) {

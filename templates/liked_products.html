@@ -16,9 +16,6 @@
                 <span style="color:#2B5173;font-size:1rem;">{{ mehsul.avg_rating|floatformat:1 }}</span>
                 <span style="color:#e74c3c;font-size:1.1rem;margin-left:8px;"><i class="fas fa-heart"></i> {{ mehsul.like_count }}</span>
             </div>
-            <button class="btn" style="background:none;border:none;font-size:1.7rem;position:absolute;top:10px;right:10px;color:#e74c3c;z-index:2;cursor:pointer;" disabled>
-                <i class="fas fa-heart"></i> <span style="font-size:1rem;vertical-align:top;">{{ mehsul.likes.count }}</span>
-            </button>
             <div class="product-row-image">
                 <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
             </div>
@@ -44,13 +41,6 @@
             {% endif %}
             <div class="product-row-actions">
                 <div class="product-price">{{ mehsul.qiymet }} ₼</div>
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                    {% for i in "12345" %}
-                        <span style="color:{% if mehsul.avg_rating >= forloop.counter %}#FFD700{% elif mehsul.avg_rating >= forloop.counter0 %}#FFD70099{% else %}#ccc{% endif %};font-size:1.1rem;">&#9733;</span>
-                    {% endfor %}
-                    <span style="color:#2B5173;font-size:1rem;">{{ mehsul.avg_rating|floatformat:1 }}</span>
-                    <span style="color:#e74c3c;font-size:1.1rem;margin-left:8px;"><i class="fas fa-heart"></i> {{ mehsul.like_count }}</span>
-                </div>
                 <button type="button" class="cart-add-btn" {% if mehsul.stok == 0 %}disabled{% endif %} onclick="openQuantityModal({{ mehsul.id }}, {{ mehsul.stok }})">
                     <i class="fas fa-shopping-cart"></i>
                 </button>

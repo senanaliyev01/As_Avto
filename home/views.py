@@ -13,7 +13,7 @@ from functools import reduce
 from operator import and_, or_
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_POST
 from .forms import MehsulForm, SifarisEditForm, SifarisItemEditForm
 import pandas as pd
 from django.db import transaction
@@ -1689,3 +1689,34 @@ def product_detail_view(request, product_id):
         'review_submitted': review_submitted,
     }
     return render(request, 'product_detail.html', context)
+
+@require_POST
+def add_product_review_view(request, product_id):
+    from .models import Mehsul, ProductReview
+    from .forms import ProductReviewForm
+    if not request.user.is_authenticated:
+        return JsonResponse({'success': False, 'error': 'Daxil olunmalıdır.'}, status=403)
+    mehsul = get_object_or_404(Mehsul, id=product_id)
+    form = ProductReviewForm(request.POST)
+    if form.is_valid():
+        review = form.save(commit=False)
+        review.mehsul = mehsul
+        review.user = request.user
+        review.is_approved = False
+        review.save()
+        # Profil şəkli
+        profile = getattr(request.user, 'profile', None)
+        sekil_url = profile.sekil.url if profile and profile.sekil else '/static/images/no_image.jpg'
+        return JsonResponse({
+            'success': True,
+            'review': {
+                'username': request.user.username,
+                'profile_img': sekil_url,
+                'comment': review.comment,
+                'rating': review.rating,
+                'created_at': review.created_at.strftime('%d.%m.%Y %H:%M'),
+                'pending': True
+            }
+        })
+    else:
+        return JsonResponse({'success': False, 'error': 'Form xətası', 'errors': form.errors}, status=400)

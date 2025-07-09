@@ -221,12 +221,70 @@
     {% endif %}
     {% if user.is_authenticated %}
     <div class="review-form-card" style="background:#f5f8fa;border-radius:10px;padding:20px 24px;box-shadow:0 2px 8px rgba(43,81,115,0.04);">
-        <form method="post">
+        <form id="reviewForm" method="post" action="{% url 'add_product_review' mehsul.id %}" autocomplete="off">
             {% csrf_token %}
-            {{ review_form.as_p }}
-            <button type="submit" name="add_review" class="btn btn-primary">Göndər</button>
+            <div style="display:flex;align-items:flex-start;gap:16px;">
+                <img src="{{ user.profile.sekil.url if user.profile and user.profile.sekil else '/static/images/no_image.jpg' }}" alt="Profil" style="width:48px;height:48px;border-radius:50%;object-fit:cover;box-shadow:0 1px 4px rgba(0,0,0,0.07);">
+                <div style="flex:1;">
+                    <div style="margin-bottom:8px;">{{ review_form.rating }}</div>
+                    <div>{{ review_form.comment }}</div>
+                </div>
+            </div>
+            <div style="margin-top:12px;text-align:right;">
+                <button type="submit" class="btn btn-primary">Göndər</button>
+            </div>
         </form>
+        <div id="review-success-message" style="display:none;margin-top:10px;" class="alert alert-success">Şərhiniz göndərildi və təsdiqləndikdən sonra görünəcək.</div>
+        <div id="review-error-message" style="display:none;margin-top:10px;" class="alert alert-danger"></div>
     </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('reviewForm');
+        const successMsg = document.getElementById('review-success-message');
+        const errorMsg = document.getElementById('review-error-message');
+        form.onsubmit = function(e) {
+            e.preventDefault();
+            successMsg.style.display = 'none';
+            errorMsg.style.display = 'none';
+            const formData = new FormData(form);
+            fetch(form.action, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    // Yeni şərhi yuxarıya əlavə et (pending statusu ilə)
+                    const reviewsList = document.querySelector('.product-reviews-list');
+                    const reviewDiv = document.createElement('div');
+                    reviewDiv.className = 'review-card';
+                    reviewDiv.style = 'background:#f8fafc;border-radius:10px;padding:18px 20px;margin-bottom:18px;box-shadow:0 2px 8px rgba(43,81,115,0.04);opacity:0.7;';
+                    reviewDiv.innerHTML = `
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <img src="${data.review.profile_img}" alt="Profil" style="width:38px;height:38px;border-radius:50%;object-fit:cover;box-shadow:0 1px 4px rgba(0,0,0,0.07);">
+                            <span style="font-weight:600;color:#2B5173;">${data.review.username}</span>
+                            <span style="color:#888;font-size:0.95rem;">${data.review.created_at}</span>
+                        </div>
+                        <div style="margin-top:8px;font-size:1.08rem;color:#333;">${data.review.comment.replace(/\n/g,'<br>')}</div>
+                        <div style="margin-top:10px;color:#f5b301;">${'★'.repeat(data.review.rating)}${'☆'.repeat(5-data.review.rating)}</div>
+                        <div style="margin-top:8px;color:#888;font-size:0.98rem;">Təsdiqlənmə gözləyir</div>
+                    `;
+                    reviewsList.prepend(reviewDiv);
+                    form.reset();
+                    successMsg.style.display = 'block';
+                } else {
+                    errorMsg.textContent = data.error || 'Xəta baş verdi';
+                    errorMsg.style.display = 'block';
+                }
+            })
+            .catch(() => {
+                errorMsg.textContent = 'Xəta baş verdi';
+                errorMsg.style.display = 'block';
+            });
+        };
+    });
+    </script>
     {% else %}
     <div style="color:#888;font-size:1.08rem;">Şərh yazmaq üçün <a href="{% url 'login' %}">daxil olun</a>.</div>
     {% endif %}

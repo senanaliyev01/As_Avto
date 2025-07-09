@@ -14,7 +14,7 @@ from operator import and_, or_
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.views.decorators.http import require_http_methods
-from .forms import MehsulForm, SifarisEditForm, SifarisItemEditForm
+from .forms import MehsulForm, SifarisEditForm, SifarisItemEditForm, MehsulReviewForm, MehsulReviewReplyForm
 import pandas as pd
 from django.db import transaction
 import math
@@ -1631,7 +1631,7 @@ def root_view(request):
         return redirect('login')
 
 def product_detail_view(request, product_id):
-    from .models import Mehsul
+    from .models import Mehsul, MehsulReview
     from django.http import Http404
     import re
     mehsul = get_object_or_404(Mehsul, id=product_id)
@@ -1639,4 +1639,52 @@ def product_detail_view(request, product_id):
     if mehsul.kodlar:
         kodlar_list = re.split(r'[\s,\n]+', mehsul.kodlar)
         kodlar_list = [k for k in kodlar_list if k]
-    return render(request, 'product_detail.html', {'mehsul': mehsul, 'kodlar_list': kodlar_list})
+
+    reviews = mehsul.reviews.select_related('istifadeci').all()
+    user_review = None
+    review_form = None
+    reply_forms = {}
+
+    # Review əlavə etmək
+    if request.method == 'POST':
+        if 'add_review' in request.POST and request.user.is_authenticated:
+            review_form = MehsulReviewForm(request.POST)
+            if review_form.is_valid():
+                # Yalnız bir dəfə şərh
+                if not MehsulReview.objects.filter(mehsul=mehsul, istifadeci=request.user).exists():
+                    review = review_form.save(commit=False)
+                    review.mehsul = mehsul
+                    review.istifadeci = request.user
+                    review.save()
+                    return redirect('product_detail', product_id=mehsul.id)
+        elif 'reply_review_id' in request.POST and request.user.is_authenticated:
+            # Cavab yalnız sahib üçün
+            review_id = request.POST.get('reply_review_id')
+            try:
+                review = MehsulReview.objects.get(id=review_id, mehsul=mehsul)
+                if mehsul.sahib == request.user:
+                    reply_form = MehsulReviewReplyForm(request.POST, instance=review)
+                    if reply_form.is_valid():
+                        reply_form.save()
+                        return redirect('product_detail', product_id=mehsul.id)
+            except MehsulReview.DoesNotExist:
+                pass
+
+    # GET və ya POST sonrası form hazırlığı
+    if request.user.is_authenticated:
+        try:
+            user_review = MehsulReview.objects.get(mehsul=mehsul, istifadeci=request.user)
+        except MehsulReview.DoesNotExist:
+            review_form = MehsulReviewForm()
+    for review in reviews:
+        if mehsul.sahib == request.user:
+            reply_forms[review.id] = MehsulReviewReplyForm(instance=review)
+
+    return render(request, 'product_detail.html', {
+        'mehsul': mehsul,
+        'kodlar_list': kodlar_list,
+        'reviews': reviews,
+        'review_form': review_form,
+        'reply_forms': reply_forms,
+        'user_review': user_review,
+    })

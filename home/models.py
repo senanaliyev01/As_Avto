@@ -11,6 +11,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 from datetime import timedelta
 from django.utils.text import slugify
+from django.conf import settings
 
 class Header_Message(models.Model):
     mesaj = models.CharField(max_length=100)
@@ -241,5 +242,22 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
+
+
+class MehsulReview(models.Model):
+    mehsul = models.ForeignKey('Mehsul', on_delete=models.CASCADE, related_name='reviews')
+    istifadeci = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='mehsul_reviews')
+    qiymet = models.PositiveSmallIntegerField(choices=[(i, str(i)) for i in range(1, 6)])
+    serh = models.TextField()
+    cavab = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('mehsul', 'istifadeci')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.mehsul.adi} - {self.istifadeci.username} ({self.qiymet})"
 
 

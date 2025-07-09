@@ -46,7 +46,12 @@ class SifarisItemEditForm(forms.ModelForm):
         } 
 
 class ProductReviewForm(forms.ModelForm):
-    rating = forms.ChoiceField(choices=[(i, str(i)) for i in range(1, 6)], widget=forms.RadioSelect, label="Qiymət")
+    rating = forms.TypedChoiceField(
+        choices=[(i, str(i)) for i in range(1, 6)],
+        widget=forms.RadioSelect,
+        label="Qiymət",
+        coerce=int
+    )
     comment = forms.CharField(widget=forms.Textarea(attrs={'rows': 3, 'placeholder': 'Şərhinizi yazın...'}), label="Şərh")
 
     class Meta:

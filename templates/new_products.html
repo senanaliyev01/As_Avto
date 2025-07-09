@@ -13,7 +13,7 @@
                 <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" onclick="openImageModal('{{ mehsul.sekil.url }}')">
             </div>
             <div class="product-row-info">
-                <div class="product-title">{{ mehsul.adi }} {{ mehsul.brend_kod }} {{ mehsul.firma.adi }}</div>
+                <div class="product-title"><a href="{% url 'product_detail' mehsul.id %}" class="product-title-link">{{ mehsul.adi }} {{ mehsul.brend_kod }} {{ mehsul.firma.adi }}</a></div>
                 <div class="product-meta">
                     {% if mehsul.sahib %}
                     <a href="#" class="seller-link" onclick="openUserDetailsModal({{ mehsul.sahib.id }}); return false;"><i class="fas fa-user"></i> {{ mehsul.sahib.username }}</a>

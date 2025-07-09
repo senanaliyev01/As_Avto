@@ -1629,3 +1629,9 @@ def root_view(request):
         return redirect('base')
     else:
         return redirect('login')
+
+def product_detail_view(request, product_id):
+    from .models import Mehsul
+    from django.utils import timezone
+    mehsul = get_object_or_404(Mehsul, id=product_id)
+    return render(request, 'product_detail.html', {'mehsul': mehsul, 'now': timezone.now()})

@@ -145,6 +145,10 @@ def products_view(request):
                 mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter).order_by('-id')
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
+    # Hər məhsul üçün ortalama reytinq və bəyənmə sayı əlavə et
+    for m in initial_products:
+        m.avg_rating = m.ratings.aggregate(models.Avg('rating'))['rating__avg'] or 0
+        m.like_count = m.likes.count()
     return render(request, 'products.html', {
         'mehsullar': initial_products,
         'has_more': has_more,
@@ -191,6 +195,8 @@ def load_more_products(request):
     has_more = mehsullar.count() > (offset + limit)
     products_data = []
     for product in products:
+        avg_rating = product.ratings.aggregate(models.Avg('rating'))['rating__avg'] or 0
+        like_count = product.likes.count()
         products_data.append({
             'id': product.id,
             'adi': product.adi,
@@ -206,6 +212,8 @@ def load_more_products(request):
             'yenidir': product.yenidir,
             'sahib_id': product.sahib.id if product.sahib else None,
             'sahib_username': product.sahib.username if product.sahib else 'AS-AVTO',
+            'avg_rating': avg_rating,
+            'like_count': like_count,
         })
     return JsonResponse({
         'products': products_data,
@@ -594,6 +602,9 @@ def new_products_view(request):
     firmalar = Firma.objects.all()
     avtomobiller = Avtomobil.objects.all()
     popup_images = PopupImage.objects.filter(aktiv=True)
+    for m in initial_products:
+        m.avg_rating = m.ratings.aggregate(models.Avg('rating'))['rating__avg'] or 0
+        m.like_count = m.likes.count()
     return render(request, 'new_products.html', {
         'mehsullar': initial_products,
         'has_more': has_more,
@@ -642,6 +653,8 @@ def load_more_new_products(request):
     has_more = mehsullar.count() > (offset + limit)
     products_data = []
     for product in products:
+        avg_rating = product.ratings.aggregate(models.Avg('rating'))['rating__avg'] or 0
+        like_count = product.likes.count()
         products_data.append({
             'id': product.id,
             'adi': product.adi,
@@ -657,6 +670,8 @@ def load_more_new_products(request):
             'yenidir': product.yenidir,
             'sahib_id': product.sahib.id if product.sahib else None,
             'sahib_username': product.sahib.username if product.sahib else 'AS-AVTO',
+            'avg_rating': avg_rating,
+            'like_count': like_count,
         })
     return JsonResponse({
         'products': products_data,
@@ -1699,4 +1714,7 @@ def rate_product(request):
 @login_required
 def liked_products_view(request):
     liked_products = Mehsul.objects.filter(likes__user=request.user)
+    for m in liked_products:
+        m.avg_rating = m.ratings.aggregate(models.Avg('rating'))['rating__avg'] or 0
+        m.like_count = m.likes.count()
     return render(request, 'liked_products.html', {'mehsullar': liked_products})

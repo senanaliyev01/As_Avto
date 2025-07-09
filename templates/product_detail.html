@@ -139,7 +139,7 @@
             <div><span class="meta-label">Brend Kod:</span> {{ mehsul.brend_kod }}</div>
         </div>
         {% if mehsul.sahib %}
-        <div style="margin-top: 8px;display:flex;align-items:center;gap:10px;">
+        <div>
             <span class="meta-label">Satıcı:</span>
             <a href="#" class="seller-link" onclick="openUserDetailsModal({{ mehsul.sahib.id }}); return false;" style="color:#2B5173;font-weight:600;"><i class="fas fa-user"></i> {{ mehsul.sahib.username }}</a>
             <button type="button" class="cart-add-btn" {% if mehsul.stok == 0 %}disabled{% endif %} onclick="openQuantityModal({{ mehsul.id }}, {{ mehsul.stok }})">

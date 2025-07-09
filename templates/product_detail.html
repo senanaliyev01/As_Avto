@@ -157,7 +157,7 @@
                         ;font-size:1.5rem;">&#9733;</span>
                 {% endfor %}
             </span>
-            <span id="avg-rating-value" style="font-size:1.1rem;color:#2B5173;">{{ avg_rating }}</span>
+            <span id="avg-rating-value" style="font-size:1.1rem;color:#2B5173;">{{ avg_rating|floatformat:1 }}</span>
             <span id="review-count" style="font-size:1.1rem;color:#888;">({{ review_count }} rəy)</span>
         </div>
         <div class="product-detail-meta">

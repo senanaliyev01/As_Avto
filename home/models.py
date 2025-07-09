@@ -260,6 +260,7 @@ class ProductRating(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='rated_products')
     mehsul = models.ForeignKey(Mehsul, on_delete=models.CASCADE, related_name='ratings')
     rating = models.PositiveSmallIntegerField(choices=[(i, str(i)) for i in range(1, 6)])
+    comment = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now=True)
 
     class Meta:

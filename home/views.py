@@ -1649,6 +1649,9 @@ def product_detail_view(request, product_id):
             user_rating = rating_obj.rating
     avg_rating = ProductRating.objects.filter(mehsul=mehsul).aggregate(Avg('rating'))['rating__avg'] or 0
     like_count = ProductLike.objects.filter(mehsul=mehsul).count()
+    # Bütün şərhlər (ən yenilər birinci)
+    reviews = ProductRating.objects.filter(mehsul=mehsul).select_related('user__profile').order_by('-created_at')
+    review_count = reviews.count()
     return render(request, 'product_detail.html', {
         'mehsul': mehsul,
         'kodlar_list': kodlar_list,
@@ -1656,6 +1659,8 @@ def product_detail_view(request, product_id):
         'user_rating': user_rating,
         'avg_rating': round(avg_rating, 2),
         'like_count': like_count,
+        'reviews': reviews,
+        'review_count': review_count,
     })
 
 @csrf_exempt
@@ -1679,15 +1684,17 @@ def like_product(request):
 def rate_product(request):
     product_id = request.POST.get('product_id')
     rating_value = int(request.POST.get('rating', 0))
+    comment = request.POST.get('comment', '').strip()
     mehsul = get_object_or_404(Mehsul, id=product_id)
     if rating_value < 1 or rating_value > 5:
         return JsonResponse({'success': False, 'error': 'Yanlış reytinq'}, status=400)
     rating, created = ProductRating.objects.update_or_create(
         user=request.user, mehsul=mehsul,
-        defaults={'rating': rating_value}
+        defaults={'rating': rating_value, 'comment': comment}
     )
     avg_rating = ProductRating.objects.filter(mehsul=mehsul).aggregate(Avg('rating'))['rating__avg'] or 0
-    return JsonResponse({'success': True, 'avg_rating': round(avg_rating, 2), 'user_rating': rating_value})
+    review_count = ProductRating.objects.filter(mehsul=mehsul).count()
+    return JsonResponse({'success': True, 'avg_rating': round(avg_rating, 2), 'user_rating': rating_value, 'review_count': review_count})
 
 @login_required
 def liked_products_view(request):

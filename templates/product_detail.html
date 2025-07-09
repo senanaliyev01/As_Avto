@@ -123,28 +123,45 @@
     justify-content: flex-start;
 }
 .rating-radio-group label {
-    cursor: pointer;
+    position: relative;
     font-size: 2.2rem;
     color: #e0e0e0;
-    transition: color 0.2s, transform 0.2s;
+    cursor: pointer;
     margin-bottom: 0;
     padding: 0 2px;
-    position: relative;
+    transition: color 0.2s, transform 0.2s;
 }
-.rating-radio-group input[type="radio"] {
+.rating-radio-group label input[type="radio"] {
     display: none;
 }
-.rating-radio-group input[type="radio"]:checked + span {
+.rating-radio-group label span, .rating-radio-group label .django-radio-label {
+    opacity: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1em;
+    height: 1em;
+    pointer-events: none;
+}
+.rating-radio-group label::after {
+    content: "★";
+    color: #e0e0e0;
+    position: relative;
+    left: 0;
+    top: 0;
+    transition: color 0.2s, transform 0.2s;
+    z-index: 1;
+}
+.rating-radio-group label input[type="radio"]:checked ~ .django-radio-label,
+.rating-radio-group label input[type="radio"]:checked + span {
     color: #f5b301;
     text-shadow: 0 2px 8px rgba(245,179,1,0.18);
     transform: scale(1.15);
 }
-.rating-radio-group span {
-    transition: color 0.2s, transform 0.2s;
-    display: inline-block;
-}
-.rating-radio-group label:hover span,
-.rating-radio-group label:focus span {
+.rating-radio-group label input[type="radio"]:checked ~ .django-radio-label,
+.rating-radio-group label input[type="radio"]:checked + span,
+.rating-radio-group label:focus::after,
+.rating-radio-group label:hover::after {
     color: #f5b301;
     transform: scale(1.12);
 }

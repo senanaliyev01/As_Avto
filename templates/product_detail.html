@@ -141,6 +141,17 @@
                 {% endfor %}
             </div>
             <span id="avg-rating" style="font-size:1.1rem;color:#2B5173;">Ortalama: <b>{{ avg_rating }}</b></span>
+            <span id="avg-rating-stars" style="font-size:1.7rem;margin-left:8px;">
+                {% for i in "12345" %}
+                    {% if avg_rating|floatformat:1 >= forloop.counter %}
+                        <span style="color:#FFD700;">&#9733;</span>
+                    {% elif avg_rating|floatformat:1 > forloop.counter0 and avg_rating|floatformat:1 < forloop.counter %}
+                        <span style="color:#FFD700;">&#189;</span>
+                    {% else %}
+                        <span style="color:#ccc;">&#9733;</span>
+                    {% endif %}
+                {% endfor %}
+            </span>
         </div>
         <div class="product-detail-meta">
             <div><span class="meta-label">Firma:</span> {{ mehsul.firma.adi }}</div>
@@ -222,6 +233,15 @@ if (stars.length) {
                 if (data.success) {
                     currentUserRating = val;
                     document.getElementById('avg-rating').innerHTML = 'Ortalama: <b>' + data.avg_rating + '</b>';
+                    // Ortalama ulduzları yenilə
+                    let avg = parseFloat(data.avg_rating);
+                    let starsHtml = '';
+                    for (let i = 1; i <= 5; i++) {
+                        if (avg >= i) starsHtml += '<span style="color:#FFD700;">&#9733;</span>';
+                        else if (avg > i-1 && avg < i) starsHtml += '<span style="color:#FFD700;">&#189;</span>';
+                        else starsHtml += '<span style="color:#ccc;">&#9733;</span>';
+                    }
+                    document.getElementById('avg-rating-stars').innerHTML = starsHtml;
                     stars.forEach(s => {
                         if (parseInt(s.getAttribute('data-value')) <= val) s.style.color = '#FFD700';
                         else s.style.color = '#ccc';

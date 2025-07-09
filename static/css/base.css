@@ -4091,3 +4091,241 @@ body {
     pointer-events: none;
 }
 
+@media (max-width: 600px) {
+  /* Wrapper və container */
+  .wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .container {
+    padding: 0 6px;
+    max-width: 100vw;
+  }
+  /* Header və naviqasiya */
+  .header {
+    padding: 8px 2px;
+    border-radius: 0 0 10px 10px;
+    min-width: 0;
+    box-shadow: 0 2px 8px rgba(44,62,80,0.06);
+  }
+  .header-content {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+  .logo {
+    max-width: 120px;
+    margin: 0 auto 6px auto;
+  }
+  .logo-img {
+    height: 48px;
+    max-width: 100%;
+  }
+  .header-right {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+    min-width: 0;
+  }
+  .main-nav ul {
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+  }
+  .nav-link {
+    width: 100%;
+    padding: 10px 8px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #e5e9f2;
+    background: #f8f9fa;
+    justify-content: flex-start;
+  }
+  .nav-link i {
+    width: 22px;
+    text-align: center;
+  }
+  /* Search */
+  .header-search-form {
+    width: 100%;
+    margin: 0 auto 8px auto;
+  }
+  .header-search-input-wrapper {
+    width: 100%;
+  }
+  .header-search-input {
+    font-size: 1rem;
+    padding: 8px 8px;
+    width: 100%;
+  }
+  .header-search-btn {
+    font-size: 1.1rem;
+    padding: 8px 12px;
+  }
+  /* Global stats bar */
+  .global-stats-bar-content {
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.98rem;
+    padding: 4px 0;
+  }
+  .stats-nav-links {
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+  }
+  /* Product card və product-row */
+  .product-row, .product-card {
+    flex-direction: column !important;
+    align-items: stretch;
+    min-width: 0;
+    margin-bottom: 14px;
+    padding: 8px 2px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(44,62,80,0.06);
+    background: #fff;
+    position: relative;
+  }
+  .product-row-image img, .product-image img {
+    width: 100%;
+    max-width: 220px;
+    height: auto;
+    margin: 0 auto 8px auto;
+    display: block;
+    border-radius: 8px;
+  }
+  .product-row-info, .product-info {
+    padding: 0 2px;
+    font-size: 0.98rem;
+  }
+  .product-title, .product-title a {
+    font-size: 1.08rem;
+    word-break: break-word;
+  }
+  .product-meta, .product-stock {
+    font-size: 0.95rem;
+  }
+  .product-row-actions, .product-card .product-row-actions {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    gap: 8px;
+  }
+  .product-price {
+    font-size: 1.08rem;
+    font-weight: 600;
+  }
+  .cart-add-btn {
+    font-size: 1.1rem;
+    padding: 7px 12px;
+  }
+  .firma-logo, .avtomobil-logo {
+    width: 32px !important;
+    height: 32px !important;
+    margin: 0 2px;
+  }
+  .avtomobil-logos-wrapper {
+    justify-content: flex-start;
+    gap: 4px;
+    margin: 6px 0;
+  }
+  /* Modal və form */
+  .modal, .modal-content, .custom-quantity-modal-content, .details-modal-content {
+    width: 98vw !important;
+    min-width: 0 !important;
+    max-width: 99vw !important;
+    left: 1vw !important;
+    right: 1vw !important;
+    padding: 8px 2px !important;
+  }
+  .modal h3, .details-modal h3 {
+    font-size: 1.1rem;
+  }
+  .form-control, input, select, textarea {
+    font-size: 1rem;
+    padding: 7px 8px;
+  }
+  .btn, button {
+    font-size: 1rem;
+    padding: 8px 12px;
+  }
+  /* Cədvəl və mesajlar */
+  table, thead, tbody, th, td, tr {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  thead {
+    display: none;
+  }
+  tr {
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(44,62,80,0.04);
+    background: #fff;
+    padding: 8px 0;
+  }
+  td {
+    padding: 6px 8px;
+    text-align: left;
+    font-size: 0.97rem;
+    border: none;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  td:last-child {
+    border-bottom: none;
+  }
+  .table {
+    border: none;
+  }
+  .messages, .message {
+    font-size: 0.98rem;
+    padding: 8px 6px;
+  }
+  /* Footer */
+  .footer, .simple-footer {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+    padding: 8px 2px;
+  }
+  .footer-logo-img {
+    height: 48px;
+    max-width: 100%;
+  }
+  /* WhatsApp, cart, user menu */
+  .whatsapp-chat {
+    width: 48px;
+    height: 48px;
+    bottom: 12px;
+    right: 12px;
+  }
+  .whatsapp-chat i {
+    font-size: 28px;
+  }
+  .cart-sidebar {
+    width: 100vw;
+    right: -100vw;
+  }
+  .cart-sidebar.active {
+    right: 0;
+  }
+  .user-menu, .user-dropdown-content {
+    width: 100%;
+    right: 0;
+  }
+  .user-button {
+    width: 100%;
+    justify-content: space-between;
+    padding: 10px;
+  }
+  /* Modal close button */
+  .close, .modal-header .btn-close {
+    font-size: 1.5rem;
+    right: 10px;
+    top: 10px;
+  }
+}
+

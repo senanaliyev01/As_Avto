@@ -35,9 +35,12 @@
             {% if mehsul.firma.logo %}
             <img class="firma-logo" src="{{ mehsul.firma.logo.url }}" alt="{{ mehsul.firma.adi }}">
             {% endif %}
-            <button type="button" class="cart-add-btn" {% if mehsul.stok == 0 %}disabled{% endif %} onclick="openQuantityModal({{ mehsul.id }}, {{ mehsul.stok }})">
-                <i class="fas fa-shopping-cart"></i>
-            </button>
+            <div class="product-row-actions">
+                <div class="product-price">{{ mehsul.qiymet }} ₼</div>
+                <button type="button" class="cart-add-btn" {% if mehsul.stok == 0 %}disabled{% endif %} onclick="openQuantityModal({{ mehsul.id }}, {{ mehsul.stok }})">
+                    <i class="fas fa-shopping-cart"></i>
+                </button>
+            </div>
         </div>
         {% empty %}
         <div class="empty-message">

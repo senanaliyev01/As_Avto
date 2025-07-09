@@ -240,10 +240,8 @@
             <div style="display:flex;align-items:flex-start;gap:16px;">
                 <img src="{{ user.profile.sekil.url }}" alt="Profil" style="width:48px;height:48px;border-radius:50%;object-fit:cover;box-shadow:0 1px 4px rgba(0,0,0,0.07);">
                 <div style="flex:1;">
-                    <div class="rating-radio-group" id="starRatingGroup">
-                        {% for radio in review_form.rating %}
-                            <label>{% include "star_radio.html" with radio=radio %}</label>
-                        {% endfor %}
+                    <div class="rating-radio-group">
+                        {{ review_form.rating }}
                     </div>
                     <div>{{ review_form.comment }}</div>
                 </div>
@@ -258,7 +256,7 @@
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Ulduz qiymətləndirmə interaktivliyi
-        const group = document.getElementById('starRatingGroup');
+        const group = document.querySelector('.rating-radio-group');
         if (group) {
             const stars = group.querySelectorAll('span[data-value]');
             const radios = group.querySelectorAll('input[type="radio"]');

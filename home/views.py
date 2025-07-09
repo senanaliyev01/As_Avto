@@ -34,6 +34,7 @@ from django.db.models.functions import Concat
 from django.db.models import CharField
 from .models import ProductReview
 from .forms import ProductReviewForm
+from django.db import models
 
 def truncate_product_name(name, max_length=20):
     """Məhsul adını qısaldır və uzun olarsa ... əlavə edir"""

@@ -1679,6 +1679,9 @@ def product_detail_view(request, product_id):
             except ProductReview.DoesNotExist:
                 pass
 
+    user_has_review = False
+    if request.user.is_authenticated:
+        user_has_review = mehsul.reviews.filter(user=request.user).exists()
     context = {
         'mehsul': mehsul,
         'kodlar_list': kodlar_list,
@@ -1687,6 +1690,7 @@ def product_detail_view(request, product_id):
         'review_count': review_count,
         'review_form': review_form,
         'review_submitted': review_submitted,
+        'user_has_review': user_has_review,
     }
     return render(request, 'product_detail.html', context)
 

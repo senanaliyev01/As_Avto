@@ -233,13 +233,14 @@
 <div class="product-review-section" style="max-width:1100px;margin:40px auto 0 auto;">
     <div class="product-detail-section-title" style="font-size:1.3rem;">Qiymətləndirmə və Şərhlər</div>
     {% if user.is_authenticated %}
+    {% if not user_has_review %}
     <div class="review-form-card" style="background:#f5f8fa;border-radius:10px;padding:20px 24px;box-shadow:0 2px 8px rgba(43,81,115,0.04);margin-bottom:32px;">
         <form id="reviewForm" method="post" action="{% url 'add_product_review' mehsul.id %}" autocomplete="off">
             {% csrf_token %}
             <div style="display:flex;align-items:flex-start;gap:16px;">
                 <img src="{{ user.profile.sekil.url }}" alt="Profil" style="width:48px;height:48px;border-radius:50%;object-fit:cover;box-shadow:0 1px 4px rgba(0,0,0,0.07);">
                 <div style="flex:1;">
-                    <div class="rating-radio-group">
+                    <div class="rating-radio-group" id="starRatingGroup">
                         {% for radio in review_form.rating %}
                             <label>{% include "star_radio.html" with radio=radio %}</label>
                         {% endfor %}
@@ -256,6 +257,31 @@
     </div>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Ulduz qiymətləndirmə interaktivliyi
+        const group = document.getElementById('starRatingGroup');
+        if (group) {
+            const stars = group.querySelectorAll('span[data-value]');
+            const radios = group.querySelectorAll('input[type="radio"]');
+            stars.forEach(function(star, idx) {
+                star.addEventListener('mouseenter', function() {
+                    stars.forEach((s, i) => s.style.color = i <= idx ? '#f5b301' : '#e0e0e0');
+                });
+                star.addEventListener('mouseleave', function() {
+                    const checked = group.querySelector('input[type="radio"]:checked');
+                    const val = checked ? parseInt(checked.value) : 0;
+                    stars.forEach((s, i) => s.style.color = i < val ? '#f5b301' : '#e0e0e0');
+                });
+                star.addEventListener('click', function() {
+                    radios[idx].checked = true;
+                    stars.forEach((s, i) => s.style.color = i <= idx ? '#f5b301' : '#e0e0e0');
+                });
+            });
+            // İlk yüklənmədə seçilmiş ulduzları göstər
+            const checked = group.querySelector('input[type="radio"]:checked');
+            const val = checked ? parseInt(checked.value) : 0;
+            stars.forEach((s, i) => s.style.color = i < val ? '#f5b301' : '#e0e0e0');
+        }
+        // AJAX şərh göndərmə (mövcud kod)
         const form = document.getElementById('reviewForm');
         const successMsg = document.getElementById('review-success-message');
         const errorMsg = document.getElementById('review-error-message');
@@ -290,6 +316,9 @@
                     reviewsList.prepend(reviewDiv);
                     form.reset();
                     successMsg.style.display = 'block';
+                    // Ulduzları sıfırla
+                    const stars = group.querySelectorAll('span[data-value]');
+                    stars.forEach((s) => s.style.color = '#e0e0e0');
                 } else {
                     errorMsg.textContent = data.error || 'Xəta baş verdi';
                     errorMsg.style.display = 'block';
@@ -302,6 +331,9 @@
         };
     });
     </script>
+    {% else %}
+    <div style="color:#888;font-size:1.08rem;margin-bottom:32px;">Siz artıq bu məhsula şərh yazmısınız.</div>
+    {% endif %}
     {% else %}
     <div style="color:#888;font-size:1.08rem;">Şərh yazmaq üçün <a href="{% url 'login' %}">daxil olun</a>.</div>
     {% endif %}

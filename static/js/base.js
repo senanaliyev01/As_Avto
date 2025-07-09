@@ -900,11 +900,16 @@ function initializeProductsPage() {
                                 }
                             }
                             div.innerHTML = `
+                                <div style="position:absolute;top:10px;right:10px;z-index:2;display:flex;align-items:center;gap:8px;">
+                                    ${[1,2,3,4,5].map(i => `<span style='color:${product.avg_rating >= i ? '#FFD700' : (product.avg_rating >= (i-1) ? '#FFD70099' : '#ccc')};font-size:1.1rem;'>&#9733;</span>`).join('')}
+                                    <span style='color:#2B5173;font-size:1rem;'>${parseFloat(product.avg_rating).toFixed(1)}</span>
+                                    <span style='color:#e74c3c;font-size:1.1rem;margin-left:8px;'><i class='fas fa-heart'></i> ${product.like_count}</span>
+                                </div>
                                 <div class="product-row-image">
                                     <img src="${product.sekil_url || '/static/images/no_image.webp'}" alt="${product.adi}" onclick="openImageModal('${product.sekil_url}')">
                                 </div>
                                 <div class="product-row-info">
-                                    <div class="product-title">${product.adi} ${product.brend_kod} ${product.firma}</div>
+                                    <div class="product-title"><a href="/product/${product.id}/" style="color:inherit;text-decoration:none;">${product.adi} ${product.brend_kod} ${product.firma}</a></div>
                                     <div class="product-meta">
                                         ${product.sahib_id && product.sahib_username ? `<a href=\"#\" class=\"seller-link\" onclick=\"openUserDetailsModal(${product.sahib_id}); return false;\"><i class='fas fa-user'></i> ${product.sahib_username}</a>` : ''}
                                     </div>

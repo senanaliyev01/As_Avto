@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Kateqoriya, Firma, Avtomobil, Mehsul, Sifaris, SifarisItem, Vitrin, PopupImage, Profile, Header_Message, AvtomobilLogo
+from .models import Kateqoriya, Firma, Avtomobil, Mehsul, Sifaris, SifarisItem, Vitrin, PopupImage, Profile, Header_Message, AvtomobilLogo, ProductLike, ProductRating
 from django.core.exceptions import ValidationError
 from django.utils.html import format_html
 from django.urls import path
@@ -860,3 +860,19 @@ class ProfileAdmin(admin.ModelAdmin):
         queryset.update(is_verified=False)
         self.message_user(request, f'{queryset.count()} profilin təsdiqi ləğv edildi.')
     unverify_profiles.short_description = "Seçilmiş profillərin təsdiqini ləğv et"
+
+@admin.register(ProductLike)
+class ProductLikeAdmin(admin.ModelAdmin):
+    list_display = ('user', 'mehsul', 'created_at')
+    list_filter = ('user', 'mehsul', 'created_at')
+    search_fields = ('user__username', 'mehsul__adi')
+    readonly_fields = ('created_at',)
+    date_hierarchy = 'created_at'
+
+@admin.register(ProductRating)
+class ProductRatingAdmin(admin.ModelAdmin):
+    list_display = ('user', 'mehsul', 'rating', 'comment', 'created_at')
+    list_filter = ('rating', 'user', 'mehsul', 'created_at')
+    search_fields = ('user__username', 'mehsul__adi', 'comment')
+    readonly_fields = ('created_at',)
+    date_hierarchy = 'created_at'

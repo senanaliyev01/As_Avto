@@ -117,36 +117,36 @@
 }
 </style>
 <div class="product-detail-container">
-    <div class="product-detail-image" style="position:relative;">
+    <div class="product-detail-image" style="width:100%;">
         <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
-        <div class="avtomobil-logos-wrapper">
+        <div style="display:flex;align-items:center;gap:10px;margin-top:18px;justify-content:center;">
+            {% if mehsul.firma.logo %}
+            <img class="firma-logo" src="{{ mehsul.firma.logo.url }}" alt="{{ mehsul.firma.adi }}" style="width:70px;height:70px;object-fit:contain;border-radius:8px;background:#fff;border:1px solid #e0e0e0;">
+            {% endif %}
             {% for logo in mehsul.avtomobil.logolar.all %}
-            <img class="avtomobil-logo" src="{{ logo.sekil.url }}" alt="{{ mehsul.avtomobil.adi }}">
+            <img class="avtomobil-logo" src="{{ logo.sekil.url }}" alt="{{ mehsul.avtomobil.adi }}" style="width:70px;height:70px;object-fit:contain;border-radius:8px;background:#fff;border:1px solid #e0e0e0;">
             {% endfor %}
         </div>
-        {% if mehsul.firma.logo %}
-        <img class="firma-logo" src="{{ mehsul.firma.logo.url }}" alt="{{ mehsul.firma.adi }}">
-        {% endif %}
-    </div>
-    <div class="product-detail-main">
-        <div class="product-detail-title">{{ mehsul.adi }}</div>
-        <div class="product-detail-meta">
-            <div><span class="meta-label">Firma:</span> {{ mehsul.firma.adi }}</div>
-            <div><span class="meta-label">Avtomobil:</span> {{ mehsul.avtomobil.adi }}</div>
-            <div><span class="meta-label">Vitrin:</span> {{ mehsul.vitrin.nomre }}</div>
-            <div><span class="meta-label">Qiymət:</span> <span style="color:#1a7f37;font-weight:700;">{{ mehsul.qiymet }} ₼</span></div>
-            <div class="product-detail-stock">Stok: {{ mehsul.stok }}</div>
-            <div><span class="meta-label">Brend Kod:</span> {{ mehsul.brend_kod }}</div>
+        <div style="margin-top:18px;display:flex;flex-direction:column;align-items:center;gap:8px;">
+            <div class="product-detail-title" style="text-align:center;">{{ mehsul.adi }}</div>
+            <div class="product-detail-meta" style="justify-content:center;gap:18px 32px;flex-wrap:wrap;">
+                <div><span class="meta-label">Firma:</span> {{ mehsul.firma.adi }}</div>
+                <div><span class="meta-label">Avtomobil:</span> {{ mehsul.avtomobil.adi }}</div>
+                <div><span class="meta-label">Vitrin:</span> {{ mehsul.vitrin.nomre }}</div>
+                <div><span class="meta-label">Qiymət:</span> <span style="color:#1a7f37;font-weight:700;">{{ mehsul.qiymet }} ₼</span></div>
+                <div class="product-detail-stock">Stok: {{ mehsul.stok }}</div>
+                <div><span class="meta-label">Brend Kod:</span> {{ mehsul.brend_kod }}</div>
+            </div>
+            {% if mehsul.sahib %}
+            <div style="display:flex;align-items:center;gap:10px;justify-content:center;">
+                <span class="meta-label">Satıcı:</span>
+                <a href="#" class="seller-link" onclick="openUserDetailsModal({{ mehsul.sahib.id }}); return false;" style="color:#2B5173;font-weight:600;"><i class="fas fa-user"></i> {{ mehsul.sahib.username }}</a>
+                <button type="button" class="cart-add-btn" {% if mehsul.stok == 0 %}disabled{% endif %} onclick="openQuantityModal({{ mehsul.id }}, {{ mehsul.stok }})">
+                    <i class="fas fa-shopping-cart"></i>
+                </button>
+            </div>
+            {% endif %}
         </div>
-        {% if mehsul.sahib %}
-        <div style="margin-top: 8px;display:flex;align-items:center;gap:10px;">
-            <span class="meta-label">Satıcı:</span>
-            <a href="#" class="seller-link" onclick="openUserDetailsModal({{ mehsul.sahib.id }}); return false;" style="color:#2B5173;font-weight:600;"><i class="fas fa-user"></i> {{ mehsul.sahib.username }}</a>
-            <button type="button" class="cart-add-btn" {% if mehsul.stok == 0 %}disabled{% endif %} onclick="openQuantityModal({{ mehsul.id }}, {{ mehsul.stok }})">
-                <i class="fas fa-shopping-cart"></i>
-            </button>
-        </div>
-        {% endif %}
     </div>
 </div>
 <div class="product-detail-card" style="max-width:1100px;margin:32px auto 0 auto;">

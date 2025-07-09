@@ -35,10 +35,9 @@
             {% if mehsul.firma.logo %}
             <img class="firma-logo" src="{{ mehsul.firma.logo.url }}" alt="{{ mehsul.firma.adi }}">
             {% endif %}
-            <div class="product-row-actions">
-                <div class="product-price">{{ mehsul.qiymet }} ₼</div>
-                <a href="{% url 'product_detail' mehsul.id %}" class="btn btn-primary">Bax</a>
-            </div>
+            <button type="button" class="cart-add-btn" {% if mehsul.stok == 0 %}disabled{% endif %} onclick="openQuantityModal({{ mehsul.id }}, {{ mehsul.stok }})">
+                <i class="fas fa-shopping-cart"></i>
+            </button>
         </div>
         {% empty %}
         <div class="empty-message">

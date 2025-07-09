@@ -187,15 +187,16 @@
     </div>
     <div class="product-reviews-list" style="margin-bottom:32px;">
         {% for review in approved_reviews %}
-        <div class="review-card" style="background:#f8fafc;border-radius:10px;padding:18px 20px;margin-bottom:18px;box-shadow:0 2px 8px rgba(43,81,115,0.04);">
-            <div style="display:flex;align-items:center;gap:10px;">
-                <span style="font-size:1.3rem;color:#f5b301;">
+        <div class="review-card review-card-pro" style="background:#f8fafc;border-radius:10px;padding:18px 20px;margin-bottom:18px;box-shadow:0 2px 8px rgba(43,81,115,0.04);">
+            <div style="display:flex;align-items:center;gap:14px;">
+                <img src="{{ review.user.profile.sekil.url }}" alt="Profil" class="review-profile-img">
+                <span style="font-weight:600;color:#2B5173;">{{ review.user.username }}</span>
+                <span style="color:#888;font-size:0.95rem;">{{ review.created_at|date:"d.m.Y H:i" }}</span>
+                <span style="font-size:1.15rem;color:#f5b301;margin-left:auto;">
                     {% for i in "12345" %}
                         {% if i|add:'0' <= review.rating %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}
                     {% endfor %}
                 </span>
-                <span style="font-weight:600;color:#2B5173;">{{ review.user.username }}</span>
-                <span style="color:#888;font-size:0.95rem;">{{ review.created_at|date:"d.m.Y H:i" }}</span>
             </div>
             <div style="margin-top:8px;font-size:1.08rem;color:#333;">{{ review.comment|linebreaksbr }}</div>
             {% if review.owner_reply %}

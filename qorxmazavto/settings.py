@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False  # Prod üçün False qoyun, testdə True ola bilər
 
 ALLOWED_HOSTS = ['localhost','127.0.0.1','0.0.0.0', 'as-avto.com', 'www.as-avto.com']
 
@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',  # Sitemap üçün əlavə edildi
     'home',
 ]
 
@@ -135,8 +136,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'az-az'
-
+# SEO və Google üçün uyğun dil və zaman qurşağı
+LANGUAGE_CODE = 'az'
 TIME_ZONE = 'Asia/Baku'
 
 USE_I18N = True

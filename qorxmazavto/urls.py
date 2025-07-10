@@ -19,6 +19,8 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import HttpResponse
+from django.contrib.sitemaps.views import sitemap
+from home.sitemaps import ProductSitemap, StaticViewSitemap
 
 
 def ads_txt_view(request):
@@ -31,6 +33,7 @@ urlpatterns = [
     path('admin-as-avto-1983-2002/', admin.site.urls),
     path('', include('home.urls')),
     path("ads.txt", ads_txt_view),
+    path('sitemap.xml', sitemap, {'sitemaps': {'products': ProductSitemap, 'static': StaticViewSitemap}}, name='django.contrib.sitemaps.views.sitemap'),
 ]
 
 if settings.DEBUG:

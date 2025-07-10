@@ -169,6 +169,10 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Brauzer bağlandıqda sessiyanın bit
 SESSION_SAVE_EVERY_REQUEST = False  # Hər sorğuda sessiyanın yenilənməməsi
 LOGIN_URL = '/'  # Sessiya bitdikdə yönləndiriləcək səhifə
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
 # 3. Jazzmin tənzimləmələri
 JAZZMIN_SETTINGS = {
     # Başlıq və Loqo

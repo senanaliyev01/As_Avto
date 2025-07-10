@@ -13,7 +13,7 @@
       "mpn": "{{ mehsul.brend_kod|escapejs }}",
       "vehicleModel": "{{ mehsul.avtomobil.adi|escapejs }}",
       "image": [
-        "{{ request.build_absolute_uri(mehsul.sekil.url) }}"
+        "{{ request.scheme }}://{{ request.get_host }}{{ mehsul.sekil.url }}"
       ],
       "description": "{{ mehsul.melumat|default:''|striptags|escapejs }}",
       "sku": "{{ mehsul.id }}",
@@ -58,7 +58,7 @@
       {% endif %}
       "mainEntityOfPage": {
         "@type": "WebPage",
-        "@id": "{{ request.build_absolute_uri }}"
+        "@id": "{{ request.scheme }}://{{ request.get_host }}{{ request.path }}"
       }
     }
     </script>

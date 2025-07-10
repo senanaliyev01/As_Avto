@@ -1,16 +1,16 @@
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
-from .models import Product
+from .models import Mehsul
 
 class ProductSitemap(Sitemap):
     changefreq = "weekly"
     priority = 0.8
 
     def items(self):
-        return Product.objects.filter(is_active=True)
+        return Mehsul.objects.all()
 
     def lastmod(self, obj):
-        return obj.updated_at if hasattr(obj, 'updated_at') else None
+        return obj.yeni_edildiyi_tarix if hasattr(obj, 'yeni_edildiyi_tarix') else None
 
     def location(self, obj):
         return reverse('product_detail', args=[obj.id])

@@ -8,7 +8,7 @@
         {% if url.lastmod %}<lastmod>{{ url.lastmod|date:"Y-m-d" }}</lastmod>{% endif %}
         {% if url.changefreq %}<changefreq>{{ url.changefreq }}</changefreq>{% endif %}
         {% if url.priority %}<priority>{{ url.priority }}</priority>{% endif %}
-        {% if url.item and url.item|hasattr:'sekil' and url.item.sekil %}
+        {% if url.item and url.item.sekil %}
         <image:image>
             <image:loc>{{ url.item.sekil.url|default_if_none:"" }}</image:loc>
             <image:title>{{ url.item.adi|default_if_none:"" }}</image:title>

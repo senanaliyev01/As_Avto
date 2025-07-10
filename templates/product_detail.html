@@ -3,6 +3,67 @@
 
 {% block title %}{{mehsul.brend_kod}} {{ mehsul.adi }} {{mehsul.firma.adi}} {{mehsul.avtomobil.adi}} - Məhsul Detalları{% endblock %}
 
+{% block head %}
+    {{ block.super }}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org/",
+      "@type": "Product",
+      "name": "{{ mehsul.adi|escapejs }}",
+      "mpn": "{{ mehsul.brend_kod|escapejs }}",
+      "vehicleModel": "{{ mehsul.avtomobil.adi|escapejs }}",
+      "image": [
+        "{{ request.build_absolute_uri(mehsul.sekil.url) }}"
+      ],
+      "description": "{{ mehsul.melumat|default:''|striptags|escapejs }}",
+      "sku": "{{ mehsul.id }}",
+      "brand": {
+        "@type": "Brand",
+        "name": "{{ mehsul.firma.adi|escapejs }}"
+      },
+      "offers": {
+        "@type": "Offer",
+        "priceCurrency": "AZN",
+        "price": "{{ mehsul.qiymet }}",
+        "availability": "https://schema.org/{% if mehsul.stok > 0 %}InStock{% else %}OutOfStock{% endif %}"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "{{ avg_rating|floatformat:1|stringformat:'s'|cut:',' }}",
+        "reviewCount": "{{ review_count|default:0 }}"
+      },
+      "interactionStatistic": {
+        "@type": "InteractionCounter",
+        "interactionType": { "@type": "LikeAction" },
+        "userInteractionCount": "{{ like_count|default:0 }}"
+      },
+      {% if reviews %}
+      "review": [
+        {% for review in reviews %}
+        {
+          "@type": "Review",
+          "author": {
+            "@type": "Person",
+            "name": "{{ review.user.username|escapejs }}"
+          },
+          "datePublished": "{{ review.created_at|date:'Y-m-d' }}",
+          "reviewBody": "{{ review.comment|default:''|striptags|escapejs }}",
+          "reviewRating": {
+            "@type": "Rating",
+            "ratingValue": "{{ review.rating }}"
+          }
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+      ],
+      {% endif %}
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "{{ request.build_absolute_uri }}"
+      }
+    }
+    </script>
+{% endblock %}
+
 {% block content %}
 <style>
 .product-detail-container {

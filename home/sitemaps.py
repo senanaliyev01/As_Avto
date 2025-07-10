@@ -20,6 +20,16 @@ class ProductSitemap(Sitemap):
         urls = super().get_urls(site=site, **kwargs)
         for url in urls:
             url['location'] = url['location'].replace('http://', 'https://')
+            # Şəkil üçün tam URL əlavə et
+            obj = url.get('item')
+            if obj and hasattr(obj, 'sekil') and obj.sekil:
+                if site:
+                    domain = f"https://{site.domain}" if not site.domain.startswith('http') else site.domain
+                else:
+                    domain = 'https://as-avto.com'
+                url['image_absolute_url'] = domain + obj.sekil.url
+            else:
+                url['image_absolute_url'] = ''
         return urls
 
     def image_urls(self, obj):

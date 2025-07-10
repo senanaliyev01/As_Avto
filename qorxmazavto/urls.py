@@ -33,7 +33,7 @@ urlpatterns = [
     path('admin-as-avto-1983-2002/', admin.site.urls),
     path('', include('home.urls')),
     path("ads.txt", ads_txt_view),
-    path('sitemap.xml', sitemap, {'sitemaps': {'products': ProductSitemap, 'static': StaticViewSitemap}}, name='django.contrib.sitemaps.views.sitemap'),
+    path('sitemap.xml', sitemap, {'sitemaps': {'products': ProductSitemap, 'static': StaticViewSitemap}, 'template_name': 'sitemap.xml'}, name='django.contrib.sitemaps.views.sitemap'),
 ]
 
 if settings.DEBUG:

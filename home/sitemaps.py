@@ -18,13 +18,11 @@ class ProductSitemap(Sitemap):
 
     def get_urls(self, site=None, **kwargs):
         urls = super().get_urls(site=site, **kwargs)
-        # HTTPS-i məcburi et
         for url in urls:
             url['location'] = url['location'].replace('http://', 'https://')
         return urls
 
     def image_urls(self, obj):
-        # Google image sitemap üçün
         if obj.sekil:
             return [obj.sekil.url]
         return []
@@ -34,7 +32,13 @@ class StaticViewSitemap(Sitemap):
     changefreq = "monthly"
 
     def items(self):
-        return ['root', 'products', 'orders', 'cart']
+        # Açıq səhifələrin URL adları (orders, cart, checkout, liked_products çıxarıldı):
+        return [
+            'root', 'login', 'register', 'base', 'products', 'new_products', 'search_suggestions', 'product_detail'
+        ]
 
     def location(self, item):
+        if item == 'product_detail':
+            # Bir nümunə məhsul üçün göstərmək üçün (əslində bütün məhsullar ProductSitemap-dadır)
+            return reverse(item, args=[1])
         return reverse(item) 

@@ -33,6 +33,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models.functions import Concat
 from django.db.models import CharField
 from django.db import models
+from math import sqrt
 
 def truncate_product_name(name, max_length=20):
     """Məhsul adını qısaldır və uzun olarsa ... əlavə edir"""
@@ -105,12 +106,6 @@ def home_view(request):
         .filter(total_sold__isnull=False)
         .order_by('-total_sold')[:10]
     )
-    # Ən çox ulduz alan (qiymətləndirilən) məhsullar (top 10, ortalama reytinqə görə)
-    most_rated_products = (
-        Mehsul.objects.annotate(avg_rating=Avg('ratings__rating'), rating_count=Count('ratings'))
-        .filter(rating_count__gt=0)
-        .order_by('-avg_rating', '-rating_count')[:10]
-    )
     # Ən çox bəyənilən məhsullar (top 10)
     most_liked_products = (
         Mehsul.objects.annotate(like_count=Count('likes'))
@@ -118,11 +113,34 @@ def home_view(request):
         .order_by('-like_count')[:10]
     )
 
-    # Hər biri üçün əlavə info (ortalama reytinq, bəyənmə sayı)
-    for m in list(most_sold_products) + list(most_rated_products) + list(most_liked_products):
-        m.avg_rating = m.ratings.aggregate(Avg('rating'))['rating__avg'] or 0
+    # Wilson score ilə ən yaxşı reytinqli məhsullar (top 10)
+    rated_products = (
+        Mehsul.objects.annotate(
+            avg_rating=Avg('ratings__rating'),
+            rating_count=Count('ratings'),
+            sum_rating=Sum('ratings__rating')
+        )
+        .filter(rating_count__gt=0)
+    )
+    # Wilson lower bound hesabla və sıralama üçün python-da sort et
+    def wilson_score(sum_rating, rating_count, max_rating=5, confidence=0.95):
+        if not rating_count or not sum_rating:
+            return 0
+        z = 1.96  # 95% confidence
+        phat = (sum_rating / rating_count) / max_rating
+        n = rating_count
+        denominator = 1 + z*z/n
+        centre = phat + z*z/(2*n)
+        margin = z * sqrt((phat*(1-phat) + z*z/(4*n)) / n)
+        score = (centre - margin) / denominator
+        return score
+    rated_products = list(rated_products)
+    for m in rated_products:
+        m.wilson_score = wilson_score(m.sum_rating, m.rating_count)
+        m.avg_rating = m.avg_rating or 0
         m.like_count = m.likes.count()
         m.total_sold = m.sifarisitem_set.aggregate(Sum('miqdar'))['miqdar__sum'] or 0
+    most_rated_products = sorted(rated_products, key=lambda m: m.wilson_score, reverse=True)[:10]
 
     return render(request, 'base.html', {
         'new_products': new_products,

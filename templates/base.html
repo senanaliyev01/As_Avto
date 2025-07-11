@@ -130,7 +130,7 @@
         {% if request.resolver_match.url_name == 'base' and new_products %}
         <div class="new-products-section">
             <div class="container">
-                <h2 style="margin: 18px 0 10px 0; color: red; font-size: 1.2rem; text-align: center;">Ən çox satılan məhsullar</h2>
+                <h2 style="margin: 18px 0 10px 0; color: red; font-size: 1.2rem; text-align: center;">Yeni Gələn Məhsullar</h2>
                 <div class="swiper new-products-swiper">
                     <div class="swiper-wrapper">
                         {% for product in new_products %}
@@ -174,14 +174,14 @@
         {% if most_sold_products %}
         <div class="new-products-section">
             <div class="container">
-                <h2 style="margin: 18px 0 10px 0; color: #1d6f42; font-size: 1.2rem; text-align: center;">Ən çox satılan məhsullar</h2>
+                <h2 style="margin: 18px 0 10px 0; color: #1d6f42; font-size: 1.2rem; text-align: center;">Ən Çox Satılan Məhsullar</h2>
                 <div class="swiper new-products-swiper">
                     <div class="swiper-wrapper">
                         {% for product in most_sold_products %}
                         <div class="swiper-slide">
                             <div class="product-card">
                                 <div class="ribbon-wrapper">
-                                    <div class="ribbon" style="background:#007bff;">Top Satış</div>
+                                    <div class="ribbon" style="background:#007bff;">Satış</div>
                                 </div>
                                 <div class="product-image">
                                     {% if product.sekil and product.sekil.url != 'mehsul_sekilleri/no_image.webp' %}
@@ -213,14 +213,14 @@
         {% if most_rated_products %}
         <div class="new-products-section">
             <div class="container">
-                <h2 style="margin: 18px 0 10px 0; color: #ff9800; font-size: 1.2rem; text-align: center;">Ən çox ulduz alan məhsullar</h2>
+                <h2 style="margin: 18px 0 10px 0; color: #ff9800; font-size: 1.2rem; text-align: center;">Ən Çox Dəyərə Sahib Məhsullar</h2>
                 <div class="swiper new-products-swiper">
                     <div class="swiper-wrapper">
                         {% for product in most_rated_products %}
                         <div class="swiper-slide">
                             <div class="product-card">
                                 <div class="ribbon-wrapper">
-                                    <div class="ribbon" style="background:#ff9800;">Top Ulduz</div>
+                                    <div class="ribbon" style="background:#ff9800;">Dəyər</div>
                                 </div>
                                 <div class="product-image">
                                     {% if product.sekil and product.sekil.url != 'mehsul_sekilleri/no_image.webp' %}
@@ -252,7 +252,7 @@
         {% if most_liked_products %}
         <div class="new-products-section">
             <div class="container">
-                <h2 style="margin: 18px 0 10px 0; color: #e74c3c; font-size: 1.2rem; text-align: center;">Ən çox bəyənilən məhsullar</h2>
+                <h2 style="margin: 18px 0 10px 0; color: #e74c3c; font-size: 1.2rem; text-align: center;">Ən Çox Bəyənilən Məhsullar</h2>
                 <div class="swiper new-products-swiper">
                     <div class="swiper-wrapper">
                         {% for product in most_liked_products %}

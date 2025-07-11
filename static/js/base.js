@@ -576,7 +576,7 @@ function initializeSwiper() {
             spaceBetween: 20,
             loop: true,
             autoplay: {
-                delay: 3000,
+                delay: 2500, // 2.5 saniyə
                 disableOnInteraction: false,
             },
             pagination: {
@@ -601,7 +601,7 @@ function initializeSwiper() {
             spaceBetween: 20,
             loop: true,
             autoplay: {
-                delay: 3000,
+                delay: 3500, // 3.5 saniyə
                 disableOnInteraction: false,
             },
             pagination: {
@@ -626,7 +626,7 @@ function initializeSwiper() {
             spaceBetween: 20,
             loop: true,
             autoplay: {
-                delay: 3000,
+                delay: 4500, // 4.5 saniyə
                 disableOnInteraction: false,
             },
             pagination: {
@@ -651,7 +651,7 @@ function initializeSwiper() {
             spaceBetween: 20,
             loop: true,
             autoplay: {
-                delay: 3000,
+                delay: 5500, // 5.5 saniyə
                 disableOnInteraction: false,
             },
             pagination: {

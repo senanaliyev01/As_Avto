@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .models import Mehsul, Kateqoriya, Sifaris, SifarisItem, Firma, Avtomobil, PopupImage, Header_Message, Vitrin, ProductLike, ProductRating
-from django.db.models import Q, Sum, F, Case, When, DecimalField, Avg
+from django.db.models import Q, Sum, F, Case, When, DecimalField, Avg, Count
 from decimal import Decimal
 from django.contrib import messages
 import re
@@ -95,12 +95,41 @@ def login_view(request):
 
 def home_view(request):
     # Yeni məhsulları əldə et
-    new_products = Mehsul.objects.filter(yenidir=True).order_by('-id')
+    new_products = Mehsul.objects.filter(yenidir=True).order_by('-id')[:10]
     # Aktiv popup şəkilləri əldə et
     popup_images = PopupImage.objects.filter(aktiv=True)
+
+    # Ən çox satılan məhsullar (top 10)
+    most_sold_products = (
+        Mehsul.objects.annotate(total_sold=Sum('sifarisitem__miqdar'))
+        .filter(total_sold__isnull=False)
+        .order_by('-total_sold')[:10]
+    )
+    # Ən çox ulduz alan (qiymətləndirilən) məhsullar (top 10, ortalama reytinqə görə)
+    most_rated_products = (
+        Mehsul.objects.annotate(avg_rating=Avg('ratings__rating'), rating_count=Count('ratings'))
+        .filter(rating_count__gt=0)
+        .order_by('-avg_rating', '-rating_count')[:10]
+    )
+    # Ən çox bəyənilən məhsullar (top 10)
+    most_liked_products = (
+        Mehsul.objects.annotate(like_count=Count('likes'))
+        .filter(like_count__gt=0)
+        .order_by('-like_count')[:10]
+    )
+
+    # Hər biri üçün əlavə info (ortalama reytinq, bəyənmə sayı)
+    for m in list(most_sold_products) + list(most_rated_products) + list(most_liked_products):
+        m.avg_rating = m.ratings.aggregate(Avg('rating'))['rating__avg'] or 0
+        m.like_count = m.likes.count()
+        m.total_sold = m.sifarisitem_set.aggregate(Sum('miqdar'))['miqdar__sum'] or 0
+
     return render(request, 'base.html', {
         'new_products': new_products,
-        'popup_images': popup_images
+        'popup_images': popup_images,
+        'most_sold_products': most_sold_products,
+        'most_rated_products': most_rated_products,
+        'most_liked_products': most_liked_products,
     })
 
 

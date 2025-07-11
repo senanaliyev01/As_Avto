@@ -165,12 +165,127 @@
                         </div>
                         {% endfor %}
                     </div>
-                    <!-- <div class="swiper-pagination"></div>
-                    <div class="swiper-button-prev"></div>
-                    <div class="swiper-button-next"></div> -->
                 </div>
             </div>
         </div>
+        
+        <!-- Ən çox satılan məhsullar slideri -->
+        {% if most_sold_products %}
+        <div class="new-products-section">
+            <div class="container">
+                <h2 style="margin: 18px 0 10px 0; color: #1d6f42; font-size: 1.2rem;">Ən çox satılan məhsullar</h2>
+                <div class="swiper new-products-swiper">
+                    <div class="swiper-wrapper">
+                        {% for product in most_sold_products %}
+                        <div class="swiper-slide">
+                            <div class="product-card">
+                                <div class="ribbon-wrapper">
+                                    <div class="ribbon" style="background:#007bff;">Top Satış</div>
+                                </div>
+                                <div class="product-image">
+                                    {% if product.sekil and product.sekil.url != 'mehsul_sekilleri/no_image.webp' %}
+                                    <img src="{{ product.sekil.url }}" alt="{{ product.adi }}" onclick="openImageModal('{{ product.sekil.url }}')" class="clickable-image" onerror="this.src='{% static 'images/no_image.webp' %}'">
+                                    {% else %}
+                                    <img src="{% static 'images/no_image.webp' %}" alt="No Image">
+                                    {% endif %}
+                                </div>
+                                <div class="product-info">
+                                    <h3 class="product-title">{{ product.adi }}</h3>
+                                    <p class="product-code">{{ product.brend_kod }}</p>
+                                    <p class="product-price">{{ product.qiymet }} ₼</p>
+                                    <p class="product-seller">Satıcı: {% if product.sahib %}{{ product.sahib.username }}{% else %}AS-AVTO{% endif %}</p>
+                                    <p style="font-size:12px;color:#007bff;">Satış sayı: {{ product.total_sold }}</p>
+                                    <a href="{% url 'products' %}?search={{ product.brend_kod }}" class="view-product">
+                                        Məhsula bax <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Ən çox ulduz alan məhsullar slideri -->
+        {% if most_rated_products %}
+        <div class="new-products-section">
+            <div class="container">
+                <h2 style="margin: 18px 0 10px 0; color: #ff9800; font-size: 1.2rem;">Ən çox ulduz alan məhsullar</h2>
+                <div class="swiper new-products-swiper">
+                    <div class="swiper-wrapper">
+                        {% for product in most_rated_products %}
+                        <div class="swiper-slide">
+                            <div class="product-card">
+                                <div class="ribbon-wrapper">
+                                    <div class="ribbon" style="background:#ff9800;">Top Ulduz</div>
+                                </div>
+                                <div class="product-image">
+                                    {% if product.sekil and product.sekil.url != 'mehsul_sekilleri/no_image.webp' %}
+                                    <img src="{{ product.sekil.url }}" alt="{{ product.adi }}" onclick="openImageModal('{{ product.sekil.url }}')" class="clickable-image" onerror="this.src='{% static 'images/no_image.webp' %}'">
+                                    {% else %}
+                                    <img src="{% static 'images/no_image.webp' %}" alt="No Image">
+                                    {% endif %}
+                                </div>
+                                <div class="product-info">
+                                    <h3 class="product-title">{{ product.adi }}</h3>
+                                    <p class="product-code">{{ product.brend_kod }}</p>
+                                    <p class="product-price">{{ product.qiymet }} ₼</p>
+                                    <p class="product-seller">Satıcı: {% if product.sahib %}{{ product.sahib.username }}{% else %}AS-AVTO{% endif %}</p>
+                                    <p style="font-size:12px;color:#ff9800;">Ortalama ulduz: {{ product.avg_rating|floatformat:1 }} ★</p>
+                                    <a href="{% url 'products' %}?search={{ product.brend_kod }}" class="view-product">
+                                        Məhsula bax <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Ən çox bəyənilən məhsullar slideri -->
+        {% if most_liked_products %}
+        <div class="new-products-section">
+            <div class="container">
+                <h2 style="margin: 18px 0 10px 0; color: #e74c3c; font-size: 1.2rem;">Ən çox bəyənilən məhsullar</h2>
+                <div class="swiper new-products-swiper">
+                    <div class="swiper-wrapper">
+                        {% for product in most_liked_products %}
+                        <div class="swiper-slide">
+                            <div class="product-card">
+                                <div class="ribbon-wrapper">
+                                    <div class="ribbon" style="background:#e74c3c;">Top Like</div>
+                                </div>
+                                <div class="product-image">
+                                    {% if product.sekil and product.sekil.url != 'mehsul_sekilleri/no_image.webp' %}
+                                    <img src="{{ product.sekil.url }}" alt="{{ product.adi }}" onclick="openImageModal('{{ product.sekil.url }}')" class="clickable-image" onerror="this.src='{% static 'images/no_image.webp' %}'">
+                                    {% else %}
+                                    <img src="{% static 'images/no_image.webp' %}" alt="No Image">
+                                    {% endif %}
+                                </div>
+                                <div class="product-info">
+                                    <h3 class="product-title">{{ product.adi }}</h3>
+                                    <p class="product-code">{{ product.brend_kod }}</p>
+                                    <p class="product-price">{{ product.qiymet }} ₼</p>
+                                    <p class="product-seller">Satıcı: {% if product.sahib %}{{ product.sahib.username }}{% else %}AS-AVTO{% endif %}</p>
+                                    <p style="font-size:12px;color:#e74c3c;">Bəyənmə sayı: {{ product.like_count }}</p>
+                                    <a href="{% url 'products' %}?search={{ product.brend_kod }}" class="view-product">
+                                        Məhsula bax <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
         {% endif %}
 
         <!-- Main Content -->

@@ -5217,3 +5217,184 @@ body {
         height: 28px !important;
     }
 }
+
+/* ===================== Mobil üçün optimallaşdırılmış media query ===================== */
+@media (max-width: 768px) {
+    /* Layout və əsas konteynerlər */
+    .container, .search-section, .footer, .header {
+        max-width: 100% !important;
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+    }
+    .wrapper {
+        min-width: 0;
+    }
+    /* Header və naviqasiya */
+    .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .logo {
+        max-width: 120px;
+        min-width: 80px;
+    }
+    .logo-img {
+        max-width: 100px;
+        height: 50px;
+    }
+    .header-right {
+        flex-direction: column;
+        min-width: unset;
+        gap: 8px;
+        width: 100%;
+    }
+    .main-nav ul {
+        flex-direction: column;
+        gap: 0;
+        width: 100%;
+    }
+    .nav-link {
+        width: 100%;
+        justify-content: flex-start;
+        padding: 10px 0;
+        font-size: 15px;
+    }
+    /* Footer */
+    .simple-footer {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    .footer-email, .footer-phone {
+        justify-content: center;
+    }
+    /* Kartlar və məhsullar */
+    .product-card, .product-grid {
+        min-width: 0;
+        width: 100%;
+        margin: 0 auto 12px auto;
+    }
+    .product-image, .cart-container .table .product-image {
+        height: 100px;
+        width: 100px;
+        min-width: 60px;
+        min-height: 60px;
+    }
+    .product-title {
+        font-size: 14px;
+        height: auto;
+    }
+    .product-price {
+        font-size: 15px;
+    }
+    /* Cart və checkout */
+    .cart-summary, .cart-total, .checkout-form, .quantity-control, .update-form {
+        flex-direction: column !important;
+        width: 100% !important;
+        gap: 10px;
+        align-items: stretch;
+    }
+    .checkout-form button, .update-form button {
+        width: 100%;
+    }
+    .quantity-input {
+        width: 100%;
+    }
+    /* Table və gridlər */
+    .table-container, .orders-container {
+        margin: 0.5rem 0;
+        padding: 0.5rem;
+    }
+    .table thead th, .table tbody td {
+        font-size: 13px;
+        padding: 8px 4px;
+    }
+    /* Axtarış və nəticələr */
+    .search-results {
+        min-width: 0;
+        width: 100%;
+        left: 0;
+        right: 0;
+        font-size: 14px;
+    }
+    .search-result-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 10px 6px;
+    }
+    .search-result-image {
+        width: 48px;
+        height: 48px;
+    }
+    .search-result-title {
+        font-size: 1rem;
+    }
+    .search-result-details {
+        font-size: 0.93rem;
+    }
+    .search-result-price {
+        font-size: 1rem;
+    }
+    /* Modal və popuplar */
+    .modal-content, .popup-content {
+        padding: 10px;
+        width: 98vw;
+        min-width: 0;
+    }
+    /* Digər */
+    .section-title {
+        font-size: 18px;
+    }
+    .order-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .header-summary {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .user-menu, .user-dropdown-content {
+        width: 100%;
+    }
+    .cart-sidebar {
+        width: 100vw;
+        min-width: 0;
+    }
+    .whatsapp-chat {
+        right: 10px;
+        bottom: 10px;
+    }
+}
+
+@media (max-width: 600px) {
+    /* Daha kiçik ekranlar üçün əlavə düzəlişlər */
+    .container, .header, .footer, .search-section {
+        padding-left: 2px !important;
+        padding-right: 2px !important;
+    }
+    .logo-img {
+        max-width: 70px;
+        height: 40px;
+    }
+    .product-image, .cart-container .table .product-image {
+        height: 60px;
+        width: 60px;
+    }
+    .product-title {
+        font-size: 12px;
+    }
+    .product-price {
+        font-size: 13px;
+    }
+    .search-result-image {
+        width: 36px;
+        height: 36px;
+    }
+    .modal-content, .popup-content {
+        padding: 4px;
+        width: 99vw;
+    }
+}
+/* ===================== SON ===================== */

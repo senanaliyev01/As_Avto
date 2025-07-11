@@ -126,10 +126,10 @@
         </div>
         {% endif %}
 
-        <!-- Yeni gələn məhsullar bölməsi -->
+        {% if request.resolver_match.url_name == 'base' and new_products %}
         <section class="product-section new-products-section">
             <div class="container">
-                <h2 class="section-title">Yeni gələn məhsullar</h2>
+                <h2 class="section-title new-products-title">Yeni Gələn Məhsullar</h2>
                 <div class="swiper new-products-swiper">
                     <div class="swiper-wrapper">
                         {% for product in new_products %}
@@ -168,18 +168,19 @@
                 </div>
             </div>
         </section>
-
-        <!-- Ən çox satılan məhsullar bölməsi -->
+        {% endif %}
+        
+        {% if most_sold_products %}
         <section class="product-section most-sold-section">
             <div class="container">
-                <h2 class="section-title">Ən çox satılan məhsullar</h2>
+                <h2 class="section-title most-sold-title">Ən Çox Satılan Məhsullar</h2>
                 <div class="swiper most-sold-swiper">
                     <div class="swiper-wrapper">
                         {% for product in most_sold_products %}
                         <div class="swiper-slide">
                             <div class="product-card">
                                 <div class="ribbon-wrapper">
-                                    <div class="ribbon" style="background:#27ae60;">Satış</div>
+                                    <div class="ribbon" style="background:#007bff;">Satış</div>
                                 </div>
                                 <div class="product-image">
                                     {% if product.sekil and product.sekil.url != 'mehsul_sekilleri/no_image.webp' %}
@@ -193,7 +194,7 @@
                                     <p class="product-code">{{ product.brend_kod }}</p>
                                     <p class="product-price">{{ product.qiymet }} ₼</p>
                                     <p class="product-seller">Satıcı: {% if product.sahib %}{{ product.sahib.username }}{% else %}AS-AVTO{% endif %}</p>
-                                    <p style="font-size:12px;color:#27ae60;">Satış sayı: {{ product.total_sold }}</p>
+                                    <p style="font-size:12px;color:#007bff;">Satış sayı: {{ product.total_sold }}</p>
                                     <a href="{% url 'products' %}?search={{ product.brend_kod }}" class="view-product">
                                         Məhsula bax <i class="fas fa-arrow-right"></i>
                                     </a>
@@ -205,18 +206,19 @@
                 </div>
             </div>
         </section>
-
-        <!-- Ən çox dəyərə sahib (ulduzlu) məhsullar bölməsi -->
+        {% endif %}
+        
+        {% if most_rated_products %}
         <section class="product-section most-rated-section">
             <div class="container">
-                <h2 class="section-title">Ən çox dəyərə sahib məhsullar</h2>
+                <h2 class="section-title most-rated-title">Ən Çox Dəyərə Sahib Məhsullar</h2>
                 <div class="swiper most-rated-swiper">
                     <div class="swiper-wrapper">
                         {% for product in most_rated_products %}
                         <div class="swiper-slide">
                             <div class="product-card">
                                 <div class="ribbon-wrapper">
-                                    <div class="ribbon" style="background:#f1c40f;">Ulduz</div>
+                                    <div class="ribbon" style="background:#ff9800;">Dəyər</div>
                                 </div>
                                 <div class="product-image">
                                     {% if product.sekil and product.sekil.url != 'mehsul_sekilleri/no_image.webp' %}
@@ -245,11 +247,12 @@
                 </div>
             </div>
         </section>
-
-        <!-- Ən çox bəyənilən məhsullar bölməsi -->
+        {% endif %}
+        
+        {% if most_liked_products %}
         <section class="product-section most-liked-section">
             <div class="container">
-                <h2 class="section-title">Ən çox bəyənilən məhsullar</h2>
+                <h2 class="section-title most-liked-title">Ən Çox Bəyənilən Məhsullar</h2>
                 <div class="swiper most-liked-swiper">
                     <div class="swiper-wrapper">
                         {% for product in most_liked_products %}
@@ -282,6 +285,7 @@
                 </div>
             </div>
         </section>
+        {% endif %}
         
         {% endif %}
 

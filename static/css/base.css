@@ -5399,41 +5399,45 @@ body {
 }
 /* ===================== SON ===================== */
 
+/* ===================== Məhsul Bölmələri üçün Section Dizaynı ===================== */
 .product-section {
-    margin: 32px 0 40px 0;
-    padding: 0 0 24px 0;
+    margin: 36px 0 36px 0;
+    padding: 32px 0 24px 0;
     background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 2px 12px rgba(44,62,80,0.04);
+    border-radius: 18px;
+    box-shadow: 0 2px 16px rgba(44,62,80,0.07);
 }
-.section-title {
-    font-size: 1.45rem;
+.product-section .section-title {
+    font-size: 1.35rem;
     font-weight: 700;
-    color: #2b5173;
     margin-bottom: 18px;
-    padding-top: 18px;
-    text-align: left;
+    text-align: center;
+    letter-spacing: 0.5px;
 }
+.new-products-section { border-left: 6px solid #e74c3c; }
+.most-sold-section { border-left: 6px solid #007bff; }
+.most-rated-section { border-left: 6px solid #ff9800; }
+.most-liked-section { border-left: 6px solid #1d6f42; }
+
 @media (max-width: 900px) {
     .product-section {
-        margin: 18px 0 24px 0;
-        padding: 0 0 12px 0;
+        margin: 24px 0 24px 0;
+        padding: 18px 0 12px 0;
+        border-radius: 12px;
     }
-    .section-title {
-        font-size: 1.13rem;
-        padding-top: 10px;
-        margin-bottom: 10px;
+    .product-section .section-title {
+        font-size: 1.1rem;
+        margin-bottom: 12px;
     }
 }
 @media (max-width: 600px) {
     .product-section {
-        margin: 10px 0 12px 0;
-        padding: 0 0 6px 0;
-        border-radius: 7px;
+        margin: 12px 0 12px 0;
+        padding: 10px 0 6px 0;
+        border-radius: 8px;
     }
-    .section-title {
-        font-size: 1.01rem;
-        padding-top: 6px;
-        margin-bottom: 6px;
+    .product-section .section-title {
+        font-size: 1rem;
+        margin-bottom: 8px;
     }
 }

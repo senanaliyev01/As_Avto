@@ -5398,3 +5398,42 @@ body {
     }
 }
 /* ===================== SON ===================== */
+
+.product-section {
+    margin: 32px 0 40px 0;
+    padding: 0 0 24px 0;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(44,62,80,0.04);
+}
+.section-title {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: #2b5173;
+    margin-bottom: 18px;
+    padding-top: 18px;
+    text-align: left;
+}
+@media (max-width: 900px) {
+    .product-section {
+        margin: 18px 0 24px 0;
+        padding: 0 0 12px 0;
+    }
+    .section-title {
+        font-size: 1.13rem;
+        padding-top: 10px;
+        margin-bottom: 10px;
+    }
+}
+@media (max-width: 600px) {
+    .product-section {
+        margin: 10px 0 12px 0;
+        padding: 0 0 6px 0;
+        border-radius: 7px;
+    }
+    .section-title {
+        font-size: 1.01rem;
+        padding-top: 6px;
+        margin-bottom: 6px;
+    }
+}

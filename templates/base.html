@@ -126,11 +126,10 @@
         </div>
         {% endif %}
 
-        <!-- New Products Carousel - Only show on home page -->
-        {% if request.resolver_match.url_name == 'base' and new_products %}
-        <div class="new-products-section">
+        <!-- Yeni gələn məhsullar bölməsi -->
+        <section class="product-section new-products-section">
             <div class="container">
-                <h2 style="margin: 18px 0 10px 0; color: red; font-size: 1.2rem; text-align: center;">Yeni Gələn Məhsullar</h2>
+                <h2 class="section-title">Yeni gələn məhsullar</h2>
                 <div class="swiper new-products-swiper">
                     <div class="swiper-wrapper">
                         {% for product in new_products %}
@@ -168,20 +167,19 @@
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Ən çox satılan məhsullar slideri -->
-        {% if most_sold_products %}
-        <div class="new-products-section">
+        </section>
+
+        <!-- Ən çox satılan məhsullar bölməsi -->
+        <section class="product-section most-sold-section">
             <div class="container">
-                <h2 style="margin: 18px 0 10px 0; color: #1d6f42; font-size: 1.2rem; text-align: center;">Ən Çox Satılan Məhsullar</h2>
-                <div class="swiper new-products-swiper">
+                <h2 class="section-title">Ən çox satılan məhsullar</h2>
+                <div class="swiper most-sold-swiper">
                     <div class="swiper-wrapper">
                         {% for product in most_sold_products %}
                         <div class="swiper-slide">
                             <div class="product-card">
                                 <div class="ribbon-wrapper">
-                                    <div class="ribbon" style="background:#007bff;">Satış</div>
+                                    <div class="ribbon" style="background:#27ae60;">Satış</div>
                                 </div>
                                 <div class="product-image">
                                     {% if product.sekil and product.sekil.url != 'mehsul_sekilleri/no_image.webp' %}
@@ -195,7 +193,7 @@
                                     <p class="product-code">{{ product.brend_kod }}</p>
                                     <p class="product-price">{{ product.qiymet }} ₼</p>
                                     <p class="product-seller">Satıcı: {% if product.sahib %}{{ product.sahib.username }}{% else %}AS-AVTO{% endif %}</p>
-                                    <p style="font-size:12px;color:#007bff;">Satış sayı: {{ product.total_sold }}</p>
+                                    <p style="font-size:12px;color:#27ae60;">Satış sayı: {{ product.total_sold }}</p>
                                     <a href="{% url 'products' %}?search={{ product.brend_kod }}" class="view-product">
                                         Məhsula bax <i class="fas fa-arrow-right"></i>
                                     </a>
@@ -206,21 +204,19 @@
                     </div>
                 </div>
             </div>
-        </div>
-        {% endif %}
-        
-        <!-- Ən çox ulduz alan məhsullar slideri -->
-        {% if most_rated_products %}
-        <div class="new-products-section">
+        </section>
+
+        <!-- Ən çox dəyərə sahib (ulduzlu) məhsullar bölməsi -->
+        <section class="product-section most-rated-section">
             <div class="container">
-                <h2 style="margin: 18px 0 10px 0; color: #ff9800; font-size: 1.2rem; text-align: center;">Ən Çox Dəyərə Sahib Məhsullar</h2>
-                <div class="swiper new-products-swiper">
+                <h2 class="section-title">Ən çox dəyərə sahib məhsullar</h2>
+                <div class="swiper most-rated-swiper">
                     <div class="swiper-wrapper">
                         {% for product in most_rated_products %}
                         <div class="swiper-slide">
                             <div class="product-card">
                                 <div class="ribbon-wrapper">
-                                    <div class="ribbon" style="background:#ff9800;">Dəyər</div>
+                                    <div class="ribbon" style="background:#f1c40f;">Ulduz</div>
                                 </div>
                                 <div class="product-image">
                                     {% if product.sekil and product.sekil.url != 'mehsul_sekilleri/no_image.webp' %}
@@ -235,7 +231,7 @@
                                     <p class="product-price">{{ product.qiymet }} ₼</p>
                                     <p class="product-seller">Satıcı: {% if product.sahib %}{{ product.sahib.username }}{% else %}AS-AVTO{% endif %}</p>
                                     <p style="font-size:12px;color:#ff9800;">
-                                        Dəyər: {{ product.avg_rating|floatformat:1 }}★ ({{ product.rating_count }} rəy)<br>
+                                        Ortalama ulduz: {{ product.avg_rating|floatformat:1 }}★ ({{ product.rating_count }} rəy)<br>
                                         <span style="color:#888;font-size:11px;">Dəyər Xalı: {{ product.wilson_score|floatformat:3 }}</span>
                                     </p>
                                     <a href="{% url 'products' %}?search={{ product.brend_kod }}" class="view-product">
@@ -248,15 +244,13 @@
                     </div>
                 </div>
             </div>
-        </div>
-        {% endif %}
-        
-        <!-- Ən çox bəyənilən məhsullar slideri -->
-        {% if most_liked_products %}
-        <div class="new-products-section">
+        </section>
+
+        <!-- Ən çox bəyənilən məhsullar bölməsi -->
+        <section class="product-section most-liked-section">
             <div class="container">
-                <h2 style="margin: 18px 0 10px 0; color: #e74c3c; font-size: 1.2rem; text-align: center;">Ən Çox Bəyənilən Məhsullar</h2>
-                <div class="swiper new-products-swiper">
+                <h2 class="section-title">Ən çox bəyənilən məhsullar</h2>
+                <div class="swiper most-liked-swiper">
                     <div class="swiper-wrapper">
                         {% for product in most_liked_products %}
                         <div class="swiper-slide">
@@ -287,8 +281,7 @@
                     </div>
                 </div>
             </div>
-        </div>
-        {% endif %}
+        </section>
         
         {% endif %}
 

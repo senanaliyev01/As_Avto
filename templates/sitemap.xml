@@ -2,7 +2,8 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
         xmlns:geo="http://www.google.com/schemas/sitemap-geo/1.0"
-        xmlns:product="http://www.google.com/schemas/sitemap-product/1.0">
+        xmlns:product="http://www.google.com/schemas/sitemap-product/1.0"
+        xmlns:schema="http://www.google.com/schemas/sitemap-schema/1.0">
     {% for url in urlset %}
     <url>
         <loc>{{ url.location }}</loc>
@@ -22,6 +23,24 @@
             {% if url.product_category %}<product:category>{{ url.product_category }}</product:category>{% endif %}
             {% if url.product_size %}<product:size>{{ url.product_size }}</product:size>{% endif %}
         </product:product>
+        {% endif %}
+        
+        {% if url.schema_name %}
+        <schema:structured_data>
+            <schema:type>Product</schema:type>
+            <schema:name>{{ url.schema_name }}</schema:name>
+            {% if url.schema_mpn %}<schema:mpn>{{ url.schema_mpn }}</schema:mpn>{% endif %}
+            {% if url.schema_vehicle_model %}<schema:vehicle_model>{{ url.schema_vehicle_model }}</schema:vehicle_model>{% endif %}
+            {% if url.schema_brand_name %}<schema:brand_name>{{ url.schema_brand_name }}</schema:brand_name>{% endif %}
+            {% if url.schema_price %}<schema:price>{{ url.schema_price }}</schema:price>{% endif %}
+            {% if url.schema_price_currency %}<schema:price_currency>{{ url.schema_price_currency }}</schema:price_currency>{% endif %}
+            {% if url.schema_availability %}<schema:availability>{{ url.schema_availability }}</schema:availability>{% endif %}
+            {% if url.schema_sku %}<schema:sku>{{ url.schema_sku }}</schema:sku>{% endif %}
+            {% if url.schema_description %}<schema:description>{{ url.schema_description }}</schema:description>{% endif %}
+            {% if url.schema_rating_value %}<schema:rating_value>{{ url.schema_rating_value }}</schema:rating_value>{% endif %}
+            {% if url.schema_review_count %}<schema:review_count>{{ url.schema_review_count }}</schema:review_count>{% endif %}
+            {% if url.schema_like_count %}<schema:like_count>{{ url.schema_like_count }}</schema:like_count>{% endif %}
+        </schema:structured_data>
         {% endif %}
         
         {% if url.image_absolute_url %}

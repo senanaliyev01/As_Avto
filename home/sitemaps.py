@@ -49,6 +49,30 @@ class ProductSitemap(Sitemap):
                 url['product_description'] = obj.melumat or f"{obj.adi} - {obj.brend_kod} {obj.firma.adi} {obj.avtomobil.adi}"
                 url['product_category'] = obj.kateqoriya.adi if obj.kateqoriya else "Avtomobil Ehtiyat Hissələri"
                 url['product_size'] = obj.olcu or ""
+                # Structured Data məlumatları
+                url['schema_name'] = obj.adi
+                url['schema_mpn'] = obj.brend_kod
+                url['schema_vehicle_model'] = obj.avtomobil.adi
+                url['schema_brand_name'] = obj.firma.adi
+                url['schema_price_currency'] = "AZN"
+                url['schema_price'] = str(obj.qiymet)
+                url['schema_availability'] = "InStock" if obj.stok > 0 else "OutOfStock"
+                url['schema_sku'] = str(obj.id)
+                url['schema_description'] = obj.melumat or f"{obj.adi} - {obj.brend_kod} {obj.firma.adi} {obj.avtomobil.adi}"
+                # Rating məlumatları (əgər varsa)
+                from django.db.models import Avg, Count
+                ratings = obj.ratings.all()
+                if ratings.exists():
+                    avg_rating = ratings.aggregate(avg=Avg('rating'))['avg']
+                    review_count = ratings.count()
+                    url['schema_rating_value'] = str(round(avg_rating, 1))
+                    url['schema_review_count'] = str(review_count)
+                else:
+                    url['schema_rating_value'] = "0.0"
+                    url['schema_review_count'] = "0"
+                # Like məlumatları
+                like_count = obj.likes.count()
+                url['schema_like_count'] = str(like_count)
             else:
                 url['image_absolute_url'] = ''
                 url['image_title'] = ''
@@ -70,6 +94,18 @@ class ProductSitemap(Sitemap):
                 url['product_description'] = ''
                 url['product_category'] = ''
                 url['product_size'] = ''
+                url['schema_name'] = ''
+                url['schema_mpn'] = ''
+                url['schema_vehicle_model'] = ''
+                url['schema_brand_name'] = ''
+                url['schema_price_currency'] = ''
+                url['schema_price'] = ''
+                url['schema_availability'] = ''
+                url['schema_sku'] = ''
+                url['schema_description'] = ''
+                url['schema_rating_value'] = ''
+                url['schema_review_count'] = ''
+                url['schema_like_count'] = ''
         return urls
 
     def image_urls(self, obj):

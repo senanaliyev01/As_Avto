@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
-        xmlns:geo="http://www.google.com/schemas/sitemap-geo/1.0"
-        xmlns:product="http://www.google.com/schemas/sitemap-product/1.0"
-        xmlns:schema="http://www.google.com/schemas/sitemap-schema/1.0">
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
     {% for url in urlset %}
     <url>
         <loc>{{ url.location }}</loc>
@@ -11,65 +8,12 @@
         {% if url.changefreq %}<changefreq>{{ url.changefreq }}</changefreq>{% endif %}
         {% if url.priority %}<priority>{{ url.priority }}</priority>{% endif %}
         
-        {% if url.product_name %}
-        <product:product>
-            <product:name>{{ url.product_name }}</product:name>
-            {% if url.product_code %}<product:code>{{ url.product_code }}</product:code>{% endif %}
-            {% if url.product_brand %}<product:brand>{{ url.product_brand }}</product:brand>{% endif %}
-            {% if url.product_vehicle %}<product:vehicle>{{ url.product_vehicle }}</product:vehicle>{% endif %}
-            {% if url.product_price %}<product:price>{{ url.product_price }} ₼</product:price>{% endif %}
-            {% if url.product_stock %}<product:stock>{{ url.product_stock }} ədəd</product:stock>{% endif %}
-            {% if url.product_description %}<product:description>{{ url.product_description }}</product:description>{% endif %}
-            {% if url.product_category %}<product:category>{{ url.product_category }}</product:category>{% endif %}
-            {% if url.product_size %}<product:size>{{ url.product_size }}</product:size>{% endif %}
-        </product:product>
-        {% endif %}
-        
-        {% if url.schema_name %}
-        <schema:structured_data>
-            <schema:type>Product</schema:type>
-            <schema:name>{{ url.schema_name }}</schema:name>
-            {% if url.schema_mpn %}<schema:mpn>{{ url.schema_mpn }}</schema:mpn>{% endif %}
-            {% if url.schema_vehicle_model %}<schema:vehicle_model>{{ url.schema_vehicle_model }}</schema:vehicle_model>{% endif %}
-            {% if url.schema_brand_name %}<schema:brand_name>{{ url.schema_brand_name }}</schema:brand_name>{% endif %}
-            {% if url.schema_price %}<schema:price>{{ url.schema_price }}</schema:price>{% endif %}
-            {% if url.schema_price_currency %}<schema:price_currency>{{ url.schema_price_currency }}</schema:price_currency>{% endif %}
-            {% if url.schema_availability %}<schema:availability>{{ url.schema_availability }}</schema:availability>{% endif %}
-            {% if url.schema_sku %}<schema:sku>{{ url.schema_sku }}</schema:sku>{% endif %}
-            {% if url.schema_description %}<schema:description>{{ url.schema_description }}</schema:description>{% endif %}
-            {% if url.schema_rating_value %}<schema:rating_value>{{ url.schema_rating_value }}</schema:rating_value>{% endif %}
-            {% if url.schema_review_count %}<schema:review_count>{{ url.schema_review_count }}</schema:review_count>{% endif %}
-            {% if url.schema_like_count %}<schema:like_count>{{ url.schema_like_count }}</schema:like_count>{% endif %}
-        </schema:structured_data>
-        {% endif %}
-        
         {% if url.image_absolute_url %}
         <image:image>
             <image:loc>{{ url.image_absolute_url }}</image:loc>
             <image:title>{{ url.image_title|default_if_none:"" }}</image:title>
             {% if url.image_caption %}<image:caption>{{ url.image_caption }}</image:caption>{% endif %}
             {% if url.image_license %}<image:license>{{ url.image_license }}</image:license>{% endif %}
-            {% if url.image_geo_location %}
-            <image:geo_location>{{ url.image_geo_location }}</image:geo_location>
-            {% endif %}
-            {% if url.image_geo_region %}
-            <image:geo_region>{{ url.image_geo_region }}</image:geo_region>
-            {% endif %}
-            {% if url.image_geo_placename %}
-            <image:geo_placename>{{ url.image_geo_placename }}</image:geo_placename>
-            {% endif %}
-            {% if url.image_geo_position %}
-            <image:geo_position>{{ url.image_geo_position }}</image:geo_position>
-            {% endif %}
-            {% if url.image_geo_title %}
-            <image:geo_title>{{ url.image_geo_title }}</image:geo_title>
-            {% endif %}
-            {% if url.image_license_url %}
-            <image:license_url>{{ url.image_license_url }}</image:license_url>
-            {% endif %}
-            {% if url.image_license_title %}
-            <image:license_title>{{ url.image_license_title }}</image:license_title>
-            {% endif %}
         </image:image>
         {% endif %}
     </url>

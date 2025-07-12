@@ -178,20 +178,34 @@ def products_view(request):
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
             melumat_filter = Q(melumat__icontains=clean_search)
-            sahib_username_filter = Q(sahib__username__icontains=clean_search)
-            sahib_firstname_filter = Q(sahib__first_name__icontains=clean_search)
-            sahib_lastname_filter = Q(sahib__last_name__icontains=clean_search)
             def clean_code(val):
                 return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
             brend_kod_ids = [m.id for m in Mehsul.objects.all() if clean_code(search_query) in clean_code(m.brend_kod)]
             brend_kod_filter = Q(id__in=brend_kod_ids)
             if search_words:
                 ad_filters = []
+                username_filters = []
+                firstname_filters = []
+                lastname_filters = []
+                melumat_filters = []
+                firma_filters = []
+                avtomobil_filters = []
                 for word in search_words:
                     word_variations = normalize_azerbaijani_chars(word)
-                    word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
-                    ad_filters.append(word_filter)
-                ad_filter = reduce(and_, ad_filters)
+                    ad_filters.append(reduce(or_, [Q(adi__icontains=variation) for variation in word_variations]))
+                    username_filters.append(reduce(or_, [Q(sahib__username__icontains=variation) for variation in word_variations]))
+                    firstname_filters.append(reduce(or_, [Q(sahib__first_name__icontains=variation) for variation in word_variations]))
+                    lastname_filters.append(reduce(or_, [Q(sahib__last_name__icontains=variation) for variation in word_variations]))
+                    melumat_filters.append(reduce(or_, [Q(melumat__icontains=variation) for variation in word_variations]))
+                    firma_filters.append(reduce(or_, [Q(firma__adi__icontains=variation) for variation in word_variations]))
+                    avtomobil_filters.append(reduce(or_, [Q(avtomobil__adi__icontains=variation) for variation in word_variations]))
+                ad_filter = reduce(and_, ad_filters) if ad_filters else Q()
+                username_filter = reduce(and_, username_filters) if username_filters else Q()
+                firstname_filter = reduce(and_, firstname_filters) if firstname_filters else Q()
+                lastname_filter = reduce(and_, lastname_filters) if lastname_filters else Q()
+                melumat_filter_var = reduce(and_, melumat_filters) if melumat_filters else Q()
+                firma_filter_var = reduce(and_, firma_filters) if firma_filters else Q()
+                avtomobil_filter_var = reduce(and_, avtomobil_filters) if avtomobil_filters else Q()
                 searchtext_and_filter = reduce(
                     and_,
                     [reduce(or_, [Q(search_text__icontains=variation) for variation in normalize_azerbaijani_chars(word)]) for word in search_words]
@@ -200,22 +214,28 @@ def products_view(request):
                     kod_filter |
                     olcu_filter |
                     melumat_filter |
-                    sahib_username_filter |
-                    sahib_firstname_filter |
-                    sahib_lastname_filter |
                     brend_kod_filter |
                     ad_filter |
+                    username_filter |
+                    firstname_filter |
+                    lastname_filter |
+                    melumat_filter_var |
+                    firma_filter_var |
+                    avtomobil_filter_var |
                     searchtext_and_filter
                 ).order_by('-id')
             else:
+                sahib_username_filter = Q(sahib__username__icontains=clean_search)
+                sahib_firstname_filter = Q(sahib__first_name__icontains=clean_search)
+                sahib_lastname_filter = Q(sahib__last_name__icontains=clean_search)
                 mehsullar = mehsullar.filter(
                     kod_filter |
                     olcu_filter |
                     melumat_filter |
+                    brend_kod_filter |
                     sahib_username_filter |
                     sahib_firstname_filter |
-                    sahib_lastname_filter |
-                    brend_kod_filter
+                    sahib_lastname_filter
                 ).order_by('-id')
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
@@ -604,20 +624,34 @@ def search_suggestions(request):
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
             melumat_filter = Q(melumat__icontains=clean_search)
-            sahib_username_filter = Q(sahib__username__icontains=clean_search)
-            sahib_firstname_filter = Q(sahib__first_name__icontains=clean_search)
-            sahib_lastname_filter = Q(sahib__last_name__icontains=clean_search)
             def clean_code(val):
                 return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
             brend_kod_ids = [m.id for m in mehsullar if clean_code(search_query) in clean_code(m.brend_kod)]
             brend_kod_filter = Q(id__in=brend_kod_ids)
             if search_words:
                 ad_filters = []
+                username_filters = []
+                firstname_filters = []
+                lastname_filters = []
+                melumat_filters = []
+                firma_filters = []
+                avtomobil_filters = []
                 for word in search_words:
                     word_variations = normalize_azerbaijani_chars(word)
-                    word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
-                    ad_filters.append(word_filter)
-                ad_filter = reduce(and_, ad_filters)
+                    ad_filters.append(reduce(or_, [Q(adi__icontains=variation) for variation in word_variations]))
+                    username_filters.append(reduce(or_, [Q(sahib__username__icontains=variation) for variation in word_variations]))
+                    firstname_filters.append(reduce(or_, [Q(sahib__first_name__icontains=variation) for variation in word_variations]))
+                    lastname_filters.append(reduce(or_, [Q(sahib__last_name__icontains=variation) for variation in word_variations]))
+                    melumat_filters.append(reduce(or_, [Q(melumat__icontains=variation) for variation in word_variations]))
+                    firma_filters.append(reduce(or_, [Q(firma__adi__icontains=variation) for variation in word_variations]))
+                    avtomobil_filters.append(reduce(or_, [Q(avtomobil__adi__icontains=variation) for variation in word_variations]))
+                ad_filter = reduce(and_, ad_filters) if ad_filters else Q()
+                username_filter = reduce(and_, username_filters) if username_filters else Q()
+                firstname_filter = reduce(and_, firstname_filters) if firstname_filters else Q()
+                lastname_filter = reduce(and_, lastname_filters) if lastname_filters else Q()
+                melumat_filter_var = reduce(and_, melumat_filters) if melumat_filters else Q()
+                firma_filter_var = reduce(and_, firma_filters) if firma_filters else Q()
+                avtomobil_filter_var = reduce(and_, avtomobil_filters) if avtomobil_filters else Q()
                 searchtext_and_filter = reduce(
                     and_,
                     [reduce(or_, [Q(search_text__icontains=variation) for variation in normalize_azerbaijani_chars(word)]) for word in search_words]
@@ -626,23 +660,29 @@ def search_suggestions(request):
                     kod_filter |
                     olcu_filter |
                     melumat_filter |
-                    sahib_username_filter |
-                    sahib_firstname_filter |
-                    sahib_lastname_filter |
                     brend_kod_filter |
                     ad_filter |
+                    username_filter |
+                    firstname_filter |
+                    lastname_filter |
+                    melumat_filter_var |
+                    firma_filter_var |
+                    avtomobil_filter_var |
                     searchtext_and_filter
-                )[:5]
+                ).order_by('-id')
             else:
+                sahib_username_filter = Q(sahib__username__icontains=clean_search)
+                sahib_firstname_filter = Q(sahib__first_name__icontains=clean_search)
+                sahib_lastname_filter = Q(sahib__last_name__icontains=clean_search)
                 mehsullar = mehsullar.filter(
                     kod_filter |
                     olcu_filter |
                     melumat_filter |
+                    brend_kod_filter |
                     sahib_username_filter |
                     sahib_firstname_filter |
-                    sahib_lastname_filter |
-                    brend_kod_filter
-                )[:5]
+                    sahib_lastname_filter
+                ).order_by('-id')
             suggestions = []
             for mehsul in mehsullar:
                 suggestions.append({
@@ -685,20 +725,34 @@ def new_products_view(request):
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
             melumat_filter = Q(melumat__icontains=clean_search)
-            sahib_username_filter = Q(sahib__username__icontains=clean_search)
-            sahib_firstname_filter = Q(sahib__first_name__icontains=clean_search)
-            sahib_lastname_filter = Q(sahib__last_name__icontains=clean_search)
             def clean_code(val):
                 return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
             brend_kod_ids = [m.id for m in mehsullar if clean_code(search_query) in clean_code(m.brend_kod)]
             brend_kod_filter = Q(id__in=brend_kod_ids)
             if search_words:
                 ad_filters = []
+                username_filters = []
+                firstname_filters = []
+                lastname_filters = []
+                melumat_filters = []
+                firma_filters = []
+                avtomobil_filters = []
                 for word in search_words:
                     word_variations = normalize_azerbaijani_chars(word)
-                    word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
-                    ad_filters.append(word_filter)
-                ad_filter = reduce(and_, ad_filters)
+                    ad_filters.append(reduce(or_, [Q(adi__icontains=variation) for variation in word_variations]))
+                    username_filters.append(reduce(or_, [Q(sahib__username__icontains=variation) for variation in word_variations]))
+                    firstname_filters.append(reduce(or_, [Q(sahib__first_name__icontains=variation) for variation in word_variations]))
+                    lastname_filters.append(reduce(or_, [Q(sahib__last_name__icontains=variation) for variation in word_variations]))
+                    melumat_filters.append(reduce(or_, [Q(melumat__icontains=variation) for variation in word_variations]))
+                    firma_filters.append(reduce(or_, [Q(firma__adi__icontains=variation) for variation in word_variations]))
+                    avtomobil_filters.append(reduce(or_, [Q(avtomobil__adi__icontains=variation) for variation in word_variations]))
+                ad_filter = reduce(and_, ad_filters) if ad_filters else Q()
+                username_filter = reduce(and_, username_filters) if username_filters else Q()
+                firstname_filter = reduce(and_, firstname_filters) if firstname_filters else Q()
+                lastname_filter = reduce(and_, lastname_filters) if lastname_filters else Q()
+                melumat_filter_var = reduce(and_, melumat_filters) if melumat_filters else Q()
+                firma_filter_var = reduce(and_, firma_filters) if firma_filters else Q()
+                avtomobil_filter_var = reduce(and_, avtomobil_filters) if avtomobil_filters else Q()
                 searchtext_and_filter = reduce(
                     and_,
                     [reduce(or_, [Q(search_text__icontains=variation) for variation in normalize_azerbaijani_chars(word)]) for word in search_words]
@@ -707,22 +761,28 @@ def new_products_view(request):
                     kod_filter |
                     olcu_filter |
                     melumat_filter |
-                    sahib_username_filter |
-                    sahib_firstname_filter |
-                    sahib_lastname_filter |
                     brend_kod_filter |
                     ad_filter |
+                    username_filter |
+                    firstname_filter |
+                    lastname_filter |
+                    melumat_filter_var |
+                    firma_filter_var |
+                    avtomobil_filter_var |
                     searchtext_and_filter
                 ).order_by('-id')
             else:
+                sahib_username_filter = Q(sahib__username__icontains=clean_search)
+                sahib_firstname_filter = Q(sahib__first_name__icontains=clean_search)
+                sahib_lastname_filter = Q(sahib__last_name__icontains=clean_search)
                 mehsullar = mehsullar.filter(
                     kod_filter |
                     olcu_filter |
                     melumat_filter |
+                    brend_kod_filter |
                     sahib_username_filter |
                     sahib_firstname_filter |
-                    sahib_lastname_filter |
-                    brend_kod_filter
+                    sahib_lastname_filter
                 ).order_by('-id')
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
@@ -771,20 +831,34 @@ def load_more_new_products(request):
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
             melumat_filter = Q(melumat__icontains=clean_search)
-            sahib_username_filter = Q(sahib__username__icontains=clean_search)
-            sahib_firstname_filter = Q(sahib__first_name__icontains=clean_search)
-            sahib_lastname_filter = Q(sahib__last_name__icontains=clean_search)
             def clean_code(val):
                 return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
             brend_kod_ids = [m.id for m in mehsullar if clean_code(search_query) in clean_code(m.brend_kod)]
             brend_kod_filter = Q(id__in=brend_kod_ids)
             if search_words:
                 ad_filters = []
+                username_filters = []
+                firstname_filters = []
+                lastname_filters = []
+                melumat_filters = []
+                firma_filters = []
+                avtomobil_filters = []
                 for word in search_words:
                     word_variations = normalize_azerbaijani_chars(word)
-                    word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
-                    ad_filters.append(word_filter)
-                ad_filter = reduce(and_, ad_filters)
+                    ad_filters.append(reduce(or_, [Q(adi__icontains=variation) for variation in word_variations]))
+                    username_filters.append(reduce(or_, [Q(sahib__username__icontains=variation) for variation in word_variations]))
+                    firstname_filters.append(reduce(or_, [Q(sahib__first_name__icontains=variation) for variation in word_variations]))
+                    lastname_filters.append(reduce(or_, [Q(sahib__last_name__icontains=variation) for variation in word_variations]))
+                    melumat_filters.append(reduce(or_, [Q(melumat__icontains=variation) for variation in word_variations]))
+                    firma_filters.append(reduce(or_, [Q(firma__adi__icontains=variation) for variation in word_variations]))
+                    avtomobil_filters.append(reduce(or_, [Q(avtomobil__adi__icontains=variation) for variation in word_variations]))
+                ad_filter = reduce(and_, ad_filters) if ad_filters else Q()
+                username_filter = reduce(and_, username_filters) if username_filters else Q()
+                firstname_filter = reduce(and_, firstname_filters) if firstname_filters else Q()
+                lastname_filter = reduce(and_, lastname_filters) if lastname_filters else Q()
+                melumat_filter_var = reduce(and_, melumat_filters) if melumat_filters else Q()
+                firma_filter_var = reduce(and_, firma_filters) if firma_filters else Q()
+                avtomobil_filter_var = reduce(and_, avtomobil_filters) if avtomobil_filters else Q()
                 searchtext_and_filter = reduce(
                     and_,
                     [reduce(or_, [Q(search_text__icontains=variation) for variation in normalize_azerbaijani_chars(word)]) for word in search_words]
@@ -793,22 +867,28 @@ def load_more_new_products(request):
                     kod_filter |
                     olcu_filter |
                     melumat_filter |
-                    sahib_username_filter |
-                    sahib_firstname_filter |
-                    sahib_lastname_filter |
                     brend_kod_filter |
                     ad_filter |
+                    username_filter |
+                    firstname_filter |
+                    lastname_filter |
+                    melumat_filter_var |
+                    firma_filter_var |
+                    avtomobil_filter_var |
                     searchtext_and_filter
                 ).order_by('-id')
             else:
+                sahib_username_filter = Q(sahib__username__icontains=clean_search)
+                sahib_firstname_filter = Q(sahib__first_name__icontains=clean_search)
+                sahib_lastname_filter = Q(sahib__last_name__icontains=clean_search)
                 mehsullar = mehsullar.filter(
                     kod_filter |
                     olcu_filter |
                     melumat_filter |
+                    brend_kod_filter |
                     sahib_username_filter |
                     sahib_firstname_filter |
-                    sahib_lastname_filter |
-                    brend_kod_filter
+                    sahib_lastname_filter
                 ).order_by('-id')
     products = mehsullar[offset:offset + limit]
     has_more = mehsullar.count() > (offset + limit)
@@ -900,20 +980,34 @@ def my_products_view(request):
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
             melumat_filter = Q(melumat__icontains=clean_search)
-            sahib_username_filter = Q(sahib__username__icontains=clean_search)
-            sahib_firstname_filter = Q(sahib__first_name__icontains=clean_search)
-            sahib_lastname_filter = Q(sahib__last_name__icontains=clean_search)
             def clean_code(val):
                 return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
             brend_kod_ids = [m.id for m in mehsullar if clean_code(search_query) in clean_code(m.brend_kod)]
             brend_kod_filter = Q(id__in=brend_kod_ids)
             if search_words:
                 ad_filters = []
+                username_filters = []
+                firstname_filters = []
+                lastname_filters = []
+                melumat_filters = []
+                firma_filters = []
+                avtomobil_filters = []
                 for word in search_words:
                     word_variations = normalize_azerbaijani_chars(word)
-                    word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
-                    ad_filters.append(word_filter)
-                ad_filter = reduce(and_, ad_filters)
+                    ad_filters.append(reduce(or_, [Q(adi__icontains=variation) for variation in word_variations]))
+                    username_filters.append(reduce(or_, [Q(sahib__username__icontains=variation) for variation in word_variations]))
+                    firstname_filters.append(reduce(or_, [Q(sahib__first_name__icontains=variation) for variation in word_variations]))
+                    lastname_filters.append(reduce(or_, [Q(sahib__last_name__icontains=variation) for variation in word_variations]))
+                    melumat_filters.append(reduce(or_, [Q(melumat__icontains=variation) for variation in word_variations]))
+                    firma_filters.append(reduce(or_, [Q(firma__adi__icontains=variation) for variation in word_variations]))
+                    avtomobil_filters.append(reduce(or_, [Q(avtomobil__adi__icontains=variation) for variation in word_variations]))
+                ad_filter = reduce(and_, ad_filters) if ad_filters else Q()
+                username_filter = reduce(and_, username_filters) if username_filters else Q()
+                firstname_filter = reduce(and_, firstname_filters) if firstname_filters else Q()
+                lastname_filter = reduce(and_, lastname_filters) if lastname_filters else Q()
+                melumat_filter_var = reduce(and_, melumat_filters) if melumat_filters else Q()
+                firma_filter_var = reduce(and_, firma_filters) if firma_filters else Q()
+                avtomobil_filter_var = reduce(and_, avtomobil_filters) if avtomobil_filters else Q()
                 searchtext_and_filter = reduce(
                     and_,
                     [reduce(or_, [Q(search_text__icontains=variation) for variation in normalize_azerbaijani_chars(word)]) for word in search_words]
@@ -922,22 +1016,28 @@ def my_products_view(request):
                     kod_filter |
                     olcu_filter |
                     melumat_filter |
-                    sahib_username_filter |
-                    sahib_firstname_filter |
-                    sahib_lastname_filter |
                     brend_kod_filter |
                     ad_filter |
+                    username_filter |
+                    firstname_filter |
+                    lastname_filter |
+                    melumat_filter_var |
+                    firma_filter_var |
+                    avtomobil_filter_var |
                     searchtext_and_filter
                 ).order_by('-id')
             else:
+                sahib_username_filter = Q(sahib__username__icontains=clean_search)
+                sahib_firstname_filter = Q(sahib__first_name__icontains=clean_search)
+                sahib_lastname_filter = Q(sahib__last_name__icontains=clean_search)
                 mehsullar = mehsullar.filter(
                     kod_filter |
                     olcu_filter |
                     melumat_filter |
+                    brend_kod_filter |
                     sahib_username_filter |
                     sahib_firstname_filter |
-                    sahib_lastname_filter |
-                    brend_kod_filter
+                    sahib_lastname_filter
                 ).order_by('-id')
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
@@ -979,20 +1079,34 @@ def load_more_my_products(request):
             kod_filter = Q(kodlar__icontains=clean_search)
             olcu_filter = Q(olcu__icontains=clean_search)
             melumat_filter = Q(melumat__icontains=clean_search)
-            sahib_username_filter = Q(sahib__username__icontains=clean_search)
-            sahib_firstname_filter = Q(sahib__first_name__icontains=clean_search)
-            sahib_lastname_filter = Q(sahib__last_name__icontains=clean_search)
             def clean_code(val):
                 return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
             brend_kod_ids = [m.id for m in mehsullar if clean_code(search_query) in clean_code(m.brend_kod)]
             brend_kod_filter = Q(id__in=brend_kod_ids)
             if search_words:
                 ad_filters = []
+                username_filters = []
+                firstname_filters = []
+                lastname_filters = []
+                melumat_filters = []
+                firma_filters = []
+                avtomobil_filters = []
                 for word in search_words:
                     word_variations = normalize_azerbaijani_chars(word)
-                    word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
-                    ad_filters.append(word_filter)
-                ad_filter = reduce(and_, ad_filters)
+                    ad_filters.append(reduce(or_, [Q(adi__icontains=variation) for variation in word_variations]))
+                    username_filters.append(reduce(or_, [Q(sahib__username__icontains=variation) for variation in word_variations]))
+                    firstname_filters.append(reduce(or_, [Q(sahib__first_name__icontains=variation) for variation in word_variations]))
+                    lastname_filters.append(reduce(or_, [Q(sahib__last_name__icontains=variation) for variation in word_variations]))
+                    melumat_filters.append(reduce(or_, [Q(melumat__icontains=variation) for variation in word_variations]))
+                    firma_filters.append(reduce(or_, [Q(firma__adi__icontains=variation) for variation in word_variations]))
+                    avtomobil_filters.append(reduce(or_, [Q(avtomobil__adi__icontains=variation) for variation in word_variations]))
+                ad_filter = reduce(and_, ad_filters) if ad_filters else Q()
+                username_filter = reduce(and_, username_filters) if username_filters else Q()
+                firstname_filter = reduce(and_, firstname_filters) if firstname_filters else Q()
+                lastname_filter = reduce(and_, lastname_filters) if lastname_filters else Q()
+                melumat_filter_var = reduce(and_, melumat_filters) if melumat_filters else Q()
+                firma_filter_var = reduce(and_, firma_filters) if firma_filters else Q()
+                avtomobil_filter_var = reduce(and_, avtomobil_filters) if avtomobil_filters else Q()
                 searchtext_and_filter = reduce(
                     and_,
                     [reduce(or_, [Q(search_text__icontains=variation) for variation in normalize_azerbaijani_chars(word)]) for word in search_words]
@@ -1001,22 +1115,28 @@ def load_more_my_products(request):
                     kod_filter |
                     olcu_filter |
                     melumat_filter |
-                    sahib_username_filter |
-                    sahib_firstname_filter |
-                    sahib_lastname_filter |
                     brend_kod_filter |
                     ad_filter |
+                    username_filter |
+                    firstname_filter |
+                    lastname_filter |
+                    melumat_filter_var |
+                    firma_filter_var |
+                    avtomobil_filter_var |
                     searchtext_and_filter
                 ).order_by('-id')
             else:
+                sahib_username_filter = Q(sahib__username__icontains=clean_search)
+                sahib_firstname_filter = Q(sahib__first_name__icontains=clean_search)
+                sahib_lastname_filter = Q(sahib__last_name__icontains=clean_search)
                 mehsullar = mehsullar.filter(
                     kod_filter |
                     olcu_filter |
                     melumat_filter |
+                    brend_kod_filter |
                     sahib_username_filter |
                     sahib_firstname_filter |
-                    sahib_lastname_filter |
-                    brend_kod_filter
+                    sahib_lastname_filter
                 ).order_by('-id')
     products = mehsullar[offset:offset+limit]
     has_more = mehsullar.count() > (offset + limit)

@@ -27,12 +27,18 @@ def ads_txt_view(request):
     content = "google.com, pub-8801377705417869, DIRECT, f08c47fec0942fa0"
     return HttpResponse(content, content_type="text/plain")
 
+def robots_txt_view(request):
+    with open('robots.txt', 'r', encoding='utf-8') as f:
+        content = f.read()
+    return HttpResponse(content, content_type="text/plain")
+
 handler404 = 'home.views.custom_404'
 
 urlpatterns = [
     path('admin-as-avto-1983-2002/', admin.site.urls),
     path('', include('home.urls')),
     path("ads.txt", ads_txt_view),
+    path('robots.txt', robots_txt_view),
     path('sitemap.xml', sitemap, {'sitemaps': {'products': ProductSitemap, 'static': StaticViewSitemap}, 'template_name': 'sitemap.xml'}, name='django.contrib.sitemaps.views.sitemap'),
 ]
 

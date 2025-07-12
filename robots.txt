@@ -1,4 +1,11 @@
 User-agent: *
-Disallow:
+Disallow: /admin-as-avto-1983-2002/
+Disallow: /media/admin/
+Disallow: /static/admin/
+
+# Şəkillərə icazə ver
+Allow: /media/mehsul_sekilleri/
+Allow: /media/firma_sekilleri/
+Allow: /media/avtomobil_sekilleri/
 
 Sitemap: https://as-avto.com/sitemap.xml 

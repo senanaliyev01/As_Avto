@@ -5,6 +5,17 @@
 
 {% block head %}
     {{ block.super }}
+    <meta name="description" content="{{ mehsul.adi }} - {{ mehsul.brend_kod }} {{ mehsul.firma.adi }} {{ mehsul.avtomobil.adi }}. Qiymət: {{ mehsul.qiymet }} ₼. Stok: {{ mehsul.stok }} ədəd.">
+    <meta name="keywords" content="{{ mehsul.adi }}, {{ mehsul.brend_kod }}, {{ mehsul.firma.adi }}, {{ mehsul.avtomobil.adi }}, avtomobil ehtiyat hissələri">
+    <meta property="og:title" content="{{ mehsul.adi }} - {{ mehsul.brend_kod }}">
+    <meta property="og:description" content="{{ mehsul.adi }} - {{ mehsul.brend_kod }} {{ mehsul.firma.adi }} {{ mehsul.avtomobil.adi }}. Qiymət: {{ mehsul.qiymet }} ₼">
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ mehsul.sekil.url }}">
+    <meta property="og:image:alt" content="{{ mehsul.adi }} - {{ mehsul.brend_kod }}">
+    <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+    <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+
+{% block head %}
+    {{ block.super }}
     <script type="application/ld+json">
     {
       "@context": "https://schema.org/",
@@ -13,7 +24,13 @@
       "mpn": "{{ mehsul.brend_kod|escapejs }}",
       "vehicleModel": "{{ mehsul.avtomobil.adi|escapejs }}",
       "image": [
-        "{{ request.scheme }}://{{ request.get_host }}{{ mehsul.sekil.url }}"
+        {
+          "@type": "ImageObject",
+          "url": "{{ request.scheme }}://{{ request.get_host }}{{ mehsul.sekil.url }}",
+          "name": "{{ mehsul.adi|escapejs }} - {{ mehsul.brend_kod|escapejs }}",
+          "description": "{{ mehsul.adi|escapejs }} - {{ mehsul.brend_kod|escapejs }} {{ mehsul.firma.adi|escapejs }} {{ mehsul.avtomobil.adi|escapejs }}",
+          "contentUrl": "{{ request.scheme }}://{{ request.get_host }}{{ mehsul.sekil.url }}"
+        }
       ],
       "description": "{{ mehsul.melumat|default:''|striptags|escapejs }}",
       "sku": "{{ mehsul.id }}",
@@ -182,7 +199,7 @@
         {% if mehsul.firma.logo %}
         <img class="firma-logo" src="{{ mehsul.firma.logo.url }}" alt="{{ mehsul.firma.adi }}" style="width:70px;height:70px;object-fit:contain;position:absolute;top:0;right:0;z-index:2;">
         {% endif %}
-        <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}">
+        <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }} - {{ mehsul.brend_kod }} {{ mehsul.firma.adi }} {{ mehsul.avtomobil.adi }}" title="{{ mehsul.adi }} - {{ mehsul.brend_kod }}" loading="lazy">
         <div style="display:flex;justify-content:center;align-items:center;gap:10px;margin-top:18px;width:100%;">
             {% for logo in mehsul.avtomobil.logolar.all %}
             <img class="avtomobil-logo" src="{{ logo.sekil.url }}" alt="{{ mehsul.avtomobil.adi }}" style="width:70px;height:70px;object-fit:contain;border-radius:8px;background:#fff;border:1px solid #e0e0e0;">

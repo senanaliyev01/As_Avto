@@ -70,7 +70,7 @@
             {% for item in order.sifarisitem_set.all %}
             <tr>
                 <td>
-                    <img src="{{ item.mehsul.sekil.url }}" alt="{{ item.mehsul.adi }}" class="product-image" onclick="openImageModal('{{ item.mehsul.sekil.url }}')">
+                    <img src="{{ item.mehsul.sekil.url }}" alt="{{ item.mehsul.adi }} - {{ item.mehsul.brend_kod }} {{ item.mehsul.firma.adi }} {{ item.mehsul.avtomobil.adi }}" title="{{ item.mehsul.adi }} - {{ item.mehsul.brend_kod }}" class="product-image" loading="lazy" onclick="openImageModal('{{ item.mehsul.sekil.url }}')">
                 </td>
                 <td>{{ item.mehsul.brend_kod }}</td>
                 <td>{{ item.mehsul.firma.adi }}</td>

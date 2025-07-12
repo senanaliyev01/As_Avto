@@ -17,7 +17,7 @@
                 <span style="color:#e74c3c;font-size:1.1rem;margin-left:8px;"><i class="fas fa-heart"></i> {{ mehsul.like_count }}</span>
             </div>
             <div class="product-row-image">
-                <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" onclick="openImageModal('{{ mehsul.sekil.url }}')">
+                <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }} - {{ mehsul.brend_kod }} {{ mehsul.firma.adi }} {{ mehsul.avtomobil.adi }}" title="{{ mehsul.adi }} - {{ mehsul.brend_kod }}" loading="lazy" onclick="openImageModal('{{ mehsul.sekil.url }}')">
             </div>
             <div class="product-row-info">
                 <div class="product-title"><a href="{% url 'product_detail' mehsul.id %}" style="color:inherit;text-decoration:none;">{{ mehsul.adi }} {{ mehsul.brend_kod }} {{ mehsul.firma.adi }}</a></div>

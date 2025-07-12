@@ -28,8 +28,15 @@ class ProductSitemap(Sitemap):
                 else:
                     domain = 'https://as-avto.com'
                 url['image_absolute_url'] = domain + obj.sekil.url
+                # Şəkil üçün əlavə metadata
+                url['image_title'] = obj.adi
+                url['image_caption'] = f"{obj.adi} - {obj.brend_kod}"
+                url['image_license'] = "https://as-avto.com"
             else:
                 url['image_absolute_url'] = ''
+                url['image_title'] = ''
+                url['image_caption'] = ''
+                url['image_license'] = ''
         return urls
 
     def image_urls(self, obj):

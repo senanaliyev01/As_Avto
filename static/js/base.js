@@ -969,7 +969,7 @@ function initializeProductsPage() {
                                     <span style='color:#e74c3c;font-size:1.1rem;margin-left:8px;'><i class='fas fa-heart'></i> ${product.like_count}</span>
                                 </div>
                                 <div class="product-row-image">
-                                    <img src="${product.sekil_url || '/static/images/no_image.webp'}" alt="${product.adi}" onclick="openImageModal('${product.sekil_url}')">
+                                    <img src="${product.sekil_url || '/static/images/no_image.webp'}" alt="${product.adi} - ${product.brend_kod} ${product.firma} ${product.avtomobil}" title="${product.adi} - ${product.brend_kod}" loading="lazy" onclick="openImageModal('${product.sekil_url}')">
                                 </div>
                                 <div class="product-row-info">
                                     <div class="product-title"><a href="/products/${product.id}/" style="color:inherit;text-decoration:none;">${product.adi} ${product.brend_kod} ${product.firma}</a></div>

@@ -34,7 +34,7 @@
                             
                             {% for item in order_items %}
                                 <tr class="{% if item.mehsul.sahib == request.user %}editable-row{% else %}non-editable-row{% endif %}">
-                                    <td><img src="{{ item.mehsul.sekil.url }}" alt="{{ item.mehsul.adi }}" class="product-image" onclick="openImageModal('{{ item.mehsul.sekil.url }}')"></td>
+                                    <td><img src="{{ item.mehsul.sekil.url }}" alt="{{ item.mehsul.adi }} - {{ item.mehsul.brend_kod }} {{ item.mehsul.firma.adi }} {{ item.mehsul.avtomobil.adi }}" title="{{ item.mehsul.adi }} - {{ item.mehsul.brend_kod }}" class="product-image" loading="lazy" onclick="openImageModal('{{ item.mehsul.sekil.url }}')"></td>
                                     <td>{{ item.mehsul.brend_kod }}</td>
                                     <td>{{ item.mehsul.firma.adi }}</td>
                                     <td>{{ item.mehsul.adi }}</td>

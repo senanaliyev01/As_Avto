@@ -10,7 +10,9 @@
         {% if url.image_absolute_url %}
         <image:image>
             <image:loc>{{ url.image_absolute_url }}</image:loc>
-            <image:title>{{ url.item.adi|default_if_none:"" }}</image:title>
+            <image:title>{{ url.image_title|default_if_none:"" }}</image:title>
+            {% if url.image_caption %}<image:caption>{{ url.image_caption }}</image:caption>{% endif %}
+            {% if url.image_license %}<image:license>{{ url.image_license }}</image:license>{% endif %}
         </image:image>
         {% endif %}
     </url>

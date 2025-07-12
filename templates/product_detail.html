@@ -13,9 +13,6 @@
     <meta property="og:image:alt" content="{{ mehsul.adi }} - {{ mehsul.brend_kod }}">
     <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
     <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
-
-{% block head %}
-    {{ block.super }}
     <script type="application/ld+json">
     {
       "@context": "https://schema.org/",

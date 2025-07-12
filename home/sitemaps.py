@@ -28,15 +28,48 @@ class ProductSitemap(Sitemap):
                 else:
                     domain = 'https://as-avto.com'
                 url['image_absolute_url'] = domain + obj.sekil.url
-                # Şəkil üçün əlavə metadata
-                url['image_title'] = obj.adi
-                url['image_caption'] = f"{obj.adi} - {obj.brend_kod}"
+                # Şəkil üçün ətraflı metadata
+                url['image_title'] = f"{obj.adi} - {obj.brend_kod}"
+                url['image_caption'] = f"{obj.adi} - {obj.brend_kod} {obj.firma.adi} {obj.avtomobil.adi}"
                 url['image_license'] = "https://as-avto.com"
+                url['image_geo_location'] = "Bakı, Azərbaycan"
+                url['image_geo_region'] = "AZ"
+                url['image_geo_placename'] = "Bakı"
+                url['image_geo_position'] = "40.3777;49.8920"
+                url['image_geo_title'] = f"{obj.adi} - {obj.brend_kod} - AS-AVTO"
+                url['image_license_url'] = "https://as-avto.com"
+                url['image_license_title'] = "AS-AVTO"
+                # Məhsul məlumatları
+                url['product_name'] = obj.adi
+                url['product_code'] = obj.brend_kod
+                url['product_brand'] = obj.firma.adi
+                url['product_vehicle'] = obj.avtomobil.adi
+                url['product_price'] = str(obj.qiymet)
+                url['product_stock'] = obj.stok
+                url['product_description'] = obj.melumat or f"{obj.adi} - {obj.brend_kod} {obj.firma.adi} {obj.avtomobil.adi}"
+                url['product_category'] = obj.kateqoriya.adi if obj.kateqoriya else "Avtomobil Ehtiyat Hissələri"
+                url['product_size'] = obj.olcu or ""
             else:
                 url['image_absolute_url'] = ''
                 url['image_title'] = ''
                 url['image_caption'] = ''
                 url['image_license'] = ''
+                url['image_geo_location'] = ''
+                url['image_geo_region'] = ''
+                url['image_geo_placename'] = ''
+                url['image_geo_position'] = ''
+                url['image_geo_title'] = ''
+                url['image_license_url'] = ''
+                url['image_license_title'] = ''
+                url['product_name'] = ''
+                url['product_code'] = ''
+                url['product_brand'] = ''
+                url['product_vehicle'] = ''
+                url['product_price'] = ''
+                url['product_stock'] = ''
+                url['product_description'] = ''
+                url['product_category'] = ''
+                url['product_size'] = ''
         return urls
 
     def image_urls(self, obj):

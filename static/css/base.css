@@ -3491,7 +3491,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    max-width: 400px;
+    max-width: 600px;
     min-width: 180px;
     margin: 0 12px;
 }

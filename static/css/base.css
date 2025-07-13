@@ -51,7 +51,7 @@ body {
     border-radius: 0 0 12px 12px;
     margin: 0 auto 12px auto;
     width: 100%;
-    max-width: 1200px;
+    max-width: 100%;
     min-width: 320px;
     box-shadow: 0 2px 12px rgba(44,62,80,0.06);
     padding: 0 18px;

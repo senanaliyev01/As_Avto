@@ -26,21 +26,19 @@
         <!-- Global Statistics Bar -->
         <div class="global-stats-bar global-stats-bar-header">
             <div class="global-stats-bar-content">
-                <!-- <span><b>İstifadəçi sayı:</b> {{ request.total_user_count }}</span>
-                <span><b>Satıcı sayı:</b> {{ request.total_seller_count }}</span>
-                <span><b>Məhsul sayı:</b> {{ request.total_product_count }}</span>
-                <span><b>Firma sayı:</b> {{ request.total_firma_count }}</span> -->
+                <!-- Proqramçı/Sistem sahibi məlumatı -->
+                <div class="stats-owner-info" style="display:flex;align-items:center;gap:14px;margin-right:auto;">
+                    <div style="width:48px;height:48px;min-width:48px;min-height:48px;border-radius:50%;overflow:hidden;box-shadow:0 2px 8px rgba(44,62,80,0.10);background:#fff;display:flex;align-items:center;justify-content:center;">
+                        <img src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y" alt="Sənan Əliyev" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+                    </div>
+                    <div style="display:flex;flex-direction:column;line-height:1.4;">
+                        <span style="font-weight:600;font-size:15px;">Proqramçı/Sistem sahibi: Sənan Əliyev</span>
+                        <span style="font-size:14px;">Əlaqə: <a href="tel:+994773959585" style="color:#3498db;text-decoration:none;">+994 77 395 95 85</a></span>
+                        <span style="font-size:14px;">Mail: <a href="mailto:senan.eliyev.9997@gmail.com" style="color:#3498db;text-decoration:none;">senan.eliyev.9997@gmail.com</a></span>
+                    </div>
+                </div>
                 <!-- Naviqasiya linkləri və Satıcı Paneli sayğacı -->
-                <div style="display:flex;align-items:center;gap:16px;">
-                  <div style="display:flex;align-items:center;gap:10px;">
-                    <img src="https://www.gravatar.com/avatar/7e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e?d=mp&s=40" alt="Sənan Əliyev" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid #3498db;">
-                    <span style="font-size:14px;font-weight:500;line-height:1.2;">
-                      Proqramçı sistem sahibi: Sənan Əliyev<br>
-                      <span style="font-size:13px;font-weight:400;">Əlaqə: <a href="tel:+994773959585" style="color:#3498db;text-decoration:none;">+994 77 395 95 85</a> | 
-                      <a href="mailto:senan.eliyev.9997@gmail.com" style="color:#3498db;text-decoration:none;">senan.eliyev.9997@gmail.com</a></span>
-                    </span>
-                  </div>
-                  <div class="stats-nav-links">
+                <span class="stats-nav-links">
                     <a href="{% url 'products' %}" class="stats-nav-link"><i class="fas fa-box"></i> Məhsullar</a>
                     <a href="{% url 'new_products' %}" class="stats-nav-link"><i class="fas fa-star"></i> Yeni Məhsullar</a>
                     <a href="{% url 'orders' %}" class="stats-nav-link"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a>
@@ -50,8 +48,7 @@
                         <span id="salesBadge" class="sales-badge-sidebar" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span>
                     </a>
                     {% endif %}
-                  </div>
-                </div>
+                </span>
             </div>
         </div>
         <!-- Header -->

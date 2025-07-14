@@ -4138,41 +4138,43 @@ body {
 .stats-nav-links {
     display: inline-flex;
     align-items: center;
-    gap: 18px;
-    margin-left: 32px;
-    vertical-align: middle;
+    gap: 12px;
+    margin-left: 18px;
 }
 .stats-nav-link {
-    display: inline-flex;
+    font-size: 15px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    background: #f8f9fa;
+    color: var(--primary-color);
+    font-weight: 500;
+    box-shadow: none;
+    border: 1px solid #e3e7ed;
+    transition: background 0.18s, color 0.18s;
+    display: flex;
     align-items: center;
     gap: 7px;
-    font-size: 1.08rem;
-    font-weight: 600;
-    color: #2B5173;
-    background: #fff;
-    border: 1.5px solid #e9ecef;
-    border-radius: 8px;
-    padding: 7px 18px;
-    text-decoration: none;
-    box-shadow: 0 1px 4px rgba(44, 62, 80, 0.06);
-    letter-spacing: 0.2px;
-    transition: background 0.18s, color 0.18s, border 0.18s, box-shadow 0.18s;
-    position: relative;
 }
 .stats-nav-link i {
-    font-size: 1.1rem;
-    color: #3a6ea5;
-    transition: color 0.18s;
+    font-size: 15px;
+    margin-right: 2px;
 }
 .stats-nav-link:hover, .stats-nav-link:focus {
-    background: #2B5173;
-    color: #fff;
-    border-color: #2B5173;
-    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.12);
-    text-decoration: none;
+    background: #eaf6ff;
+    color: var(--secondary-color);
 }
-.stats-nav-link:hover i, .stats-nav-link:focus i {
-    color: #ffd700;
+@media (max-width: 900px) {
+    .stats-nav-links {
+        gap: 8px;
+        margin-left: 4px;
+    }
+    .stats-nav-link {
+        font-size: 13px;
+        padding: 6px 10px;
+    }
+    .stats-nav-link i {
+        font-size: 13px;
+    }
 }
 
 /* Satıcı Paneli Linki üçün xüsusi dizayn */
@@ -5730,13 +5732,13 @@ body {
 .global-stats-bar .stats-nav-links {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     margin-left: 18px;
 }
 .global-stats-bar .stats-nav-link {
-    font-size: 13px;
-    padding: 5px 10px;
-    border-radius: 5px;
+    font-size: 15px;
+    padding: 8px 16px;
+    border-radius: 6px;
     background: #f8f9fa;
     color: var(--primary-color);
     font-weight: 500;
@@ -5745,10 +5747,10 @@ body {
     transition: background 0.18s, color 0.18s;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 7px;
 }
 .global-stats-bar .stats-nav-link i {
-    font-size: 13px;
+    font-size: 15px;
     margin-right: 2px;
 }
 .global-stats-bar .stats-nav-link:hover, .global-stats-bar .stats-nav-link:focus {
@@ -5757,12 +5759,15 @@ body {
 }
 @media (max-width: 900px) {
     .global-stats-bar .stats-nav-links {
-        gap: 6px;
+        gap: 8px;
         margin-left: 4px;
     }
     .global-stats-bar .stats-nav-link {
-        font-size: 12px;
-        padding: 4px 6px;
+        font-size: 13px;
+        padding: 6px 10px;
+    }
+    .global-stats-bar .stats-nav-link i {
+        font-size: 13px;
     }
 }
 /* --- End Global Stats Bar Link Styling --- */

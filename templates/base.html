@@ -31,7 +31,16 @@
                 <span><b>Məhsul sayı:</b> {{ request.total_product_count }}</span>
                 <span><b>Firma sayı:</b> {{ request.total_firma_count }}</span> -->
                 <!-- Naviqasiya linkləri və Satıcı Paneli sayğacı -->
-                <span class="stats-nav-links">
+                <div style="display:flex;align-items:center;gap:16px;">
+                  <div style="display:flex;align-items:center;gap:10px;">
+                    <img src="https://www.gravatar.com/avatar/7e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e?d=mp&s=40" alt="Sənan Əliyev" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid #3498db;">
+                    <span style="font-size:14px;font-weight:500;line-height:1.2;">
+                      Proqramçı sistem sahibi: Sənan Əliyev<br>
+                      <span style="font-size:13px;font-weight:400;">Əlaqə: <a href="tel:+994773959585" style="color:#3498db;text-decoration:none;">+994 77 395 95 85</a> | 
+                      <a href="mailto:senan.eliyev.9997@gmail.com" style="color:#3498db;text-decoration:none;">senan.eliyev.9997@gmail.com</a></span>
+                    </span>
+                  </div>
+                  <div class="stats-nav-links">
                     <a href="{% url 'products' %}" class="stats-nav-link"><i class="fas fa-box"></i> Məhsullar</a>
                     <a href="{% url 'new_products' %}" class="stats-nav-link"><i class="fas fa-star"></i> Yeni Məhsullar</a>
                     <a href="{% url 'orders' %}" class="stats-nav-link"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a>
@@ -41,7 +50,8 @@
                         <span id="salesBadge" class="sales-badge-sidebar" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span>
                     </a>
                     {% endif %}
-                </span>
+                  </div>
+                </div>
             </div>
         </div>
         <!-- Header -->

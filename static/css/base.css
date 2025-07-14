@@ -234,25 +234,27 @@ body {
 .global-stats-bar-content {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    max-width: var(--container-width);
-    margin: 0 auto;
-    gap: 18px;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 0;
 }
 .owner-card {
-    margin-right: 0;
+    order: 1;
+    margin-right: 24px;
     flex-shrink: 0;
 }
 .stats-nav-links {
-    display: flex;
-    gap: 10px;
-    align-items: center;
+    order: 2;
     margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: nowrap;
 }
 .stats-nav-link {
-    font-size: 13px;
-    padding: 6px 12px;
-    border-radius: 5px;
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 4px;
     font-weight: 500;
     background: #f8f9fa;
     color: var(--primary-color);
@@ -261,8 +263,8 @@ body {
     transition: background 0.2s, color 0.2s, box-shadow 0.2s;
 }
 .stats-nav-link i {
-    font-size: 14px;
-    margin-right: 3px;
+    font-size: 13px;
+    margin-right: 2px;
 }
 .stats-nav-link:hover, .stats-nav-link:focus {
     background: #eaf6ff;
@@ -288,9 +290,9 @@ body {
     }
     .owner-card {
         margin-bottom: 8px;
+        margin-right: 0;
     }
     .stats-nav-links {
-        justify-content: flex-start;
         margin-left: 0;
         flex-wrap: wrap;
         gap: 7px;

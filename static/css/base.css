@@ -234,10 +234,15 @@ body {
 .global-stats-bar-content {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    max-width: var(--container-width);
-    margin: 0 auto;
+    justify-content: space-between;
+    flex-wrap: wrap;
     gap: 18px;
+}
+.global-stats-bar-content > div {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
 }
 .stats-nav-links {
     display: flex;

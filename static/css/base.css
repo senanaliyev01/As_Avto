@@ -5578,3 +5578,87 @@ body {
         margin-bottom: 8px;
     }
 }
+
+/* --- Sistem sahibi kartı (owner-card) dizaynı --- */
+.owner-card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(44,62,80,0.07);
+    padding: 10px 22px 10px 10px;
+    margin-right: 24px;
+    border: 1.5px solid #e3e7ed;
+    min-width: 320px;
+    max-width: 420px;
+    transition: box-shadow 0.2s, border 0.2s;
+}
+.owner-card:hover {
+    box-shadow: 0 4px 24px rgba(44,62,80,0.13);
+    border: 1.5px solid var(--secondary-color);
+}
+.owner-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2.5px solid var(--secondary-color);
+    box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+    flex-shrink: 0;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.owner-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+}
+.owner-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.owner-name {
+    font-size: 1.08rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 2px;
+}
+.owner-phone, .owner-mail {
+    font-size: 0.97rem;
+    color: #444;
+    margin-bottom: 1px;
+}
+.owner-phone a, .owner-mail a {
+    color: var(--secondary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+.owner-phone a:hover, .owner-mail a:hover {
+    color: var(--accent-color);
+}
+@media (max-width: 700px) {
+    .owner-card {
+        min-width: 0;
+        max-width: 100%;
+        padding: 8px 10px;
+        margin-right: 8px;
+    }
+    .owner-avatar {
+        width: 48px;
+        height: 48px;
+    }
+    .owner-name {
+        font-size: 1rem;
+    }
+    .owner-phone, .owner-mail {
+        font-size: 0.92rem;
+    }
+}
+/* --- Sistem sahibi kartı (owner-card) dizaynı SON --- */

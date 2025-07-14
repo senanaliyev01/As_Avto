@@ -22,80 +22,108 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <header class="main-header">
-        <div class="main-header-inner">
-            <div class="main-header-logo-wrapper">
-                <a href="{% url 'base' %}" class="main-header-logo-link">
-                    <img src="{% static 'images/Header_Logo.png' %}" alt="AS-AVTO" class="main-header-logo-img">
-                </a>
-            </div>
-            <nav class="main-header-nav">
-                <ul class="main-header-nav-list">
-                    <li><a href="{% url 'products' %}" class="main-header-nav-link"><i class="fas fa-box"></i> Məhsullar</a></li>
-                    <li><a href="{% url 'new_products' %}" class="main-header-nav-link"><i class="fas fa-star"></i> Yeni Məhsullar</a></li>
-                    <li><a href="{% url 'orders' %}" class="main-header-nav-link"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a></li>
+    <div class="wrapper">
+        <!-- Global Statistics Bar -->
+        <div class="global-stats-bar global-stats-bar-header">
+            <div class="global-stats-bar-content">
+                <!-- <span><b>İstifadəçi sayı:</b> {{ request.total_user_count }}</span>
+                <span><b>Satıcı sayı:</b> {{ request.total_seller_count }}</span>
+                <span><b>Məhsul sayı:</b> {{ request.total_product_count }}</span>
+                <span><b>Firma sayı:</b> {{ request.total_firma_count }}</span> -->
+                <!-- Naviqasiya linkləri və Satıcı Paneli sayğacı -->
+                <span class="stats-nav-links">
+                    <a href="{% url 'products' %}" class="stats-nav-link"><i class="fas fa-box"></i> Məhsullar</a>
+                    <a href="{% url 'new_products' %}" class="stats-nav-link"><i class="fas fa-star"></i> Yeni Məhsullar</a>
+                    <a href="{% url 'orders' %}" class="stats-nav-link"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a>
                     {% if request.user.is_authenticated and request.user.profile.is_verified %}
-                    <li><a href="{% url 'seller_admin_panel' %}" class="main-header-nav-link seller-panel-link">
+                    <a href="{% url 'seller_admin_panel' %}" class="stats-nav-link seller-panel-link">
                         <i class="fas fa-cogs"></i> Satıcı Paneli
                         <span id="salesBadge" class="sales-badge-sidebar" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span>
-                    </a></li>
-                    {% endif %}
-                </ul>
-            </nav>
-            <form method="get" action="{% url 'products' %}" class="main-header-search-form">
-                <input type="text" id="query" name="search" placeholder="Məhsul, kod və ya ad axtar..." value="{{ request.GET.search }}" autocomplete="off" class="main-header-search-input">
-                <button type="submit" class="main-header-search-btn"><i class="fas fa-search"></i></button>
-            </form>
-            <div class="main-header-user">
-                <span class="main-header-balance">
-                    {% if request.statistics.umumi_borc < 0 %}
-                        <span style="color: #28a745; font-weight: bold;">Balans +{{ request.statistics.umumi_borc|floatformat:2|slice:'1:' }} ₼</span>
-                    {% else %}
-                        <i class="fas fa-money-bill-wave"></i> Borc: {{ request.statistics.umumi_borc|floatformat:2 }} ₼
+                    </a>
                     {% endif %}
                 </span>
-                <a href="#" class="main-header-cart" id="cartSidebarToggle">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span class="cart-counter">{{ request.session.cart|length }}</span>
-                </a>
-                {% if request.user.is_authenticated %}
-                <div class="main-header-user-dropdown">
-                    <button class="main-header-user-btn">
-                        <i class="fas fa-user"></i>
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <div class="main-header-user-dropdown-content">
-                        <a href="#" id="openProfileModal" class="user-name">
-                            <i class="fas fa-user"></i> {{ request.user.username }}
-                        </a>
-                        {% if request.user.profile.is_verified %}
-                        <div class="dropdown-divider"></div>
-                        {% endif %}
-                        <a href="{% url 'logout' %}" class="logout-link">
-                            <i class="fas fa-sign-out-alt"></i> Çıxış et
-                        </a>
-                    </div>
-                </div>
-                {% else %}
-                <div class="main-header-user-dropdown">
-                    <button class="main-header-user-btn">
-                        <i class="fas fa-user"></i>
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <div class="main-header-user-dropdown-content">
-                        <a href="#" id="openLoginModal" class="user-name">
-                            <i class="fas fa-sign-in-alt"></i> Daxil ol
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" id="openRegisterModal" class="user-name">
-                            <i class="fas fa-user-plus"></i> Qeydiyyat
-                        </a>
-                    </div>
-                </div>
-                {% endif %}
             </div>
         </div>
-    </header>
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content header-search-layout">
+                <div class="logo">
+                    <a href="{% url 'base' %}">
+                        <img src="{% static 'images/Header_Logo.png' %}" alt="AS-AVTO" class="logo-img">
+                    </a>
+                </div>
+                <form method="get" action="{% url 'products' %}" class="header-search-form">
+                    <div class="header-search-input-wrapper">
+                        <input type="text" id="query" name="search" placeholder="Məhsul, kod və ya ad axtar..." value="{{ request.GET.search }}" autocomplete="off" class="header-search-input">
+                        <button type="submit" class="header-search-btn"><i class="fas fa-search"></i></button>
+                        <div id="search-results" class="search-results"></div>
+                    </div>
+                </form>
+                <div class="header-right">
+                    <span class="total-debt">
+                        {% if request.statistics.umumi_borc < 0 %}
+                            <span style="color: #28a745; font-weight: bold;">Balans +{{ request.statistics.umumi_borc|floatformat:2|slice:'1:' }} ₼</span>
+                        {% else %}
+                            <i class="fas fa-money-bill-wave"></i> Borc: {{ request.statistics.umumi_borc|floatformat:2 }} ₼
+                        {% endif %}
+                    </span>
+                    <nav class="main-nav">
+                        <ul>
+                            <li><a href="#" class="nav-link nav-link-sm blink-news" id="yeniliklerLink"><i class="fas fa-bullhorn"></i> Yeniliklər</a></li>
+                            <li><a class="nav-link" href="{% url 'liked_products' %}"><i class="fas fa-heart"></i> Bəyəndiyim Məhsullar</a></li>
+                            <li>
+                                <a href="#" class="nav-link nav-link-sm {% if request.resolver_match.url_name == 'cart' %}active{% endif %}" id="cartSidebarToggle">
+                                    <span class="cart-icon">
+                                        <i class="fas fa-shopping-cart"></i>
+                                        <span class="cart-counter">{{ request.session.cart|length }}</span>
+                                    </span>
+                                    Səbət
+                                </a>
+                            </li>
+                            {% if request.user.is_authenticated %}
+                                <li class="user-menu">
+                                    <div class="user-dropdown">
+                                        <button class="user-button">
+                                            <i class="fas fa-user"></i>
+                                            <i class="fas fa-chevron-down"></i>
+                                        </button>
+                                        <div class="user-dropdown-content">
+                                            <a href="#" id="openProfileModal" class="user-name">
+                                                <i class="fas fa-user"></i> {{ request.user.username }}
+                                            </a>
+                                            {% if request.user.profile.is_verified %}
+                                            <div class="dropdown-divider"></div>
+                                            {% endif %}
+                                            <a href="{% url 'logout' %}" class="logout-link">
+                                                <i class="fas fa-sign-out-alt"></i> Çıxış et
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% else %}
+                                <li class="user-menu">
+                                    <div class="user-dropdown">
+                                        <button class="user-button">
+                                            <i class="fas fa-user"></i>
+                                            <i class="fas fa-chevron-down"></i>
+                                        </button>
+                                        <div class="user-dropdown-content">
+                                            <a href="#" id="openLoginModal" class="user-name">
+                                                <i class="fas fa-sign-in-alt"></i> Daxil ol
+                                            </a>
+                                            <div class="dropdown-divider"></div>
+                                            <a href="#" id="openRegisterModal" class="user-name">
+                                                <i class="fas fa-user-plus"></i> Qeydiyyat
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </header>
 
         {% if request.header_messages %}
         <div class="header-message">

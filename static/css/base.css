@@ -5441,3 +5441,287 @@ body {
         margin-bottom: 8px;
     }
 }
+
+/* --- New Modern Header Styles --- */
+.main-header {
+    width: 100%;
+    background: #fff;
+    box-shadow: 0 4px 24px rgba(44,62,80,0.10);
+    border-bottom: 2px solid var(--border-color);
+    position: relative;
+    z-index: 100;
+    padding: 0;
+}
+.main-header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px 18px 0;
+    position: relative;
+    gap: 24px;
+}
+.main-header-logo-wrapper {
+    position: relative;
+    flex: 0 0 auto;
+    z-index: 2;
+    margin-right: 32px;
+}
+.main-header-logo-link {
+    display: block;
+    position: relative;
+}
+.main-header-logo-img {
+    width: 180px;
+    height: 100px;
+    object-fit: contain;
+    display: block;
+    position: relative;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    filter: drop-shadow(0 4px 16px rgba(44,62,80,0.10));
+    transition: transform 0.2s;
+}
+.main-header-logo-img:hover {
+    transform: scale(1.04) rotate(-2deg);
+}
+.main-header-nav {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+.main-header-nav-list {
+    display: flex;
+    gap: 18px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.main-header-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--primary-color);
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    position: relative;
+}
+.main-header-nav-link:hover, .main-header-nav-link.active {
+    background: var(--light-gray);
+    color: var(--secondary-color);
+    box-shadow: 0 2px 8px rgba(44,62,80,0.06);
+}
+.seller-panel-link {
+    background: #dc3545;
+    color: #fff !important;
+    font-weight: bold;
+    border-radius: 8px;
+    padding: 8px 18px;
+    margin-left: 8px;
+    transition: background 0.2s;
+}
+.seller-panel-link:hover {
+    background: #b52a37;
+    color: #fff;
+}
+.main-header-search-form {
+    display: flex;
+    align-items: center;
+    background: #f5f6fa;
+    border-radius: 8px;
+    padding: 2px 8px 2px 16px;
+    margin: 0 24px;
+    min-width: 260px;
+    max-width: 340px;
+    flex: 0 0 320px;
+    box-shadow: 0 1px 4px rgba(44,62,80,0.04);
+}
+.main-header-search-input {
+    border: none;
+    background: transparent;
+    font-size: 15px;
+    padding: 8px 0;
+    outline: none;
+    width: 100%;
+    color: var(--primary-color);
+}
+.main-header-search-btn {
+    background: none;
+    border: none;
+    color: var(--secondary-color);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+.main-header-search-btn:hover {
+    background: #e9ecef;
+}
+.main-header-user {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    position: relative;
+    z-index: 2;
+}
+.main-header-balance {
+    font-size: 15px;
+    font-weight: 500;
+    color: #28a745;
+    margin-right: 8px;
+}
+.main-header-cart {
+    display: flex;
+    align-items: center;
+    position: relative;
+    color: var(--primary-color);
+    font-size: 22px;
+    text-decoration: none;
+    margin-right: 8px;
+    transition: color 0.2s;
+}
+.main-header-cart:hover {
+    color: var(--secondary-color);
+}
+.main-header-cart .cart-counter {
+    background: #dc3545;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 2px 7px;
+    position: absolute;
+    top: -8px;
+    right: -12px;
+    min-width: 22px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(220,53,69,0.15);
+}
+.main-header-user-dropdown {
+    position: relative;
+}
+.main-header-user-btn {
+    background: #f5f6fa;
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--primary-color);
+    cursor: pointer;
+    transition: background 0.2s;
+    box-shadow: 0 1px 4px rgba(44,62,80,0.04);
+}
+.main-header-user-btn:hover {
+    background: #e9ecef;
+}
+.main-header-user-dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 54px;
+    min-width: 180px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 8px 32px rgba(44,62,80,0.12);
+    padding: 12px 0;
+    z-index: 10;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.main-header-user-dropdown:hover .main-header-user-dropdown-content,
+.main-header-user-dropdown:focus-within .main-header-user-dropdown-content {
+    display: flex;
+}
+.main-header-user-dropdown-content a {
+    color: var(--primary-color);
+    text-decoration: none;
+    padding: 10px 24px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    transition: background 0.2s, color 0.2s;
+}
+.main-header-user-dropdown-content a:hover {
+    background: var(--light-gray);
+    color: var(--secondary-color);
+}
+.main-header-user-dropdown-content .dropdown-divider {
+    height: 1px;
+    background: #e9ecef;
+    margin: 6px 0;
+    width: 90%;
+    align-self: center;
+}
+
+/* Responsive Styles */
+@media (max-width: 900px) {
+    .main-header-inner {
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 12px 8px 12px 0;
+    }
+    .main-header-logo-img {
+        width: 140px;
+        height: 70px;
+    }
+    .main-header-search-form {
+        min-width: 180px;
+        max-width: 220px;
+        flex: 0 0 180px;
+        margin: 0 8px;
+    }
+    .main-header-nav-list {
+        gap: 10px;
+    }
+}
+@media (max-width: 600px) {
+    .main-header-inner {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 8px 2vw 8px 0;
+    }
+    .main-header-logo-wrapper {
+        margin: 0 auto 8px auto;
+        text-align: center;
+    }
+    .main-header-logo-img {
+        width: 110px;
+        height: 50px;
+    }
+    .main-header-nav-list {
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: center;
+    }
+    .main-header-search-form {
+        min-width: 100px;
+        max-width: 100%;
+        flex: 1 1 100%;
+        margin: 0 auto 8px auto;
+    }
+    .main-header-user {
+        justify-content: center;
+        gap: 10px;
+    }
+}
+
+/* Remove old header styles that may conflict */
+.header, .header-content, .logo, .logo-img, .main-nav, .main-nav ul, .nav-link, .header-right {
+    all: unset;
+    display: revert;
+}

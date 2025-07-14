@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import about_view, privacy_policy_view
 
 handler404 = 'home.views.custom_404'
 
@@ -43,4 +44,9 @@ urlpatterns = [
     path('like-product/', views.like_product, name='like_product'),
     path('rate-product/', views.rate_product, name='rate_product'),
     path('liked-products/', views.liked_products_view, name='liked_products'),
+]
+
+urlpatterns += [
+    path('about/', about_view, name='about'),
+    path('privacy-policy/', privacy_policy_view, name='privacy_policy'),
 ]

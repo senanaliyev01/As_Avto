@@ -1796,3 +1796,9 @@ def liked_products_view(request):
         m.avg_rating = m.ratings.aggregate(models.Avg('rating'))['rating__avg'] or 0
         m.like_count = m.likes.count()
     return render(request, 'liked_products.html', {'mehsullar': liked_products})
+
+def about_view(request):
+    return render(request, 'about.html')
+
+def privacy_policy_view(request):
+    return render(request, 'privacy_policy.html')

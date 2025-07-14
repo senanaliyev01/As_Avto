@@ -5662,3 +5662,66 @@ body {
     }
 }
 /* --- Sistem sahibi kartı (owner-card) dizaynı SON --- */
+
+/* --- About & Privacy Policy Page Styling --- */
+.page-container {
+    max-width: 800px;
+    margin: 36px auto 36px auto;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(44,62,80,0.08);
+    padding: 36px 32px 32px 32px;
+    font-size: 1.08rem;
+    color: var(--text-color);
+    line-height: 1.7;
+    border: 1.5px solid #e3e7ed;
+}
+.page-container h1 {
+    font-size: 2.1rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 18px;
+    letter-spacing: 0.5px;
+}
+.page-container h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+    margin-top: 28px;
+    margin-bottom: 10px;
+}
+.page-container ul {
+    margin: 0 0 18px 24px;
+    padding: 0;
+    list-style: disc inside;
+}
+.page-container li {
+    margin-bottom: 7px;
+    font-size: 1.05rem;
+    color: #444;
+}
+.page-container p {
+    margin-bottom: 18px;
+    color: #333;
+}
+.page-container a {
+    color: var(--secondary-color);
+    text-decoration: underline;
+    transition: color 0.2s;
+}
+.page-container a:hover {
+    color: var(--accent-color);
+}
+@media (max-width: 900px) {
+    .page-container {
+        padding: 22px 8px 18px 8px;
+        max-width: 98vw;
+    }
+    .page-container h1 {
+        font-size: 1.4rem;
+    }
+    .page-container h3 {
+        font-size: 1.08rem;
+    }
+}
+/* --- About & Privacy Policy Page Styling END --- */

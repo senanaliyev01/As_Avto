@@ -47,6 +47,8 @@
                     <a href="{% url 'products' %}" class="stats-nav-link"><i class="fas fa-box"></i> Məhsullar</a>
                     <a href="{% url 'new_products' %}" class="stats-nav-link"><i class="fas fa-star"></i> Yeni Məhsullar</a>
                     <a href="{% url 'orders' %}" class="stats-nav-link"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a>
+                    <a href="{% url 'about' %}" class="stats-nav-link"><i class="fas fa-info-circle"></i> Haqqımızda</a>
+                    <a href="{% url 'privacy_policy' %}" class="stats-nav-link"><i class="fas fa-user-shield"></i> Gizlilik Siyasəti</a>
                     {% if request.user.is_authenticated and request.user.profile.is_verified %}
                     <a href="{% url 'seller_admin_panel' %}" class="stats-nav-link seller-panel-link">
                         <i class="fas fa-cogs"></i> Satıcı Paneli

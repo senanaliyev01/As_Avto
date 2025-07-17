@@ -51,7 +51,7 @@ class StaticViewSitemap(Sitemap):
     def items(self):
         # Açıq səhifələrin URL adları (orders, cart, checkout, liked_products çıxarıldı):
         return [
-            'root', 'login', 'register', 'base', 'products', 'new_products', 'search_suggestions', 'product_detail'
+            'root', 'base', 'products', 'new_products', 'search_suggestions', 'product_detail', 'about', 'privacy_policy'
         ]
 
     def location(self, item):

@@ -56,6 +56,6 @@ class StaticViewSitemap(Sitemap):
 
     def location(self, item):
         if item == 'product_detail':
-            # Bir nümunə məhsul üçün göstərmək üçün (əslində bütün məhsullarr ProductSitemap-dadır)
-            return reverse(item, args=[1])
+            # Bir nümunə məhsul üçün göstərmək üçün (əslində bütün məhsullar ProductSitemap-dadır)
+            return reverse(item, args=[3091])
         return reverse(item) 

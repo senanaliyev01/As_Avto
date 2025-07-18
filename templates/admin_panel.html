@@ -8,15 +8,54 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
-    {% block extra_css %}{% endblock %}
+    {% block extra_css %}
+    <style>
+    .admin-sidebar {
+        width: 220px;
+        transition: width 0.2s;
+    }
+    .admin-layout.sidebar-collapsed .admin-sidebar {
+        width: 60px;
+    }
+    .admin-layout.sidebar-collapsed .admin-sidebar .sidebar-nav-item a {
+        justify-content: center;
+    }
+    .admin-layout.sidebar-collapsed .admin-sidebar .sidebar-nav-item a .sidebar-link-text,
+    .admin-layout.sidebar-collapsed .admin-sidebar .admin-panel-link .sidebar-link-text {
+        display: none;
+    }
+    .admin-layout.sidebar-collapsed .admin-sidebar .sidebar-nav-item a i,
+    .admin-layout.sidebar-collapsed .admin-sidebar .admin-panel-link i {
+        font-size: 1.5em;
+    }
+    .admin-layout.sidebar-collapsed .admin-main {
+        margin-left: 60px !important;
+    }
+    .admin-main {
+        transition: margin-left 0.2s;
+        margin-left: 220px;
+    }
+    .sidebar-toggle-btn {
+        background: none;
+        border: none;
+        font-size: 1.3em;
+        margin-right: 10px;
+        cursor: pointer;
+        color: #333;
+    }
+    </style>
+    {% endblock %}
 </head>
 <body>
     <div class="admin-layout">
         <!-- Sidebar -->
         <aside class="admin-sidebar">
             <div class="sidebar-header">
+                <button id="sidebarToggle" class="sidebar-toggle-btn" title="Paneli aç/bağla">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <a href="{% url 'seller_admin_panel' %}" class="admin-panel-link {% if request.resolver_match.url_name == 'seller_admin_panel' %}active{% endif %}">
-                    <i class="fas fa-cogs"></i> Satıcı Paneli
+                    <i class="fas fa-cogs"></i> <span class="sidebar-link-text">Satıcı Paneli</span>
                 </a>
             </div>
             <nav class="sidebar-nav">
@@ -320,6 +359,21 @@
             });
         }
     })();
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('sidebarToggle');
+        const layout = document.querySelector('.admin-layout');
+        toggleBtn.addEventListener('click', function() {
+            layout.classList.toggle('sidebar-collapsed');
+            if (layout.classList.contains('sidebar-collapsed')) {
+                localStorage.setItem('sidebar-collapsed', '1');
+            } else {
+                localStorage.removeItem('sidebar-collapsed');
+            }
+        });
+        if (localStorage.getItem('sidebar-collapsed') === '1') {
+            layout.classList.add('sidebar-collapsed');
+        }
+    });
     </script>
     {% endblock %}
 </body>

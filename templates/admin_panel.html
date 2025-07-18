@@ -13,29 +13,7 @@
 <body>
     <div class="admin-layout">
         <!-- Sidebar -->
-        <aside class="admin-sidebar">
-            <div class="sidebar-header">
-                <button id="sidebarToggle" class="sidebar-toggle-btn" title="Paneli aç/bağla">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <a href="{% url 'seller_admin_panel' %}" class="admin-panel-link {% if request.resolver_match.url_name == 'seller_admin_panel' %}active{% endif %}">
-                    <i class="fas fa-cogs"></i> Satıcı Paneli
-                </a>
-            </div>
-            <nav class="sidebar-nav">
-                <ul>
-                    <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'my_products' %}active{% endif %}">
-                        <a href="{% url 'my_products' %}"><i class="fas fa-box"></i> Mənim Məhsullarım</a>
-                    </li>
-                    <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'my_sales' %}active{% endif %}">
-                        <a href="{% url 'my_sales' %}" id="sidebarMySalesLink">
-                            <i class="fas fa-receipt"></i> Mənə gələn sifarişlər
-                            <span id="salesBadge" class="sales-badge-sidebar" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
+        <!-- Sidebar tamamilə silindi -->
         <!-- Main Content -->
         <div class="admin-main">
             <!-- Header -->
@@ -43,6 +21,19 @@
                 <div class="admin-header-left">
                     <span class="admin-header-title">{% if request.resolver_match.url_name == 'seller_admin_panel' %}Dashboard{% else %}{% block panel_title %}Satıcı Paneli{% endblock %}{% endif %}</span>
                 </div>
+                <nav class="admin-header-nav">
+                    <ul>
+                        <li class="{% if request.resolver_match.url_name == 'my_products' %}active{% endif %}">
+                            <a href="{% url 'my_products' %}"><i class="fas fa-box"></i> Mənim Məhsullarım</a>
+                        </li>
+                        <li class="{% if request.resolver_match.url_name == 'my_sales' %}active{% endif %}">
+                            <a href="{% url 'my_sales' %}" id="sidebarMySalesLink">
+                                <i class="fas fa-receipt"></i> Mənə gələn sifarişlər
+                                <span id="salesBadge" class="sales-badge-sidebar" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
                 <div class="admin-header-right">
                     <span class="admin-user">
                         <img src="{{ request.user.profile.sekil.url|default:'/static/images/no_image.jpg' }}" alt="Profil şəkli" class="admin-user-avatar" style="width:36px;height:36px;border-radius:50%;object-fit:cover;margin-right:8px;vertical-align:middle;">
@@ -271,23 +262,6 @@
     </div>
     <script src="{% static 'js/base.js' %}"></script>
     {% block extra_js %}
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const toggleBtn = document.getElementById('sidebarToggle');
-        const layout = document.querySelector('.admin-layout');
-        toggleBtn.addEventListener('click', function() {
-            layout.classList.toggle('sidebar-collapsed');
-            if (layout.classList.contains('sidebar-collapsed')) {
-                localStorage.setItem('sidebar-collapsed', '1');
-            } else {
-                localStorage.removeItem('sidebar-collapsed');
-            }
-        });
-        if (localStorage.getItem('sidebar-collapsed') === '1') {
-            layout.classList.add('sidebar-collapsed');
-        }
-    });
-    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
     // Real-time sales badge və mesaj səsi üçün kod

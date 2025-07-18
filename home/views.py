@@ -153,8 +153,7 @@ def home_view(request):
 
 def products_view(request):
     search_query = request.GET.get('search', '')
-    order = request.GET.get('order', '-id')
-    mehsullar = Mehsul.objects.all().order_by(order)
+    mehsullar = Mehsul.objects.all().order_by('-id')
     popup_images = PopupImage.objects.filter(aktiv=True)
     if search_query:
         mehsullar = mehsullar.annotate(
@@ -190,15 +189,17 @@ def products_view(request):
                     firma_filter = reduce(or_, [Q(firma__adi__icontains=variation) for variation in word_variations])
                     ad_filters.append(word_filter | melumat_filter | avtomobil_filter | firma_filter)
                 ad_filter = reduce(and_, ad_filters)
+                # search_text üçün AND və AZ variantları ilə
                 searchtext_and_filter = reduce(
                     and_,
                     [reduce(or_, [Q(search_text__icontains=variation) for variation in normalize_azerbaijani_chars(word)]) for word in search_words]
                 )
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | melumat_filter | brend_kod_filter | ad_filter | searchtext_and_filter).order_by(order)
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | melumat_filter | brend_kod_filter | ad_filter | searchtext_and_filter).order_by('-id')
             else:
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | melumat_filter | brend_kod_filter).order_by(order)
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | melumat_filter | brend_kod_filter).order_by('-id')
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
+    # Hər məhsul üçün ortalama reytinq və bəyənmə sayı əlavə et
     for m in initial_products:
         m.avg_rating = m.ratings.aggregate(models.Avg('rating'))['rating__avg'] or 0
         m.like_count = m.likes.count()
@@ -214,8 +215,7 @@ def load_more_products(request):
     offset = int(request.GET.get('offset', 0))
     limit = 5
     search_query = request.GET.get('search', '')
-    order = request.GET.get('order', '-id')
-    mehsullar = Mehsul.objects.all().order_by(order)
+    mehsullar = Mehsul.objects.all().order_by('-id')
     if search_query:
         mehsullar = mehsullar.annotate(
             search_text=Concat(
@@ -244,9 +244,9 @@ def load_more_products(request):
                     and_,
                     [reduce(or_, [Q(search_text__icontains=variation) for variation in normalize_azerbaijani_chars(word)]) for word in search_words]
                 )
-                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | ad_filter | searchtext_and_filter).order_by(order)
+                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | ad_filter | searchtext_and_filter).order_by('-id')
             else:
-                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter).order_by(order)
+                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter).order_by('-id')
     products = mehsullar[offset:offset + limit]
     has_more = mehsullar.count() > (offset + limit)
     products_data = []
@@ -622,8 +622,7 @@ def search_suggestions(request):
 
 def new_products_view(request):
     search_query = request.GET.get('search', '')
-    order = request.GET.get('order', '-id')
-    mehsullar = Mehsul.objects.filter(yenidir=True).order_by(order)
+    mehsullar = Mehsul.objects.filter(yenidir=True).order_by('-id')
     if search_query:
         mehsullar = mehsullar.annotate(
             search_text=Concat(
@@ -661,9 +660,9 @@ def new_products_view(request):
                     and_,
                     [reduce(or_, [Q(search_text__icontains=variation) for variation in normalize_azerbaijani_chars(word)]) for word in search_words]
                 )
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | searchtext_and_filter).order_by(order)
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter | ad_filter | searchtext_and_filter)
             else:
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter).order_by(order)
+                mehsullar = mehsullar.filter(kod_filter | olcu_filter | brend_kod_filter)
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
     kateqoriyalar = Kateqoriya.objects.all()
@@ -687,8 +686,7 @@ def load_more_new_products(request):
     offset = int(request.GET.get('offset', 0))
     limit = 5
     search_query = request.GET.get('search', '')
-    order = request.GET.get('order', '-id')
-    mehsullar = Mehsul.objects.filter(yenidir=True).order_by(order)
+    mehsullar = Mehsul.objects.filter(yenidir=True).order_by('-id')
     if search_query:
         mehsullar = mehsullar.annotate(
             search_text=Concat(
@@ -717,9 +715,9 @@ def load_more_new_products(request):
                     and_,
                     [reduce(or_, [Q(search_text__icontains=variation) for variation in normalize_azerbaijani_chars(word)]) for word in search_words]
                 )
-                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | ad_filter | searchtext_and_filter).order_by(order)
+                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter | ad_filter | searchtext_and_filter)
             else:
-                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter).order_by(order)
+                mehsullar = mehsullar.filter(kod_filter | brend_kod_filter)
     products = mehsullar[offset:offset + limit]
     has_more = mehsullar.count() > (offset + limit)
     products_data = []

@@ -530,19 +530,19 @@ def search_suggestions(request):
     if search_query:
         mehsullar = Mehsul.objects.all()
         mehsullar = get_search_filtered_products(mehsullar, search_query, order_by_wilson=True)[:5]
-            suggestions = []
-            for mehsul in mehsullar:
-                suggestions.append({
-                    'id': mehsul.id,
-                    'adi': mehsul.adi,
-                    'brend_kod': mehsul.brend_kod,
-                    'oem': mehsul.oem,
-                    'olcu': mehsul.olcu,
-                    'qiymet': str(mehsul.qiymet),
-                    'sekil_url': mehsul.sekil.url if mehsul.sekil else None,
-                    'satici': mehsul.sahib.username if mehsul.sahib else 'AS-AVTO',
-                })
-            return JsonResponse({'suggestions': suggestions})
+        suggestions = []
+        for mehsul in mehsullar:
+            suggestions.append({
+                'id': mehsul.id,
+                'adi': mehsul.adi,
+                'brend_kod': mehsul.brend_kod,
+                'oem': mehsul.oem,
+                'olcu': mehsul.olcu,
+                'qiymet': str(mehsul.qiymet),
+                'sekil_url': mehsul.sekil.url if mehsul.sekil else None,
+                'satici': mehsul.sahib.username if mehsul.sahib else 'AS-AVTO',
+            })
+        return JsonResponse({'suggestions': suggestions})
     return JsonResponse({'suggestions': []})
 
 

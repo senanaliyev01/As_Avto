@@ -156,11 +156,29 @@ def products_view(request):
     mehsullar = Mehsul.objects.all()
     popup_images = PopupImage.objects.filter(aktiv=True)
     mehsullar = get_search_filtered_products(mehsullar, search_query, order_by_wilson=True)
-    initial_products = mehsullar[:5]
+    initial_products = list(mehsullar[:5])
     has_more = mehsullar.count() > 5
+
+    # Wilson score hesabla (base.html-dəki kimi)
+    def wilson_score(sum_rating, rating_count, max_rating=5, confidence=0.95):
+        if not rating_count or not sum_rating:
+            return 0
+        z = 1.96  # 95% confidence
+        phat = (sum_rating / rating_count) / max_rating
+        n = rating_count
+        denominator = 1 + z*z/n
+        centre = phat + z*z/(2*n)
+        margin = z * sqrt((phat*(1-phat) + z*z/(4*n)) / n)
+        score = (centre - margin) / denominator
+        return score
+
     for m in initial_products:
         m.avg_rating = m.ratings.aggregate(models.Avg('rating'))['rating__avg'] or 0
         m.like_count = m.likes.count()
+        m.sum_rating = m.ratings.aggregate(Sum('rating'))['rating__sum'] or 0
+        m.rating_count = m.ratings.count()
+        m.wilson_score = wilson_score(m.sum_rating, m.rating_count)
+
     return render(request, 'products.html', {
         'mehsullar': initial_products,
         'has_more': has_more,
@@ -514,15 +532,33 @@ def new_products_view(request):
     search_query = request.GET.get('search', '')
     mehsullar = Mehsul.objects.filter(yenidir=True)
     mehsullar = get_search_filtered_products(mehsullar, search_query, order_by_wilson=True)
-    initial_products = mehsullar[:5]
+    initial_products = list(mehsullar[:5])
     has_more = mehsullar.count() > 5
     kateqoriyalar = Kateqoriya.objects.all()
     firmalar = Firma.objects.all()
     avtomobiller = Avtomobil.objects.all()
     popup_images = PopupImage.objects.filter(aktiv=True)
+
+    from math import sqrt
+    def wilson_score(sum_rating, rating_count, max_rating=5, confidence=0.95):
+        if not rating_count or not sum_rating:
+            return 0
+        z = 1.96
+        phat = (sum_rating / rating_count) / max_rating
+        n = rating_count
+        denominator = 1 + z*z/n
+        centre = phat + z*z/(2*n)
+        margin = z * sqrt((phat*(1-phat) + z*z/(4*n)) / n)
+        score = (centre - margin) / denominator
+        return score
+
     for m in initial_products:
         m.avg_rating = m.ratings.aggregate(models.Avg('rating'))['rating__avg'] or 0
         m.like_count = m.likes.count()
+        m.sum_rating = m.ratings.aggregate(Sum('rating'))['rating__sum'] or 0
+        m.rating_count = m.ratings.count()
+        m.wilson_score = wilson_score(m.sum_rating, m.rating_count)
+
     return render(request, 'new_products.html', {
         'mehsullar': initial_products,
         'has_more': has_more,

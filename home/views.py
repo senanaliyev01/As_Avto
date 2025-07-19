@@ -195,10 +195,27 @@ def load_more_products(request):
     mehsullar = get_search_filtered_products(mehsullar, search_query, order_by_wilson=True)
     products = mehsullar[offset:offset + limit]
     has_more = mehsullar.count() > (offset + limit)
+
+    from math import sqrt
+    def wilson_score(sum_rating, rating_count, max_rating=5, confidence=0.95):
+        if not rating_count or not sum_rating:
+            return 0
+        z = 1.96
+        phat = (sum_rating / rating_count) / max_rating
+        n = rating_count
+        denominator = 1 + z*z/n
+        centre = phat + z*z/(2*n)
+        margin = z * sqrt((phat*(1-phat) + z*z/(4*n)) / n)
+        score = (centre - margin) / denominator
+        return score
+
     products_data = []
     for product in products:
         avg_rating = product.ratings.aggregate(models.Avg('rating'))['rating__avg'] or 0
         like_count = product.likes.count()
+        sum_rating = product.ratings.aggregate(Sum('rating'))['rating__sum'] or 0
+        rating_count = product.ratings.count()
+        wilson = wilson_score(sum_rating, rating_count)
         products_data.append({
             'id': product.id,
             'adi': product.adi,
@@ -216,6 +233,7 @@ def load_more_products(request):
             'sahib_username': product.sahib.username if product.sahib else 'AS-AVTO',
             'avg_rating': avg_rating,
             'like_count': like_count,
+            'wilson_score': wilson,
         })
     return JsonResponse({
         'products': products_data,
@@ -577,10 +595,27 @@ def load_more_new_products(request):
     mehsullar = get_search_filtered_products(mehsullar, search_query, order_by_wilson=True)
     products = mehsullar[offset:offset + limit]
     has_more = mehsullar.count() > (offset + limit)
+
+    from math import sqrt
+    def wilson_score(sum_rating, rating_count, max_rating=5, confidence=0.95):
+        if not rating_count or not sum_rating:
+            return 0
+        z = 1.96
+        phat = (sum_rating / rating_count) / max_rating
+        n = rating_count
+        denominator = 1 + z*z/n
+        centre = phat + z*z/(2*n)
+        margin = z * sqrt((phat*(1-phat) + z*z/(4*n)) / n)
+        score = (centre - margin) / denominator
+        return score
+
     products_data = []
     for product in products:
         avg_rating = product.ratings.aggregate(models.Avg('rating'))['rating__avg'] or 0
         like_count = product.likes.count()
+        sum_rating = product.ratings.aggregate(Sum('rating'))['rating__sum'] or 0
+        rating_count = product.ratings.count()
+        wilson = wilson_score(sum_rating, rating_count)
         products_data.append({
             'id': product.id,
             'adi': product.adi,
@@ -598,6 +633,7 @@ def load_more_new_products(request):
             'sahib_username': product.sahib.username if product.sahib else 'AS-AVTO',
             'avg_rating': avg_rating,
             'like_count': like_count,
+            'wilson_score': wilson,
         })
     return JsonResponse({
         'products': products_data,
@@ -663,8 +699,27 @@ def load_more_my_products(request):
     mehsullar = get_search_filtered_products(mehsullar, search_query, order_by_wilson=True)
     products = mehsullar[offset:offset+limit]
     has_more = mehsullar.count() > (offset + limit)
+
+    from math import sqrt
+    def wilson_score(sum_rating, rating_count, max_rating=5, confidence=0.95):
+        if not rating_count or not sum_rating:
+            return 0
+        z = 1.96
+        phat = (sum_rating / rating_count) / max_rating
+        n = rating_count
+        denominator = 1 + z*z/n
+        centre = phat + z*z/(2*n)
+        margin = z * sqrt((phat*(1-phat) + z*z/(4*n)) / n)
+        score = (centre - margin) / denominator
+        return score
+
     products_data = []
     for product in products:
+        avg_rating = product.ratings.aggregate(models.Avg('rating'))['rating__avg'] or 0
+        like_count = product.likes.count()
+        sum_rating = product.ratings.aggregate(Sum('rating'))['rating__sum'] or 0
+        rating_count = product.ratings.count()
+        wilson = wilson_score(sum_rating, rating_count)
         products_data.append({
             'id': product.id,
             'adi': product.adi,
@@ -675,6 +730,9 @@ def load_more_my_products(request):
             'qiymet': str(product.qiymet),
             'yenidir': product.yenidir,
             'qalan_vaxt': product.qalan_vaxt() if product.yenidir else None,
+            'avg_rating': avg_rating,
+            'like_count': like_count,
+            'wilson_score': wilson,
         })
     return JsonResponse({'products': products_data, 'has_more': has_more})
 

@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .models import Mehsul, Kateqoriya, Sifaris, SifarisItem, Firma, Avtomobil, PopupImage, Header_Message, Vitrin, ProductLike, ProductRating
-from django.db.models import Q, Sum, F, Case, When, DecimalField, Avg, Count
+from django.db.models import Q, Sum, F, Case, When, DecimalField, Avg, Count, FloatField
 from decimal import Decimal
 from django.contrib import messages
 import re
@@ -30,7 +30,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 import io
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models.functions import Concat
+from django.db.models.functions import Concat, Cast
 from django.db.models import CharField
 from django.db import models
 from math import sqrt
@@ -153,9 +153,9 @@ def home_view(request):
 
 def products_view(request):
     search_query = request.GET.get('search', '')
-    mehsullar = Mehsul.objects.all().order_by('-id')
+    mehsullar = Mehsul.objects.all()
     popup_images = PopupImage.objects.filter(aktiv=True)
-    mehsullar = get_search_filtered_products(mehsullar, search_query).order_by('-id')
+    mehsullar = get_search_filtered_products(mehsullar, search_query, order_by_wilson=True)
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
     for m in initial_products:
@@ -173,8 +173,8 @@ def load_more_products(request):
     offset = int(request.GET.get('offset', 0))
     limit = 5
     search_query = request.GET.get('search', '')
-    mehsullar = Mehsul.objects.all().order_by('-id')
-    mehsullar = get_search_filtered_products(mehsullar, search_query).order_by('-id')
+    mehsullar = Mehsul.objects.all()
+    mehsullar = get_search_filtered_products(mehsullar, search_query, order_by_wilson=True)
     products = mehsullar[offset:offset + limit]
     has_more = mehsullar.count() > (offset + limit)
     products_data = []
@@ -493,7 +493,7 @@ def search_suggestions(request):
     search_query = request.GET.get('search', '')
     if search_query:
         mehsullar = Mehsul.objects.all()
-        mehsullar = get_search_filtered_products(mehsullar, search_query).order_by('-id')[:5]
+        mehsullar = get_search_filtered_products(mehsullar, search_query, order_by_wilson=True)[:5]
         suggestions = []
         for mehsul in mehsullar:
             suggestions.append({
@@ -512,8 +512,8 @@ def search_suggestions(request):
 
 def new_products_view(request):
     search_query = request.GET.get('search', '')
-    mehsullar = Mehsul.objects.filter(yenidir=True).order_by('-id')
-    mehsullar = get_search_filtered_products(mehsullar, search_query).order_by('-id')
+    mehsullar = Mehsul.objects.filter(yenidir=True)
+    mehsullar = get_search_filtered_products(mehsullar, search_query, order_by_wilson=True)
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
     kateqoriyalar = Kateqoriya.objects.all()
@@ -537,8 +537,8 @@ def load_more_new_products(request):
     offset = int(request.GET.get('offset', 0))
     limit = 5
     search_query = request.GET.get('search', '')
-    mehsullar = Mehsul.objects.filter(yenidir=True).order_by('-id')
-    mehsullar = get_search_filtered_products(mehsullar, search_query).order_by('-id')
+    mehsullar = Mehsul.objects.filter(yenidir=True)
+    mehsullar = get_search_filtered_products(mehsullar, search_query, order_by_wilson=True)
     products = mehsullar[offset:offset + limit]
     has_more = mehsullar.count() > (offset + limit)
     products_data = []
@@ -605,8 +605,8 @@ def my_products_view(request):
         messages.error(request, 'Bu səhifəyə giriş üçün icazəniz yoxdur.')
         return redirect('base')
     search_query = request.GET.get('search', '')
-    mehsullar = Mehsul.objects.filter(sahib=request.user).order_by('-id')
-    mehsullar = get_search_filtered_products(mehsullar, search_query).order_by('-id')
+    mehsullar = Mehsul.objects.filter(sahib=request.user)
+    mehsullar = get_search_filtered_products(mehsullar, search_query, order_by_wilson=True)
     initial_products = mehsullar[:5]
     has_more = mehsullar.count() > 5
     return render(request, 'my_products.html', {
@@ -623,8 +623,8 @@ def load_more_my_products(request):
     offset = int(request.GET.get('offset', 0))
     limit = 5
     search_query = request.GET.get('search', '')
-    mehsullar = Mehsul.objects.filter(sahib=request.user).order_by('-id')
-    mehsullar = get_search_filtered_products(mehsullar, search_query).order_by('-id')
+    mehsullar = Mehsul.objects.filter(sahib=request.user)
+    mehsullar = get_search_filtered_products(mehsullar, search_query, order_by_wilson=True)
     products = mehsullar[offset:offset+limit]
     has_more = mehsullar.count() > (offset + limit)
     products_data = []
@@ -1554,14 +1554,41 @@ def privacy_policy_view(request):
 
 # UNIVERSAL SEARCH FILTER
 
-def get_search_filtered_products(queryset, search_query):
+def get_search_filtered_products(queryset, search_query, order_by_wilson=True):
     import re
     from functools import reduce
     from operator import and_, or_
-    from django.db.models import Q, Value, CharField
-    from django.db.models.functions import Concat
+    from django.db.models import Q, Value, CharField, Avg, Count, Sum, FloatField
+    from django.db.models.functions import Concat, Cast
+    from math import sqrt
 
     if not search_query:
+        # Wilson score annotasiyası əlavə et
+        if order_by_wilson:
+            queryset = queryset.annotate(
+                sum_rating=Sum('ratings__rating'),
+                rating_count=Count('ratings'),
+            )
+            # Wilson score hesabla (SQL səviyyəsində mümkün deyil, amma annotate ilə təxmini)
+            # Ən yaxşısı: python səviyyəsində sort etməkdir, amma burada annotate ilə sıralayırıq
+            def wilson_score(sum_rating, rating_count, max_rating=5, confidence=0.95):
+                if not rating_count or not sum_rating:
+                    return 0
+                z = 1.96  # 95% confidence
+                phat = (sum_rating / rating_count) / max_rating
+                n = rating_count
+                denominator = 1 + z*z/n
+                centre = phat + z*z/(2*n)
+                margin = z * sqrt((phat*(1-phat) + z*z/(4*n)) / n)
+                score = (centre - margin) / denominator
+                return score
+            # Annotate üçün: sadəcə ortalama reytinq və sayına görə sıralayırıq
+            queryset = queryset.annotate(
+                avg_rating=Avg('ratings__rating'),
+                rating_count=Count('ratings'),
+            ).order_by(
+                '-rating_count', '-avg_rating', '-id'
+            )
         return queryset
 
     queryset = queryset.annotate(
@@ -1636,4 +1663,10 @@ def get_search_filtered_products(queryset, search_query):
             queryset = queryset.filter(
                 kod_filter | olcu_filter | melumat_filter | brend_kod_filter
             )
+    if order_by_wilson:
+        queryset = queryset.annotate(
+            sum_rating=Sum('ratings__rating'),
+            rating_count=Count('ratings'),
+            avg_rating=Avg('ratings__rating'),
+        ).order_by('-rating_count', '-avg_rating', '-id')
     return queryset

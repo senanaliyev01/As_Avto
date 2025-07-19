@@ -967,6 +967,7 @@ function initializeProductsPage() {
                                     ${[1,2,3,4,5].map(i => `<span style='color:${product.avg_rating >= i ? '#FFD700' : (product.avg_rating >= (i-1) ? '#FFD70099' : '#ccc')};font-size:1.1rem;'>&#9733;</span>`).join('')}
                                     <span style='color:#2B5173;font-size:1rem;'>${parseFloat(product.avg_rating).toFixed(1)}</span>
                                     <span style='color:#e74c3c;font-size:1.1rem;margin-left:8px;'><i class='fas fa-heart'></i> ${product.like_count}</span>
+                                    <span style='color:#888;font-size:0.95rem;margin-left:8px;'>Dəyər Xalı: ${typeof product.wilson_score !== 'undefined' ? parseFloat(product.wilson_score).toFixed(3) : '-'}</span>
                                 </div>
                                 <div class="product-row-image">
                                     <img src="${product.sekil_url || '/static/images/no_image.webp'}" alt="${product.adi} - ${product.brend_kod} ${product.firma} ${product.avtomobil}" title="${product.adi} - ${product.brend_kod}" loading="lazy" onclick="openImageModal('${product.sekil_url}')">

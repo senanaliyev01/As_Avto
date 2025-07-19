@@ -22,7 +22,6 @@ from django.http import HttpResponse, FileResponse, Http404
 from django.contrib.sitemaps.views import sitemap
 from home.sitemaps import ProductSitemap, StaticViewSitemap
 import os
-from django.conf.urls.i18n import i18n_patterns
 
 
 
@@ -47,7 +46,6 @@ urlpatterns = [
     path('robots.txt', robots_txt_view),
     path('sw.js', service_worker_view, name='service_worker'),
     path('sitemap.xml', sitemap, {'sitemaps': {'products': ProductSitemap, 'static': StaticViewSitemap}, 'template_name': 'sitemap.xml'}, name='django.contrib.sitemaps.views.sitemap'),
-    path('i18n/', include('django.conf.urls.i18n')),
 ]
 
 if settings.DEBUG:

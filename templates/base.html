@@ -51,14 +51,6 @@
                         <span id="salesBadge" class="sales-badge-sidebar" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span>
                     </a>
                     {% endif %}
-                    <form action="{% url 'set_language' %}" method="post" id="languageSelector" style="display:inline;margin-left:16px;">
-                        {% csrf_token %}
-                        <select name="language" onchange="this.form.submit();" style="padding:4px 8px; border-radius:4px;">
-                            <option value="az" {% if LANGUAGE_CODE == 'az' %}selected{% endif %}>Azərbaycan dili</option>
-                            <option value="en" {% if LANGUAGE_CODE == 'en' %}selected{% endif %}>English</option>
-                        </select>
-                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                    </form>
                 </span>
             </div>
         </div>

@@ -77,14 +77,6 @@
                             <i class="fas fa-money-bill-wave"></i> Borc: {{ request.statistics.umumi_borc|floatformat:2 }} ₼
                         {% endif %}
                     </span>
-                    <div class="language-switcher" style="display:flex;align-items:center;gap:8px;margin-left:16px;">
-                        <a href="#" onclick="setLanguage('en'); return false;" title="English">
-                            <img src="https://flagcdn.com/24x18/gb.png" alt="English" style="width:24px;height:18px;">
-                        </a>
-                        <a href="#" onclick="setLanguage('az'); return false;" title="Azərbaycan dili">
-                            <img src="https://flagcdn.com/24x18/az.png" alt="Azərbaycan" style="width:24px;height:18px;">
-                        </a>
-                    </div>
                     <nav class="main-nav">
                         <ul>
                             <li><a href="#" class="nav-link nav-link-sm blink-news" id="yeniliklerLink"><i class="fas fa-bullhorn"></i> Yeniliklər</a></li>
@@ -548,39 +540,5 @@
             </form>
         </div>
     </div>
-
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // İngilis dili üçün
-        document.getElementById('lang-en').addEventListener('click', function(e) {
-            e.preventDefault();
-            localStorage.setItem('site_lang', 'en');
-            var currentUrl = window.location.origin + window.location.pathname + window.location.search;
-            var translateUrl = 'https://translate.google.com/translate?hl=en&sl=az&u=' + encodeURIComponent(currentUrl);
-            window.location.href = translateUrl;
-        });
-        // Azərbaycan dili üçün
-        document.getElementById('lang-az').addEventListener('click', function(e) {
-            e.preventDefault();
-            localStorage.setItem('site_lang', 'az');
-            // Orijinal sayta yönləndir
-            var origin = window.location.origin + window.location.pathname + window.location.search;
-            window.location.href = origin;
-        });
-
-        // Hər səhifə yüklənəndə avtomatik yönləndir
-        var lang = localStorage.getItem('site_lang');
-        if (lang === 'en' && !window.location.href.includes('translate.google.com')) {
-            var currentUrl = window.location.origin + window.location.pathname + window.location.search;
-            var translateUrl = 'https://translate.google.com/translate?hl=en&sl=az&u=' + encodeURIComponent(currentUrl);
-            window.location.href = translateUrl;
-        }
-        // Əgər azərbaycan dili seçilibsə və translate.google.com-dasansa, orijinala qaytar
-        if (lang === 'az' && window.location.href.includes('translate.google.com')) {
-            var origin = window.location.origin + window.location.pathname + window.location.search;
-            window.location.href = origin;
-        }
-    });
-    </script>
 </body>
 </html>

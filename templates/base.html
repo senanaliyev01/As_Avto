@@ -548,5 +548,39 @@
             </form>
         </div>
     </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // İngilis dili üçün
+        document.getElementById('lang-en').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.setItem('site_lang', 'en');
+            var currentUrl = window.location.origin + window.location.pathname + window.location.search;
+            var translateUrl = 'https://translate.google.com/translate?hl=en&sl=az&u=' + encodeURIComponent(currentUrl);
+            window.location.href = translateUrl;
+        });
+        // Azərbaycan dili üçün
+        document.getElementById('lang-az').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.setItem('site_lang', 'az');
+            // Orijinal sayta yönləndir
+            var origin = window.location.origin + window.location.pathname + window.location.search;
+            window.location.href = origin;
+        });
+
+        // Hər səhifə yüklənəndə avtomatik yönləndir
+        var lang = localStorage.getItem('site_lang');
+        if (lang === 'en' && !window.location.href.includes('translate.google.com')) {
+            var currentUrl = window.location.origin + window.location.pathname + window.location.search;
+            var translateUrl = 'https://translate.google.com/translate?hl=en&sl=az&u=' + encodeURIComponent(currentUrl);
+            window.location.href = translateUrl;
+        }
+        // Əgər azərbaycan dili seçilibsə və translate.google.com-dasansa, orijinala qaytar
+        if (lang === 'az' && window.location.href.includes('translate.google.com')) {
+            var origin = window.location.origin + window.location.pathname + window.location.search;
+            window.location.href = origin;
+        }
+    });
+    </script>
 </body>
 </html>

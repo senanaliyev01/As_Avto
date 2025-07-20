@@ -31,12 +31,7 @@ def robots_txt_view(request):
         content = f.read()
     return HttpResponse(content, content_type="text/plain")
 
-def service_worker_view(request):
-    # Faylın tam yolunu göstər
-    sw_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'sw.js')
-    if os.path.exists(sw_path):
-        return FileResponse(open(sw_path, 'rb'), content_type='application/javascript')
-    raise Http404("sw.js tapılmadı")
+
 
 handler404 = 'home.views.custom_404'
 
@@ -44,7 +39,6 @@ urlpatterns = [
     path('admin-as-avto-1983-2002/', admin.site.urls),
     path('', include('home.urls')),
     path('robots.txt', robots_txt_view),
-    path('sw.js', service_worker_view, name='service_worker'),
     path('sitemap.xml', sitemap, {'sitemaps': {'products': ProductSitemap, 'static': StaticViewSitemap}, 'template_name': 'sitemap.xml'}, name='django.contrib.sitemaps.views.sitemap'),
 ]
 

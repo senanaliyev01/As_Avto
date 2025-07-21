@@ -96,47 +96,35 @@
                                     Cart
                                 </a>
                             </li>
-                            {% if request.user.is_authenticated %}
-                                <li class="user-menu">
-                                    <div class="user-dropdown">
-                                        <button class="user-button">
-                                            <i class="fas fa-user"></i>
-                                            <i class="fas fa-chevron-down"></i>
-                                        </button>
-                                        <div class="user-dropdown-content">
-                                            <a href="#" id="openProfileModal" class="user-name">
-                                                <i class="fas fa-user"></i> {{ request.user.username }}
-                                            </a>
-                                            {% if request.user.profile.is_verified %}
-                                            <div class="dropdown-divider"></div>
-                                            {% endif %}
-                                            <a href="{% url 'logout' %}" class="logout-link">
-                                                <i class="fas fa-sign-out-alt"></i> Logout
-                                            </a>
-                                        </div>
-                                    </div>
-                                </li>
-                            {% else %}
-                                <li class="user-menu">
-                                    <div class="user-dropdown">
-                                        <button class="user-button">
-                                            <i class="fas fa-user"></i>
-                                            <i class="fas fa-chevron-down"></i>
-                                        </button>
-                                        <div class="user-dropdown-content">
-                                            <a href="#" id="openLoginModal" class="user-name">
-                                                <i class="fas fa-sign-in-alt"></i> Login
-                                            </a>
-                                            <div class="dropdown-divider"></div>
-                                            <a href="#" id="openRegisterModal" class="user-name">
-                                                <i class="fas fa-user-plus"></i> Register
-                                            </a>
-                                        </div>
-                                    </div>
-                                </li>
-                            {% endif %}
                         </ul>
+                        {% if not request.user.is_authenticated %}
+                        <div class="auth-buttons" style="margin-top: 10px; display: flex; gap: 10px;">
+                            <button class="btn btn-primary" id="showLoginModalBtn" type="button">Login</button>
+                            <button class="btn btn-secondary" id="showRegisterModalBtn" type="button">Register</button>
+                        </div>
+                        {% endif %}
                     </nav>
+                    {% if request.user.is_authenticated %}
+                    <div class="user-menu">
+                        <div class="user-dropdown">
+                            <button class="user-button">
+                                <i class="fas fa-user"></i>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="user-dropdown-content">
+                                <a href="#" id="openProfileModal" class="user-name">
+                                    <i class="fas fa-user"></i> {{ request.user.username }}
+                                </a>
+                                {% if request.user.profile.is_verified %}
+                                <div class="dropdown-divider"></div>
+                                {% endif %}
+                                <a href="{% url 'logout' %}" class="logout-link">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </header>
@@ -546,5 +534,23 @@
             </form>
         </div>
     </div>
+
+    <script>
+    // Show login/register modal on button click
+    document.addEventListener('DOMContentLoaded', function() {
+        var loginBtn = document.getElementById('showLoginModalBtn');
+        var registerBtn = document.getElementById('showRegisterModalBtn');
+        if (loginBtn) {
+            loginBtn.addEventListener('click', function() {
+                document.getElementById('loginModal').style.display = 'block';
+            });
+        }
+        if (registerBtn) {
+            registerBtn.addEventListener('click', function() {
+                document.getElementById('registerModal').style.display = 'block';
+            });
+        }
+    });
+    </script>
 </body>
 </html>

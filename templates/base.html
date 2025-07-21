@@ -97,12 +97,6 @@
                                 </a>
                             </li>
                         </ul>
-                        {% if not request.user.is_authenticated %}
-                        <div class="auth-buttons" style="margin-top: 10px; display: flex; gap: 10px;">
-                            <button class="btn btn-primary" id="showLoginModalBtn" type="button">Login</button>
-                            <button class="btn btn-secondary" id="showRegisterModalBtn" type="button">Register</button>
-                        </div>
-                        {% endif %}
                     </nav>
                     {% if request.user.is_authenticated %}
                     <div class="user-menu">
@@ -139,7 +133,12 @@
         </div>
         {% endif %}
 
-
+        {% if not request.user.is_authenticated %}
+        <div class="auth-buttons-center" style="display: flex; justify-content: center; align-items: center; gap: 16px; margin: 24px 0 0 0;">
+            <button class="btn btn-primary" id="showLoginModalBtn" type="button">Login</button>
+            <button class="btn btn-secondary" id="showRegisterModalBtn" type="button">Register</button>
+        </div>
+        {% endif %}
 
         {% if request.resolver_match.url_name == 'base' and new_products %}
         <section class="product-section new-products-section">

@@ -90,7 +90,7 @@ def login_view(request):
             login(request, user)
             return JsonResponse({'success': True})
         else:
-            return JsonResponse({'success': False, 'error': 'İstifadəçi adı və ya şifrə yanlışdır'})
+            return JsonResponse({'success': False, 'error': 'Invalid username or password'})
     return redirect('base')
 
 
@@ -270,7 +270,7 @@ def cart_view(request):
             if str(product_id) in cart:
                 del cart[str(product_id)]
         request.session.modified = True
-        messages.warning(request, 'Bəzi məhsullar artıq mövcud olmadığı üçün səbətdən silindi.')
+        messages.warning(request, 'Some products were removed from the cart because they are no longer available.')
     
     return render(request, 'cart.html', {
         'cart_items': cart_items,
@@ -290,7 +290,7 @@ def add_to_cart(request, product_id):
         }
         
         if quantity > product.stok:
-            response_data['message'] = f'{product.adi} məhsulundan stokda yalnız {product.stok} ədəd var!'
+            response_data['message'] = f'Only {product.stok} units of {product.adi} are in stock!'
             return JsonResponse(response_data)
         
         if 'cart' not in request.session:
@@ -301,7 +301,7 @@ def add_to_cart(request, product_id):
         new_quantity = current_quantity + quantity
         
         if new_quantity > product.stok:
-            response_data['message'] = f'{product.adi} məhsulundan stokda yalnız {product.stok} ədəd var!'
+            response_data['message'] = f'Only {product.stok} units of {product.adi} are in stock!'
             return JsonResponse(response_data)
         
         cart[str(product_id)] = new_quantity
@@ -310,7 +310,7 @@ def add_to_cart(request, product_id):
         
         response_data.update({
             'status': 'success',
-            'message': f'{product.adi} məhsulundan {quantity} ədəd səbətə əlavə edildi!',
+            'message': f'{quantity} units of {product.adi} added to cart!',
             'cart_count': len(cart)
         })
         
@@ -329,13 +329,13 @@ def remove_from_cart(request, product_id):
                 
                 return JsonResponse({
                     'status': 'success',
-                    'message': 'Məhsul səbətdən silindi!',
+                    'message': 'Product removed from cart!',
                     'cart_count': len(cart)
                 })
     
         return JsonResponse({
             'status': 'error',
-            'message': 'Məhsul tapılmadı!'
+            'message': 'Product not found!'
         })
         
     return JsonResponse({
@@ -359,7 +359,7 @@ def orders_view(request):
 def checkout(request):
     if request.method == 'POST':
         if 'cart' not in request.session or not request.session['cart']:
-            messages.error(request, 'Səbətiniz boşdur.')
+            messages.error(request, 'Your cart is empty.')
             return redirect('cart')
 
         # Seçilmiş məhsulları al
@@ -367,11 +367,11 @@ def checkout(request):
         catdirilma_usulu = request.POST.get('catdirilma_usulu')
         
         if not selected_items:
-            messages.error(request, 'Zəhmət olmasa ən azı bir məhsul seçin.')
+            messages.error(request, 'Please select at least one product.')
             return redirect('cart')
             
         if not catdirilma_usulu:
-            messages.error(request, 'Zəhmət olmasa çatdırılma üsulunu seçin.')
+            messages.error(request, 'Please select a delivery method.')
             return redirect('cart')
 
         cart = request.session['cart']
@@ -384,7 +384,7 @@ def checkout(request):
             if product_id in selected_items:
                 product = get_object_or_404(Mehsul, id=product_id)
                 if product.stok < quantity:
-                    errors.append(f'{product.adi} məhsulundan kifayət qədər stok yoxdur.')
+                    errors.append(f'Not enough stock for {product.adi}.')
                     continue
                 seller_id = product.sahib.id if product.sahib else 'asavto'
                 if seller_id not in order_items_by_seller:
@@ -439,17 +439,17 @@ def checkout(request):
             request.session.modified = True
 
             if len(created_orders) == 1:
-                messages.success(request, 'Sifarişiniz uğurla yaradıldı.')
+                messages.success(request, 'Your order was created successfully.')
             elif len(created_orders) > 1:
-                messages.success(request, f'{len(created_orders)} ayrı sifariş yaradıldı (fərqli satıcılar üçün).')
+                messages.success(request, f'{len(created_orders)} separate orders were created (for different sellers).')
             else:
-                messages.error(request, 'Sifariş yaradılmadı.')
+                messages.error(request, 'Order was not created.')
             return redirect('orders')
         except Exception as e:
             # Əgər hər hansı bir order yaradılıbsa, onları sil
             for order in created_orders:
                 order.delete()
-            messages.error(request, 'Sifariş yaradılarkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.')
+            messages.error(request, 'An error occurred while creating the order. Please try again.')
             return redirect('cart')
 
     return redirect('cart')
@@ -467,11 +467,11 @@ def update_cart(request, product_id):
             }
             
             if quantity > product.stok:
-                response_data['message'] = f'{product.adi} məhsulundan stokda yalnız {product.stok} ədəd var!'
+                response_data['message'] = f'Only {product.stok} units of {product.adi} are in stock!'
                 return JsonResponse(response_data)
             
             if quantity < 1:
-                response_data['message'] = 'Miqdar 1-dən az ola bilməz!'
+                response_data['message'] = 'Quantity cannot be less than 1!'
                 return JsonResponse(response_data)
             
             cart = request.session.get('cart', {})
@@ -488,7 +488,7 @@ def update_cart(request, product_id):
             
             response_data.update({
                 'status': 'success',
-                'message': f'{product.adi} məhsulunun miqdarı yeniləndi!',
+                'message': f'Quantity of {product.adi} updated!',
                 'subtotal': f'{subtotal} ₼',
                 'cart_total': f'{cart_total} ₼'
             })
@@ -498,12 +498,12 @@ def update_cart(request, product_id):
         except ValueError:
             return JsonResponse({
                 'status': 'error',
-                'message': 'Yanlış miqdar daxil edildi!'
+                'message': 'Invalid quantity entered!'
             })
         except Exception as e:
             return JsonResponse({
                 'status': 'error',
-                'message': 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.'
+                'message': 'An error occurred. Please try again.'
             })
     
     return JsonResponse({
@@ -655,11 +655,11 @@ def register_view(request):
         phone = request.POST.get('phone', '')
         address = request.POST.get('address', '')
         if User.objects.filter(username=username).exists():
-            return JsonResponse({'success': False, 'error': 'Bu istifadəçi adı artıq mövcuddur'})
+            return JsonResponse({'success': False, 'error': 'This username is already taken'})
         if User.objects.filter(email=email).exists():
-            return JsonResponse({'success': False, 'error': 'Bu email artıq mövcuddur'})
+            return JsonResponse({'success': False, 'error': 'This email is already taken'})
         if phone and hasattr(User, 'profile') and hasattr(User.profile, 'phone') and User.objects.filter(profile__phone=phone).exists():
-            return JsonResponse({'success': False, 'error': 'Bu telefon nömrəsi artıq mövcuddur'})
+            return JsonResponse({'success': False, 'error': 'This phone number is already taken'})
         user = User.objects.create_user(username=username, email=email, password=password)
         user.profile.phone = phone
         user.profile.address = address
@@ -674,7 +674,7 @@ def register_view(request):
 @login_required
 def my_products_view(request):
     if not request.user.profile.is_verified:
-        messages.error(request, 'Bu səhifəyə giriş üçün icazəniz yoxdur.')
+        messages.error(request, 'You do not have permission to access this page.')
         return redirect('base')
     search_query = request.GET.get('search', '')
     mehsullar = Mehsul.objects.filter(sahib=request.user)
@@ -739,7 +739,7 @@ def load_more_my_products(request):
 @login_required
 def my_sales_view(request):
     if not request.user.profile.is_verified:
-        messages.error(request, 'Bu səhifəyə giriş üçün icazəniz yoxdur.')
+        messages.error(request, 'You do not have permission to access this page.')
         return redirect('base')
 
     all_orders = Sifaris.objects.all().order_by('-tarix')
@@ -793,13 +793,13 @@ def my_sales_view(request):
 @login_required
 def edit_my_sale_view(request, order_id):
     if not request.user.profile.is_verified:
-        messages.error(request, 'Bu səhifəyə giriş üçün icazəniz yoxdur.')
+        messages.error(request, 'You do not have permission to access this page.')
         return redirect('my_sales')
 
     order = get_object_or_404(Sifaris, id=order_id)
     # Yalnız həmin satıcıya aid məhsulları olan sifarişlərə baxmaq üçün yoxlama
     if not SifarisItem.objects.filter(sifaris=order, mehsul__sahib=request.user).exists():
-        messages.error(request, 'Bu sifarişi redaktə etmək üçün icazəniz yoxdur.')
+        messages.error(request, 'You do not have permission to edit this order.')
         return redirect('my_sales')
 
     # Sifarişin öz məhsulları üçün formset yarat
@@ -830,10 +830,10 @@ def edit_my_sale_view(request, order_id):
             form.save()
             formset.save()
             order.update_total() # Formset save olanda onsuz da total update olur, amma zəmanət üçün
-            messages.success(request, f"Sifariş #{order.id} uğurla yeniləndi.")
+            messages.success(request, f"Order #{order.id} updated successfully.")
             return redirect('my_sales')
         else:
-            messages.error(request, "Zəhmət olmasa xətaları düzəldin.")
+            messages.error(request, "Please correct the errors.")
 
     else:
         form = SifarisEditForm(instance=order)
@@ -853,13 +853,13 @@ def edit_my_sale_view(request, order_id):
 @login_required
 def add_edit_product_view(request, product_id=None):
     if not request.user.profile.is_verified:
-        messages.error(request, 'Bu əməliyyatı etmək üçün icazəniz yoxdur.')
+        messages.error(request, 'You do not have permission to perform this action.')
         return redirect('my_products')
 
     if product_id:
         mehsul = get_object_or_404(Mehsul, id=product_id)
         if mehsul.sahib != request.user:
-            messages.error(request, 'Bu məhsulu redaktə etmək üçün icazəniz yoxdur.')
+            messages.error(request, 'You do not have permission to edit this product.')
             return redirect('my_products')
     else:
         mehsul = None
@@ -898,7 +898,7 @@ def add_edit_product_view(request, product_id=None):
                 thread.daemon = True
                 thread.start()
             
-            messages.success(request, f'Məhsul uğurla {"yeniləndi" if mehsul else "əlavə edildi"}.')
+            messages.success(request, f'Product successfully {"updated" if mehsul else "added"}.')
             return redirect('my_products')
     else:
         form = MehsulForm(instance=mehsul)
@@ -908,16 +908,16 @@ def add_edit_product_view(request, product_id=None):
 @login_required
 def delete_product_view(request, product_id):
     if not request.user.profile.is_verified:
-        messages.error(request, 'Bu əməliyyatı etmək üçün icazəniz yoxdur.')
+        messages.error(request, 'You do not have permission to perform this action.')
         return redirect('my_products')
 
     mehsul = get_object_or_404(Mehsul, id=product_id)
     if mehsul.sahib != request.user:
-        messages.error(request, 'Bu məhsulu silmək üçün icazəniz yoxdur.')
+        messages.error(request, 'You do not have permission to delete this product.')
         return redirect('my_products')
     
     mehsul.delete()
-    messages.success(request, 'Məhsul uğurla silindi.')
+    messages.success(request, 'Product deleted successfully.')
     return redirect('my_products')
 
 @require_http_methods(["GET"])
@@ -938,12 +938,12 @@ def user_details_view(request, user_id):
     except User.DoesNotExist:
         data = {
             'status': 'error',
-            'message': 'İstifadəçi tapılmadı.'
+            'message': 'User not found.'
         }
     except Exception as e:
         data = {
             'status': 'error',
-            'message': 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.'
+            'message': 'An error occurred. Please try again.'
         }
     
     return JsonResponse(data)
@@ -952,17 +952,17 @@ def user_details_view(request, user_id):
 @transaction.atomic
 def import_user_products_view(request):
     if not request.user.profile.is_verified:
-        messages.error(request, "Bu əməliyyatı etmək üçün icazəniz yoxdur.")
+        messages.error(request, "You do not have permission to perform this action.")
         return redirect('my_products')
 
     if request.method == 'POST':
         excel_file = request.FILES.get("excel_file")
         if not excel_file:
-            messages.error(request, 'Zəhmət olmasa Excel faylı seçin')
+            messages.error(request, 'Please select an Excel file')
             return redirect('my_products')
         
         if not excel_file.name.endswith('.xlsx'):
-            messages.error(request, 'Yalnız .xlsx faylları qəbul edilir')
+            messages.error(request, 'Only .xlsx files are accepted')
             return redirect('my_products')
             
         try:
@@ -994,7 +994,7 @@ def import_user_products_view(request):
                         vitrin, _ = Vitrin.objects.get_or_create(nomre=str(row['vitrin']).strip())
 
                     if 'adi' not in row or pd.isna(row['adi']):
-                        messages.error(request, f'Sətir {index + 2}: Məhsulun adı boşdur.', level=messages.ERROR)
+                        messages.error(request, f'Error occurred while processing row {index + 2}: Məhsulun adı boşdur.', level=messages.ERROR)
                         error_count += 1
                         continue
 
@@ -1012,7 +1012,7 @@ def import_user_products_view(request):
                                 brend_kod = None
 
                     if not brend_kod:
-                        messages.error(request, f'Sətir {index + 2}: Brend kodu boşdur.', level=messages.ERROR)
+                        messages.error(request, f'Error occurred while processing row {index + 2}: Brend kodu boşdur.', level=messages.ERROR)
                         error_count += 1
                         continue
 
@@ -1061,26 +1061,26 @@ def import_user_products_view(request):
                         new_count += 1
 
                 except Exception as e:
-                    messages.error(request, f'Sətir {index + 2} emal edilərkən xəta baş verdi: {e}', level=messages.ERROR)
+                    messages.error(request, f'Error occurred while processing row {index + 2}: {e}', level=messages.ERROR)
                     error_count += 1
                     continue
             
-            success_message = f"Excel faylı uğurla import edildi! "
+            success_message = f"Excel file imported successfully! "
             if new_count > 0:
-                success_message += f"{new_count} yeni məhsul əlavə edildi. "
+                success_message += f"{new_count} new products added. "
             if update_count > 0:
-                success_message += f"{update_count} məhsul yeniləndi. "
+                success_message += f"{update_count} products updated. "
             
             if error_count > 0:
-                messages.warning(request, f"{error_count} sətirdə xəta baş verdi.")
+                messages.warning(request, f"Errors occurred in {error_count} rows.")
             
             if new_count > 0 or update_count > 0:
                 messages.success(request, success_message)
             elif error_count == 0:
-                messages.info(request, "Faylda heç bir dəyişiklik edilmədi.")
+                messages.info(request, "No changes were made in the file.")
 
         except Exception as e:
-            messages.error(request, f'Excel faylı oxunarkən xəta: {e}', level=messages.ERROR)
+            messages.error(request, f'Error reading Excel file: {e}', level=messages.ERROR)
         
         return redirect('my_products')
     
@@ -1314,17 +1314,17 @@ def update_profile(request):
         sekil = request.FILES.get('sekil')
         # Username yoxlaması
         if not username:
-            return JsonResponse({'status': 'error', 'message': 'İstifadəçi adı boş ola bilməz!'}, status=400)
+            return JsonResponse({'status': 'error', 'message': 'Username cannot be empty!'}, status=400)
         if username != user.username and User.objects.filter(username=username).exclude(id=user.id).exists():
-            return JsonResponse({'status': 'error', 'message': 'Bu istifadəçi adı artıq mövcuddur!'}, status=400)
+            return JsonResponse({'status': 'error', 'message': 'This username is already taken!'}, status=400)
         # Telefon yoxlaması
         if not phone:
-            return JsonResponse({'status': 'error', 'message': 'Telefon boş ola bilməz!'}, status=400)
+            return JsonResponse({'status': 'error', 'message': 'Phone cannot be empty!'}, status=400)
         if profile and phone != profile.phone and User.objects.filter(profile__phone=phone).exclude(id=user.id).exists():
-            return JsonResponse({'status': 'error', 'message': 'Bu telefon nömrəsi artıq istifadə olunur!'}, status=400)
+            return JsonResponse({'status': 'error', 'message': 'This phone number is already in use!'}, status=400)
         # Ünvan yoxlaması
         if not address:
-            return JsonResponse({'status': 'error', 'message': 'Ünvan boş ola bilməz!'}, status=400)
+            return JsonResponse({'status': 'error', 'message': 'Address cannot be empty!'}, status=400)
         # Yenilə
         user.username = username
         user.save()
@@ -1429,7 +1429,7 @@ def unread_sales_count(request):
 def seller_admin_panel(request):
     if not request.user.is_authenticated or not hasattr(request.user, 'profile') or not request.user.profile.is_verified:
         from django.contrib import messages
-        messages.error(request, 'Satıcı panelinə giriş üçün icazəniz yoxdur.')
+        messages.error(request, 'You do not have permission to access the seller panel.')
         return redirect('base')
     
     # Dashboard statistikaları
@@ -1536,14 +1536,14 @@ def toggle_product_new_status(request, product_id):
                 'success': True,
                 'yenidir': mehsul.yenidir,
                 'qalan_vaxt': mehsul.qalan_vaxt() if mehsul.yenidir else None,
-                'message': 'Məhsul yeni statusu yeniləndi'
+                'message': 'Product new status updated'
             })
         except Exception as e:
             return JsonResponse({
                 'success': False,
-                'message': 'Xəta baş verdi'
+                'message': 'An error occurred'
             })
-    return JsonResponse({'success': False, 'message': 'Yanlış sorğu'})
+    return JsonResponse({'success': False, 'message': 'Invalid request'})
 
 @csrf_exempt
 @login_required
@@ -1558,7 +1558,7 @@ def change_product_image(request, product_id):
             'success': True,
             'sekil_url': mehsul.sekil.url
         })
-    return JsonResponse({'success': False, 'message': 'Şəkil yüklənmədi'})
+    return JsonResponse({'success': False, 'message': 'Image upload failed'})
 
 def root_view(request):
     if request.user.is_authenticated:
@@ -1623,7 +1623,7 @@ def rate_product(request):
     comment = request.POST.get('comment', '').strip()
     mehsul = get_object_or_404(Mehsul, id=product_id)
     if rating_value < 1 or rating_value > 5:
-        return JsonResponse({'success': False, 'error': 'Yanlış reytinq'}, status=400)
+        return JsonResponse({'success': False, 'error': 'Invalid rating'}, status=400)
     rating, created = ProductRating.objects.update_or_create(
         user=request.user, mehsul=mehsul,
         defaults={'rating': rating_value, 'comment': comment}

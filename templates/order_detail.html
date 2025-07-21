@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
-{% block title %}Sifariş #{{ order.id }} - AS-AVTO{% endblock %}
+{% block title %}Order #{{ order.id }} - AS-AVTO{% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="order-header">
-        <h2>Sifariş #{{ order.id }}</h2>
+        <h2>Order #{{ order.id }}</h2>
         <a href="{% url 'orders' %}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Sifarişlərə qayıt
+            <i class="fas fa-arrow-left"></i> Back to Orders
         </a>
     </div>
 
@@ -16,7 +16,7 @@
             <div class="header-summary">
                 <div class="summary-item">
                     <i class="fas fa-calendar"></i>
-                    <span class="summary-label">Sifariş tarixi:</span>
+                    <span class="summary-label">Order date:</span>
                     <span class="summary-value">{{ order.tarix|date:"d.m.Y H:i" }}</span>
             </div>
                 <div class="summary-item">
@@ -28,42 +28,42 @@
             </div>
                 <div class="summary-item">
                     <i class="fas fa-truck"></i>
-                    <span class="summary-label">Çatdırılma:</span>
+                    <span class="summary-label">Delivery:</span>
                     <span class="delivery-badge">
                         {{ order.get_catdirilma_usulu_display }}
                     </span>
                 </div>
                 <div class="summary-item">
                     <i class="fas fa-money-bill-wave"></i>
-                    <span class="summary-label">Ümumi məbləğ:</span>
+                    <span class="summary-label">Total amount:</span>
                     <span class="summary-value">{{ order.umumi_mebleg }} ₼</span>
                 </div>
                 <div class="summary-item">
                     <i class="fas fa-check-circle"></i>
-                    <span class="summary-label">Ödənilən:</span>
+                    <span class="summary-label">Paid:</span>
                     <span class="summary-value">{{ order.odenilen_mebleg }} ₼</span>
             </div>
                 <div class="summary-item">
                     <i class="fas fa-exclamation-circle"></i>
-                    <span class="summary-label">Qalıq borc:</span>
+                    <span class="summary-label">Remaining debt:</span>
                     <span class="summary-value">{{ order.qaliq_borc }} ₼</span>
             </div>
         </div>
     </div>
 
         <div class="order-items">
-    <h3>Sifariş edilən məhsullar</h3>
+    <h3>Ordered Products</h3>
     <table class="table">
         <thead>
             <tr>
-                <th>Şəkil</th>
-                <th>Kodu</th>
-                <th>Firma Adı</th>
-                <th>Məhsul Adı</th>
+                <th>Image</th>
+                <th>Code</th>
+                <th>Brand Name</th>
+                <th>Product Name</th>
                 <!-- <th>OEM</th> -->
-                <th>Miqdar</th>
-                <th>Qiymət</th>
-                <th>Cəmi</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
             </tr>
         </thead>
         <tbody>

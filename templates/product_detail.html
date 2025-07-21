@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{mehsul.brend_kod}} {{ mehsul.adi }} {{mehsul.firma.adi}} {{mehsul.avtomobil.adi}} - Məhsul Detalları{% endblock %}
+{% block title %}{{mehsul.brend_kod}} {{ mehsul.adi }} {{mehsul.firma.adi}} {{mehsul.avtomobil.adi}} - Product Details{% endblock %}
 
 {% block head %}
     {{ block.super }}
-    <meta name="description" content="{{ mehsul.adi }} - {{ mehsul.brend_kod }} {{ mehsul.firma.adi }} {{ mehsul.avtomobil.adi }}. Qiymət: {{ mehsul.qiymet }} ₼. Stok: {{ mehsul.stok }} ədəd.">
-    <meta name="keywords" content="{{ mehsul.adi }}, {{ mehsul.brend_kod }}, {{ mehsul.firma.adi }}, {{ mehsul.avtomobil.adi }}, avtomobil ehtiyat hissələri">
+    <meta name="description" content="{{ mehsul.adi }} - {{ mehsul.brend_kod }} {{ mehsul.firma.adi }} {{ mehsul.avtomobil.adi }}. Price: {{ mehsul.qiymet }} ₼. Stock: {{ mehsul.stok }} pcs.">
+    <meta name="keywords" content="{{ mehsul.adi }}, {{ mehsul.brend_kod }}, {{ mehsul.firma.adi }}, {{ mehsul.avtomobil.adi }}, auto spare parts">
     <meta property="og:title" content="{{ mehsul.adi }} - {{ mehsul.brend_kod }}">
-    <meta property="og:description" content="{{ mehsul.adi }} - {{ mehsul.brend_kod }} {{ mehsul.firma.adi }} {{ mehsul.avtomobil.adi }}. Qiymət: {{ mehsul.qiymet }} ₼">
+    <meta property="og:description" content="{{ mehsul.adi }} - {{ mehsul.brend_kod }} {{ mehsul.firma.adi }} {{ mehsul.avtomobil.adi }}. Price: {{ mehsul.qiymet }} ₼">
     <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ mehsul.sekil.url }}">
     <meta property="og:image:alt" content="{{ mehsul.adi }} - {{ mehsul.brend_kod }}">
     <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
@@ -218,25 +218,25 @@
         </div>
         <!-- Ort. reytinq ayrıca blokda, ulduzlarla və rəy sayı ilə -->
         <div id="avg-rating-block" style="margin-bottom:18px;">
-            <span style="font-size:1.1rem;color:#2B5173;font-weight:600;">Ortalama:</span>
+            <span style="font-size:1.1rem;color:#2B5173;font-weight:600;">Average:</span>
             {% for i in "12345" %}
                 <span style="color:{% if avg_rating >= forloop.counter %}#FFD700{% elif avg_rating >= forloop.counter0 %}#FFD70099{% else %}#ccc{% endif %};font-size:1.1rem;">&#9733;</span>
             {% endfor %}
             <span id="avg-rating-value" style="color:#2B5173;font-size:1rem;">{{ avg_rating|floatformat:1 }}</span>
-            <span id="review-count" style="font-size:1.1rem;color:#888;">({{ review_count }} rəy)</span>
+            <span id="review-count" style="font-size:1.1rem;color:#888;">({{ review_count }} reviews)</span>
         </div>
         <div class="product-detail-meta">
-            <div><span class="meta-label">Firma:</span> {{ mehsul.firma.adi }}</div>
-            <div><span class="meta-label">Avtomobil:</span> {{ mehsul.avtomobil.adi }}</div>
-            <div><span class="meta-label">Vitrin:</span> {{ mehsul.vitrin.nomre }}</div>
-            <div><span class="meta-label">Ölçü:</span> {{ mehsul.olcu }}</div>
-            <div><span class="meta-label">Qiymət:</span> <span style="color:#1a7f37;font-weight:700;">{{ mehsul.qiymet }} ₼</span></div>
-            <div class="product-detail-stock">Stok: {{ mehsul.stok }}</div>
-            <div><span class="meta-label">Kod:</span> {{ mehsul.brend_kod }}</div>
+            <div><span class="meta-label">Company:</span> {{ mehsul.firma.adi }}</div>
+            <div><span class="meta-label">Car:</span> {{ mehsul.avtomobil.adi }}</div>
+            <div><span class="meta-label">Display:</span> {{ mehsul.vitrin.nomre }}</div>
+            <div><span class="meta-label">Size:</span> {{ mehsul.olcu }}</div>
+            <div><span class="meta-label">Price:</span> <span style="color:#1a7f37;font-weight:700;">{{ mehsul.qiymet }} ₼</span></div>
+            <div class="product-detail-stock">Stock: {{ mehsul.stok }}</div>
+            <div><span class="meta-label">Code:</span> {{ mehsul.brend_kod }}</div>
         </div>
         {% if mehsul.sahib %}
         <div style="margin-top: 8px;display:flex;align-items:center;gap:10px;">
-            <span class="meta-label">Satıcı:</span>
+            <span class="meta-label">Seller:</span>
             <a href="#" class="seller-link" onclick="openUserDetailsModal({{ mehsul.sahib.id }}); return false;"><i class="fas fa-user"></i> {{ mehsul.sahib.username }}</a>
             <button type="button" class="cart-add-btn" {% if mehsul.stok == 0 %}disabled{% endif %} onclick="openQuantityModal({{ mehsul.id }}, {{ mehsul.stok }})">
                 <i class="fas fa-shopping-cart"></i>
@@ -246,14 +246,14 @@
     </div>
 </div>
 <div class="product-detail-card" style="max-width:1100px;margin:32px auto 0 auto;">
-    <div class="product-detail-section-title">Məhsul haqqında</div>
+    <div class="product-detail-section-title">About the Product</div>
     <div class="product-detail-about">{{ mehsul.melumat|linebreaksbr }}</div>
 </div>
 {% if mehsul.kodlar %}
 <div class="product-detail-codes-card" style="max-width:1100px;margin:24px auto 0 auto;flex-direction:column;align-items:stretch;">
     <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div class="product-detail-section-title" style="margin-bottom:0;">Kodlar</div>
-        <button class="copy-btn" onclick="copyCodesToClipboard()">Kopyala</button>
+        <div class="product-detail-section-title" style="margin-bottom:0;">Codes</div>
+        <button class="copy-btn" onclick="copyCodesToClipboard()">Copy</button>
     </div>
     <div class="product-detail-codes" id="productCodes" style="margin-top:12px;">
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
@@ -268,7 +268,7 @@
 <div id="reviewModal" class="modal">
     <div class="custom-quantity-modal-content" style="max-width:400px;">
         <span class="close" onclick="closeReviewModal()">&times;</span>
-        <h3>Qiymətləndir və şərh yaz</h3>
+        <h3>Rate and Write a Review</h3>
         <form id="reviewForm">
             <div style="display:flex;justify-content:center;gap:8px;margin-bottom:10px;">
                 {% for i in "12345" %}
@@ -276,17 +276,17 @@
                 {% endfor %}
             </div>
             <input type="hidden" name="rating" id="modalRatingInput" value="0">
-            <textarea name="comment" id="modalCommentInput" class="form-control" rows="3" placeholder="Şərhinizi yazın..."></textarea>
+            <textarea name="comment" id="modalCommentInput" class="form-control" rows="3" placeholder="Write your review..."></textarea>
             <div class="modal-buttons" style="margin-top:10px;">
-                <button type="button" class="btn btn-danger" onclick="closeReviewModal()">Ləğv et</button>
-                <button type="submit" class="btn btn-primary">Göndər</button>
+                <button type="button" class="btn btn-danger" onclick="closeReviewModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Send</button>
             </div>
         </form>
     </div>
 </div>
 <!-- Şərhlər bölməsi -->
 <div class="product-detail-card" style="max-width:1100px;margin:32px auto 0 auto;">
-    <div class="product-detail-section-title">Şərhlər ({{ review_count }})</div>
+    <div class="product-detail-section-title">Reviews ({{ review_count }})</div>
     {% for review in reviews %}
     <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;">
         <img src="{{ review.user.profile.sekil.url }}" alt="{{ review.user.username }}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:1.5px solid #e0e0e0;">
@@ -302,7 +302,7 @@
         </div>
     </div>
     {% empty %}
-    <div style="color:#888;">Hələ şərh yoxdur.</div>
+    <div style="color:#888;">No reviews yet.</div>
     {% endfor %}
 </div>
 <script>
@@ -310,13 +310,13 @@ function copyCodesToClipboard() {
     var codes = Array.from(document.querySelectorAll('#productCodes div')).map(e=>e.innerText).join('   ');
     navigator.clipboard.writeText(codes).then(function() {
         var btn = document.querySelector('.copy-btn');
-        btn.innerText = 'Kopyalandı!';
-        setTimeout(function(){ btn.innerText = 'Kopyala'; }, 1200);
+        btn.innerText = 'Copied!';
+        setTimeout(function(){ btn.innerText = 'Copy'; }, 1200);
     });
 }
 // Ulduz reytinqi: modal aç
 const stars = document.querySelectorAll('#rating-stars .star');
-let currentUserRating = {{ user_rating|default:0 }};
+let currentUserRating = Number("{{ user_rating|default:'0' }}");
 if (stars.length) {
     stars.forEach(star => {
         star.addEventListener('click', function() {
@@ -369,7 +369,7 @@ if (reviewForm) {
                 closeReviewModal();
                 // Real-time: ortalama ulduzlar, rəqəm və rəy sayı yenilə
                 updateAvgRatingStars(data.avg_rating);
-                document.getElementById('review-count').innerText = `(${data.review_count} rəy)`;
+                document.getElementById('review-count').innerText = `(${data.review_count} reviews)`;
                 // Səhifəni yenilə (və ya AJAX ilə şərhləri yenilə)
                 location.reload();
             }
@@ -423,13 +423,13 @@ document.addEventListener('DOMContentLoaded', function() {
 <div id="quantityModal" class="modal">
     <div class="custom-quantity-modal-content">
         <span class="close" onclick="closeQuantityModal()">&times;</span>
-        <h3>Miqdar seçin</h3>
+        <h3>Select Quantity</h3>
         <form method="POST" id="addToCartForm">
             {% csrf_token %}
             <input type="number" name="quantity" id="quantityInput" value="1" min="1" class="form-control">
             <div class="modal-buttons">
-                <button type="button" class="btn btn-danger" onclick="closeQuantityModal()">Ləğv et</button>
-                <button type="submit" class="btn btn-primary">Təsdiq et</button>
+                <button type="button" class="btn btn-danger" onclick="closeQuantityModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Confirm</button>
             </div>
         </form>
     </div>

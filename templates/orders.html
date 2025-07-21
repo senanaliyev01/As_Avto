@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
-{% block title %}Sifarişlərim - AS-AVTO{% endblock %}
+{% block title %}My Orders - AS-AVTO{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h2>Sifarişlərim</h2>
+    <h2>My Orders</h2>
 
     {% if orders %}
         <div class="table-container">
@@ -12,22 +12,22 @@
                 <div class="header-summary">
                     <div class="summary-item">
                         <i class="fas fa-shopping-cart"></i>
-                        <span class="summary-label">Ümumi Sifarişlər:</span>
+                        <span class="summary-label">Total Orders:</span>
                         <span class="summary-value">{{ statistics.umumi_sifaris_sayi }}</span>
                     </div>
                     <div class="summary-item">
                         <i class="fas fa-money-bill-wave"></i>
-                        <span class="summary-label">Ümumi Məbləğ:</span>
+                        <span class="summary-label">Total Amount:</span>
                         <span class="summary-value">{{ statistics.umumi_mebleg }} ₼</span>
                     </div>
                     <div class="summary-item">
                         <i class="fas fa-check-circle"></i>
-                        <span class="summary-label">Ödənilən:</span>
+                        <span class="summary-label">Paid:</span>
                         <span class="summary-value">{{ statistics.umumi_odenilen }} ₼</span>
                     </div>
                     <div class="summary-item">
                         <i class="fas fa-exclamation-circle"></i>
-                        <span class="summary-label">Qalıq Borc:</span>
+                        <span class="summary-label">Remaining Debt:</span>
                         <span class="summary-value">
                             {% if statistics.umumi_borc < 0 %}
                                 <span style="color: #28a745; font-weight: bold;">+{{ statistics.umumi_borc|floatformat:2|slice:'1:' }} ₼</span>
@@ -41,14 +41,14 @@
             <table class="table orders-table">
                 <thead>
                     <tr>
-                        <th>Sifariş №</th>
-                        <th>Tarix</th>
+                        <th>Order #</th>
+                        <th>Date</th>
                         <th>Status</th>
-                        <th>Çatdırılma</th>
-                        <th>Ümumi Məbləğ</th>
-                        <th>Ödənilən</th>
-                        <th>Qalıq Borc</th>
-                        <th>Satıcı</th>
+                        <th>Delivery</th>
+                        <th>Total Amount</th>
+                        <th>Paid</th>
+                        <th>Remaining Debt</th>
+                        <th>Seller</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -96,8 +96,8 @@
     {% else %}
         <div class="empty-orders">
             <i class="fas fa-clipboard-list"></i>
-            <p>Hələ heç bir sifariş verməmisiniz.</p>
-            <a href="{% url 'products' %}" class="btn btn-primary">Məhsullara bax</a>
+            <p>You have not placed any orders yet.</p>
+            <a href="{% url 'products' %}" class="btn btn-primary">View Products</a>
         </div>
     {% endif %}
 </div>

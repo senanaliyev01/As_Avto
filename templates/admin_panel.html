@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Satıcı Paneli{% endblock %}</title>
+    <title>{% block title %}Seller Panel{% endblock %}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
@@ -16,17 +16,17 @@
         <aside class="admin-sidebar">
             <div class="sidebar-header">
                 <a href="{% url 'seller_admin_panel' %}" class="admin-panel-link {% if request.resolver_match.url_name == 'seller_admin_panel' %}active{% endif %}">
-                    <i class="fas fa-cogs"></i> Satıcı Paneli
+                    <i class="fas fa-cogs"></i> Seller Panel
                 </a>
             </div>
             <nav class="sidebar-nav">
                 <ul>
                     <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'my_products' %}active{% endif %}">
-                        <a href="{% url 'my_products' %}"><i class="fas fa-box"></i> Mənim Məhsullarım</a>
+                        <a href="{% url 'my_products' %}"><i class="fas fa-box"></i> My Products</a>
                     </li>
                     <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'my_sales' %}active{% endif %}">
                         <a href="{% url 'my_sales' %}" id="sidebarMySalesLink">
-                            <i class="fas fa-receipt"></i> Mənə gələn sifarişlər
+                            <i class="fas fa-receipt"></i> Incoming Orders
                             <span id="salesBadge" class="sales-badge-sidebar" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span>
                         </a>
                     </li>
@@ -38,15 +38,15 @@
             <!-- Header -->
             <header class="admin-header">
                 <div class="admin-header-left">
-                    <span class="admin-header-title">{% if request.resolver_match.url_name == 'seller_admin_panel' %}Dashboard{% else %}{% block panel_title %}Satıcı Paneli{% endblock %}{% endif %}</span>
+                    <span class="admin-header-title">{% if request.resolver_match.url_name == 'seller_admin_panel' %}Dashboard{% else %}{% block panel_title %}Seller Panel{% endblock %}{% endif %}</span>
                 </div>
                 <div class="admin-header-right">
                     <span class="admin-user">
                         <img src="{{ request.user.profile.sekil.url|default:'/static/images/no_image.jpg' }}" alt="Profil şəkli" class="admin-user-avatar" style="width:36px;height:36px;border-radius:50%;object-fit:cover;margin-right:8px;vertical-align:middle;">
                         {{ request.user.username }}
                     </span>
-                    <a href="{% url 'base' %}" class="admin-site-link" style="margin-right: 16px;"><i class="fas fa-globe"></i> Sayta bax</a>
-                    <a href="{% url 'logout' %}" class="admin-logout"><i class="fas fa-sign-out-alt"></i> Çıxış</a>
+                    <a href="{% url 'base' %}" class="admin-site-link" style="margin-right: 16px;"><i class="fas fa-globe"></i> View Site</a>
+                    <a href="{% url 'logout' %}" class="admin-logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
                 </div>
             </header>
             <main class="admin-content">
@@ -55,7 +55,7 @@
                 <div class="dashboard-container">
                     <!-- Welcome Section -->
                     <div class="welcome-section mb-4">
-                        <h1 class="dashboard-title">Xoş gəlmisiniz, {{ request.user.username }}!</h1>
+                        <h1 class="dashboard-title">Welcome, {{ request.user.username }}!</h1>
                     </div>
 
                     <!-- Statistics Cards -->
@@ -66,7 +66,7 @@
                             </div>
                             <div class="stat-content">
                                 <h3 class="stat-number">{{ total_products }}</h3>
-                                <p class="stat-label">Ümumi Məhsul</p>
+                                <p class="stat-label">Total Products</p>
                             </div>
                         </div>
                         
@@ -76,7 +76,7 @@
                             </div>
                             <div class="stat-content">
                                 <h3 class="stat-number">{{ new_products }}</h3>
-                                <p class="stat-label">Yeni Məhsul</p>
+                                <p class="stat-label">New Products</p>
                             </div>
                         </div>
                         
@@ -86,7 +86,7 @@
                             </div>
                             <div class="stat-content">
                                 <h3 class="stat-number">{{ total_orders }}</h3>
-                                <p class="stat-label">Ümumi Sifariş</p>
+                                <p class="stat-label">Total Orders</p>
                             </div>
                         </div>
                         
@@ -96,7 +96,7 @@
                             </div>
                             <div class="stat-content">
                                 <h3 class="stat-number">{{ total_sales|floatformat:2 }} ₼</h3>
-                                <p class="stat-label">Ümumi Satış</p>
+                                <p class="stat-label">Total Sales</p>
                             </div>
                         </div>
                     </div>
@@ -106,8 +106,8 @@
                         <div class="dashboard-col">
                             <div class="dashboard-card">
                                 <div class="card-header">
-                                    <h3>Son Sifarişlər</h3>
-                                    <a href="{% url 'my_sales' %}" class="view-all-link">Hamısına bax</a>
+                                    <h3>Recent Orders</h3>
+                                    <a href="{% url 'my_sales' %}" class="view-all-link">View All</a>
                                 </div>
                                 <div class="card-body">
                                     {% if recent_orders %}
@@ -128,7 +128,7 @@
                                     {% else %}
                                     <div class="empty-state">
                                         <i class="fas fa-receipt"></i>
-                                        <p>Hələ heç bir sifariş yoxdur</p>
+                                        <p>No orders yet</p>
                                     </div>
                                     {% endif %}
                                 </div>
@@ -138,7 +138,7 @@
                         <div class="dashboard-col">
                             <div class="dashboard-card">
                                 <div class="card-header">
-                                    <h3>Ən Yaxşı Alıcılar</h3>
+                                    <h3>Top Buyers</h3>
                                 </div>
                                 <div class="card-body">
                                     {% if top_buyers %}
@@ -147,7 +147,7 @@
                                         <div class="buyer-item">
                                             <div class="buyer-info">
                                                 <span class="buyer-name">{{ buyer.username }}</span>
-                                                <span class="buyer-orders">{{ buyer.order_count }} sifariş</span>
+                                                <span class="buyer-orders">{{ buyer.order_count }} orders</span>
                                             </div>
                                             <div class="buyer-amount">
                                                 <span class="amount">{{ buyer.total_amount|floatformat:2 }} ₼</span>
@@ -158,7 +158,7 @@
                                     {% else %}
                                     <div class="empty-state">
                                         <i class="fas fa-users"></i>
-                                        <p>Hələ heç bir alıcı yoxdur</p>
+                                        <p>No buyers yet</p>
                                     </div>
                                     {% endif %}
                                 </div>
@@ -171,7 +171,7 @@
                         <div class="dashboard-col">
                             <div class="dashboard-card">
                                 <div class="card-header">
-                                    <h3>Ən Populyar Firmalar</h3>
+                                    <h3>Top Brands</h3>
                                 </div>
                                 <div class="card-body">
                                     {% if top_brands %}
@@ -182,7 +182,7 @@
                                                 <span class="brand-name">{{ brand }}</span>
                                             </div>
                                             <div class="brand-count">
-                                                <span class="count">{{ count }} məhsul</span>
+                                                <span class="count">{{ count }} products</span>
                                             </div>
                                         </div>
                                         {% endfor %}
@@ -190,7 +190,7 @@
                                     {% else %}
                                     <div class="empty-state">
                                         <i class="fas fa-tags"></i>
-                                        <p>Hələ heç bir firma yoxdur</p>
+                                        <p>No brands yet</p>
                                     </div>
                                     {% endif %}
                                 </div>
@@ -200,21 +200,21 @@
                         <div class="dashboard-col">
                             <div class="dashboard-card">
                                 <div class="card-header">
-                                    <h3>Tez Əməliyyatlar</h3>
+                                    <h3>Quick Actions</h3>
                                 </div>
                                 <div class="card-body">
                                     <div class="quick-actions">
                                         <a href="{% url 'add_product' %}" class="quick-action-btn">
                                             <i class="fas fa-plus"></i>
-                                            <span>Yeni Məhsul</span>
+                                            <span>Add New Product</span>
                                         </a>
                                         <a href="{% url 'my_products' %}" class="quick-action-btn">
                                             <i class="fas fa-box"></i>
-                                            <span>Məhsullarım</span>
+                                            <span>My Products</span>
                                         </a>
                                         <a href="{% url 'my_sales' %}" class="quick-action-btn">
                                             <i class="fas fa-receipt"></i>
-                                            <span>Sifarişlər</span>
+                                            <span>Orders</span>
                                         </a>
                                     </div>
                                 </div>
@@ -227,7 +227,7 @@
                 {% endif %}
             </main>
             <footer class="admin-footer">
-                <span>© {{ now|date:'Y' }} AS-AVTO Satıcı Paneli. Bütün hüquqlar qorunur.</span>
+                <span>&copy; {{ now|date:'Y' }} AS-AVTO Seller Panel. All rights reserved.</span>
             </footer>
         </div>
     </div>
@@ -244,21 +244,21 @@
             <span class="user-details-modal-close" style="position:absolute;right:20px;top:20px;cursor:pointer;font-size:24px;">&times;</span>
             <div class="details-content">
                 <div class="details-header">
-                    <h3>İstifadəçi Məlumatları</h3>
+                    <h3>User Information</h3>
                 </div>
                 <div class="details-body">
                     <div class="details-info text-center">
                         <img id="userDetailsImage" src="" alt="Profil şəkli" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:10px;">
                         <div class="info-row">
-                            <span class="info-label">İstifadəçi adı:</span>
+                            <span class="info-label">Username:</span>
                             <span id="userDetailsUsername" class="info-value"></span>
                         </div>
                         <div class="info-row">
-                            <span class="info-label">Telefon:</span>
+                            <span class="info-label">Phone:</span>
                             <span id="userDetailsPhone" class="info-value"></span>
                         </div>
                         <div class="info-row">
-                            <span class="info-label">Ünvan:</span>
+                            <span class="info-label">Address:</span>
                             <span id="userDetailsAddress" class="info-value"></span>
                         </div>
                     </div>

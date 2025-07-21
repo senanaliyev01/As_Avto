@@ -195,9 +195,9 @@ function initializeSearch() {
                                         <div class="search-result-info">
                                             <div class="search-result-title">${item.adi}</div>
                                             <div class="search-result-details">
-                                                <b>Kod:</b> ${item.brend_kod}<br>
+                                                <b>Code:</b> ${item.brend_kod}<br>
                                                 ${item.oem ? `<b>OEM:</b> ${item.oem}<br>` : ''}
-                                                ${item.olcu ? `<b>Ölçü:</b> ${item.olcu}<br>` : ''}
+                                                ${item.olcu ? `<b>Size:</b> ${item.olcu}<br>` : ''}
                                             </div>
                                             <div class="search-result-seller"><i class="fas fa-user"></i> ${item.satici || 'AS-AVTO'}</div>
                                         </div>
@@ -239,7 +239,7 @@ function initializeCart() {
     if (checkoutForm) {
         checkoutForm.addEventListener('submit', function(e) {
             // Sifarişi göndərmədən öncə təsdiq istə
-            if (!confirm('Sifariş etmək istədiyinizə əminsiniz?')) {
+            if (!confirm('Are you sure you want to order?')) {
                 e.preventDefault(); // Əgər istifadəçi "Cancel" basarsa, formanın göndərilməsini dayandır
             }
         });
@@ -291,7 +291,7 @@ function initializeCart() {
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    showMessage('error', 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+                    showMessage('error', 'An error occurred. Please try again.');
                 });
             });
         });
@@ -387,7 +387,7 @@ function initializeModal() {
             })
             .catch(error => {
                 console.error('Error:', error);
-                showMessage('error', 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+                showMessage('error', 'An error occurred. Please try again.');
             });
         });
     }
@@ -431,8 +431,8 @@ function removeFromCart(productId) {
                 const emptyCartHTML = `
                     <div class="empty-cart" style="margin: 20px;">
                         <i class="fas fa-shopping-cart"></i>
-                        <p>Səbətiniz boşdur.</p>
-                        <a href="/products/" class="btn btn-primary">Məhsullara bax</a>
+                        <p>Your cart is empty.</p>
+                        <a href="/products/" class="btn btn-primary">View Products</a>
                     </div>
                 `;
                 
@@ -471,7 +471,7 @@ function removeFromCart(productId) {
     })
     .catch(error => {
         console.error('Error:', error);
-        showMessage('error', 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+        showMessage('error', 'An error occurred. Please try again.');
     });
 }
 
@@ -866,8 +866,8 @@ function initializeCartSidebar() {
                         sidebarContent.innerHTML = `
                             <div class="empty-cart" style="margin: 20px;">
                                 <i class="fas fa-shopping-cart"></i>
-                                <p>Səbətiniz boşdur.</p>
-                                <a href="/products/" class="btn btn-primary">Məhsullara bax</a>
+                                <p>Your cart is empty.</p>
+                                <a href="/products/" class="btn btn-primary">View Products</a>
                             </div>
                         `;
                     }
@@ -967,7 +967,7 @@ function initializeProductsPage() {
                                     ${[1,2,3,4,5].map(i => `<span style='color:${product.avg_rating >= i ? '#FFD700' : (product.avg_rating >= (i-1) ? '#FFD70099' : '#ccc')};font-size:1.1rem;'>&#9733;</span>`).join('')}
                                     <span style='color:#2B5173;font-size:1rem;'>${parseFloat(product.avg_rating).toFixed(1)}</span>
                                     <span style='color:#e74c3c;font-size:1.1rem;margin-left:8px;'><i class='fas fa-heart'></i> ${product.like_count}</span>
-                                    <span style='color:#888;font-size:0.95rem;margin-left:8px;'>Dəyər Xalı: ${typeof product.wilson_score !== 'undefined' ? parseFloat(product.wilson_score).toFixed(3) : '-'}</span>
+                                    <span style='color:#888;font-size:0.95rem;margin-left:8px;'>Wilson Score: ${typeof product.wilson_score !== 'undefined' ? parseFloat(product.wilson_score).toFixed(3) : '-'}</span>
                                 </div>
                                 <div class="product-row-image">
                                     <img src="${product.sekil_url || '/static/images/no_image.webp'}" alt="${product.adi} - ${product.brend_kod} ${product.firma} ${product.avtomobil}" title="${product.adi} - ${product.brend_kod}" loading="lazy" onclick="openImageModal('${product.sekil_url}')">
@@ -975,10 +975,10 @@ function initializeProductsPage() {
                                 <div class="product-row-info">
                                     <div class="product-title"><a href="/products/${product.id}/" style="color:inherit;text-decoration:none;">${product.adi} ${product.brend_kod} ${product.firma}</a></div>
                                     <div class="product-meta">
-                                        ${product.sahib_id && product.sahib_username ? `<a href=\"#\" class=\"seller-link\" onclick=\"openUserDetailsModal(${product.sahib_id}); return false;\"><i class='fas fa-user'></i> ${product.sahib_username}</a>` : ''}
+                                        ${product.sahib_id && product.sahib_username ? `<a href="#" class="seller-link" onclick="openUserDetailsModal(${product.sahib_id}); return false;"><i class='fas fa-user'></i> ${product.sahib_username}</a>` : ''}
                                     </div>
-                                    <div class="product-stock">Kod: ${product.brend_kod}</div>
-                                    <div class="product-stock">Stok: ${product.stok}</div>
+                                    <div class="product-stock">Code: ${product.brend_kod}</div>
+                                    <div class="product-stock">Stock: ${product.stok}</div>
                                 </div>
                                 ${avtomobilLogosHtml}
                                 ${product.firma_logo_url ? `<img class='firma-logo' src='${product.firma_logo_url}' alt='${product.firma}'>` : ''}
@@ -1051,7 +1051,7 @@ function openUserDetailsModal(userId) {
         })
         .catch(error => {
             console.error('Error:', error);
-            showMessage('error', 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+            showMessage('error', 'An error occurred. Please try again.');
         });
 }
 
@@ -1107,7 +1107,7 @@ function openDetailsModal(productId) {
                 document.getElementById('detailsBrendKod').textContent = data.product.brend_kod;
                 document.getElementById('detailsOlcu').textContent = data.product.olcu || '-';
                 document.getElementById('detailsQiymet').textContent = data.product.qiymet + ' ₼';
-                document.getElementById('detailsStok').textContent = data.product.stok + ' ədəd';
+                document.getElementById('detailsStok').textContent = data.product.stok + ' pieces';
                 document.getElementById('detailsMelumat').textContent = data.product.melumat || '-';
 
                 // Seller info
@@ -1131,7 +1131,7 @@ function openDetailsModal(productId) {
         })
         .catch(error => {
             console.error('Error:', error);
-            showMessage('error', 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+            showMessage('error', 'An error occurred. Please try again.');
         });
 }
 
@@ -1351,13 +1351,13 @@ function initializeProfileModal() {
                 }
                 // Optionally update phone/address elsewhere if needed
                 closeModal();
-                alert('Profil məlumatları yeniləndi!');
+                alert('Profile information updated!');
             } else {
-                alert(data.message || 'Xəta baş verdi!');
+                alert(data.message || 'An error occurred!');
             }
         })
         .catch(() => {
-            alert('Xəta baş verdi!');
+            alert('An error occurred!');
         });
     });
 }
@@ -1411,13 +1411,13 @@ function initializeAuthModals() {
                 if (data.success) {
                     window.location.reload();
                 } else {
-                    loginError.textContent = data.error || 'Daxil olmaq mümkün olmadı';
+                    loginError.textContent = data.error || 'Login failed';
                     loginError.style.display = 'block';
                 }
             })
             .catch(() => {
                 loginSpinner.style.display = 'none';
-                loginError.textContent = 'Xəta baş verdi';
+                loginError.textContent = 'An error occurred';
                 loginError.style.display = 'block';
             });
         }, 3000);
@@ -1444,13 +1444,13 @@ function initializeAuthModals() {
                 if (data.success) {
                     window.location.reload();
                 } else {
-                    registerError.textContent = data.error || 'Qeydiyyat mümkün olmadı';
+                    registerError.textContent = data.error || 'Registration failed';
                     registerError.style.display = 'block';
                 }
             })
             .catch(() => {
                 registerSpinner.style.display = 'none';
-                registerError.textContent = 'Xəta baş verdi';
+                registerError.textContent = 'An error occurred';
                 registerError.style.display = 'block';
             });
         }, 3000);

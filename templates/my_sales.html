@@ -1,7 +1,7 @@
 {% extends 'admin_panel.html' %}
 
-{% block title %}Mənə Gələn Sifarişlər - AS-AVTO{% endblock %}
-{% block panel_title %}Mənə Gələn Sifarişlər{% endblock %}
+{% block title %}Incoming Orders - AS-AVTO{% endblock %}
+{% block panel_title %}Incoming Orders{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -17,26 +17,26 @@
     {% endif %}
     
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">Mənə Gələn Sifarişlər</h2>
-        <button id="openStatsModal" class="btn btn-secondary mb-3">Statistikanı bax</button>
+        <h2 class="mb-0">Incoming Orders</h2>
+        <button id="openStatsModal" class="btn btn-secondary mb-3">View Statistics</button>
     </div>
     
 
     <div class="orders-summary">
         <div class="summary-item">
-            <span class="summary-label">Ümumi Sifariş Sayı</span>
+            <span class="summary-label">Total Orders</span>
             <span class="summary-value">{{ stats.total_orders }}</span>
         </div>
         <div class="summary-item">
-            <span class="summary-label">Ümumi Məbləğ</span>
+            <span class="summary-label">Total Amount</span>
             <span class="summary-value">{{ stats.total_amount|floatformat:2 }} ₼</span>
         </div>
         <div class="summary-item">
-            <span class="summary-label">Ödənilən Məbləğ</span>
+            <span class="summary-label">Paid Amount</span>
             <span class="summary-value">{{ stats.total_paid|floatformat:2 }} ₼</span>
         </div>
         <div class="summary-item">
-            <span class="summary-label">Qalıq Borc</span>
+            <span class="summary-label">Remaining Debt</span>
             <span class="summary-value">
                 {% if stats.total_debt < 0 %}
                     <span style="color: #28a745; font-weight: bold;">+{{ stats.total_debt|floatformat:2|slice:'1:' }} ₼</span>
@@ -48,7 +48,7 @@
     </div>
     <div class="d-flex justify-content-end mb-3">
         <div class="buyer-filter-container" style="min-width:260px;max-width:320px;position:relative;">
-            <input type="text" id="buyerLiveSearch" class="form-control" placeholder="Alıcı axtar..." autocomplete="off" style="width:100%;">
+            <input type="text" id="buyerLiveSearch" class="form-control" placeholder="Search buyer..." autocomplete="off" style="width:100%;">
             <div id="buyerLiveDropdown" class="buyer-live-dropdown">
                 {% for buyer in buyer_stats %}
                     <div class="buyer-live-option" data-username="{{ buyer.username|lower }}">{{ buyer.username }}</div>
@@ -62,14 +62,14 @@
             <table class="table table-striped" id="orders-table">
                 <thead>
                     <tr>
-                        <th>Sifariş №</th>
-                        <th>Alıcı</th>
-                        <th>Tarix</th>
+                        <th>Order #</th>
+                        <th>Buyer</th>
+                        <th>Date</th>
                         <th>Status</th>
-                        <th>Ümumi Məbləğ</th>
-                        <th>Ödənilən</th>
-                        <th>Qalıq Borc</th>
-                        <th>Əməliyyat</th>
+                        <th>Total Amount</th>
+                        <th>Paid</th>
+                        <th>Remaining Debt</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -97,8 +97,8 @@
                             {% endif %}
                         </td>
                         <td>
-                            <a href="{% url 'edit_my_sale' order.id %}" class="btn btn-primary btn-sm">Redaktə Et</a>
-                            <a href="{% url 'my_sale_pdf' order.id %}" class="btn btn-primary btn-sm" title="PDF-ə çıxar" style="margin-left: 5px;" target="_blank">
+                            <a href="{% url 'edit_my_sale' order.id %}" class="btn btn-primary btn-sm">Edit</a>
+                            <a href="{% url 'my_sale_pdf' order.id %}" class="btn btn-primary btn-sm" title="Export to PDF" style="margin-left: 5px;" target="_blank">
                                 <i class="fas fa-file-pdf"></i>
                             </a>
                         </td>
@@ -110,7 +110,7 @@
     {% else %}
         <div class="empty-orders">
             <i class="fas fa-receipt"></i>
-            <p>Sizə gələn heç bir sifariş yoxdur.</p>
+            <p>You have no incoming orders.</p>
         </div>
     {% endif %}
 </div>
@@ -121,18 +121,18 @@
         <span class="buyer-stats-modal-close" style="position:absolute;right:20px;top:20px;cursor:pointer;font-size:24px;">&times;</span>
         <div class="details-content">
             <div class="details-header">
-                <h3>Alıcılar üzrə Statistika</h3>
-                <input type="text" id="buyerStatsSearch" class="form-control" placeholder="Alıcı axtar..." style="margin: 15px 0;">
+                <h3>Buyer Statistics</h3>
+                <input type="text" id="buyerStatsSearch" class="form-control" placeholder="Search buyer..." style="margin: 15px 0;">
             </div>
             <div class="details-body" style="overflow-x:auto;">
                 <table class="table table-striped" id="buyerStatsTable">
                     <thead>
                         <tr>
-                            <th>Alıcı</th>
-                            <th>Sifariş sayı</th>
-                            <th>Ümumi Məbləğ</th>
-                            <th>Ödənilən</th>
-                            <th>Qalıq Borc</th>
+                            <th>Buyer</th>
+                            <th>Order Count</th>
+                            <th>Total Amount</th>
+                            <th>Paid</th>
+                            <th>Remaining Debt</th>
                         </tr>
                     </thead>
                     <tbody>

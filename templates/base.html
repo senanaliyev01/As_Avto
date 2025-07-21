@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="AS-AVTO - Avtomobil ehtiyat hissələri və aksesuarları. Keyfiyyətli məhsullar, sərfəli qiymətlər.">
-    <meta name="keywords" content="avtomobil ehtiyat hissələri, avtomobil aksesuarları, avto parts, AS-AVTO">
+    <meta name="description" content="AS-AVTO - Car spare parts and accessories. Quality products, affordable prices.">
+    <meta name="keywords" content="car spare parts, car accessories, auto parts, AS-AVTO">
     <meta name="author" content="AS-AVTO">
     <meta name="robots" content="index, follow">
     <meta property="og:type" content="website">
@@ -39,21 +39,21 @@
                         <img src="{% static 'images/profil.webp' %}" alt="Sənan Əliyev" />
                     </div>
                     <div class="owner-info">
-                        <div class="owner-name">Proqramçı sistem sahibi: <b>Sənan Əliyev</b></div>
-                        <div class="owner-phone">Əlaqə nömrəsi: <a href="tel:+994773059585">+994 77 305 95 85</a></div>
+                        <div class="owner-name">System owner programmer: <b>Sənan Əliyev</b></div>
+                        <div class="owner-phone">Contact number: <a href="tel:+994773059585">+994 77 305 95 85</a></div>
                         <div class="owner-mail">Mail: <a href="mailto:senan.eliyev.9997@gmail.com">senan.eliyev.9997@gmail.com</a></div>
                     </div>
                 </div>
                 <!-- Proqramçı sistem sahibi kartı SON -->
                 <span class="stats-nav-links">
-                    <a href="{% url 'products' %}" class="stats-nav-link"><i class="fas fa-box"></i> Məhsullar</a>
-                    <a href="{% url 'new_products' %}" class="stats-nav-link"><i class="fas fa-star"></i> Yeni Məhsullar</a>
-                    <a href="{% url 'orders' %}" class="stats-nav-link"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a>
-                    <a href="{% url 'about' %}" class="stats-nav-link"><i class="fas fa-info-circle"></i> Haqqımızda</a>
-                    <a href="{% url 'privacy_policy' %}" class="stats-nav-link"><i class="fas fa-user-shield"></i> Gizlilik Siyasəti</a>
+                    <a href="{% url 'products' %}" class="stats-nav-link"><i class="fas fa-box"></i> Products</a>
+                    <a href="{% url 'new_products' %}" class="stats-nav-link"><i class="fas fa-star"></i> New Products</a>
+                    <a href="{% url 'orders' %}" class="stats-nav-link"><i class="fas fa-clipboard-list"></i> My Orders</a>
+                    <a href="{% url 'about' %}" class="stats-nav-link"><i class="fas fa-info-circle"></i> About Us</a>
+                    <a href="{% url 'privacy_policy' %}" class="stats-nav-link"><i class="fas fa-user-shield"></i> Privacy Policy</a>
                     {% if request.user.is_authenticated and request.user.profile.is_verified %}
                     <a href="{% url 'seller_admin_panel' %}" class="stats-nav-link seller-panel-link">
-                        <i class="fas fa-cogs"></i> Satıcı Paneli
+                        <i class="fas fa-cogs"></i> Seller Panel
                         <span id="salesBadge" class="sales-badge-sidebar" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span>
                     </a>
                     {% endif %}
@@ -70,7 +70,7 @@
                 </div>
                 <form method="get" action="{% url 'products' %}" class="header-search-form">
                     <div class="header-search-input-wrapper">
-                        <input type="text" id="query" name="search" placeholder="Məhsul, kod və ya ad axtar..." value="{{ request.GET.search }}" autocomplete="off" class="header-search-input">
+                        <input type="text" id="query" name="search" placeholder="Search by product, code or name..." value="{{ request.GET.search }}" autocomplete="off" class="header-search-input">
                         <button type="submit" class="header-search-btn"><i class="fas fa-search"></i></button>
                         <div id="search-results" class="search-results"></div>
                     </div>
@@ -78,22 +78,22 @@
                 <div class="header-right">
                     <span class="total-debt">
                         {% if request.statistics.umumi_borc < 0 %}
-                            <span style="color: #28a745; font-weight: bold;">Balans +{{ request.statistics.umumi_borc|floatformat:2|slice:'1:' }} ₼</span>
+                            <span style="color: #28a745; font-weight: bold;">Balance +{{ request.statistics.umumi_borc|floatformat:2|slice:'1:' }} ₼</span>
                         {% else %}
-                            <i class="fas fa-money-bill-wave"></i> Borc: {{ request.statistics.umumi_borc|floatformat:2 }} ₼
+                            <i class="fas fa-money-bill-wave"></i> Debt: {{ request.statistics.umumi_borc|floatformat:2 }} ₼
                         {% endif %}
                     </span>
                     <nav class="main-nav">
                         <ul>
-                            <li><a href="#" class="nav-link nav-link-sm blink-news" id="yeniliklerLink"><i class="fas fa-bullhorn"></i> Yeniliklər</a></li>
-                            <li><a class="nav-link" href="{% url 'liked_products' %}"><i class="fas fa-heart"></i> Bəyəndiyim Məhsullar</a></li>
+                            <li><a href="#" class="nav-link nav-link-sm blink-news" id="yeniliklerLink"><i class="fas fa-bullhorn"></i> News</a></li>
+                            <li><a class="nav-link" href="{% url 'liked_products' %}"><i class="fas fa-heart"></i> Liked Products</a></li>
                             <li>
                                 <a href="#" class="nav-link nav-link-sm {% if request.resolver_match.url_name == 'cart' %}active{% endif %}" id="cartSidebarToggle">
                                     <span class="cart-icon">
                                         <i class="fas fa-shopping-cart"></i>
                                         <span class="cart-counter">{{ request.session.cart|length }}</span>
                                     </span>
-                                    Səbət
+                                    Cart
                                 </a>
                             </li>
                             {% if request.user.is_authenticated %}
@@ -111,7 +111,7 @@
                                             <div class="dropdown-divider"></div>
                                             {% endif %}
                                             <a href="{% url 'logout' %}" class="logout-link">
-                                                <i class="fas fa-sign-out-alt"></i> Çıxış et
+                                                <i class="fas fa-sign-out-alt"></i> Logout
                                             </a>
                                         </div>
                                     </div>
@@ -125,11 +125,11 @@
                                         </button>
                                         <div class="user-dropdown-content">
                                             <a href="#" id="openLoginModal" class="user-name">
-                                                <i class="fas fa-sign-in-alt"></i> Daxil ol
+                                                <i class="fas fa-sign-in-alt"></i> Login
                                             </a>
                                             <div class="dropdown-divider"></div>
                                             <a href="#" id="openRegisterModal" class="user-name">
-                                                <i class="fas fa-user-plus"></i> Qeydiyyat
+                                                <i class="fas fa-user-plus"></i> Register
                                             </a>
                                         </div>
                                     </div>
@@ -156,14 +156,14 @@
         {% if request.resolver_match.url_name == 'base' and new_products %}
         <section class="product-section new-products-section">
             <div class="container">
-                <h2 class="section-title new-products-title">Yeni Gələn Məhsullar</h2>
+                <h2 class="section-title new-products-title">Newly Arrived Products</h2>
                 <div class="swiper new-products-swiper">
                     <div class="swiper-wrapper">
                         {% for product in new_products %}
                         <div class="swiper-slide">
                             <div class="product-card">
                                 <div class="ribbon-wrapper">
-                                    <div class="ribbon">Yeni</div>
+                                    <div class="ribbon">New</div>
                                 </div>
                                 <div class="product-image">
                                     {% if product.sekil and product.sekil.url != 'mehsul_sekilleri/no_image.webp' %}
@@ -177,7 +177,7 @@
                                     <p class="product-code">{{ product.brend_kod }}</p>
                                     <p class="product-price">{{ product.qiymet }} ₼</p>
                                     <p class="product-seller">
-                                        Satıcı: 
+                                        Seller: 
                                         {% if product.sahib %}
                                             {{ product.sahib.username }}
                                         {% else %}
@@ -185,7 +185,7 @@
                                         {% endif %}
                                     </p>
                                     <a href="{% url 'products' %}?search={{ product.brend_kod }}" class="view-product">
-                                        Məhsula bax <i class="fas fa-arrow-right"></i>
+                                        View Product <i class="fas fa-arrow-right"></i>
                                     </a>
                                 </div>
                             </div>
@@ -200,14 +200,14 @@
         {% if most_sold_products %}
         <section class="product-section most-sold-section">
             <div class="container">
-                <h2 class="section-title most-sold-title">Ən Çox Satılan Məhsullar</h2>
+                <h2 class="section-title most-sold-title">Best Selling Products</h2>
                 <div class="swiper most-sold-swiper">
                     <div class="swiper-wrapper">
                         {% for product in most_sold_products %}
                         <div class="swiper-slide">
                             <div class="product-card">
                                 <div class="ribbon-wrapper">
-                                    <div class="ribbon" style="background:#007bff;">Satış</div>
+                                    <div class="ribbon" style="background:#007bff;">Sale</div>
                                 </div>
                                 <div class="product-image">
                                     {% if product.sekil and product.sekil.url != 'mehsul_sekilleri/no_image.webp' %}
@@ -220,10 +220,10 @@
                                     <h3 class="product-title">{{ product.adi }}</h3>
                                     <p class="product-code">{{ product.brend_kod }}</p>
                                     <p class="product-price">{{ product.qiymet }} ₼</p>
-                                    <p class="product-seller">Satıcı: {% if product.sahib %}{{ product.sahib.username }}{% else %}AS-AVTO{% endif %}</p>
-                                    <p style="font-size:12px;color:#007bff;">Satış sayı: {{ product.total_sold }}</p>
+                                    <p class="product-seller">Seller: {% if product.sahib %}{{ product.sahib.username }}{% else %}AS-AVTO{% endif %}</p>
+                                    <p style="font-size:12px;color:#007bff;">Sales count: {{ product.total_sold }}</p>
                                     <a href="{% url 'products' %}?search={{ product.brend_kod }}" class="view-product">
-                                        Məhsula bax <i class="fas fa-arrow-right"></i>
+                                        View Product <i class="fas fa-arrow-right"></i>
                                     </a>
                                 </div>
                             </div>
@@ -238,14 +238,14 @@
         {% if most_rated_products %}
         <section class="product-section most-rated-section">
             <div class="container">
-                <h2 class="section-title most-rated-title">Ən Çox Dəyərə Sahib Məhsullar</h2>
+                <h2 class="section-title most-rated-title">Most Valued Products</h2>
                 <div class="swiper most-rated-swiper">
                     <div class="swiper-wrapper">
                         {% for product in most_rated_products %}
                         <div class="swiper-slide">
                             <div class="product-card">
                                 <div class="ribbon-wrapper">
-                                    <div class="ribbon" style="background:#ff9800;">Dəyər</div>
+                                    <div class="ribbon" style="background:#ff9800;">Value</div>
                                 </div>
                                 <div class="product-image">
                                     {% if product.sekil and product.sekil.url != 'mehsul_sekilleri/no_image.webp' %}
@@ -258,13 +258,13 @@
                                     <h3 class="product-title">{{ product.adi }}</h3>
                                     <p class="product-code">{{ product.brend_kod }}</p>
                                     <p class="product-price">{{ product.qiymet }} ₼</p>
-                                    <p class="product-seller">Satıcı: {% if product.sahib %}{{ product.sahib.username }}{% else %}AS-AVTO{% endif %}</p>
+                                    <p class="product-seller">Seller: {% if product.sahib %}{{ product.sahib.username }}{% else %}AS-AVTO{% endif %}</p>
                                     <p style="font-size:12px;color:#ff9800;">
-                                        Ortalama ulduz: {{ product.avg_rating|floatformat:1 }}★ ({{ product.rating_count }} rəy)<br>
-                                        <span style="color:#888;font-size:11px;">Dəyər Xalı: {{ product.wilson_score|floatformat:3 }}</span>
+                                        Average star: {{ product.avg_rating|floatformat:1 }}★ ({{ product.rating_count }} review)<br>
+                                        <span style="color:#888;font-size:11px;">Value Score: {{ product.wilson_score|floatformat:3 }}</span>
                                     </p>
                                     <a href="{% url 'products' %}?search={{ product.brend_kod }}" class="view-product">
-                                        Məhsula bax <i class="fas fa-arrow-right"></i>
+                                        View Product <i class="fas fa-arrow-right"></i>
                                     </a>
                                 </div>
                             </div>
@@ -279,14 +279,14 @@
         {% if most_liked_products %}
         <section class="product-section most-liked-section">
             <div class="container">
-                <h2 class="section-title most-liked-title">Ən Çox Bəyənilən Məhsullar</h2>
+                <h2 class="section-title most-liked-title">Most Liked Products</h2>
                 <div class="swiper most-liked-swiper">
                     <div class="swiper-wrapper">
                         {% for product in most_liked_products %}
                         <div class="swiper-slide">
                             <div class="product-card">
                                 <div class="ribbon-wrapper">
-                                    <div class="ribbon" style="background:#e74c3c;">Bəyənmə</div>
+                                    <div class="ribbon" style="background:#e74c3c;">Like</div>
                                 </div>
                                 <div class="product-image">
                                     {% if product.sekil and product.sekil.url != 'mehsul_sekilleri/no_image.webp' %}
@@ -299,10 +299,10 @@
                                     <h3 class="product-title">{{ product.adi }}</h3>
                                     <p class="product-code">{{ product.brend_kod }}</p>
                                     <p class="product-price">{{ product.qiymet }} ₼</p>
-                                    <p class="product-seller">Satıcı: {% if product.sahib %}{{ product.sahib.username }}{% else %}AS-AVTO{% endif %}</p>
-                                    <p style="font-size:12px;color:#e74c3c;">Bəyənmə sayı: {{ product.like_count }}</p>
+                                    <p class="product-seller">Seller: {% if product.sahib %}{{ product.sahib.username }}{% else %}AS-AVTO{% endif %}</p>
+                                    <p style="font-size:12px;color:#e74c3c;">Like count: {{ product.like_count }}</p>
                                     <a href="{% url 'products' %}?search={{ product.brend_kod }}" class="view-product">
-                                        Məhsula bax <i class="fas fa-arrow-right"></i>
+                                        View Product <i class="fas fa-arrow-right"></i>
                                     </a>
                                 </div>
                             </div>
@@ -387,7 +387,7 @@
         <div class="cart-sidebar-header">
             <div class="cart-sidebar-title">
                 <i class="fas fa-shopping-cart"></i>
-                <span>Səbətim</span>
+                <span>My Cart</span>
             </div>
             <button id="closeSidebar" class="close-sidebar"><i class="fas fa-times"></i></button>
         </div>
@@ -433,7 +433,7 @@
             <span class="profile-modal-close" style="position:absolute;right:20px;top:20px;cursor:pointer;font-size:24px;">&times;</span>
             <div class="details-content">
                 <div class="details-header">
-                    <h3>Profil Məlumatları</h3>
+                    <h3>Profile Information</h3>
                 </div>
                 <form id="profileForm" enctype="multipart/form-data">
                     <div class="form-group text-center">
@@ -441,18 +441,18 @@
                         <input type="file" id="profileImageInput" name="sekil" accept="image/*" style="display:block;margin:10px auto 0 auto;">
                     </div>
                     <div class="form-group">
-                        <label for="profileUsername">İstifadəçi adı</label>
+                        <label for="profileUsername">Username</label>
                         <input type="text" id="profileUsername" name="username" class="form-control" value="{{ request.user.username }}" required>
                     </div>
                     <div class="form-group">
-                        <label for="profilePhone">Telefon</label>
+                        <label for="profilePhone">Phone</label>
                         <input type="text" id="profilePhone" name="phone" class="form-control" value="{{ request.user.profile.phone }}" required>
                     </div>
                     <div class="form-group">
-                        <label for="profileAddress">Ünvan</label>
+                        <label for="profileAddress">Address</label>
                         <textarea id="profileAddress" name="address" class="form-control" required>{{ request.user.profile.address }}</textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Yadda saxla</button>
+                    <button type="submit" class="btn btn-primary w-100">Save</button>
                 </form>
             </div>
         </div>
@@ -464,21 +464,21 @@
             <span class="user-details-modal-close" style="position:absolute;right:20px;top:20px;cursor:pointer;font-size:24px;">&times;</span>
             <div class="details-content">
                 <div class="details-header">
-                    <h3>İstifadəçi Məlumatları</h3>
+                    <h3>User Information</h3>
                 </div>
                 <div class="details-body">
                     <div class="details-info text-center">
                         <img id="userDetailsImage" src="" alt="Profil şəkli" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:10px;">
                         <div class="info-row">
-                            <span class="info-label">İstifadəçi adı:</span>
+                            <span class="info-label">Username:</span>
                             <span id="userDetailsUsername" class="info-value"></span>
                         </div>
                         <div class="info-row">
-                            <span class="info-label">Telefon:</span>
+                            <span class="info-label">Phone:</span>
                             <span id="userDetailsPhone" class="info-value"></span>
                         </div>
                         <div class="info-row">
-                            <span class="info-label">Ünvan:</span>
+                            <span class="info-label">Address:</span>
                             <span id="userDetailsAddress" class="info-value"></span>
                         </div>
                     </div>
@@ -491,20 +491,20 @@
     <div id="loginModal" class="modal" style="display:none;">
         <div class="modal-content">
             <span class="close" id="closeLoginModal">&times;</span>
-            <h3>Daxil ol</h3>
+            <h3>Login</h3>
             <form id="loginForm">
                 {% csrf_token %}
                 <div class="form-group">
-                    <label for="loginUsername">İstifadəçi adı</label>
+                    <label for="loginUsername">Username</label>
                     <input type="text" id="loginUsername" name="username" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label for="loginPassword">Şifrə</label>
+                    <label for="loginPassword">Password</label>
                     <input type="password" id="loginPassword" name="password" class="form-control" required>
                 </div>
                 <div id="loginError" class="message message-error" style="display:none;"></div>
                 <div class="modal-buttons">
-                    <button type="submit" class="btn btn-primary">Daxil ol</button>
+                    <button type="submit" class="btn btn-primary">Login</button>
                     <span id="loginSpinner" class="spinner" style="display:none; margin-left:10px;">• • •</span>
                 </div>
             </form>
@@ -515,11 +515,11 @@
     <div id="registerModal" class="modal" style="display:none;">
         <div class="modal-content">
             <span class="close" id="closeRegisterModal">&times;</span>
-            <h3>Qeydiyyat</h3>
+            <h3>Register</h3>
             <form id="registerForm">
                 {% csrf_token %}
                 <div class="form-group">
-                    <label for="registerUsername">İstifadəçi adı</label>
+                    <label for="registerUsername">Username</label>
                     <input type="text" id="registerUsername" name="username" class="form-control" required>
                 </div>
                 <div class="form-group">
@@ -527,20 +527,20 @@
                     <input type="email" id="registerEmail" name="email" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label for="registerPhone">Telefon nömrəsi</label>
+                    <label for="registerPhone">Phone number</label>
                     <input type="text" id="registerPhone" name="phone" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label for="registerAddress">Ünvan</label>
+                    <label for="registerAddress">Address</label>
                     <input type="text" id="registerAddress" name="address" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label for="registerPassword">Şifrə</label>
+                    <label for="registerPassword">Password</label>
                     <input type="password" id="registerPassword" name="password" class="form-control" required>
                 </div>
                 <div id="registerError" class="message message-error" style="display:none;"></div>
                 <div class="modal-buttons">
-                    <button type="submit" class="btn btn-primary">Qeydiyyat</button>
+                    <button type="submit" class="btn btn-primary">Register</button>
                     <span id="registerSpinner" class="spinner" style="display:none; margin-left:10px;">• • •</span>
                 </div>
             </form>

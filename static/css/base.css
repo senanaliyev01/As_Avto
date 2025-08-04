@@ -5786,7 +5786,7 @@ body {
     text-overflow: ellipsis;
     display: block;
     word-break: break-word;
-    max-width: 15ch; /* Limit to 15 characters */
+    max-width: 20ch; /* Limit to 15 characters */
     text-align: center;
 }
 

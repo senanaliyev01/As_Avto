@@ -541,8 +541,6 @@ def search_suggestions(request):
                 'qiymet': str(mehsul.qiymet),
                 'sekil_url': mehsul.sekil.url if mehsul.sekil else None,
                 'satici': mehsul.sahib.username if mehsul.sahib else 'AS-AVTO',
-                'firma': mehsul.firma.adi if mehsul.firma else '',
-                'avtomobil': mehsul.avtomobil.adi if mehsul.avtomobil else '',
             })
         return JsonResponse({'suggestions': suggestions})
     return JsonResponse({'suggestions': []})
@@ -1648,57 +1646,7 @@ def about_view(request):
 def privacy_policy_view(request):
     return render(request, 'privacy_policy.html')
 
-def test_search_view(request):
-    """Axtarış funksiyasını test etmək üçün"""
-    search_query = request.GET.get('search', '')
-    if search_query:
-        mehsullar = Mehsul.objects.all()
-        filtered_products = get_search_filtered_products(mehsullar, search_query, order_by_wilson=True)
-        
-        # Test məlumatları
-        test_data = {
-            'search_query': search_query,
-            'total_results': filtered_products.count(),
-            'search_terms': extract_search_terms(search_query) if 'extract_search_terms' in globals() else [],
-            'products': []
-        }
-        
-        for product in filtered_products[:10]:  # İlk 10 nəticə
-            test_data['products'].append({
-                'id': product.id,
-                'adi': product.adi,
-                'brend_kod': product.brend_kod,
-                'firma': product.firma.adi if product.firma else '',
-                'avtomobil': product.avtomobil.adi if product.avtomobil else '',
-                'oem': product.oem,
-                'olcu': product.olcu,
-            })
-        
-        return JsonResponse(test_data)
-    
-    # Test nümunələri
-    test_examples = [
-        "b----mwfil---ter yag 11421!@#!@#!@#----745390",
-        "bmw filter yağ",
-        "BMW-FILTER-YAG",
-        "bmw_filter_yag",
-        "BMWFilterYag",
-        "11421-745390",
-        "11421745390",
-        "11421 745390",
-        "!@#!@#!@#",
-        "b----mwfil---ter",
-        "yag 11421",
-        "745390",
-    ]
-    
-    return JsonResponse({
-        'message': 'Test search examples',
-        'examples': test_examples,
-        'usage': 'Add ?search=your_query to test search functionality'
-    })
-
-# UNIVERSAL SEARCH FILTER - TƏKMİLLƏŞDİRİLMİŞ VERSİYA
+# UNIVERSAL SEARCH FILTER
 
 def get_search_filtered_products(queryset, search_query, order_by_wilson=True):
     import re
@@ -1737,85 +1685,23 @@ def get_search_filtered_products(queryset, search_query, order_by_wilson=True):
             )
         return queryset
 
-    # Axtarış mətnini təmizlə və normalizə et
-    def clean_search_text(text):
-        """Mətni təmizləyir və normalizə edir"""
-        if not text:
-            return ""
-        # Bütün xüsusi simvolları və boşluqları təmizlə
-        cleaned = re.sub(r'[^\w\s]', '', text)
-        # Çoxlu boşluqları tək boşluqla əvəz et
-        cleaned = re.sub(r'\s+', ' ', cleaned)
-        return cleaned.strip().lower()
-    
-    def extract_numbers_and_letters(text):
-        """Mətndən rəqəmləri və hərfləri ayrıca çıxarır"""
-        if not text:
-            return []
-        
-        # Rəqəmləri tap
-        numbers = re.findall(r'\d+', text)
-        
-        # Hərfləri tap (yalnız hərflər)
-        letters = re.findall(r'[a-zA-Z]+', text)
-        
-        # Hərf və rəqəm birləşmələri
-        alphanumeric = re.findall(r'[a-zA-Z0-9]+', text)
-        
-        return numbers + letters + alphanumeric
-    
-    def extract_search_terms(text):
-        """Axtarış mətnindən açar sözləri çıxarır"""
-        if not text:
-            return []
-        
-        # Orijinal mətn
-        original_terms = [text]
-        
-        # Təmizlənmiş mətn
-        cleaned_text = clean_search_text(text)
-        if cleaned_text:
-            original_terms.append(cleaned_text)
-        
-        # Hərf və rəqəmləri ayır
-        alphanumeric_only = re.sub(r'[^a-zA-Z0-9]', '', text.lower())
-        if alphanumeric_only:
-            original_terms.append(alphanumeric_only)
-        
-        # Birleşik sözləri ayır (camelCase, snake_case, kebab-case)
-        # camelCase: "bmwFilter" -> ["bmw", "filter"]
-        camel_case_split = re.findall(r'[A-Z]?[a-z]+|[A-Z]{2,}(?=[A-Z][a-z]|\b|\d)|\d+', text)
-        if camel_case_split:
-            original_terms.extend(camel_case_split)
-        
-        # Snake case və kebab case ayırma
-        snake_case_split = re.findall(r'[a-zA-Z0-9]+', text.replace('_', ' ').replace('-', ' '))
-        if snake_case_split:
-            original_terms.extend(snake_case_split)
-        
-        # Rəqəmləri ayrıca əlavə et
-        numbers = re.findall(r'\d+', text)
-        original_terms.extend(numbers)
-        
-        # Boşluqlarla ayrılmış sözlər
-        words = text.split()
-        original_terms.extend(words)
-        
-        # Təmizlənmiş sözlər
-        cleaned_words = cleaned_text.split() if cleaned_text else []
-        original_terms.extend(cleaned_words)
-        
-        # Xüsusi simvolları təmizləyərək sözlər
-        special_cleaned = re.sub(r'[^\w\s]', ' ', text)
-        special_words = [word for word in special_cleaned.split() if word.strip()]
-        original_terms.extend(special_words)
-        
-        # Təkrarlananları sil və boş olmayanları saxla
-        unique_terms = list(set([term for term in original_terms if term.strip() and len(term.strip()) > 0]))
-        return unique_terms
+    queryset = queryset.annotate(
+        search_text=Concat(
+            'adi', Value(' '),
+            'brend_kod', Value(' '),
+            'firma__adi', Value(' '),
+            'avtomobil__adi', Value(' '),
+            'kodlar', Value(' '),
+            'olcu', Value(' '),
+            'melumat',
+            output_field=CharField()
+        )
+    )
+    processed_query = re.sub(r'\s+', ' ', search_query).strip()
+    search_words = processed_query.split()
+    clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
 
     def normalize_azerbaijani_chars(text):
-        """Azərbaycan hərflərinin qarşılıqlı çevrilməsi"""
         char_map = {
             'ə': 'e', 'e': 'ə', 'Ə': 'E', 'E': 'Ə',
             'ö': 'o', 'o': 'ö', 'Ö': 'O', 'O': 'Ö',
@@ -1825,13 +1711,11 @@ def get_search_filtered_products(queryset, search_query, order_by_wilson=True):
             'ş': 's', 's': 'ş', 'Ş': 'S', 'S': 'Ş',
             'ç': 'c', 'c': 'ç', 'Ç': 'C', 'C': 'Ç'
         }
-        
         variations = {text}
         lower_text = text.lower()
         variations.add(lower_text)
         upper_text = text.upper()
         variations.add(upper_text)
-        
         all_variations = set()
         for variant in variations:
             current_variations = {variant}
@@ -1842,109 +1726,41 @@ def get_search_filtered_products(queryset, search_query, order_by_wilson=True):
                         new_variations.add(v.replace(char, char_map[char]))
                     current_variations.update(new_variations)
             all_variations.update(current_variations)
-        
         return all_variations
 
-    def create_search_filters(search_terms):
-        """Axtarış şərtlərini yaradır"""
-        filters = []
-        
-        for term in search_terms:
-            if not term.strip():
-                continue
-                
-            # Azərbaycan hərfləri üçün variantlar
-            term_variations = normalize_azerbaijani_chars(term)
-            
-            # Hər bir variant üçün filter yarat
-            term_filters = []
-            for variation in term_variations:
-                if not variation.strip():
-                    continue
-                    
-                # Əsas sahələr üçün filter
-                adi_filter = Q(adi__icontains=variation)
-                brend_kod_filter = Q(brend_kod__icontains=variation)
-                oem_filter = Q(oem__icontains=variation)
-                olcu_filter = Q(olcu__icontains=variation)
-                melumat_filter = Q(melumat__icontains=variation)
-                kodlar_filter = Q(kodlar__icontains=variation)
-                
-                # Əlaqəli sahələr üçün filter
-                firma_filter = Q(firma__adi__icontains=variation)
-                avtomobil_filter = Q(avtomobil__adi__icontains=variation)
-                kateqoriya_filter = Q(kateqoriya__adi__icontains=variation)
-                vitrin_filter = Q(vitrin__nomre__icontains=variation)
-                
-                # Fuzzy search üçün qısaltmalar
-                if len(variation) >= 3:
-                    # İlk 3 hərf ilə başlayan
-                    adi_startswith = Q(adi__istartswith=variation[:3])
-                    brend_kod_startswith = Q(brend_kod__istartswith=variation[:3])
-                    firma_startswith = Q(firma__adi__istartswith=variation[:3])
-                    avtomobil_startswith = Q(avtomobil__adi__istartswith=variation[:3])
-                    
-                    # Bütün filterləri birləşdir
-                    combined_filter = (
-                        adi_filter | brend_kod_filter | oem_filter | olcu_filter | 
-                        melumat_filter | kodlar_filter | firma_filter | avtomobil_filter |
-                        kateqoriya_filter | vitrin_filter | adi_startswith | brend_kod_startswith |
-                        firma_startswith | avtomobil_startswith
-                    )
-                else:
-                    # Bütün filterləri birləşdir
-                    combined_filter = (
-                        adi_filter | brend_kod_filter | oem_filter | olcu_filter | 
-                        melumat_filter | kodlar_filter | firma_filter | avtomobil_filter |
-                        kateqoriya_filter | vitrin_filter
-                    )
-                
-                term_filters.append(combined_filter)
-            
-            # Bütün variantlar üçün OR əməliyyatı
-            if term_filters:
-                term_combined = reduce(or_, term_filters)
-                filters.append(term_combined)
-        
-        return filters
-
-    # Axtarış şərtlərini çıxar
-    search_terms = extract_search_terms(search_query)
-    
-    if not search_terms:
-        # Wilson score sıralama
-        if order_by_wilson:
-            queryset = queryset.annotate(
-                sum_rating=Sum('ratings__rating'),
-                rating_count=Count('ratings'),
-                avg_rating=Avg('ratings__rating'),
-            ).order_by('-rating_count', '-avg_rating', '-id')
-        return queryset
-
-    # Axtarış filterlərini yarat
-    search_filters = create_search_filters(search_terms)
-    
-    if search_filters:
-        # Bütün şərtlər üçün AND əməliyyatı (hər şərt ödənməlidir)
-        final_filter = reduce(and_, search_filters)
-        queryset = queryset.filter(final_filter)
-    
-    # Əgər nəticə tapılmadısa, daha geniş axtarış et
-    if not queryset.exists() and len(search_terms) > 1:
-        # Yalnız ən vacib şərtləri istifadə et
-        important_terms = [term for term in search_terms if len(term) >= 2]
-        if important_terms:
-            backup_filters = create_search_filters(important_terms[:2])  # Yalnız ilk 2 şərt
-            if backup_filters:
-                backup_filter = reduce(and_, backup_filters)
-                queryset = queryset.filter(backup_filter)
-    
-    # Wilson score sıralama
+    if clean_search:
+        kod_filter = Q(kodlar__icontains=clean_search)
+        olcu_filter = Q(olcu__icontains=clean_search)
+        melumat_filter = Q(melumat__icontains=clean_search)
+        def clean_code(val):
+            return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
+        brend_kod_ids = [m.id for m in queryset if clean_code(search_query) in clean_code(m.brend_kod)]
+        brend_kod_filter = Q(id__in=brend_kod_ids)
+        if search_words:
+            ad_filters = []
+            for word in search_words:
+                word_variations = normalize_azerbaijani_chars(word)
+                word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
+                melumat_word_filter = reduce(or_, [Q(melumat__icontains=variation) for variation in word_variations])
+                avtomobil_filter = reduce(or_, [Q(avtomobil__adi__icontains=variation) for variation in word_variations])
+                firma_filter = reduce(or_, [Q(firma__adi__icontains=variation) for variation in word_variations])
+                ad_filters.append(word_filter | melumat_word_filter | avtomobil_filter | firma_filter)
+            ad_filter = reduce(and_, ad_filters)
+            searchtext_and_filter = reduce(
+                and_,
+                [reduce(or_, [Q(search_text__icontains=variation) for variation in normalize_azerbaijani_chars(word)]) for word in search_words]
+            )
+            queryset = queryset.filter(
+                kod_filter | olcu_filter | melumat_filter | brend_kod_filter | ad_filter | searchtext_and_filter
+            )
+        else:
+            queryset = queryset.filter(
+                kod_filter | olcu_filter | melumat_filter | brend_kod_filter
+            )
     if order_by_wilson:
         queryset = queryset.annotate(
             sum_rating=Sum('ratings__rating'),
             rating_count=Count('ratings'),
             avg_rating=Avg('ratings__rating'),
         ).order_by('-rating_count', '-avg_rating', '-id')
-    
     return queryset

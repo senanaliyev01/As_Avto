@@ -49,4 +49,5 @@ urlpatterns = [
 urlpatterns += [
     path('about/', about_view, name='about'),
     path('privacy-policy/', privacy_policy_view, name='privacy_policy'),
+    path('test-search/', views.test_search_view, name='test_search'),
 ]

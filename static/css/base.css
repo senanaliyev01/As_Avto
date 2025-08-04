@@ -5787,6 +5787,7 @@ body {
     display: block;
     word-break: break-word;
     max-width: 15ch; /* Limit to 15 characters */
+    text-align: center;
 }
 
 .product-title-name:hover {

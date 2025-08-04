@@ -1763,15 +1763,4 @@ def get_search_filtered_products(queryset, search_query, order_by_wilson=True):
             rating_count=Count('ratings'),
             avg_rating=Avg('ratings__rating'),
         ).order_by('-rating_count', '-avg_rating', '-id')
-    # --- İstifadəçi inputunda istənilən simvol daxil edildikdə də düzgün nəticə üçün əlavə kod ---
-    import re
-    def extract_search_words(query):
-        # Yalnız hərf və rəqəm olan sözləri saxla
-        return re.findall(r'[a-zA-Z0-9əöüğışçƏÖÜĞİŞÇ]+', query)
-
-    user_search_words = extract_search_words(search_query)
-    if user_search_words:
-        for word in user_search_words:
-            queryset = queryset.filter(search_text__icontains=word)
-    # --- Əlavə kod sonu ---
     return queryset

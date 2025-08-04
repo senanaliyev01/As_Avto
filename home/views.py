@@ -1662,46 +1662,87 @@ def get_search_filtered_products(queryset, search_query, order_by_wilson=True):
             queryset = queryset.annotate(
                 sum_rating=Sum('ratings__rating'),
                 rating_count=Count('ratings'),
-            )
-            # Wilson score hesabla (SQL səviyyəsində mümkün deyil, amma annotate ilə təxmini)
-            # Ən yaxşısı: python səviyyəsində sort etməkdir, amma burada annotate ilə sıralayırıq
-            def wilson_score(sum_rating, rating_count, max_rating=5, confidence=0.95):
-                if not rating_count or not sum_rating:
-                    return 0
-                z = 1.96  # 95% confidence
-                phat = (sum_rating / rating_count) / max_rating
-                n = rating_count
-                denominator = 1 + z*z/n
-                centre = phat + z*z/(2*n)
-                margin = z * sqrt((phat*(1-phat) + z*z/(4*n)) / n)
-                score = (centre - margin) / denominator
-                return score
-            # Annotate üçün: sadəcə ortalama reytinq və sayına görə sıralayırıq
-            queryset = queryset.annotate(
                 avg_rating=Avg('ratings__rating'),
-                rating_count=Count('ratings'),
-            ).order_by(
-                '-rating_count', '-avg_rating', '-id'
-            )
+            ).order_by('-rating_count', '-avg_rating', '-id')
         return queryset
 
-    queryset = queryset.annotate(
-        search_text=Concat(
-            'adi', Value(' '),
-            'brend_kod', Value(' '),
-            'firma__adi', Value(' '),
-            'avtomobil__adi', Value(' '),
-            'kodlar', Value(' '),
-            'olcu', Value(' '),
-            'melumat',
-            output_field=CharField()
-        )
-    )
-    processed_query = re.sub(r'\s+', ' ', search_query).strip()
-    search_words = processed_query.split()
-    clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
+    def clean_and_extract_terms(text):
+        """Mətni təmizləyir və bütün mümkün axtarış variantlarını çıxarır"""
+        if not text:
+            return []
+        
+        terms = set()
+        
+        # Orijinal mətn
+        terms.add(text)
+        terms.add(text.lower())
+        terms.add(text.upper())
+        
+        # Xüsusi simvolları təmizləyərək (yalnız hərf və rəqəmlər qalsın)
+        cleaned_only_letters = re.sub(r'[^a-zA-Z0-9]', '', text)
+        if cleaned_only_letters:
+            terms.add(cleaned_only_letters)
+            terms.add(cleaned_only_letters.lower())
+            terms.add(cleaned_only_letters.upper())
+        
+        # Xüsusi simvolları boşluqla əvəz edərək
+        cleaned_with_spaces = re.sub(r'[^\w\s]', ' ', text)
+        cleaned_with_spaces = re.sub(r'\s+', ' ', cleaned_with_spaces).strip()
+        if cleaned_with_spaces:
+            terms.add(cleaned_with_spaces)
+            terms.add(cleaned_with_spaces.lower())
+            terms.add(cleaned_with_spaces.upper())
+        
+        # Rəqəmləri ayrıca çıxar
+        numbers = re.findall(r'\d+', text)
+        terms.update(numbers)
+        
+        # Hərfləri ayrıca çıxar
+        letters = re.findall(r'[a-zA-Z]+', text)
+        terms.update(letters)
+        terms.update([word.lower() for word in letters])
+        terms.update([word.upper() for word in letters])
+        
+        # Boşluqlarla ayrılmış sözlər
+        words = text.split()
+        terms.update(words)
+        terms.update([word.lower() for word in words])
+        terms.update([word.upper() for word in words])
+        
+        # Təmizlənmiş sözlər
+        cleaned_words = cleaned_with_spaces.split() if cleaned_with_spaces else []
+        terms.update(cleaned_words)
+        terms.update([word.lower() for word in cleaned_words])
+        terms.update([word.upper() for word in cleaned_words])
+        
+        # Birləşik yazılan sözləri ayır (xüsusi simvollar ilə)
+        split_by_special = re.split(r'[^a-zA-Z0-9]+', text)
+        terms.update([word for word in split_by_special if word.strip()])
+        terms.update([word.lower() for word in split_by_special if word.strip()])
+        terms.update([word.upper() for word in split_by_special if word.strip()])
+        
+        # Birleşik sözləri ayır (camelCase, snake_case, kebab-case)
+        camel_case = re.findall(r'[A-Z]?[a-z]+|[A-Z]{2,}(?=[A-Z][a-z]|\b|\d)|\d+', text)
+        terms.update(camel_case)
+        terms.update([word.lower() for word in camel_case])
+        
+        # Snake case və kebab case
+        snake_case = re.findall(r'[a-zA-Z0-9]+', text.replace('_', ' ').replace('-', ' '))
+        terms.update(snake_case)
+        terms.update([word.lower() for word in snake_case])
+        
+        # Qısaltmalar (3 və ya daha çox hərf)
+        for term in list(terms):
+            if len(term) >= 3:
+                terms.add(term[:3])
+                terms.add(term[:3].lower())
+                terms.add(term[:3].upper())
+        
+        # Boş olmayan və minimum uzunluqda olanları saxla
+        return [term for term in terms if term.strip() and len(term.strip()) >= 1]
 
     def normalize_azerbaijani_chars(text):
+        """Azərbaycan hərflərinin qarşılıqlı çevrilməsi"""
         char_map = {
             'ə': 'e', 'e': 'ə', 'Ə': 'E', 'E': 'Ə',
             'ö': 'o', 'o': 'ö', 'Ö': 'O', 'O': 'Ö',
@@ -1711,11 +1752,13 @@ def get_search_filtered_products(queryset, search_query, order_by_wilson=True):
             'ş': 's', 's': 'ş', 'Ş': 'S', 'S': 'Ş',
             'ç': 'c', 'c': 'ç', 'Ç': 'C', 'C': 'Ç'
         }
+        
         variations = {text}
         lower_text = text.lower()
         variations.add(lower_text)
         upper_text = text.upper()
         variations.add(upper_text)
+        
         all_variations = set()
         for variant in variations:
             current_variations = {variant}
@@ -1726,41 +1769,109 @@ def get_search_filtered_products(queryset, search_query, order_by_wilson=True):
                         new_variations.add(v.replace(char, char_map[char]))
                     current_variations.update(new_variations)
             all_variations.update(current_variations)
+        
         return all_variations
 
-    if clean_search:
-        kod_filter = Q(kodlar__icontains=clean_search)
-        olcu_filter = Q(olcu__icontains=clean_search)
-        melumat_filter = Q(melumat__icontains=clean_search)
-        def clean_code(val):
-            return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
-        brend_kod_ids = [m.id for m in queryset if clean_code(search_query) in clean_code(m.brend_kod)]
-        brend_kod_filter = Q(id__in=brend_kod_ids)
-        if search_words:
-            ad_filters = []
-            for word in search_words:
-                word_variations = normalize_azerbaijani_chars(word)
-                word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
-                melumat_word_filter = reduce(or_, [Q(melumat__icontains=variation) for variation in word_variations])
-                avtomobil_filter = reduce(or_, [Q(avtomobil__adi__icontains=variation) for variation in word_variations])
-                firma_filter = reduce(or_, [Q(firma__adi__icontains=variation) for variation in word_variations])
-                ad_filters.append(word_filter | melumat_word_filter | avtomobil_filter | firma_filter)
-            ad_filter = reduce(and_, ad_filters)
-            searchtext_and_filter = reduce(
-                and_,
-                [reduce(or_, [Q(search_text__icontains=variation) for variation in normalize_azerbaijani_chars(word)]) for word in search_words]
-            )
-            queryset = queryset.filter(
-                kod_filter | olcu_filter | melumat_filter | brend_kod_filter | ad_filter | searchtext_and_filter
-            )
-        else:
-            queryset = queryset.filter(
-                kod_filter | olcu_filter | melumat_filter | brend_kod_filter
-            )
+    def create_search_filters(search_terms):
+        """Axtarış şərtlərini yaradır"""
+        filters = []
+        
+        for term in search_terms:
+            if not term.strip():
+                continue
+                
+            # Azərbaycan hərfləri üçün variantlar
+            term_variations = normalize_azerbaijani_chars(term)
+            
+            # Hər bir variant üçün filter yarat
+            term_filters = []
+            for variation in term_variations:
+                if not variation.strip():
+                    continue
+                    
+                # Əsas sahələr üçün filter
+                adi_filter = Q(adi__icontains=variation)
+                brend_kod_filter = Q(brend_kod__icontains=variation)
+                oem_filter = Q(oem__icontains=variation)
+                olcu_filter = Q(olcu__icontains=variation)
+                melumat_filter = Q(melumat__icontains=variation)
+                kodlar_filter = Q(kodlar__icontains=variation)
+                
+                # Əlaqəli sahələr üçün filter
+                firma_filter = Q(firma__adi__icontains=variation)
+                avtomobil_filter = Q(avtomobil__adi__icontains=variation)
+                kateqoriya_filter = Q(kateqoriya__adi__icontains=variation)
+                vitrin_filter = Q(vitrin__nomre__icontains=variation)
+                
+                # Fuzzy search üçün qısaltmalar
+                if len(variation) >= 3:
+                    # İlk 3 hərf ilə başlayan
+                    adi_startswith = Q(adi__istartswith=variation[:3])
+                    brend_kod_startswith = Q(brend_kod__istartswith=variation[:3])
+                    firma_startswith = Q(firma__adi__istartswith=variation[:3])
+                    avtomobil_startswith = Q(avtomobil__adi__istartswith=variation[:3])
+                    
+                    # Bütün filterləri birləşdir
+                    combined_filter = (
+                        adi_filter | brend_kod_filter | oem_filter | olcu_filter | 
+                        melumat_filter | kodlar_filter | firma_filter | avtomobil_filter |
+                        kateqoriya_filter | vitrin_filter | adi_startswith | brend_kod_startswith |
+                        firma_startswith | avtomobil_startswith
+                    )
+                else:
+                    # Bütün filterləri birləşdir
+                    combined_filter = (
+                        adi_filter | brend_kod_filter | oem_filter | olcu_filter | 
+                        melumat_filter | kodlar_filter | firma_filter | avtomobil_filter |
+                        kateqoriya_filter | vitrin_filter
+                    )
+                
+                term_filters.append(combined_filter)
+            
+            # Bütün variantlar üçün OR əməliyyatı
+            if term_filters:
+                term_combined = reduce(or_, term_filters)
+                filters.append(term_combined)
+        
+        return filters
+
+    # Axtarış şərtlərini çıxar
+    search_terms = clean_and_extract_terms(search_query)
+    
+    if not search_terms:
+        # Wilson score sıralama
+        if order_by_wilson:
+            queryset = queryset.annotate(
+                sum_rating=Sum('ratings__rating'),
+                rating_count=Count('ratings'),
+                avg_rating=Avg('ratings__rating'),
+            ).order_by('-rating_count', '-avg_rating', '-id')
+        return queryset
+
+    # Axtarış filterlərini yarat
+    search_filters = create_search_filters(search_terms)
+    
+    if search_filters:
+        # Bütün şərtlər üçün AND əməliyyatı (hər şərt ödənməlidir)
+        final_filter = reduce(and_, search_filters)
+        queryset = queryset.filter(final_filter)
+    
+    # Əgər nəticə tapılmadısa, daha geniş axtarış et
+    if not queryset.exists() and len(search_terms) > 1:
+        # Yalnız ən vacib şərtləri istifadə et
+        important_terms = [term for term in search_terms if len(term) >= 2]
+        if important_terms:
+            backup_filters = create_search_filters(important_terms[:2])  # Yalnız ilk 2 şərt
+            if backup_filters:
+                backup_filter = reduce(and_, backup_filters)
+                queryset = queryset.filter(backup_filter)
+    
+    # Wilson score sıralama
     if order_by_wilson:
         queryset = queryset.annotate(
             sum_rating=Sum('ratings__rating'),
             rating_count=Count('ratings'),
             avg_rating=Avg('ratings__rating'),
         ).order_by('-rating_count', '-avg_rating', '-id')
+    
     return queryset

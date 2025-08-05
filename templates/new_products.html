@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}New Products - AS-AVTO{% endblock %}
+{% block title %}Yeni Məhsullar - AS-AVTO{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h2>New Products</h2>
+    <h2>Yeni Məhsullar</h2>
     <div id="products-list" data-has-more="{{ has_more|yesno:'true,false' }}">
         {% for mehsul in mehsullar %}
         <div class="product-row" style="position:relative;">
@@ -19,8 +19,8 @@
                     <a href="#" class="seller-link" onclick="openUserDetailsModal({{ mehsul.sahib.id }}); return false;"><i class="fas fa-user"></i> {{ mehsul.sahib.username }}</a>
                     {% endif %}
                 </div>
-                <div class="product-stock">Code: {{ mehsul.brend_kod }}</div>
-                <div class="product-stock">Stock: {{ mehsul.stok }}</div>
+                <div class="product-stock">Kod: {{ mehsul.brend_kod }}</div>
+                <div class="product-stock">Stok: {{ mehsul.stok }}</div>
             </div>
           
             <div class="avtomobil-logos-wrapper">
@@ -39,7 +39,7 @@
                     {% endfor %}
                     <span style="color:#2B5173;font-size:1rem;">{{ mehsul.avg_rating|floatformat:1 }}</span>
                     <span style="color:#e74c3c;font-size:1.1rem;margin-left:8px;"><i class="fas fa-heart"></i> {{ mehsul.like_count }}</span>
-                    <span style="color:#888;font-size:0.95rem;margin-left:8px;">Value Score: {{ mehsul.wilson_score|floatformat:3 }}</span>
+                    <span style="color:#888;font-size:0.95rem;margin-left:8px;">Dəyər Skoru: {{ mehsul.wilson_score|floatformat:3 }}</span>
                 </div>
                 <button type="button" class="cart-add-btn" {% if mehsul.stok == 0 %}disabled{% endif %} onclick="openQuantityModal({{ mehsul.id }}, {{ mehsul.stok }})">
                     <i class="fas fa-shopping-cart"></i>
@@ -49,7 +49,7 @@
         {% empty %}
         <div class="empty-message">
             <i class="fas fa-box-open"></i>
-            <p>There are currently no new products.</p>
+            <p>Hal-hazırda yeni məhsul yoxdur.</p>
         </div>
         {% endfor %}
     </div>
@@ -64,23 +64,23 @@
 <div id="quantityModal" class="modal">
     <div class="custom-quantity-modal-content">
         <span class="close">&times;</span>
-        <h3>Select Quantity</h3>
+        <h3>Miqdar Seçin</h3>
         <form method="POST" id="addToCartForm">
             {% csrf_token %}
             <input type="number" name="quantity" id="quantityInput" value="1" min="1" class="form-control">
             <div class="modal-buttons">
-                <button type="button" class="btn btn-danger" onclick="closeQuantityModal()">Cancel</button>
-                <button type="submit" class="btn btn-primary">Confirm</button>
+                <button type="button" class="btn btn-danger" onclick="closeQuantityModal()">Ləğv Et</button>
+                <button type="submit" class="btn btn-primary">Təsdiqlə</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Image Modal -->
+<!-- Şəkil Modal -->
 <div id="imageModal" class="image-modal">
     <span class="image-modal-close">&times;</span>
     <div class="modal-image-content">
-        <img id="modalImage" class="modal-image" src="" alt="Modal Image">
+        <img id="modalImage" class="modal-image" src="" alt="Modal Şəkli">
     </div>
 </div>
 

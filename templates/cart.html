@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
-{% block title %}Cart - As Avto{% endblock %}
+{% block title %}Səbət - As Avto{% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="cart-header">
-        <h2>My Cart</h2>
+        <h2>Səbətim</h2>
     </div>
 
     {% if cart_items %}
@@ -16,17 +16,17 @@
                     <th>
                         <input type="checkbox" id="select-all" class="select-checkbox">
                     </th>
-                    <th>Image</th>
-                    <th>Code</th>
-                    <th>Brand Name</th>
-                    <th>Product Name</th>
+                    <th>Şəkil</th>
+                    <th>Kod</th>
+                    <th>Marka Adı</th>
+                    <th>Məhsul Adı</th>
                     <!-- <th>OEM</th> -->
-                    <th>Stock</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Total</th>
-                    <th>Seller</th>
-                    <th>Delete</th>
+                    <th>Stok</th>
+                    <th>Qiymət</th>
+                    <th>Miqdar</th>
+                    <th>Ümumi</th>
+                    <th>Satıcı</th>
+                    <th>Sil</th>
                 </tr>
             </thead>
             <tbody>
@@ -71,41 +71,41 @@
             {% csrf_token %}
             <div class="cart-summary">
                 <div class="cart-total">
-                    <span class="total-label">Selected Amount:</span>
+                    <span class="total-label">Seçilmiş Məbləğ:</span>
                     <span class="total-value" id="selected-total">0.00 ₼</span>
                 </div>
                 <div class="delivery-method">
-                    <h4>Delivery Method</h4>
+                    <h4>Çatdırılma Üsulu</h4>
                     <div class="delivery-options">
                         <label class="delivery-option">
                             <input type="radio" name="catdirilma_usulu" value="TAXI" required>
-                            <span>Delivery by Taxi</span>
+                            <span>Taksi ilə çatdırılma</span>
                         </label>
                         <label class="delivery-option">
                             <input type="radio" name="catdirilma_usulu" value="PICKUP" required>
-                            <span>I will pick up myself</span>
+                            <span>Özüm götürəcəyəm</span>
                         </label>
                     </div>
                 </div>
                 <div class="checkout-form">
-                    <button type="submit" class="btn btn-primary" id="checkout-button" disabled>Send Order</button>
+                    <button type="submit" class="btn btn-primary" id="checkout-button" disabled>Sifariş Göndər</button>
                 </div>
             </div>
         </form>
         </div>
     {% else %}
         <div class="empty-cart">
-            <p>Your cart is empty.</p>
-            <a href="{% url 'products' %}" class="btn btn-primary">View Products</a>
+            <p>Səbətiniz boşdur.</p>
+            <a href="{% url 'products' %}" class="btn btn-primary">Məhsullara Bax</a>
         </div>
     {% endif %}
 </div>
 
-<!-- Image Modal -->
+<!-- Şəkil Modal -->
 <div id="imageModal" class="image-modal">
     <span class="image-modal-close">&times;</span>
     <div class="modal-image-content">
-        <img id="modalImage" class="modal-image" src="" alt="Modal Image">
+        <img id="modalImage" class="modal-image" src="" alt="Modal Şəkli">
     </div>
 </div>
 

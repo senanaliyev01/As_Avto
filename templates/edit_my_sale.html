@@ -1,32 +1,32 @@
 {% extends 'admin_panel.html' %}
 
-{% block title %}Edit Order #{{ order.id }} - AS-AVTO{% endblock %}
-{% block panel_title %}Edit Order #{{ order.id }}{% endblock %}
+{% block title %}Sifariş #{{ order.id }} Redaktə Et - AS-AVTO{% endblock %}
+{% block panel_title %}Sifariş #{{ order.id }} Redaktə Et{% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Edit Order #{{ order.id }}</h2>
-        <a href="{% url 'my_sales' %}" class="btn btn-secondary">Go Back</a>
+        <h2>Sifariş #{{ order.id }} Redaktə Et</h2>
+        <a href="{% url 'my_sales' %}" class="btn btn-secondary">Geri Qayıt</a>
     </div>
 
     <form method="post">
         {% csrf_token %}
         <div class="row">
             <div class="col-md-8">
-                <h4>Products in This Order</h4>
+                <h4>Bu Sifarişdəki Məhsullar</h4>
                 <div class="table-responsive">
                     <table class="table table-bordered">
                         <thead class="thead-light">
                             <tr>
-                                <th>Image</th>
-                                <th>Code</th>
-                                <th>Brand Name</th>
-                                <th>Product Name</th>
-                                <th>Seller</th>
-                                <th style="width: 100px;">Quantity</th>
-                                <th style="width: 120px;">Price</th>
-                                <th style="width: 120px;">Total</th>
+                                <th>Şəkil</th>
+                                <th>Kod</th>
+                                <th>Marka Adı</th>
+                                <th>Məhsul Adı</th>
+                                <th>Satıcı</th>
+                                <th style="width: 100px;">Miqdar</th>
+                                <th style="width: 120px;">Qiymət</th>
+                                <th style="width: 120px;">Ümumi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -63,19 +63,19 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <h4>Update Order</h4>
+                <h4>Sifarişi Yenilə</h4>
                 <div class="card">
                     <div class="card-body">
                         <div class="mb-3">
-                            <label class="form-label">Total Amount</label>
+                            <label class="form-label">Ümumi Məbləğ</label>
                             <input type="text" id="total-amount-display" class="form-control" value="{{ total_amount|floatformat:2 }} ₼" readonly>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Remaining Debt</label>
+                            <label class="form-label">Qalıq Borc</label>
                             <input type="text" id="qaliq-borc-display" class="form-control" value="{{ qaliq_borc|floatformat:2 }} ₼" readonly>
                         </div>
                         {{ form.as_p }}
-                        <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+                        <button type="submit" class="btn btn-primary w-100">Dəyişiklikləri Yadda Saxla</button>
                     </div>
                 </div>
             </div>

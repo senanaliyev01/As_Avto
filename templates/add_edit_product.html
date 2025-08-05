@@ -1,12 +1,12 @@
 {% extends 'admin_panel.html' %}
 {% load static %}
 
-{% block title %}{% if form.instance.pk %}Edit Product{% else %}Add New Product{% endif %} - AS-AVTO{% endblock %}
-{% block panel_title %}{% if form.instance.pk %}Edit Product{% else %}Add New Product{% endif %}{% endblock %}
+{% block title %}{% if form.instance.pk %}Məhsulu Redaktə Et{% else %}Yeni Məhsul Əlavə Et{% endif %} - AS-AVTO{% endblock %}
+{% block panel_title %}{% if form.instance.pk %}Məhsulu Redaktə Et{% else %}Yeni Məhsul Əlavə Et{% endif %}{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h2>{% if form.instance.pk %}Edit Product{% else %}Add New Product{% endif %}</h2>
+    <h2>{% if form.instance.pk %}Məhsulu Redaktə Et{% else %}Yeni Məhsul Əlavə Et{% endif %}</h2>
     
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
@@ -28,10 +28,10 @@
             {% endfor %}
             <div class="col-md-6 mb-3">
                 <div class="form-group">
-                    <label for="id_sekil">Image</label>
+                    <label for="id_sekil">Şəkil</label>
                     {% if form.instance.sekil %}
                         <div class="mb-2">
-                            <img src="{{ form.instance.sekil.url }}?t={{ now|date:'U' }}" alt="Product Image" style="max-width: 120px; max-height: 120px;">
+                            <img src="{{ form.instance.sekil.url }}?t={{ now|date:'U' }}" alt="Məhsul Şəkli" style="max-width: 120px; max-height: 120px;">
                         </div>
                     {% endif %}
                     <input type="file" name="sekil" class="form-control" id="id_sekil">
@@ -44,9 +44,9 @@
             </div>
         </div>
         <button type="submit" class="btn btn-primary">
-            {% if form.instance.pk %}Save{% else %}Add{% endif %}
+            {% if form.instance.pk %}Yadda Saxla{% else %}Əlavə Et{% endif %}
         </button>
-        <a href="{% url 'my_products' %}" class="btn btn-secondary">Cancel</a>
+        <a href="{% url 'my_products' %}" class="btn btn-secondary">Ləğv Et</a>
     </form>
 </div>
 {% endblock %} 

@@ -5809,3 +5809,68 @@ body {
         max-width: 10ch; /* Even smaller on very small screens */
     }
 }
+
+/* Satıcı səbətləri üçün xüsusi dizayn */
+.seller-carts-bar {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+    margin: 16px 0 24px 0;
+    flex-wrap: wrap;
+}
+.seller-cart-box {
+    background: #fff;
+    border: 1px solid #dcdde1;
+    border-radius: 10px;
+    padding: 8px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+    transition: box-shadow 0.2s, border 0.2s;
+}
+.seller-cart-box:hover {
+    box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+    border: 1.5px solid #3498db;
+}
+.seller-cart-box img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1.5px solid #3498db;
+}
+.seller-cart-box .cart-link {
+    margin-left: 8px;
+    color: #e74c3c;
+    font-size: 18px;
+    position: relative;
+    text-decoration: none;
+}
+.seller-cart-box .cart-link:hover {
+    color: #c0392b;
+}
+.seller-cart-box .cart-counter {
+    position: absolute;
+    top: -8px;
+    right: -12px;
+    background: #e74c3c;
+    color: #fff;
+    border-radius: 10px;
+    padding: 2px 7px;
+    font-size: 12px;
+    font-weight: bold;
+    min-width: 18px;
+    text-align: center;
+}
+@media (max-width: 600px) {
+    .seller-carts-bar {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .seller-cart-box {
+        width: 90vw;
+        justify-content: flex-start;
+    }
+}

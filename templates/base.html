@@ -319,8 +319,22 @@
             </div>
         </main>
 
-        <!-- Loqo Slayder -->
-        <!-- Firma logo sliderinə aid bütün HTML kodu silindi -->
+        <!-- Header bitdi, indi satıcı səbətləri -->
+        {% if verified_sellers %}
+        <div class="seller-carts-bar" style="display: flex; gap: 16px; justify-content: center; align-items: center; margin: 16px 0;">
+            {% for seller in verified_sellers %}
+                <div class="seller-cart-box" style="background: #fff; border: 1px solid #dcdde1; border-radius: 10px; padding: 8px 18px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 8px rgba(44,62,80,0.07);">
+                    <img src="{{ seller.profile.sekil.url }}" alt="{{ seller.username }}" style="width:32px; height:32px; border-radius:50%; object-fit:cover; border:1.5px solid #3498db;">
+                    <span style="font-weight: bold; color: #2c3e50;">{{ seller.username }}</span>
+                    <a href="{% url 'cart' %}?seller={{ seller.id }}" class="cart-link" style="margin-left: 8px; color: #e74c3c; font-size: 18px; position: relative;">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-counter" id="cart-counter-{{ seller.id }}" style="position: absolute; top: -8px; right: -12px; background: #e74c3c; color: #fff; border-radius: 10px; padding: 2px 7px; font-size: 12px; font-weight: bold;">0</span>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <!-- Satıcı səbətləri bitdi -->
 
     </div>
 

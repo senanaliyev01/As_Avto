@@ -169,31 +169,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-
-    // Satıcı səbət saylarını doldur
-    function updateSellerCartCounters() {
-        let cart = {};
-        try {
-            cart = JSON.parse(localStorage.getItem('cart')) || {};
-        } catch (e) {
-            cart = {};
-        }
-        document.querySelectorAll('.cart-counter').forEach(function(counter) {
-            const sellerId = counter.id.replace('cart-counter-', '');
-            if (cart[sellerId]) {
-                counter.textContent = Object.keys(cart[sellerId]).length;
-            } else {
-                counter.textContent = '0';
-            }
-        });
-    }
-    updateSellerCartCounters();
-    // Əgər səbət dəyişərsə, yenilə (məsələn, məhsul əlavə/sil)
-    window.addEventListener('storage', function(e) {
-        if (e.key === 'cart') {
-            updateSellerCartCounters();
-        }
-    });
 });
 
 function initializeSearch() {
@@ -251,6 +226,26 @@ function initializeSearch() {
             }
         });
     }
+}
+
+// Hər satıcı üçün səbət sayını yenilə
+function updateAllSellerCartCounters() {
+    // Səbət strukturu: { seller_id: {product_id: quantity, ...}, ... }
+    let cart = {};
+    try {
+        cart = JSON.parse(sessionStorage.getItem('cart') || '{}');
+    } catch (e) {
+        cart = {};
+    }
+    // Hər satıcı üçün səbət sayını hesabla və göstər
+    document.querySelectorAll('[id^="cart-counter-"]').forEach(function(counter) {
+        const sellerId = counter.id.replace('cart-counter-', '');
+        let count = 0;
+        if (cart[sellerId]) {
+            count = Object.keys(cart[sellerId]).length;
+        }
+        counter.textContent = count;
+    });
 }
 
 function initializeCart() {
@@ -362,6 +357,7 @@ function initializeCart() {
             });
         });
     }
+    updateAllSellerCartCounters();
 }
 
 function initializeModal() {
@@ -1480,67 +1476,5 @@ function initializeAuthModals() {
             });
         }, 3000);
     };
-}
-
-function updateLocalStorageCart(cart) {
-    try {
-        localStorage.setItem('cart', JSON.stringify(cart));
-    } catch (e) {}
-}
-
-// Mövcud səbətə əlavə/sil funksiyalarında localStorage yenilə
-// add_to_cart və remove_from_cart AJAX cavabında istifadə et
-
-// Mövcud kodda məhsul səbətə əlavə olunanda:
-function addToCart(productId, quantity, sellerId) {
-    fetch(`/cart/add/${productId}/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': getCookie('csrftoken'),
-            'X-Requested-With': 'XMLHttpRequest',
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `quantity=${quantity}`
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            // LocalStorage-də səbəti yenilə
-            let cart = {};
-            try { cart = JSON.parse(localStorage.getItem('cart')) || {}; } catch (e) { cart = {}; }
-            if (!cart[sellerId]) cart[sellerId] = {};
-            cart[sellerId][productId] = (cart[sellerId][productId] || 0) + quantity;
-            updateLocalStorageCart(cart);
-            // Sayğacları yenilə
-            document.getElementById('cart-counter-' + sellerId).textContent = Object.keys(cart[sellerId]).length;
-        }
-    });
-}
-
-// Məhsul səbətdən silinəndə:
-function removeFromCart(productId, sellerId) {
-    fetch(`/cart/remove/${productId}/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': getCookie('csrftoken'),
-            'X-Requested-With': 'XMLHttpRequest',
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            let cart = {};
-            try { cart = JSON.parse(localStorage.getItem('cart')) || {}; } catch (e) { cart = {}; }
-            if (cart[sellerId] && cart[sellerId][productId]) {
-                delete cart[sellerId][productId];
-                if (Object.keys(cart[sellerId]).length === 0) {
-                    delete cart[sellerId];
-                }
-                updateLocalStorageCart(cart);
-            }
-            // Sayğacları yenilə
-            document.getElementById('cart-counter-' + sellerId).textContent = cart[sellerId] ? Object.keys(cart[sellerId]).length : 0;
-        }
-    });
 }
 

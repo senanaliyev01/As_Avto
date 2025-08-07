@@ -34,7 +34,7 @@ from django.db.models.functions import Concat, Cast
 from django.db.models import CharField
 from django.db import models
 from math import sqrt
-from home.models import Profile
+from .models import Profile
 
 def truncate_product_name(name, max_length=20):
     """Məhsul adını qısaldır və uzun olarsa ... əlavə edir"""
@@ -94,8 +94,6 @@ def login_view(request):
             return JsonResponse({'success': False, 'error': 'Şifrə və ya istifadəçi adı yanlışdır'})
     return redirect('base')
 
-def get_verified_sellers():
-    return User.objects.filter(profile__is_verified=True)
 
 def home_view(request):
     # Yeni məhsulları əldə et
@@ -145,8 +143,8 @@ def home_view(request):
         m.total_sold = m.sifarisitem_set.aggregate(Sum('miqdar'))['miqdar__sum'] or 0
     most_rated_products = sorted(rated_products, key=lambda m: m.wilson_score, reverse=True)[:10]
 
-    # Təsdiqlənmiş satıcılar
-    verified_sellers = get_verified_sellers()
+    # Bütün təsdiqlənmiş satıcılar (is_verified=True)
+    verified_sellers = Profile.objects.filter(is_verified=True)
 
     return render(request, 'base.html', {
         'new_products': new_products,
@@ -252,35 +250,42 @@ def cart_view(request):
     if 'cart' not in request.session:
         request.session['cart'] = {}
     cart = request.session['cart']
-    cart_items = []
+    # Yeni struktur: { seller_id: {product_id: quantity, ...}, ... }
+    seller_carts = {}
     total = Decimal('0.00')
     popup_images = PopupImage.objects.filter(aktiv=True)
     invalid_products = []
-    # Yeni: satıcıya görə qruplaşdırılmış səbət
-    for seller_id, seller_cart in cart.items():
-        for product_id, quantity in seller_cart.items():
+    # Hər satıcı üçün məhsulları ayır
+    for seller_id, products in cart.items():
+        seller_cart_items = []
+        seller_total = Decimal('0.00')
+        for product_id, quantity in products.items():
             try:
                 product = Mehsul.objects.get(id=product_id)
                 subtotal = product.qiymet * Decimal(str(quantity))
-                cart_items.append({
+                seller_cart_items.append({
                     'product': product,
                     'quantity': quantity,
-                    'subtotal': subtotal,
-                    'seller_id': seller_id,
-                    'seller': product.sahib
+                    'subtotal': subtotal
                 })
+                seller_total += subtotal
                 total += subtotal
             except Mehsul.DoesNotExist:
                 invalid_products.append((seller_id, product_id))
+        seller_carts[seller_id] = {
+            'items': seller_cart_items,
+            'total': seller_total,
+            'seller': Profile.objects.filter(user__id=seller_id).first()
+        }
     # Mövcud olmayan məhsulları səbətdən sil
     if invalid_products:
         for seller_id, product_id in invalid_products:
-            if seller_id in cart and str(product_id) in cart[seller_id]:
-                del cart[seller_id][str(product_id)]
+            if seller_id in cart and product_id in cart[seller_id]:
+                del cart[seller_id][product_id]
         request.session.modified = True
         messages.warning(request, 'Bəzi məhsullar səbətdən silindi, çünki artıq mövcud deyil.')
     return render(request, 'cart.html', {
-        'cart_items': cart_items,
+        'seller_carts': seller_carts,
         'total': total,
         'popup_images': popup_images
     })
@@ -290,35 +295,39 @@ def add_to_cart(request, product_id):
     if request.method == 'POST':
         product = get_object_or_404(Mehsul, id=product_id)
         quantity = int(request.POST.get('quantity', 1))
+        
         response_data = {
             'status': 'error',
             'message': ''
         }
+        
         if quantity > product.stok:
             response_data['message'] = f'Yalnız {product.stok} vahid {product.adi} mövcuddur!'
             return JsonResponse(response_data)
+        
         if 'cart' not in request.session:
             request.session['cart'] = {}
+        
         cart = request.session['cart']
-        seller_id = str(product.sahib.id) if product.sahib else 'asavto'
-        if seller_id not in cart:
-            cart[seller_id] = {}
-        current_quantity = cart[seller_id].get(str(product_id), 0)
+        current_quantity = cart.get(str(product_id), 0)
         new_quantity = current_quantity + quantity
+        
         if new_quantity > product.stok:
             response_data['message'] = f'Yalnız {product.stok} vahid {product.adi} mövcuddur!'
             return JsonResponse(response_data)
-        cart[seller_id][str(product_id)] = new_quantity
+        
+        cart[str(product_id)] = new_quantity
         request.session['cart'] = cart
         request.session.modified = True
-        # Yeni: bütün məhsulların cəmi sayı
-        cart_count = sum(len(seller_cart) for seller_cart in cart.values())
+        
         response_data.update({
             'status': 'success',
             'message': f'{quantity} vahid {product.adi} səbətə əlavə edildi!',
-            'cart_count': cart_count
+            'cart_count': len(cart)
         })
+        
         return JsonResponse(response_data)
+    
     return JsonResponse({'status': 'error', 'message': 'Səhv məlumat daxil edildi'})
 
 @login_required
@@ -326,24 +335,21 @@ def remove_from_cart(request, product_id):
     if request.method == 'POST':
         if 'cart' in request.session:
             cart = request.session['cart']
-            # Bütün satıcı səbətlərində axtar
-            for seller_id in list(cart.keys()):
-                if str(product_id) in cart[seller_id]:
-                    del cart[seller_id][str(product_id)]
-                    # Əgər satıcının səbəti boşdursa, onu da sil
-                    if not cart[seller_id]:
-                        del cart[seller_id]
-                    request.session.modified = True
-                    cart_count = sum(len(seller_cart) for seller_cart in cart.values())
-                    return JsonResponse({
-                        'status': 'success',
-                        'message': 'Məhsul səbətdən silindi!',
-                        'cart_count': cart_count
-                    })
+            if str(product_id) in cart:
+                del cart[str(product_id)]
+                request.session.modified = True
+                
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'Məhsul səbətdən silindi!',
+                    'cart_count': len(cart)
+                })
+    
         return JsonResponse({
             'status': 'error',
             'message': 'Məhsul tapılmadı!'
         })
+        
     return JsonResponse({
         'status': 'error',
         'message': 'Səhv məlumat daxil edildi'

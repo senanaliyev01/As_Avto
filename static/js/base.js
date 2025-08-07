@@ -169,7 +169,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-    initializeSellerCarts();
 });
 
 function initializeSearch() {
@@ -1456,86 +1455,5 @@ function initializeAuthModals() {
             });
         }, 3000);
     };
-}
-
-function initializeSellerCarts() {
-    // Hər satıcı üçün səbət açma və bağlama funksionallığı
-    const sellerCartToggles = document.querySelectorAll('.seller-cart-toggle');
-    sellerCartToggles.forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            const sellerId = btn.getAttribute('data-seller-id');
-            openSellerCartSidebar(sellerId);
-        });
-    });
-}
-
-function openSellerCartSidebar(sellerId) {
-    // Əgər artıq varsa, sil
-    let sidebar = document.getElementById('seller-cart-sidebar-' + sellerId);
-    if (!sidebar) {
-        sidebar = document.createElement('div');
-        sidebar.className = 'seller-cart-sidebar';
-        sidebar.id = 'seller-cart-sidebar-' + sellerId;
-        sidebar.innerHTML = `
-            <div class="seller-cart-sidebar-header">
-                <span class="seller-cart-sidebar-title">
-                    <i class="fas fa-shopping-cart"></i>
-                    Satıcı Səbəti
-                </span>
-                <button class="seller-cart-sidebar-close" title="Bağla">&times;</button>
-            </div>
-            <div class="seller-cart-sidebar-content">
-                <div class="loading">Yüklənir...</div>
-            </div>
-        `;
-        document.body.appendChild(sidebar);
-        // Bağlama düyməsi
-        sidebar.querySelector('.seller-cart-sidebar-close').addEventListener('click', function() {
-            sidebar.classList.remove('active');
-            setTimeout(() => sidebar.remove(), 350);
-        });
-    }
-    // Bütün digər sidebarları bağla
-    document.querySelectorAll('.seller-cart-sidebar.active').forEach(function(sb) {
-        if (sb !== sidebar) {
-            sb.classList.remove('active');
-            setTimeout(() => sb.remove(), 350);
-        }
-    });
-    // Aç
-    sidebar.classList.add('active');
-    // Səbət məzmununu yüklə (AJAX və ya localStorage ilə)
-    loadSellerCartContent(sellerId, sidebar);
-}
-
-function loadSellerCartContent(sellerId, sidebar) {
-    // AJAX ilə backend-dən səbət məzmununu yüklə (hazırda demo)
-    const contentDiv = sidebar.querySelector('.seller-cart-sidebar-content');
-    contentDiv.innerHTML = '<div class="loading">Yüklənir...</div>';
-    fetch(`/api/seller-cart/${sellerId}/`, { credentials: 'same-origin' })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'success') {
-                if (data.items.length === 0) {
-                    contentDiv.innerHTML = '<div class="empty-cart">Bu satıcının səbəti boşdur.</div>';
-                } else {
-                    let html = '<ul class="seller-cart-list-ul">';
-                    data.items.forEach(item => {
-                        html += `<li>
-                            <img src="${item.image}" alt="${item.name}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;margin-right:8px;">
-                            <span>${item.name}</span> <b>x${item.quantity}</b> <span style="float:right;">${item.price} ₼</span>
-                        </li>`;
-                    });
-                    html += '</ul>';
-                    html += `<div class="cart-total" style="margin-top:18px;font-weight:700;font-size:18px;">Cəm: ${data.total} ₼</div>`;
-                    contentDiv.innerHTML = html;
-                }
-            } else {
-                contentDiv.innerHTML = '<div class="empty-cart">Səbət tapılmadı.</div>';
-            }
-        })
-        .catch(() => {
-            contentDiv.innerHTML = '<div class="empty-cart">Xəta baş verdi.</div>';
-        });
 }
 

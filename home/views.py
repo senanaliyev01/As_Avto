@@ -13,7 +13,7 @@ from functools import reduce
 from operator import and_, or_
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
-from django.views.decorators.http import require_http_methods, require_POST, require_GET
+from django.views.decorators.http import require_http_methods, require_POST
 from .forms import MehsulForm, SifarisEditForm, SifarisItemEditForm
 import pandas as pd
 from django.db import transaction
@@ -34,7 +34,6 @@ from django.db.models.functions import Concat, Cast
 from django.db.models import CharField
 from django.db import models
 from math import sqrt
-from .models import Profile
 
 def truncate_product_name(name, max_length=20):
     """Məhsul adını qısaldır və uzun olarsa ... əlavə edir"""
@@ -143,16 +142,12 @@ def home_view(request):
         m.total_sold = m.sifarisitem_set.aggregate(Sum('miqdar'))['miqdar__sum'] or 0
     most_rated_products = sorted(rated_products, key=lambda m: m.wilson_score, reverse=True)[:10]
 
-    # Təsdiqlənmiş satıcılar (is_verified=True)
-    verified_sellers = Profile.objects.filter(is_verified=True)
-
     return render(request, 'base.html', {
         'new_products': new_products,
         'popup_images': popup_images,
         'most_sold_products': most_sold_products,
-        'most_liked_products': most_liked_products,
         'most_rated_products': most_rated_products,
-        'verified_sellers': verified_sellers,
+        'most_liked_products': most_liked_products,
     })
 
 
@@ -245,68 +240,46 @@ def load_more_products(request):
         'has_more': has_more
     })
 
-def get_cart_by_seller(request):
-    """
-    Session-dakı səbəti hər satıcıya görə qruplaşdırılmış şəkildə qaytarır.
-    Struktur: { seller_id: {product_id: quantity, ...}, ... }
-    """
-    cart = request.session.get('cart', {})
-    # Əgər köhnə strukturda (birbaşa product_id: quantity) varsa, onu yeni struktura çevir
-    if cart and all(isinstance(v, int) for v in cart.values()):
-        # Köhnə strukturdan yeni struktura çevir
-        new_cart = defaultdict(dict)
-        from .models import Mehsul
-        for product_id, quantity in cart.items():
-            try:
-                product = Mehsul.objects.get(id=product_id)
-                seller_id = str(product.sahib.id) if product.sahib else 'asavto'
-                new_cart[seller_id][str(product_id)] = quantity
-            except Mehsul.DoesNotExist:
-                continue
-        cart = dict(new_cart)
-        request.session['cart'] = cart
-        request.session.modified = True
-    return cart
-
 @login_required
 def cart_view(request):
-    cart = get_cart_by_seller(request)
+    if 'cart' not in request.session:
+        request.session['cart'] = {}
+    cart = request.session['cart']
     cart_items_by_seller = {}
-    total_by_seller = {}
-    from .models import Mehsul, Profile, PopupImage
+    total = Decimal('0.00')
     popup_images = PopupImage.objects.filter(aktiv=True)
     invalid_products = []
-    for seller_id, products in cart.items():
-        cart_items = []
-        total = 0
-        for product_id, quantity in products.items():
-            try:
-                product = Mehsul.objects.get(id=product_id)
-                subtotal = product.qiymet * quantity
-                cart_items.append({
-                    'product': product,
-                    'quantity': quantity,
-                    'subtotal': subtotal
-                })
-                total += subtotal
-            except Mehsul.DoesNotExist:
-                invalid_products.append((seller_id, product_id))
-        cart_items_by_seller[seller_id] = cart_items
-        total_by_seller[seller_id] = total
-    # Mövcud olmayan məhsulları səbətdən sil
+
+    for product_id, quantity in cart.items():
+        try:
+            product = Mehsul.objects.get(id=product_id)
+            subtotal = product.qiymet * Decimal(str(quantity))
+            seller_id = product.sahib.id if product.sahib else 'asavto'
+            seller_name = product.sahib.username if product.sahib else 'AS-AVTO'
+            if seller_id not in cart_items_by_seller:
+                cart_items_by_seller[seller_id] = {
+                    'seller': seller_name,
+                    'items': []
+                }
+            cart_items_by_seller[seller_id]['items'].append({
+                'product': product,
+                'quantity': quantity,
+                'subtotal': subtotal
+            })
+            total += subtotal
+        except Mehsul.DoesNotExist:
+            invalid_products.append(product_id)
+
     if invalid_products:
-        for seller_id, product_id in invalid_products:
-            if product_id in cart.get(seller_id, {}):
-                del cart[seller_id][product_id]
-        request.session['cart'] = cart
+        for product_id in invalid_products:
+            if str(product_id) in cart:
+                del cart[str(product_id)]
         request.session.modified = True
         messages.warning(request, 'Bəzi məhsullar səbətdən silindi, çünki artıq mövcud deyil.')
-    # Satıcı profillərini yığ
-    seller_profiles = {str(profile.user.id): profile for profile in Profile.objects.filter(is_verified=True)}
+
     return render(request, 'cart.html', {
         'cart_items_by_seller': cart_items_by_seller,
-        'total_by_seller': total_by_seller,
-        'seller_profiles': seller_profiles,
+        'total': total,
         'popup_images': popup_images
     })
 
@@ -1796,33 +1769,3 @@ def get_search_filtered_products(queryset, search_query, order_by_wilson=True):
             avg_rating=Avg('ratings__rating'),
         ).order_by('-rating_count', '-avg_rating', '-id')
     return queryset
-
-@require_GET
-@login_required
-def api_seller_cart(request, seller_id):
-    cart = request.session.get('cart', {})
-    seller_id = str(seller_id)
-    items = []
-    total = 0
-    from .models import Mehsul
-    if seller_id in cart:
-        for product_id, quantity in cart[seller_id].items():
-            try:
-                product = Mehsul.objects.get(id=product_id)
-                subtotal = float(product.qiymet) * int(quantity)
-                items.append({
-                    'id': product.id,
-                    'name': product.adi,
-                    'image': product.sekil.url if product.sekil else '/static/images/no_image.webp',
-                    'price': float(product.qiymet),
-                    'quantity': int(quantity),
-                    'subtotal': subtotal
-                })
-                total += subtotal
-            except Mehsul.DoesNotExist:
-                continue
-    return JsonResponse({
-        'status': 'success',
-        'items': items,
-        'total': total
-    })

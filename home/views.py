@@ -240,48 +240,40 @@ def load_more_products(request):
         'has_more': has_more
     })
 
-def get_seller_id(product):
-    return str(product.sahib.id) if product.sahib else 'asavto'
-
 @login_required
 def cart_view(request):
     if 'cart' not in request.session:
         request.session['cart'] = {}
+    
     cart = request.session['cart']
     cart_items = []
     total = Decimal('0.00')
     popup_images = PopupImage.objects.filter(aktiv=True)
-    invalid_products = []
-
-    # Yeni struktur: {seller_id: {product_id: quantity}}
-    for seller_id, products in cart.items():
-        for product_id, quantity in products.items():
-            try:
-                product = Mehsul.objects.get(id=product_id)
-                subtotal = product.qiymet * Decimal(str(quantity))
-                cart_items.append({
-                    'product': product,
-                    'quantity': quantity,
-                    'subtotal': subtotal,
-                    'seller_id': seller_id,
-                    'seller': product.sahib
-                })
-                total += subtotal
-            except Mehsul.DoesNotExist:
-                invalid_products.append((seller_id, product_id))
-    # Silinmiş məhsulları səbətdən çıxar
+    invalid_products = []  # Mövcud olmayan məhsulları izləmək üçün
+    
+    for product_id, quantity in cart.items():
+        try:
+            product = Mehsul.objects.get(id=product_id)
+            subtotal = product.qiymet * Decimal(str(quantity))
+            cart_items.append({
+                'product': product,
+                'quantity': quantity,
+                'subtotal': subtotal
+            })
+            total += subtotal
+        except Mehsul.DoesNotExist:
+            invalid_products.append(product_id)  # Mövcud olmayan məhsulu qeyd et
+    
+    # Mövcud olmayan məhsulları səbətdən sil
     if invalid_products:
-        for seller_id, product_id in invalid_products:
-            if seller_id in cart and product_id in cart[seller_id]:
-                del cart[seller_id][product_id]
+        for product_id in invalid_products:
+            if str(product_id) in cart:
+                del cart[str(product_id)]
         request.session.modified = True
         messages.warning(request, 'Bəzi məhsullar səbətdən silindi, çünki artıq mövcud deyil.')
-    # Satıcıya görə qruplaşdır
-    grouped_cart = defaultdict(list)
-    for item in cart_items:
-        grouped_cart[item['seller_id']].append(item)
+    
     return render(request, 'cart.html', {
-        'grouped_cart': grouped_cart,
+        'cart_items': cart_items,
         'total': total,
         'popup_images': popup_images
     })
@@ -291,31 +283,39 @@ def add_to_cart(request, product_id):
     if request.method == 'POST':
         product = get_object_or_404(Mehsul, id=product_id)
         quantity = int(request.POST.get('quantity', 1))
-        response_data = {'status': 'error', 'message': ''}
+        
+        response_data = {
+            'status': 'error',
+            'message': ''
+        }
+        
         if quantity > product.stok:
             response_data['message'] = f'Yalnız {product.stok} vahid {product.adi} mövcuddur!'
             return JsonResponse(response_data)
+        
         if 'cart' not in request.session:
             request.session['cart'] = {}
+        
         cart = request.session['cart']
-        seller_id = get_seller_id(product)
-        if seller_id not in cart:
-            cart[seller_id] = {}
-        current_quantity = cart[seller_id].get(str(product_id), 0)
+        current_quantity = cart.get(str(product_id), 0)
         new_quantity = current_quantity + quantity
+        
         if new_quantity > product.stok:
             response_data['message'] = f'Yalnız {product.stok} vahid {product.adi} mövcuddur!'
             return JsonResponse(response_data)
-        cart[seller_id][str(product_id)] = new_quantity
+        
+        cart[str(product_id)] = new_quantity
         request.session['cart'] = cart
         request.session.modified = True
-        cart_count = sum(len(products) for products in cart.values())
+        
         response_data.update({
             'status': 'success',
             'message': f'{quantity} vahid {product.adi} səbətə əlavə edildi!',
-            'cart_count': cart_count
+            'cart_count': len(cart)
         })
+        
         return JsonResponse(response_data)
+    
     return JsonResponse({'status': 'error', 'message': 'Səhv məlumat daxil edildi'})
 
 @login_required
@@ -323,59 +323,25 @@ def remove_from_cart(request, product_id):
     if request.method == 'POST':
         if 'cart' in request.session:
             cart = request.session['cart']
-            found = False
-            for seller_id in list(cart.keys()):
-                if str(product_id) in cart[seller_id]:
-                    del cart[seller_id][str(product_id)]
-                    found = True
-                    if not cart[seller_id]:
-                        del cart[seller_id]
-                    break
-            request.session.modified = True
-            cart_count = sum(len(products) for products in cart.values())
-            if found:
-                return JsonResponse({'status': 'success', 'message': 'Məhsul səbətdən silindi!', 'cart_count': cart_count})
-        return JsonResponse({'status': 'error', 'message': 'Məhsul tapılmadı!'})
-    return JsonResponse({'status': 'error', 'message': 'Səhv məlumat daxil edildi'})
-
-@login_required
-def update_cart(request, product_id):
-    if request.method == 'POST':
-        try:
-            product = get_object_or_404(Mehsul, id=product_id)
-            quantity = int(request.POST.get('quantity', 1))
-            response_data = {'status': 'error', 'message': ''}
-            if quantity > product.stok:
-                response_data['message'] = f'Yalnız {product.stok} vahid {product.adi} mövcuddur!'
-                return JsonResponse(response_data)
-            if quantity < 1:
-                response_data['message'] = 'Vahid sayı 1-dən az ola bilməz!'
-                return JsonResponse(response_data)
-            cart = request.session.get('cart', {})
-            seller_id = get_seller_id(product)
-            if seller_id not in cart:
-                cart[seller_id] = {}
-            cart[seller_id][str(product_id)] = quantity
-            request.session['cart'] = cart
-            request.session.modified = True
-            subtotal = product.qiymet * quantity
-            cart_total = 0
-            for products in cart.values():
-                for pid, qty in products.items():
-                    p = Mehsul.objects.get(id=int(pid))
-                    cart_total += p.qiymet * qty
-            response_data.update({
-                'status': 'success',
-                'message': f'{product.adi} üçün vahid sayı yeniləndi!',
-                'subtotal': f'{subtotal} ₼',
-                'cart_total': f'{cart_total} ₼'
-            })
-            return JsonResponse(response_data)
-        except ValueError:
-            return JsonResponse({'status': 'error', 'message': 'Səhv vahid sayı daxil edildi!'})
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': 'Xəta baş verdi. Zəhmət olmasa, yenidən cəhd edin.'})
-    return JsonResponse({'status': 'error', 'message': 'Səhv məlumat daxil edildi'})
+            if str(product_id) in cart:
+                del cart[str(product_id)]
+                request.session.modified = True
+                
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'Məhsul səbətdən silindi!',
+                    'cart_count': len(cart)
+                })
+    
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Məhsul tapılmadı!'
+        })
+        
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Səhv məlumat daxil edildi'
+    })
 
 @login_required
 def orders_view(request):
@@ -487,6 +453,63 @@ def checkout(request):
             return redirect('cart')
 
     return redirect('cart')
+
+@login_required
+def update_cart(request, product_id):
+    if request.method == 'POST':
+        try:
+            product = get_object_or_404(Mehsul, id=product_id)
+            quantity = int(request.POST.get('quantity', 1))
+            
+            response_data = {
+                'status': 'error',
+                'message': ''
+            }
+            
+            if quantity > product.stok:
+                response_data['message'] = f'Yalnız {product.stok} vahid {product.adi} mövcuddur!'
+                return JsonResponse(response_data)
+            
+            if quantity < 1:
+                response_data['message'] = 'Vahid sayı 1-dən az ola bilməz!'
+                return JsonResponse(response_data)
+            
+            cart = request.session.get('cart', {})
+            cart[str(product_id)] = quantity
+            request.session['cart'] = cart
+            request.session.modified = True
+            
+            # Calculate new subtotal and cart total
+            subtotal = product.qiymet * quantity
+            cart_total = sum(
+                Mehsul.objects.get(id=int(pid)).qiymet * qty
+                for pid, qty in cart.items()
+            )
+            
+            response_data.update({
+                'status': 'success',
+                'message': f'{product.adi} üçün vahid sayı yeniləndi!',
+                'subtotal': f'{subtotal} ₼',
+                'cart_total': f'{cart_total} ₼'
+            })
+            
+            return JsonResponse(response_data)
+            
+        except ValueError:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Səhv vahid sayı daxil edildi!'
+            })
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Xəta baş verdi. Zəhmət olmasa, yenidən cəhd edin.'
+            })
+    
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Səhv məlumat daxil edildi'
+    })
 
 @login_required
 def order_detail_view(request, order_id):

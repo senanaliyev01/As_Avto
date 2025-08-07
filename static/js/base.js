@@ -298,13 +298,28 @@ function initializeCart() {
     }
 
     if (selectAll && checkboxes.length > 0 && selectedTotal && checkoutButton) {
+        // Yeni: Satıcıya görə seç-all funksiyası
+        const selectAllSellerCheckboxes = document.querySelectorAll('.select-all-seller');
+        if (selectAllSellerCheckboxes.length > 0) {
+            selectAllSellerCheckboxes.forEach(function(sellerCheckbox) {
+                sellerCheckbox.addEventListener('change', function() {
+                    const sellerId = this.getAttribute('data-seller');
+                    const sellerRows = document.querySelectorAll('tr[data-seller-id="' + sellerId + '"] .item-checkbox');
+                    sellerRows.forEach(function(cb) {
+                        cb.checked = sellerCheckbox.checked;
+                    });
+                    updateSelectedTotal();
+                });
+            });
+        }
+        // updateSelectedTotal funksiyasını bütün .item-checkbox-lar üçün işə sal
         function updateSelectedTotal() {
             let total = 0;
+            const checkboxes = document.querySelectorAll('.item-checkbox');
             checkboxes.forEach(checkbox => {
                 if (checkbox.checked) {
                     const row = checkbox.closest('tr');
                     const subtotalText = row.querySelector('.subtotal').textContent;
-                    // Remove currency symbol and convert to number
                     const subtotal = parseFloat(subtotalText.replace(' ₼', '').replace(',', '.'));
                     if (!isNaN(subtotal)) {
                         total += subtotal;
@@ -314,12 +329,15 @@ function initializeCart() {
                     checkbox.closest('tr').classList.remove('selected');
                 }
             });
-            
-            // Format total with 2 decimal places and proper currency symbol
-            selectedTotal.textContent = total.toFixed(2).replace('.', ',') + ' ₼';
-            
-            const hasSelectedItems = Array.from(checkboxes).some(checkbox => checkbox.checked);
-            checkoutButton.disabled = !hasSelectedItems;
+            const selectedTotal = document.getElementById('selected-total');
+            if (selectedTotal) {
+                selectedTotal.textContent = total.toFixed(2).replace('.', ',') + ' ₼';
+            }
+            const checkoutButton = document.getElementById('checkout-button');
+            if (checkoutButton) {
+                const hasSelectedItems = Array.from(checkboxes).some(checkbox => checkbox.checked);
+                checkoutButton.disabled = !hasSelectedItems;
+            }
         }
 
         selectAll.addEventListener('change', function() {
@@ -330,11 +348,7 @@ function initializeCart() {
         });
 
         checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-                selectAll.checked = allChecked;
-                updateSelectedTotal();
-            });
+            checkbox.addEventListener('change', updateSelectedTotal);
         });
     }
 }

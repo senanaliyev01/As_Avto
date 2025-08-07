@@ -239,7 +239,7 @@ function initializeCart() {
     if (checkoutForm) {
         checkoutForm.addEventListener('submit', function(e) {
             // Sifarişi göndərmədən öncə təsdiq istə
-            if (!confirm('Are you sure you want to order?')) {
+            if (!confirm('Sifarişi vermək istədiyinizə əminsiniz?')) {
                 e.preventDefault(); // Əgər istifadəçi "Cancel" basarsa, formanın göndərilməsini dayandır
             }
         });
@@ -291,7 +291,7 @@ function initializeCart() {
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    showMessage('error', 'An error occurred. Please try again.');
+                    showMessage('error', 'Xəta baş verdi. Zəhmət olmasa, yenidən cəhd edin.');
                 });
             });
         });
@@ -387,7 +387,7 @@ function initializeModal() {
             })
             .catch(error => {
                 console.error('Error:', error);
-                showMessage('error', 'An error occurred. Please try again.');
+                showMessage('error', 'Xəta baş verdi. Zəhmət olmasa, yenidən cəhd edin.');
             });
         });
     }
@@ -431,8 +431,8 @@ function removeFromCart(productId) {
                 const emptyCartHTML = `
                     <div class="empty-cart" style="margin: 20px;">
                         <i class="fas fa-shopping-cart"></i>
-                        <p>Your cart is empty.</p>
-                        <a href="/products/" class="btn btn-primary">View Products</a>
+                        <p>Səbətiniz boşdur.</p>
+                        <a href="/products/" class="btn btn-primary">Məhsullara bax</a>
                     </div>
                 `;
                 
@@ -471,7 +471,7 @@ function removeFromCart(productId) {
     })
     .catch(error => {
         console.error('Error:', error);
-        showMessage('error', 'An error occurred. Please try again.');
+        showMessage('error', 'Xəta baş verdi. Zəhmət olmasa, yenidən cəhd edin.');
     });
 }
 
@@ -866,8 +866,8 @@ function initializeCartSidebar() {
                         sidebarContent.innerHTML = `
                             <div class="empty-cart" style="margin: 20px;">
                                 <i class="fas fa-shopping-cart"></i>
-                                <p>Your cart is empty.</p>
-                                <a href="/products/" class="btn btn-primary">View Products</a>
+                                <p>Səbətiniz boşdur.</p>
+                                <a href="/products/" class="btn btn-primary">Məhsullara bax</a>
                             </div>
                         `;
                     }
@@ -1051,7 +1051,7 @@ function openUserDetailsModal(userId) {
         })
         .catch(error => {
             console.error('Error:', error);
-            showMessage('error', 'An error occurred. Please try again.');
+            showMessage('error', 'Xəta baş verdi. Zəhmət olmasa, yenidən cəhd edin.');
         });
 }
 
@@ -1131,7 +1131,7 @@ function openDetailsModal(productId) {
         })
         .catch(error => {
             console.error('Error:', error);
-            showMessage('error', 'An error occurred. Please try again.');
+            showMessage('error', 'Xəta baş verdi. Zəhmət olmasa, yenidən cəhd edin.');
         });
 }
 
@@ -1351,13 +1351,13 @@ function initializeProfileModal() {
                 }
                 // Optionally update phone/address elsewhere if needed
                 closeModal();
-                alert('Profile information updated!');
+                alert('Profil məlumatları yeniləndi!');
             } else {
-                alert(data.message || 'An error occurred!');
+                alert(data.message || 'Xəta baş verdi!');
             }
         })
         .catch(() => {
-            alert('An error occurred!');
+            alert('Xəta baş verdi!');
         });
     });
 }

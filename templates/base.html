@@ -80,7 +80,7 @@
                         <ul>
                             <li><a href="#" class="nav-link nav-link-sm blink-news" id="yeniliklerLink"><i class="fas fa-bullhorn"></i> Xəbərlər</a></li>
                             <li><a class="nav-link" href="{% url 'liked_products' %}"><i class="fas fa-heart"></i> Bəyəndiyim Məhsullar</a></li>
-                            <!-- Səbət linki və sayı BURADAN SİLİNİR -->
+                            <!-- Səbət ikonunu və sayını silirik -->
                         </ul>
                     </nav>
                     {% if request.user.is_authenticated %}
@@ -107,24 +107,23 @@
                 </div>
             </div>
         </header>
-        <!-- Hər təsdiqlənmiş satıcı üçün ayrıca səbət blokları -->
-        <div class="seller-carts-wrapper">
-            {% for seller in verified_sellers %}
-                <div class="seller-cart-block">
-                    <div class="seller-cart-header">
-                        <img src="{{ seller.sekil.url }}" alt="{{ seller.user.username }}" class="seller-cart-avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
-                        <span class="seller-cart-name">{{ seller.user.username }}</span>
-                    </div>
-                    <a href="{% url 'cart' %}?seller_id={{ seller.user.id }}" class="seller-cart-link">
+        <!-- Hər təsdiqlənmiş satıcı üçün ayrıca səbət BAŞLANGIC -->
+        <div class="seller-carts-bar">
+            <div class="seller-carts-list">
+                {% for seller in verified_sellers %}
+                <div class="seller-cart-item">
+                    <button class="seller-cart-toggle" data-seller-id="{{ seller.user.id }}">
                         <span class="cart-icon">
                             <i class="fas fa-shopping-cart"></i>
                             <span class="cart-counter" id="cart-counter-{{ seller.user.id }}">0</span>
                         </span>
-                        Səbət
-                    </a>
+                        <span class="seller-name">{{ seller.user.username }}</span>
+                    </button>
                 </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
         </div>
+        <!-- Hər təsdiqlənmiş satıcı üçün ayrıca səbət SON -->
         
 
 

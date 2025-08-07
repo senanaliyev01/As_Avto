@@ -13,7 +13,7 @@ from functools import reduce
 from operator import and_, or_
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
-from django.views.decorators.http import require_http_methods, require_POST
+from django.views.decorators.http import require_http_methods, require_POST, require_GET
 from .forms import MehsulForm, SifarisEditForm, SifarisItemEditForm
 import pandas as pd
 from django.db import transaction
@@ -143,7 +143,7 @@ def home_view(request):
         m.total_sold = m.sifarisitem_set.aggregate(Sum('miqdar'))['miqdar__sum'] or 0
     most_rated_products = sorted(rated_products, key=lambda m: m.wilson_score, reverse=True)[:10]
 
-    # Bütün təsdiqlənmiş satıcılar (is_verified=True)
+    # Təsdiqlənmiş satıcılar (is_verified=True)
     verified_sellers = Profile.objects.filter(is_verified=True)
 
     return render(request, 'base.html', {
@@ -245,48 +245,68 @@ def load_more_products(request):
         'has_more': has_more
     })
 
+def get_cart_by_seller(request):
+    """
+    Session-dakı səbəti hər satıcıya görə qruplaşdırılmış şəkildə qaytarır.
+    Struktur: { seller_id: {product_id: quantity, ...}, ... }
+    """
+    cart = request.session.get('cart', {})
+    # Əgər köhnə strukturda (birbaşa product_id: quantity) varsa, onu yeni struktura çevir
+    if cart and all(isinstance(v, int) for v in cart.values()):
+        # Köhnə strukturdan yeni struktura çevir
+        new_cart = defaultdict(dict)
+        from .models import Mehsul
+        for product_id, quantity in cart.items():
+            try:
+                product = Mehsul.objects.get(id=product_id)
+                seller_id = str(product.sahib.id) if product.sahib else 'asavto'
+                new_cart[seller_id][str(product_id)] = quantity
+            except Mehsul.DoesNotExist:
+                continue
+        cart = dict(new_cart)
+        request.session['cart'] = cart
+        request.session.modified = True
+    return cart
+
 @login_required
 def cart_view(request):
-    if 'cart' not in request.session:
-        request.session['cart'] = {}
-    cart = request.session['cart']
-    # Yeni struktur: { seller_id: {product_id: quantity, ...}, ... }
-    seller_carts = {}
-    total = Decimal('0.00')
+    cart = get_cart_by_seller(request)
+    cart_items_by_seller = {}
+    total_by_seller = {}
+    from .models import Mehsul, Profile, PopupImage
     popup_images = PopupImage.objects.filter(aktiv=True)
     invalid_products = []
-    # Hər satıcı üçün məhsulları ayır
     for seller_id, products in cart.items():
-        seller_cart_items = []
-        seller_total = Decimal('0.00')
+        cart_items = []
+        total = 0
         for product_id, quantity in products.items():
             try:
                 product = Mehsul.objects.get(id=product_id)
-                subtotal = product.qiymet * Decimal(str(quantity))
-                seller_cart_items.append({
+                subtotal = product.qiymet * quantity
+                cart_items.append({
                     'product': product,
                     'quantity': quantity,
                     'subtotal': subtotal
                 })
-                seller_total += subtotal
                 total += subtotal
             except Mehsul.DoesNotExist:
                 invalid_products.append((seller_id, product_id))
-        seller_carts[seller_id] = {
-            'items': seller_cart_items,
-            'total': seller_total,
-            'seller': Profile.objects.filter(user__id=seller_id).first()
-        }
+        cart_items_by_seller[seller_id] = cart_items
+        total_by_seller[seller_id] = total
     # Mövcud olmayan məhsulları səbətdən sil
     if invalid_products:
         for seller_id, product_id in invalid_products:
-            if seller_id in cart and product_id in cart[seller_id]:
+            if product_id in cart.get(seller_id, {}):
                 del cart[seller_id][product_id]
+        request.session['cart'] = cart
         request.session.modified = True
         messages.warning(request, 'Bəzi məhsullar səbətdən silindi, çünki artıq mövcud deyil.')
+    # Satıcı profillərini yığ
+    seller_profiles = {str(profile.user.id): profile for profile in Profile.objects.filter(is_verified=True)}
     return render(request, 'cart.html', {
-        'seller_carts': seller_carts,
-        'total': total,
+        'cart_items_by_seller': cart_items_by_seller,
+        'total_by_seller': total_by_seller,
+        'seller_profiles': seller_profiles,
         'popup_images': popup_images
     })
 
@@ -1776,3 +1796,33 @@ def get_search_filtered_products(queryset, search_query, order_by_wilson=True):
             avg_rating=Avg('ratings__rating'),
         ).order_by('-rating_count', '-avg_rating', '-id')
     return queryset
+
+@require_GET
+@login_required
+def api_seller_cart(request, seller_id):
+    cart = request.session.get('cart', {})
+    seller_id = str(seller_id)
+    items = []
+    total = 0
+    from .models import Mehsul
+    if seller_id in cart:
+        for product_id, quantity in cart[seller_id].items():
+            try:
+                product = Mehsul.objects.get(id=product_id)
+                subtotal = float(product.qiymet) * int(quantity)
+                items.append({
+                    'id': product.id,
+                    'name': product.adi,
+                    'image': product.sekil.url if product.sekil else '/static/images/no_image.webp',
+                    'price': float(product.qiymet),
+                    'quantity': int(quantity),
+                    'subtotal': subtotal
+                })
+                total += subtotal
+            except Mehsul.DoesNotExist:
+                continue
+    return JsonResponse({
+        'status': 'success',
+        'items': items,
+        'total': total
+    })

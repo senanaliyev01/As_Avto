@@ -39,6 +39,7 @@ urlpatterns = [
     path('update-profile/', views.update_profile, name='update_profile'),
     path('my-products/pdf/', views.my_products_pdf, name='my_products_pdf'),
     path('api/unread-sales-count/', views.unread_sales_count, name='unread_sales_count'),
+    path('api/seller-cart/<int:seller_id>/', views.api_seller_cart, name='api_seller_cart'),
     path('seller-admin-panel/', views.seller_admin_panel, name='seller_admin_panel'),
     path('my-products/change-image/<int:product_id>/', views.change_product_image, name='change_product_image'),
     path('like-product/', views.like_product, name='like_product'),

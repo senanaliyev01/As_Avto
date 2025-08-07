@@ -244,41 +244,36 @@ def load_more_products(request):
 def cart_view(request):
     if 'cart' not in request.session:
         request.session['cart'] = {}
+    
     cart = request.session['cart']
-    cart_items_by_seller = {}
+    cart_items = []
     total = Decimal('0.00')
     popup_images = PopupImage.objects.filter(aktiv=True)
-    invalid_products = []
-
+    invalid_products = []  # Mövcud olmayan məhsulları izləmək üçün
+    
     for product_id, quantity in cart.items():
         try:
             product = Mehsul.objects.get(id=product_id)
             subtotal = product.qiymet * Decimal(str(quantity))
-            seller_id = product.sahib.id if product.sahib else 'asavto'
-            seller_name = product.sahib.username if product.sahib else 'AS-AVTO'
-            if seller_id not in cart_items_by_seller:
-                cart_items_by_seller[seller_id] = {
-                    'seller': seller_name,
-                    'items': []
-                }
-            cart_items_by_seller[seller_id]['items'].append({
+            cart_items.append({
                 'product': product,
                 'quantity': quantity,
                 'subtotal': subtotal
             })
             total += subtotal
         except Mehsul.DoesNotExist:
-            invalid_products.append(product_id)
-
+            invalid_products.append(product_id)  # Mövcud olmayan məhsulu qeyd et
+    
+    # Mövcud olmayan məhsulları səbətdən sil
     if invalid_products:
         for product_id in invalid_products:
             if str(product_id) in cart:
                 del cart[str(product_id)]
         request.session.modified = True
         messages.warning(request, 'Bəzi məhsullar səbətdən silindi, çünki artıq mövcud deyil.')
-
+    
     return render(request, 'cart.html', {
-        'cart_items_by_seller': cart_items_by_seller,
+        'cart_items': cart_items,
         'total': total,
         'popup_images': popup_images
     })

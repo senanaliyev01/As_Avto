@@ -80,7 +80,15 @@
                         <ul>
                             <li><a href="#" class="nav-link nav-link-sm blink-news" id="yeniliklerLink"><i class="fas fa-bullhorn"></i> Xəbərlər</a></li>
                             <li><a class="nav-link" href="{% url 'liked_products' %}"><i class="fas fa-heart"></i> Bəyəndiyim Məhsullar</a></li>
-                            <!-- Sebet ikonu və sayğacı buradan silindi -->
+                            <li>
+                                <a href="#" class="nav-link nav-link-sm {% if request.resolver_match.url_name == 'cart' %}active{% endif %}" id="cartSidebarToggle">
+                                    <span class="cart-icon">
+                                        <i class="fas fa-shopping-cart"></i>
+                                        <span class="cart-counter">{{ request.session.cart|length }}</span>
+                                    </span>
+                                    Səbət
+                                </a>
+                            </li>
                         </ul>
                     </nav>
                     {% if request.user.is_authenticated %}
@@ -108,7 +116,18 @@
             </div>
         </header>
         
-        {# Bu blok səhv sintaksisə səbəb olduğu üçün silindi #}
+
+
+
+        {% if request.header_messages %}
+        <div class="header-message">
+            <div class="header-message-content">
+                {% for message in request.header_messages %}
+                    <p class="message-slide" {% if not forloop.first %}style="display: none;"{% endif %}>{{ message.mesaj }}</p>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
 
         
 
@@ -134,7 +153,7 @@
                                 </div>
                                 <div class="product-image">
                                     {% if product.sekil and product.sekil.url != 'mehsul_sekilleri/no_image.webp' %}
-                                    <img src="{{ product.sekil.url }}" alt="{{ product.adi }}" onclick="openImageModal('{{ product.sekil.url }}')" class="clickable-image" onerror="this.src='/static/images/no_image.webp'">
+                                    <img src="{{ product.sekil.url }}" alt="{{ product.adi }}" onclick="openImageModal('{{ product.sekil.url }}')" class="clickable-image" onerror="this.src='{% static 'images/no_image.webp' %}'">
                                     {% else %}
                                     <img src="{% static 'images/no_image.webp' %}" alt="Şəkil Yoxdur">
                                     {% endif %}
@@ -178,7 +197,7 @@
                                 </div>
                                 <div class="product-image">
                                     {% if product.sekil and product.sekil.url != 'mehsul_sekilleri/no_image.webp' %}
-                                    <img src="{{ product.sekil.url }}" alt="{{ product.adi }}" onclick="openImageModal('{{ product.sekil.url }}')" class="clickable-image" onerror="this.src='/static/images/no_image.webp'">
+                                    <img src="{{ product.sekil.url }}" alt="{{ product.adi }}" onclick="openImageModal('{{ product.sekil.url }}')" class="clickable-image" onerror="this.src='{% static 'images/no_image.webp' %}'">
                                     {% else %}
                                     <img src="{% static 'images/no_image.webp' %}" alt="Şəkil Yoxdur">
                                     {% endif %}
@@ -216,7 +235,7 @@
                                 </div>
                                 <div class="product-image">
                                     {% if product.sekil and product.sekil.url != 'mehsul_sekilleri/no_image.webp' %}
-                                    <img src="{{ product.sekil.url }}" alt="{{ product.adi }}" onclick="openImageModal('{{ product.sekil.url }}')" class="clickable-image" onerror="this.src='/static/images/no_image.webp'">
+                                    <img src="{{ product.sekil.url }}" alt="{{ product.adi }}" onclick="openImageModal('{{ product.sekil.url }}')" class="clickable-image" onerror="this.src='{% static 'images/no_image.webp' %}'">
                                     {% else %}
                                     <img src="{% static 'images/no_image.webp' %}" alt="Şəkil Yoxdur">
                                     {% endif %}
@@ -257,7 +276,7 @@
                                 </div>
                                 <div class="product-image">
                                     {% if product.sekil and product.sekil.url != 'mehsul_sekilleri/no_image.webp' %}
-                                    <img src="{{ product.sekil.url }}" alt="{{ product.adi }}" onclick="openImageModal('{{ product.sekil.url }}')" class="clickable-image" onerror="this.src='/static/images/no_image.webp'">
+                                    <img src="{{ product.sekil.url }}" alt="{{ product.adi }}" onclick="openImageModal('{{ product.sekil.url }}')" class="clickable-image" onerror="this.src='{% static 'images/no_image.webp' %}'">
                                     {% else %}
                                     <img src="{% static 'images/no_image.webp' %}" alt="Şəkil Yoxdur">
                                     {% endif %}

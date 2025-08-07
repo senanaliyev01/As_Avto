@@ -8,59 +8,65 @@
         <h2>Səbətim</h2>
     </div>
 
-    {% if cart_items_by_seller %}
+    {% if cart_items %}
         <div class="cart-container">
-        {% for seller_id, seller_data in cart_items_by_seller.items %}
-            <div class="cart-seller-block">
-                <h3 style="margin-top: 24px;">Satıcı: {{ seller_data.seller }}</h3>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>
-                                <input type="checkbox" id="select-all-{{ seller_id }}" class="select-checkbox">
-                            </th>
-                            <th>Şəkil</th>
-                            <th>Kod</th>
-                            <th>Marka Adı</th>
-                            <th>Məhsul Adı</th>
-                            <th>Stok</th>
-                            <th>Qiymət</th>
-                            <th>Miqdar</th>
-                            <th>Ümumi</th>
-                            <th>Sil</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in seller_data.items %}
-                            <tr class="cart-item" data-product-id="{{ item.product.id }}">
-                                <td>
-                                    <input type="checkbox" name="selected_items[]" value="{{ item.product.id }}" class="item-checkbox select-checkbox" form="checkout-form">
-                                </td>
-                                <td><img src="{{ item.product.sekil.url }}" alt="{{ item.product.adi }}" class="product-image" onclick="openImageModal('{{ item.product.sekil.url }}')"></td>
-                                <td>{{ item.product.brend_kod }}</td>
-                                <td>{{ item.product.firma.adi }}</td>
-                                <td>{{ item.product.adi }}</td>
-                                <td>{{ item.product.stok }}</td>
-                                <td>{{ item.product.qiymet }} ₼</td>
-                                <td>
-                                    <div class="quantity-control">
-                                        <form method="POST" action="{% url 'update_cart' item.product.id %}" class="update-form">
-                                            {% csrf_token %}
-                                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stok }}" class="form-control quantity-input">
-                                            <button type="submit" class="btn btn-secondary"><i class="fas fa-sync-alt"></i></button>
-                                        </form>
-                                    </div>
-                                </td>
-                                <td class="subtotal">{{ item.subtotal }} ₼</td>
-                                <td>
-                                    <button type="button" class="btn btn-danger" onclick="removeFromCart({{ item.product.id }})"><i class="fas fa-trash-alt"></i></button>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% endfor %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        <input type="checkbox" id="select-all" class="select-checkbox">
+                    </th>
+                    <th>Şəkil</th>
+                    <th>Kod</th>
+                    <th>Marka Adı</th>
+                    <th>Məhsul Adı</th>
+                    <!-- <th>OEM</th> -->
+                    <th>Stok</th>
+                    <th>Qiymət</th>
+                    <th>Miqdar</th>
+                    <th>Ümumi</th>
+                    <th>Satıcı</th>
+                    <th>Sil</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart_items %}
+                    <tr class="cart-item" data-product-id="{{ item.product.id }}">
+                        <td>
+                            <input type="checkbox" name="selected_items[]" value="{{ item.product.id }}" class="item-checkbox select-checkbox" form="checkout-form">
+                        </td>
+                        <td><img src="{{ item.product.sekil.url }}" alt="{{ item.product.adi }}" class="product-image" onclick="openImageModal('{{ item.product.sekil.url }}')"></td>
+                        <td>{{ item.product.brend_kod }}</td>
+                        <td>{{ item.product.firma.adi }}</td>
+                        <td>{{ item.product.adi }}</td>
+                        <!-- <td>{{ item.product.oem }}</td> -->
+                        <td>{{ item.product.stok }}</td>
+                        <td>{{ item.product.qiymet }} ₼</td>
+                        <td>
+                            <div class="quantity-control">
+                                <form method="POST" action="{% url 'update_cart' item.product.id %}" class="update-form">
+                                    {% csrf_token %}
+                                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stok }}" class="form-control quantity-input">
+                                    <button type="submit" class="btn btn-secondary"><i class="fas fa-sync-alt"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                        <td class="subtotal">{{ item.subtotal }} ₼</td>
+                        <td>
+                            {% if item.product.sahib %}
+                                <a href="#" class="seller-link" onclick="openUserDetailsModal({{ item.product.sahib.id }}); return false;"><i class="fas fa-user"></i> {{ item.product.sahib.username }}</a>
+                            {% else %}
+                                AS-AVTO
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger" onclick="removeFromCart({{ item.product.id }})"><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
         <form method="POST" action="{% url 'checkout' %}" id="checkout-form">
             {% csrf_token %}
             <div class="cart-summary">
@@ -69,7 +75,7 @@
                     <span class="total-value" id="selected-total">0.00 ₼</span>
                 </div>
                 <div class="delivery-method">
-                    <h4>Çatdırılma üsulu</h4>
+                    <h4>Çatdırılma Üsulu</h4>
                     <div class="delivery-options">
                         <label class="delivery-option">
                             <input type="radio" name="catdirilma_usulu" value="TAXI" required>

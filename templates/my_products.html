@@ -717,8 +717,9 @@
                     const val = (key in row) ? row[key] : '';
                     const errsForField = (lineFieldErrors[lineNo] && lineFieldErrors[lineNo][key]) || [];
                     const badge = errsForField.length ? `<span class="badge bg-danger ms-1">${errsForField.some(m => String(m).toLowerCase().includes('boşdur')) ? 'Boşdur' : 'Xəta'}</span>` : '';
+                    const displayVal = truncateText(String(val || ''), 25);
                     return `<td class="align-middle" style="max-width:220px;">
-                        <div class="text-truncate" style="max-width: 220px;">${escapeHtml(String(val || ''))}</div>${badge}
+                        <div class="text-truncate" style="max-width: 220px;">${escapeHtml(displayVal)}</div>${badge}
                     </td>`;
                 }).join('');
                 return `<tr>
@@ -750,6 +751,12 @@
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#039;');
+        }
+
+        function truncateText(text, maxLen) {
+            if (!text) return '';
+            if (text.length <= maxLen) return text;
+            return text.slice(0, Math.max(0, maxLen - 1)) + '…';
         }
 
         if (startImportBtn && importForm) {

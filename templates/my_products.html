@@ -125,7 +125,7 @@
                         </div>
                         <div id="importStatus" class="small text-muted mb-2"></div>
                         <div id="importCounters" class="small text-muted mb-2"></div>
-                        <div id="importErrors" class="alert alert-warning d-none" style="max-height: 160px; overflow:auto;"></div>
+                        <div id="importErrors" class="alert alert-warning d-none" style="max-height: 200px; overflow:auto;"></div>
                         <button type="button" id="startImportBtn" class="btn btn-success">İdxal Et</button>
                     </form>
                 </div>
@@ -551,14 +551,65 @@
         function appendErrors(list) {
             if (!list || !list.length) return;
             importErrors.classList.remove('d-none');
-            const ul = document.createElement('ul');
-            ul.className = 'mb-0 ps-3';
-            list.forEach(line => {
-                const li = document.createElement('li');
-                li.textContent = line;
-                ul.appendChild(li);
+            const frag = document.createDocumentFragment();
+            list.forEach(item => {
+                const li = document.createElement('div');
+                li.className = 'mb-2';
+                const line = typeof item === 'object' ? item.line : null;
+                const message = typeof item === 'object' ? item.message : String(item);
+                li.innerHTML = `<strong>${line ? (line + '-ci sətir') : 'Sətir'}</strong>: ${escapeHtml(message)} `;
+                if (item && typeof item === 'object' && item.row) {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'btn btn-link btn-sm p-0';
+                    btn.textContent = 'Detala bax';
+                    btn.addEventListener('click', () => {
+                        showRowDetails(item);
+                    });
+                    li.appendChild(btn);
+                }
+                frag.appendChild(li);
             });
-            importErrors.appendChild(ul);
+            importErrors.appendChild(frag);
+        }
+
+        function showRowDetails(item) {
+            const row = item.row || {};
+            const fields = ['adi','brend_kod','firma','avtomobil','qiymet','stok','kodlar','olcu'];
+            const lines = fields.map(k => `<tr><th class="pe-2 text-muted" style="white-space:nowrap;">${k}</th><td>${escapeHtml(row[k] || '')}</td></tr>`).join('');
+            const html = `<div class="table-responsive"><table class="table table-sm table-bordered mb-0"><tbody>${lines}</tbody></table></div>`;
+            // Sadə modal göstərilməsi: mövcud import modalının içində ayrı bölmə kimi açırıq
+            const dlg = document.createElement('div');
+            dlg.className = 'modal fade';
+            dlg.innerHTML = `
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">${item.line ? (item.line + '-ci sətir detalları') : 'Sətir detalları'}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <div class="mb-2"><strong>Xəta:</strong> ${escapeHtml(item.message || '')}</div>
+                  ${html}
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bağla</button>
+                </div>
+              </div>
+            </div>`;
+            document.body.appendChild(dlg);
+            const modal = new bootstrap.Modal(dlg);
+            modal.show();
+            dlg.addEventListener('hidden.bs.modal', () => dlg.remove());
+        }
+
+        function escapeHtml(unsafe) {
+            return String(unsafe)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
         }
 
         if (startImportBtn && importForm) {

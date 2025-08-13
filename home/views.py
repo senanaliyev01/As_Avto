@@ -1210,6 +1210,8 @@ def import_user_products_batch(request):
     batch_errors = []
 
     # Emal məntiqi (mövcud import_user_products_view ilə eyni)
+    preview_keys = ['adi', 'brend_kod', 'firma', 'avtomobil', 'qiymet', 'stok', 'kodlar', 'olcu']
+
     for idx, row in enumerate(subset, start=start):
         try:
             excel_line_no = idx + 2  # Başlıq 1-ci sətir, data 2-dən başlayır
@@ -1230,7 +1232,11 @@ def import_user_products_batch(request):
 
             if 'adi' not in row or pd.isna(row['adi']):
                 error_count += 1
-                batch_errors.append(f"{excel_line_no}-ci sətirdə xəta: Məhsulun adı boşdur")
+                batch_errors.append({
+                    'line': excel_line_no,
+                    'message': 'Məhsulun adı boşdur',
+                    'row': {k: ('' if k not in row or pd.isna(row.get(k)) else str(row.get(k))) for k in preview_keys}
+                })
                 continue
 
             temiz_ad = str(row['adi']).strip()
@@ -1248,7 +1254,11 @@ def import_user_products_batch(request):
 
             if not brend_kod:
                 error_count += 1
-                batch_errors.append(f"{excel_line_no}-ci sətirdə xəta: Brend kodu boşdur")
+                batch_errors.append({
+                    'line': excel_line_no,
+                    'message': 'Brend kodu boşdur',
+                    'row': {k: ('' if k not in row or pd.isna(row.get(k)) else str(row.get(k))) for k in preview_keys}
+                })
                 continue
 
             excel_keys.add((brend_kod, firma.id if firma else None))
@@ -1295,7 +1305,11 @@ def import_user_products_batch(request):
                 new_count += 1
         except Exception as e:
             error_count += 1
-            batch_errors.append(f"{excel_line_no}-ci sətirdə xəta: {e}")
+            batch_errors.append({
+                'line': excel_line_no,
+                'message': str(e),
+                'row': {k: ('' if k not in row or pd.isna(row.get(k)) else str(row.get(k))) for k in preview_keys}
+            })
             continue
 
     # State-i yenilə

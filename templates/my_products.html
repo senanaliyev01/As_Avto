@@ -595,9 +595,8 @@
             allErrors.slice(-list.length).forEach(item => {
                 const div = document.createElement('div');
                 const line = typeof item === 'object' ? item.line : null;
-                const messages = (item && typeof item === 'object' && Array.isArray(item.messages)) ? item.messages : [ (typeof item === 'object' ? (item.message || '') : String(item)) ];
-                const summary = messages.length ? messages[0] : '';
-                div.textContent = `${line ? (line + '-ci sətir') : 'Sətir'}: ${summary}`;
+                const message = typeof item === 'object' ? item.message : String(item);
+                div.textContent = `${line ? (line + '-ci sətir') : 'Sətir'}: ${message}`;
                 frag.appendChild(div);
             });
             importErrors.appendChild(frag);
@@ -605,22 +604,24 @@
 
         function showRowDetails(item) {
             const row = item.row || {};
-            // Bütün sütunları (Excel-də olan adlarla) göstər
-            const lines = Object.keys(row).sort().map(k => `<tr><th class="pe-2 text-muted" style="white-space:nowrap;">${escapeHtml(k)}</th><td>${escapeHtml(row[k] || '')}</td></tr>`).join('');
-            const html = `<div class="table-responsive"><table class="table table-sm table-striped table-bordered mb-0"><tbody>${lines}</tbody></table></div>`;
-            // Sadə modal göstərilməsi: mövcud import modalının içində ayrı bölmə kimi açırıq
+            // Bütün sütunlar: obyektin öz açarlarını sırala
+            const keys = Object.keys(row);
+            const lines = (keys.length ? keys : ['adi','brend_kod','firma','avtomobil','qiymet','stok','kodlar','olcu'])
+                .map(k => `<tr><th class="pe-2 text-muted" style="white-space:nowrap;">${escapeHtml(k)}</th><td>${escapeHtml(row[k] || '')}</td></tr>`)
+                .join('');
+            const html = `<div class="table-responsive"><table class="table table-sm table-bordered mb-0"><tbody>${lines}</tbody></table></div>`;
+            // Modal tam mərkəzdə
             const dlg = document.createElement('div');
             dlg.className = 'modal fade';
             dlg.innerHTML = `
-            <div class="modal-dialog modal-dialog-centered" style="max-width: 720px;">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h6 class="modal-title">${item.line ? (item.line + '-ci sətir detalları') : 'Sətir detalları'}</h6>
+                  <h5 class="modal-title">${item.line ? (escapeHtml(item.line) + '-ci sətir detalları') : 'Sətir detalları'}</h5>
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body p-2" style="max-height: 65vh; overflow:auto;">
-                  <div class="mb-2"><strong>Xətalar:</strong><div>${((item.messages && item.messages.length) ? item.messages : [item.message || '']).map(m => `<div>${escapeHtml(m)}</div>`).join('')}</div></div>
-                  ${item.fields && item.fields.length ? `<div class=\"mb-2\"><strong>Xəta sütunları:</strong> ${item.fields.map(f => `<span class=\"badge bg-danger me-1\">${escapeHtml(f)}</span>`).join('')}</div>` : ''}
+                <div class="modal-body">
+                  <div class="mb-2"><strong>Xəta:</strong> ${escapeHtml(item.message || '')}</div>
                   ${html}
                 </div>
                 <div class="modal-footer">
@@ -642,12 +643,11 @@
             }
             const rowsHtml = allErrors.map((item, i) => {
                 const line = typeof item === 'object' ? item.line : '';
-                const messages = (item && typeof item === 'object' && Array.isArray(item.messages)) ? item.messages : [ (typeof item === 'object' ? (item.message || '') : String(item)) ];
-                const summary = messages.map(m => `<div>${escapeHtml(m)}</div>`).join('');
+                const message = typeof item === 'object' ? item.message : String(item);
                 const btn = (item && typeof item === 'object' && item.row) ? `<button type="button" class="btn btn-link btn-sm p-0 show-detail" data-idx="${i}">Detala bax</button>` : '';
                 return `<tr>
                     <td style="width: 120px;">${line ? escapeHtml(line + '-ci sətir') : '-'}</td>
-                    <td>${summary}</td>
+                    <td>${escapeHtml(message)}</td>
                     <td style="width: 110px;" class="text-end">${btn}</td>
                 </tr>`;
             }).join('');

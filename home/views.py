@@ -1211,23 +1211,10 @@ def import_user_products_batch(request):
 
     # Emal məntiqi (mövcud import_user_products_view ilə eyni)
     preview_keys = ['adi', 'brend_kod', 'firma', 'avtomobil', 'qiymet', 'stok', 'kodlar', 'olcu']
-    def sanitize_row_values(row_dict):
-        safe = {}
-        for k, v in row_dict.items():
-            try:
-                if pd.isna(v):
-                    safe[str(k)] = ''
-                else:
-                    safe[str(k)] = str(v)
-            except Exception:
-                safe[str(k)] = ''
-        return safe
 
     for idx, row in enumerate(subset, start=start):
         try:
             excel_line_no = idx + 2  # Başlıq 1-ci sətir, data 2-dən başlayır
-            row_error_items = []  # [{'field': 'adi', 'message': '...'}]
-            sanitized_row = sanitize_row_values(row)
             # Model referansları
             kateqoriya = None
             firma = None
@@ -1244,7 +1231,15 @@ def import_user_products_batch(request):
                 vitrin, _ = Vitrin.objects.get_or_create(nomre=str(row['vitrin']).strip())
 
             if 'adi' not in row or pd.isna(row['adi']):
-                row_error_items.append({'field': 'adi', 'message': 'Məhsulun adı boşdur'})
+                error_count += 1
+                # Full row snapshot as strings
+                full_row = {str(k): ('' if (k not in row or pd.isna(row.get(k))) else str(row.get(k))) for k in row.keys()}
+                batch_errors.append({
+                    'line': excel_line_no,
+                    'message': 'Məhsulun adı boşdur',
+                    'row': full_row,
+                })
+                continue
 
             temiz_ad = str(row['adi']).strip()
             temiz_ad = ' '.join(temiz_ad.split())
@@ -1260,40 +1255,12 @@ def import_user_products_batch(request):
                         brend_kod = None
 
             if not brend_kod:
-                row_error_items.append({'field': 'brend_kod', 'message': 'Brend kodu boşdur'})
-
-            # Rəqəmsal sahələr üçün yoxlama
-            def is_floatable(val):
-                try:
-                    float(val)
-                    return True
-                except Exception:
-                    return False
-            def is_intable(val):
-                try:
-                    int(float(val))
-                    return True
-                except Exception:
-                    return False
-
-            if 'qiymet' in row and pd.notna(row['qiymet']):
-                if not is_floatable(row['qiymet']):
-                    row_error_items.append({'field': 'qiymet', 'message': 'qiymet rəqəm olmalıdır'})
-            if 'maya_qiymet' in row and pd.notna(row['maya_qiymet']):
-                if not is_floatable(row['maya_qiymet']):
-                    row_error_items.append({'field': 'maya_qiymet', 'message': 'maya_qiymet rəqəm olmalıdır'})
-            if 'stok' in row and pd.notna(row['stok']):
-                if not is_intable(row['stok']):
-                    row_error_items.append({'field': 'stok', 'message': 'stok tam ədəd olmalıdır'})
-
-            # Əgər xəta varsa, bu sətiri emal etmədən saxla
-            if row_error_items:
                 error_count += 1
+                full_row = {str(k): ('' if (k not in row or pd.isna(row.get(k))) else str(row.get(k))) for k in row.keys()}
                 batch_errors.append({
                     'line': excel_line_no,
-                    'messages': [e['message'] for e in row_error_items],
-                    'fields': [e['field'] for e in row_error_items],
-                    'row': sanitized_row
+                    'message': 'Brend kodu boşdur',
+                    'row': full_row,
                 })
                 continue
 
@@ -1341,11 +1308,11 @@ def import_user_products_batch(request):
                 new_count += 1
         except Exception as e:
             error_count += 1
+            full_row = {str(k): ('' if (k not in row or pd.isna(row.get(k))) else str(row.get(k))) for k in row.keys()}
             batch_errors.append({
                 'line': excel_line_no,
-                'messages': [str(e)],
-                'fields': [],
-                'row': sanitize_row_values(row)
+                'message': str(e),
+                'row': full_row,
             })
             continue
 

@@ -124,7 +124,8 @@
                             <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
                         </div>
                         <div id="importStatus" class="small text-muted mb-2"></div>
-                        <div id="importCounters" class="small text-muted mb-3"></div>
+                        <div id="importCounters" class="small text-muted mb-2"></div>
+                        <div id="importErrors" class="alert alert-warning d-none" style="max-height: 160px; overflow:auto;"></div>
                         <button type="button" id="startImportBtn" class="btn btn-success">İdxal Et</button>
                     </form>
                 </div>
@@ -466,6 +467,7 @@
         const progressBar = progressWrap ? progressWrap.querySelector('.progress-bar') : null;
         const importStatus = document.getElementById('importStatus');
         const importCounters = document.getElementById('importCounters');
+        const importErrors = document.getElementById('importErrors');
 
         async function runBatchImport(file, size) {
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
@@ -504,6 +506,9 @@
                 const percent = total ? Math.round((processed / total) * 100) : 100;
                 updateProgress(percent, processed);
                 setCounters(data.new_count || 0, data.update_count || 0, data.error_count || 0, 0);
+                if (Array.isArray(data.errors) && data.errors.length) {
+                    appendErrors(data.errors);
+                }
                 start += size;
             }
 
@@ -517,6 +522,9 @@
             const finData = await finRes.json();
             if (finData.status !== 'ok') throw new Error(finData.message || 'Finalize xətası');
             setCounters(parseInt(importCounters.dataset.newCount || '0'), parseInt(importCounters.dataset.updateCount || '0'), parseInt(importCounters.dataset.errorCount || '0'), finData.deleted_count || 0);
+            if (Array.isArray(finData.error_details) && finData.error_details.length) {
+                appendErrors(finData.error_details);
+            }
             setStatus('Tamamlandı');
             showMessage(`İmport tamamlandı. Silinən: ${finData.deleted_count || 0}`, 'success');
         }
@@ -538,6 +546,19 @@
             importCounters.dataset.errorCount = String(e);
             importCounters.dataset.deletedCount = String(d);
             importCounters.textContent = `Yeni: ${n} | Yenilənən: ${u} | Xəta: ${e}` + (d ? ` | Silinən: ${d}` : '');
+        }
+
+        function appendErrors(list) {
+            if (!list || !list.length) return;
+            importErrors.classList.remove('d-none');
+            const ul = document.createElement('ul');
+            ul.className = 'mb-0 ps-3';
+            list.forEach(line => {
+                const li = document.createElement('li');
+                li.textContent = line;
+                ul.appendChild(li);
+            });
+            importErrors.appendChild(ul);
         }
 
         if (startImportBtn && importForm) {

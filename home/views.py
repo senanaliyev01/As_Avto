@@ -1161,6 +1161,7 @@ def import_user_products_init(request):
         'error_count': 0,
         'deleted_count': 0,
         'excel_product_keys': [],  # (brend_kod, firma_id)
+        'error_details': [],  # ['5-ci sətir: ...', ...]
         'rows': cleaned_rows,
     }
     with open(job_state_path, 'w', encoding='utf-8') as f:
@@ -1205,10 +1206,13 @@ def import_user_products_batch(request):
     update_count = state['update_count']
     error_count = state['error_count']
     excel_keys = set(tuple(k) for k in state.get('excel_product_keys', []))
+    error_details = state.get('error_details', [])
+    batch_errors = []
 
     # Emal məntiqi (mövcud import_user_products_view ilə eyni)
     for idx, row in enumerate(subset, start=start):
         try:
+            excel_line_no = idx + 2  # Başlıq 1-ci sətir, data 2-dən başlayır
             # Model referansları
             kateqoriya = None
             firma = None
@@ -1226,6 +1230,7 @@ def import_user_products_batch(request):
 
             if 'adi' not in row or pd.isna(row['adi']):
                 error_count += 1
+                batch_errors.append(f"{excel_line_no}-ci sətirdə xəta: Məhsulun adı boşdur")
                 continue
 
             temiz_ad = str(row['adi']).strip()
@@ -1243,6 +1248,7 @@ def import_user_products_batch(request):
 
             if not brend_kod:
                 error_count += 1
+                batch_errors.append(f"{excel_line_no}-ci sətirdə xəta: Brend kodu boşdur")
                 continue
 
             excel_keys.add((brend_kod, firma.id if firma else None))
@@ -1287,8 +1293,9 @@ def import_user_products_batch(request):
                 }
                 Mehsul.objects.create(**mehsul_data)
                 new_count += 1
-        except Exception:
+        except Exception as e:
             error_count += 1
+            batch_errors.append(f"{excel_line_no}-ci sətirdə xəta: {e}")
             continue
 
     # State-i yenilə
@@ -1297,6 +1304,10 @@ def import_user_products_batch(request):
     state['error_count'] = error_count
     state['processed_rows'] = min(state['total_rows'], start + len(subset))
     state['excel_product_keys'] = list(excel_keys)
+    # Toplam error detallarını yığ
+    if batch_errors:
+        error_details.extend(batch_errors)
+        state['error_details'] = error_details
     with open(job_state_path, 'w', encoding='utf-8') as f:
         json.dump(state, f, ensure_ascii=False)
 
@@ -1307,6 +1318,7 @@ def import_user_products_batch(request):
         'new_count': new_count,
         'update_count': update_count,
         'error_count': error_count,
+        'errors': batch_errors,
     })
 
 
@@ -1352,7 +1364,7 @@ def import_user_products_finalize(request):
     except Exception:
         pass
 
-    return JsonResponse({'status': 'ok', 'deleted_count': deleted_count})
+    return JsonResponse({'status': 'ok', 'deleted_count': deleted_count, 'total_errors': len(state.get('error_details', [])), 'error_details': state.get('error_details', [])})
 
 @login_required
 def my_sale_pdf(request, order_id):

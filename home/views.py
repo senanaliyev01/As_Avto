@@ -1141,6 +1141,8 @@ def import_user_products_init(request):
         return JsonResponse({'status': 'error', 'message': f'Excel oxunmadı: {e}'}, status=400)
 
     cleaned_rows = []
+    columns_display = [str(c) for c in df.columns]
+    columns_lower = [str(c).strip().lower() for c in df.columns]
     for index, row in df.iterrows():
         row = {str(k).strip().lower(): v for k, v in row.items()}
         cleaned_rows.append(row)
@@ -1163,6 +1165,8 @@ def import_user_products_init(request):
         'excel_product_keys': [],  # (brend_kod, firma_id)
         'error_details': [],  # ['5-ci sətir: ...', ...]
         'rows': cleaned_rows,
+        'columns': columns_lower,
+        'columns_display': columns_display,
     }
     with open(job_state_path, 'w', encoding='utf-8') as f:
         json.dump(job_state, f, ensure_ascii=False)
@@ -1399,6 +1403,7 @@ def import_user_products_batch(request):
         'update_count': update_count,
         'error_count': error_count,
         'errors': batch_errors,
+        'columns': state.get('columns_display') or [],
     })
 
 
@@ -1444,7 +1449,13 @@ def import_user_products_finalize(request):
     except Exception:
         pass
 
-    return JsonResponse({'status': 'ok', 'deleted_count': deleted_count, 'total_errors': len(state.get('error_details', [])), 'error_details': state.get('error_details', [])})
+    return JsonResponse({
+        'status': 'ok',
+        'deleted_count': deleted_count,
+        'total_errors': len(state.get('error_details', [])),
+        'error_details': state.get('error_details', []),
+        'columns': state.get('columns_display') or []
+    })
 
 @login_required
 def my_sale_pdf(request, order_id):

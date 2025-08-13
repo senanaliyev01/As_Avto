@@ -488,6 +488,7 @@
         const errorsModalEl = document.getElementById('importErrorsModal');
         const errorsModalBody = document.getElementById('importErrorsModalBody');
         let allErrors = [];
+        let excelColumns = [];
 
         async function runBatchImport(file, size) {
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
@@ -526,6 +527,9 @@
                 });
                 const data = await batchRes.json();
                 if (data.status !== 'ok') throw new Error(data.message || 'Batch xətası');
+                if (Array.isArray(data.columns) && data.columns.length) {
+                    excelColumns = data.columns;
+                }
 
                 const processed = data.processed_rows || end;
                 const percent = total ? Math.round((processed / total) * 100) : 100;
@@ -546,6 +550,9 @@
             });
             const finData = await finRes.json();
             if (finData.status !== 'ok') throw new Error(finData.message || 'Finalize xətası');
+            if (Array.isArray(finData.columns) && finData.columns.length) {
+                excelColumns = finData.columns;
+            }
             setCounters(parseInt(importCounters.dataset.newCount || '0'), parseInt(importCounters.dataset.updateCount || '0'), parseInt(importCounters.dataset.errorCount || '0'), finData.deleted_count || 0);
             if (Array.isArray(finData.error_details) && finData.error_details.length) {
                 appendErrors(finData.error_details);
@@ -602,7 +609,45 @@
             importErrors.appendChild(frag);
         }
 
-        // showRowDetails ləğv edildi — bütün xətalar tək bir cədvəldə göstərilir
+        function showRowDetails(item) {
+            const row = item.row || {};
+            // Bütün sütunlar: obyektin öz açarlarını sırala
+            const keys = Object.keys(row);
+            const lines = (keys.length ? keys : ['adi','brend_kod','firma','avtomobil','qiymet','stok','kodlar','olcu'])
+                .map(k => `
+                    <tr>
+                        <th class="pe-2 text-muted" style="white-space:normal; width: 30%; word-break: break-word; overflow-wrap: anywhere;">${escapeHtml(k)}</th>
+                        <td style="white-space:normal; word-break: break-word; overflow-wrap: anywhere;">${escapeHtml(row[k] || '')} ${item.field && item.field === k ? '<span class="badge bg-danger ms-1">Boşdur / Xəta</span>' : ''}</td>
+                    </tr>`)
+                .join('');
+            const html = `
+                <table class="table table-sm table-bordered mb-0" style="table-layout:fixed; width:100%;">
+                    <tbody>${lines}</tbody>
+                </table>`;
+            // Modal tam mərkəzdə və geniş
+            const dlg = document.createElement('div');
+            dlg.className = 'modal fade';
+            dlg.innerHTML = `
+            <div class="modal-dialog modal-dialog-centered modal-xl">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">${item.line ? (escapeHtml(item.line) + '-ci sətir detalları') : 'Sətir detalları'}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <div class="mb-2"><strong>Xəta:</strong> ${escapeHtml(item.message || '')}</div>
+                  ${html}
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bağla</button>
+                </div>
+              </div>
+            </div>`;
+            document.body.appendChild(dlg);
+            const modal = new bootstrap.Modal(dlg);
+            modal.show();
+            dlg.addEventListener('hidden.bs.modal', () => dlg.remove());
+        }
 
         function renderErrorsModal() {
             if (!errorsModalBody) return;
@@ -610,32 +655,48 @@
                 errorsModalBody.innerHTML = '<div class="text-muted">Xəta yoxdur.</div>';
                 return;
             }
-            // Excel-vari geniş cədvəl: hər xəta sətiri və bütün sütunlar
-            const displayCols = ['adi','brend_kod','firma','avtomobil','maya_qiymet','qiymet','stok','kodlar','olcu','kateqoriya','vitrin','melumat'];
-            const head = ['Sətir','Xəta','Sütun'].concat(displayCols);
-            const thead = head.map(h => `<th class="text-nowrap">${escapeHtml(h)}</th>`).join('');
-            const rowsHtml = allErrors.map(item => {
-                const line = (item && typeof item === 'object') ? item.line : '';
-                const msg = (item && typeof item === 'object') ? item.message : String(item);
-                const fld = (item && typeof item === 'object' && item.field) ? item.field : '';
-                const row = (item && typeof item === 'object' && item.row) ? item.row : {};
-                const tds = displayCols.map(col => {
-                    const val = row[col] || '';
-                    const mark = (fld && fld === col) ? '<span class="badge bg-danger ms-1">Boşdur / Xəta</span>' : '';
-                    return `<td class="text-truncate" style="max-width:160px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(val)} ${mark}</td>`;
+            // Başlıqlar Excel-dən olduğu kimi
+            const columns = (excelColumns && excelColumns.length) ? excelColumns : ['adi','brend_kod','firma','avtomobil','maya_qiymet','qiymet','stok'];
+            const headerHtml = ['Sətir'].concat(columns).map(c => `<th class="text-nowrap">${escapeHtml(c)}</th>`).join('');
+
+            // Line -> row snapshot və xəta xəritəsi
+            const lineToRow = {};
+            const lineFieldErrors = {}; // { line: {field: [messages]} }
+            allErrors.forEach(item => {
+                if (item && item.line) {
+                    if (item.row) lineToRow[item.line] = item.row;
+                    const field = (item.field || '').toString().toLowerCase();
+                    if (!lineFieldErrors[item.line]) lineFieldErrors[item.line] = {};
+                    if (field) {
+                        if (!lineFieldErrors[item.line][field]) lineFieldErrors[item.line][field] = [];
+                        lineFieldErrors[item.line][field].push(item.message || 'Xəta');
+                    }
+                }
+            });
+
+            const lines = Object.keys(lineToRow).map(n => parseInt(n)).sort((a,b)=>a-b);
+            const bodyHtml = lines.map(lineNo => {
+                const row = lineToRow[lineNo] || {};
+                const tds = columns.map(col => {
+                    const key = col.toString().trim().toLowerCase();
+                    const val = (key in row) ? row[key] : '';
+                    const errsForField = (lineFieldErrors[lineNo] && lineFieldErrors[lineNo][key]) || [];
+                    const badge = errsForField.length ? `<span class="badge bg-danger ms-1">${errsForField.some(m => String(m).toLowerCase().includes('boşdur')) ? 'Boşdur' : 'Xəta'}</span>` : '';
+                    return `<td class="align-middle" style="max-width:220px;">
+                        <div class="text-truncate" style="max-width: 220px;">${escapeHtml(String(val || ''))}</div>${badge}
+                    </td>`;
                 }).join('');
                 return `<tr>
-                    <td class="text-nowrap" style="width:120px;">${line ? escapeHtml(line + '-ci sətir') : '-'}</td>
-                    <td class="text-truncate" style="max-width:240px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(msg)}</td>
-                    <td class="text-nowrap" style="width:140px;">${escapeHtml(fld || '')}</td>
+                    <td class="text-muted">${escapeHtml(lineNo + '-ci sətir')}</td>
                     ${tds}
                 </tr>`;
             }).join('');
+
             errorsModalBody.innerHTML = `
                 <div class="table-responsive">
-                    <table class="table table-sm table-bordered align-middle mb-0" style="table-layout:fixed; width:100%;">
-                        <thead><tr>${thead}</tr></thead>
-                        <tbody>${rowsHtml}</tbody>
+                    <table class="table table-sm table-bordered align-middle mb-0" style="table-layout: fixed;">
+                        <thead><tr>${headerHtml}</tr></thead>
+                        <tbody>${bodyHtml}</tbody>
                     </table>
                 </div>`;
         }

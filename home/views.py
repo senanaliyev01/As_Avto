@@ -971,6 +971,9 @@ def import_user_products_view(request):
             new_count = 0
             update_count = 0
             error_count = 0
+            deleted_count = 0
+            # Excel faylındakı məhsulların açarları: (brend_kod, firma_id)
+            excel_product_keys = set()
             
             for index, row in df.iterrows():
                 try:
@@ -1015,6 +1018,9 @@ def import_user_products_view(request):
                         messages.error(request, f'Xəta baş verdi, sətir {index + 2} işlənir: Brend kodu boşdur.', level=messages.ERROR)
                         error_count += 1
                         continue
+
+                    # Bu sətirdəki məhsulun açarını yadda saxla
+                    excel_product_keys.add((brend_kod, firma.id if firma else None))
 
                     # Mövcud məhsulu həm brend_kod, həm firma, həm də sahib ilə yoxla
                     if firma:
@@ -1065,16 +1071,28 @@ def import_user_products_view(request):
                     error_count += 1
                     continue
             
+            # Excel-də olmayan məhsulları sil (yalnız bu istifadəçiyə aid)
+            if excel_product_keys:
+                user_products_qs = Mehsul.objects.filter(sahib=request.user)
+                to_delete_ids = [
+                    p.id for p in user_products_qs.only('id', 'brend_kod', 'firma_id')
+                    if (p.brend_kod, p.firma_id) not in excel_product_keys
+                ]
+                if to_delete_ids:
+                    deleted_count, _ = Mehsul.objects.filter(id__in=to_delete_ids).delete()
+
             success_message = f"Excel fayl uğurla əlavə edildi! "
             if new_count > 0:
                 success_message += f"{new_count} yeni məhsul əlavə edildi. "
             if update_count > 0:
                 success_message += f"{update_count} məhsul yeniləndi. "
+            if deleted_count > 0:
+                success_message += f"{deleted_count} məhsul Excel-də olmadığı üçün silindi. "
             
             if error_count > 0:
                 messages.warning(request, f"Xətalar {error_count} sətirdə baş verdi.")
             
-            if new_count > 0 or update_count > 0:
+            if new_count > 0 or update_count > 0 or deleted_count > 0:
                 messages.success(request, success_message)
             elif error_count == 0:
                 messages.info(request, "Fayldakı dəyişikliklər yoxdur.")

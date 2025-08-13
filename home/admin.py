@@ -236,6 +236,10 @@ class MehsulAdmin(admin.ModelAdmin):
                 new_count = 0
                 update_count = 0
                 error_count = 0
+                deleted_count = 0
+
+                # Excel faylında olan məhsulların unikal açarlarını saxla: (brend_kod, firma_id)
+                excel_product_keys = set()
                 
                 with transaction.atomic():
                     for index, row in df.iterrows():
@@ -298,6 +302,9 @@ class MehsulAdmin(admin.ModelAdmin):
 
                             print(f"Brend kod: {brend_kod}")
 
+                            # Bu sətirdəki məhsulun açarını yadda saxla
+                            excel_product_keys.add((brend_kod, firma.id if firma else None))
+
                             # Mövcud məhsulu həm brend_kod, həm firma, həm də sahib ilə yoxla
                             existing_product = Mehsul.objects.filter(brend_kod=brend_kod, firma=firma, sahib=request.user).first()
 
@@ -356,6 +363,18 @@ class MehsulAdmin(admin.ModelAdmin):
                             error_count += 1
                             continue
 
+                    # Excel-də olmayan məhsulları sil (yalnız bu istifadəçinin məhsulları)
+                    if excel_product_keys:
+                        qs_user_products = Mehsul.objects.filter(sahib=request.user)
+                        # Silinəcək məhsullar: istifadəçinin mövcud məhsulları içində açarı Excel dəstində olmayanlar
+                        to_delete_ids = [
+                            p.id for p in qs_user_products.only('id', 'brend_kod', 'firma_id')
+                            if (p.brend_kod, p.firma_id) not in excel_product_keys
+                        ]
+                        if to_delete_ids:
+                            deleted_count, _ = Mehsul.objects.filter(id__in=to_delete_ids).delete()
+                            print(f"Excel-də olmayan {deleted_count} məhsul silindi")
+
                     # Nəticəni göstər
                     success_message = f"Excel faylı uğurla import edildi! "
                     if new_count > 0:
@@ -364,6 +383,8 @@ class MehsulAdmin(admin.ModelAdmin):
                         success_message += f"{update_count} məhsul yeniləndi. "
                     if error_count > 0:
                         success_message += f"{error_count} xəta baş verdi."
+                    if deleted_count > 0:
+                        success_message += f" {deleted_count} məhsul Excel-də olmadığı üçün silindi."
                     
                     self.message_user(request, success_message, level=messages.SUCCESS)
                     return HttpResponseRedirect("../")

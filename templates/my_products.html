@@ -586,20 +586,12 @@
 
         function appendErrors(list) {
             if (!list || !list.length) return;
-            importErrors.classList.remove('d-none');
-            // Yadda saxla və UI-də göstər
+            // Yadda saxla və dərhal modal kontentini yenilə
             list.forEach(item => allErrors.push(item));
             renderErrorsModal();
-            // Köhnə alert-blokda da qısa özet saxlayırıq (istəyə görə)
-            const frag = document.createDocumentFragment();
-            allErrors.slice(-list.length).forEach(item => {
-                const div = document.createElement('div');
-                const line = typeof item === 'object' ? item.line : null;
-                const message = typeof item === 'object' ? item.message : String(item);
-                div.textContent = `${line ? (line + '-ci sətir') : 'Sətir'}: ${message}`;
-                frag.appendChild(div);
-            });
-            importErrors.appendChild(frag);
+            // Xəta varsa xəbərdarlıq blokunu qısa görünən saxla (opsional)
+            importErrors.classList.remove('d-none');
+            importErrors.textContent = `Xəta sayı: ${allErrors.length}`;
         }
 
         function showRowDetails(item) {
@@ -648,34 +640,45 @@
                 errorsModalBody.innerHTML = '<div class="text-muted">Xəta yoxdur.</div>';
                 return;
             }
-            const rowsHtml = allErrors.map((item, i) => {
-                const line = typeof item === 'object' ? item.line : '';
-                const message = typeof item === 'object' ? item.message : String(item);
-                const field = (item && typeof item === 'object' && item.field) ? ` (<span class="text-danger">${escapeHtml(item.field)}</span>)` : '';
-                const btn = (item && typeof item === 'object' && item.row) ? `<button type="button" class="btn btn-link btn-sm p-0 show-detail" data-idx="${i}">Detala bax</button>` : '';
+            // Bütün xətaların sütunlarını topla (birləşmiş set)
+            const unionKeysSet = new Set();
+            allErrors.forEach(it => {
+                const row = (it && typeof it === 'object') ? it.row : null;
+                if (row) Object.keys(row).forEach(k => unionKeysSet.add(k));
+            });
+            // Tələb olunan sahələri önə çəkək
+            const required = ['adi','brend_kod','firma','avtomobil','maya_qiymet','qiymet','stok'];
+            const others = Array.from(unionKeysSet).filter(k => !required.includes(k));
+            const columns = [...required, ...others];
+
+            // Cədvəl: sətir, sütun, xəta + excel sütunları
+            const headerCols = ['Sətir','Sütun','Xəta', ...columns];
+            const thead = `<tr>${headerCols.map(h => `<th class=\"text-nowrap\">${escapeHtml(h)}</th>`).join('')}</tr>`;
+
+            // Ellipsis stili üçün helper
+            const cell = (text) => `<div style=\"max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\">${escapeHtml(text || '')}</div>`;
+
+            const tbody = allErrors.map(it => {
+                const line = it.line ? `${it.line}-ci sətir` : '-';
+                const field = it.field || '';
+                const message = it.message || '';
+                const row = it.row || {};
+                const rowTds = columns.map(k => `<td>${cell(row[k])}</td>`).join('');
                 return `<tr>
-                    <td style="width: 120px;">${line ? escapeHtml(line + '-ci sətir') : '-'}</td>
-                    <td>${escapeHtml(message)}${field}</td>
-                    <td style="width: 110px;" class="text-end">${btn}</td>
+                    <td>${cell(line)}</td>
+                    <td>${cell(field)}</td>
+                    <td>${cell(message)}</td>
+                    ${rowTds}
                 </tr>`;
             }).join('');
+
             errorsModalBody.innerHTML = `
-                <div class="table-responsive">
-                    <table class="table table-sm table-bordered align-middle mb-0">
-                        <thead>
-                            <tr><th>Sətir</th><th>Xəta</th><th>Detallar</th></tr>
-                        </thead>
-                        <tbody>${rowsHtml}</tbody>
+                <div>
+                    <table class="table table-sm table-bordered mb-0" style="table-layout:fixed; width:100%;">
+                        <thead>${thead}</thead>
+                        <tbody>${tbody}</tbody>
                     </table>
                 </div>`;
-            // Detal düymələrini bağla
-            errorsModalBody.querySelectorAll('.show-detail').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const idx = parseInt(btn.getAttribute('data-idx'));
-                    const item = allErrors[idx];
-                    if (item) showRowDetails(item);
-                });
-            });
         }
 
         function openErrorsModal() {

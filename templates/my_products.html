@@ -133,19 +133,49 @@
         </div>
     </div>
 
-    <!-- İdxal Xətaları Modal -->
-    <div class="modal fade" id="importErrorsModal" tabindex="-1" aria-labelledby="importErrorsModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="importErrorsModalLabel">İdxal Xətaları</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- İdxal Xətaları Modal (Bootstrap-sız, xüsusi CSS) -->
+    <style>
+    .ie-modal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 1050; background: rgba(15, 23, 42, 0.45); backdrop-filter: saturate(120%) blur(2px); }
+    .ie-modal.is-open { display: flex; }
+    .ie-dialog { width: 92vw; max-width: 1400px; max-height: 88vh; background: #fff; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; flex-direction: column; overflow: hidden; }
+    .ie-header { position: sticky; top: 0; background: #ffffff; border-bottom: 1px solid #e9ecf2; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
+    .ie-title { font-weight: 700; color: #2B5173; letter-spacing: .2px; margin: 0; font-size: 1.1rem; }
+    .ie-close { background: transparent; border: 0; width: 36px; height: 36px; border-radius: 8px; cursor: pointer; color: #334155; }
+    .ie-close:hover { background: #f3f6f9; }
+    .ie-body { background: #f7f9fb; padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+    .ie-footer { background: #fff; border-top: 1px solid #e9ecf2; padding: 10px 14px; display: flex; justify-content: flex-end; gap: 8px; }
+    .ie-btn { padding: 8px 14px; border-radius: 8px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer; }
+    .ie-btn:hover { background: #f8fafc; }
+    .ie-btn.primary { background: #2B5173; color: #fff; border-color: #2B5173; }
+    .ie-btn.primary:hover { filter: brightness(1.05); }
+    /* Cədvəl */
+    .ie-table-wrap { flex: 1; overflow: auto; }
+    .ie-table { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; margin: 0; }
+    .ie-table thead th { position: sticky; top: 0; z-index: 2; background: #2B5173; color: #fff; font-weight: 600; padding: 10px 12px; border-bottom: 0; white-space: nowrap; }
+    .ie-table th, .ie-table td { border: 1px solid #e9ecf2; }
+    .ie-table tbody tr:nth-child(odd) { background: #ffffff; }
+    .ie-table tbody tr:nth-child(even) { background: #f3f6f9; }
+    .ie-table td { padding: 10px 12px; vertical-align: middle; }
+    .ie-table th:first-child, .ie-table td:first-child { width: 120px; white-space: nowrap; }
+    .truncate { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .badge-danger { display: inline-block; margin-left: 6px; background: #d9534f; color: #fff; border-radius: 6px; padding: 2px 6px; font-size: 12px; font-weight: 600; }
+    </style>
+    <div id="importErrorsModal" class="ie-modal" aria-hidden="true">
+        <div class="ie-dialog" role="dialog" aria-modal="true" aria-labelledby="importErrorsModalLabel">
+            <div class="ie-header">
+                <h5 id="importErrorsModalLabel" class="ie-title">İdxal Xətaları</h5>
+                <button type="button" class="ie-close" id="ieCloseBtn" aria-label="Bağla">✕</button>
+            </div>
+            <div class="ie-body">
+                <div class="ie-table-wrap">
+                    <table class="ie-table" id="ieTable">
+                        <thead id="ieThead"></thead>
+                        <tbody id="importErrorsModalBody"></tbody>
+                    </table>
                 </div>
-                <div class="modal-body" id="importErrorsModalBody">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bağla</button>
-                </div>
+            </div>
+            <div class="ie-footer">
+                <button type="button" class="ie-btn" id="ieCloseBtnFooter">Bağla</button>
             </div>
         </div>
     </div>
@@ -487,6 +517,9 @@
         const importErrors = document.getElementById('importErrors');
         const errorsModalEl = document.getElementById('importErrorsModal');
         const errorsModalBody = document.getElementById('importErrorsModalBody');
+        const errorsThead = document.getElementById('ieThead');
+        const errorsCloseBtn = document.getElementById('ieCloseBtn');
+        const errorsCloseBtnFooter = document.getElementById('ieCloseBtnFooter');
         let allErrors = [];
         let excelColumns = [];
 
@@ -652,12 +685,14 @@
         function renderErrorsModal() {
             if (!errorsModalBody) return;
             if (!allErrors.length) {
-                errorsModalBody.innerHTML = '<div class="text-muted">Xəta yoxdur.</div>';
+                errorsThead.innerHTML = '';
+                errorsModalBody.innerHTML = '<tr><td class="text-muted">Xəta yoxdur.</td></tr>';
                 return;
             }
             // Başlıqlar Excel-dən olduğu kimi
             const columns = (excelColumns && excelColumns.length) ? excelColumns : ['adi','brend_kod','firma','avtomobil','maya_qiymet','qiymet','stok'];
-            const headerHtml = ['Sətir'].concat(columns).map(c => `<th class="text-nowrap">${escapeHtml(c)}</th>`).join('');
+            const headerHtml = '<tr>' + ['Sətir'].concat(columns).map(c => `<th class="text-nowrap">${escapeHtml(c)}</th>`).join('') + '</tr>';
+            errorsThead.innerHTML = headerHtml;
 
             // Line -> row snapshot və xəta xəritəsi
             const lineToRow = {};
@@ -692,20 +727,21 @@
                 </tr>`;
             }).join('');
 
-            errorsModalBody.innerHTML = `
-                <div class="table-responsive">
-                    <table class="table table-sm table-bordered align-middle mb-0" style="table-layout: fixed;">
-                        <thead><tr>${headerHtml}</tr></thead>
-                        <tbody>${bodyHtml}</tbody>
-                    </table>
-                </div>`;
+            errorsModalBody.innerHTML = bodyHtml;
         }
 
         function openErrorsModal() {
             renderErrorsModal();
-            const modal = new bootstrap.Modal(errorsModalEl);
-            modal.show();
+            errorsModalEl.classList.add('is-open');
         }
+
+        function closeErrorsModal() {
+            errorsModalEl.classList.remove('is-open');
+        }
+
+        if (errorsCloseBtn) errorsCloseBtn.addEventListener('click', closeErrorsModal);
+        if (errorsCloseBtnFooter) errorsCloseBtnFooter.addEventListener('click', closeErrorsModal);
+        errorsModalEl.addEventListener('click', function(e){ if (e.target === errorsModalEl) closeErrorsModal(); });
 
         function escapeHtml(unsafe) {
             return String(unsafe)

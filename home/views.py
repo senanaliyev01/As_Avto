@@ -1237,6 +1237,7 @@ def import_user_products_batch(request):
                 batch_errors.append({
                     'line': excel_line_no,
                     'message': 'Məhsulun adı boşdur',
+                    'field': 'adi',
                     'row': full_row,
                 })
                 continue
@@ -1260,9 +1261,21 @@ def import_user_products_batch(request):
                 batch_errors.append({
                     'line': excel_line_no,
                     'message': 'Brend kodu boşdur',
+                    'field': 'brend_kod',
                     'row': full_row,
                 })
                 continue
+
+            # Qeyri-kritik boşluqlar (yenə də qeyd edək ki görünüşdə çıxsın)
+            # Firma boşdursa qeyd et (amma davam et)
+            if 'firma' not in row or pd.isna(row.get('firma')) or str(row.get('firma')).strip() == '':
+                full_row = {str(k): ('' if (k not in row or pd.isna(row.get(k))) else str(row.get(k))) for k in row.keys()}
+                batch_errors.append({
+                    'line': excel_line_no,
+                    'message': 'Firma boşdur',
+                    'field': 'firma',
+                    'row': full_row,
+                })
 
             excel_keys.add((brend_kod, firma.id if firma else None))
 
@@ -1312,6 +1325,7 @@ def import_user_products_batch(request):
             batch_errors.append({
                 'line': excel_line_no,
                 'message': str(e),
+                'field': None,
                 'row': full_row,
             })
             continue

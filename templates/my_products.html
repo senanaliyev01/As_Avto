@@ -610,7 +610,7 @@
                 .map(k => `
                     <tr>
                         <th class="pe-2 text-muted" style="white-space:normal; width: 30%; word-break: break-word; overflow-wrap: anywhere;">${escapeHtml(k)}</th>
-                        <td style="white-space:normal; word-break: break-word; overflow-wrap: anywhere;">${escapeHtml(row[k] || '')}</td>
+                        <td style="white-space:normal; word-break: break-word; overflow-wrap: anywhere;">${escapeHtml(row[k] || '')} ${item.field && item.field === k ? '<span class="badge bg-danger ms-1">Boşdur / Xəta</span>' : ''}</td>
                     </tr>`)
                 .join('');
             const html = `
@@ -651,10 +651,11 @@
             const rowsHtml = allErrors.map((item, i) => {
                 const line = typeof item === 'object' ? item.line : '';
                 const message = typeof item === 'object' ? item.message : String(item);
+                const field = (item && typeof item === 'object' && item.field) ? ` (<span class="text-danger">${escapeHtml(item.field)}</span>)` : '';
                 const btn = (item && typeof item === 'object' && item.row) ? `<button type="button" class="btn btn-link btn-sm p-0 show-detail" data-idx="${i}">Detala bax</button>` : '';
                 return `<tr>
                     <td style="width: 120px;">${line ? escapeHtml(line + '-ci sətir') : '-'}</td>
-                    <td>${escapeHtml(message)}</td>
+                    <td>${escapeHtml(message)}${field}</td>
                     <td style="width: 110px;" class="text-end">${btn}</td>
                 </tr>`;
             }).join('');

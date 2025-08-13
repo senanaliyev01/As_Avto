@@ -160,7 +160,7 @@
     .truncate { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .ie-table td .cell { display: flex; align-items: center; justify-content: center; gap: 6px; min-width: 0; }
     .ie-table td .cell-text { display: block; min-width: 0; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .badge-danger { display: inline-block; margin-left: 6px; background: #d9534f; color: #fff; border-radius: 6px; padding: 2px 6px; font-size: 12px; font-weight: 600; }
+    .badge-danger { display: inline-flex; align-items: center; justify-content: center; margin-left: 6px; background: #d9534f; color: #fff; border-radius: 50%; width: 18px; height: 18px; font-size: 12px; font-weight: bold; }
     </style>
     <div id="importErrorsModal" class="ie-modal" aria-hidden="true">
         <div class="ie-dialog" role="dialog" aria-modal="true" aria-labelledby="importErrorsModalLabel">
@@ -718,7 +718,7 @@
                     const key = col.toString().trim().toLowerCase();
                     const val = (key in row) ? row[key] : '';
                     const errsForField = (lineFieldErrors[lineNo] && lineFieldErrors[lineNo][key]) || [];
-                    const badge = errsForField.length ? `<span class="badge bg-danger ms-1">${errsForField.some(m => String(m).toLowerCase().includes('boşdur')) ? 'Boşdur' : 'Xəta'}</span>` : '';
+                    const badge = errsForField.length ? `<span class="badge-danger">✕</span>` : '';
                     const displayVal = truncateText(String(val || ''), 25);
                     return `<td class="align-middle" style="max-width:220px;">
                         <div class="cell"><span class="cell-text">${escapeHtml(displayVal)}</span>${badge}</div>

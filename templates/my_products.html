@@ -155,9 +155,11 @@
     .ie-table th, .ie-table td { border: 1px solid #e9ecf2; }
     .ie-table tbody tr:nth-child(odd) { background: #ffffff; }
     .ie-table tbody tr:nth-child(even) { background: #f3f6f9; }
-    .ie-table td { padding: 10px 12px; vertical-align: middle; }
+    .ie-table td { padding: 10px 12px; vertical-align: middle; white-space: nowrap; }
     .ie-table th:first-child, .ie-table td:first-child { width: 120px; white-space: nowrap; }
     .truncate { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ie-table td .cell { display: flex; align-items: center; gap: 6px; min-width: 0; }
+    .ie-table td .cell-text { display: block; min-width: 0; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .badge-danger { display: inline-block; margin-left: 6px; background: #d9534f; color: #fff; border-radius: 6px; padding: 2px 6px; font-size: 12px; font-weight: 600; }
     </style>
     <div id="importErrorsModal" class="ie-modal" aria-hidden="true">
@@ -719,7 +721,7 @@
                     const badge = errsForField.length ? `<span class="badge bg-danger ms-1">${errsForField.some(m => String(m).toLowerCase().includes('boşdur')) ? 'Boşdur' : 'Xəta'}</span>` : '';
                     const displayVal = truncateText(String(val || ''), 25);
                     return `<td class="align-middle" style="max-width:220px;">
-                        <div class="text-truncate" style="max-width: 220px;">${escapeHtml(displayVal)}</div>${badge}
+                        <div class="cell"><span class="cell-text">${escapeHtml(displayVal)}</span>${badge}</div>
                     </td>`;
                 }).join('');
                 return `<tr>

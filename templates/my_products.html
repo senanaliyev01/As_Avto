@@ -135,28 +135,50 @@
 
     <!-- İdxal Xətaları Modal -->
     <style>
-    /* İdxal xətaları modalı üçün peşəkar tam ekran dizayn */
-    #importErrorsModal.modal { backdrop-filter: blur(2px); }
-    #importErrorsModal .modal-dialog { margin: 0; width: 100%; max-width: none; }
-    #importErrorsModal .modal-content { height: 100vh; border: 0; border-radius: 0; display: flex; flex-direction: column; }
-    #importErrorsModal .modal-header { position: sticky; top: 0; z-index: 3; background: #ffffff; border-bottom: 1px solid #e9ecef; }
-    #importErrorsModal .modal-title { font-weight: 600; color: #2B5173; }
-    #importErrorsModal .modal-body { padding: 0; background: #f7f9fb; overflow: auto; }
-    #importErrorsModal .section { padding: 16px; }
-    #importErrorsModal .table { margin: 0; }
-    #importErrorsModal .table.sticky-head thead th { position: sticky; top: 0; background: #2B5173; color: #fff; z-index: 2; }
-    #importErrorsModal .table thead th { font-weight: 600; }
+    /* Import Errors Modal – Custom, professional styling (no Bootstrap dependency for visuals) */
+    #importErrorsModal.modal { backdrop-filter: saturate(120%) blur(2px); }
+    #importErrorsModal .modal-dialog { width: 92vw; max-width: 1400px; margin: 4vh auto; }
+    #importErrorsModal .modal-content {
+        border: 0; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        max-height: 88vh; display: flex; overflow: hidden;
+    }
+    #importErrorsModal .modal-header {
+        position: sticky; top: 0; z-index: 3;
+        background: #ffffff; border-bottom: 1px solid #e9ecf2; padding: 14px 18px;
+    }
+    #importErrorsModal .modal-title { font-weight: 700; color: #2B5173; letter-spacing: .2px; }
+    #importErrorsModal .btn-close { filter: invert(35%); opacity: .7; }
+    #importErrorsModal .btn-close:hover { opacity: 1; }
+    #importErrorsModal .modal-body { background: #f7f9fb; padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+    #importErrorsModal .modal-footer { background: #fff; border-top: 1px solid #e9ecf2; }
+
+    /* Table visuals */
+    #importErrorsModal .table { width: 100%; table-layout: fixed; margin: 0; border-collapse: separate; border-spacing: 0; }
+    #importErrorsModal .table thead th {
+        position: sticky; top: 0; z-index: 2; background: #2B5173; color: #fff;
+        font-weight: 600; padding: 10px 12px; border-bottom: 0;
+    }
     #importErrorsModal .table tbody tr:nth-child(odd) { background: #ffffff; }
     #importErrorsModal .table tbody tr:nth-child(even) { background: #f3f6f9; }
-    #importErrorsModal .badge { font-weight: 500; }
-    /* Hüceyrələrdə ellipsis və sabit enlər (yan skrollsuz) */
-    #importErrorsModal .cell { max-width: 300px; }
-    #importErrorsModal .cell .text-truncate { max-width: 300px !important; }
-    /* Sətir sütunu daha dar, məlumat sütunları sabit genişliklə */
-    #importErrorsModal th.line-col, #importErrorsModal td.line-col { width: 120px; white-space: nowrap; }
+    #importErrorsModal .table td { padding: 10px 12px; border-color: #e9ecf2; vertical-align: middle; }
+    #importErrorsModal .table th, #importErrorsModal .table td { border: 1px solid #e9ecf2; }
+
+    /* Columns */
+    #importErrorsModal .table thead th:first-child,
+    #importErrorsModal .table tbody td:first-child { width: 120px; white-space: nowrap; }
+
+    /* Text truncation within cells (prevents horizontal scroll) */
+    #importErrorsModal .text-truncate { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Badges */
+    #importErrorsModal .badge { font-weight: 600; }
+    #importErrorsModal .badge.bg-danger { background: #d9534f !important; }
+
+    /* Responsive wrapper */
+    #importErrorsModal .table-responsive { flex: 1; overflow: auto; }
     </style>
-    <div class="modal fade import-errors-modal" id="importErrorsModal" tabindex="-1" aria-labelledby="importErrorsModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-fullscreen">
+    <div class="modal fade" id="importErrorsModal" tabindex="-1" aria-labelledby="importErrorsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="importErrorsModalLabel">İdxal Xətaları</h5>
@@ -678,7 +700,7 @@
             }
             // Başlıqlar Excel-dən olduğu kimi
             const columns = (excelColumns && excelColumns.length) ? excelColumns : ['adi','brend_kod','firma','avtomobil','maya_qiymet','qiymet','stok'];
-            const headerHtml = ['Sətir'].concat(columns).map((c, idx) => idx === 0 ? `<th class="line-col">${escapeHtml(c)}</th>` : `<th class="text-nowrap">${escapeHtml(c)}</th>`).join('');
+            const headerHtml = ['Sətir'].concat(columns).map(c => `<th class="text-nowrap">${escapeHtml(c)}</th>`).join('');
 
             // Line -> row snapshot və xəta xəritəsi
             const lineToRow = {};
@@ -708,14 +730,14 @@
                     </td>`;
                 }).join('');
                 return `<tr>
-                    <td class="text-muted line-col">${escapeHtml(lineNo + '-ci sətir')}</td>
+                    <td class="text-muted">${escapeHtml(lineNo + '-ci sətir')}</td>
                     ${tds}
                 </tr>`;
             }).join('');
 
             errorsModalBody.innerHTML = `
                 <div class="table-responsive">
-                    <table class="table table-sm table-bordered align-middle sticky-head mb-0" style="table-layout: fixed;">
+                    <table class="table table-sm table-bordered align-middle mb-0" style="table-layout: fixed;">
                         <thead><tr>${headerHtml}</tr></thead>
                         <tbody>${bodyHtml}</tbody>
                     </table>

@@ -103,16 +103,29 @@
                             </ul>
                         </div>
                     </div>
-                    <form action="{% url 'import_user_products' %}" method="post" enctype="multipart/form-data">
+                    <form id="excelImportForm" enctype="multipart/form-data" onsubmit="return false;">
                         {% csrf_token %}
                         <div class="mb-3">
                             <label for="excel_file" class="form-label">Excel Faylı (.xlsx)</label>
                             <input class="form-control" type="file" name="excel_file" id="excel_file" accept=".xlsx" required>
                         </div>
+                        <div class="mb-3">
+                            <label for="batch_size" class="form-label">Paket Ölçüsü</label>
+                            <select id="batch_size" class="form-select form-select-sm" style="max-width: 160px;">
+                                <option value="100" selected>100</option>
+                                <option value="50">50</option>
+                                <option value="10">10</option>
+                            </select>
+                        </div>
                         <p class="small text-muted">
                             <b>Vacib:</b> Excel faylınızda `brend_kod`, `adi`, `firma`, `avtomobil`, `qiymet`, `stok` kimi sütunlar olmalıdır. Mövcud `brend_kod` olan məhsullar yenilənəcək, digərləri yeni kimi yaradılacaq.
                         </p>
-                        <button type="submit" class="btn btn-success">İdxal Et</button>
+                        <div id="importProgress" class="progress d-none mb-2" style="height: 18px;">
+                            <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                        </div>
+                        <div id="importStatus" class="small text-muted mb-2"></div>
+                        <div id="importCounters" class="small text-muted mb-3"></div>
+                        <button type="button" id="startImportBtn" class="btn btn-success">İdxal Et</button>
                     </form>
                 </div>
             </div>
@@ -441,6 +454,111 @@
                             loadMoreBtn.remove();
                         }
                     });
+            });
+        }
+
+        // Batch Excel Import
+        const importForm = document.getElementById('excelImportForm');
+        const startImportBtn = document.getElementById('startImportBtn');
+        const excelInput = document.getElementById('excel_file');
+        const batchSizeSelect = document.getElementById('batch_size');
+        const progressWrap = document.getElementById('importProgress');
+        const progressBar = progressWrap ? progressWrap.querySelector('.progress-bar') : null;
+        const importStatus = document.getElementById('importStatus');
+        const importCounters = document.getElementById('importCounters');
+
+        async function runBatchImport(file, size) {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+
+            progressWrap.classList.remove('d-none');
+            updateProgress(0, 0);
+            setStatus('Başlayır...');
+            setCounters(0,0,0,0);
+
+            // init
+            const formData = new FormData();
+            formData.append('excel_file', file);
+            const initRes = await fetch('/my-products/import/init/', { method: 'POST', body: formData, credentials: 'include', headers: { 'X-CSRFToken': csrfToken } });
+            const initData = await initRes.json();
+            if (initData.status !== 'ok') throw new Error(initData.message || 'Başlatma xətası');
+            const jobId = initData.job_id;
+            const total = initData.total_rows || 0;
+            let start = 0;
+
+            // batch loop
+            while (start < total) {
+                const end = Math.min(start + size, total);
+                setStatus(`Sətirlər: ${start}-${end}`);
+
+                const body = new URLSearchParams({ job_id: jobId, start: String(start), size: String(size) });
+                const batchRes = await fetch('/my-products/import/batch/', {
+                    method: 'POST',
+                    body,
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': csrfToken },
+                    credentials: 'include'
+                });
+                const data = await batchRes.json();
+                if (data.status !== 'ok') throw new Error(data.message || 'Batch xətası');
+
+                const processed = data.processed_rows || end;
+                const percent = total ? Math.round((processed / total) * 100) : 100;
+                updateProgress(percent, processed);
+                setCounters(data.new_count || 0, data.update_count || 0, data.error_count || 0, 0);
+                start += size;
+            }
+
+            // finalize
+            const finRes = await fetch('/my-products/import/finalize/', {
+                method: 'POST',
+                body: new URLSearchParams({ job_id: jobId }),
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': csrfToken },
+                credentials: 'include'
+            });
+            const finData = await finRes.json();
+            if (finData.status !== 'ok') throw new Error(finData.message || 'Finalize xətası');
+            setCounters(parseInt(importCounters.dataset.newCount || '0'), parseInt(importCounters.dataset.updateCount || '0'), parseInt(importCounters.dataset.errorCount || '0'), finData.deleted_count || 0);
+            setStatus('Tamamlandı');
+            showMessage(`İmport tamamlandı. Silinən: ${finData.deleted_count || 0}`, 'success');
+        }
+
+        function updateProgress(percent, processed) {
+            if (!progressBar) return;
+            progressBar.style.width = percent + '%';
+            progressBar.setAttribute('aria-valuenow', percent);
+            progressBar.textContent = percent + '%';
+        }
+
+        function setStatus(text) {
+            if (importStatus) importStatus.textContent = text;
+        }
+
+        function setCounters(n, u, e, d) {
+            importCounters.dataset.newCount = String(n);
+            importCounters.dataset.updateCount = String(u);
+            importCounters.dataset.errorCount = String(e);
+            importCounters.dataset.deletedCount = String(d);
+            importCounters.textContent = `Yeni: ${n} | Yenilənən: ${u} | Xəta: ${e}` + (d ? ` | Silinən: ${d}` : '');
+        }
+
+        if (startImportBtn && importForm) {
+            startImportBtn.addEventListener('click', async function() {
+                const file = excelInput?.files?.[0];
+                if (!file) {
+                    showMessage('Zəhmət olmasa Excel faylı seçin.', 'error');
+                    return;
+                }
+                const size = parseInt(batchSizeSelect?.value || '100');
+                startImportBtn.disabled = true;
+                const original = startImportBtn.innerHTML;
+                startImportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Yüklənir...';
+                try {
+                    await runBatchImport(file, size);
+                } catch (err) {
+                    showMessage((err && err.message) ? err.message : 'İdxal zamanı xəta baş verdi', 'error');
+                } finally {
+                    startImportBtn.disabled = false;
+                    startImportBtn.innerHTML = original;
+                }
             });
         }
     });

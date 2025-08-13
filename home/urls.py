@@ -24,6 +24,10 @@ urlpatterns = [
     path('load-more-new-products/', views.load_more_new_products, name='load_more_new_products'),
     path('my-products/', views.my_products_view, name='my_products'),
     path('my-products/import/', views.import_user_products_view, name='import_user_products'),
+    # Batch import API-ları
+    path('my-products/import/init/', views.import_user_products_init, name='import_user_products_init'),
+    path('my-products/import/batch/', views.import_user_products_batch, name='import_user_products_batch'),
+    path('my-products/import/finalize/', views.import_user_products_finalize, name='import_user_products_finalize'),
     path('my-products/load-more/', views.load_more_my_products, name='load_more_my_products'),
     path('my-products/edit/<int:product_id>/', views.add_edit_product_view, name='edit_product_my'),
     path('my-products/delete/<int:product_id>/', views.delete_product_view, name='delete_product_my'),

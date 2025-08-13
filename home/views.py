@@ -34,6 +34,10 @@ from django.db.models.functions import Concat, Cast
 from django.db.models import CharField
 from django.db import models
 from math import sqrt
+import os
+import json
+import uuid
+from django.conf import settings
 
 def truncate_product_name(name, max_length=20):
     """Məhsul adını qısaldır və uzun olarsa ... əlavə edir"""
@@ -1103,6 +1107,252 @@ def import_user_products_view(request):
         return redirect('my_products')
     
     return redirect('my_products')
+
+
+# =============== BATCH EXCEL IMPORT (Mərhələli) ===============
+@login_required
+@csrf_exempt
+def import_user_products_init(request):
+    """Excel faylını qəbul edir, sətirləri təmizləyib job faylına yazır, job_id qaytarır"""
+    if not request.user.profile.is_verified:
+        return JsonResponse({'status': 'error', 'message': 'Icazə yoxdur.'}, status=403)
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Yalnız POST.'}, status=405)
+
+    excel_file = request.FILES.get("excel_file")
+    if not excel_file:
+        return JsonResponse({'status': 'error', 'message': 'Excel faylı seçin.'}, status=400)
+    if not excel_file.name.endswith('.xlsx'):
+        return JsonResponse({'status': 'error', 'message': 'Yalnız .xlsx faylı qəbul edilir.'}, status=400)
+
+    # Faylı media/imports altına yaz
+    imports_dir = os.path.join(settings.MEDIA_ROOT, 'imports')
+    os.makedirs(imports_dir, exist_ok=True)
+    job_id = str(uuid.uuid4())
+    saved_path = os.path.join(imports_dir, f'user_{request.user.id}_{job_id}.xlsx')
+    with open(saved_path, 'wb+') as dest:
+        for chunk in excel_file.chunks():
+            dest.write(chunk)
+
+    # Exceli oxu və sətirləri təmizlə
+    try:
+        df = pd.read_excel(saved_path)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': f'Excel oxunmadı: {e}'}, status=400)
+
+    cleaned_rows = []
+    for index, row in df.iterrows():
+        row = {str(k).strip().lower(): v for k, v in row.items()}
+        cleaned_rows.append(row)
+
+    total_rows = len(cleaned_rows)
+
+    # Job state faylı
+    jobs_dir = os.path.join(imports_dir, 'jobs')
+    os.makedirs(jobs_dir, exist_ok=True)
+    job_state_path = os.path.join(jobs_dir, f'{job_id}.json')
+    job_state = {
+        'user_id': request.user.id,
+        'file_path': saved_path,
+        'total_rows': total_rows,
+        'processed_rows': 0,
+        'new_count': 0,
+        'update_count': 0,
+        'error_count': 0,
+        'deleted_count': 0,
+        'excel_product_keys': [],  # (brend_kod, firma_id)
+        'rows': cleaned_rows,
+    }
+    with open(job_state_path, 'w', encoding='utf-8') as f:
+        json.dump(job_state, f, ensure_ascii=False)
+
+    return JsonResponse({'status': 'ok', 'job_id': job_id, 'total_rows': total_rows})
+
+
+@login_required
+@csrf_exempt
+def import_user_products_batch(request):
+    """Verilən interval üzrə (start, size) sətirləri emal edir"""
+    if not request.user.profile.is_verified:
+        return JsonResponse({'status': 'error', 'message': 'Icazə yoxdur.'}, status=403)
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Yalnız POST.'}, status=405)
+
+    job_id = request.POST.get('job_id')
+    try:
+        start = int(request.POST.get('start', 0))
+        size = int(request.POST.get('size', 100))
+    except ValueError:
+        return JsonResponse({'status': 'error', 'message': 'start/size yanlışdır.'}, status=400)
+
+    imports_dir = os.path.join(settings.MEDIA_ROOT, 'imports')
+    job_state_path = os.path.join(imports_dir, 'jobs', f'{job_id}.json')
+    if not os.path.exists(job_state_path):
+        return JsonResponse({'status': 'error', 'message': 'Job tapılmadı.'}, status=404)
+
+    with open(job_state_path, 'r', encoding='utf-8') as f:
+        state = json.load(f)
+
+    if state.get('user_id') != request.user.id:
+        return JsonResponse({'status': 'error', 'message': 'Icazə yoxdur.'}, status=403)
+
+    rows = state.get('rows', [])
+    subset = rows[start:start+size]
+    if not subset:
+        return JsonResponse({'status': 'ok', 'message': 'Heç nə yoxdur', 'processed_rows': state['processed_rows'], 'new_count': state['new_count'], 'update_count': state['update_count'], 'error_count': state['error_count']})
+
+    new_count = state['new_count']
+    update_count = state['update_count']
+    error_count = state['error_count']
+    excel_keys = set(tuple(k) for k in state.get('excel_product_keys', []))
+
+    # Emal məntiqi (mövcud import_user_products_view ilə eyni)
+    for idx, row in enumerate(subset, start=start):
+        try:
+            # Model referansları
+            kateqoriya = None
+            firma = None
+            avtomobil = None
+            vitrin = None
+
+            if 'kateqoriya' in row and pd.notna(row['kateqoriya']):
+                kateqoriya, _ = Kateqoriya.objects.get_or_create(adi=str(row['kateqoriya']).strip())
+            if 'firma' in row and pd.notna(row['firma']):
+                firma, _ = Firma.objects.get_or_create(adi=str(row['firma']).strip())
+            if 'avtomobil' in row and pd.notna(row['avtomobil']):
+                avtomobil, _ = Avtomobil.objects.get_or_create(adi=str(row['avtomobil']).strip())
+            if 'vitrin' in row and pd.notna(row['vitrin']):
+                vitrin, _ = Vitrin.objects.get_or_create(nomre=str(row['vitrin']).strip())
+
+            if 'adi' not in row or pd.isna(row['adi']):
+                error_count += 1
+                continue
+
+            temiz_ad = str(row['adi']).strip()
+            temiz_ad = ' '.join(temiz_ad.split())
+
+            brend_kod = None
+            if 'brend_kod' in row and pd.notna(row['brend_kod']):
+                value = row['brend_kod']
+                if isinstance(value, float) and math.isnan(value):
+                    brend_kod = None
+                else:
+                    brend_kod = str(value).strip()
+                    if brend_kod.lower() == 'nan' or brend_kod == '':
+                        brend_kod = None
+
+            if not brend_kod:
+                error_count += 1
+                continue
+
+            excel_keys.add((brend_kod, firma.id if firma else None))
+
+            if firma:
+                existing_product = Mehsul.objects.filter(brend_kod=brend_kod, firma=firma, sahib=request.user).first()
+            else:
+                existing_product = Mehsul.objects.filter(brend_kod=brend_kod, firma__isnull=True, sahib=request.user).first()
+
+            if existing_product:
+                if not existing_product.sahib:
+                    existing_product.sahib = request.user
+                existing_product.adi = temiz_ad
+                existing_product.kateqoriya = kateqoriya
+                existing_product.avtomobil = avtomobil
+                existing_product.vitrin = vitrin
+                existing_product.olcu = str(row['olcu']).strip() if 'olcu' in row and pd.notna(row['olcu']) else ''
+                existing_product.maya_qiymet = float(row['maya_qiymet']) if 'maya_qiymet' in row and pd.notna(row['maya_qiymet']) else 0
+                existing_product.qiymet = float(row['qiymet']) if 'qiymet' in row and pd.notna(row['qiymet']) else 0
+                existing_product.stok = int(row['stok']) if 'stok' in row and pd.notna(row['stok']) else 0
+                existing_product.kodlar = str(row['kodlar']) if 'kodlar' in row and pd.notna(row['kodlar']) else ''
+                existing_product.melumat = str(row['melumat']) if 'melumat' in row and pd.notna(row['melumat']) else ''
+                existing_product.save()
+                update_count += 1
+            else:
+                mehsul_data = {
+                    'adi': temiz_ad,
+                    'sahib': request.user,
+                    'kateqoriya': kateqoriya,
+                    'firma': firma,
+                    'avtomobil': avtomobil,
+                    'vitrin': vitrin,
+                    'brend_kod': brend_kod,
+                    'oem': '',
+                    'olcu': str(row['olcu']).strip() if 'olcu' in row and pd.notna(row['olcu']) else '',
+                    'maya_qiymet': float(row['maya_qiymet']) if 'maya_qiymet' in row and pd.notna(row['maya_qiymet']) else 0,
+                    'qiymet': float(row['qiymet']) if 'qiymet' in row and pd.notna(row['qiymet']) else 0,
+                    'stok': int(row['stok']) if 'stok' in row and pd.notna(row['stok']) else 0,
+                    'kodlar': str(row['kodlar']) if 'kodlar' in row and pd.notna(row['kodlar']) else '',
+                    'melumat': str(row['melumat']) if 'melumat' in row and pd.notna(row['melumat']) else '',
+                    'yenidir': False
+                }
+                Mehsul.objects.create(**mehsul_data)
+                new_count += 1
+        except Exception:
+            error_count += 1
+            continue
+
+    # State-i yenilə
+    state['new_count'] = new_count
+    state['update_count'] = update_count
+    state['error_count'] = error_count
+    state['processed_rows'] = min(state['total_rows'], start + len(subset))
+    state['excel_product_keys'] = list(excel_keys)
+    with open(job_state_path, 'w', encoding='utf-8') as f:
+        json.dump(state, f, ensure_ascii=False)
+
+    return JsonResponse({
+        'status': 'ok',
+        'processed_rows': state['processed_rows'],
+        'total_rows': state['total_rows'],
+        'new_count': new_count,
+        'update_count': update_count,
+        'error_count': error_count,
+    })
+
+
+@login_required
+@csrf_exempt
+def import_user_products_finalize(request):
+    """Excel-də olmayan məhsulları silir və job fayllarını təmizləyir"""
+    if not request.user.profile.is_verified:
+        return JsonResponse({'status': 'error', 'message': 'Icazə yoxdur.'}, status=403)
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Yalnız POST.'}, status=405)
+
+    job_id = request.POST.get('job_id')
+    imports_dir = os.path.join(settings.MEDIA_ROOT, 'imports')
+    job_state_path = os.path.join(imports_dir, 'jobs', f'{job_id}.json')
+    if not os.path.exists(job_state_path):
+        return JsonResponse({'status': 'error', 'message': 'Job tapılmadı.'}, status=404)
+
+    with open(job_state_path, 'r', encoding='utf-8') as f:
+        state = json.load(f)
+    if state.get('user_id') != request.user.id:
+        return JsonResponse({'status': 'error', 'message': 'Icazə yoxdur.'}, status=403)
+
+    excel_keys = set(tuple(k) for k in state.get('excel_product_keys', []))
+    deleted_count = 0
+    if excel_keys:
+        user_products_qs = Mehsul.objects.filter(sahib=request.user)
+        to_delete_ids = [
+            p.id for p in user_products_qs.only('id', 'brend_kod', 'firma_id')
+            if (p.brend_kod, p.firma_id) not in excel_keys
+        ]
+        if to_delete_ids:
+            deleted_count, _ = Mehsul.objects.filter(id__in=to_delete_ids).delete()
+
+    # Faylları təmizlə
+    try:
+        if os.path.exists(state.get('file_path', '')):
+            os.remove(state['file_path'])
+    except Exception:
+        pass
+    try:
+        os.remove(job_state_path)
+    except Exception:
+        pass
+
+    return JsonResponse({'status': 'ok', 'deleted_count': deleted_count})
 
 @login_required
 def my_sale_pdf(request, order_id):

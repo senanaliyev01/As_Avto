@@ -1,3 +1,15 @@
+/* Custom modal size for Excel import */
+.modal-dialog-custom-600 {
+	width: 600px;
+	max-width: 600px;
+	height: 600px;
+}
+.modal-dialog-custom-600 .modal-content {
+	height: 600px;
+}
+.modal-dialog-custom-600 .modal-body {
+	overflow: auto;
+}
 /* Reset and Base Styles */
 :root {
     --primary-color: #2c3e50;

@@ -133,6 +133,23 @@
         </div>
     </div>
 
+    <!-- İdxal Xətaları Modal -->
+    <div class="modal fade" id="importErrorsModal" tabindex="-1" aria-labelledby="importErrorsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importErrorsModalLabel">İdxal Xətaları</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="importErrorsModalBody">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bağla</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="table-container">
         <table class="table" id="products-table">
             <thead>
@@ -468,6 +485,9 @@
         const importStatus = document.getElementById('importStatus');
         const importCounters = document.getElementById('importCounters');
         const importErrors = document.getElementById('importErrors');
+        const errorsModalEl = document.getElementById('importErrorsModal');
+        const errorsModalBody = document.getElementById('importErrorsModalBody');
+        let allErrors = [];
 
         async function runBatchImport(file, size) {
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
@@ -476,11 +496,15 @@
             updateProgress(0, 0);
             setStatus('Başlayır...');
             setCounters(0,0,0,0);
-            if (importErrors) { importErrors.classList.add('d-none'); importErrors.innerHTML = ''; }
 
             // init
             const formData = new FormData();
             formData.append('excel_file', file);
+            // Reset errors UI/state
+            allErrors = [];
+            if (errorsModalBody) errorsModalBody.innerHTML = '';
+            if (importErrors) { importErrors.classList.add('d-none'); importErrors.innerHTML = ''; }
+
             const initRes = await fetch('/my-products/import/init/', { method: 'POST', body: formData, credentials: 'include', headers: { 'X-CSRFToken': csrfToken } });
             const initData = await initRes.json();
             if (initData.status !== 'ok') throw new Error(initData.message || 'Başlatma xətası');
@@ -546,43 +570,34 @@
             importCounters.dataset.updateCount = String(u);
             importCounters.dataset.errorCount = String(e);
             importCounters.dataset.deletedCount = String(d);
-            const errorsHtml = e > 0 ? `Xəta: <a href="#" class="show-errors-link">${e}</a>` : `Xəta: ${e}`;
-            importCounters.innerHTML = `Yeni: ${n} | Yenilənən: ${u} | ${errorsHtml}` + (d ? ` | Silinən: ${d}` : '');
-            bindErrorsLink();
-        }
-
-        function bindErrorsLink() {
-            const link = importCounters.querySelector('.show-errors-link');
-            if (!link) return;
-            link.addEventListener('click', function(ev) {
-                ev.preventDefault();
-                if (!importErrors) return;
-                importErrors.classList.remove('d-none');
-                importErrors.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, { once: true });
+            if (e > 0) {
+                importCounters.innerHTML = `Yeni: ${n} | Yenilənən: ${u} | Xəta: <a href="#" id="showErrorsLink">${e}</a>` + (d ? ` | Silinən: ${d}` : '');
+                const link = document.getElementById('showErrorsLink');
+                if (link) {
+                    link.addEventListener('click', function(ev) {
+                        ev.preventDefault();
+                        openErrorsModal();
+                    });
+                }
+            } else {
+                importCounters.textContent = `Yeni: ${n} | Yenilənən: ${u} | Xəta: ${e}` + (d ? ` | Silinən: ${d}` : '');
+            }
         }
 
         function appendErrors(list) {
             if (!list || !list.length) return;
             importErrors.classList.remove('d-none');
+            // Yadda saxla və UI-də göstər
+            list.forEach(item => allErrors.push(item));
+            renderErrorsModal();
+            // Köhnə alert-blokda da qısa özet saxlayırıq (istəyə görə)
             const frag = document.createDocumentFragment();
-            list.forEach(item => {
-                const li = document.createElement('div');
-                li.className = 'mb-2';
+            allErrors.slice(-list.length).forEach(item => {
+                const div = document.createElement('div');
                 const line = typeof item === 'object' ? item.line : null;
                 const message = typeof item === 'object' ? item.message : String(item);
-                li.innerHTML = `<strong>${line ? (line + '-ci sətir') : 'Sətir'}</strong>: ${escapeHtml(message)} `;
-                if (item && typeof item === 'object' && item.row) {
-                    const btn = document.createElement('button');
-                    btn.type = 'button';
-                    btn.className = 'btn btn-link btn-sm p-0';
-                    btn.textContent = 'Detala bax';
-                    btn.addEventListener('click', () => {
-                        showRowDetails(item);
-                    });
-                    li.appendChild(btn);
-                }
-                frag.appendChild(li);
+                div.textContent = `${line ? (line + '-ci sətir') : 'Sətir'}: ${message}`;
+                frag.appendChild(div);
             });
             importErrors.appendChild(frag);
         }
@@ -615,6 +630,47 @@
             const modal = new bootstrap.Modal(dlg);
             modal.show();
             dlg.addEventListener('hidden.bs.modal', () => dlg.remove());
+        }
+
+        function renderErrorsModal() {
+            if (!errorsModalBody) return;
+            if (!allErrors.length) {
+                errorsModalBody.innerHTML = '<div class="text-muted">Xəta yoxdur.</div>';
+                return;
+            }
+            const rowsHtml = allErrors.map((item, i) => {
+                const line = typeof item === 'object' ? item.line : '';
+                const message = typeof item === 'object' ? item.message : String(item);
+                const btn = (item && typeof item === 'object' && item.row) ? `<button type="button" class="btn btn-link btn-sm p-0 show-detail" data-idx="${i}">Detala bax</button>` : '';
+                return `<tr>
+                    <td style="width: 120px;">${line ? escapeHtml(line + '-ci sətir') : '-'}</td>
+                    <td>${escapeHtml(message)}</td>
+                    <td style="width: 110px;" class="text-end">${btn}</td>
+                </tr>`;
+            }).join('');
+            errorsModalBody.innerHTML = `
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered align-middle mb-0">
+                        <thead>
+                            <tr><th>Sətir</th><th>Xəta</th><th>Detallar</th></tr>
+                        </thead>
+                        <tbody>${rowsHtml}</tbody>
+                    </table>
+                </div>`;
+            // Detal düymələrini bağla
+            errorsModalBody.querySelectorAll('.show-detail').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const idx = parseInt(btn.getAttribute('data-idx'));
+                    const item = allErrors[idx];
+                    if (item) showRowDetails(item);
+                });
+            });
+        }
+
+        function openErrorsModal() {
+            renderErrorsModal();
+            const modal = new bootstrap.Modal(errorsModalEl);
+            modal.show();
         }
 
         function escapeHtml(unsafe) {

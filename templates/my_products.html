@@ -595,8 +595,9 @@
             allErrors.slice(-list.length).forEach(item => {
                 const div = document.createElement('div');
                 const line = typeof item === 'object' ? item.line : null;
-                const message = typeof item === 'object' ? item.message : String(item);
-                div.textContent = `${line ? (line + '-ci sətir') : 'Sətir'}: ${message}`;
+                const messages = (item && typeof item === 'object' && Array.isArray(item.messages)) ? item.messages : [ (typeof item === 'object' ? (item.message || '') : String(item)) ];
+                const summary = messages.length ? messages[0] : '';
+                div.textContent = `${line ? (line + '-ci sətir') : 'Sətir'}: ${summary}`;
                 frag.appendChild(div);
             });
             importErrors.appendChild(frag);
@@ -604,8 +605,8 @@
 
         function showRowDetails(item) {
             const row = item.row || {};
-            const fields = ['adi','brend_kod','firma','avtomobil','qiymet','stok','kodlar','olcu'];
-            const lines = fields.map(k => `<tr><th class="pe-2 text-muted" style="white-space:nowrap;">${k}</th><td>${escapeHtml(row[k] || '')}</td></tr>`).join('');
+            // Bütün sütunları (Excel-də olan adlarla) göstər
+            const lines = Object.keys(row).sort().map(k => `<tr><th class="pe-2 text-muted" style="white-space:nowrap;">${escapeHtml(k)}</th><td>${escapeHtml(row[k] || '')}</td></tr>`).join('');
             const html = `<div class="table-responsive"><table class="table table-sm table-bordered mb-0"><tbody>${lines}</tbody></table></div>`;
             // Sadə modal göstərilməsi: mövcud import modalının içində ayrı bölmə kimi açırıq
             const dlg = document.createElement('div');
@@ -618,7 +619,7 @@
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                  <div class="mb-2"><strong>Xəta:</strong> ${escapeHtml(item.message || '')}</div>
+                  <div class="mb-2"><strong>Xətalar:</strong><div>${((item.messages && item.messages.length) ? item.messages : [item.message || '']).map(m => `<div>${escapeHtml(m)}</div>`).join('')}</div></div>
                   ${html}
                 </div>
                 <div class="modal-footer">
@@ -640,11 +641,12 @@
             }
             const rowsHtml = allErrors.map((item, i) => {
                 const line = typeof item === 'object' ? item.line : '';
-                const message = typeof item === 'object' ? item.message : String(item);
+                const messages = (item && typeof item === 'object' && Array.isArray(item.messages)) ? item.messages : [ (typeof item === 'object' ? (item.message || '') : String(item)) ];
+                const summary = messages.map(m => `<div>${escapeHtml(m)}</div>`).join('');
                 const btn = (item && typeof item === 'object' && item.row) ? `<button type="button" class="btn btn-link btn-sm p-0 show-detail" data-idx="${i}">Detala bax</button>` : '';
                 return `<tr>
                     <td style="width: 120px;">${line ? escapeHtml(line + '-ci sətir') : '-'}</td>
-                    <td>${escapeHtml(message)}</td>
+                    <td>${summary}</td>
                     <td style="width: 110px;" class="text-end">${btn}</td>
                 </tr>`;
             }).join('');

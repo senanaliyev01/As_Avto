@@ -476,6 +476,7 @@
             updateProgress(0, 0);
             setStatus('Başlayır...');
             setCounters(0,0,0,0);
+            if (importErrors) { importErrors.classList.add('d-none'); importErrors.innerHTML = ''; }
 
             // init
             const formData = new FormData();
@@ -545,7 +546,20 @@
             importCounters.dataset.updateCount = String(u);
             importCounters.dataset.errorCount = String(e);
             importCounters.dataset.deletedCount = String(d);
-            importCounters.textContent = `Yeni: ${n} | Yenilənən: ${u} | Xəta: ${e}` + (d ? ` | Silinən: ${d}` : '');
+            const errorsHtml = e > 0 ? `Xəta: <a href="#" class="show-errors-link">${e}</a>` : `Xəta: ${e}`;
+            importCounters.innerHTML = `Yeni: ${n} | Yenilənən: ${u} | ${errorsHtml}` + (d ? ` | Silinən: ${d}` : '');
+            bindErrorsLink();
+        }
+
+        function bindErrorsLink() {
+            const link = importCounters.querySelector('.show-errors-link');
+            if (!link) return;
+            link.addEventListener('click', function(ev) {
+                ev.preventDefault();
+                if (!importErrors) return;
+                importErrors.classList.remove('d-none');
+                importErrors.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, { once: true });
         }
 
         function appendErrors(list) {

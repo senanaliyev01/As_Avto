@@ -607,14 +607,21 @@
             // Bütün sütunlar: obyektin öz açarlarını sırala
             const keys = Object.keys(row);
             const lines = (keys.length ? keys : ['adi','brend_kod','firma','avtomobil','qiymet','stok','kodlar','olcu'])
-                .map(k => `<tr><th class="pe-2 text-muted" style="white-space:nowrap;">${escapeHtml(k)}</th><td>${escapeHtml(row[k] || '')}</td></tr>`)
+                .map(k => `
+                    <tr>
+                        <th class="pe-2 text-muted" style="white-space:normal; width: 30%; word-break: break-word; overflow-wrap: anywhere;">${escapeHtml(k)}</th>
+                        <td style="white-space:normal; word-break: break-word; overflow-wrap: anywhere;">${escapeHtml(row[k] || '')}</td>
+                    </tr>`)
                 .join('');
-            const html = `<div class="table-responsive"><table class="table table-sm table-bordered mb-0"><tbody>${lines}</tbody></table></div>`;
-            // Modal tam mərkəzdə
+            const html = `
+                <table class="table table-sm table-bordered mb-0" style="table-layout:fixed; width:100%;">
+                    <tbody>${lines}</tbody>
+                </table>`;
+            // Modal tam mərkəzdə və geniş
             const dlg = document.createElement('div');
             dlg.className = 'modal fade';
             dlg.innerHTML = `
-            <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-dialog modal-dialog-centered modal-xl">
               <div class="modal-content">
                 <div class="modal-header">
                   <h5 class="modal-title">${item.line ? (escapeHtml(item.line) + '-ci sətir detalları') : 'Sətir detalları'}</h5>

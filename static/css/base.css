@@ -1,13 +1,34 @@
-/* Custom modal size for Excel import */
-.modal-dialog-custom-600 {
-	width: 600px;
-	max-width: 600px;
-	height: 600px;
+/* Import Errors Modal - full screen professional layout */
+.import-errors-modal .modal-content {
+	border-radius: 8px;
+	box-shadow: 0 12px 32px rgba(0,0,0,0.25);
 }
-.modal-dialog-custom-600 .modal-content {
-	height: 600px;
+.import-errors-modal .modal-header {
+	border-bottom: 1px solid rgba(0,0,0,0.08);
 }
-.modal-dialog-custom-600 .modal-body {
+.import-errors-modal .modal-footer {
+	border-top: 1px solid rgba(0,0,0,0.08);
+}
+.import-errors-modal .table th,
+.import-errors-modal .table td {
+	vertical-align: middle !important;
+}
+.import-errors-modal .table thead th {
+	background: #f8f9fb;
+	position: sticky;
+	top: 0;
+	z-index: 1;
+}
+.import-errors-modal .text-truncate,
+.import-errors-modal .truncate {
+	display: inline-block;
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.import-errors-modal .table-responsive {
+	max-height: calc(100vh - 220px);
 	overflow: auto;
 }
 /* Reset and Base Styles */

@@ -638,7 +638,7 @@
                 const div = document.createElement('div');
                 const line = typeof item === 'object' ? item.line : null;
                 const message = typeof item === 'object' ? item.message : String(item);
-                div.textContent = `${line ? (line + '-ci sətir') : 'Sətir'}: ${message}`;
+                div.textContent = `${line ? (line) : 'Sətir'}: ${message}`;
                 frag.appendChild(div);
             });
             importErrors.appendChild(frag);
@@ -693,7 +693,7 @@
             }
             // Başlıqlar Excel-dən olduğu kimi
             const columns = (excelColumns && excelColumns.length) ? excelColumns : ['adi','brend_kod','firma','avtomobil','maya_qiymet','qiymet','stok'];
-            const headerHtml = '<tr>' + ['Sətir'].concat(columns).map(c => `<th class="text-nowrap">${escapeHtml(c)}</th>`).join('') + '</tr>';
+            const headerHtml = '<tr>' + ['№'].concat(columns).map(c => `<th class="text-nowrap">${escapeHtml(c)}</th>`).join('') + '</tr>';
             errorsThead.innerHTML = headerHtml;
 
             // Line -> row snapshot və xəta xəritəsi
@@ -725,7 +725,7 @@
                     </td>`;
                 }).join('');
                 return `<tr>
-                    <td class="text-muted">${escapeHtml(lineNo + '-ci sətir')}</td>
+                    <td class="text-muted">${escapeHtml(lineNo)}</td>
                     ${tds}
                 </tr>`;
             }).join('');

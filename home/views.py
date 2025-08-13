@@ -1226,7 +1226,7 @@ def import_user_products_batch(request):
     for idx, row in enumerate(subset, start=start):
         try:
             excel_line_no = idx + 2  # Başlıq 1-ci sətir, data 2-dən başlayır
-            row_errors = []
+            row_error_items = []  # [{'field': 'adi', 'message': '...'}]
             sanitized_row = sanitize_row_values(row)
             # Model referansları
             kateqoriya = None
@@ -1244,7 +1244,7 @@ def import_user_products_batch(request):
                 vitrin, _ = Vitrin.objects.get_or_create(nomre=str(row['vitrin']).strip())
 
             if 'adi' not in row or pd.isna(row['adi']):
-                row_errors.append('Məhsulun adı boşdur')
+                row_error_items.append({'field': 'adi', 'message': 'Məhsulun adı boşdur'})
 
             temiz_ad = str(row['adi']).strip()
             temiz_ad = ' '.join(temiz_ad.split())
@@ -1260,7 +1260,7 @@ def import_user_products_batch(request):
                         brend_kod = None
 
             if not brend_kod:
-                row_errors.append('Brend kodu boşdur')
+                row_error_items.append({'field': 'brend_kod', 'message': 'Brend kodu boşdur'})
 
             # Rəqəmsal sahələr üçün yoxlama
             def is_floatable(val):
@@ -1278,20 +1278,21 @@ def import_user_products_batch(request):
 
             if 'qiymet' in row and pd.notna(row['qiymet']):
                 if not is_floatable(row['qiymet']):
-                    row_errors.append('qiymet rəqəm olmalıdır')
+                    row_error_items.append({'field': 'qiymet', 'message': 'qiymet rəqəm olmalıdır'})
             if 'maya_qiymet' in row and pd.notna(row['maya_qiymet']):
                 if not is_floatable(row['maya_qiymet']):
-                    row_errors.append('maya_qiymet rəqəm olmalıdır')
+                    row_error_items.append({'field': 'maya_qiymet', 'message': 'maya_qiymet rəqəm olmalıdır'})
             if 'stok' in row and pd.notna(row['stok']):
                 if not is_intable(row['stok']):
-                    row_errors.append('stok tam ədəd olmalıdır')
+                    row_error_items.append({'field': 'stok', 'message': 'stok tam ədəd olmalıdır'})
 
             # Əgər xəta varsa, bu sətiri emal etmədən saxla
-            if row_errors:
+            if row_error_items:
                 error_count += 1
                 batch_errors.append({
                     'line': excel_line_no,
-                    'messages': row_errors,
+                    'messages': [e['message'] for e in row_error_items],
+                    'fields': [e['field'] for e in row_error_items],
                     'row': sanitized_row
                 })
                 continue
@@ -1343,6 +1344,7 @@ def import_user_products_batch(request):
             batch_errors.append({
                 'line': excel_line_no,
                 'messages': [str(e)],
+                'fields': [],
                 'row': sanitize_row_values(row)
             })
             continue

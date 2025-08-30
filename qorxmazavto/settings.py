@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
+
 from pathlib import Path
 import os
 from dotenv import load_dotenv

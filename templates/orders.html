@@ -12,7 +12,7 @@
                 <div class="header-summary">
                     <div class="summary-item">
                         <i class="fas fa-shopping-cart"></i>
-                        <span class="summary-label">Ümumi Sifariş:</span>
+                        <span class="summary-label">Ümumi Sifarişlər:</span>
                         <span class="summary-value">{{ statistics.umumi_sifaris_sayi }}</span>
                     </div>
                     <div class="summary-item">
@@ -28,27 +28,20 @@
                     <div class="summary-item">
                         <i class="fas fa-exclamation-circle"></i>
                         <span class="summary-label">Qalıq Borc:</span>
-                        <span class="summary-value">
-                            {% if statistics.umumi_borc < 0 %}
-                                <span style="color: #28a745; font-weight: bold;">+{{ statistics.umumi_borc|floatformat:2|slice:'1:' }} ₼</span>
-                            {% else %}
-                                {{ statistics.umumi_borc|floatformat:2 }} ₼
-                            {% endif %}
-                        </span>
+                        <span class="summary-value">{{ statistics.umumi_borc }} ₼</span>
                     </div>
                 </div>
             </div>
             <table class="table orders-table">
                 <thead>
                     <tr>
-                        <th>Sifariş #</th>
+                        <th>Sifariş №</th>
                         <th>Tarix</th>
                         <th>Status</th>
                         <th>Çatdırılma</th>
                         <th>Ümumi Məbləğ</th>
                         <th>Ödənilən</th>
                         <th>Qalıq Borc</th>
-                        <th>Satıcı</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -72,22 +65,7 @@
                         </td>
                         <td>{{ order.umumi_mebleg }} ₼</td>
                         <td>{{ order.odenilen_mebleg }} ₼</td>
-                        <td>
-                            {% if order.qaliq_borc < 0 %}
-                                <span style="color: #28a745; font-weight: bold;">+{{ order.qaliq_borc|floatformat:2|slice:'1:' }} ₼</span>
-                            {% else %}
-                                {{ order.qaliq_borc|floatformat:2 }} ₼
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% with first_item=order.sifarisitem_set.first %}
-                                {% if first_item and first_item.mehsul.sahib %}
-                                    <a href="#" class="seller-link" onclick="openUserDetailsModal({{ first_item.mehsul.sahib.id }}); return false;"><i class="fas fa-user"></i> {{ first_item.mehsul.sahib.username }}</a>
-                                {% else %}
-                                    AS-AVTO
-                                {% endif %}
-                            {% endwith %}
-                        </td>
+                        <td>{{ order.qaliq_borc }} ₼</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -97,7 +75,7 @@
         <div class="empty-orders">
             <i class="fas fa-clipboard-list"></i>
             <p>Hələ heç bir sifariş verməmisiniz.</p>
-            <a href="{% url 'products' %}" class="btn btn-primary">Məhsullara Bax</a>
+            <a href="{% url 'products' %}" class="btn btn-primary">Məhsullara bax</a>
         </div>
     {% endif %}
 </div>

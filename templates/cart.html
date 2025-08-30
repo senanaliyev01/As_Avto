@@ -17,15 +17,14 @@
                         <input type="checkbox" id="select-all" class="select-checkbox">
                     </th>
                     <th>Şəkil</th>
-                    <th>Kod</th>
-                    <th>Marka Adı</th>
+                    <th>Kodu</th>
+                    <th>Firma Adı</th>
                     <th>Məhsul Adı</th>
                     <!-- <th>OEM</th> -->
                     <th>Stok</th>
                     <th>Qiymət</th>
                     <th>Miqdar</th>
-                    <th>Ümumi</th>
-                    <th>Satıcı</th>
+                    <th>Cəmi</th>
                     <th>Sil</th>
                 </tr>
             </thead>
@@ -53,13 +52,6 @@
                         </td>
                         <td class="subtotal">{{ item.subtotal }} ₼</td>
                         <td>
-                            {% if item.product.sahib %}
-                                <a href="#" class="seller-link" onclick="openUserDetailsModal({{ item.product.sahib.id }}); return false;"><i class="fas fa-user"></i> {{ item.product.sahib.username }}</a>
-                            {% else %}
-                                AS-AVTO
-                            {% endif %}
-                        </td>
-                        <td>
                             <button type="button" class="btn btn-danger" onclick="removeFromCart({{ item.product.id }})"><i class="fas fa-trash-alt"></i></button>
                         </td>
                     </tr>
@@ -71,11 +63,11 @@
             {% csrf_token %}
             <div class="cart-summary">
                 <div class="cart-total">
-                    <span class="total-label">Seçilmiş Məbləğ:</span>
+                    <span class="total-label">Seçilmiş məbləğ:</span>
                     <span class="total-value" id="selected-total">0.00 ₼</span>
                 </div>
                 <div class="delivery-method">
-                    <h4>Çatdırılma Üsulu</h4>
+                    <h4>Çatdırılma üsulu</h4>
                     <div class="delivery-options">
                         <label class="delivery-option">
                             <input type="radio" name="catdirilma_usulu" value="TAXI" required>
@@ -83,12 +75,12 @@
                         </label>
                         <label class="delivery-option">
                             <input type="radio" name="catdirilma_usulu" value="PICKUP" required>
-                            <span>Özüm götürəcəyəm</span>
+                            <span>Özüm götürəcəm</span>
                         </label>
                     </div>
                 </div>
                 <div class="checkout-form">
-                    <button type="submit" class="btn btn-primary" id="checkout-button" disabled>Sifariş Göndər</button>
+                    <button type="submit" class="btn btn-primary" id="checkout-button" disabled>Sifarişi göndər</button>
                 </div>
             </div>
         </form>
@@ -96,16 +88,16 @@
     {% else %}
         <div class="empty-cart">
             <p>Səbətiniz boşdur.</p>
-            <a href="{% url 'products' %}" class="btn btn-primary">Məhsullara Bax</a>
+            <a href="{% url 'products' %}" class="btn btn-primary">Məhsullara bax</a>
         </div>
     {% endif %}
 </div>
 
-<!-- Şəkil Modal -->
+<!-- Image Modal -->
 <div id="imageModal" class="image-modal">
     <span class="image-modal-close">&times;</span>
     <div class="modal-image-content">
-        <img id="modalImage" class="modal-image" src="" alt="Modal Şəkli">
+        <img id="modalImage" class="modal-image" src="" alt="Modal Image">
     </div>
 </div>
 

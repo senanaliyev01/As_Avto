@@ -8,9 +8,6 @@ from io import BytesIO
 import uuid
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.utils import timezone
-from datetime import timedelta
-from django.utils.text import slugify
 
 class Header_Message(models.Model):
     mesaj = models.CharField(max_length=100)
@@ -56,12 +53,6 @@ class Avtomobil(models.Model):
         verbose_name = 'Avtomobil'
         verbose_name_plural = 'Avtomobillər'
 
-class AvtomobilLogo(models.Model):
-    avtomobil = models.ForeignKey('Avtomobil', on_delete=models.CASCADE, related_name='logolar')
-    sekil = models.ImageField(upload_to='avtomobil_sekilleri')
-    def __str__(self):
-        return f"{self.avtomobil.adi} logo"
-
 class Vitrin(models.Model):
     nomre = models.CharField(max_length=100, null=True, blank=True)
 
@@ -74,7 +65,6 @@ class Vitrin(models.Model):
 
     
 class Mehsul(models.Model):
-    sahib = models.ForeignKey(User, on_delete=models.CASCADE, related_name='mehsullar', null=True, blank=True, verbose_name='Məhsulun Sahibi')
     adi = models.CharField(max_length=100)
     kateqoriya = models.ForeignKey(Kateqoriya,on_delete=models.CASCADE, null=True, blank=True)
     firma = models.ForeignKey(Firma,on_delete=models.CASCADE)
@@ -90,42 +80,57 @@ class Mehsul(models.Model):
     melumat = models.TextField(null=True, blank=True)
     sekil = models.ImageField(upload_to='mehsul_sekilleri', default='mehsul_sekilleri/no_image.webp',null=True, blank=True)    
     yenidir = models.BooleanField(default=False)
-    yeni_edildiyi_tarix = models.DateTimeField(null=True, blank=True, verbose_name='Yeni edildiyi tarix')
 
     def save(self, *args, **kwargs):
         if self.kodlar:
             # Yalnız hərf, rəqəm və boşluq saxla
             self.kodlar = re.sub(r'[^a-zA-Z0-9 ]', '', self.kodlar)
-
         
-
+        # Şəkil emalı
+        if self.sekil and hasattr(self.sekil, 'file'):
+            # Əgər şəkil yenidirsə və no_image.webp deyilsə
+            if isinstance(self.sekil.file, InMemoryUploadedFile) and 'no_image.webp' not in self.sekil.name:
+                # Şəkli aç
+                image = Image.open(self.sekil)
+                
+                # Şəkli RGBA formatına çevir (webp üçün)
+                if image.mode != 'RGBA':
+                    image = image.convert('RGBA')
+                
+                # Yeni fayl adı yarat
+                new_name = f"{uuid.uuid4().hex[:10]}_{self.brend_kod}.webp"
+                
+                # BytesIO buffer yarat
+                output = BytesIO()
+                
+                # Şəkli webp formatında saxla
+                image.save(output, format='WEBP', quality=85, optimize=True)
+                output.seek(0)
+                
+                # Köhnə şəkli sil (əgər varsa və default deyilsə)
+                if self.pk:
+                    try:
+                        old_instance = Mehsul.objects.get(pk=self.pk)
+                        if old_instance.sekil and old_instance.sekil.name != 'mehsul_sekilleri/no_image.webp':
+                            if os.path.isfile(old_instance.sekil.path):
+                                os.remove(old_instance.sekil.path)
+                    except:
+                        pass
+                
+                # Yeni şəkli təyin et
+                self.sekil = InMemoryUploadedFile(
+                    output,
+                    'ImageField',
+                    new_name,
+                    'image/webp',
+                    output.tell(),
+                    None
+                )
+        
         super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.adi} - {self.brend_kod} - {self.oem}"
-    
-    def qalan_vaxt(self):
-        """Məhsulun yeni statusundan çıxmasına qalan vaxtı hesablayır"""
-        if not self.yenidir or not self.yeni_edildiyi_tarix:
-            return None
-        
-        indiki_vaxt = timezone.now()
-        bitis_vaxti = self.yeni_edildiyi_tarix + timedelta(days=3)
-        qalan = bitis_vaxti - indiki_vaxt
-        
-        if qalan.total_seconds() <= 0:
-            return "Vaxt bitdi"
-        
-        gun = int(qalan.days)
-        saat = int(qalan.seconds // 3600)
-        deqiqe = int((qalan.seconds % 3600) // 60)
-        
-        if gun > 0:
-            return f"{gun} gün {saat} saat"
-        elif saat > 0:
-            return f"{saat} saat {deqiqe} dəqiqə"
-        else:
-            return f"{deqiqe} dəqiqə"
     
     class Meta:
         verbose_name = 'Məhsul'
@@ -223,12 +228,10 @@ class Profile(models.Model):
     phone = models.CharField(max_length=15, unique=True, null=True, blank=True)
     address = models.TextField(null=True, blank=True)
     is_verified = models.BooleanField(default=False, verbose_name='Təsdiqlənib')
-    sekil = models.ImageField(upload_to='profile_pics', default='profile_pics/no_image.webp', null=True, blank=True, verbose_name='Profil şəkli')
-    yeni_unread_sales = models.IntegerField(default=0, verbose_name='Yeni sifarişlər (görülməmiş)')
-    
+
     def __str__(self):
         return f"{self.user.username} profili"
-    
+
     class Meta:
         verbose_name = 'Profil'
         verbose_name_plural = 'Profillər'
@@ -241,34 +244,5 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
-
-
-class ProductLike(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='liked_products')
-    mehsul = models.ForeignKey(Mehsul, on_delete=models.CASCADE, related_name='likes')
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ('user', 'mehsul')
-        verbose_name = 'Bəyənmə'
-        verbose_name_plural = 'Bəyənmələr'
-
-    def __str__(self):
-        return f"{self.user.username} - {self.mehsul.adi} (like)"
-
-class ProductRating(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='rated_products')
-    mehsul = models.ForeignKey(Mehsul, on_delete=models.CASCADE, related_name='ratings')
-    rating = models.PositiveSmallIntegerField(choices=[(i, str(i)) for i in range(1, 6)])
-    comment = models.TextField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        unique_together = ('user', 'mehsul')
-        verbose_name = 'Qiymətləndirmə'
-        verbose_name_plural = 'Qiymətləndirmələr'
-
-    def __str__(self):
-        return f"{self.user.username} - {self.mehsul.adi} ({self.rating} ulduz)"
 
 

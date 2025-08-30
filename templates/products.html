@@ -6,81 +6,154 @@
 {% block content %}
 <div class="container">
     <h2>Məhsullar</h2>
-    <div id="products-list" data-has-more="{{ has_more|yesno:'true,false' }}">
-        {% for mehsul in mehsullar %}
-        <div class="product-row" style="position:relative;">
-            <div style="position:absolute;top:10px;right:10px;z-index:2;display:flex;align-items:center;gap:8px;">
-                {% for i in "12345" %}
-                    <span style="color:{% if mehsul.avg_rating >= forloop.counter %}#FFD700{% elif mehsul.avg_rating >= forloop.counter0 %}#FFD70099{% else %}#ccc{% endif %};font-size:1.1rem;">&#9733;</span>
+    
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Şəkil</th>
+                    <th>Kodu</th>
+                    <th>Firma Adı</th>
+                    <th>Məhsul Adı</th>
+                    <!-- <th>OEM</th> -->
+                    <th>Stok</th>
+                    <th>Qiymət</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="products-tbody" data-has-more="{{ has_more|lower }}">
+                {% for mehsul in mehsullar %}
+                <tr>
+                    <td><img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }}" class="product-image" onclick="openImageModal('{{ mehsul.sekil.url }}')"></td>
+                    <td>{{ mehsul.brend_kod }}</td>
+                    <td>{{ mehsul.firma.adi }}</td>
+                    <td>
+                        {{ mehsul.adi }}
+                        {% if mehsul.yenidir %}
+                        <span class="new-badge">Yeni</span>
+                        {% endif %}
+                    </td>
+                    <!-- <td>{{ mehsul.oem }}</td> -->
+                    <td>{{ mehsul.stok }}</td>
+                    <td>{{ mehsul.qiymet }} ₼</td>
+                    <td>
+                        <button type="button" 
+                                class="cart-add-btn" 
+                                {% if mehsul.stok == 0 %}disabled{% endif %}
+                                onclick="openQuantityModal({{ mehsul.id }}, {{ mehsul.stok }})">
+                            <i class="fas fa-shopping-cart"></i>
+                        </button>
+                    </td>
+                    <td>
+                        <button type="button" 
+                                class="details-btn" 
+                                onclick="openDetailsModal({{ mehsul.id }})">
+                            <i class="fas fa-info-circle"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="text-center">
+                        <div class="empty-message">
+                            <i class="fas fa-box-open"></i>
+                            <p>Heç bir məhsul tapılmadı.</p>
+                        </div>
+                    </td>
+                </tr>
                 {% endfor %}
-                <span style="color:#2B5173;font-size:1rem;">{{ mehsul.avg_rating|floatformat:1 }}</span>
-                <span style="color:#e74c3c;font-size:1.1rem;margin-left:8px;"><i class="fas fa-heart"></i> {{ mehsul.like_count }}</span>
-                <span style="color:#888;font-size:0.95rem;margin-left:8px;">Dəyər Skoru: {{ mehsul.wilson_score|floatformat:3 }}</span>
-            </div>
-            <div class="product-row-image">
-                <img src="{{ mehsul.sekil.url }}" alt="{{ mehsul.adi }} - {{ mehsul.brend_kod }} {{ mehsul.firma.adi }} {{ mehsul.avtomobil.adi }}" title="{{ mehsul.adi }} - {{ mehsul.brend_kod }}" loading="lazy" onclick="openImageModal('{{ mehsul.sekil.url }}')">
-            </div>
-            <div class="product-row-info">
-                <div class="product-title"><a href="{% url 'product_detail' mehsul.id %}" style="color:inherit;text-decoration:none;">{{ mehsul.adi }} {{ mehsul.brend_kod }} {{ mehsul.firma.adi }}</a></div>
-                <div class="product-meta">
-                    {% if mehsul.sahib %}
-                    <a href="#" class="seller-link" onclick="openUserDetailsModal({{ mehsul.sahib.id }}); return false;"><i class="fas fa-user"></i> {{ mehsul.sahib.username }}</a>
-                    {% endif %}
-                </div>
-                <div class="product-stock">Kod: {{ mehsul.brend_kod }}</div>
-                <div class="product-stock">Stok: {{ mehsul.stok }}</div>
-            </div>
-           
-            <div class="avtomobil-logos-wrapper">
-            {% for logo in mehsul.avtomobil.logolar.all %}
-            <img class="avtomobil-logo" src="{{ logo.sekil.url }}" alt="{{ mehsul.avtomobil.adi }}">
-            {% endfor %}
-            </div>
-            {% if mehsul.firma.logo %}
-            <img class="firma-logo" src="{{ mehsul.firma.logo.url }}" alt="{{ mehsul.firma.adi }}">
-            {% endif %}
-            <div class="product-row-actions">
-                <div class="product-price">{{ mehsul.qiymet }} ₼</div>
-                <button type="button" class="cart-add-btn" {% if mehsul.stok == 0 %}disabled{% endif %} onclick="openQuantityModal({{ mehsul.id }}, {{ mehsul.stok }})">
-                    <i class="fas fa-shopping-cart"></i>
-                </button>
-            </div>
+            </tbody>
+        </table>
+        
+        {% if has_more %}
+        <div id="loading-spinner" class="loading-spinner" style="display: none;">
+            <div class="spinner"></div>
         </div>
-        {% empty %}
-        <div class="empty-message">
-            <i class="fas fa-box-open"></i>
-            <p>Məhsul tapılmadı.</p>
-        </div>
-        {% endfor %}
+        {% endif %}
     </div>
-    {% if has_more %}
-    <div id="loading-spinner" class="loading-spinner" style="display: none;">
-        <div class="spinner"></div>
-    </div>
-    {% endif %}
 </div>
 
 <!-- Miqdar Modal -->
 <div id="quantityModal" class="modal">
-    <div class="custom-quantity-modal-content">
+    <div class="modal-content">
         <span class="close">&times;</span>
-        <h3>Miqdar Seçin</h3>
+        <h3>Miqdar seçin</h3>
         <form method="POST" id="addToCartForm">
             {% csrf_token %}
             <input type="number" name="quantity" id="quantityInput" value="1" min="1" class="form-control">
             <div class="modal-buttons">
-                <button type="button" class="btn btn-danger" onclick="closeQuantityModal()">Ləğv Et</button>
-                <button type="submit" class="btn btn-primary">Təsdiqlə</button>
+                <button type="button" class="btn btn-danger" onclick="closeQuantityModal()">Ləğv et</button>
+                <button type="submit" class="btn btn-primary">Təsdiq et</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Şəkil Modal -->
+<!-- Image Modal -->
 <div id="imageModal" class="image-modal">
     <span class="image-modal-close">&times;</span>
     <div class="modal-image-content">
-        <img id="modalImage" class="modal-image" src="" alt="Modal Şəkli">
+        <img id="modalImage" class="modal-image" src="" alt="Modal Image">
+    </div>
+</div>
+
+<!-- Details Modal -->
+<div id="detailsModal" class="details-modal">
+    <div class="details-modal-content">
+        <span class="details-modal-close">&times;</span>
+        <div class="details-content">
+            <div class="details-header">
+                <h3>Məhsul Məlumatları</h3>
+            </div>
+            <div class="details-body">
+                <div class="details-image">
+                    <img id="detailsImage" src="" alt="Məhsul şəkli">
+                </div>
+                <div class="details-info">
+                    <div class="info-row">
+                        <span class="info-label">Məhsul adı:</span>
+                        <span id="detailsName" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Kateqoriya:</span>
+                        <span id="detailsCategory" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Firma:</span>
+                        <span id="detailsFirma" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Avtomobil:</span>
+                        <span id="detailsAvtomobil" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Kodu:</span>
+                        <span id="detailsBrendKod" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">OEM:</span>
+                        <span id="detailsOEM" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Ölçü:</span>
+                        <span id="detailsOlcu" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Qiymət:</span>
+                        <span id="detailsQiymet" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Stok:</span>
+                        <span id="detailsStok" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Məlumat:</span>
+                        <span id="detailsMelumat" class="info-value"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

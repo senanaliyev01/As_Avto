@@ -4,15 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="AS-AVTO - Avtomobil ehtiyat hissələri və aksesuarları. Keyfiyyətli məhsullar, sərfəli qiymətlər.">
-    <meta name="keywords" content="avtomobil ehtiyat hissələri, avtomobil aksesuarları, avto hissələri, AS-AVTO">
-    <meta name="author" content="AS-AVTO">
-    <meta name="robots" content="index, follow">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="AS-AVTO">
-    <meta property="og:image" content="https://as-avto.com/static/images/Header_Logo.png">
-    <meta property="og:image:alt" content="AS-AVTO Loqosu">
-    <link rel="canonical" href="https://as-avto.com{{ request.path }}">
     <title>{% block title %}AS-AVTO{% endblock %}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
@@ -21,103 +12,114 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-
     <div class="wrapper">
-        <!-- Qlobal Statistika Çubuğu -->
-        <div class="global-stats-bar global-stats-bar-header">
-            <div class="global-stats-bar-content" style="display: flex; align-items: center; justify-content: space-between;">
-                <!-- Proqramçı sistem sahibi kartı BAŞLANGIC -->
-                <div class="owner-card">
-                    <div class="owner-avatar">
-                        <img src="{% static 'images/profil.webp' %}" alt="Sənan Əliyev" />
-                    </div>
-                    <div class="owner-info">
-                        <div class="owner-name">Sistem Proqramçısı: <b>Sənan Əliyev</b></div>
-                        <div class="owner-phone">Əlaqə nömrəsi: <a href="tel:+994773059585">+994 77 305 95 85</a></div>
-                        <div class="owner-mail">E-poçt: <a href="mailto:senan.eliyev.9997@gmail.com">senan.eliyev.9997@gmail.com</a></div>
-                    </div>
-                </div>
-                <!-- Proqramçı sistem sahibi kartı SON -->
-                <span class="stats-nav-links">
-                    <a href="{% url 'products' %}" class="stats-nav-link"><i class="fas fa-box"></i> Məhsullar</a>
-                    <a href="{% url 'new_products' %}" class="stats-nav-link"><i class="fas fa-star"></i> Yeni Məhsullar</a>
-                    <a href="{% url 'orders' %}" class="stats-nav-link"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a>
-                    <a href="{% url 'about' %}" class="stats-nav-link"><i class="fas fa-info-circle"></i> Haqqımızda</a>
-                    <a href="{% url 'privacy_policy' %}" class="stats-nav-link"><i class="fas fa-user-shield"></i> Gizlilik Siyasəti</a>
-                    {% if request.user.is_authenticated and request.user.profile.is_verified %}
-                    <a href="{% url 'seller_admin_panel' %}" class="stats-nav-link seller-panel-link">
-                        <i class="fas fa-cogs"></i> Satıcı Paneli
-                        <span id="salesBadge" class="sales-badge-sidebar" style="display:none; margin-left:8px; background:#dc3545;color:white;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:bold;vertical-align:middle;">0</span>
-                    </a>
-                    {% endif %}
-                </span>
-            </div>
-        </div>
-        <!-- Başlıq -->
+        <!-- Header -->
         <header class="header">
-            <div class="header-content header-search-layout">
-                <div class="logo">
-                    <a href="{% url 'base' %}">
-                        <img src="{% static 'images/Header_Logo.png' %}" alt="AS-AVTO" class="logo-img">
-                    </a>
-                </div>
-                <form method="get" action="{% url 'products' %}" class="header-search-form">
-                    <div class="header-search-input-wrapper">
-                        <input type="text" id="query" name="search" placeholder="Məhsul, kod və ya ad ilə axtarın..." value="{{ request.GET.search }}" autocomplete="off" class="header-search-input">
-                        <button type="submit" class="header-search-btn"><i class="fas fa-search"></i></button>
-                        <div id="search-results" class="search-results"></div>
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo">
+                        <a href="{% url 'base' %}">
+                            <img src="{% static 'images/Header_Logo.png' %}" alt="AS-AVTO" class="logo-img">
+                        </a>
                     </div>
-                </form>
-                <div class="header-right">
-                    <span class="total-debt">
-                        {% if request.statistics.umumi_borc < 0 %}
-                            <span style="color: #28a745; font-weight: bold;">Balans +{{ request.statistics.umumi_borc|floatformat:2|slice:'1:' }} ₼</span>
-                        {% else %}
-                            <i class="fas fa-money-bill-wave"></i> Borc: {{ request.statistics.umumi_borc|floatformat:2 }} ₼
-                        {% endif %}
-                    </span>
-                    <nav class="main-nav">
-                        <ul>
-                            <li><a href="#" class="nav-link nav-link-sm blink-news" id="yeniliklerLink"><i class="fas fa-bullhorn"></i> Xəbərlər</a></li>
-                            <li><a class="nav-link" href="{% url 'liked_products' %}"><i class="fas fa-heart"></i> Bəyəndiyim Məhsullar</a></li>
-                            <li>
-                                <a href="#" class="nav-link nav-link-sm {% if request.resolver_match.url_name == 'cart' %}active{% endif %}" id="cartSidebarToggle">
-                                    <span class="cart-icon">
-                                        <i class="fas fa-shopping-cart"></i>
-                                        <span class="cart-counter">{{ request.session.cart|length }}</span>
-                                    </span>
-                                    Səbət
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
-                    {% if request.user.is_authenticated %}
-                    <div class="user-menu">
-                        <div class="user-dropdown">
-                            <button class="user-button">
-                                <i class="fas fa-user"></i>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="user-dropdown-content">
-                                <a href="#" id="openProfileModal" class="user-name">
-                                    <i class="fas fa-user"></i> {{ request.user.username }}
-                                </a>
-                                {% if request.user.profile.is_verified %}
-                                <div class="dropdown-divider"></div>
-                                {% endif %}
-                                <a href="{% url 'logout' %}" class="logout-link">
-                                    <i class="fas fa-sign-out-alt"></i> Çıxış
-                                </a>
-                            </div>
-                        </div>
+                    <div class="header-right">
+                        <nav class="main-nav">
+                            <ul>
+                                <!-- <li><a href="{% url 'base' %}" class="nav-link {% if request.resolver_match.url_name == 'base' %}active{% endif %}"><i class="fas fa-home"></i> Ana Səhifə</a></li> -->
+                                <li><a href="#" class="nav-link blink-news" id="yeniliklerLink"><i class="fas fa-bullhorn"></i> Yeniliklər</a></li>
+                                <li><a href="{% url 'products' %}" class="nav-link {% if request.resolver_match.url_name == 'products' %}active{% endif %}"><i class="fas fa-box"></i> Məhsullar</a></li>
+                                <li><a href="{% url 'new_products' %}" class="nav-link {% if request.resolver_match.url_name == 'new_products' %}active{% endif %}"><i class="fas fa-star"></i> Yeni Məhsullar</a></li>
+                                <li><a href="{% url 'orders' %}" class="nav-link {% if request.resolver_match.url_name == 'orders' %}active{% endif %}"><i class="fas fa-clipboard-list"></i> Sifarişlərim</a></li>
+                                <li>
+                                    <a href="tel:+994702754499" class="nav-link">
+                                        <i class="fas fa-phone"></i> +994 70 275 44 99
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="nav-link {% if request.resolver_match.url_name == 'cart' %}active{% endif %}" id="cartSidebarToggle">
+                                        <span class="cart-icon">
+                                            <i class="fas fa-shopping-cart"></i>
+                                            <span class="cart-counter">{{ request.session.cart|length }}</span>
+                                        </span>
+                                        Səbət
+                                    </a>
+                                </li>
+                                <li class="user-menu">
+                                    <div class="user-dropdown">
+                                        <button class="user-button">
+                                            <i class="fas fa-user"></i>
+                                            <i class="fas fa-chevron-down"></i>
+                                        </button>
+                                        <div class="user-dropdown-content">
+                                            <span class="user-name">
+                                                <i class="fa-regular fa-circle-user"></i>
+                                                {{ request.user.username }}
+                                            </span>
+                                            <a href="{% url 'logout' %}" class="logout-link">
+                                                <i class="fas fa-sign-out-alt"></i> Çıxış et
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </nav>
                     </div>
-                    {% endif %}
                 </div>
             </div>
         </header>
-        
 
-
+        <!-- Search Section -->
+        <div class="search-section">
+            <div class="container">
+                <form method="get" action="{% url 'products' %}" class="search-form">
+                    <div class="search-grid">
+                        <div class="search-item">
+                            <!-- <label for="category">Kateqoriya</label> -->
+                            <select id="category" name="kateqoriya">
+                                <option value="">Bütün Kateqoriyalar</option>
+                                {% for category in request.categories %}
+                                <option value="{{ category.adi }}" {% if request.GET.kateqoriya == category.adi %}selected{% endif %}>{{ category.adi }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="search-item">
+                            <!-- <label for="brand">Marka</label> -->
+                            <select id="brand" name="firma">
+                                <option value="">Bütün Firmalar</option>
+                                {% for brand in request.brands %}
+                                <option value="{{ brand.adi }}" {% if request.GET.firma == brand.adi %}selected{% endif %}>{{ brand.adi }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="search-item">
+                            <!-- <label for="model">Model</label> -->
+                            <select id="model" name="avtomobil">
+                                <option value="">Bütün Avtomobillər</option>
+                                {% for model in request.models %}
+                                <option value="{{ model.adi }}" {% if request.GET.avtomobil == model.adi %}selected{% endif %}>{{ model.adi }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="search-item">
+                            <!-- <label for="query">Məhsul Adı</label> -->
+                            <div class="search-container">
+                                <input type="text" id="query" name="search" placeholder="Kodu daxil edin..." value="{{ request.GET.search }}" autocomplete="off">
+                                <div id="search-results" class="search-results"></div>
+                            </div>
+                        </div>
+                        <div class="search-item search-button">
+                            <button type="submit" class="search-icon-button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                            <span class="total-debt">
+                                <i class="fas fa-money-bill-wave"></i>
+                                Borc: {{ request.statistics.umumi_borc }} ₼
+                            </span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
 
         {% if request.header_messages %}
         <div class="header-message">
@@ -129,20 +131,10 @@
         </div>
         {% endif %}
 
-        
-
-
-        {% if not request.user.is_authenticated %}
-        <div class="auth-buttons-center" style="display: flex; justify-content: center; align-items: center; gap: 16px; margin: 24px 0 0 0;">
-            <button class="btn btn-primary" id="showLoginModalBtn" type="button">Giriş</button>
-            <button class="btn btn-secondary" id="showRegisterModalBtn" type="button">Qeydiyyat</button>
-        </div>
-        {% endif %}
-
+        <!-- New Products Carousel - Only show on home page -->
         {% if request.resolver_match.url_name == 'base' and new_products %}
-        <section class="product-section new-products-section">
+        <div class="new-products-section">
             <div class="container">
-                <h2 class="section-title new-products-title">Yeni Gələn Məhsullar</h2>
                 <div class="swiper new-products-swiper">
                     <div class="swiper-wrapper">
                         {% for product in new_products %}
@@ -155,153 +147,30 @@
                                     {% if product.sekil and product.sekil.url != 'mehsul_sekilleri/no_image.webp' %}
                                     <img src="{{ product.sekil.url }}" alt="{{ product.adi }}" onclick="openImageModal('{{ product.sekil.url }}')" class="clickable-image" onerror="this.src='{% static 'images/no_image.webp' %}'">
                                     {% else %}
-                                    <img src="{% static 'images/no_image.webp' %}" alt="Şəkil Yoxdur">
+                                    <img src="{% static 'images/no_image.webp' %}" alt="No Image">
                                     {% endif %}
                                 </div>
                                 <div class="product-info">
-                                    <h3 class="product-title-name">{{ product.adi }}</h3>
+                                    <h3 class="product-title">{{ product.adi }}</h3>
                                     <p class="product-code">{{ product.brend_kod }}</p>
                                     <p class="product-price">{{ product.qiymet }} ₼</p>
-                                    <p class="product-seller">
-                                        Satıcı: 
-                                        {% if product.sahib %}
-                                            {{ product.sahib.username }}
-                                        {% else %}
-                                            AS-AVTO
-                                        {% endif %}
-                                    </p>
                                     <a href="{% url 'products' %}?search={{ product.brend_kod }}" class="view-product">
-                                        Məhsula Bax <i class="fas fa-arrow-right"></i>
+                                        Məhsula bax <i class="fas fa-arrow-right"></i>
                                     </a>
                                 </div>
                             </div>
                         </div>
                         {% endfor %}
                     </div>
+                    <!-- <div class="swiper-pagination"></div>
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-button-next"></div> -->
                 </div>
             </div>
-        </section>
+        </div>
         {% endif %}
-        
-        {% if most_sold_products %}
-        <section class="product-section most-sold-section">
-            <div class="container">
-                <h2 class="section-title most-sold-title">Ən Çox Satılan Məhsullar</h2>
-                <div class="swiper most-sold-swiper">
-                    <div class="swiper-wrapper">
-                        {% for product in most_sold_products %}
-                        <div class="swiper-slide">
-                            <div class="product-card">
-                                <div class="ribbon-wrapper">
-                                    <div class="ribbon" style="background:#007bff;">Satış</div>
-                                </div>
-                                <div class="product-image">
-                                    {% if product.sekil and product.sekil.url != 'mehsul_sekilleri/no_image.webp' %}
-                                    <img src="{{ product.sekil.url }}" alt="{{ product.adi }}" onclick="openImageModal('{{ product.sekil.url }}')" class="clickable-image" onerror="this.src='{% static 'images/no_image.webp' %}'">
-                                    {% else %}
-                                    <img src="{% static 'images/no_image.webp' %}" alt="Şəkil Yoxdur">
-                                    {% endif %}
-                                </div>
-                                <div class="product-info">
-                                    <h3 class="product-title-name">{{ product.adi }}</h3>
-                                    <p class="product-code">{{ product.brend_kod }}</p>
-                                    <p class="product-price">{{ product.qiymet }} ₼</p>
-                                    <p class="product-seller">Satıcı: {% if product.sahib %}{{ product.sahib.username }}{% else %}AS-AVTO{% endif %}</p>
-                                    <p style="font-size:12px;color:#007bff;">Satış sayı: {{ product.total_sold }}</p>
-                                    <a href="{% url 'products' %}?search={{ product.brend_kod }}" class="view-product">
-                                        Məhsula Bax <i class="fas fa-arrow-right"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </section>
-        {% endif %}
-        
-        {% if most_rated_products %}
-        <section class="product-section most-rated-section">
-            <div class="container">
-                <h2 class="section-title most-rated-title">Ən Dəyərli Məhsullar</h2>
-                <div class="swiper most-rated-swiper">
-                    <div class="swiper-wrapper">
-                        {% for product in most_rated_products %}
-                        <div class="swiper-slide">
-                            <div class="product-card">
-                                <div class="ribbon-wrapper">
-                                    <div class="ribbon" style="background:#ff9800;">Dəyər</div>
-                                </div>
-                                <div class="product-image">
-                                    {% if product.sekil and product.sekil.url != 'mehsul_sekilleri/no_image.webp' %}
-                                    <img src="{{ product.sekil.url }}" alt="{{ product.adi }}" onclick="openImageModal('{{ product.sekil.url }}')" class="clickable-image" onerror="this.src='{% static 'images/no_image.webp' %}'">
-                                    {% else %}
-                                    <img src="{% static 'images/no_image.webp' %}" alt="Şəkil Yoxdur">
-                                    {% endif %}
-                                </div>
-                                <div class="product-info">
-                                    <h3 class="product-title-name">{{ product.adi }}</h3>
-                                    <p class="product-code">{{ product.brend_kod }}</p>
-                                    <p class="product-price">{{ product.qiymet }} ₼</p>
-                                    <p class="product-seller">Satıcı: {% if product.sahib %}{{ product.sahib.username }}{% else %}AS-AVTO{% endif %}</p>
-                                    <p style="font-size:12px;color:#ff9800;">
-                                        Orta ulduz: {{ product.avg_rating|floatformat:1 }}★ ({{ product.rating_count }} rəy)<br>
-                                        <span style="color:#888;font-size:11px;">Dəyər Skoru: {{ product.wilson_score|floatformat:3 }}</span>
-                                    </p>
-                                    <a href="{% url 'products' %}?search={{ product.brend_kod }}" class="view-product">
-                                        Məhsula Bax <i class="fas fa-arrow-right"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </section>
-        {% endif %}
-        
-        {% if most_liked_products %}
-        <section class="product-section most-liked-section">
-            <div class="container">
-                <h2 class="section-title most-liked-title">Ən Çox Bəyənilən Məhsullar</h2>
-                <div class="swiper most-liked-swiper">
-                    <div class="swiper-wrapper">
-                        {% for product in most_liked_products %}
-                        <div class="swiper-slide">
-                            <div class="product-card">
-                                <div class="ribbon-wrapper">
-                                    <div class="ribbon" style="background:#e74c3c;">Bəyəni</div>
-                                </div>
-                                <div class="product-image">
-                                    {% if product.sekil and product.sekil.url != 'mehsul_sekilleri/no_image.webp' %}
-                                    <img src="{{ product.sekil.url }}" alt="{{ product.adi }}" onclick="openImageModal('{{ product.sekil.url }}')" class="clickable-image" onerror="this.src='{% static 'images/no_image.webp' %}'">
-                                    {% else %}
-                                    <img src="{% static 'images/no_image.webp' %}" alt="Şəkil Yoxdur">
-                                    {% endif %}
-                                </div>
-                                <div class="product-info">
-                                    <h3 class="product-title-name">{{ product.adi }}</h3>
-                                    <p class="product-code">{{ product.brend_kod }}</p>
-                                    <p class="product-price">{{ product.qiymet }} ₼</p>
-                                    <p class="product-seller">Satıcı: {% if product.sahib %}{{ product.sahib.username }}{% else %}AS-AVTO{% endif %}</p>
-                                    <p style="font-size:12px;color:#e74c3c;">Bəyəni sayı: {{ product.like_count }}</p>
-                                    <a href="{% url 'products' %}?search={{ product.brend_kod }}" class="view-product">
-                                        Məhsula Bax <i class="fas fa-arrow-right"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </section>
-        {% endif %}
-        
-       
-        <!-- Əsas Məzmun -->
+
+        <!-- Main Content -->
         <main class="main-content">
             <div class="container">
                 {% if messages %}
@@ -319,13 +188,27 @@
             </div>
         </main>
 
-        <!-- Loqo Slayder -->
-        <!-- Firma logo sliderinə aid bütün HTML kodu silindi -->
-
+        <!-- Logo Slider -->
+        <div class="logo-slider-section">
+            <div class="container">
+                <div class="swiper logo-swiper">
+                    <div class="swiper-wrapper">
+                        {% for firma in request.brands %}
+                            {% if firma.logo %}
+                            <div class="swiper-slide">
+                                <div class="logo-slide">
+                                    <img src="{{ firma.logo.url }}" alt="{{ firma.adi }}" class="firma-logo">
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'js/base.js' %}"></script>
    
     {% block extra_js %}{% endblock %}
@@ -342,7 +225,7 @@
                         {% if image.link %}
                         <a href="{{ image.link }}" target="_blank">
                         {% endif %}
-                            <img src="{{ image.sekil.url }}" alt="{{ image.basliq|default:'Popup Şəkli' }}">
+                            <img src="{{ image.sekil.url }}" alt="{{ image.basliq|default:'Popup Image' }}">
                             {% if image.basliq %}
                             <div class="popup-title">{{ image.basliq }}</div>
                             {% endif %}
@@ -352,23 +235,23 @@
                     </div>
                     {% endfor %}
                 </div>
-                <!-- <div class="swiper-pagination"></div>
+                <div class="swiper-pagination"></div>
                 <div class="swiper-button-prev"></div>
-                <div class="swiper-button-next"></div> -->
+                <div class="swiper-button-next"></div>
             </div>
         </div>
     </div>
     {% endif %}
 
-    <!-- Şəkil Modal -->
+    <!-- Image Modal -->
     <div id="imageModal" class="image-modal">
         <span class="image-modal-close">&times;</span>
         <div class="modal-image-content">
-            <img id="modalImage" class="modal-image" src="" alt="Modal Şəkli">
+            <img id="modalImage" class="modal-image" src="" alt="Modal Image">
         </div>
     </div>
 
-    <!-- Səbət Yan Paneli -->
+    <!-- Cart Sidebar -->
     <div id="cartSidebar" class="cart-sidebar">
         <div class="cart-sidebar-header">
             <div class="cart-sidebar-title">
@@ -378,177 +261,15 @@
             <button id="closeSidebar" class="close-sidebar"><i class="fas fa-times"></i></button>
         </div>
         <div class="cart-sidebar-content">
-            <!-- Səbət məzmunu burada yüklənəcək -->
+            <!-- Cart content will be loaded here -->
         </div>
     </div>
-    <!-- Səbət Yan Paneli Örtüyü -->
+    <!-- Cart Sidebar Overlay -->
     <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
     <!-- WhatsApp Chat Bot -->
-    <!-- <a href="https://wa.me/+994773059585" target="_blank" class="whatsapp-chat">
+    <a href="https://wa.me/+994773059585" target="_blank" class="whatsapp-chat">
         <i class="fab fa-whatsapp"></i>
-    </a> -->
-
-    <!-- WhatsApp iconunun yerində scroll-to-top düyməsi -->
-    <div id="scroll-to-top-btn" style="position: fixed; right: 30px; bottom: 30px; z-index: 999; display: none;">
-        <button style="background: #fff; border: 2px solid #2c3e50; border-radius: 50%; width: 56px; height: 56px; box-shadow: 0 2px 8px rgba(44,62,80,0.15); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s;">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="11" stroke="#2c3e50" stroke-width="2" fill="#fff"/>
-                <path d="M8 13L12 9L16 13" stroke="#2c3e50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-        </button>
-    </div>
-    <script>
-    // Scroll-to-top button görünməsi və klikdə yuxarı aparması
-    const scrollBtn = document.getElementById('scroll-to-top-btn');
-    window.addEventListener('scroll', function() {
-        if (window.scrollY > 200) {
-            scrollBtn.style.display = 'block';
-        } else {
-            scrollBtn.style.display = 'none';
-        }
-    });
-    scrollBtn.addEventListener('click', function() {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-    </script>
-
-    <!-- Profil Modal -->
-    <div id="profileModal" class="details-modal">
-        <div class="details-modal-content" style="max-width: 400px;">
-            <span class="profile-modal-close" style="position:absolute;right:20px;top:20px;cursor:pointer;font-size:24px;">&times;</span>
-            <div class="details-content">
-                <div class="details-header">
-                    <h3>Profil Məlumatları</h3>
-                </div>
-                <form id="profileForm" enctype="multipart/form-data">
-                    <div class="form-group text-center">
-                        <img id="profileImagePreview" src="{{ request.user.profile.sekil.url }}" alt="Profil şəkli" style="width:80px;height:80px;border-radius:50%;object-fit:cover;">
-                        <input type="file" id="profileImageInput" name="sekil" accept="image/*" style="display:block;margin:10px auto 0 auto;">
-                    </div>
-                    <div class="form-group">
-                        <label for="profileUsername">İstifadəçi adı</label>
-                        <input type="text" id="profileUsername" name="username" class="form-control" value="{{ request.user.username }}" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="profilePhone">Telefon</label>
-                        <input type="text" id="profilePhone" name="phone" class="form-control" value="{{ request.user.profile.phone }}" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="profileAddress">Ünvan</label>
-                        <textarea id="profileAddress" name="address" class="form-control" required>{{ request.user.profile.address }}</textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100">Yadda Saxla</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- İstifadəçi Məlumatları Modal -->
-    <div id="userDetailsModal" class="details-modal">
-        <div class="details-modal-content">
-            <span class="user-details-modal-close" style="position:absolute;right:20px;top:20px;cursor:pointer;font-size:24px;">&times;</span>
-            <div class="details-content">
-                <div class="details-header">
-                    <h3>İstifadəçi Məlumatları</h3>
-                </div>
-                <div class="details-body">
-                    <div class="details-info text-center">
-                        <img id="userDetailsImage" src="" alt="Profil şəkli" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:10px;">
-                        <div class="info-row">
-                            <span class="info-label">İstifadəçi adı:</span>
-                            <span id="userDetailsUsername" class="info-value"></span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Telefon:</span>
-                            <span id="userDetailsPhone" class="info-value"></span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Ünvan:</span>
-                            <span id="userDetailsAddress" class="info-value"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Giriş Modal -->
-    <div id="loginModal" class="modal" style="display:none;">
-        <div class="modal-content">
-            <span class="close" id="closeLoginModal">&times;</span>
-            <h3>Giriş</h3>
-            <form id="loginForm">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="loginUsername">İstifadəçi adı</label>
-                    <input type="text" id="loginUsername" name="username" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="loginPassword">Şifrə</label>
-                    <input type="password" id="loginPassword" name="password" class="form-control" required>
-                </div>
-                <div id="loginError" class="message message-error" style="display:none;"></div>
-                <div class="modal-buttons">
-                    <button type="submit" class="btn btn-primary">Giriş</button>
-                    <span id="loginSpinner" class="spinner" style="display:none; margin-left:10px;">• • •</span>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Qeydiyyat Modal -->
-    <div id="registerModal" class="modal" style="display:none;">
-        <div class="modal-content">
-            <span class="close" id="closeRegisterModal">&times;</span>
-            <h3>Qeydiyyat</h3>
-            <form id="registerForm">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="registerUsername">İstifadəçi adı</label>
-                    <input type="text" id="registerUsername" name="username" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="registerEmail">E-poçt</label>
-                    <input type="email" id="registerEmail" name="email" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="registerPhone">Telefon nömrəsi</label>
-                    <input type="text" id="registerPhone" name="phone" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="registerAddress">Ünvan</label>
-                    <input type="text" id="registerAddress" name="address" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="registerPassword">Şifrə</label>
-                    <input type="password" id="registerPassword" name="password" class="form-control" required>
-                </div>
-                <div id="registerError" class="message message-error" style="display:none;"></div>
-                <div class="modal-buttons">
-                    <button type="submit" class="btn btn-primary">Qeydiyyat</button>
-                    <span id="registerSpinner" class="spinner" style="display:none; margin-left:10px;">• • •</span>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script>
-    // Show login/register modal on button click
-    document.addEventListener('DOMContentLoaded', function() {
-        var loginBtn = document.getElementById('showLoginModalBtn');
-        var registerBtn = document.getElementById('showRegisterModalBtn');
-        if (loginBtn) {
-            loginBtn.addEventListener('click', function() {
-                document.getElementById('loginModal').style.display = 'block';
-            });
-        }
-        if (registerBtn) {
-            registerBtn.addEventListener('click', function() {
-                document.getElementById('registerModal').style.display = 'block';
-            });
-        }
-    });
-    </script>
+    </a>
 </body>
 </html>

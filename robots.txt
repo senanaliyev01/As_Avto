@@ -1,4 +1,0 @@
-User-agent: *
-Disallow: /admin-as-avto-1983-2002/
-
-Sitemap: https://as-avto.com/sitemap.xml 

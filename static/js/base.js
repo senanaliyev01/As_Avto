@@ -29,150 +29,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize Details Modal
     initializeDetailsModal();
 
-    // Initialize User Details Modal
-    initializeUserDetailsModal();
+    // Initialize Logo Slider
+    initializeLogoSlider();
 
     // Initialize Header Messages
     initializeHeaderMessages();
-
-    setupCustomDropdown('category-dropdown', 'category');
-    setupCustomDropdown('brand-dropdown', 'brand');
-    setupCustomDropdown('model-dropdown', 'model');
-    setupCustomDropdown('seller-dropdown', 'seller');
-
-    // Buyer Stats Modal logic for my_sales.html
-    initializeBuyerStatsModal();
-
-    // Profile Modal logic
-    initializeProfileModal();
-
-    // Real-time sales notification
-    let lastSalesCount = parseInt(localStorage.getItem('lastSalesCount') || '0', 10);
-    let salesSound = null;
-
-    function playSalesSound() {
-        const audio = new Audio('/static/sounds/new_order.mp3');
-        audio.currentTime = 0;
-        audio.play();
-    }
-
-    function updateSalesBadge(count) {
-        const badge = document.getElementById('salesBadge');
-        if (!badge) return;
-        if (count > 0) {
-            badge.textContent = count;
-            badge.style.display = 'inline-block';
-        } else {
-            badge.textContent = '0';
-            badge.style.display = 'none';
-        }
-    }
-
-    function pollSalesCount() {
-        fetch('/api/unread-sales-count/', { credentials: 'same-origin' })
-            .then(res => res.json())
-            .then(data => {
-                if (typeof data.count === 'number') {
-                    updateSalesBadge(data.count);
-                    if (data.count > lastSalesCount) {
-                        playSalesSound();
-                    }
-                    lastSalesCount = data.count;
-                    localStorage.setItem('lastSalesCount', lastSalesCount);
-                }
-            })
-            .catch(() => {});
-    }
-
-    setInterval(pollSalesCount, 10000); // 10 saniyədən bir yoxla
-    pollSalesCount(); // İlk yükləmədə də yoxla
-
-    // Linkə kliklədikdə sayğacı sıfırla
-    const salesLink = document.querySelector('.user-dropdown .mr-sls');
-    if (salesLink) {
-        salesLink.addEventListener('click', function() {
-            fetch('/api/unread-sales-count/', { method: 'POST', credentials: 'same-origin' })
-                .then(() => {
-                    updateSalesBadge(0);
-                    lastSalesCount = 0;
-                    localStorage.setItem('lastSalesCount', '0');
-                });
-        });
-    }
-
-    // --- Buyer live dropdown for my_sales.html ---
-    const buyerSearch = document.getElementById('buyerLiveSearch');
-    const buyerDropdown = document.getElementById('buyerLiveDropdown');
-    if (buyerSearch && buyerDropdown) {
-        // Açmaq üçün inputa klik
-        buyerSearch.addEventListener('focus', function() {
-            buyerDropdown.style.display = 'block';
-            filterBuyerDropdown(this.value);
-        });
-        // Yazdıqca filtrlə və aç
-        buyerSearch.addEventListener('input', function() {
-            buyerDropdown.style.display = 'block';
-            filterBuyerDropdown(this.value);
-            filterOrdersByBuyerInput(this.value);
-        });
-        // Seçimə klik
-        buyerDropdown.addEventListener('click', function(e) {
-            if (e.target.classList.contains('buyer-live-option')) {
-                buyerSearch.value = e.target.textContent;
-                buyerDropdown.style.display = 'none';
-                filterOrdersByBuyerInput(e.target.textContent);
-            }
-        });
-        // Çöldə kliklədikdə bağla
-        document.addEventListener('click', function(e) {
-            if (!buyerDropdown.contains(e.target) && e.target !== buyerSearch) {
-                buyerDropdown.style.display = 'none';
-            }
-        });
-        function filterBuyerDropdown(query) {
-            const val = query.toLowerCase();
-            buyerDropdown.querySelectorAll('.buyer-live-option').forEach(opt => {
-                opt.style.display = opt.dataset.username.includes(val) ? '' : 'none';
-            });
-        }
-        function filterOrdersByBuyerInput(query) {
-            const val = query.toLowerCase();
-            const rows = document.querySelectorAll('table.table tbody tr');
-            rows.forEach(row => {
-                const buyerCell = row.querySelector('td:nth-child(2) a');
-                if (!buyerCell) return;
-                const username = buyerCell.textContent.toLowerCase();
-                row.style.display = username.includes(val) ? '' : 'none';
-            });
-        }
-    }
-
-    // Modal açıb-bağlama və AJAX login/register
-    initializeAuthModals();
-
-    // Logout AJAX
-    const logoutLink = document.querySelector('.logout-link');
-    if (logoutLink) {
-        logoutLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            fetch('/logout/', {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': getCookie('csrftoken')
-                }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.reload();
-                }
-            });
-        });
-    }
 });
 
 function initializeSearch() {
-    const searchInput = document.querySelector('.header-search-input');
+    const searchInput = document.getElementById('query');
     const searchResults = document.getElementById('search-results');
     let searchTimeout;
 
@@ -180,6 +45,7 @@ function initializeSearch() {
         searchInput.addEventListener('input', function() {
             clearTimeout(searchTimeout);
             const query = this.value.trim();
+            
             if (query.length > 0) {
                 searchTimeout = setTimeout(() => {
                     fetch(`/search-suggestions/?search=${encodeURIComponent(query)}`)
@@ -195,18 +61,17 @@ function initializeSearch() {
                                         <div class="search-result-info">
                                             <div class="search-result-title">${item.adi}</div>
                                             <div class="search-result-details">
-                                                <b>Code:</b> ${item.brend_kod}<br>
-                                                ${item.oem ? `<b>OEM:</b> ${item.oem}<br>` : ''}
-                                                ${item.olcu ? `<b>Size:</b> ${item.olcu}<br>` : ''}
+                                                Brend Kodu: ${item.brend_kod}<br>
+                                                OEM: ${item.oem}<br>
+                                                ${item.olcu ? `Ölçü: ${item.olcu}` : ''}
                                             </div>
-                                            <div class="search-result-seller"><i class="fas fa-user"></i> ${item.satici || 'AS-AVTO'}</div>
                                         </div>
                                         <div class="search-result-price">${item.qiymet} ₼</div>
                                     `;
                                     div.addEventListener('click', () => {
                                         searchInput.value = item.brend_kod;
                                         searchResults.style.display = 'none';
-                                        document.querySelector('.header-search-form').submit();
+                                        document.querySelector('form.search-form').submit();
                                     });
                                     searchResults.appendChild(div);
                                 });
@@ -220,6 +85,8 @@ function initializeSearch() {
                 searchResults.style.display = 'none';
             }
         });
+
+        // Close search results when clicking outside
         document.addEventListener('click', function(e) {
             if (!searchResults.contains(e.target) && e.target !== searchInput) {
                 searchResults.style.display = 'none';
@@ -234,16 +101,6 @@ function initializeCart() {
     const selectedTotal = document.getElementById('selected-total');
     const checkoutButton = document.getElementById('checkout-button');
     const updateForms = document.querySelectorAll('.update-form');
-    const checkoutForm = document.getElementById('checkout-form');
-
-    if (checkoutForm) {
-        checkoutForm.addEventListener('submit', function(e) {
-            // Sifarişi göndərmədən öncə təsdiq istə
-            if (!confirm('Sifarişi vermək istədiyinizə əminsiniz?')) {
-                e.preventDefault(); // Əgər istifadəçi "Cancel" basarsa, formanın göndərilməsini dayandır
-            }
-        });
-    }
 
     // Add event listener for update forms
     if (updateForms) {
@@ -291,7 +148,7 @@ function initializeCart() {
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    showMessage('error', 'Xəta baş verdi. Zəhmət olmasa, yenidən cəhd edin.');
+                    showMessage('error', 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
                 });
             });
         });
@@ -343,9 +200,8 @@ function initializeModal() {
     const modal = document.getElementById('quantityModal');
     const closeBtn = document.querySelector('.close');
     const form = document.getElementById('addToCartForm');
-    const modalContent = document.querySelector('.custom-quantity-modal-content');
     
-    if (modal && closeBtn && form && modalContent) {
+    if (modal && closeBtn && form) {
         closeBtn.onclick = () => modal.style.display = 'none';
         
         window.onclick = function(event) {
@@ -387,7 +243,7 @@ function initializeModal() {
             })
             .catch(error => {
                 console.error('Error:', error);
-                showMessage('error', 'Xəta baş verdi. Zəhmət olmasa, yenidən cəhd edin.');
+                showMessage('error', 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
             });
         });
     }
@@ -471,7 +327,7 @@ function removeFromCart(productId) {
     })
     .catch(error => {
         console.error('Error:', error);
-        showMessage('error', 'Xəta baş verdi. Zəhmət olmasa, yenidən cəhd edin.');
+        showMessage('error', 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
     });
 }
 
@@ -576,7 +432,7 @@ function initializeSwiper() {
             spaceBetween: 20,
             loop: true,
             autoplay: {
-                delay: 2500, // 2.5 saniyə
+                delay: 3000,
                 disableOnInteraction: false,
             },
             pagination: {
@@ -588,85 +444,22 @@ function initializeSwiper() {
                 prevEl: '.swiper-button-prev',
             },
             breakpoints: {
-                320: { slidesPerView: 1, spaceBetween: 10 },
-                480: { slidesPerView: 2, spaceBetween: 15 },
-                768: { slidesPerView: 3, spaceBetween: 15 },
-                1024: { slidesPerView: 4, spaceBetween: 20 }
-            }
-        });
-    }
-    if (document.querySelector('.most-sold-swiper')) {
-        new Swiper('.most-sold-swiper', {
-            slidesPerView: 4,
-            spaceBetween: 20,
-            loop: true,
-            autoplay: {
-                delay: 3500, // 3.5 saniyə
-                disableOnInteraction: false,
-            },
-            pagination: {
-                el: '.swiper-pagination',
-                clickable: true,
-            },
-            navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
-            },
-            breakpoints: {
-                320: { slidesPerView: 1, spaceBetween: 10 },
-                480: { slidesPerView: 2, spaceBetween: 15 },
-                768: { slidesPerView: 3, spaceBetween: 15 },
-                1024: { slidesPerView: 4, spaceBetween: 20 }
-            }
-        });
-    }
-    if (document.querySelector('.most-rated-swiper')) {
-        new Swiper('.most-rated-swiper', {
-            slidesPerView: 4,
-            spaceBetween: 20,
-            loop: true,
-            autoplay: {
-                delay: 4500, // 4.5 saniyə
-                disableOnInteraction: false,
-            },
-            pagination: {
-                el: '.swiper-pagination',
-                clickable: true,
-            },
-            navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
-            },
-            breakpoints: {
-                320: { slidesPerView: 1, spaceBetween: 10 },
-                480: { slidesPerView: 2, spaceBetween: 15 },
-                768: { slidesPerView: 3, spaceBetween: 15 },
-                1024: { slidesPerView: 4, spaceBetween: 20 }
-            }
-        });
-    }
-    if (document.querySelector('.most-liked-swiper')) {
-        new Swiper('.most-liked-swiper', {
-            slidesPerView: 4,
-            spaceBetween: 20,
-            loop: true,
-            autoplay: {
-                delay: 5500, // 5.5 saniyə
-                disableOnInteraction: false,
-            },
-            pagination: {
-                el: '.swiper-pagination',
-                clickable: true,
-            },
-            navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
-            },
-            breakpoints: {
-                320: { slidesPerView: 1, spaceBetween: 10 },
-                480: { slidesPerView: 2, spaceBetween: 15 },
-                768: { slidesPerView: 3, spaceBetween: 15 },
-                1024: { slidesPerView: 4, spaceBetween: 20 }
+                320: {
+                    slidesPerView: 1,
+                    spaceBetween: 10
+                },
+                480: {
+                    slidesPerView: 2,
+                    spaceBetween: 15
+                },
+                768: {
+                    slidesPerView: 3,
+                    spaceBetween: 15
+                },
+                1024: {
+                    slidesPerView: 4,
+                    spaceBetween: 20
+                }
             }
         });
     }
@@ -910,17 +703,14 @@ function initializeCartSidebar() {
 
 // Products Page Functions
 function initializeProductsPage() {
-    let offset = 5;
+    let offset = 15;
     let loading = false;
-    const productsList = document.getElementById('products-list');
+    const tbody = document.getElementById('products-tbody');
     const spinner = document.getElementById('loading-spinner');
-    let hasMore = false;
+    let hasMore = false; // Bu dəyər HTML-dən gələcək
 
-    console.log('initializeProductsPage called');
-    console.log('productsList:', productsList);
-    console.log('spinner:', spinner);
-
-    if (productsList) {
+    // hasMore dəyərini HTML-dən alırıq
+    if (tbody) {
         const hasMoreElement = document.querySelector('[data-has-more]');
         if (hasMoreElement) {
             hasMore = hasMoreElement.dataset.hasMore === 'true';
@@ -928,76 +718,65 @@ function initializeProductsPage() {
     }
 
     function loadMoreProducts() {
-        if (loading || !hasMore) {
-            console.log('Already loading or no more products');
-            return;
-        }
+        if (loading || !hasMore) return;
+        
         loading = true;
         if (spinner) {
             spinner.style.display = 'flex';
         }
+        
         const params = new URLSearchParams(window.location.search);
         params.append('offset', offset);
+        
+        // Determine if we're on the new products page
         const isNewProductsPage = window.location.pathname.includes('new-products');
         const endpoint = isNewProductsPage ? '/load-more-new-products/' : '/load-more-products/';
-        console.log('Sending AJAX request to:', endpoint, 'with params:', params.toString());
+        
         setTimeout(() => {
             fetch(`${endpoint}?${params.toString()}`)
-                .then(response => {
-                    console.log('AJAX response status:', response.status);
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
-                    console.log('AJAX response data:', data);
-                    if (productsList) {
+                    if (tbody) {
                         data.products.forEach(product => {
-                            const div = document.createElement('div');
-                            div.className = 'product-row';
-                            let avtomobilLogosHtml = '';
-                            if (product.avtomobil_logo_urls && Array.isArray(product.avtomobil_logo_urls)) {
-                                product.avtomobil_logo_urls.forEach(url => {
-                                    avtomobilLogosHtml += `<img class='avtomobil-logo' src='${url}' alt='${product.avtomobil}'>`;
-                                });
-                                if (avtomobilLogosHtml) {
-                                    avtomobilLogosHtml = `<div class="avtomobil-logos-wrapper">${avtomobilLogosHtml}</div>`;
-                                }
-                            }
-                            div.innerHTML = `
-                                <div style="position:absolute;top:10px;right:10px;z-index:2;display:flex;align-items:center;gap:8px;">
-                                    ${[1,2,3,4,5].map(i => `<span style='color:${product.avg_rating >= i ? '#FFD700' : (product.avg_rating >= (i-1) ? '#FFD70099' : '#ccc')};font-size:1.1rem;'>&#9733;</span>`).join('')}
-                                    <span style='color:#2B5173;font-size:1rem;'>${parseFloat(product.avg_rating).toFixed(1)}</span>
-                                    <span style='color:#e74c3c;font-size:1.1rem;margin-left:8px;'><i class='fas fa-heart'></i> ${product.like_count}</span>
-                                    <span style='color:#888;font-size:0.95rem;margin-left:8px;'>Value Score: ${typeof product.wilson_score !== 'undefined' ? parseFloat(product.wilson_score).toFixed(3) : '-'}</span>
-                                </div>
-                                <div class="product-row-image">
-                                    <img src="${product.sekil_url || '/static/images/no_image.webp'}" alt="${product.adi} - ${product.brend_kod} ${product.firma} ${product.avtomobil}" title="${product.adi} - ${product.brend_kod}" loading="lazy" onclick="openImageModal('${product.sekil_url}')">
-                                </div>
-                                <div class="product-row-info">
-                                    <div class="product-title"><a href="/products/${product.id}/" style="color:inherit;text-decoration:none;">${product.adi} ${product.brend_kod} ${product.firma}</a></div>
-                                    <div class="product-meta">
-                                        ${product.sahib_id && product.sahib_username ? `<a href="#" class="seller-link" onclick="openUserDetailsModal(${product.sahib_id}); return false;"><i class='fas fa-user'></i> ${product.sahib_username}</a>` : ''}
-                                    </div>
-                                    <div class="product-stock">Code: ${product.brend_kod}</div>
-                                    <div class="product-stock">Stock: ${product.stok}</div>
-                                </div>
-                                ${avtomobilLogosHtml}
-                                ${product.firma_logo_url ? `<img class='firma-logo' src='${product.firma_logo_url}' alt='${product.firma}'>` : ''}
-                                <div class="product-row-actions">
-                                    <div class="product-price">${product.qiymet} ₼</div>
-                                    <button type="button" class="cart-add-btn" ${product.stok === 0 ? 'disabled' : ''} onclick="openQuantityModal(${product.id}, ${product.stok})">
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td><img src="${product.sekil_url || '/static/images/no_image.webp'}" alt="${product.adi}" class="product-image" onclick="openImageModal('${product.sekil_url}')"></td>
+                                <td>${product.brend_kod}</td>
+                                <td>${product.firma}</td>
+                                <td>
+                                    ${product.adi}
+                                    ${product.yenidir ? '<span class="new-badge">Yeni</span>' : ''}
+                                </td>
+                                <td>${product.stok}</td>
+                                <td>${product.qiymet} ₼</td>
+                                <td>
+                                    <button type="button" 
+                                            class="cart-add-btn" 
+                                            ${product.stok === 0 ? 'disabled' : ''}
+                                            onclick="openQuantityModal(${product.id}, ${product.stok})">
                                         <i class="fas fa-shopping-cart"></i>
                                     </button>
-                                </div>
+                                </td>
+                                <td>
+                                    <button type="button" 
+                                            class="details-btn" 
+                                            onclick="openDetailsModal(${product.id})">
+                                        <i class="fas fa-info-circle"></i>
+                                    </button>
+                                </td>
                             `;
-                            productsList.appendChild(div);
+                            tbody.appendChild(row);
                         });
+                        
                         hasMore = data.has_more;
-                        offset += 5;
+                        offset += 15;
+                        
+                        // Initialize image modal for new images
                         initializeImageModal();
                     }
                 })
                 .catch(error => {
-                    console.error('AJAX error:', error);
+                    console.error('Error:', error);
                 })
                 .finally(() => {
                     loading = false;
@@ -1005,84 +784,14 @@ function initializeProductsPage() {
                         spinner.style.display = 'none';
                     }
                 });
-        }, 500);
+        }, 500); // 0.5 saniyə gözləmə
     }
 
-    if (productsList) {
-        document.addEventListener('scroll', () => {
-            console.log('Scroll event fired');
+    // Scroll event listener
+    if (tbody) {
+        window.addEventListener('scroll', () => {
             if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 200) {
-                console.log('Triggering loadMoreProducts');
                 loadMoreProducts();
-            }
-        });
-    }
-}
-
-// User Details Modal Functions
-function openUserDetailsModal(userId) {
-    const modal = document.getElementById('userDetailsModal');
-    if (!modal) return;
-
-    // Fetch user details
-    fetch(`/user-details/${userId}/`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                // Update modal content
-                document.getElementById('userDetailsUsername').textContent = data.user.username;
-                document.getElementById('userDetailsPhone').textContent = data.user.phone || '-';
-                document.getElementById('userDetailsAddress').textContent = data.user.address || '-';
-                // Profil şəkli
-                var img = document.getElementById('userDetailsImage');
-                if (img && data.user.sekil_url) {
-                    img.src = data.user.sekil_url;
-                } else if (img) {
-                    img.src = '/static/images/no_image.jpg';
-                }
-                // Show modal with animation
-                modal.style.display = 'block';
-                setTimeout(() => {
-                    modal.classList.add('show');
-                }, 10);
-            } else {
-                showMessage('error', data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showMessage('error', 'Xəta baş verdi. Zəhmət olmasa, yenidən cəhd edin.');
-        });
-}
-
-function closeUserDetailsModal() {
-    const modal = document.getElementById('userDetailsModal');
-    if (!modal) return;
-
-    modal.classList.remove('show');
-    setTimeout(() => {
-        modal.style.display = 'none';
-    }, 300);
-}
-
-function initializeUserDetailsModal() {
-    const modal = document.getElementById('userDetailsModal');
-    const closeBtn = document.querySelector('.user-details-modal-close');
-    
-    if (modal && closeBtn) {
-        closeBtn.onclick = closeUserDetailsModal;
-        
-        // Close modal when clicking outside
-        modal.onclick = function(e) {
-            if (e.target === modal) {
-                closeUserDetailsModal();
-            }
-        };
-        
-        // Close modal with ESC key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && modal.style.display === 'block') {
-                closeUserDetailsModal();
             }
         });
     }
@@ -1105,20 +814,11 @@ function openDetailsModal(productId) {
                 document.getElementById('detailsFirma').textContent = data.product.firma;
                 document.getElementById('detailsAvtomobil').textContent = data.product.avtomobil;
                 document.getElementById('detailsBrendKod').textContent = data.product.brend_kod;
+                document.getElementById('detailsOEM').textContent = data.product.oem;
                 document.getElementById('detailsOlcu').textContent = data.product.olcu || '-';
                 document.getElementById('detailsQiymet').textContent = data.product.qiymet + ' ₼';
-                document.getElementById('detailsStok').textContent = data.product.stok + ' pieces';
+                document.getElementById('detailsStok').textContent = data.product.stok + ' ədəd';
                 document.getElementById('detailsMelumat').textContent = data.product.melumat || '-';
-
-                // Seller info
-                const detailsSeller = document.getElementById('detailsSeller');
-                if (detailsSeller) {
-                    if (data.product.sahib_id && data.product.sahib_username) {
-                        detailsSeller.innerHTML = `<a href="#" class="seller-link" onclick="openUserDetailsModal(${data.product.sahib_id}); return false;"><i class="fas fa-user"></i> ${data.product.sahib_username}</a>`;
-                    } else {
-                        detailsSeller.textContent = 'AS-AVTO';
-                    }
-                }
 
                 // Show modal with animation
                 modal.style.display = 'block';
@@ -1131,7 +831,7 @@ function openDetailsModal(productId) {
         })
         .catch(error => {
             console.error('Error:', error);
-            showMessage('error', 'Xəta baş verdi. Zəhmət olmasa, yenidən cəhd edin.');
+            showMessage('error', 'Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
         });
 }
 
@@ -1169,6 +869,37 @@ function initializeDetailsModal() {
     }
 }
 
+// Initialize Logo Slider
+function initializeLogoSlider() {
+    const logoSwiper = new Swiper('.logo-swiper', {
+        slidesPerView: 'auto',
+        spaceBetween: 3,
+        loop: true,
+        autoplay: {
+            delay: 2000,
+            disableOnInteraction: false,
+        },
+        breakpoints: {
+            320: {
+                slidesPerView: 4,
+                spaceBetween: 0
+            },
+            480: {
+                slidesPerView: 6,
+                spaceBetween: 0
+            },
+            768: {
+                slidesPerView: 8,
+                spaceBetween: 0
+            },
+            1024: {
+                slidesPerView: 10,
+                spaceBetween: 0
+            }
+        }
+    });
+}
+
 function initializeHeaderMessages() {
     const messages = document.querySelectorAll('.message-slide');
     if (messages.length <= 1) return;
@@ -1199,261 +930,5 @@ function initializeHeaderMessages() {
 
     // Hər 5 saniyədən bir növbəti mesaja keç
     setInterval(nextMessage, interval);
-}
-
-function setupCustomDropdown(dropdownId, selectId) {
-    const dropdown = document.getElementById(dropdownId);
-    const select = document.getElementById(selectId);
-    if (!dropdown || !select) return;
-    const input = dropdown.querySelector('.dropdown-search-input');
-    const optionsContainer = dropdown.querySelector('.dropdown-options');
-    const options = Array.from(optionsContainer.querySelectorAll('.dropdown-option'));
-
-    // Show/hide dropdown
-    dropdown.addEventListener('click', function(e) {
-        e.stopPropagation();
-        optionsContainer.style.display = 'block';
-        input.focus();
-    });
-    // Filter options
-    input.addEventListener('input', function() {
-        const val = input.value.toLowerCase();
-        options.forEach(opt => {
-            if (opt.textContent.toLowerCase().includes(val)) {
-                opt.style.display = '';
-            } else {
-                opt.style.display = 'none';
-            }
-        });
-    });
-    // Option click
-    options.forEach(opt => {
-        opt.addEventListener('click', function(e) {
-            e.stopPropagation();
-            // Set value in select
-            select.value = opt.getAttribute('data-value');
-            // Update input value
-            input.value = opt.textContent;
-            optionsContainer.style.display = 'none';
-        });
-    });
-    // Click outside closes
-    document.addEventListener('click', function() {
-        optionsContainer.style.display = 'none';
-    });
-    // On page load, set input value to selected
-    const selected = select.querySelector('option:checked');
-    if (selected) {
-        input.value = selected.textContent;
-    }
-}
-
-// Buyer Stats Modal logic for my_sales.html
-function initializeBuyerStatsModal() {
-    const openBtn = document.getElementById('openStatsModal');
-    const modal = document.getElementById('buyerStatsModal');
-    const closeBtn = document.querySelector('.buyer-stats-modal-close');
-    const searchInput = document.getElementById('buyerStatsSearch');
-    const table = document.getElementById('buyerStatsTable');
-    if (!openBtn || !modal || !closeBtn || !searchInput || !table) return;
-
-    openBtn.addEventListener('click', function() {
-        modal.style.display = 'block';
-        setTimeout(() => modal.classList.add('show'), 10);
-        searchInput.value = '';
-        filterBuyerStatsTable('');
-        searchInput.focus();
-    });
-    closeBtn.addEventListener('click', closeModal);
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal) closeModal();
-    });
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && modal.style.display === 'block') closeModal();
-    });
-    function closeModal() {
-        modal.classList.remove('show');
-        setTimeout(() => { modal.style.display = 'none'; }, 300);
-    }
-    searchInput.addEventListener('input', function() {
-        filterBuyerStatsTable(this.value);
-    });
-    function filterBuyerStatsTable(query) {
-        const rows = table.querySelectorAll('tbody tr');
-        const val = query.toLowerCase();
-        rows.forEach(row => {
-            const username = row.querySelector('td').innerText.toLowerCase();
-            row.style.display = username.includes(val) ? '' : 'none';
-        });
-    }
-}
-
-// Profile Modal logic
-function initializeProfileModal() {
-    const openBtn = document.getElementById('openProfileModal');
-    const modal = document.getElementById('profileModal');
-    const closeBtn = document.querySelector('.profile-modal-close');
-    const form = document.getElementById('profileForm');
-    const imageInput = document.getElementById('profileImageInput');
-    const imagePreview = document.getElementById('profileImagePreview');
-    if (!openBtn || !modal || !closeBtn || !form) return;
-
-    // Open modal
-    openBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        modal.style.display = 'block';
-        setTimeout(() => modal.classList.add('show'), 10);
-    });
-    // Close modal
-    function closeModal() {
-        modal.classList.remove('show');
-        setTimeout(() => { modal.style.display = 'none'; }, 300);
-    }
-    closeBtn.addEventListener('click', closeModal);
-    window.addEventListener('click', function(e) {
-        if (e.target === modal) closeModal();
-    });
-    window.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') closeModal();
-    });
-    // Image preview
-    if (imageInput && imagePreview) {
-        imageInput.addEventListener('change', function() {
-            if (this.files && this.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    imagePreview.src = e.target.result;
-                };
-                reader.readAsDataURL(this.files[0]);
-            }
-        });
-    }
-    // AJAX submit
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const formData = new FormData(form);
-        fetch('/update-profile/', {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': (document.querySelector('[name=csrfmiddlewaretoken]') || {}).value || ''
-            },
-            body: formData
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'success') {
-                // Update dropdown username, phone, address, image
-                document.querySelectorAll('.user-name').forEach(el => {
-                    el.innerHTML = '<i class="fas fa-user"></i> ' + data.username;
-                });
-                if (data.sekil_url) {
-                    imagePreview.src = data.sekil_url;
-                }
-                // Optionally update phone/address elsewhere if needed
-                closeModal();
-                alert('Profil məlumatları yeniləndi!');
-            } else {
-                alert(data.message || 'Xəta baş verdi!');
-            }
-        })
-        .catch(() => {
-            alert('Xəta baş verdi!');
-        });
-    });
-}
-
-// Modal açıb-bağlama və AJAX login/register
-function initializeAuthModals() {
-    // Modal elementləri
-    const loginModal = document.getElementById('loginModal');
-    const registerModal = document.getElementById('registerModal');
-    const openLoginModal = document.getElementById('openLoginModal');
-    const openRegisterModal = document.getElementById('openRegisterModal');
-    const closeLoginModal = document.getElementById('closeLoginModal');
-    const closeRegisterModal = document.getElementById('closeRegisterModal');
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
-    const loginError = document.getElementById('loginError');
-    const registerError = document.getElementById('registerError');
-    const loginSpinner = document.getElementById('loginSpinner');
-    const registerSpinner = document.getElementById('registerSpinner');
-
-    // Modal aç
-    if (openLoginModal) openLoginModal.onclick = function(e) { e.preventDefault(); loginModal.style.display = 'block'; };
-    if (openRegisterModal) openRegisterModal.onclick = function(e) { e.preventDefault(); registerModal.style.display = 'block'; };
-    // Modal bağla
-    if (closeLoginModal) closeLoginModal.onclick = function() { loginModal.style.display = 'none'; loginError.style.display = 'none'; };
-    if (closeRegisterModal) closeRegisterModal.onclick = function() { registerModal.style.display = 'none'; registerError.style.display = 'none'; };
-    // Modalı çöldə kliklədikdə bağla
-    window.onclick = function(event) {
-        if (event.target === loginModal) { loginModal.style.display = 'none'; loginError.style.display = 'none'; }
-        if (event.target === registerModal) { registerModal.style.display = 'none'; registerError.style.display = 'none'; }
-    };
-    // AJAX login
-    if (loginForm) loginForm.onsubmit = function(e) {
-        e.preventDefault();
-        loginError.style.display = 'none';
-        loginSpinner.style.display = 'inline-block';
-        const csrfInput = loginForm.querySelector('[name=csrfmiddlewaretoken]');
-        const csrfToken = csrfInput ? csrfInput.value : getCookie('csrftoken');
-        setTimeout(function() {
-            fetch('/login/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': csrfToken
-                },
-                body: `username=${encodeURIComponent(loginForm.username.value)}&password=${encodeURIComponent(loginForm.password.value)}`
-            })
-            .then(res => res.json())
-            .then(data => {
-                loginSpinner.style.display = 'none';
-                if (data.success) {
-                    window.location.reload();
-                } else {
-                    loginError.textContent = data.error || 'Login failed';
-                    loginError.style.display = 'block';
-                }
-            })
-            .catch(() => {
-                loginSpinner.style.display = 'none';
-                loginError.textContent = 'An error occurred';
-                loginError.style.display = 'block';
-            });
-        }, 3000);
-    };
-    // AJAX register
-    if (registerForm) registerForm.onsubmit = function(e) {
-        e.preventDefault();
-        registerError.style.display = 'none';
-        registerSpinner.style.display = 'inline-block';
-        const csrfInput = registerForm.querySelector('[name=csrfmiddlewaretoken]');
-        const csrfToken = csrfInput ? csrfInput.value : getCookie('csrftoken');
-        setTimeout(function() {
-            fetch('/register/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': csrfToken
-                },
-                body: `username=${encodeURIComponent(registerForm.username.value)}&email=${encodeURIComponent(registerForm.email.value)}&phone=${encodeURIComponent(registerForm.phone.value)}&address=${encodeURIComponent(registerForm.address.value)}&password=${encodeURIComponent(registerForm.password.value)}`
-            })
-            .then(res => res.json())
-            .then(data => {
-                registerSpinner.style.display = 'none';
-                if (data.success) {
-                    window.location.reload();
-                } else {
-                    registerError.textContent = data.error || 'Registration failed';
-                    registerError.style.display = 'block';
-                }
-            })
-            .catch(() => {
-                registerSpinner.style.display = 'none';
-                registerError.textContent = 'An error occurred';
-                registerError.style.display = 'block';
-            });
-        }, 3000);
-    };
 }
 

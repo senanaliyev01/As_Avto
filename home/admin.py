@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Kateqoriya, Firma, Avtomobil, Mehsul, Sifaris, SifarisItem, Vitrin, PopupImage, Profile, Header_Message, AvtomobilLogo, ProductLike, ProductRating
+from .models import Kateqoriya, Firma, Avtomobil, Mehsul, Sifaris, SifarisItem, Vitrin, PopupImage, Profile, Header_Message
 from django.core.exceptions import ValidationError
 from django.utils.html import format_html
 from django.urls import path
@@ -18,13 +18,6 @@ import pandas as pd
 from django.contrib import messages
 from django.db import transaction
 import math
-from django.contrib.admin import SimpleListFilter
-
-def truncate_product_name(name, max_length=20):
-    """Məhsul adını qısaldır və uzun olarsa ... əlavə edir"""
-    if len(name) <= max_length:
-        return name
-    return name[:max_length-3] + "..."
 
 @admin.register(Header_Message)
 class Header_MessageAdmin(admin.ModelAdmin):
@@ -43,57 +36,27 @@ class VitrinAdmin(admin.ModelAdmin):
 
 @admin.register(Firma)
 class FirmaAdmin(admin.ModelAdmin):
-    list_display = ['adi', 'logo_tag']
+    list_display = ['adi']
     search_fields = ['adi']
-
-    def logo_tag(self, obj):
-        if obj.logo:
-            return format_html('<img src="{}" style="height:40px;max-width:80px;object-fit:contain;" />', obj.logo.url)
-        return "-"
-    logo_tag.short_description = "Logo"
-    logo_tag.allow_tags = True
-
-class AvtomobilLogoInline(admin.TabularInline):
-    model = AvtomobilLogo
-    extra = 1
 
 @admin.register(Avtomobil)
 class AvtomobilAdmin(admin.ModelAdmin):
-    list_display = ['adi', 'avtomobil_logos_preview']
-    inlines = [AvtomobilLogoInline]
+    list_display = ['adi']
     search_fields = ['adi']
-
-    def avtomobil_logos_preview(self, obj):
-        logos = obj.logolar.all()
-        if logos:
-            return format_html(''.join([
-                '<img src="{}" style="height:40px;max-width:80px;object-fit:contain;margin-right:4px;" />'.format(logo.sekil.url)
-                for logo in logos if logo.sekil
-            ]))
-        return "-"
-    avtomobil_logos_preview.short_description = "Logolar"
-    avtomobil_logos_preview.allow_tags = True
 
 @admin.register(Mehsul)
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ['sahib', 'brend_kod', 'firma', 'adi',  'olcu', 'vitrin', 'stok', 'maya_qiymet', 'qiymet',  'yenidir', 'qalan_vaxt', 'sekil_preview']
-    list_filter = ['sahib', 'kateqoriya', 'firma', 'avtomobil', 'vitrin', 'yenidir']
-    search_fields = ['adi', 'brend_kod', 'oem', 'kodlar', 'olcu', 'sahib__username']
+    list_display = ['brend_kod', 'firma', 'adi',  'olcu', 'vitrin', 'stok', 'maya_qiymet', 'qiymet',  'yenidir', 'sekil_preview']
+    list_filter = ['kateqoriya', 'firma', 'avtomobil', 'vitrin', 'yenidir']
+    search_fields = ['adi', 'brend_kod', 'oem', 'kodlar', 'olcu']
     change_list_template = 'admin/mehsul_change_list.html'
     actions = ['mark_as_new', 'remove_from_new']
 
     def sekil_preview(self, obj):
-        from django.utils import timezone
         if obj.sekil:
-            return format_html('<img src="{}?t={}" style="max-height: 50px;"/>', obj.sekil.url, int(timezone.now().timestamp()))
+            return format_html('<img src="{}" style="max-height: 50px;"/>', obj.sekil.url)
         return '-'
     sekil_preview.short_description = 'Şəkil'
-
-    def qalan_vaxt(self, obj):
-        if obj.yenidir and obj.qalan_vaxt():
-            return format_html('<span style="color: #17a2b8; font-weight: bold;">{}</span>', obj.qalan_vaxt())
-        return '-'
-    qalan_vaxt.short_description = 'Qalan Vaxt'
 
     def get_urls(self):
         urls = super().get_urls()
@@ -141,7 +104,7 @@ class MehsulAdmin(admin.ModelAdmin):
                 str(index),
                 mehsul.brend_kod,
                 mehsul.firma.adi if mehsul.firma else '-',
-                truncate_product_name(mehsul.adi),
+                mehsul.adi,
                 str(mehsul.vitrin.nomre) if mehsul.vitrin else '-',
                 str(mehsul.stok),
                 f"{mehsul.qiymet} ₼"
@@ -188,28 +151,8 @@ class MehsulAdmin(admin.ModelAdmin):
         return response
 
     def mark_as_new(self, request, queryset):
-        updated = queryset.update(yenidir=True, yeni_edildiyi_tarix=timezone.now())
-        
-        # 3 gün sonra avtomatik olaraq yenidən çıxar
-        import threading
-        def auto_remove_new():
-            import time
-            time.sleep(259200)  # 3 gün (72 saat)
-            try:
-                # Yenidən yeni olan məhsulları tap və yenidən çıxar
-                from django.db import transaction
-                with transaction.atomic():
-                    new_products = Mehsul.objects.filter(id__in=queryset.values_list('id', flat=True), yenidir=True)
-                    new_products.update(yenidir=False, yeni_edildiyi_tarix=None)
-            except Exception as e:
-                print(f"Auto remove new status error: {e}")
-        
-        # Thread-i başlat
-        thread = threading.Thread(target=auto_remove_new)
-        thread.daemon = True
-        thread.start()
-        
-        self.message_user(request, f'{updated} məhsul yeni olaraq işarələndi və 3 gün sonra avtomatik olaraq yenidən çıxarılacaq.')
+        updated = queryset.update(yenidir=True)
+        self.message_user(request, f'{updated} məhsul yeni olaraq işarələndi.')
     mark_as_new.short_description = "Seçilmiş məhsulları yeni olaraq işarələ"
 
     def remove_from_new(self, request, queryset):
@@ -236,10 +179,6 @@ class MehsulAdmin(admin.ModelAdmin):
                 new_count = 0
                 update_count = 0
                 error_count = 0
-                deleted_count = 0
-
-                # Excel faylında olan məhsulların unikal açarlarını saxla: (brend_kod, firma_id)
-                excel_product_keys = set()
                 
                 with transaction.atomic():
                     for index, row in df.iterrows():
@@ -302,21 +241,20 @@ class MehsulAdmin(admin.ModelAdmin):
 
                             print(f"Brend kod: {brend_kod}")
 
-                            # Bu sətirdəki məhsulun açarını yadda saxla
-                            excel_product_keys.add((brend_kod, firma.id if firma else None))
-
-                            # Mövcud məhsulu həm brend_kod, həm firma, həm də sahib ilə yoxla
-                            existing_product = Mehsul.objects.filter(brend_kod=brend_kod, firma=firma, sahib=request.user).first()
+                            existing_product = Mehsul.objects.filter(brend_kod=brend_kod).first()
 
                             try:
                                 if existing_product:
-                                    # Mövcud məhsulu yenilə, firmaya toxunma!
-                                    if not existing_product.sahib:
-                                        existing_product.sahib = request.user
+                                    # Mövcud məhsulu yenilə
                                     existing_product.adi = temiz_ad
+                                    
+                                    # Excel-də olan məlumatları yenilə, olmayanları None et
                                     existing_product.kateqoriya = kateqoriya
+                                    existing_product.firma = firma
                                     existing_product.avtomobil = avtomobil
                                     existing_product.vitrin = vitrin
+                                    
+                                    # Digər məlumatları yenilə
                                     existing_product.brend_kod = brend_kod
                                     existing_product.olcu = str(row['olcu']).strip() if 'olcu' in row and pd.notna(row['olcu']) else ''
                                     existing_product.maya_qiymet = float(row['maya_qiymet']) if 'maya_qiymet' in row and pd.notna(row['maya_qiymet']) else 0
@@ -324,6 +262,7 @@ class MehsulAdmin(admin.ModelAdmin):
                                     existing_product.stok = int(row['stok']) if 'stok' in row and pd.notna(row['stok']) else 0
                                     existing_product.kodlar = str(row['kodlar']) if 'kodlar' in row and pd.notna(row['kodlar']) else ''
                                     existing_product.melumat = str(row['melumat']) if 'melumat' in row and pd.notna(row['melumat']) else ''
+                                    
                                     existing_product.save()
                                     print(f"Məhsul yeniləndi: {existing_product}")
                                     update_count += 1
@@ -343,8 +282,7 @@ class MehsulAdmin(admin.ModelAdmin):
                                         'stok': int(row['stok']) if 'stok' in row and pd.notna(row['stok']) else 0,
                                         'kodlar': str(row['kodlar']) if 'kodlar' in row and pd.notna(row['kodlar']) else '',
                                         'melumat': str(row['melumat']) if 'melumat' in row and pd.notna(row['melumat']) else '',
-                                        'yenidir': False,
-                                        'sahib': request.user,
+                                        'yenidir': False
                                     }
                                     
                                     yeni_mehsul = Mehsul.objects.create(**mehsul_data)
@@ -363,18 +301,6 @@ class MehsulAdmin(admin.ModelAdmin):
                             error_count += 1
                             continue
 
-                    # Excel-də olmayan məhsulları sil (yalnız bu istifadəçinin məhsulları)
-                    if excel_product_keys:
-                        qs_user_products = Mehsul.objects.filter(sahib=request.user)
-                        # Silinəcək məhsullar: istifadəçinin mövcud məhsulları içində açarı Excel dəstində olmayanlar
-                        to_delete_ids = [
-                            p.id for p in qs_user_products.only('id', 'brend_kod', 'firma_id')
-                            if (p.brend_kod, p.firma_id) not in excel_product_keys
-                        ]
-                        if to_delete_ids:
-                            deleted_count, _ = Mehsul.objects.filter(id__in=to_delete_ids).delete()
-                            print(f"Excel-də olmayan {deleted_count} məhsul silindi")
-
                     # Nəticəni göstər
                     success_message = f"Excel faylı uğurla import edildi! "
                     if new_count > 0:
@@ -383,8 +309,6 @@ class MehsulAdmin(admin.ModelAdmin):
                         success_message += f"{update_count} məhsul yeniləndi. "
                     if error_count > 0:
                         success_message += f"{error_count} xəta baş verdi."
-                    if deleted_count > 0:
-                        success_message += f" {deleted_count} məhsul Excel-də olmadığı üçün silindi."
                     
                     self.message_user(request, success_message, level=messages.SUCCESS)
                     return HttpResponseRedirect("../")
@@ -424,80 +348,11 @@ class MehsulAdmin(admin.ModelAdmin):
         
         return super().changelist_view(request, extra_context=extra_context)
 
-    def save_model(self, request, obj, form, change):
-        # Əgər məhsul yeni olaraq işarələnibsə, tarixi qeyd et
-        if obj.yenidir:
-            obj.yeni_edildiyi_tarix = timezone.now()
-        
-        # Əgər məhsul yeni olaraq işarələnibsə, 3 gün sonra avtomatik olaraq yenidən çıxar
-        if obj.yenidir:  # Həm yeni yaradılan, həm də redaktə edilən məhsullar üçün
-            import threading
-            def auto_remove_new():
-                import time
-                time.sleep(259200)  # 3 gün (72 saat)
-                try:
-                    # Məhsulu yenidən yüklə və yenidir statusunu yoxla
-                    from django.db import transaction
-                    with transaction.atomic():
-                        mehsul = Mehsul.objects.select_for_update().get(id=obj.id)
-                        if mehsul.yenidir:  # Əgər hələ də yenidirsə
-                            mehsul.yenidir = False
-                            mehsul.yeni_edildiyi_tarix = None
-                            mehsul.save()
-                except Exception as e:
-                    print(f"Auto remove new status error: {e}")
-            
-            # Thread-i başlat
-            thread = threading.Thread(target=auto_remove_new)
-            thread.daemon = True
-            thread.start()
-        
-        super().save_model(request, obj, form, change)
-
-    def save_formset(self, request, form, formset, change):
-        instances = formset.save(commit=False)
-        for instance in instances:
-            if hasattr(instance, 'yenidir') and instance.yenidir:
-                # Əgər məhsul yeni olaraq işarələnibsə, tarixi qeyd et
-                from django.utils import timezone
-                instance.yeni_edildiyi_tarix = timezone.now()
-                
-                # Əgər məhsul yeni olaraq işarələnibsə, 3 gün sonra avtomatik olaraq yenidən çıxar
-                import threading
-                def auto_remove_new():
-                    import time
-                    time.sleep(259200)  # 3 gün (72 saat)
-                    try:
-                        # Məhsulu yenidən yüklə və yenidir statusunu yoxla
-                        from django.db import transaction
-                        with transaction.atomic():
-                            mehsul = Mehsul.objects.select_for_update().get(id=instance.id)
-                            if mehsul.yenidir:  # Əgər hələ də yenidirsə
-                                mehsul.yenidir = False
-                                mehsul.yeni_edildiyi_tarix = None
-                                mehsul.save()
-                    except Exception as e:
-                        print(f"Auto remove new status error: {e}")
-                
-                # Thread-i başlat
-                thread = threading.Thread(target=auto_remove_new)
-                thread.daemon = True
-                thread.start()
-        
-        formset.save()
-        super().save_formset(request, form, formset, change)
-
 class SifarisItemInline(admin.TabularInline):
     model = SifarisItem
     extra = 0
-    readonly_fields = ['mehsul', 'mehsul_sahibi']
-    fields = ['mehsul', 'mehsul_sahibi', 'miqdar', 'qiymet']
-
-    def mehsul_sahibi(self, obj):
-        if obj.mehsul and obj.mehsul.sahib:
-            return obj.mehsul.sahib.username
-        return "AS-AVTO"
-    mehsul_sahibi.short_description = 'Satıcı'
+    readonly_fields = ['mehsul']
+    fields = ['mehsul', 'miqdar', 'qiymet']
 
     def get_max_num(self, request, obj=None, **kwargs):
         if obj:
@@ -513,50 +368,15 @@ class SifarisItemInline(admin.TabularInline):
         super().save_model(request, obj, form, change)
         obj.sifaris.update_total()
 
-class SellerFilter(SimpleListFilter):
-    title = 'Satıcı'
-    parameter_name = 'satici'
-
-    def lookups(self, request, model_admin):
-        from django.contrib.auth.models import User
-        sellers = set()
-        for item in SifarisItem.objects.select_related('mehsul__sahib').all():
-            if item.mehsul and item.mehsul.sahib:
-                sellers.add((item.mehsul.sahib.id, item.mehsul.sahib.username))
-            else:
-                sellers.add((0, 'AS-AVTO'))
-        return sorted(sellers, key=lambda x: (x[0] != 0, x[1]))
-
-    def queryset(self, request, queryset):
-        value = self.value()
-        if value is not None:
-            if value == '0':
-                # Only orders with at least one item with no seller
-                return queryset.filter(sifarisitem__mehsul__sahib__isnull=True).distinct()
-            else:
-                return queryset.filter(sifarisitem__mehsul__sahib__id=value).distinct()
-        return queryset
-
 @admin.register(Sifaris)
 class SifarisAdmin(admin.ModelAdmin):
-    list_display = ['id', 'istifadeci', 'saticilar', 'tarix', 'status', 'catdirilma_usulu', 'umumi_mebleg', 'odenilen_mebleg', 'qaliq_borc', 'pdf_button']
-    list_filter = ['status', 'catdirilma_usulu', 'tarix', 'istifadeci', SellerFilter]
+    list_display = ['id', 'istifadeci', 'tarix', 'status', 'catdirilma_usulu', 'umumi_mebleg', 'odenilen_mebleg', 'qaliq_borc', 'pdf_button']
+    list_filter = ['status', 'catdirilma_usulu', 'tarix', 'istifadeci']
     search_fields = ['istifadeci__username']
     readonly_fields = ['istifadeci', 'tarix', 'umumi_mebleg', 'qaliq_borc']
     fields = ['istifadeci', 'tarix', 'status', 'catdirilma_usulu', 'umumi_mebleg', 'odenilen_mebleg', 'qaliq_borc', 'qeyd']
     inlines = [SifarisItemInline]
     change_list_template = 'admin/sifaris_change_list.html'
-
-    def saticilar(self, obj):
-        # Sifarişdə olan bütün məhsulların sahiblərini tapırıq
-        satici_set = set()
-        for item in obj.sifarisitem_set.all():
-            if item.mehsul and item.mehsul.sahib:
-                satici_set.add(item.mehsul.sahib.username)
-            else:
-                satici_set.add('AS-AVTO')
-        return ', '.join(satici_set)
-    saticilar.short_description = 'Satıcı(lar)'
 
     def pdf_button(self, obj):
         return format_html(
@@ -695,7 +515,7 @@ class SifarisAdmin(admin.ModelAdmin):
                 Paragraph(str(index), contentStyle),
                 Paragraph(item.mehsul.brend_kod, contentStyle),
                 Paragraph(item.mehsul.firma.adi, contentStyle),
-                Paragraph(truncate_product_name(item.mehsul.adi), contentStyle),
+                Paragraph(item.mehsul.adi, contentStyle),
                 Paragraph(str(item.mehsul.vitrin.nomre) if item.mehsul.vitrin else '-', contentStyle),
                 Paragraph(str(item.miqdar), contentStyle),
                 Paragraph(f"{item.qiymet} ₼", contentStyle),
@@ -881,19 +701,3 @@ class ProfileAdmin(admin.ModelAdmin):
         queryset.update(is_verified=False)
         self.message_user(request, f'{queryset.count()} profilin təsdiqi ləğv edildi.')
     unverify_profiles.short_description = "Seçilmiş profillərin təsdiqini ləğv et"
-
-@admin.register(ProductLike)
-class ProductLikeAdmin(admin.ModelAdmin):
-    list_display = ('user', 'mehsul', 'created_at')
-    list_filter = ('user', 'mehsul', 'created_at')
-    search_fields = ('user__username', 'mehsul__adi')
-    readonly_fields = ('created_at',)
-    date_hierarchy = 'created_at'
-
-@admin.register(ProductRating)
-class ProductRatingAdmin(admin.ModelAdmin):
-    list_display = ('user', 'mehsul', 'rating', 'comment', 'created_at')
-    list_filter = ('rating', 'user', 'mehsul', 'created_at')
-    search_fields = ('user__username', 'mehsul__adi', 'comment')
-    readonly_fields = ('created_at',)
-    date_hierarchy = 'created_at'

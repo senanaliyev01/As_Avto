@@ -15,43 +15,6 @@ from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.views.decorators.http import require_http_methods
 
-def normalize_azerbaijani_chars(text):
-    # Azərbaycan hərflərinin qarşılıqlı çevrilməsi
-    char_map = {
-        'ə': 'e', 'e': 'ə', 'Ə': 'E', 'E': 'Ə',
-        'ö': 'o', 'o': 'ö', 'Ö': 'O', 'O': 'Ö',
-        'ğ': 'g', 'g': 'ğ', 'Ğ': 'G', 'G': 'Ğ',
-        'ı': 'i', 'i': 'ı', 'I': 'İ', 'İ': 'I',
-        'ü': 'u', 'u': 'ü', 'Ü': 'U', 'U': 'Ü',
-        'ş': 's', 's': 'ş', 'Ş': 'S', 'S': 'Ş',
-        'ç': 'c', 'c': 'ç', 'Ç': 'C', 'C': 'Ç'
-    }
-    
-    # Orijinal mətni saxla
-    variations = {text}
-    
-    # Kiçik hərflərlə variant
-    lower_text = text.lower()
-    variations.add(lower_text)
-    
-    # Böyük hərflərlə variant
-    upper_text = text.upper()
-    variations.add(upper_text)
-    
-    # Hər bir variant üçün qarşılıqlı çevirmələr
-    all_variations = set()
-    for variant in variations:
-        current_variations = {variant}
-        for char in variant:
-            if char in char_map:
-                new_variations = set()
-                for v in current_variations:
-                    new_variations.add(v.replace(char, char_map[char]))
-                current_variations.update(new_variations)
-        all_variations.update(current_variations)
-    
-    return all_variations
-
 def custom_404(request, exception=None):
     return HttpResponseNotFound(render(request, '404.html').content)
 
@@ -91,42 +54,11 @@ def products_view(request):
     firma = request.GET.get('firma', '')
     avtomobil = request.GET.get('avtomobil', '')
     
-    mehsullar = Mehsul.objects.all().order_by('-id')
+    mehsullar = Mehsul.objects.all()
     popup_images = PopupImage.objects.filter(aktiv=True)
     
-    if search_query:
-        # Kodlarla axtarış üçün əvvəlki təmizləmə
-        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
-        
-        # İki ayrı filter tətbiq edək
-        if clean_search:
-            # Kod və ölçü ilə axtarış
-            kod_filter = Q(kodlar__icontains=clean_search)
-            olcu_filter = Q(olcu__icontains=clean_search)
-            
-            # Ad ilə təkmilləşdirilmiş axtarış
-            # Çoxlu boşluq və təbləri tək boşluğa çeviririk
-            processed_query = re.sub(r'\s+', ' ', search_query).strip()
-            
-            # Axtarış sözlərini ayırırıq
-            search_words = processed_query.split()
-            
-            if search_words:
-                # Hər bir söz üçün bütün mümkün variantları yarat
-                ad_filters = []
-                for word in search_words:
-                    word_variations = normalize_azerbaijani_chars(word)
-                    word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
-                    ad_filters.append(word_filter)
-                
-                # "AND" operatoru ilə birləşdiririk - bütün sözlər olmalıdır
-                ad_filter = reduce(and_, ad_filters)
-                
-                # Kod, ölçü və ad filterini "OR" operatoru ilə birləşdiririk
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter | ad_filter)
-            else:
-                # Əgər heç bir söz yoxdursa, yalnız kod və ölçü ilə axtarış
-                mehsullar = mehsullar.filter(kod_filter | olcu_filter)
+    # Use the centralized search function
+    mehsullar = get_search_filtered_products(mehsullar, search_query)
     
     if kateqoriya:
         mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)
@@ -167,38 +99,10 @@ def load_more_products(request):
     firma = request.GET.get('firma', '')
     avtomobil = request.GET.get('avtomobil', '')
     
-    mehsullar = Mehsul.objects.all().order_by('-id')
+    mehsullar = Mehsul.objects.all()
     
-    if search_query:
-        # Kodlarla axtarış üçün əvvəlki təmizləmə
-        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
-        
-        # İki ayrı filter tətbiq edək
-        if clean_search:
-            # Kod ilə axtarış
-            kod_filter = Q(kodlar__icontains=clean_search)
-            
-            # Ad ilə təkmilləşdirilmiş axtarış
-            # Çoxlu boşluq və təbləri tək boşluğa çeviririk
-            processed_query = re.sub(r'\s+', ' ', search_query).strip()
-            
-            # Axtarış sözlərini ayırırıq
-            search_words = processed_query.split()
-            
-            if search_words:
-                # Hər bir söz məhsulun adında olmalıdır (sıradan asılı olmayaraq)
-                ad_filters = []
-                for word in search_words:
-                    ad_filters.append(Q(adi__icontains=word))
-                
-                # "AND" operatoru ilə birləşdiririk - bütün sözlər olmalıdır
-                ad_filter = reduce(and_, ad_filters)
-                
-                # Kod və ad filterini "OR" operatoru ilə birləşdiririk
-                mehsullar = mehsullar.filter(kod_filter | ad_filter)
-            else:
-                # Əgər heç bir söz yoxdursa, yalnız kod ilə axtarış
-                mehsullar = mehsullar.filter(kod_filter)
+    # Use the centralized search function
+    mehsullar = get_search_filtered_products(mehsullar, search_query)
     
     if kateqoriya:
         mehsullar = mehsullar.filter(kateqoriya__adi=kateqoriya)
@@ -497,50 +401,24 @@ def search_suggestions(request):
     search_query = request.GET.get('search', '')
     
     if search_query:
-        # Kodlarla axtarış üçün əvvəlki təmizləmə
-        clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
+        mehsullar = Mehsul.objects.all()
+        # Use the centralized search function
+        mehsullar = get_search_filtered_products(mehsullar, search_query)
+        # Limit to 5 suggestions
+        mehsullar = mehsullar[:5]
         
-        if clean_search:
-            # Kod və ölçü ilə axtarış
-            kod_filter = Q(kodlar__icontains=clean_search)
-            olcu_filter = Q(olcu__icontains=clean_search)
-            
-            # Ad ilə təkmilləşdirilmiş axtarış
-            # Çoxlu boşluq və təbləri tək boşluğa çeviririk
-            processed_query = re.sub(r'\s+', ' ', search_query).strip()
-            
-            # Axtarış sözlərini ayırırıq
-            search_words = processed_query.split()
-            
-            if search_words:
-                # Hər bir söz üçün bütün mümkün variantları yarat
-                ad_filters = []
-                for word in search_words:
-                    word_variations = normalize_azerbaijani_chars(word)
-                    word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
-                    ad_filters.append(word_filter)
-                
-                # "AND" operatoru ilə birləşdiririk - bütün sözlər olmalıdır
-                ad_filter = reduce(and_, ad_filters)
-                
-                # Kod, ölçü və ad filterini "OR" operatoru ilə birləşdiririk
-                mehsullar = Mehsul.objects.filter(kod_filter | olcu_filter | ad_filter)[:5]
-            else:
-                # Əgər heç bir söz yoxdursa, yalnız kod və ölçü ilə axtarış
-                mehsullar = Mehsul.objects.filter(kod_filter | olcu_filter)[:5]
-            
-            suggestions = []
-            for mehsul in mehsullar:
-                suggestions.append({
-                    'id': mehsul.id,
-                    'adi': mehsul.adi,
-                    'brend_kod': mehsul.brend_kod,
-                    'oem': mehsul.oem,
-                    'olcu': mehsul.olcu,
-                    'qiymet': str(mehsul.qiymet),
-                    'sekil_url': mehsul.sekil.url if mehsul.sekil else None,
-                })
-            return JsonResponse({'suggestions': suggestions})
+        suggestions = []
+        for mehsul in mehsullar:
+            suggestions.append({
+                'id': mehsul.id,
+                'adi': mehsul.adi,
+                'brend_kod': mehsul.brend_kod,
+                'oem': mehsul.oem,
+                'olcu': mehsul.olcu,
+                'qiymet': str(mehsul.qiymet),
+                'sekil_url': mehsul.sekil.url if mehsul.sekil else None,
+            })
+        return JsonResponse({'suggestions': suggestions})
     
     return JsonResponse({'suggestions': []})
 
@@ -700,3 +578,89 @@ def product_details(request, product_id):
         }
     
     return JsonResponse(data)
+
+
+def get_search_filtered_products(queryset, search_query):
+    import re
+    from functools import reduce
+    from operator import and_, or_
+    from django.db.models import Q, Value, CharField
+    from django.db.models.functions import Concat
+
+    if not search_query:
+        return queryset.order_by('-id')
+
+    queryset = queryset.annotate(
+        search_text=Concat(
+            'adi', Value(' '),
+            'brend_kod', Value(' '),
+            'firma__adi', Value(' '),
+            'avtomobil__adi', Value(' '),
+            'kodlar', Value(' '),
+            'olcu', Value(' '),
+            'melumat',
+            output_field=CharField()
+        )
+    )
+    processed_query = re.sub(r'\s+', ' ', search_query).strip()
+    search_words = processed_query.split()
+    clean_search = re.sub(r'[^a-zA-Z0-9]', '', search_query.lower())
+
+    def normalize_azerbaijani_chars(text):
+        char_map = {
+            'ə': 'e', 'e': 'ə', 'Ə': 'E', 'E': 'Ə',
+            'ö': 'o', 'o': 'ö', 'Ö': 'O', 'O': 'Ö',
+            'ğ': 'g', 'g': 'ğ', 'Ğ': 'G', 'G': 'Ğ',
+            'ı': 'i', 'i': 'ı', 'I': 'İ', 'İ': 'I',
+            'ü': 'u', 'u': 'ü', 'Ü': 'U', 'U': 'Ü',
+            'ş': 's', 's': 'ş', 'Ş': 'S', 'S': 'Ş',
+            'ç': 'c', 'c': 'ç', 'Ç': 'C', 'C': 'Ç'
+        }
+        variations = {text}
+        lower_text = text.lower()
+        variations.add(lower_text)
+        upper_text = text.upper()
+        variations.add(upper_text)
+        all_variations = set()
+        for variant in variations:
+            current_variations = {variant}
+            for char in variant:
+                if char in char_map:
+                    new_variations = set()
+                    for v in current_variations:
+                        new_variations.add(v.replace(char, char_map[char]))
+                    current_variations.update(new_variations)
+            all_variations.update(current_variations)
+        return all_variations
+
+    if clean_search:
+        kod_filter = Q(kodlar__icontains=clean_search)
+        olcu_filter = Q(olcu__icontains=clean_search)
+        melumat_filter = Q(melumat__icontains=clean_search)
+        def clean_code(val):
+            return re.sub(r'[^a-zA-Z0-9]', '', val.lower()) if val else ''
+        brend_kod_ids = [m.id for m in queryset if clean_code(search_query) in clean_code(m.brend_kod)]
+        brend_kod_filter = Q(id__in=brend_kod_ids)
+        if search_words:
+            ad_filters = []
+            for word in search_words:
+                word_variations = normalize_azerbaijani_chars(word)
+                word_filter = reduce(or_, [Q(adi__icontains=variation) for variation in word_variations])
+                melumat_word_filter = reduce(or_, [Q(melumat__icontains=variation) for variation in word_variations])
+                avtomobil_filter = reduce(or_, [Q(avtomobil__adi__icontains=variation) for variation in word_variations])
+                firma_filter = reduce(or_, [Q(firma__adi__icontains=variation) for variation in word_variations])
+                ad_filters.append(word_filter | melumat_word_filter | avtomobil_filter | firma_filter)
+            ad_filter = reduce(and_, ad_filters)
+            searchtext_and_filter = reduce(
+                and_,
+                [reduce(or_, [Q(search_text__icontains=variation) for variation in normalize_azerbaijani_chars(word)]) for word in search_words]
+            )
+            queryset = queryset.filter(
+                kod_filter | olcu_filter | melumat_filter | brend_kod_filter | ad_filter | searchtext_and_filter
+            )
+        else:
+            queryset = queryset.filter(
+                kod_filter | olcu_filter | melumat_filter | brend_kod_filter
+            )
+    
+    return queryset.order_by('-id')    

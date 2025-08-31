@@ -68,6 +68,9 @@ class MehsulAdmin(admin.ModelAdmin):
         custom_urls = [
             path('import-excel/', self.import_excel_view, name='import_excel'),
             path('export-pdf/', self.export_pdf, name='export_pdf'),
+            path('import-excel-init/', self.import_excel_init, name='import_excel_init'),
+            path('import-excel-batch/', self.import_excel_batch, name='import_excel_batch'),
+            path('import-excel-finalize/', self.import_excel_finalize, name='import_excel_finalize'),
         ]
         return custom_urls + urls
 

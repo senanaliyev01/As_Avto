@@ -84,9 +84,19 @@
                 <div class="file-input-container">
                     <input type="file" name="excel_file" accept=".xlsx" required>
                 </div>
+                
+                <!-- Progress Bar -->
+                <div id="importProgress" style="display: none; margin: 20px 0;">
+                    <div style="background-color: #f0f0f0; border-radius: 10px; overflow: hidden;">
+                        <div id="progressBar" style="background-color: #4CAF50; height: 20px; width: 0%; transition: width 0.3s;"></div>
+                    </div>
+                    <div id="progressText" style="text-align: center; margin-top: 5px;">0%</div>
+                    <div id="statusText" style="text-align: center; margin-top: 5px; font-size: 12px;"></div>
+                </div>
+                
                 <div class="button-container">
                     <button type="button" class="closeBtn">Bağla</button>
-                    <button type="submit" class="submit-btn">İdxal Et</button>
+                    <button type="submit" class="submit-btn" id="importBtn">İdxal Et</button>
                 </div>
             </form>
         </div>
@@ -120,6 +130,290 @@
     </div>
 
     {{ block.super }}
+
+    <style>
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 2% auto;
+            padding: 0;
+            border: none;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            background-color: #2B5173;
+            color: white;
+            padding: 20px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            opacity: 0.7;
+        }
+
+        .excel-sample {
+            padding: 20px;
+            background-color: #f8f9fa;
+            margin: 20px;
+            border-radius: 4px;
+        }
+
+        .sample-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+
+        .sample-table th, .sample-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .sample-table th {
+            background-color: #2B5173;
+            color: white;
+        }
+
+        .notes {
+            margin-top: 15px;
+        }
+
+        .notes ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .file-input-container {
+            padding: 20px;
+        }
+
+        .button-container {
+            padding: 20px;
+            text-align: right;
+            border-top: 1px solid #ddd;
+        }
+
+        .submit-btn, .closeBtn {
+            padding: 10px 20px;
+            margin-left: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .closeBtn {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .import-btn {
+            background-color: #2B5173;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('excelImportModal');
+            const showBtn = document.getElementById('showExcelImportModal');
+            const closeBtns = document.querySelectorAll('.close, .closeBtn');
+            const form = document.querySelector('#excelImportModal form');
+            const importBtn = document.getElementById('importBtn');
+            const progressDiv = document.getElementById('importProgress');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const statusText = document.getElementById('statusText');
+
+            // Show modal
+            showBtn.onclick = function() {
+                modal.style.display = 'block';
+            }
+
+            // Close modal
+            closeBtns.forEach(btn => {
+                btn.onclick = function() {
+                    modal.style.display = 'none';
+                    resetProgress();
+                }
+            });
+
+            // Close modal when clicking outside
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                    resetProgress();
+                }
+            }
+
+            // Handle form submission
+            form.onsubmit = function(e) {
+                e.preventDefault();
+                performBatchImport();
+            }
+
+            function resetProgress() {
+                progressDiv.style.display = 'none';
+                progressBar.style.width = '0%';
+                progressText.textContent = '0%';
+                statusText.textContent = '';
+                importBtn.disabled = false;
+                importBtn.textContent = 'İdxal Et';
+            }
+
+            function updateProgress(processed, total, newCount, updateCount, errorCount) {
+                const percentage = Math.round((processed / total) * 100);
+                progressBar.style.width = percentage + '%';
+                progressText.textContent = percentage + '%';
+                statusText.textContent = `${processed}/${total} sətir emal edildi. Yeni: ${newCount}, Yeniləndi: ${updateCount}, Xəta: ${errorCount}`;
+            }
+
+            async function performBatchImport() {
+                const fileInput = form.querySelector('input[type="file"]');
+                const file = fileInput.files[0];
+                
+                if (!file) {
+                    alert('Excel faylı seçin');
+                    return;
+                }
+
+                importBtn.disabled = true;
+                importBtn.textContent = 'İdxal edilir...';
+                progressDiv.style.display = 'block';
+                statusText.textContent = 'Excel faylı oxunur...';
+
+                try {
+                    // Step 1: Initialize import
+                    const formData = new FormData();
+                    formData.append('excel_file', file);
+                    formData.append('csrfmiddlewaretoken', form.querySelector('[name="csrfmiddlewaretoken"]').value);
+
+                    const initResponse = await fetch('import-excel-init/', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const initResult = await initResponse.json();
+                    
+                    if (initResult.status !== 'ok') {
+                        throw new Error(initResult.message);
+                    }
+
+                    const jobId = initResult.job_id;
+                    const totalRows = initResult.total_rows;
+
+                    // Step 2: Process in batches
+                    const batchSize = 50;
+                    let processed = 0;
+                    let newCount = 0;
+                    let updateCount = 0;
+                    let errorCount = 0;
+
+                    while (processed < totalRows) {
+                        const batchFormData = new FormData();
+                        batchFormData.append('job_id', jobId);
+                        batchFormData.append('start', processed);
+                        batchFormData.append('size', batchSize);
+                        batchFormData.append('csrfmiddlewaretoken', form.querySelector('[name="csrfmiddlewaretoken"]').value);
+
+                        const batchResponse = await fetch('import-excel-batch/', {
+                            method: 'POST',
+                            body: batchFormData
+                        });
+
+                        const batchResult = await batchResponse.json();
+                        
+                        if (batchResult.status !== 'ok') {
+                            throw new Error(batchResult.message);
+                        }
+
+                        processed = batchResult.processed_rows;
+                        newCount = batchResult.new_count;
+                        updateCount = batchResult.update_count;
+                        errorCount = batchResult.error_count;
+
+                        updateProgress(processed, totalRows, newCount, updateCount, errorCount);
+                        
+                        // Small delay to allow UI to update
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+
+                    // Step 3: Finalize (delete products not in Excel)
+                    statusText.textContent = 'Excel-də olmayan məhsullar silinir...';
+                    
+                    const finalizeFormData = new FormData();
+                    finalizeFormData.append('job_id', jobId);
+                    finalizeFormData.append('csrfmiddlewaretoken', form.querySelector('[name="csrfmiddlewaretoken"]').value);
+
+                    const finalizeResponse = await fetch('import-excel-finalize/', {
+                        method: 'POST',
+                        body: finalizeFormData
+                    });
+
+                    const finalizeResult = await finalizeResponse.json();
+                    
+                    if (finalizeResult.status !== 'ok') {
+                        throw new Error(finalizeResult.message);
+                    }
+
+                    const deletedCount = finalizeResult.deleted_count;
+                    
+                    // Show final results
+                    progressBar.style.width = '100%';
+                    progressText.textContent = '100%';
+                    statusText.textContent = `Tamamlandı! Yeni: ${newCount}, Yeniləndi: ${updateCount}, Silindi: ${deletedCount}, Xəta: ${errorCount}`;
+                    
+                    setTimeout(() => {
+                        alert(`Excel import tamamlandı!\n\nYeni məhsullar: ${newCount}\nYenilənən məhsullar: ${updateCount}\nSilinən məhsullar: ${deletedCount}\nXətalar: ${errorCount}`);
+                        location.reload();
+                    }, 2000);
+
+                } catch (error) {
+                    console.error('Import error:', error);
+                    alert('Xəta: ' + error.message);
+                    resetProgress();
+                }
+            }
+        });
+    </script>
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">

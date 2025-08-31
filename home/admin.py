@@ -74,7 +74,7 @@ class MehsulAdmin(admin.ModelAdmin):
                 '<button type="button" class="change-image-btn" data-product-id="{}" title="Şəkil Əlavə Et"><i class="fas fa-plus"></i></button>',
                 obj.id
             )
-    change_image_button.short_description = 'Şəkil Əməliyyatı'
+    change_image_button.short_description = '🖼️'
     change_image_button.allow_tags = True
 
     def get_urls(self):

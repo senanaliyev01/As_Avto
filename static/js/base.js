@@ -808,16 +808,16 @@ function openDetailsModal(productId) {
         .then(data => {
             if (data.status === 'success') {
                 // Update modal content
-                document.getElementById('detailsImage').src = data.product.sekil_url;
-                document.getElementById('detailsName').textContent = data.product.adi;
+                document.getElementById('detailsImage').src = data.product.sekil_url || '/static/images/no_image.jpg';
+                document.getElementById('detailsName').textContent = data.product.adi || '';
                 document.getElementById('detailsCategory').textContent = data.product.kateqoriya || '-';
-                document.getElementById('detailsFirma').textContent = data.product.firma;
-                document.getElementById('detailsAvtomobil').textContent = data.product.avtomobil;
-                document.getElementById('detailsBrendKod').textContent = data.product.brend_kod;
-                document.getElementById('detailsOEM').textContent = data.product.oem;
+                document.getElementById('detailsFirma').textContent = data.product.firma || '';
+                document.getElementById('detailsAvtomobil').textContent = data.product.avtomobil || '';
+                document.getElementById('detailsBrendKod').textContent = data.product.brend_kod || '';
+
                 document.getElementById('detailsOlcu').textContent = data.product.olcu || '-';
-                document.getElementById('detailsQiymet').textContent = data.product.qiymet + ' ₼';
-                document.getElementById('detailsStok').textContent = data.product.stok + ' ədəd';
+                document.getElementById('detailsQiymet').textContent = data.product.qiymet ? `${data.product.qiymet} ₼` : '';
+                document.getElementById('detailsStok').textContent = data.product.stok ? `${data.product.stok} ədəd` : '';
                 document.getElementById('detailsMelumat').textContent = data.product.melumat || '-';
 
                 // Show modal with animation

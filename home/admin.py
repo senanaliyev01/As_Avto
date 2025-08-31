@@ -705,59 +705,70 @@ class MehsulAdmin(admin.ModelAdmin):
         return super().changelist_view(request, extra_context=extra_context)
 
     def change_image(self, request):
-        if request.method == 'POST':
-            try:
-                product_id = request.POST.get('product_id')
-                image_file = request.FILES.get('image')
-                
-                if not product_id or not image_file:
-                    return JsonResponse({
-                        'status': 'error',
-                        'message': 'Məhsul ID və ya şəkil faylı tapılmadı.'
-                    })
-                
-                # Validate image file
-                if not image_file.content_type.startswith('image/'):
-                    return JsonResponse({
-                        'status': 'error',
-                        'message': 'Yalnız şəkil faylları qəbul edilir.'
-                    })
-                
-                # Get product and update image
-                product = Mehsul.objects.get(id=product_id)
-                
-                # Delete old image if exists
-                if product.sekil:
-                    old_image_path = product.sekil.path
-                    if os.path.exists(old_image_path):
-                        os.remove(old_image_path)
-                
-                # Save new image
-                product.sekil = image_file
-                product.save()
-                
+        if request.method != 'POST':
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Yalnız POST metodu qəbul edilir.'
+            })
+        
+        try:
+            product_id = request.POST.get('product_id')
+            image_file = request.FILES.get('image')
+            
+            if not product_id or not image_file:
                 return JsonResponse({
-                    'status': 'success',
-                    'message': 'Şəkil uğurla yeniləndi!',
-                    'new_image_url': product.sekil.url,
-                    'product_id': product_id
+                    'status': 'error',
+                    'message': 'Məhsul ID və ya şəkil faylı tapılmadı.'
                 })
-                
+            
+            # Quick validation
+            if not image_file.content_type.startswith('image/'):
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Yalnız şəkil faylları qəbul edilir.'
+                })
+            
+            # Check file size (max 5MB)
+            if image_file.size > 5 * 1024 * 1024:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Şəkil faylı çox böyükdür. Maksimum 5MB olmalıdır.'
+                })
+            
+            # Get product
+            try:
+                product = Mehsul.objects.select_for_update().get(id=product_id)
             except Mehsul.DoesNotExist:
                 return JsonResponse({
                     'status': 'error',
                     'message': 'Məhsul tapılmadı.'
                 })
-            except Exception as e:
-                return JsonResponse({
-                    'status': 'error',
-                    'message': f'Xəta baş verdi: {str(e)}'
-                })
-        
-        return JsonResponse({
-            'status': 'error',
-            'message': 'Yalnız POST metodu qəbul edilir.'
-        })
+            
+            # Delete old image if exists (async)
+            if product.sekil:
+                old_image_path = product.sekil.path
+                if os.path.exists(old_image_path):
+                    try:
+                        os.remove(old_image_path)
+                    except OSError:
+                        pass  # Ignore file deletion errors
+            
+            # Save new image
+            product.sekil = image_file
+            product.save(update_fields=['sekil'])
+            
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Şəkil uğurla yeniləndi!',
+                'new_image_url': product.sekil.url,
+                'product_id': product_id
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': f'Xəta baş verdi: {str(e)}'
+            })
 
 class SifarisItemInline(admin.TabularInline):
     model = SifarisItem

@@ -726,11 +726,15 @@ class MehsulAdmin(admin.ModelAdmin):
                 # Get product and update image
                 product = Mehsul.objects.get(id=product_id)
                 
-                # Delete old image if exists
+                # Delete old image if exists (but don't delete no_image.webp)
                 if product.sekil:
                     old_image_path = product.sekil.path
-                    if os.path.exists(old_image_path):
-                        os.remove(old_image_path)
+                    old_image_name = os.path.basename(old_image_path)
+                    if os.path.exists(old_image_path) and old_image_name != 'no_image.webp':
+                        try:
+                            os.remove(old_image_path)
+                        except OSError:
+                            pass  # Ignore file deletion errors
                 
                 # Save new image
                 product.sekil = image_file

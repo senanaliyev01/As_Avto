@@ -569,9 +569,8 @@
             .then(response => response.json())
             .then(data => {
                         if (data.status === 'success') {
-                            // Update the image in the admin list
-                            const productRow = button.closest('tr');
-                            const imageCell = productRow.querySelector('img');
+                            // Update the image in the admin list using the specific ID
+                            const imageCell = document.getElementById(`product-image-${productId}`);
                             if (imageCell) {
                                 imageCell.src = data.new_image_url;
                                 imageCell.style.width = '50px';

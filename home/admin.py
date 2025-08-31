@@ -59,7 +59,7 @@ class MehsulAdmin(admin.ModelAdmin):
 
     def sekil_preview(self, obj):
         if obj.sekil:
-            return format_html('<img src="{}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"/>', obj.sekil.url)
+            return format_html('<img src="{}" id="product-image-{}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"/>', obj.sekil.url, obj.id)
         return '-'
     sekil_preview.short_description = 'Şəkil'
 
@@ -1082,7 +1082,7 @@ class PopupImageAdmin(admin.ModelAdmin):
     
     def sekil_preview(self, obj):
         if obj.sekil:
-            return format_html('<img src="{}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"/>', obj.sekil.url)
+            return format_html('<img src="{}" id="popup-image-{}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"/>', obj.sekil.url, obj.id)
         return '-'
     sekil_preview.short_description = 'Şəkil'
 

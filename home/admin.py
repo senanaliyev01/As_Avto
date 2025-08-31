@@ -63,6 +63,9 @@ class MehsulAdmin(admin.ModelAdmin):
         custom_urls = [
             path('import-excel/', self.import_excel_view, name='import_excel'),
             path('export-pdf/', self.export_pdf, name='export_pdf'),
+            path('import-excel-init/', self.import_excel_init, name='import_excel_init'),
+            path('import-excel-batch/', self.import_excel_batch, name='import_excel_batch'),
+            path('import-excel-finalize/', self.import_excel_finalize, name='import_excel_finalize'),
         ]
         return custom_urls + urls
 
@@ -179,6 +182,9 @@ class MehsulAdmin(admin.ModelAdmin):
                 new_count = 0
                 update_count = 0
                 error_count = 0
+                deleted_count = 0
+                # Excel faylındakı məhsulların açarları: (brend_kod, firma_id)
+                excel_product_keys = set()
                 
                 with transaction.atomic():
                     for index, row in df.iterrows():
@@ -241,7 +247,14 @@ class MehsulAdmin(admin.ModelAdmin):
 
                             print(f"Brend kod: {brend_kod}")
 
-                            existing_product = Mehsul.objects.filter(brend_kod=brend_kod).first()
+                            # Bu sətirdəki məhsulun açarını yadda saxla
+                            excel_product_keys.add((brend_kod, firma.id if firma else None))
+
+                            # Mövcud məhsulu həm brend_kod, həm firma ilə yoxla (sahib yoxdur)
+                            if firma:
+                                existing_product = Mehsul.objects.filter(brend_kod=brend_kod, firma=firma).first()
+                            else:
+                                existing_product = Mehsul.objects.filter(brend_kod=brend_kod, firma__isnull=True).first()
 
                             try:
                                 if existing_product:
@@ -301,12 +314,24 @@ class MehsulAdmin(admin.ModelAdmin):
                             error_count += 1
                             continue
 
+                    # Excel-də olmayan məhsulları sil (admin panelində bütün məhsullar)
+                    if excel_product_keys:
+                        all_products_qs = Mehsul.objects.all()
+                        to_delete_ids = [
+                            p.id for p in all_products_qs.only('id', 'brend_kod', 'firma_id')
+                            if (p.brend_kod, p.firma_id) not in excel_product_keys
+                        ]
+                        if to_delete_ids:
+                            deleted_count, _ = Mehsul.objects.filter(id__in=to_delete_ids).delete()
+
                     # Nəticəni göstər
                     success_message = f"Excel faylı uğurla import edildi! "
                     if new_count > 0:
                         success_message += f"{new_count} yeni məhsul əlavə edildi. "
                     if update_count > 0:
                         success_message += f"{update_count} məhsul yeniləndi. "
+                    if deleted_count > 0:
+                        success_message += f"{deleted_count} məhsul Excel-də olmadığı üçün silindi. "
                     if error_count > 0:
                         success_message += f"{error_count} xəta baş verdi."
                     

@@ -92,10 +92,75 @@
         </div>
     </div>
 
+    <!-- Batch Import Modal -->
+    <div id="batchImportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Mərhələli Excel İdxal</h3>
+                <span class="close">&times;</span>
+            </div>
+
+            <div class="batch-import-content">
+                <div class="file-upload-section">
+                    <h4>Excel Faylı Seçin:</h4>
+                    <input type="file" id="batchExcelFile" accept=".xlsx" required>
+                    <button id="startBatchImport" class="submit-btn" disabled>İdxalı Başlat</button>
+                </div>
+
+                <div id="importProgress" class="import-progress" style="display: none;">
+                    <h4>İdxal Prosesi:</h4>
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span id="progressText">0%</span>
+                        <span id="progressDetails">(0 / 0 sətir)</span>
+                    </div>
+                    <div class="progress-stats">
+                        <div>Yeni: <span id="newCount">0</span></div>
+                        <div>Yenilənən: <span id="updateCount">0</span></div>
+                        <div>Xəta: <span id="errorCount">0</span></div>
+                    </div>
+                </div>
+
+                <div id="importComplete" class="import-complete" style="display: none;">
+                    <h4>İdxal Tamamlandı!</h4>
+                    <div class="final-stats">
+                        <div>Yeni məhsullar: <span id="finalNewCount">0</span></div>
+                        <div>Yenilənən məhsullar: <span id="finalUpdateCount">0</span></div>
+                        <div>Silinən məhsullar: <span id="finalDeletedCount">0</span></div>
+                        <div>Xətalar: <span id="finalErrorCount">0</span></div>
+                    </div>
+                    <button id="viewErrors" class="error-btn" style="display: none;">Xətaları Gör</button>
+                    <button id="closeBatchModal" class="closeBtn">Bağla</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Errors Modal -->
+    <div id="errorsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>İdxal Xətaları</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div id="errorsContent" class="errors-content">
+                <!-- Xətalar burada göstəriləcək -->
+            </div>
+            <div class="button-container">
+                <button type="button" class="closeBtn">Bağla</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Excel Import Button -->
     <div class="import-button-container">
         <button id="showExcelImportModal" class="import-btn">
             <i class="fas fa-file-excel"></i> Excel İdxal Et
+        </button>
+        <button id="showBatchImportModal" class="import-btn batch-btn">
+            <i class="fas fa-layer-group"></i> Mərhələli İdxal
         </button>
     </div>
 
@@ -123,4 +188,227 @@
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <!-- Batch Import JavaScript -->
+    <script>
+        let currentJobId = null;
+        let importInterval = null;
+
+        // Modal funksiyaları
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function hideModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Batch import başlatma
+        document.getElementById('startBatchImport').addEventListener('click', function() {
+            const fileInput = document.getElementById('batchExcelFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Zəhmət olmasa Excel faylı seçin');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('excel_file', file);
+
+            // İdxalı başlat
+            fetch('import-excel-init/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    currentJobId = data.job_id;
+                    startBatchProcessing();
+                } else {
+                    alert('Xəta: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Xəta baş verdi');
+            });
+        });
+
+        // Batch processing
+        function startBatchProcessing() {
+            document.getElementById('importProgress').style.display = 'block';
+            document.getElementById('startBatchImport').disabled = true;
+            
+            importInterval = setInterval(() => {
+                processBatch();
+            }, 100);
+        }
+
+        function processBatch() {
+            if (!currentJobId) return;
+
+            fetch('import-excel-batch/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `job_id=${currentJobId}&start=0&size=100`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    updateProgress(data);
+                    
+                    if (data.processed_rows >= data.total_rows) {
+                        finalizeImport();
+                    }
+                } else {
+                    clearInterval(importInterval);
+                    alert('Xəta: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                clearInterval(importInterval);
+                alert('Xəta baş verdi');
+            });
+        }
+
+        function updateProgress(data) {
+            const progress = (data.processed_rows / data.total_rows) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = Math.round(progress) + '%';
+            document.getElementById('progressDetails').textContent = `(${data.processed_rows} / ${data.total_rows} sətir)`;
+            
+            document.getElementById('newCount').textContent = data.new_count;
+            document.getElementById('updateCount').textContent = data.update_count;
+            document.getElementById('errorCount').textContent = data.error_count;
+        }
+
+        function finalizeImport() {
+            clearInterval(importInterval);
+            
+            fetch('import-excel-finalize/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `job_id=${currentJobId}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    showFinalResults(data);
+                } else {
+                    alert('Xəta: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Xəta baş verdi');
+            });
+        }
+
+        function showFinalResults(data) {
+            document.getElementById('importProgress').style.display = 'none';
+            document.getElementById('importComplete').style.display = 'block';
+            
+            document.getElementById('finalNewCount').textContent = data.new_count || 0;
+            document.getElementById('finalUpdateCount').textContent = data.update_count || 0;
+            document.getElementById('finalDeletedCount').textContent = data.deleted_count || 0;
+            document.getElementById('finalErrorCount').textContent = data.total_errors || 0;
+            
+            if (data.total_errors > 0) {
+                document.getElementById('viewErrors').style.display = 'inline-block';
+                window.importErrors = data.error_details;
+            }
+        }
+
+        // Event listeners
+        document.getElementById('showBatchImportModal').addEventListener('click', () => showModal('batchImportModal'));
+        document.getElementById('batchExcelFile').addEventListener('change', function() {
+            document.getElementById('startBatchImport').disabled = !this.files[0];
+        });
+        
+        document.getElementById('viewErrors').addEventListener('click', function() {
+            showErrorsModal();
+        });
+
+        document.getElementById('closeBatchModal').addEventListener('click', function() {
+            hideModal('batchImportModal');
+            resetBatchImport();
+        });
+
+        function showErrorsModal() {
+            const errorsContent = document.getElementById('errorsContent');
+            errorsContent.innerHTML = '';
+            
+            if (window.importErrors && window.importErrors.length > 0) {
+                const table = document.createElement('table');
+                table.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th>Sətir</th>
+                            <th>Sahə</th>
+                            <th>Xəta</th>
+                            <th>Məlumat</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                `;
+                
+                const tbody = table.querySelector('tbody');
+                window.importErrors.forEach(error => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${error.line}</td>
+                        <td>${error.field || '-'}</td>
+                        <td>${error.message}</td>
+                        <td>${JSON.stringify(error.row)}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                
+                errorsContent.appendChild(table);
+            }
+            
+            showModal('errorsModal');
+        }
+
+        function resetBatchImport() {
+            document.getElementById('batchExcelFile').value = '';
+            document.getElementById('startBatchImport').disabled = true;
+            document.getElementById('importProgress').style.display = 'none';
+            document.getElementById('importComplete').style.display = 'none';
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('progressText').textContent = '0%';
+            document.getElementById('progressDetails').textContent = '(0 / 0 sətir)';
+            document.getElementById('newCount').textContent = '0';
+            document.getElementById('updateCount').textContent = '0';
+            document.getElementById('errorCount').textContent = '0';
+            currentJobId = null;
+        }
+
+        // Close buttons
+        document.querySelectorAll('.close').forEach(button => {
+            button.addEventListener('click', function() {
+                this.closest('.modal').style.display = 'none';
+            });
+        });
+
+        document.querySelectorAll('.closeBtn').forEach(button => {
+            button.addEventListener('click', function() {
+                this.closest('.modal').style.display = 'none';
+            });
+        });
+
+        // Modal dışına klikləmə
+        window.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        });
+    </script>
 {% endblock %} 

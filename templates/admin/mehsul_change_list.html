@@ -121,36 +121,8 @@
         </div>
     </div>
 
-    <!-- Image Change Modal -->
-    <div id="imageChangeModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Şəkil Dəyiş</h3>
-                <span class="close" onclick="closeImageChangeModal()">&times;</span>
-            </div>
-            <div class="modal-body">
-                <div id="currentImagePreview">
-                    <h4>Hazırkı Şəkil:</h4>
-                    <img id="currentImage" src="" alt="Hazırkı şəkil" style="max-width: 200px; max-height: 200px; object-fit: contain;">
-                </div>
-                <form id="imageChangeForm" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <input type="hidden" id="productId" name="product_id">
-                    <div class="form-group" style="padding: 20px;">
-                        <label for="imageFile">Yeni Şəkil Seç:</label>
-                        <input type="file" id="imageFile" name="image" accept="image/*" required>
-                    </div>
-                    <div class="button-container">
-                        <button type="button" onclick="closeImageChangeModal()">Ləğv Et</button>
-                        <button type="submit">Şəkli Dəyiş</button>
-                    </div>
-                </form>
-                <div id="imageChangeProgress" style="display: none; padding: 20px; text-align: center;">
-                    <p>Şəkil yenilənir...</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Hidden file input for image change -->
+    <input type="file" id="imageFileInput" accept="image/*" style="display: none;">
 
     <!-- Excel Import Button -->
     <div class="import-button-container">
@@ -308,10 +280,20 @@
             border-radius: 3px;
             cursor: pointer;
             font-size: 12px;
+            transition: all 0.3s ease;
         }
 
         .change-image-btn:hover {
             background-color: #005a87;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .change-image-btn:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
     </style>
 
@@ -557,78 +539,76 @@
         });
 
         // Image Change Functionality
-        function openImageChangeModal(productId, currentImageUrl) {
-            const modal = document.getElementById('imageChangeModal');
-            const currentImage = document.getElementById('currentImage');
-            const productIdInput = document.getElementById('productId');
-            
-            productIdInput.value = productId;
-            currentImage.src = currentImageUrl || '/static/images/no_image.jpg';
-            modal.style.display = 'block';
-        }
-
-        function closeImageChangeModal() {
-            const modal = document.getElementById('imageChangeModal');
-            const form = document.getElementById('imageChangeForm');
-            modal.style.display = 'none';
-            form.reset();
-        }
-
-        // Handle image change form submission
-        document.getElementById('imageChangeForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            const productId = formData.get('product_id');
-            const progressDiv = document.getElementById('imageChangeProgress');
-            const form = this;
-            
-            // Show progress
-            progressDiv.style.display = 'block';
-            form.style.display = 'none';
-            
-            fetch('change-image/', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    // Update the image in the admin list
-                    const productRow = document.querySelector(`button[data-product-id="${productId}"]`).closest('tr');
-                    const imageCell = productRow.querySelector('img');
-                    if (imageCell) {
-                        imageCell.src = data.new_image_url;
+        function changeProductImage(productId) {
+            const fileInput = document.getElementById('imageFileInput');
+            fileInput.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Validate image file
+                    if (!file.type.startsWith('image/')) {
+                        alert('Yalnız şəkil faylları qəbul edilir.');
+                        return;
                     }
                     
-                    // Close modal
-                    closeImageChangeModal();
+                    // Create FormData and send request
+                    const formData = new FormData();
+                    formData.append('product_id', productId);
+                    formData.append('image', file);
+                    formData.append('csrfmiddlewaretoken', document.querySelector('[name="csrfmiddlewaretoken"]').value);
                     
-                    // Show success message
-                    alert(data.message);
-                } else {
-                    alert('Xəta: ' + data.message);
+                    // Show loading state on button
+                    const button = document.querySelector(`button[data-product-id="${productId}"]`);
+                    const originalText = button.textContent;
+                    button.textContent = 'Yenilənir...';
+                    button.disabled = true;
+                    
+                    fetch('change-image/', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Update the image in the admin list
+                            const productRow = button.closest('tr');
+                            const imageCell = productRow.querySelector('img');
+                            if (imageCell) {
+                                imageCell.src = data.new_image_url;
+                            }
+                            
+                            // Update button text
+                            button.textContent = 'Şəkil Dəyişildi!';
+                            setTimeout(() => {
+                                button.textContent = originalText;
+                                button.disabled = false;
+                            }, 2000);
+                        } else {
+                            alert('Xəta: ' + data.message);
+                            button.textContent = originalText;
+                            button.disabled = false;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+                        button.textContent = originalText;
+                        button.disabled = false;
+                    });
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
-            })
-            .finally(() => {
-                progressDiv.style.display = 'none';
-                form.style.display = 'block';
-            });
-        });
+                
+                // Reset file input
+                fileInput.value = '';
+            };
+            
+            // Trigger file selection
+            fileInput.click();
+        }
 
         // Add click event listeners to change image buttons
         document.addEventListener('click', function(e) {
             if (e.target.classList.contains('change-image-btn')) {
                 const productId = e.target.getAttribute('data-product-id');
-                const currentImage = e.target.getAttribute('data-current-image');
-                openImageChangeModal(productId, currentImage);
+                changeProductImage(productId);
             }
         });
     </script>

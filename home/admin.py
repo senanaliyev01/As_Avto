@@ -51,7 +51,7 @@ class AvtomobilAdmin(admin.ModelAdmin):
 
 @admin.register(Mehsul)
 class MehsulAdmin(admin.ModelAdmin):
-    list_display = ['brend_kod', 'firma', 'adi',  'olcu', 'vitrin', 'stok', 'maya_qiymet', 'qiymet',  'yenidir', 'sekil_preview']
+    list_display = ['brend_kod', 'firma', 'adi',  'olcu', 'vitrin', 'stok', 'maya_qiymet', 'qiymet',  'yenidir', 'sekil_preview', 'change_image_button']
     list_filter = ['kateqoriya', 'firma', 'avtomobil', 'vitrin', 'yenidir']
     search_fields = ['adi', 'brend_kod', 'oem', 'kodlar', 'olcu']
     change_list_template = 'admin/mehsul_change_list.html'
@@ -63,6 +63,20 @@ class MehsulAdmin(admin.ModelAdmin):
         return '-'
     sekil_preview.short_description = 'Şəkil'
 
+    def change_image_button(self, obj):
+        if obj.sekil:
+            return format_html(
+                '<button type="button" class="change-image-btn" data-product-id="{}" data-current-image="{}">Şəkil Dəyiş</button>',
+                obj.id, obj.sekil.url
+            )
+        else:
+            return format_html(
+                '<button type="button" class="change-image-btn" data-product-id="{}" data-current-image="">Şəkil Əlavə Et</button>',
+                obj.id
+            )
+    change_image_button.short_description = 'Şəkil Əməliyyatı'
+    change_image_button.allow_tags = True
+
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
@@ -71,6 +85,7 @@ class MehsulAdmin(admin.ModelAdmin):
             path('import-excel-init/', self.import_excel_init, name='import_excel_init'),
             path('import-excel-batch/', self.import_excel_batch, name='import_excel_batch'),
             path('import-excel-finalize/', self.import_excel_finalize, name='import_excel_finalize'),
+            path('change-image/', self.change_image, name='change_image'),
         ]
         return custom_urls + urls
 
@@ -688,6 +703,61 @@ class MehsulAdmin(admin.ModelAdmin):
         extra_context['total_stats'] = total_stats
         
         return super().changelist_view(request, extra_context=extra_context)
+
+    def change_image(self, request):
+        if request.method == 'POST':
+            try:
+                product_id = request.POST.get('product_id')
+                image_file = request.FILES.get('image')
+                
+                if not product_id or not image_file:
+                    return JsonResponse({
+                        'status': 'error',
+                        'message': 'Məhsul ID və ya şəkil faylı tapılmadı.'
+                    })
+                
+                # Validate image file
+                if not image_file.content_type.startswith('image/'):
+                    return JsonResponse({
+                        'status': 'error',
+                        'message': 'Yalnız şəkil faylları qəbul edilir.'
+                    })
+                
+                # Get product and update image
+                product = Mehsul.objects.get(id=product_id)
+                
+                # Delete old image if exists
+                if product.sekil:
+                    old_image_path = product.sekil.path
+                    if os.path.exists(old_image_path):
+                        os.remove(old_image_path)
+                
+                # Save new image
+                product.sekil = image_file
+                product.save()
+                
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'Şəkil uğurla yeniləndi!',
+                    'new_image_url': product.sekil.url,
+                    'product_id': product_id
+                })
+                
+            except Mehsul.DoesNotExist:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Məhsul tapılmadı.'
+                })
+            except Exception as e:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': f'Xəta baş verdi: {str(e)}'
+                })
+        
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Yalnız POST metodu qəbul edilir.'
+        })
 
 class SifarisItemInline(admin.TabularInline):
     model = SifarisItem

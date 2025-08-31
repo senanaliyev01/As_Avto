@@ -548,15 +548,23 @@
             }
         });
 
-        // Image Change Functionality
+                // Image Change Functionality
         function changeProductImage(productId) {
             const fileInput = document.getElementById('imageFileInput');
-            fileInput.onchange = function(e) {
+            
+            // Remove existing event listeners
+            fileInput.removeEventListener('change', handleFileChange);
+            
+            // Add new event listener
+            fileInput.addEventListener('change', handleFileChange);
+            
+            function handleFileChange(e) {
                 const file = e.target.files[0];
                 if (file) {
                     // Validate image file
                     if (!file.type.startsWith('image/')) {
                         alert('Yalnız şəkil faylları qəbul edilir.');
+                        fileInput.value = '';
                         return;
                     }
                     
@@ -573,11 +581,11 @@
                     button.disabled = true;
                     
                     fetch('change-image/', {
-                method: 'POST',
+                        method: 'POST',
                         body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
+                    })
+                    .then(response => response.json())
+                    .then(data => {
                         if (data.status === 'success') {
                             // Update the image in the admin list using the specific ID
                             const imageCell = document.getElementById(`product-image-${productId}`);
@@ -589,7 +597,7 @@
                                 imageCell.style.borderRadius = '4px';
                             }
                             
-                                                        // Update button text
+                            // Update button text
                             button.innerHTML = '<i class="fas fa-check"></i>';
                             setTimeout(() => {
                                 button.innerHTML = originalHTML;
@@ -600,8 +608,8 @@
                             button.innerHTML = originalHTML;
                             button.disabled = false;
                         }
-            })
-                                .catch(error => {
+                    })
+                    .catch(error => {
                         console.error('Error:', error);
                         alert('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
                         button.innerHTML = originalHTML;
@@ -611,7 +619,7 @@
                 
                 // Reset file input
                 fileInput.value = '';
-            };
+            }
             
             // Trigger file selection
             fileInput.click();

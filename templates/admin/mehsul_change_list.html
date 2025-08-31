@@ -363,11 +363,11 @@
 
             async function performBatchImport() {
                 const fileInput = form.querySelector('input[type="file"]');
-                const file = fileInput.files[0];
-                
-                if (!file) {
-                    return;
-                }
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                return;
+            }
 
                 importBtn.disabled = true;
                 importBtn.textContent = 'İdxal edilir...';
@@ -378,13 +378,13 @@
 
                 try {
                     // Step 1: Initialize import
-                    const formData = new FormData();
-                    formData.append('excel_file', file);
+            const formData = new FormData();
+            formData.append('excel_file', file);
                     formData.append('csrfmiddlewaretoken', form.querySelector('[name="csrfmiddlewaretoken"]').value);
 
                     const initResponse = await fetch('import-excel-init/', {
-                        method: 'POST',
-                        body: formData
+                method: 'POST',
+                body: formData
                     });
 
                     const initResult = await initResponse.json();
@@ -563,17 +563,21 @@
                     button.disabled = true;
                     
                     fetch('change-image/', {
-                        method: 'POST',
+                method: 'POST',
                         body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
+            })
+            .then(response => response.json())
+            .then(data => {
                         if (data.status === 'success') {
                             // Update the image in the admin list
                             const productRow = button.closest('tr');
                             const imageCell = productRow.querySelector('img');
                             if (imageCell) {
                                 imageCell.src = data.new_image_url;
+                                imageCell.style.width = '50px';
+                                imageCell.style.height = '50px';
+                                imageCell.style.objectFit = 'cover';
+                                imageCell.style.borderRadius = '4px';
                             }
                             
                             // Update button text
@@ -582,14 +586,14 @@
                                 button.textContent = originalText;
                                 button.disabled = false;
                             }, 2000);
-                        } else {
-                            alert('Xəta: ' + data.message);
+                } else {
+                    alert('Xəta: ' + data.message);
                             button.textContent = originalText;
                             button.disabled = false;
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
                         alert('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
                         button.textContent = originalText;
                         button.disabled = false;

@@ -66,15 +66,15 @@ class MehsulAdmin(admin.ModelAdmin):
     def change_image_button(self, obj):
         if obj.sekil:
             return format_html(
-                '<button type="button" class="change-image-btn" data-product-id="{}" title="Şəkil Dəyiş"><i class="fas fa-image"></i></button>',
+                '<button type="button" class="change-image-btn" data-product-id="{}">Şəkil Dəyiş</button>',
                 obj.id
             )
         else:
             return format_html(
-                '<button type="button" class="change-image-btn" data-product-id="{}" title="Şəkil Əlavə Et"><i class="fas fa-plus"></i></button>',
+                '<button type="button" class="change-image-btn" data-product-id="{}">Şəkil Əlavə Et</button>',
                 obj.id
             )
-    change_image_button.short_description = ''
+    change_image_button.short_description = 'Şəkil Əməliyyatı'
     change_image_button.allow_tags = True
 
     def get_urls(self):
